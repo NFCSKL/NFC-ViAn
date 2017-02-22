@@ -12,8 +12,8 @@ TARGET = ViAn
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+SOURCES += main.cpp \
+    GUI/mainwindow.cpp
 
 HEADERS  += mainwindow.h
 
