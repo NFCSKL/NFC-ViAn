@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>POI</string>
+   <string>ViAn</string>
   </property>
   <property name="windowOpacity">
    <double>1.000000000000000</double>
@@ -80,21 +80,21 @@
           <item>
            <widget class="QPushButton" name="playButton">
             <property name="text">
-             <string/>
+             <string>Play</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pauseButton">
             <property name="text">
-             <string/>
+             <string>Pause</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="stopButton">
             <property name="text">
-             <string/>
+             <string>Stop</string>
             </property>
            </widget>
           </item>
@@ -148,8 +148,11 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>27</height>
+     <height>21</height>
     </rect>
+   </property>
+   <property name="mouseTracking">
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -175,32 +178,12 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionFuck_off"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
@@ -209,20 +192,6 @@
   <action name="actionLoad">
    <property name="text">
     <string>Load</string>
-   </property>
-  </action>
-  <action name="actionFuck_off">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Fuck off</string>
-   </property>
-   <property name="whatsThis">
-    <string/>
    </property>
   </action>
   <action name="actionProject">
