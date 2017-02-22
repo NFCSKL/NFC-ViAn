@@ -16,8 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
      */
     /*QImage image;
     image.load("<searchPath>");
-    ui->screenLabel->setPixmap(QPixmap::fromImage(image));
-    ui->screenLabel->show();*/
+    ui->videoFrame->setPixmap(QPixmap::fromImage(image));
+    ui->videoFrame->show();*/
 
 }
 
