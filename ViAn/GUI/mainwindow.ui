@@ -78,6 +78,19 @@
            <enum>QLayout::SetNoConstraint</enum>
           </property>
           <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Back frame</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="playButton">
             <property name="minimumSize">
              <size>
@@ -87,6 +100,25 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Forward fram</string>
             </property>
            </widget>
           </item>
@@ -119,6 +151,19 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_3">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Bookmark</string>
             </property>
            </widget>
           </item>
@@ -205,6 +250,7 @@
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -216,6 +262,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionOpen_manual"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -245,6 +292,16 @@
   <action name="actionOptions">
    <property name="text">
     <string>Options</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionOpen_manual">
+   <property name="text">
+    <string>Open manual</string>
    </property>
   </action>
  </widget>
