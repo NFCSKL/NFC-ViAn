@@ -3,6 +3,14 @@
 
 #include <QMainWindow>
 #include <QBasicTimer>
+#include "video_player.h"
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/videoio/videoio.hpp"
+#include "opencv2/video/video.hpp"
+#include "opencv2/core/core.hpp"
+using namespace std;
+using namespace cv;
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +31,8 @@ private slots:
     void on_stopButton_clicked();
 
     void on_playButton_clicked();
+
+    void play_video();
 
 private:
 

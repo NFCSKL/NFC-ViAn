@@ -13,8 +13,20 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    GUI/mainwindow.cpp
+    GUI/mainwindow.cpp \
+    video_player.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    video_player.h
 
 FORMS    += mainwindow.ui
+
+win32 {
+    INCLUDEPATH += C:\opencv\release\install\include
+    LIBS += C:\opencv\release\bin\libopencv_core320.dll
+    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
+    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
+    LIBS += C:\opencv\release\bin\libopencv_video320.dll
+    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
+    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
+}
