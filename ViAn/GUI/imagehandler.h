@@ -1,5 +1,10 @@
 #ifndef IMAGEHANDLER_H
 #define IMAGEHANDLER_H
+#define play_video 0
+#define pause_video 1
+#define stop_video 2
+#define next_frame 3
+#define previous_frame 4
 
 #include "ui_mainwindow.h"
 

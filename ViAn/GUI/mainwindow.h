@@ -29,8 +29,8 @@ private slots:
 
 private:
 
-    ImageHandler *imageHandler;
     Ui::MainWindow *ui;
+    ImageHandler *imageHandler;
 };
 
 #endif // MAINWINDOW_H

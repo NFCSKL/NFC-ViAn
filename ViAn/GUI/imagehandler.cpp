@@ -3,17 +3,23 @@
 ImageHandler::ImageHandler(){
     QPixmap playPixmap(":/play.png");
     QIcon playIcon(playPixmap);
-    iconList[0] = playIcon;
+    iconList[play_video] = playIcon;
     QPixmap pausePixmap(":/pause.png");
     QIcon pauseIcon(pausePixmap);
-    iconList[1] = pauseIcon;
+    iconList[pause_video] = pauseIcon;
     QPixmap stopPixmap(":/stop.png");
     QIcon stopIcon(stopPixmap);
-    iconList[2] = stopIcon;
+    iconList[stop_video] = stopIcon;
+    QPixmap nextPixmap(":/next_frame.png");
+    QIcon nextIcon(nextPixmap);
+    iconList[next_frame] = nextIcon;
+    QPixmap previousPixmap(":/previous_frame.png");
+    QIcon previousIcon(previousPixmap);
+    iconList[previous_frame] = previousIcon;
 }
 
 ImageHandler::~ImageHandler(){
-    for (int i = 0; i < sizeof(iconList); i++){
+    for (unsigned int i = 0; i < sizeof(iconList); i++){
         delete &iconList[i];
     }
 }
@@ -21,9 +27,9 @@ ImageHandler::~ImageHandler(){
 void ImageHandler::set_pictures_to_buttons(Ui::MainWindow *ui){
     //QIcon iconList [3];
 
-    ui->playButton->setIcon(iconList[0]);
-
-    ui->pauseButton->setIcon(iconList[1]);
-
-    ui->stopButton->setIcon(iconList[2]);
+    ui->playButton->setIcon(iconList[play_video]);
+    ui->pauseButton->setIcon(iconList[pause_video]);
+    ui->stopButton->setIcon(iconList[stop_video]);
+    ui->nextFrameButton->setIcon(iconList[next_frame]);
+    ui->previousFrameButton->setIcon((iconList[previous_frame]));
 }
