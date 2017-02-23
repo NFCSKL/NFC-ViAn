@@ -58,4 +58,27 @@ void MainWindow::on_stopButton_clicked()
 
 }
 
+void MainWindow::on_videoSlider_valueChanged(int newPos)
+{
+    // Make slider to follow the mouse directly and not by pageStep steps
+    Qt::MouseButtons btns = QApplication::mouseButtons();
+    QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+    bool clickOnSlider = (btns & Qt::LeftButton) &&
+                         (localMousePos.x() >= 0 && localMousePos.y() >= 0 &&
+                          localMousePos.x() < ui->videoSlider->size().width() &&
+                          localMousePos.y() < ui->videoSlider->size().height());
+    if (clickOnSlider)
+    {
+        // Attention! The following works only for Horizontal, Left-to-right sliders
+        float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
+        int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
+        int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
+        if (sliderPosUnderMouse != newPos)
+        {
+            ui->videoSlider->setValue(sliderPosUnderMouse);
+            return;
+        }
+    }
+}
+
 

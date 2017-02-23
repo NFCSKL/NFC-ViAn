@@ -24,6 +24,8 @@ private slots:
 
     void on_playButton_clicked();
 
+    void on_videoSlider_valueChanged(int newPos);
+
 private:
 
     Ui::MainWindow *ui;

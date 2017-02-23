@@ -165,14 +165,15 @@
      <addaction name="actionProject"/>
      <addaction name="actionVideo"/>
     </widget>
-    <addaction name="actionSave"/>
-    <addaction name="actionLoad"/>
     <addaction name="menuAdd"/>
+    <addaction name="actionLoad"/>
+    <addaction name="actionSave"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionOptions"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -202,6 +203,11 @@
   <action name="actionVideo">
    <property name="text">
     <string>Video</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>Options</string>
    </property>
   </action>
  </widget>
