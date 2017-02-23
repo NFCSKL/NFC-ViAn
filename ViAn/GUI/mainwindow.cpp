@@ -10,19 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    QPixmap playPixmap(":/play.png");
-    QIcon playIcon(playPixmap);
-    ui->playButton->setIcon(playIcon);
-
-    QPixmap pausePixmap(":/pause.png");
-    QIcon pauseIcon(pausePixmap);
-    ui->pauseButton->setIcon(pauseIcon);
-
-    QPixmap stopPixmap(":/stop.png");
-    QIcon stopIcon(stopPixmap);
-    ui->stopButton->setIcon(stopIcon);
-
+    imageHandler = new ImageHandler();
+    imageHandler->set_pictures_to_buttons(ui);
 
     /**
      * How to get a picture

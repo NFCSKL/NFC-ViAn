@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QBasicTimer>
+#include "imagehandler.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,6 +29,7 @@ private slots:
 
 private:
 
+    ImageHandler *imageHandler;
     Ui::MainWindow *ui;
 };
 
