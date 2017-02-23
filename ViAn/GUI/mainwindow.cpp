@@ -11,6 +11,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QPixmap playPixmap(":/play.png");
+    QIcon playIcon(playPixmap);
+    ui->playButton->setIcon(playIcon);
+
+    QPixmap pausePixmap(":/pause.png");
+    QIcon pauseIcon(pausePixmap);
+    ui->pauseButton->setIcon(pauseIcon);
+
+    QPixmap stopPixmap(":/stop.png");
+    QIcon stopIcon(stopPixmap);
+    ui->stopButton->setIcon(stopIcon);
+
+
     /**
      * How to get a picture
      */
@@ -58,6 +71,11 @@ void MainWindow::on_stopButton_clicked()
 
 }
 
+/**
+ * @brief MainWindow::on_videoSlider_valueChanged
+ * Update the slider to where the mouse is
+ * @param newPos current position of the slider
+ */
 void MainWindow::on_videoSlider_valueChanged(int newPos)
 {
     // Make slider to follow the mouse directly and not by pageStep steps
