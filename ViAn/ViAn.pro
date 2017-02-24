@@ -12,9 +12,19 @@ TARGET = ViAn
 TEMPLATE = app
 
 
-SOURCES += main.cpp \
-    GUI/mainwindow.cpp
 
-HEADERS  += mainwindow.h
+
+SOURCES += main.cpp \
+    GUI/mainwindow.cpp \
+	Filehandler/project.cpp \
+    Filehandler/main.cpp \
+    Filehandler/stringhelper.cpp \
+    Filehandler/testsuite_filehandler.cpp
+
+HEADERS  += mainwindow.h\
+    Filehandler/filehandler.h \
+    Filehandler/project.h \
+    Filehandler/stringhelper.h \
+    Filehandler/testsuite_filehandler.h
 
 FORMS    += mainwindow.ui
