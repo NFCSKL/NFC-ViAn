@@ -47,23 +47,23 @@ void IconOnButtonHandler::set_pictures_to_buttons(Ui::MainWindow *ui){
 
 /**
  * @brief IconOnButtonHandler::getIcon
- *  if you send in a non valid numer you get an error image
+ *  if you send in a non valid number you get an error image
  * @param iconNumber the number of the icon
- * @return the icon associated with the numer
+ * @return the icon associated with the number
  */
 QIcon IconOnButtonHandler::getIcon(int iconNumber){
-    if(iconNumber < numerOfIcons){
+    if(iconNumber < numberOfIcons){
         return iconList[iconNumber];
     } else return iconList[errorIconNumber];
 }
 /**
  * @brief IconOnButtonHandler::setIcon
- * if you send in a non valid numer you get an error image
+ * if you send in a non valid number you get an error image
  * @param iconNumber
  * @param button
  */
 void IconOnButtonHandler::setIcon(int iconNumber, QPushButton *button){
-     if(iconNumber < numerOfIcons){
+     if(iconNumber < numberOfIcons){
         button->setIcon(iconList[iconNumber]);
      }else button->setIcon(iconList[errorIconNumber]);
 }

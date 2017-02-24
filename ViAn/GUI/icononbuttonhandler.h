@@ -6,7 +6,7 @@
 #define stopIconNumber 3
 #define nextIconNumber 4
 #define previousIconNumber 5
-#define numerOfIcons 6
+#define numberOfIcons 6
 
 #include "ui_mainwindow.h"
 
@@ -19,7 +19,7 @@ public:
     void setIcon(int iconNumber, QPushButton *button);
 
 private slots:
-    QIcon iconList [numerOfIcons];
+    QIcon iconList [numberOfIcons];
 private:
 
 };
