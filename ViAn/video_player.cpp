@@ -16,6 +16,7 @@ video_player::video_player(QObject* parent) : QThread(parent) {
 bool video_player::load_video(string filename) {
     capture.open(filename);
     if (capture.isOpened()) {
+        num_frames = capture.get(CAP_PROP_FRAME_COUNT);
         frame_rate = (int) capture.get(CV_CAP_PROP_FPS);
         video_paused = false;
         start();
@@ -40,6 +41,9 @@ void video_player::run() {
         if (video_paused) {
             condition.wait(&mutex);
         }
+
+        emit currentFrame(capture.get(CAP_PROP_POS_FRAMES));
+
         if (!capture.read(frame)) {
             stop = true;
         }
@@ -70,5 +74,9 @@ Mat video_player::play_frame(VideoCapture source_video) {
 
 bool video_player::is_paused() {
     return video_paused;
+}
+
+int video_player::get_num_frames() {
+    return num_frames;
 }
 
