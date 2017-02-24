@@ -32,11 +32,12 @@ private slots:
 
     void on_playButton_clicked();
 
-    void play_video();
+    void update_video(QImage frame);
 
 private:
 
     Ui::MainWindow *ui;
+    video_player* mvideo_player;
 };
 
 #endif // MAINWINDOW_H
