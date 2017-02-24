@@ -9,16 +9,20 @@
 #define numberOfIcons 6
 
 #include "ui_mainwindow.h"
+#include <string>
 
 class IconOnButtonHandler{
 public:
     explicit IconOnButtonHandler();
     ~IconOnButtonHandler();
     void set_pictures_to_buttons(Ui::MainWindow *ui);
-    QIcon getIcon(int iconNumber);
-    void setIcon(int iconNumber, QPushButton *button);
+    QIcon getIcon(std::string icon);
+    void setIcon(std::string icon, QPushButton *button);
+    std::map <std::string, QIcon> iconMap;
+
 
 private slots:
+
     QIcon iconList [numberOfIcons];
 private:
 

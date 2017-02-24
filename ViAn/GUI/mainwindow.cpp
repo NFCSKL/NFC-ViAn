@@ -35,11 +35,13 @@ MainWindow::~MainWindow()
 
 /**
  * @brief MainWindow::on_playButton_clicked
- * The leftmost button supposed to play the video
+ * The button supposed to play the video
  */
 void MainWindow::on_playButton_clicked()
 {
-
+    //ui->playButton->setIcon("paused");
+    //IconOnButtonHandler::setIcon("paused", );
+    //ui->playButton->setIcon(iconList[playIconNumber]);
 }
 
 /**
