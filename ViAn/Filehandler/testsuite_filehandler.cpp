@@ -1,22 +1,22 @@
 #include "testsuite_filehandler.h"
 
 int runTestSuite(){
-    int a,b,c;
-    a = 0;
-    b = 0;
-    c = 0;
+    int dirTest,fileTest,projectTest;
+    dirTest = 0;
+    fileTest = 0;
+    projectTest = 0;
     FileHandler* fileHandler = new FileHandler();
     std::string dirpath = "C:/Programmering";
     Project* proj  = fileHandler->createProject("POI_PROJ");
-    a = directoryTest(fileHandler, proj);
-    b = fileTest(fileHandler, proj);
-    c  = projectHandlingTest(fileHandler, proj);
+    dirTest = directoryTest(fileHandler, proj);
+    fileTest = fileTest(fileHandler, proj);
+    projectTest  = projectHandlingTest(fileHandler, proj);
 
     if(VAR_VALUES)
-        std::cout << "dirtest: " << (a != 0) <<std::endl<<
+        std::cout << "dirtest: " << (dirTest != 0) <<std::endl<<
         "\nfiletest: " << (b != 0) << "\nprojecttest: " << c << std::endl;
 
-    return a+b+c!=0;
+    return dirTest+fileTest+projectTest!=0;
 }
 
 int projectHandlingTest(FileHandler* fileHandler, Project* proj){
@@ -79,7 +79,7 @@ int fileTest(FileHandler* fileHandler,Project* proj){
     fileHandler->readFile(fileID,1, readText);
     d = (readText != filename);
     //delete file and check if it is not there
-   //  e = fileHandler->deleteFile(fileID);
+    //  e = fileHandler->deleteFile(fileID);
     // f = (fileHandler->deleteFile(fileID)== 0);
 
     fileHandler->deleteDirectory(dirpath);

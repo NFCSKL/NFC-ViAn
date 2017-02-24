@@ -5,8 +5,9 @@ FileHandler::FileHandler()
     this->m_pid = 0;
 
 }
-
-////create a new project given a working directot
+//
+// create a new project given a working directot
+//
 Project* FileHandler::createProject(std::string projName){
     Project* proj =  new Project(this->m_pid, projName);
     this->m_projects.insert(std::make_pair(proj->m_id, proj));
@@ -17,12 +18,11 @@ Project* FileHandler::createProject(std::string projName){
 //Read from project file and build Project object
 
 void FileHandler::saveProject(Project* proj){
-    std::string fileName = proj->m_name + std::string(".txt");
-    ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);
+    std::string fileName = proj->m_name + std::string(".txt"); //filename
+    ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
     //TODO : extend seperation of created and existing.
-    // directory created
-    proj->m_dir = dirID;
-    proj->m_file = createFile(fileName, dirID);
+    proj->m_dir = dirID; 
+    proj->m_file = createFile(fileName, dirID); //create project file
     //write project info to file
     std::string projstr = "";
     projstr += "Name:"+proj->m_name + "\n";
@@ -34,7 +34,9 @@ void FileHandler::saveProject(Project* proj){
 
 
 }
-
+//
+//  Delete project and associated files
+//
 int FileHandler::deleteProject(Project* proj){
     createDirectory(this->m_dirMap.at(proj->m_dir));
     if (GetLastError() == ERROR_ALREADY_EXISTS){
@@ -46,6 +48,9 @@ int FileHandler::deleteProject(Project* proj){
         return -1;
     }
 }
+// 
+//  Add video to project
+// 
 void FileHandler::addVideo(Project* proj, std::string filePath){
     Video v (this->m_fid);
     proj->addVideo(v);
@@ -56,27 +61,10 @@ Project* FileHandler::loadProject(std::string filePath){
     Project* proj;
     std::ifstream f(filePath);
     std::string content = "";
-    std::string line = "";
-    std::getline(f,line);
-    //proj = createProject(line.substr(0, line.find(":")));
-    while(std::getline(f,line))
-    {
-        extract_proj_obj(line);
-    }
+    std::string line = "";    
+    proj = createProject(line.substr(0, line.find(":")));
+    while(proj << f); //pretty magic, see << definition in proj.cpp
 }
-
- void FileHandler::extract_proj_obj(std::string line){
-
-    char c = line[0];
-    if(c == 'V') // Analysis
-        line.substr(0, line.find(":"));
-    if(c == 'A')
-        line.substr(0, line.find(":"));
-    if(c == 'D')
-        line.substr(0, line.find(":"));
-
- }
-
  ID FileHandler::createDirectory(std::string dirpath){
      CreateDirectory(s2ws(dirpath).c_str(),NULL);
      this->m_dirMap.insert(std::make_pair(this->m_did, dirpath));
@@ -91,7 +79,6 @@ Project* FileHandler::loadProject(std::string filePath){
      std::ofstream f;
      std::string filePath = this->m_dirMap.at(dirID)+"/"+filename;
      f.open(filePath.c_str());
-     f.close();
      this->m_fileMap.insert(std::make_pair(this->m_fid, filePath));
      return this->m_fid++;
   }
@@ -102,12 +89,9 @@ Project* FileHandler::loadProject(std::string filePath){
  }
 
  void FileHandler::writeFile(ID id, std::string text){
-
     std::string fileName = this->getFile(id);
     std::ofstream f (fileName.c_str(),std::ios::in);
-    std::cout << "file to write to: "<< fileName.c_str() <<std::endl<< "texttowrite\n"<<text;
     f << text.c_str();
-    f.close();
  }
 
  void FileHandler::readFile(ID id, size_t linesToRead, std::string& buf){
