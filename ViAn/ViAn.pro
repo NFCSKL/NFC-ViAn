@@ -14,10 +14,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     GUI/mainwindow.cpp \
-    GUI/imagehandler.cpp
+    GUI/icononbuttonhandler.cpp
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/imagehandler.h
+    GUI/icononbuttonhandler.h
 
 FORMS    += GUI/mainwindow.ui
 

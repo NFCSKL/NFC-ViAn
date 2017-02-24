@@ -10,8 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    imageHandler = new ImageHandler();
-    imageHandler->set_pictures_to_buttons(ui);
+    iconOnButtonHandler = new IconOnButtonHandler();
+    iconOnButtonHandler->set_pictures_to_buttons(ui);
 
     /**
      * How to get a picture
@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
  */
 MainWindow::~MainWindow()
 {
+    delete iconOnButtonHandler;
     delete ui;
 }
 
@@ -43,7 +44,7 @@ void MainWindow::on_playButton_clicked()
 
 /**
  * @brief MainWindow::on_pauseButton_clicked
- * The middle button supposed to pause the video
+ * The button supposed to pause the video
  */
 void MainWindow::on_pauseButton_clicked()
 {
@@ -53,7 +54,7 @@ void MainWindow::on_pauseButton_clicked()
 
 /**
  * @brief MainWindow::on_stopButton_clicked
- * The rightmost button supposed to stop the video
+ * The button supposed to stop the video
  */
 void MainWindow::on_stopButton_clicked()
 {
