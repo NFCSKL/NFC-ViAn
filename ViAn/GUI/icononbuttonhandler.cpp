@@ -3,61 +3,45 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 /**
  * @brief IconOnButtonHandler::IconOnButtonHandler
  * Constructor
  */
 
 IconOnButtonHandler::IconOnButtonHandler(){
-    try{
-        QPixmap errorPixmap(":/error.png");
-        QIcon errorIcon(errorPixmap);
-        iconMap["error"] = errorIcon;
-        //iconList[errorIconNumber] = errorIcon;
+    QPixmap errorPixmap(":/error.png");
+    QPixmap playPixmap(":/play.png");
+    QPixmap pausePixmap(":/pause.png");
+    QPixmap stopPixmap(":/stop.png");
+    QPixmap nextPixmap(":/next_frame.png");
+    QPixmap previousPixmap(":/previous_frame.png");
 
-        QPixmap playPixmap(":/play.png");
-        QIcon playIcon(playPixmap);
-        iconMap["play"] = playIcon;
-        //iconList[playIconNumber] = playIcon;
-
-        QPixmap pausePixmap(":/pause.png");
-        QIcon pauseIcon(pausePixmap);
-        iconMap["pause"] = pauseIcon;
-        //iconList[pauseIconNumber] = pauseIcon;
-
-        QPixmap stopPixmap(":/stop.png");
-        QIcon stopIcon(stopPixmap);
-        iconMap["stop"] = stopIcon;
-        //iconList[stopIconNumber] = stopIcon;
-
-        QPixmap nextPixmap(":/next_frame.png");
-        QIcon nextIcon(nextPixmap);
-        iconMap["next"] = nextIcon;
-        //iconList[nextIconNumber] = nextIcon;
-
-        QPixmap previousPixmap(":/previous_frame.png");
-        QIcon previousIcon(previousPixmap);
-        iconMap["previous"] = previousIcon;
-        //iconList[previousIconNumber] = previousIcon;
-
-        /*QPixmap ePixmap(":/stopp.png");
-        QIcon eIcon(ePixmap);
-        iconMap["e"] = eIcon;*/
-        //iconList[2] = eIcon;
-
-    }catch (const std::out_of_range& e){
+    if (errorPixmap.isNull() || playPixmap.isNull() || pausePixmap.isNull()
+            || stopPixmap.isNull() || nextPixmap.isNull() || previousPixmap.isNull()){
         QMessageBox messageBox;
-        messageBox.critical(0,"Error","List out of range!");
+        messageBox.critical(0,"Error","Couldn't find one or more images!");
         messageBox.setFixedSize(500,200);
-    }catch (const std::runtime_error& e){
-        QMessageBox messageBox;
-        messageBox.critical(0,"Error","U suk!");
-        messageBox.setFixedSize(500,200);
-    }catch (const std::exception& e){
-        std::cerr << "Caught exception \"" << e.what() << "\"\n";
-    }catch (...){
-        std::cerr << "ERRORSSS";
     }
+
+    QIcon errorIcon(errorPixmap);
+    iconMap["error"] = errorIcon;
+
+    QIcon playIcon(playPixmap);
+    iconMap["play"] = playIcon;
+
+    QIcon pauseIcon(pausePixmap);
+    iconMap["pause"] = pauseIcon;
+
+    QIcon stopIcon(stopPixmap);
+    iconMap["stop"] = stopIcon;
+
+    QIcon nextIcon(nextPixmap);
+    iconMap["next"] = nextIcon;
+
+    QIcon previousIcon(previousPixmap);
+    iconMap["previous"] = previousIcon;
 }
 
 /**
@@ -67,6 +51,7 @@ IconOnButtonHandler::IconOnButtonHandler(){
 IconOnButtonHandler::~IconOnButtonHandler(){
 
 }
+
 /**
  * @brief IconOnButtonHandler::set_pictures_to_buttons
  * adds icons to all the buttons.
@@ -86,7 +71,7 @@ void IconOnButtonHandler::set_pictures_to_buttons(Ui::MainWindow *ui){
  * @param iconNumber the number of the icon
  * @return the icon associated with the number
  */
-QIcon IconOnButtonHandler::getIcon(std::string icon){
+QIcon IconOnButtonHandler::getIcon(string icon){
     if(iconMap.find(icon) == iconMap.end()){
         return iconMap["error"];
     }else{
@@ -99,7 +84,7 @@ QIcon IconOnButtonHandler::getIcon(std::string icon){
  * @param iconNumber
  * @param button
  */
-void IconOnButtonHandler::setIcon(std::string icon, QPushButton *button){
+void IconOnButtonHandler::setIcon(string icon, QPushButton *button){
     if(iconMap.find(icon) == iconMap.end()){
         button->setIcon(iconMap["error"]);
     }else{

@@ -39,9 +39,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::on_playButton_clicked()
 {
-    //ui->playButton->setIcon("paused");
-    //IconOnButtonHandler::setIcon("paused", );
-    //ui->playButton->setIcon(iconList[playIconNumber]);
+    iconOnButtonHandler->setIcon("pause", ui->playButton);
 }
 
 /**
@@ -60,7 +58,7 @@ void MainWindow::on_pauseButton_clicked()
  */
 void MainWindow::on_stopButton_clicked()
 {
-
+    iconOnButtonHandler->setIcon("play", ui->playButton);
 }
 
 /**
