@@ -1,4 +1,8 @@
 #include "stringhelper.h"
+
+//
+// Turn string into wide string
+//
 std::wstring s2ws(const std::string& str)
 {
     int len;
