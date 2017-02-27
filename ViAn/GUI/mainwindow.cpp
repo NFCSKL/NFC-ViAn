@@ -45,10 +45,12 @@ MainWindow::~MainWindow() {
 void MainWindow::on_playButton_clicked() {
 
     if (mvideo_player->is_paused()) {
-        mvideo_player->play();
+        mvideo_player->start();
     } else {
         mvideo_player->pause();
+        mvideo_player->wait();
     }
+
 
 }
 
@@ -58,6 +60,7 @@ void MainWindow::on_playButton_clicked() {
  */
 void MainWindow::on_pauseButton_clicked() {
     mvideo_player->load_video("seq_01.mp4");
+    //mvideo_player->load_video("mf.mkv");
 }
 
 

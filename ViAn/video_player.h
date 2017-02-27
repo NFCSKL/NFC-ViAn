@@ -27,9 +27,10 @@ public:
 signals:
     void processedImage(const QImage &image);
 protected:
-    void run();
+    void run() override;
     void msleep(int ms);
 private:
+    unsigned int current_frame = 0;
     VideoCapture capture;
     double frame_rate;
     double speed_multiplier = 1.0;
@@ -37,7 +38,6 @@ private:
     Mat frame;
     Mat RGBframe;
     QImage img;
-    QMutex mutex;
     QWaitCondition condition;
     bool video_paused;
 };
