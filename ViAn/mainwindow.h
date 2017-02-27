@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QBasicTimer>
+#include <QSlider>
 #include "video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -33,11 +34,14 @@ private slots:
     void on_playButton_clicked();
 
     void update_video(QImage frame);
+    void set_video_slider_pos(int pos);
 
 private:
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
+
+    QSlider *video_slider;
 };
 
 #endif // MAINWINDOW_H

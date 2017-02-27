@@ -17,6 +17,7 @@ bool video_player::load_video(string filename) {
     capture.open(filename);
     if (capture.isOpened()) {
         frame_rate = capture.get(CV_CAP_PROP_FPS);
+        num_frames = capture.get(CAP_PROP_FRAME_COUNT);
         video_paused = false;
         start();
         return true;
@@ -43,6 +44,7 @@ void video_player::run()  {
     video_paused = false;
     stop = false;
     int delay = (1000/frame_rate);
+
     cout << "Current frame rate: " << frame_rate << ", actual frame rate: " << capture.get(CV_CAP_PROP_FPS) << endl;
 
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
@@ -52,6 +54,7 @@ void video_player::run()  {
 
     //Runs the video as long as it is not paused, stopped or ended.
     while(!stop && !video_paused && capture.read(frame)){
+
 
         if (frame.channels()== 3) {
             cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
@@ -63,6 +66,7 @@ void video_player::run()  {
         }
 
         emit processedImage(img);
+        emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
         this->msleep(delay);
 
     }
@@ -89,5 +93,9 @@ Mat video_player::play_frame(VideoCapture source_video) {
 //Returns a boolean value representing whether the currently played video is paused.
 bool video_player::is_paused() {
     return video_paused;
+}
+
+int video_player::get_num_frames() {
+    return num_frames;
 }
 

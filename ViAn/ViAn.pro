@@ -30,3 +30,13 @@ win32 {
     LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
     LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
 }
+
+unix {
+    INCLUDEPATH += -L/usr/include/opencv2
+    LIBS += -lopencv_core
+    LIBS += -lopencv_imgproc
+    LIBS += -lopencv_imgcodecs
+    LIBS += -lopencv_video
+    LIBS += -lopencv_videoio
+    LIBS += -lopencv_highgui
+}

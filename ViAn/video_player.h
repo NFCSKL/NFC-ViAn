@@ -24,8 +24,10 @@ public:
     void play();
     void pause();
     bool is_paused();
+    int get_num_frames();
 signals:
     void processedImage(const QImage &image);
+    void currentFrame(const int frame);
 protected:
     void run() override;
     void msleep(int ms);
@@ -40,6 +42,7 @@ private:
     QImage img;
     QWaitCondition condition;
     bool video_paused;
+    int num_frames;
 };
 
 #endif // VIDEO_PLAYER_H
