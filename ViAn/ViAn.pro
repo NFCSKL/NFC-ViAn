@@ -25,7 +25,7 @@ HEADERS  +=\ mainwindow.h\
             Filehandler/stringhelper.h \
             Filehandler/testsuite_filehandler.h
 
+
+
 FORMS    += mainwindow.ui
 
-SOURCES +=\
-   
