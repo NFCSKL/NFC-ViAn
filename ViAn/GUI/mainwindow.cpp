@@ -39,7 +39,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::on_playButton_clicked()
 {
-    iconOnButtonHandler->setIcon("pause", ui->playButton);
+    iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
 }
 
 /**
@@ -58,7 +58,7 @@ void MainWindow::on_pauseButton_clicked()
  */
 void MainWindow::on_stopButton_clicked()
 {
-    iconOnButtonHandler->setIcon("play", ui->playButton);
+    iconOnButtonHandler->setIcon("play", ui->playButton);//changes the icon on the play button to a play-icon
 }
 
 /**

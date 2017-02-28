@@ -65,19 +65,7 @@ void IconOnButtonHandler::set_pictures_to_buttons(Ui::MainWindow *ui){
     ui->previousFrameButton->setIcon(iconMap["previous"]);
 }
 
-/**
- * @brief IconOnButtonHandler::getIcon
- *  if you send in a non valid number you get an error image
- * @param iconNumber the number of the icon
- * @return the icon associated with the number
- */
-QIcon IconOnButtonHandler::getIcon(string icon){
-    if(iconMap.find(icon) == iconMap.end()){
-        return iconMap["error"];
-    }else{
-        return iconMap[icon];
-    }
-}
+
 /**
  * @brief IconOnButtonHandler::setIcon
  * if you send in a non valid number you get an error image

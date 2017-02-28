@@ -11,7 +11,6 @@ public:
     explicit IconOnButtonHandler();
     ~IconOnButtonHandler();
     void set_pictures_to_buttons(Ui::MainWindow *ui);
-    QIcon getIcon(string icon);
     void setIcon(string icon, QPushButton *button);
 
 
