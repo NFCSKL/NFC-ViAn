@@ -42,7 +42,7 @@ FH_ERROR FileHandler::deleteDirectory(std::string dirpath){
  */
 void FileHandler::saveProject(Project* proj){
     std::string fileName = proj->m_name + std::string(".txt"); //filename
-    ID dirID = createDirectory(std::string(WORKSPACE) + proj->m_name);//project directory
+    ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
     proj->m_dir = dirID;
     proj->m_file = createFile(fileName, dirID); //create project file
 

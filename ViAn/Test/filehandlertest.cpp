@@ -43,7 +43,7 @@ void FileHandlerTest::projectHandlingTest(){
     fh->saveProject(proj);
     //check file contents
     fh->loadProject(fh->getDir(proj->m_dir));
-    //check project contents
+    //check project contentss
 }
 //
 // Test that creation and deletion of directories are working correctly.
