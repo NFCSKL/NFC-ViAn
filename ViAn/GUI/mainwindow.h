@@ -28,6 +28,10 @@ private slots:
 
     void on_videoSlider_valueChanged(int newPos);
 
+    void on_actionExit_triggered();
+
+    void setShortcuts();
+
 private:
 
     Ui::MainWindow *ui;
