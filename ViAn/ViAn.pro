@@ -13,8 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    GUI/mainwindow.cpp
+    GUI/mainwindow.cpp \
+    GUI/icononbuttonhandler.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += GUI/mainwindow.h \
+    GUI/icononbuttonhandler.h
 
-FORMS    += mainwindow.ui
+FORMS    += GUI/mainwindow.ui
+
+RESOURCES += \
+    resources.qrc
