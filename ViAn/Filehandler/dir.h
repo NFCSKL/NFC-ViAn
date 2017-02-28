@@ -2,11 +2,11 @@
 #define DIR_H
 
 #include <string>
-
+#include <iostream>
 #ifdef _WIN32  //OS
     #include <windows.h>
     #include "stringhelper.h"
-#elif __APPLE__
+#elif __APPLE__   
     #include <sys/stat.h>
     #include <sys/types.h>
     #include <unistd.h>

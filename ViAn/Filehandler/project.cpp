@@ -9,7 +9,11 @@ Project::Project(ID id, std::string name)
     this->m_dir = -1;
 
 }
-//should we add Project
+/**
+* @brief Project::addVideo
+* @param vid
+* add given video to project
+*/
 void Project::addVideo(Video vid)
 {
     this->m_videos.push_back(vid);

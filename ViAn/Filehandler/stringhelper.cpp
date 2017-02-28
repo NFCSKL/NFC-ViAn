@@ -2,7 +2,8 @@
 
 //
 // Turn string into wide string
-//
+// source : http://codereview.stackexchange.com/questions/419/converting-between-stdwstring-and-stdstring
+// date 28/02/2017
 std::wstring s2ws(const std::string& str)
 {
     int len;

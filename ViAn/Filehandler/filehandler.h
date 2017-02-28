@@ -15,23 +15,14 @@
 #include "project.h"
 #include "dir.h"
 
-#define WORKSPACE "C:/Programmering"
+#ifdef _WIN32
+    #define WORKSPACE "C:/"
+#elif __APPLE__
+    #define WORKSPACE "/"
+#endif
 typedef int FH_ERROR;
 typedef int ID;
 struct Project; // fix for include issue
-struct VideoProj
-{
-    //struct VideoFile file;
-    //std::vector<Analysis> analyses;
-};
-
-
-struct Bookmark
-{
-    double timeStamp; //in seconds
-    double frame;   //what frame is saved
-};
-
 class FileHandler
 {
 public:

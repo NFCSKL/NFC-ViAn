@@ -6,15 +6,12 @@
 #include <iostream>
 #include <fstream>
 #include "filehandler.h"
-typedef int Analysis;
-typedef int ID;
-typedef size_t Drawing;
 
+typedef int ID;
 struct Video{
     ID id;
     std::string filepath;
-    std::vector<Analysis> analyses;
-    std::vector<Drawing> drawings;   
+
     Video(ID id, std::string filepath){
         this->id = id;
         this->filepath = filepath;

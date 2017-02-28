@@ -1,5 +1,8 @@
 #include "dir.h"
 
+/*
+ * Not tested, dont have linux system
+ */
 
 /**
  * @todo make threadsafe
@@ -8,8 +11,9 @@
  * OBS! Only compatible with unix based systems
  * @param std::string
  */
-int makeDir(std::string dirpath){
+int makeDir(std::string dirpath){    
     return mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
 }
 /**
  * @todo make threadsafe
