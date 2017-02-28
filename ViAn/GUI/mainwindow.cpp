@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
+#include <iostream>
 /**
  * @brief MainWindow::MainWindow
  * Constructor
@@ -14,14 +15,9 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
+
     setShortcuts();
-    /**
-     * How to get a picture
-     */
-    /*QImage image;
-    image.load("<searchPath>");
-    ui->videoFrame->setPixmap(QPixmap::fromImage(image));
-    ui->videoFrame->show();*/
+    playing = false;
 
 }
 
@@ -40,22 +36,31 @@ void MainWindow::setShortcuts(){
 }
 
 /**
- * @brief MainWindow::on_playButton_clicked
- * The button supposed to play the video
+ * @brief MainWindow::setStatusBar
+ * @param status text to show in the statusbar
+ * @param timer time to show it in the bar in ms, 750ms is standard
  */
-void MainWindow::on_playButton_clicked()
-{
-    iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
+void MainWindow::setStatusBar(string status, int timer = 750){
+    ui->statusBar->showMessage(QString::fromStdString(status), timer);
 }
 
 /**
- * @brief MainWindow::on_pauseButton_clicked
- * The button supposed to pause the video
+ * @brief MainWindow::on_playButton_clicked
+ * The button supposed to play and pause the video
  */
-void MainWindow::on_pauseButton_clicked()
+void MainWindow::on_playPauseButton_clicked()
 {
-
+    if(playing){
+        playing = false;
+        setStatusBar("paused");
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
+    } else {
+        setStatusBar("playing");
+        playing = true;
+        iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+    }
 }
+
 
 
 /**
@@ -64,7 +69,11 @@ void MainWindow::on_pauseButton_clicked()
  */
 void MainWindow::on_stopButton_clicked()
 {
-    iconOnButtonHandler->setIcon("play", ui->playButton);//changes the icon on the play button to a play-icon
+    if(playing){
+        playing = false;
+        setStatusBar("stopped");
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
+    }
 }
 
 /**
@@ -94,7 +103,6 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
         }
     }
 }
-
 
 
 void MainWindow::on_actionExit_triggered()
