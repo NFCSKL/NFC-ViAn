@@ -2,7 +2,7 @@
 #include "Test/test_video_player.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
-#include "Filehandler/filehandler_testsuite.h"
+#include "Test/filehandlertest.h"
 /**
  * @brief qMain
  * Constructor
