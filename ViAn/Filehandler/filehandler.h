@@ -4,18 +4,15 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <conio.h>
 #include <mutex>
 #include "project.h"
-#include "stringhelper.h"
 #define WINDOWS 1
 #define UNIX 2
-//#ifdef _WIN32
+#ifdef _WIN32
     #include <windows.h>
     #include "win32dir.h"
     #include "stringhelper.h"
-
-//#endif
+#endif
 
 
 #define WORKSPACE "C:/Programmering"

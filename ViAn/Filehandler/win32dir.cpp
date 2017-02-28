@@ -1,7 +1,7 @@
 #include "win32dir.h"
 /**
  * @todo make threadsafe
- * @brief FileHandler::createDirectory
+ * @brief createDirectory
  * create a directory from given path.
  * OBS! Only compatible with windows systems
  * @param std::string
@@ -12,7 +12,7 @@ int makeDir(std::string dirpath){
 }
 /**
  * @todo make threadsafe
- * @brief FileHandler::deleteDirectory
+ * @brief removeDir
  * @param std::string
  * Delete a direcetory from given path, will not delete
  * non empty directories.

@@ -17,13 +17,25 @@ SOURCES += main.cpp \
     GUI/mainwindow.cpp \
     Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
-    Filehandler/testsuite_filehandler.cpp
+    Filehandler/testsuite_filehandler.cpp \
+
 
 win32{
 
 SOURCES += Filehandler/stringhelper.cpp\
     Filehandler/win32dir.cpp
+
+
+HEADERS += Filehandler/stringhelper.h\
+    Filehandler/win32dir.h
 }
+
+macx|unix {
+SOURCES += Filehandler/unixdir.cpp
+
+HEADERS += Filehandler/unixdir.h
+}
+
 
 HEADERS  += mainwindow.h\
     Filehandler/filehandler.h \
@@ -31,11 +43,6 @@ HEADERS  += mainwindow.h\
     Filehandler/testsuite_filehandler.h \
 
 
-win32{
-
-HEADERS += Filehandler/stringhelper.h\
-    Filehandler/win32dir.h
-}
 
 
 FORMS    += mainwindow.ui
