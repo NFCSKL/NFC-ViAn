@@ -10,10 +10,10 @@
 #define UNIX 2
 #ifdef _WIN32
     #include <windows.h>
-    #include "win32dir.h"
     #include "stringhelper.h"
+#elif __APPLE__
 #endif
-
+#include "dir.h"
 
 #define WORKSPACE "C:/Programmering"
 typedef int FH_ERROR;

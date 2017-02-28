@@ -1,4 +1,4 @@
-#include "unixdir.h"
+#include "dir.h"
 
 
 /**
@@ -9,12 +9,7 @@
  * @param std::string
  */
 int makeDir(std::string dirpath){
-    const int dir_err = mkdir(dirpath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    if (-1 == dir_err)
-    {
-        printf("Error creating directory!n");
-        exit(1);
-    }
+    return mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 /**
  * @todo make threadsafe
@@ -25,5 +20,5 @@ int makeDir(std::string dirpath){
  * OBS! Only compatible with windows systems.
  */
 int removeDir(std::string dirpath){
-
+    return rmdir(dirpath.c_str());
 }

@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <iostream>
 #include <fstream>
-#include "stringhelper.h"
 #include "filehandler.h"
 typedef int Analysis;
 typedef int ID;

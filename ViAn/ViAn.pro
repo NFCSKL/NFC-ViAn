@@ -19,7 +19,6 @@ SOURCES += main.cpp \
     Filehandler/project.cpp \
     Filehandler/testsuite_filehandler.cpp \
 
-
 win32{
 
 SOURCES += Filehandler/stringhelper.cpp\
@@ -30,8 +29,8 @@ HEADERS += Filehandler/stringhelper.h\
     Filehandler/win32dir.h
 }
 
-macx|unix {
-SOURCES += Filehandler/unixdir.cpp
+macx|linux {
+SOURCES +=     Filehandler/linux_mac_dir.cpp
 
 HEADERS += Filehandler/unixdir.h
 }
@@ -41,6 +40,7 @@ HEADERS  += mainwindow.h\
     Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/testsuite_filehandler.h \
+    Filehandler/dir.h
 
 
 
