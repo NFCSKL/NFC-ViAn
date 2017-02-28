@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QMessageBox>
 /**
  * @brief MainWindow::MainWindow
  * Constructor
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
+    setShortcuts();
     /**
      * How to get a picture
      */
@@ -31,6 +33,10 @@ MainWindow::~MainWindow()
 {
     delete iconOnButtonHandler;
     delete ui;
+}
+
+void MainWindow::setShortcuts(){
+    ui->actionExit->setShortcut(tr("Ctrl+e"));
 }
 
 /**
@@ -90,3 +96,27 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
 }
 
 
+
+void MainWindow::on_actionExit_triggered()
+{
+    QMessageBox exitBox;
+    exitBox.setWindowTitle("Exit?");
+    exitBox.setText("Do you really wanna exit?");
+    exitBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    exitBox.setDefaultButton(QMessageBox::No);
+    int ret = exitBox.exec();
+    //exitBox.setFixedSize(500,200);
+
+    switch(ret){
+    case QMessageBox::Yes:
+        //Yes was clicked
+        QCoreApplication::quit();
+        break;
+    case QMessageBox::No:
+        //No was clicked
+        break;
+    default:
+        //Should never be reached
+        break;
+    }
+}
