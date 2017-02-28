@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <iostream>
+#include <QCloseEvent>
 /**
  * @brief MainWindow::MainWindow
  * Constructor
@@ -52,10 +53,10 @@ void MainWindow::on_playPauseButton_clicked()
 {
     if(playing){
         playing = false;
-        setStatusBar("paused");
+        setStatusBar("Paused");
         iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
     } else {
-        setStatusBar("playing");
+        setStatusBar("Playing");
         playing = true;
         iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
     }
@@ -71,7 +72,7 @@ void MainWindow::on_stopButton_clicked()
 {
     if(playing){
         playing = false;
-        setStatusBar("stopped");
+        setStatusBar("Stopped");
         iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
     }
 }
@@ -103,28 +104,22 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
         }
     }
 }
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
+                                                                tr("Are you sure?\n"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::No);
 
+    //exitBox.question(this, "Exit", tr("Are you sure?\n"), QMessageBox::Yes | QMessageBox::No);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+    } else {
+        event->accept();
+    }
+}
 
 void MainWindow::on_actionExit_triggered()
 {
-    QMessageBox exitBox;
-    exitBox.setWindowTitle("Exit?");
-    exitBox.setText("Do you really wanna exit?");
-    exitBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    exitBox.setDefaultButton(QMessageBox::No);
-    int ret = exitBox.exec();
-    //exitBox.setFixedSize(500,200);
-
-    switch(ret){
-    case QMessageBox::Yes:
-        //Yes was clicked
-        QCoreApplication::quit();
-        break;
-    case QMessageBox::No:
-        //No was clicked
-        break;
-    default:
-        //Should never be reached
-        break;
-    }
+    this->close();
 }

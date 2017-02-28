@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QBasicTimer>
 #include <string>
+#include <QCloseEvent>
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
 
@@ -31,6 +32,8 @@ private slots:
     void on_actionExit_triggered();
 
     void setShortcuts();
+
+    void closeEvent (QCloseEvent *event);
 
 private:
 
