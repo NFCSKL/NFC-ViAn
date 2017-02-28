@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(mvideo_player, SIGNAL(currentFrame(int)),
                                   this, SLOT(set_video_slider_pos(int)));
 
+    //Used for rescaling the source image for video playback
+    mvideo_player->set_frame_height(ui->videoFrame->height());
+    mvideo_player->set_frame_width(ui->videoFrame->width());
 }
 
 /**
@@ -65,6 +68,8 @@ void MainWindow::on_playButton_clicked() {
 void MainWindow::on_pauseButton_clicked() {
     mvideo_player->load_video("seq_01.mp4");
     //mvideo_player->load_video("mf.mkv");
+    //mvideo_player->load_video("eng.mov");
+    //mvideo_player->load_video("Makefile");
 
     video_slider->setMaximum(mvideo_player->get_num_frames());
     cout << mvideo_player->get_num_frames() << endl;
@@ -79,14 +84,28 @@ void MainWindow::on_stopButton_clicked() {
 }
 
 void MainWindow::update_video(QImage frame) {
+    using namespace std::chrono;
+    milliseconds new_ms = duration_cast< milliseconds >(
+        system_clock::now().time_since_epoch()
+    );
+    //cout << "QImage arrives at mainwindow: " << (new_ms - mvideo_player->ms).count() << endl;
+
     ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
-    ui->videoFrame->show();
 }
 
 void MainWindow::set_video_slider_pos(int pos) {
     if (pos <= video_slider->maximum()) {
         video_slider->setSliderPosition(pos);
     }
+}
+
+//Used for rescaling the source image for video playback
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+   QMainWindow::resizeEvent(event);
+   mvideo_player->set_frame_height(ui->videoFrame->height());
+   mvideo_player->set_frame_width(ui->videoFrame->width());
+
 }
 
 

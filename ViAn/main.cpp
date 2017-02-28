@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "video_player.h"
+#include "test_video_player.h"
 #include <QApplication>
 
 /**
@@ -14,5 +15,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
+
+    test_video_player* test = new test_video_player();
+    QTest::qExec(test) ;
     return a.exec();
 }

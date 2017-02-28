@@ -15,6 +15,7 @@ video_player::video_player(QObject* parent) : QThread(parent) {}
 // This method loads a video from file.
 bool video_player::load_video(string filename) {
     capture.open(filename);
+
     if (capture.isOpened()) {
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
@@ -29,7 +30,6 @@ bool video_player::load_video(string filename) {
 
 void video_player::play() {
     video_paused = false;
-    //condition.wakeAll();
 }
 
 void video_player::pause() {
@@ -51,11 +51,13 @@ void video_player::run()  {
     //Debug print
     cout << "stop: " << stop << ", video_paused: " << video_paused << ", capture.read(frame): " << capture.read(frame) << endl;
 
-
+    std::thread::id this_id = std::this_thread::get_id();
+    //std::cout << "thread " << this_id << endl;
     //Runs the video as long as it is not paused, stopped or ended.
     while(!stop && !video_paused && capture.read(frame)){
-
-
+        ms = std::chrono::duration_cast< std::chrono::milliseconds >(
+            std::chrono::system_clock::now().time_since_epoch()
+        );
         if (frame.channels()== 3) {
             cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
             img = QImage((const unsigned char*)(RGBframe.data),
@@ -65,12 +67,16 @@ void video_player::run()  {
                                  frame.cols,frame.rows,QImage::Format_Indexed8);
         }
 
+        std::chrono::milliseconds new_ms= std::chrono::duration_cast< std::chrono::milliseconds >(
+                    std::chrono::system_clock::now().time_since_epoch()
+                );
+        //cout << "Frame fetch ends: " << (new_ms-ms).count() << endl;
         emit processedImage(img);
         emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
         this->msleep(delay);
 
     }
-    cout << "Exiting main video loop." << endl;
+    //cout << "Exiting main video loop." << endl;
     //Saves the current frame of the video if the video is paused.
     if (video_paused) {
         current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
@@ -83,13 +89,6 @@ void video_player::msleep(int delay) {
     std::this_thread::sleep_for( dura );
 }
 
-Mat video_player::play_frame(VideoCapture source_video) {
-    Mat frame;
-    source_video >> frame;
-    return frame;
-    double fps = source_video.get(CV_CAP_PROP_FPS);
-}
-
 //Returns a boolean value representing whether the currently played video is paused.
 bool video_player::is_paused() {
     return video_paused;
@@ -99,3 +98,10 @@ int video_player::get_num_frames() {
     return num_frames;
 }
 
+void video_player::set_frame_width(int new_value) {
+    frame_width = new_value;
+}
+
+void video_player::set_frame_height(int new_value) {
+    frame_height = new_value;
+}

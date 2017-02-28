@@ -6,10 +6,12 @@
 #include "opencv2/video/video.hpp"
 #include "opencv2/core/core.hpp"
 
+
 #include <QThread>
 #include <QMutex>
 #include <QImage>
 #include <QWaitCondition>
+#include <chrono>
 
 using namespace std;
 using namespace cv;
@@ -20,11 +22,16 @@ class video_player : public QThread
 public:
     video_player(QObject* parent = 0);
     bool load_video(string filename);
-    Mat play_frame(VideoCapture source_video);
     void play();
     void pause();
     bool is_paused();
     int get_num_frames();
+    std::chrono::milliseconds ms;
+    void set_frame_width(int new_value);
+    void set_frame_height(int new_value);
+
+    friend class test_video_player;
+
 signals:
     void processedImage(const QImage &image);
     void currentFrame(const int frame);
@@ -43,6 +50,8 @@ private:
     QWaitCondition condition;
     bool video_paused;
     int num_frames;
+    unsigned int frame_width;
+    unsigned int frame_height;
 };
 
 #endif // VIDEO_PLAYER_H

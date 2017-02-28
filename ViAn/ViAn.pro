@@ -5,6 +5,9 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += testlib
+
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +17,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     GUI/mainwindow.cpp \
-    video_player.cpp
+    video_player.cpp \
+    test_video_player.cpp
 
 HEADERS  += mainwindow.h \
-    video_player.h
+    video_player.h \
+    test_video_player.h
 
 FORMS    += mainwindow.ui
 
