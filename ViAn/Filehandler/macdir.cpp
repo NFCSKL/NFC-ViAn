@@ -24,6 +24,5 @@ int makeDir(std::string dirpath){
  * OBS! Only compatible with windows systems.
  */
 int removeDir(std::string dirpath){
-    std::cout << dirpath << std::endl;
     return rmdir(dirpath.c_str());
 }

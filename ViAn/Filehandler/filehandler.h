@@ -18,7 +18,7 @@
 #ifdef _WIN32
     #define WORKSPACE "C:/"
 #elif __APPLE__
-    #define WORKSPACE "/"
+    #define WORKSPACE "/Applications"
 #endif
 typedef int FH_ERROR;
 typedef int ID;

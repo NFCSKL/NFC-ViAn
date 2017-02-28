@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
-
+#include "Filehandler/filehandler_testsuite.h"
 /**
  * @brief qMain
  * Constructor
@@ -10,9 +10,11 @@
  */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-
-    return a.exec();
+    FileHandlerTest* f = new FileHandlerTest();
+    QTest::qExec(f);
+//    QApplication a(argc, argv);
+//    MainWindow w;
+//    w.show();
+//    return a.exec();
+    return 0;
 }
