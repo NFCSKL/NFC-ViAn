@@ -67,12 +67,12 @@ void FileHandlerTest::directoryTest(){
 void FileHandlerTest::fileTest(){
     FileHandler* fh = new FileHandler();
 
-    std::string dirpath = WORKSPACE;
+    std::string dirpath = std::string(WORKSPACE) + "/" + "TEST_MAP";
     std::string filename = "filetest.txt";
     ID dir = fh->createDirectory(dirpath);
     ID fileID  = fh->createFile(filename,dir); //Create file ID = i    (1)
     ID fileID2  = fh->createFile(filename,dir); // Create file ID = i+1 (2)
-    QVERIFY(1 == fileID2 - fileID);                         // check if 1 && 2 is true
+    QCOMPARE(fileID2 - fileID, 1);                         // check if 1 && 2 is true
     QVERIFY(fh->getFile(fileID) == fh->getFile(fileID2)); //check that (1), (2) point to same file.
 
     // TEST FILE WRITE AND FILE READ
@@ -80,10 +80,10 @@ void FileHandlerTest::fileTest(){
     //read and check if file contains filename"
     std::string readText;
     fh->readFile(fileID,1, readText); // read from file
-    QVERIFY(readText == filename); // d = 0 if test passes
+    QCOMPARE(readText, filename); // d = 0 if test passes
     //delete file and check if it is not there
-    QVERIFY(fh->deleteFile(fileID)== 0); // check that delete was done correctly
-    QVERIFY(fh->deleteDirectory(dirpath) == 0); //delete directory
+    QCOMPARE(fh->deleteFile(fileID), 0); // check that delete was done correctly
+    QCOMPARE(fh->deleteDirectory(dirpath), 0); //delete directory
 
 }
 

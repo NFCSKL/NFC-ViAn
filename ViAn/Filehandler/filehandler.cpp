@@ -91,7 +91,6 @@ Project* FileHandler::loadProject(std::string filePath){
  * @return int errorcode
  */
 FH_ERROR FileHandler::deleteProject(Project* proj){
-    createDirectory(this->getDir(proj->m_dir));
     deleteFile(proj->m_file);
     return deleteDirectory(this->getDir(proj->m_dir));
 
