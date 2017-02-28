@@ -1,5 +1,4 @@
-#include "filehandler_testsuite.h"
-
+#include "filehandlertest.h"
 /**
  * @brief runTestSuite
  * @return all pass errorcode,
