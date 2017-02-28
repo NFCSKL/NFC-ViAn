@@ -26,7 +26,6 @@ public:
     void pause();
     bool is_paused();
     int get_num_frames();
-    std::chrono::milliseconds ms;
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
 

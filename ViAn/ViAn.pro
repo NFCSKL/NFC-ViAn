@@ -17,14 +17,19 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     GUI/mainwindow.cpp \
-    video_player.cpp \
-    test_video_player.cpp
+    GUI/icononbuttonhandler.cpp \
+    Video/video_player.cpp \
+    Test/test_video_player.cpp
 
-HEADERS  += mainwindow.h \
-    video_player.h \
-    test_video_player.h
+HEADERS  += GUI/mainwindow.h \
+    GUI/icononbuttonhandler.h \
+    Video/video_player.h \
+    Test/test_video_player.h
 
-FORMS    += mainwindow.ui
+FORMS    += GUI/mainwindow.ui
+
+RESOURCES += \
+    resources.qrc
 
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include

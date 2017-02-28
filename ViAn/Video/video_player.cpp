@@ -1,7 +1,7 @@
 #include "video_player.h"
 #include <string>
 #include <iostream>
-#include "mainwindow.h"
+#include "GUI/mainwindow.h"
 #include <thread>
 #include <QWaitCondition>
 
@@ -28,10 +28,16 @@ bool video_player::load_video(string filename) {
         return false;
 }
 
+/**
+ * @brief video_player::play
+ */
 void video_player::play() {
     video_paused = false;
 }
 
+/**
+ * @brief video_player::pause
+ */
 void video_player::pause() {
     video_paused = true;
 }
@@ -45,19 +51,9 @@ void video_player::run()  {
     stop = false;
     int delay = (1000/frame_rate);
 
-    cout << "Current frame rate: " << frame_rate << ", actual frame rate: " << capture.get(CV_CAP_PROP_FPS) << endl;
-
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-    //Debug print
-    cout << "stop: " << stop << ", video_paused: " << video_paused << ", capture.read(frame): " << capture.read(frame) << endl;
 
-    std::thread::id this_id = std::this_thread::get_id();
-    //std::cout << "thread " << this_id << endl;
-    //Runs the video as long as it is not paused, stopped or ended.
     while(!stop && !video_paused && capture.read(frame)){
-        ms = std::chrono::duration_cast< std::chrono::milliseconds >(
-            std::chrono::system_clock::now().time_since_epoch()
-        );
         if (frame.channels()== 3) {
             cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
             img = QImage((const unsigned char*)(RGBframe.data),
@@ -67,16 +63,11 @@ void video_player::run()  {
                                  frame.cols,frame.rows,QImage::Format_Indexed8);
         }
 
-        std::chrono::milliseconds new_ms= std::chrono::duration_cast< std::chrono::milliseconds >(
-                    std::chrono::system_clock::now().time_since_epoch()
-                );
-        //cout << "Frame fetch ends: " << (new_ms-ms).count() << endl;
         emit processedImage(img);
         emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
         this->msleep(delay);
 
     }
-    //cout << "Exiting main video loop." << endl;
     //Saves the current frame of the video if the video is paused.
     if (video_paused) {
         current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
@@ -94,14 +85,26 @@ bool video_player::is_paused() {
     return video_paused;
 }
 
+/**
+ * @brief video_player::get_num_frames
+ * @return number of frames in video file
+ */
 int video_player::get_num_frames() {
     return num_frames;
 }
 
+/**
+ * @brief video_player::set_frame_width
+ * @param new_value
+ */
 void video_player::set_frame_width(int new_value) {
     frame_width = new_value;
 }
 
+/**
+ * @brief video_player::set_frame_height
+ * @param new_value
+ */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
 }

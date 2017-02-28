@@ -4,14 +4,17 @@
 #include <QMainWindow>
 #include <QBasicTimer>
 #include <QSlider>
-#include "video_player.h"
+#include "Video/video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/videoio/videoio.hpp"
 #include "opencv2/video/video.hpp"
 #include "opencv2/core/core.hpp"
+#include "icononbuttonhandler.h"
+
 using namespace std;
 using namespace cv;
+
 
 namespace Ui {
 class MainWindow;
@@ -41,8 +44,12 @@ private:
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
+    IconOnButtonHandler *iconOnButtonHandler;
 
     QSlider *video_slider;
+    void on_videoSlider_valueChanged(int newPos);
+
+
 };
 
 #endif // MAINWINDOW_H

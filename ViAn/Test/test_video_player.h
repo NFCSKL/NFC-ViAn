@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QTest>
 
-#include "video_player.h"
+#include "Video/video_player.h"
 
 class test_video_player : public QObject
 {
