@@ -97,7 +97,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="playButton">
+           <widget class="QPushButton" name="playPauseButton">
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -128,22 +128,6 @@
             </property>
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next frame&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pauseButton">
-            <property name="minimumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pause video&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
