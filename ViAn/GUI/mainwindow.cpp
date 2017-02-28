@@ -107,11 +107,10 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
-                                                                tr("Are you sure?\n"),
+                                                                tr("Are you sure you want to quit?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::No);
 
-    //exitBox.question(this, "Exit", tr("Are you sure?\n"), QMessageBox::Yes | QMessageBox::No);
     if (resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
