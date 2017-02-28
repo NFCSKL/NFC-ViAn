@@ -55,10 +55,9 @@ int readWriteTest(FileHandler* fileHandler, Project* proj){
 //
 int directoryTest(FileHandler* fileHandler, Project* proj){
     std::string dir = "C:/DIR_TEST";
-    fileHandler->createDirectory(dir);
-    int a = GetLastError();
-    fileHandler->deleteDirectory(dir);
-    int b = GetLastError();
+    int a  = fileHandler->createDirectory(dir);
+    int b = fileHandler->deleteDirectory(dir);
+
     if(VAR_VALUES){
         std::cout<< "ErrorCodes:" << std::endl << "\tCreate dir " << a <<
                 std::endl << "\tDelete dir " << b << std::endl;
@@ -77,8 +76,7 @@ int fileTest(FileHandler* fileHandler,Project* proj){
     int a,b,c,d,e,f,g; // test variables
     std::string dirpath = "C:/FILE_TEST";
     std::string filename = "filetest.txt";
-    ID dir = fileHandler->createDirectory(dirpath);
-    a = GetLastError();
+    ID dir = fileHandler->createDirectory(dirpath);   
     ID fileID  = fileHandler->createFile(filename,dir); //Create file ID = i    (1)
     ID fileID2  = fileHandler->createFile(filename,dir); // Create file ID = i+1 (2)
     b = (1 == fileID - fileID2);                         // check if 1 && 2 is true

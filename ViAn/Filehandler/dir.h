@@ -8,7 +8,8 @@
     #include "stringhelper.h"
 #elif __APPLE__
     #include <sys/stat.h>
-    #include <sys/types.h
+    #include <sys/types.h>
+    #include <unistd.h>
 #elif __linux__
     #include <sys/stat.h>
     #include <sys/types.h>

@@ -1,11 +1,5 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
-#include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <mutex>
-#include "project.h"
 #define WINDOWS 1
 #define UNIX 2
 #ifdef _WIN32
@@ -13,21 +7,24 @@
     #include "stringhelper.h"
 #elif __APPLE__
 #endif
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <mutex>
+#include "project.h"
 #include "dir.h"
 
 #define WORKSPACE "C:/Programmering"
 typedef int FH_ERROR;
 typedef int ID;
+struct Project; // fix for include issue
 struct VideoProj
 {
     //struct VideoFile file;
     //std::vector<Analysis> analyses;
 };
 
-class Project;
-struct POIFile{
-
-};
 
 struct Bookmark
 {

@@ -92,14 +92,9 @@ Project* FileHandler::loadProject(std::string filePath){
  */
 FH_ERROR FileHandler::deleteProject(Project* proj){
     createDirectory(this->getDir(proj->m_dir));
-    if (GetLastError() == ERROR_ALREADY_EXISTS){
-        deleteFile(proj->m_file);
-        deleteDirectory(this->getDir(proj->m_dir));
-        return 0;
-    }
-    else{
-        return -1;
-    }
+    deleteFile(proj->m_file);
+    return deleteDirectory(this->getDir(proj->m_dir));
+
 }
 /**
  * @todo make threadsafe
