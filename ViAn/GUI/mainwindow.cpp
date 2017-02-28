@@ -60,7 +60,11 @@ void MainWindow::on_playPauseButton_clicked()
  */
 void MainWindow::on_stopButton_clicked()
 {
-
+    if(playing){
+        playing = false;
+        setStatusBar("stopped");
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
+    }
 }
 
 /**
