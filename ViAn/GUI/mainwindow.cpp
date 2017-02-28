@@ -45,7 +45,7 @@ void MainWindow::setStatusBar(string status, int timer = 750){
 }
 
 /**
- * @brief MainWindow::on_playButton_clicked
+ * @brief MainWindow::on_playPauseButton_clicked
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked()
