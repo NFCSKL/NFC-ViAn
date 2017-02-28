@@ -12,7 +12,13 @@ using namespace cv;
 video_player::video_player(QObject* parent) : QThread(parent) {}
 
 
-// This method loads a video from file.
+//
+/**
+ * @brief video_player::load_video
+ * This method loads a video from file.
+ * @param filename
+ * @return whether video is loaded
+ */
 bool video_player::load_video(string filename) {
     capture.open(filename);
 
@@ -30,6 +36,7 @@ bool video_player::load_video(string filename) {
 
 /**
  * @brief video_player::play
+ * Sets boolean so the main loop in run() will not exit.
  */
 void video_player::play() {
     video_paused = false;
@@ -37,12 +44,15 @@ void video_player::play() {
 
 /**
  * @brief video_player::pause
+ * Sets boolean so the main loop in run() is exited
  */
 void video_player::pause() {
     video_paused = true;
 }
 
-/* This function is called whenever the thread is started or put out of sleep.
+/**
+ * @brief video_player::run
+ * This function is called whenever the thread is started or put out of sleep.
  * It houses the main loop for fetching frames from the currently played
  * video file and sending them to the GUI.
  */
@@ -74,13 +84,23 @@ void video_player::run()  {
     }
 }
 
-//This method is used to make the video player thread sleep the correct amount of time between fetching frames from source video.
+
+/**
+ * @brief video_player::msleep
+ * This method is used to make the video player thread sleep the correct amount
+ * of time between fetching frames from source video.
+ * @param delay
+ */
 void video_player::msleep(int delay) {
     std::chrono::milliseconds dura(delay);
     std::this_thread::sleep_for( dura );
 }
 
-//Returns a boolean value representing whether the currently played video is paused.
+/**
+ * @brief video_player::is_paused
+ * Returns a boolean value representing whether the currently played video is paused.
+ * @return
+ */
 bool video_player::is_paused() {
     return video_paused;
 }

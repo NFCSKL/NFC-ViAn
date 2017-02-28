@@ -91,6 +91,7 @@ void MainWindow::on_stopButton_clicked() {
 
 /**
  * @brief MainWindow::update_video
+ * Sets the videoFrame pixmap to the current frame from video
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
@@ -100,6 +101,7 @@ void MainWindow::update_video(QImage frame) {
 
 /**
  * @brief MainWindow::set_video_slider_pos
+ * Sets the position of slider in video to position pos
  * @param pos
  */
 void MainWindow::set_video_slider_pos(int pos) {
@@ -108,7 +110,11 @@ void MainWindow::set_video_slider_pos(int pos) {
     }
 }
 
-//Used for rescaling the source image for video playback
+/**
+ * @brief MainWindow::resizeEvent
+ * Used for rescaling the source image for video playback
+ * @param event
+ */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
    mvideo_player->set_frame_height(ui->videoFrame->height());
