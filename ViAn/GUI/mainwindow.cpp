@@ -1,8 +1,19 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+<<<<<<< HEAD
 #include <QMessageBox>
 #include <iostream>
 #include <QCloseEvent>
+=======
+#include <chrono>
+#include <thread>
+#include <iostream>
+#include "icononbuttonhandler.h"
+
+using namespace std;
+using namespace cv;
+
+>>>>>>> master
 /**
  * @brief MainWindow::MainWindow
  * Constructor
@@ -13,21 +24,30 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    video_slider = findChild<QSlider*>("videoSlider");
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
-
     setShortcuts();
-    playing = false;
 
+    mvideo_player = new video_player();
+    QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
+                                  this, SLOT(update_video(QImage)));
+    QObject::connect(mvideo_player, SIGNAL(currentFrame(int)),
+                                  this, SLOT(set_video_slider_pos(int)));
+
+    //Used for rescaling the source image for video playback
+    mvideo_player->set_frame_height(ui->videoFrame->height());
+    mvideo_player->set_frame_width(ui->videoFrame->width());
 }
 
 /**
  * @brief MainWindow::~MainWindow
  * Destructor
  */
-MainWindow::~MainWindow()
-{
+
+MainWindow::~MainWindow() {
+
     delete iconOnButtonHandler;
     delete ui;
 }
@@ -49,20 +69,21 @@ void MainWindow::setStatusBar(string status, int timer = 750){
  * @brief MainWindow::on_playPauseButton_clicked
  * The button supposed to play and pause the video
  */
-void MainWindow::on_playPauseButton_clicked()
-{
-    if(playing){
-        playing = false;
-        setStatusBar("Paused");
-        iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
+
+void MainWindow::on_playPauseButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        setStatusBar("Pauesd");
+        iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
+        mvideo_player->play_pause();
+        mvideo_player->start();
     } else {
         setStatusBar("Playing");
-        playing = true;
-        iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+        iconOnButtonHandler->setIcon("play", ui->playButton);
+        mvideo_player->play_pause();
+        mvideo_player->wait();
     }
+
 }
-
-
 
 /**
  * @brief MainWindow::on_stopButton_clicked
@@ -70,11 +91,46 @@ void MainWindow::on_playPauseButton_clicked()
  */
 void MainWindow::on_stopButton_clicked()
 {
-    if(playing){
-        playing = false;
-        setStatusBar("Stopped");
-        iconOnButtonHandler->setIcon("play", ui->playPauseButton);//changes the icon on the play button to a play-icon
+    setStatusBar("Stopped");
+
+
+    // The code here is only temporary and should be moved/removed
+    // once a proper video selector is added
+    mvideo_player->load_video("seq_01.mp4");
+    iconOnButtonHandler->setIcon("pause", ui->playButton);
+    video_slider->setMaximum(mvideo_player->get_num_frames());
+}
+
+/**
+ * @brief MainWindow::update_video
+ * Sets the videoFrame pixmap to the current frame from video
+ * @param frame
+ */
+void MainWindow::update_video(QImage frame) {
+
+    ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
+}
+
+/**
+ * @brief MainWindow::set_video_slider_pos
+ * Sets the position of slider in video to position pos
+ * @param pos
+ */
+void MainWindow::set_video_slider_pos(int pos) {
+    if (pos <= video_slider->maximum()) {
+        video_slider->setSliderPosition(pos);
     }
+}
+
+/**
+ * @brief MainWindow::resizeEvent
+ * Used for rescaling the source image for video playback
+ * @param event
+ */
+void MainWindow::resizeEvent(QResizeEvent* event) {
+   QMainWindow::resizeEvent(event);
+   mvideo_player->set_frame_height(ui->videoFrame->height());
+   mvideo_player->set_frame_width(ui->videoFrame->width());
 }
 
 /**
