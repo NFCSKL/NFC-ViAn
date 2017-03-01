@@ -47,7 +47,7 @@ void test_video_player::test_is_paused() {
  * @brief test_video_player::test_get_num_frames
  */
 void test_video_player::test_get_num_frames() {
-    QVERIFY(mvideo->capture.get(CAP_PROP_FRAME_COUNT) == mvideo->get_num_frames());
+    QVERIFY(mvideo->capture.get(cv::CAP_PROP_FRAME_COUNT) == mvideo->get_num_frames());
 }
 
 /**

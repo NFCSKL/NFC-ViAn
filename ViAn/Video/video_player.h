@@ -14,7 +14,6 @@
 #include <chrono>
 
 using namespace std;
-using namespace cv;
 
 
 class video_player : public QThread
@@ -38,12 +37,12 @@ protected:
     void msleep(int ms);
 private:
     unsigned int current_frame = 0;
-    VideoCapture capture;
+    cv::VideoCapture capture;
     double frame_rate;
     double speed_multiplier = 1.0;
     bool stop = false;
-    Mat frame;
-    Mat RGBframe;
+    cv::Mat frame;
+    cv::Mat RGBframe;
     QImage img;
     QWaitCondition condition;
     bool video_paused;
