@@ -17,12 +17,19 @@ struct Video{
         this->filepath = filepath;
     }
 };
-
+/**
+ * @brief The Project struct
+ * incomplete struct, will be added on
+ * along with parser functionality
+ */
 struct Project{
 public:
     Project(ID id, std::string name);
     Project(std::string dirpath);
     void addVideo(Video vid);
+// TODO
+//    void addAnalysis();
+//    void addDrawing();
 private:
     ID m_vid;    
 public:

@@ -14,6 +14,7 @@
     #include <sys/stat.h>
     #include <sys/types.h>
 #endif
+
 int makeDir(std::string dirpath);
 int removeDir(std::string dirpath);
 #endif // DIR_H

@@ -1,5 +1,9 @@
 #include "project.h"
-
+/**
+ * @brief Project::Project
+ * @param id
+ * @param name
+ */
 Project::Project(ID id, std::string name)
 {
     this->m_name = name;

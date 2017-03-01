@@ -1,7 +1,11 @@
 #include "filehandler.h"
+
+/**
+ * @brief FileHandler::FileHandler
+ */
 FileHandler::FileHandler()
 {
-    this->m_pid = 0;
+    this->m_pid = 0; // zero out counter ids
     this->m_fid = 0;
     this->m_did = 0;
 
@@ -20,13 +24,14 @@ Project* FileHandler::createProject(std::string projName){
     return proj;
 }
 ID FileHandler::createDirectory(std::string dirpath){
-    int err = makeDir(dirpath);
+    int err = makeDir(dirpath); //varying implementation, OS dependant
+    return err;
     this->addDir(std::make_pair(this->m_did, dirpath));
     return this->m_did++;
 }
 
 FH_ERROR FileHandler::deleteDirectory(std::string dirpath){
-    FH_ERROR err = removeDir(dirpath);
+    FH_ERROR err = removeDir(dirpath); //varying implementation, OS dependant
     return err;
 }
 
