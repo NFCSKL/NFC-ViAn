@@ -18,9 +18,13 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    //For testing video player.
-    //test_video_player* test = new test_video_player();
-    //filehandlertest* test = new filehandlertest();
-    //QTest::qExec(test) ;
+
+    test_video_player* video_player_test = new test_video_player();
+    //filehandlertest* file_handler_test = new filehandlertest();
+
+    QTest::qExec(video_player_test) ;
+    //QTest::qExec(file_handler_test) ;
+
+
     return a.exec();
 }

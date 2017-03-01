@@ -23,9 +23,12 @@ public:
     bool load_video(string filename);
     void play_pause();
     bool is_paused();
+    bool is_stopped();
     int get_num_frames();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
+    void set_playback_frame(int frame_num);
+    void stop_video();
 
     friend class test_video_player;
 
