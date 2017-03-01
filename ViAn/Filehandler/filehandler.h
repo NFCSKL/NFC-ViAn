@@ -20,7 +20,8 @@
 #elif __APPLE__
     #define WORKSPACE "/Applications"
 #endif
-typedef int FH_ERROR;
+
+typedef int FH_ERROR; // file handler error code
 typedef int ID;
 struct Project; // fix for include issue
 class FileHandler
