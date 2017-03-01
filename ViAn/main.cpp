@@ -1,6 +1,6 @@
-#include "Video/video_player.h"
-#include "Test/test_video_player.h"
-#include "GUI/mainwindow.h"
+//#include "Video/video_player.h"
+//#include "Test/test_video_player.h"
+//#include "GUI/mainwindow.h"
 #include <QApplication>
 #include "Test/filehandlertest.h"
 /**
@@ -12,12 +12,13 @@
  */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+//    QApplication a(argc, argv);
+//    MainWindow w;
+//    w.show();
 
     //For testing video player.
     //test_video_player* test = new test_video_player();
-    //QTest::qExec(test) ;
-    return a.exec();
+    FilehandlerTest* test = new FilehandlerTest();
+    QTest::qExec(test) ;
+    return 0;
 }

@@ -1,4 +1,4 @@
-#include "win32dir.h"
+#include "dir.h"
 /**
  * @todo make threadsafe
  * @brief createDirectory
