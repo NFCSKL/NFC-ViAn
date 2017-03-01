@@ -18,6 +18,7 @@ private slots:
     void test_get_num_frames();
     void test_set_frame_width();
     void test_set_frame_height();
+    void test_set_playback_frame();
 
 private:
     video_player* mvideo;
