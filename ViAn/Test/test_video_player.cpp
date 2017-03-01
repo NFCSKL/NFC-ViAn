@@ -25,17 +25,12 @@ void test_video_player::test_load_video() {
 /**
  * @brief test_video_player::test_play
  */
-void test_video_player::test_play() {
-    mvideo->play();
-    QVERIFY(!mvideo->video_paused);
-}
-
-/**
- * @brief test_video_player::test_pause
- */
-void test_video_player::test_pause() {
-    mvideo->pause();
-    QVERIFY(mvideo->video_paused);
+void test_video_player::test_play_pause() {
+    mvideo->video_paused = false;
+    mvideo->play_pause();
+    QVERIFY(mvideo->is_paused());
+    mvideo->play_pause();
+    QVERIFY(!mvideo->is_paused());
 }
 
 /**

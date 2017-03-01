@@ -22,8 +22,7 @@ class video_player : public QThread
 public:
     video_player(QObject* parent = 0);
     bool load_video(string filename);
-    void play();
-    void pause();
+    void play_pause();
     bool is_paused();
     int get_num_frames();
     void set_frame_width(int new_value);

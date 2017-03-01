@@ -22,13 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
-    /**
-     * How to get a picture
-     */
-    /*QImage image;
-    image.load("<searchPath>");
-    ui->videoFrame->setPixmap(QPixmap::fromImage(image));
-    ui->videoFrame->show();*/
     mvideo_player = new video_player();
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
                                   this, SLOT(update_video(QImage)));
@@ -56,16 +49,17 @@ MainWindow::~MainWindow() {
  * The button supposed to play the video
  */
 void MainWindow::on_playButton_clicked() {
-
     if (mvideo_player->is_paused()) {
         iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
+        mvideo_player->play_pause();
         mvideo_player->start();
     } else {
         iconOnButtonHandler->setIcon("play", ui->playButton);
-        mvideo_player->pause();
+        mvideo_player->play_pause();
         mvideo_player->wait();
     }
 }
+
 /**
  * @brief MainWindow::on_pauseButton_clicked
  * The button supposed to pause the video
@@ -80,12 +74,10 @@ void MainWindow::on_pauseButton_clicked() {
  * The button supposed to stop the video
  */
 void MainWindow::on_stopButton_clicked() {
+    // The code here is only temporary and should be moved/removed
+    // once a proper video selector is added
     mvideo_player->load_video("seq_01.mp4");
     iconOnButtonHandler->setIcon("pause", ui->playButton);
-    //mvideo_player->load_video("mf.mkv");
-    //mvideo_player->load_video("eng.mov");
-    //mvideo_player->load_video("Makefile");
-
     video_slider->setMaximum(mvideo_player->get_num_frames());
 }
 
