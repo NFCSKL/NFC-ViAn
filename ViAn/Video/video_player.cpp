@@ -36,18 +36,10 @@ bool video_player::load_video(string filename) {
 
 /**
  * @brief video_player::play
- * Sets boolean so the main loop in run() will not exit.
+ * Toggles the video_paused boolean
  */
-void video_player::play() {
-    video_paused = false;
-}
-
-/**
- * @brief video_player::pause
- * Sets boolean so the main loop in run() is exited
- */
-void video_player::pause() {
-    video_paused = true;
+void video_player::play_pause() {
+    video_paused = !video_paused;
 }
 
 /**

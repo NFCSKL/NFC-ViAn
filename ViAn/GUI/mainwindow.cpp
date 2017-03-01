@@ -62,7 +62,7 @@ void MainWindow::on_playButton_clicked() {
         mvideo_player->start();
     } else {
         iconOnButtonHandler->setIcon("play", ui->playButton);
-        mvideo_player->pause();
+        mvideo_player->play_pause();
         mvideo_player->wait();
     }
 }
