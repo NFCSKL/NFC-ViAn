@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     //For testing video player.
     test_video_player* test = new test_video_player();
     //testing file handling
-    FilehandlerTest* test = new FilehandlerTest();
+    FileHandlerTest* test = new FileHandlerTest();
     QTest::qExec(test) ;
     return 0;
 }

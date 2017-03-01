@@ -29,7 +29,7 @@ FileHandlerTest::FileHandlerTest(){
  */
 void FileHandlerTest::projectHandlingTest(){
     FileHandler* fh = new FileHandler();
-    Project* proj =  fh->createProject("POI_TEST/TEST_PROJ");
+    Project* proj =  fh->createProject("/TEST_PROJ");
     std::string v1 = "video1.txt"; // names for testfiles
     std::string v2 = "video2.txt";
     std::string v3 = "video3.txt";
@@ -50,7 +50,7 @@ void FileHandlerTest::projectHandlingTest(){
 //
 void FileHandlerTest::directoryTest(){
     FileHandler* fh = new FileHandler();
-    std::string dirpath = std::string(WORKSPACE) + std::string("POI_TEST/TEST_PROJ");
+    std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
     int err = fh->createDirectory(dirpath);
     QCOMPARE(err, 0);
     QCOMPARE(fh->deleteDirectory(dirpath), 0);
@@ -65,7 +65,7 @@ void FileHandlerTest::directoryTest(){
 
 void FileHandlerTest::fileTest(){
     FileHandler* fh = new FileHandler();
-    std::string dirpath = std::string(WORKSPACE) + "POI_TEST/TEST_MAP";
+    std::string dirpath = std::string(WORKSPACE) + "/TEST_MAP";
     std::string filename = "filetest.txt";
     ID dir = fh->createDirectory(dirpath);
     ID fileID  = fh->createFile(filename,dir); //Create file ID = i    (1)
