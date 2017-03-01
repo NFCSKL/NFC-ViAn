@@ -49,9 +49,9 @@ MainWindow::~MainWindow() {
  * The button supposed to play the video
  */
 void MainWindow::on_playButton_clicked() {
-
     if (mvideo_player->is_paused()) {
         iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
+        mvideo_player->play_pause();
         mvideo_player->start();
     } else {
         iconOnButtonHandler->setIcon("play", ui->playButton);
