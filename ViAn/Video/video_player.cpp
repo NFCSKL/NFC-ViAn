@@ -129,7 +129,6 @@ void video_player::set_frame_height(int new_value) {
  */
 void video_player::set_playback_frame(int frame_num) {
     if (frame_num < get_num_frames() && frame_num >= 0) {
-        capture.set(CAP_PROP_POS_FRAMES, (double)frame_num);
         current_frame = frame_num;
     }
 }

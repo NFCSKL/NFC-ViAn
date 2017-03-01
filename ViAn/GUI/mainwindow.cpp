@@ -80,6 +80,7 @@ void MainWindow::on_pauseButton_clicked() {
 void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         mvideo_player->play_pause();
+        iconOnButtonHandler->setIcon("play", ui->playButton);
     }
 
     mvideo_player->set_playback_frame(0);
