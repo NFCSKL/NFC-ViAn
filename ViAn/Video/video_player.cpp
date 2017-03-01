@@ -121,3 +121,15 @@ void video_player::set_frame_width(int new_value) {
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
 }
+
+/**
+ * @brief video_player::set_playback_frame
+ * Moves the playback to the frame specified by frame_num
+ * @param frame_num
+ */
+void video_player::set_playback_frame(int frame_num) {
+    if (frame_num < get_num_frames() && frame_num >= 0) {
+        capture.set(CAP_PROP_POS_FRAMES, (double)frame_num);
+        current_frame = frame_num;
+    }
+}
