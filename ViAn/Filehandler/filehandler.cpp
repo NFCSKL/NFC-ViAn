@@ -25,7 +25,6 @@ Project* FileHandler::createProject(std::string projName){
 }
 ID FileHandler::createDirectory(std::string dirpath){
     int err = makeDir(dirpath); //varying implementation, OS dependant
-    return err;
     this->addDir(std::make_pair(this->m_did, dirpath));
     return this->m_did++;
 }
@@ -50,7 +49,6 @@ void FileHandler::saveProject(Project* proj){
     ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
     proj->m_dir = dirID;
     proj->m_file = createFile(fileName, dirID); //create project file
-
     updateProjFile(proj);
 
 }
@@ -121,11 +119,11 @@ void FileHandler::addVideo(Project* proj, std::string filePath){
   */
 
 ID FileHandler::createFile(std::string filename, ID dirID){
-     std::ofstream f;
-     std::string filePath = this->getDir(dirID)+"/"+filename;
-     f.open(filePath.c_str());
-     this->addFile(std::make_pair(this->m_fid, filePath));
-     return this->m_fid++;
+    std::ofstream f;
+    std::string filePath = this->getDir(dirID)+"/"+filename;
+    f.open(filePath.c_str());
+    this->addFile(std::make_pair(this->m_fid, filePath));
+    return this->m_fid++;
   }
 /**
  * @todo make threadsafe
@@ -134,8 +132,8 @@ ID FileHandler::createFile(std::string filename, ID dirID){
  * @param ID file id
  */
  FH_ERROR FileHandler::deleteFile(ID id){
-     std::string file = this->getFile(id);
-     return std::remove(file.c_str());
+    std::string file = this->getFile(id);
+    return std::remove(file.c_str());
  }
  /**
   * @todo make threadsafe
@@ -172,10 +170,10 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   * @return Project*
   */
  Project* FileHandler::getProject(ID pid){
-     this->projMapLock.lock();
-     Project* p = this->m_projects.at(pid);
-     this->projMapLock.unlock();
-     return p;
+    this->projMapLock.lock();
+    Project* p = this->m_projects.at(pid);
+    this->projMapLock.unlock();
+    return p;
  }
  /**
   * @brief FileHandler::getFile
@@ -209,9 +207,9 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   * @return void
   */
  void FileHandler::addProject(std::pair<ID,Project*> pair){
-     this->dirMapLock.lock();
-     this->m_projects.insert(pair);
-     this->dirMapLock.unlock();
+    this->dirMapLock.lock();
+    this->m_projects.insert(pair);
+    this->dirMapLock.unlock();
 
  }
  /**
@@ -232,8 +230,8 @@ void FileHandler::addFile(std::pair<ID,std::string> pair){
   * @return void
   */
 void FileHandler::addDir(std::pair<ID,std::string> pair){
-     this->dirMapLock.lock();
-     this->m_dirMap.insert(pair);
-     this->dirMapLock.unlock();
+    this->dirMapLock.lock();
+    this->m_dirMap.insert(pair);
+    this->dirMapLock.unlock();
  }
 
