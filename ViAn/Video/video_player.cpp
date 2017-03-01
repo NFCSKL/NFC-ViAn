@@ -9,7 +9,9 @@
 using namespace std;
 using namespace cv;
 
-video_player::video_player(QObject* parent) : QThread(parent) {}
+video_player::video_player(QObject* parent) : QThread(parent) {
+    video_paused = false;
+}
 
 
 //
@@ -49,7 +51,6 @@ void video_player::play_pause() {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    video_paused = false;
     stop = false;
     int delay = (1000/frame_rate);
 
