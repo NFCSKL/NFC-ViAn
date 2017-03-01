@@ -1,10 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-<<<<<<< HEAD
 #include <QMessageBox>
 #include <iostream>
 #include <QCloseEvent>
-=======
 #include <chrono>
 #include <thread>
 #include <iostream>
@@ -13,7 +11,6 @@
 using namespace std;
 using namespace cv;
 
->>>>>>> master
 /**
  * @brief MainWindow::MainWindow
  * Constructor
