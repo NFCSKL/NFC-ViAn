@@ -18,18 +18,18 @@ SOURCES += main.cpp
 #
 # GUI
 #
-#SOURCES +=
-#    GUI/mainwindow.cpp \
-#    GUI/icononbuttonhandler.cpp \
-#    Video/video_player.cpp \
-#    Test/test_video_player.cpp \
-#    Test/filehandlertest.cpp
+SOURCES +=
+    GUI/mainwindow.cpp \
+    GUI/icononbuttonhandler.cpp \
+    Video/video_player.cpp \
+    Test/test_video_player.cpp \
+    Test/filehandlertest.cpp
 
-#HEADERS  += GUI/mainwindow.h \
-#    GUI/icononbuttonhandler.h \
-#    Video/video_player.h \
-#    Test/test_video_player.h \
-#    Test/filehandlertest.h
+HEADERS  += GUI/mainwindow.h \
+    GUI/icononbuttonhandler.h \
+    Video/video_player.h \
+    Test/test_video_player.h \
+    Test/filehandlertest.h
 
 FORMS    += GUI/mainwindow.ui
 
@@ -39,25 +39,25 @@ RESOURCES += \
 # VIDEOPLAYER
 # OPENCV
 #
-#win32 {
-#    INCLUDEPATH += C:\opencv\release\install\include
-#    LIBS += C:\opencv\release\bin\libopencv_core320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_video320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
-#}
+win32 {
+    INCLUDEPATH += C:\opencv\release\install\include
+    LIBS += C:\opencv\release\bin\libopencv_core320.dll
+    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
+    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
+    LIBS += C:\opencv\release\bin\libopencv_video320.dll
+    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
+    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
+}
 
-#unix {
-#    INCLUDEPATH += -L/usr/include/opencv2
-#    LIBS += -lopencv_core
-#    LIBS += -lopencv_imgproc
-#    LIBS += -lopencv_imgcodecs
-#    LIBS += -lopencv_video
-#    LIBS += -lopencv_videoio
-#    LIBS += -lopencv_highgui
-#}
+unix {
+    INCLUDEPATH += -L/usr/include/opencv2
+    LIBS += -lopencv_core
+    LIBS += -lopencv_imgproc
+    LIBS += -lopencv_imgcodecs
+    LIBS += -lopencv_video
+    LIBS += -lopencv_videoio
+    LIBS += -lopencv_highgui
+}
 
 
 #
