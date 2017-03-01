@@ -44,6 +44,10 @@ void FileHandlerTest::projectHandlingTest(){
     //check file contents
     fh->loadProject(fh->getDir(proj->m_dir));
     //check project contentss
+    fh->deleteFile(vid1);
+    fh->deleteFile(vid2);
+    fh->deleteFile(vid3);
+    fh->deleteProject(proj);
 }
 //
 // Test that creation and deletion of directories are working correctly.
