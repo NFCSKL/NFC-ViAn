@@ -21,5 +21,6 @@ int main(int argc, char *argv[])
     //testing file handling
     FileHandlerTest* test = new FileHandlerTest();
     QTest::qExec(test) ;
-    return 0;
+    QTest::qExec(test) ;
+    return a.exec();
 }

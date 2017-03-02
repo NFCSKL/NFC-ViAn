@@ -25,17 +25,12 @@ void test_video_player::test_load_video() {
 /**
  * @brief test_video_player::test_play
  */
-void test_video_player::test_play() {
-    mvideo->play();
-    QVERIFY(!mvideo->video_paused);
-}
-
-/**
- * @brief test_video_player::test_pause
- */
-void test_video_player::test_pause() {
-    mvideo->pause();
-    QVERIFY(mvideo->video_paused);
+void test_video_player::test_play_pause() {
+    mvideo->video_paused = false;
+    mvideo->play_pause();
+    QVERIFY(mvideo->is_paused());
+    mvideo->play_pause();
+    QVERIFY(!mvideo->is_paused());
 }
 
 /**
@@ -69,6 +64,14 @@ void test_video_player::test_set_frame_width() {
 void test_video_player::test_set_frame_height() {
     mvideo->set_frame_height(50);
     QVERIFY(mvideo->frame_height == 50);
+}
+
+/**
+ * @brief test_video_player::test_set_playback_frame
+ */
+void test_video_player::test_set_playback_frame() {
+    mvideo->set_playback_frame(100);
+    QVERIFY(mvideo->current_frame == 100);
 }
 
 

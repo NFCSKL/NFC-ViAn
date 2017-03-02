@@ -9,7 +9,9 @@
 using namespace std;
 using namespace cv;
 
-video_player::video_player(QObject* parent) : QThread(parent) {}
+video_player::video_player(QObject* parent) : QThread(parent) {
+    video_paused = false;
+}
 
 
 //
@@ -36,18 +38,10 @@ bool video_player::load_video(string filename) {
 
 /**
  * @brief video_player::play
- * Sets boolean so the main loop in run() will not exit.
+ * Toggles the video_paused boolean
  */
-void video_player::play() {
-    video_paused = false;
-}
-
-/**
- * @brief video_player::pause
- * Sets boolean so the main loop in run() is exited
- */
-void video_player::pause() {
-    video_paused = true;
+void video_player::play_pause() {
+    video_paused = !video_paused;
 }
 
 /**
@@ -57,7 +51,6 @@ void video_player::pause() {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    video_paused = false;
     stop = false;
     int delay = (1000/frame_rate);
 
@@ -127,4 +120,15 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
+}
+
+/**
+ * @brief video_player::set_playback_frame
+ * Moves the playback to the frame specified by frame_num
+ * @param frame_num
+ */
+void video_player::set_playback_frame(int frame_num) {
+    if (frame_num < get_num_frames() && frame_num >= 0) {
+        current_frame = frame_num;
+    }
 }

@@ -13,12 +13,12 @@ public:
     explicit test_video_player(QObject *parent = 0);
 private slots:
     void test_load_video();
-    void test_play();
-    void test_pause();
+    void test_play_pause();
     void test_is_paused();
     void test_get_num_frames();
     void test_set_frame_width();
     void test_set_frame_height();
+    void test_set_playback_frame();
 
 private:
     video_player* mvideo;
