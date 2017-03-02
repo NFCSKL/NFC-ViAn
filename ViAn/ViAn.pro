@@ -13,8 +13,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ViAn
 TEMPLATE = app
-
+#
+# GENERAL
+#
 SOURCES += main.cpp
+
 #
 # TEST
 #
@@ -38,9 +41,9 @@ HEADERS  += GUI/mainwindow.h \
 
 FORMS    += GUI/mainwindow.ui
 
-RESOURCES += \
-    resources.qrc
+RESOURCES += resources.qrc
 #
+# START :
 # VIDEOPLAYER
 # OPENCV
 #
@@ -66,13 +69,15 @@ unix {
     LIBS += -lopencv_highgui
 }
 
-
 #
-# FILEHANDLER
+# START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp
 
+HEADERS  += Filehandler/filehandler.h \
+    Filehandler/project.h \
+    Filehandler/dir.h
 
 win32{
 
@@ -86,14 +91,12 @@ win32{
 macx {
     SOURCES += Filehandler/macdir.cpp
 }
+
 linux {
     SOURCES += Filehandler/linuxdir.cpp\
      Filehandler/macdir.cpp
 }
 
-
-HEADERS  += Filehandler/filehandler.h \
-    Filehandler/project.h \
-    Filehandler/dir.h
-
-
+#
+# END: FILEHANDLER
+#

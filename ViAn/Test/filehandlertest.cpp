@@ -19,7 +19,7 @@
 // Tests that creation, manipulation and deletion of
 // projects functions as intended
 //
-FileHandlerTest::FileHandlerTest(){
+filehandlertest::filehandlertest(QObject *parent) : QObject(parent){
 
 }
 /**
@@ -27,7 +27,7 @@ FileHandlerTest::FileHandlerTest(){
  * not much to test currently, will be extended
  * with furter implementation of project manipulation
  */
-void FileHandlerTest::projectHandlingTest(){
+void filehandlertest::projectHandlingTest(){
     FileHandler* fh = new FileHandler();
     Project* proj =  fh->createProject("/TEST_PROJ");
     std::string v1 = "video1.txt"; // names for testfiles
@@ -52,7 +52,7 @@ void FileHandlerTest::projectHandlingTest(){
 //
 // Test that creation and deletion of directories are working correctly.
 //
-void FileHandlerTest::directoryTest(){
+void filehandlertest::directoryTest(){
     FileHandler* fh = new FileHandler();
     std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
     int err = fh->createDirectory(dirpath);
@@ -67,7 +67,7 @@ void FileHandlerTest::directoryTest(){
 // int deleteFile(ID id);
 // void writeFile(ID id, std::string text);
 
-void FileHandlerTest::fileTest(){
+void filehandlertest::fileTest(){
     FileHandler* fh = new FileHandler();
     std::string dirpath = std::string(WORKSPACE) + "/TEST_MAP";
     std::string filename = "filetest.txt";

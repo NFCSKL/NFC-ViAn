@@ -4,18 +4,17 @@
 #include "ui_mainwindow.h"
 #include <string>
 
-using namespace std;
 
 class IconOnButtonHandler{
 public:
     explicit IconOnButtonHandler();
     ~IconOnButtonHandler();
     void set_pictures_to_buttons(Ui::MainWindow *ui);
-    void setIcon(string icon, QPushButton *button);
+    void setIcon(std::string icon, QPushButton *button);
 
 
 private slots:
-    map <string, QIcon> iconMap;
+    std::map <std::string, QIcon> iconMap;
 
 private:
 
