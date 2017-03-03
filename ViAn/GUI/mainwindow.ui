@@ -78,6 +78,19 @@
            <enum>QLayout::SetNoConstraint</enum>
           </property>
           <item>
+           <widget class="QPushButton" name="fastBackwardButton">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>&lt;&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="previousFrameButton">
             <property name="minimumSize">
              <size>
@@ -135,6 +148,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="fastForwardButton">
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>&gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="stopButton">
             <property name="minimumSize">
              <size>
@@ -168,7 +194,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Bookmark</string>
+             <string>*</string>
             </property>
            </widget>
           </item>
@@ -235,7 +261,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">

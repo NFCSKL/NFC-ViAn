@@ -49,6 +49,14 @@ private slots:
 
     void resizeEvent(QResizeEvent* event);
 
+    void on_previousFrameButton_clicked();
+
+    void on_nextFrameButton_clicked();
+
+    void on_fastBackwardButton_clicked();
+
+    void on_fastForwardButton_clicked();
+
 private:
 
     Ui::MainWindow *ui;

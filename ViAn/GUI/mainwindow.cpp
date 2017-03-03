@@ -62,10 +62,28 @@ void MainWindow::setStatusBar(string status, int timer = 750){
 }
 
 /**
+ * @brief MainWindow::on_fastBackwardButton_clicked
+ * The button supposed to play the video slower
+ *
+ */
+void MainWindow::on_fastBackwardButton_clicked()
+{
+
+}
+
+/**
+ * @brief MainWindow::on_previousFrameButton_clicked
+ * The button supposed to get to the previous frame
+ */
+void MainWindow::on_previousFrameButton_clicked()
+{
+
+}
+
+/**
  * @brief MainWindow::on_playPauseButton_clicked
  * The button supposed to play and pause the video
  */
-
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused()) {
         setStatusBar("Pauesd");
@@ -78,6 +96,24 @@ void MainWindow::on_playPauseButton_clicked() {
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to get to the next frame
+ */
+void MainWindow::on_nextFrameButton_clicked()
+{
+
+}
+
+/**
+ * @brief MainWindow::on_fastForwardButton_clicked
+ * The button supposed to play the video faster
+ */
+void MainWindow::on_fastForwardButton_clicked()
+{
+
 }
 
 /**
