@@ -5,7 +5,6 @@
 #include <QCloseEvent>
 #include <chrono>
 #include <thread>
-#include <iostream>
 #include "icononbuttonhandler.h"
 
 using namespace std;
@@ -70,12 +69,12 @@ void MainWindow::setStatusBar(string status, int timer = 750){
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused()) {
         setStatusBar("Pauesd");
-        iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
+        iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         mvideo_player->play_pause();
         mvideo_player->start();
     } else {
         setStatusBar("Playing");
-        iconOnButtonHandler->setIcon("play", ui->playButton);
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
@@ -94,7 +93,7 @@ void MainWindow::on_stopButton_clicked()
     // The code here is only temporary and should be moved/removed
     // once a proper video selector is added
     mvideo_player->load_video("seq_01.mp4");
-    iconOnButtonHandler->setIcon("pause", ui->playButton);
+    iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
 }
 

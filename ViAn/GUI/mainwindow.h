@@ -38,14 +38,11 @@ private slots:
 
     void on_stopButton_clicked();
 
-    void on_videoSlider_valueChanged(int newPos);
-
     void on_actionExit_triggered();
 
     void setShortcuts();
 
     void closeEvent (QCloseEvent *event);
-
 
     void update_video(QImage frame);
     void set_video_slider_pos(int pos);
