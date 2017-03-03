@@ -90,4 +90,34 @@ void test_video_player::test_set_playback_frame() {
     QVERIFY(mvideo->current_frame == 100);
 }
 
+/**
+ * @brief test_video_player::test_inc_playback_speed
+ */
+void test_video_player::test_inc_playback_speed(){
+    mvideo->set_speed_multiplier(1);
+    QVERIFY(mvideo->get_speed_multiplier() == 1);
+
+    mvideo->inc_playback_speed();
+    QVERIFY(mvideo->get_speed_multiplier() == 0.5);
+
+    mvideo->set_speed_multiplier(1.0/16);
+    mvideo->inc_playback_speed();
+    QVERIFY(mvideo->get_speed_multiplier() == 1.0/16);
+}
+
+/**
+ * @brief test_video_player::test_dec_playback_speed
+ */
+void test_video_player::test_dec_playback_speed(){
+    mvideo->set_speed_multiplier(1);
+    QVERIFY(mvideo->get_speed_multiplier() == 1);
+
+    mvideo->dec_playback_speed();
+    QVERIFY(mvideo->get_speed_multiplier() == 2);
+
+    mvideo->set_speed_multiplier(16);
+    mvideo->dec_playback_speed();
+    QVERIFY(mvideo->get_speed_multiplier() == 16);
+}
+
 

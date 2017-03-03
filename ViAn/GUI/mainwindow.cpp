@@ -143,5 +143,3 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
         }
     }
 }
-
-

@@ -105,14 +105,14 @@ void video_player::run()  {
  * @param delay
  */
 void video_player::msleep(int delay) {
-    std::chrono::milliseconds dura(delay);
+    std::chrono::milliseconds dura((int)(delay*this->speed_multiplier));
     std::this_thread::sleep_for( dura );
 }
 
 /**
  * @brief video_player::is_paused
  * Returns a boolean value representing whether the currently played video is paused.
- * @return
+ * @return if the video is paused or not
  */
 bool video_player::is_paused() {
     return video_paused;
@@ -159,5 +159,43 @@ void video_player::set_frame_height(int new_value) {
 void video_player::set_playback_frame(int frame_num) {
     if (frame_num < get_num_frames() && frame_num >= 0) {
         current_frame = frame_num;
+    }
+}
+
+/**
+ * @brief video_player::set_playback_speed
+ * Sets the speed multiplyer for playback.
+ * High value gives slower playback and vice versa.
+ * @param speed multiplier value
+ */
+void video_player::set_speed_multiplier(double mult) {
+    this->speed_multiplier = mult;
+}
+
+/**
+ * @brief video_player::get_speed_multiplier
+ * @return speed multiplier
+ */
+double video_player::get_speed_multiplier() {
+    return this->speed_multiplier;
+}
+
+/**
+ * @brief video_player::dec_playback_speed
+ * Decreases the playback speed by a factor of 2
+ */
+void video_player::dec_playback_speed() {
+    if (this->speed_multiplier < MAX_SPEED_MULT) {
+        this->set_speed_multiplier(this->get_speed_multiplier()*SPEED_STEP_MULT);
+    }
+}
+
+/**
+ * @brief video_player::inc_playback_speed
+ * Increases the playback speed by a factor of 2
+ */
+void video_player::inc_playback_speed() {
+    if (this->speed_multiplier > MIN_SPEED_MULT) {
+        this->set_speed_multiplier(this->get_speed_multiplier()/SPEED_STEP_MULT);
     }
 }

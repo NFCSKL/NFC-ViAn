@@ -39,6 +39,7 @@ private slots:
     void set_video_slider_pos(int pos);
 
     void resizeEvent(QResizeEvent* event);
+
 private:
 
     Ui::MainWindow *ui;
