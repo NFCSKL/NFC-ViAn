@@ -70,6 +70,7 @@ void MainWindow::on_pauseButton_clicked() {
     mvideo_player->load_video("seq_01.mp4");
     iconOnButtonHandler->setIcon("pause", ui->playButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
+    mvideo_player->set_playback_frame(700);
 }
 
 
@@ -148,3 +149,13 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
 }
 
 
+
+void MainWindow::on_previousFrameButton_clicked() {
+    mvideo_player->dec_playback_speed();
+    cout << mvideo_player->get_speed_multiplier() << endl;
+}
+
+void MainWindow::on_nextFrameButton_clicked() {
+    mvideo_player->inc_playback_speed();
+    cout << mvideo_player->get_speed_multiplier()*16 << endl;
+}
