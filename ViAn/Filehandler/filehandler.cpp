@@ -207,9 +207,9 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   * @return void
   */
  void FileHandler::addProject(std::pair<ID,Project*> pair){
-    this->dirMapLock.lock();
+    this->projMapLock.lock();
     this->m_projects.insert(pair);
-    this->dirMapLock.unlock();
+    this->projMapLock.unlock();
 
  }
  /**
