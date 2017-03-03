@@ -83,7 +83,27 @@ void MainWindow::on_stopButton_clicked() {
     }
 
     mvideo_player->set_playback_frame(0);
-    set_video_slider_pos(0);
+    iconOnButtonHandler->setIcon("play", ui->playButton);
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to play the next frame of the video
+ */
+void MainWindow::on_nextFrameButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        mvideo_player->next_frame();
+    }
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to play the previous frame of the video
+ */
+void MainWindow::on_previousFrameButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        mvideo_player->previous_frame();
+    }
 }
 
 /**

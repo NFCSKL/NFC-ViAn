@@ -36,6 +36,9 @@ private slots:
 
     void on_playButton_clicked();
 
+    void on_nextFrameButton_clicked();
+    void on_previousFrameButton_clicked();
+
     void update_video(QImage frame);
     void set_video_slider_pos(int pos);
 

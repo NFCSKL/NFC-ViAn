@@ -28,6 +28,8 @@ public:
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_playback_frame(int frame_num);
+    void next_frame();
+    void previous_frame();
 
     friend class test_video_player;
 
@@ -38,6 +40,7 @@ protected:
     void run() override;
     void msleep(int ms);
 private:
+    void update_frame();
     unsigned int current_frame = 0;
     VideoCapture capture;
     double frame_rate;

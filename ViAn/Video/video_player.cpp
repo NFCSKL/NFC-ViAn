@@ -13,8 +13,6 @@ video_player::video_player(QObject* parent) : QThread(parent) {
     video_paused = false;
 }
 
-
-//
 /**
  * @brief video_player::load_video
  * This method loads a video from file.
@@ -57,17 +55,7 @@ void video_player::run()  {
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
 
     while(!stop && !video_paused && capture.read(frame)){
-        if (frame.channels()== 3) {
-            cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
-            img = QImage((const unsigned char*)(RGBframe.data),
-                              RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
-        } else {
-            img = QImage((const unsigned char*)(frame.data),
-                                 frame.cols,frame.rows,QImage::Format_Indexed8);
-        }
-
-        emit processedImage(img);
-        emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
+        update_frame();
         this->msleep(delay);
 
     }
@@ -75,6 +63,24 @@ void video_player::run()  {
     if (video_paused) {
         current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
     }
+}
+
+/**
+ * @brief update_frame
+ * Calculates and emits the current frame to GUI.
+ */
+void video_player::update_frame() {
+    if (frame.channels()== 3) {
+        cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
+        img = QImage((const unsigned char*)(RGBframe.data),
+                          RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+    } else {
+        img = QImage((const unsigned char*)(frame.data),
+                             frame.cols,frame.rows,QImage::Format_Indexed8);
+    }
+
+    emit processedImage(img);
+    emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
 }
 
 
@@ -132,4 +138,22 @@ void video_player::set_playback_frame(int frame_num) {
         capture.set(CAP_PROP_POS_FRAMES, (double)frame_num);
         current_frame = frame_num;
     }
+    capture.read(frame);
+    update_frame();
+}
+
+/**
+ * @brief video_player::next_frame
+ * Moves the playback one frame forward.
+ */
+void video_player::next_frame() {
+    set_playback_frame(current_frame + 1);
+}
+
+/**
+ * @brief video_player::next_frame
+ * Moves the playback one frame backward.
+ */
+void video_player::previous_frame() {
+    set_playback_frame(current_frame - 1);
 }
