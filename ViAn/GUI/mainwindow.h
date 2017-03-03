@@ -13,7 +13,6 @@
 #include "icononbuttonhandler.h"
 
 using namespace std;
-using namespace cv;
 
 
 namespace Ui {

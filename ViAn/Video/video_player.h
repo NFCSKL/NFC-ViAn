@@ -14,7 +14,6 @@
 #include <chrono>
 
 using namespace std;
-using namespace cv;
 
 
 class video_player : public QThread { Q_OBJECT
@@ -22,8 +21,11 @@ public:
     video_player(QObject* parent = 0);
     bool load_video(string filename);
     bool is_paused();
+    bool is_stopped();
+    
     int get_num_frames();    
     void play_pause();
+    void stop_video();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_playback_frame(int frame_num);
@@ -33,6 +35,10 @@ public:
 
     void inc_playback_speed();
     void dec_playback_speed();
+    
+    
+
+
 
     friend class test_video_player;
 
@@ -50,9 +56,10 @@ protected:
     void msleep(int ms);
 
 private:
-    VideoCapture capture;
-    Mat frame;
-    Mat RGBframe;
+
+    cv::VideoCapture capture;
+    cv::Mat frame;
+    cv::Mat RGBframe;
 
     int num_frames;
     unsigned int current_frame = 0;
