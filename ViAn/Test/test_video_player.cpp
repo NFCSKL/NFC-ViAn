@@ -1,5 +1,4 @@
 #include "test_video_player.h"
-#include <iostream>
 
 /**
  * @brief test_video_player::test_video_player

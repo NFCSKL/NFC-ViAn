@@ -151,12 +151,20 @@ double video_player::get_speed_multiplier() {
     return this->speed_multiplier;
 }
 
+/**
+ * @brief video_player::dec_playback_speed
+ * Decreases the playback speed by a factor of 2
+ */
 void video_player::dec_playback_speed() {
     if (this->speed_multiplier < MAX_SPEED_MULT) {
         this->set_speed_multiplier(this->get_speed_multiplier()*SPEED_STEP_MULT);
     }
 }
 
+/**
+ * @brief video_player::inc_playback_speed
+ * Increases the playback speed by a factor of 2
+ */
 void video_player::inc_playback_speed() {
     if (this->speed_multiplier > MIN_SPEED_MULT) {
         this->set_speed_multiplier(this->get_speed_multiplier()/SPEED_STEP_MULT);

@@ -40,9 +40,6 @@ private slots:
     void set_video_slider_pos(int pos);
 
     void resizeEvent(QResizeEvent* event);
-    void on_previousFrameButton_clicked();
-
-    void on_nextFrameButton_clicked();
 
 private:
 
