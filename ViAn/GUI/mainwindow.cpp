@@ -147,15 +147,3 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
         }
     }
 }
-
-
-
-void MainWindow::on_previousFrameButton_clicked() {
-    mvideo_player->dec_playback_speed();
-    cout << mvideo_player->get_speed_multiplier() << endl;
-}
-
-void MainWindow::on_nextFrameButton_clicked() {
-    mvideo_player->inc_playback_speed();
-    cout << mvideo_player->get_speed_multiplier()*16 << endl;
-}
