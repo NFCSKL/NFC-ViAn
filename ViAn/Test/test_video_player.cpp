@@ -74,11 +74,6 @@ void test_video_player::test_set_playback_frame() {
     QVERIFY(mvideo->current_frame == 100);
 }
 
-void test_video_player::test_set_speed_multiplier()
-{
-
-}
-
 /**
  * @brief test_video_player::test_inc_playback_speed
  */
