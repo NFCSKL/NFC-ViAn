@@ -34,16 +34,18 @@ public:
     //
     Project* openProject(std::string dirpath);
     Project* createProject(std::string projName);
-
+    FH_ERROR deleteProject(Project* proj);
     void saveProject(Project* proj);
     Project* loadProject(std::string filePath);
+
     void addVideo(Project* proj, std::string filePath);
-    void extract_proj_obj(std::string line);
-    FH_ERROR deleteProject(Project* proj);
+
+    //directory manipulation
     //varying implementation
     ID createDirectory(std::string dirpath);
     FH_ERROR deleteDirectory(std::string dirpath);
 
+    //file manipulation
     ID createFile(std::string filename, ID dirID);
     FH_ERROR deleteFile(ID id);
     void writeFile(ID id, std::string text);
