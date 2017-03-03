@@ -13,6 +13,7 @@
 #elif __linux__
     #include <sys/stat.h>
     #include <sys/types.h>
+    #include <unistd.h>
 #endif
 
 int makeDir(std::string dirpath);
