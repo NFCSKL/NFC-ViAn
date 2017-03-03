@@ -78,15 +78,13 @@ void MainWindow::on_playPauseButton_clicked() {
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
-
 }
 
 /**
  * @brief MainWindow::on_stopButton_clicked
  * The button supposed to stop the video
  */
-void MainWindow::on_stopButton_clicked()
-{
+void MainWindow::on_stopButton_clicked(){
     setStatusBar("Stopped");
 
 
@@ -156,6 +154,11 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
         }
     }
 }
+/**
+ * @brief MainWindow::closeEvent
+ * asks if you are sure you want to quit.
+ * @param event closing
+ */
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
@@ -169,7 +172,10 @@ void MainWindow::closeEvent (QCloseEvent *event)
         event->accept();
     }
 }
-
+/**
+ * @brief MainWindow::on_actionExit_triggered
+ * sends a closeEvent when you press exit
+ */
 void MainWindow::on_actionExit_triggered()
 {
     this->close();

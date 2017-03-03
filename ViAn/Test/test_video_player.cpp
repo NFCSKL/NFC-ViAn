@@ -66,4 +66,12 @@ void test_video_player::test_set_frame_height() {
     QVERIFY(mvideo->frame_height == 50);
 }
 
+/**
+ * @brief test_video_player::test_set_playback_frame
+ */
+void test_video_player::test_set_playback_frame() {
+    mvideo->set_playback_frame(100);
+    QVERIFY(mvideo->current_frame == 100);
+}
+
 

@@ -27,6 +27,7 @@ public:
     int get_num_frames();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
+    void set_playback_frame(int frame_num);
 
     friend class test_video_player;
 
