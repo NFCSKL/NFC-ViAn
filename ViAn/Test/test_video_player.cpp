@@ -87,7 +87,6 @@ void test_video_player::test_inc_playback_speed(){
     mvideo->set_speed_multiplier(1.0/16);
     mvideo->inc_playback_speed();
     QVERIFY(mvideo->get_speed_multiplier() == 1.0/16);
-
 }
 
 /**

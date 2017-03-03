@@ -92,7 +92,7 @@ void video_player::msleep(int delay) {
 /**
  * @brief video_player::is_paused
  * Returns a boolean value representing whether the currently played video is paused.
- * @return
+ * @return if the video is paused or not
  */
 bool video_player::is_paused() {
     return video_paused;
@@ -137,7 +137,7 @@ void video_player::set_playback_frame(int frame_num) {
  * @brief video_player::set_playback_speed
  * Sets the speed multiplyer for playback.
  * High value gives slower playback and vice versa.
- * @param mult
+ * @param speed multiplier value
  */
 void video_player::set_speed_multiplier(double mult) {
     this->speed_multiplier = mult;
@@ -145,7 +145,7 @@ void video_player::set_speed_multiplier(double mult) {
 
 /**
  * @brief video_player::get_speed_multiplier
- * @return
+ * @return speed multiplier
  */
 double video_player::get_speed_multiplier() {
     return this->speed_multiplier;
