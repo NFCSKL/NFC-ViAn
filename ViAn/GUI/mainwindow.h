@@ -16,7 +16,6 @@
 #include "ui_mainwindow.h"
 
 using namespace std;
-using namespace cv;
 
 
 namespace Ui {
@@ -56,6 +55,8 @@ private slots:
     void on_fastBackwardButton_clicked();
 
     void on_fastForwardButton_clicked();
+
+    void on_bookmarkButton_clicked();
 
 private:
 

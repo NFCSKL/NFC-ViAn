@@ -85,10 +85,8 @@ void MainWindow::on_previousFrameButton_clicked()
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked() {
-    if (mvideo_player->is_paused()) {
-        setStatusBar("Pauesd");
+    if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
         iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
-        mvideo_player->play_pause();
         mvideo_player->start();
     } else {
         setStatusBar("Playing");
@@ -102,6 +100,7 @@ void MainWindow::on_playPauseButton_clicked() {
  * @brief MainWindow::on_nextFrameButton_clicked
  * The button supposed to get to the next frame
  */
+
 void MainWindow::on_nextFrameButton_clicked()
 {
 
@@ -120,15 +119,12 @@ void MainWindow::on_fastForwardButton_clicked()
  * @brief MainWindow::on_stopButton_clicked
  * The button supposed to stop the video
  */
-void MainWindow::on_stopButton_clicked(){
+void MainWindow::on_stopButton_clicked() {
     setStatusBar("Stopped");
-
-
-    // The code here is only temporary and should be moved/removed
-    // once a proper video selector is added
-    mvideo_player->load_video("seq_01.mp4");
-    iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
-    video_slider->setMaximum(mvideo_player->get_num_frames());
+    if (!mvideo_player->is_paused()) {
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);
+    }
+    mvideo_player->stop_video();
 }
 
 /**
@@ -215,4 +211,17 @@ void MainWindow::closeEvent (QCloseEvent *event)
 void MainWindow::on_actionExit_triggered()
 {
     this->close();
+}
+
+/**
+ * @brief MainWindow::on_bookmarkButton_clicked
+ * the button supposed to add a bookmark
+ */
+void MainWindow::on_bookmarkButton_clicked()
+{
+    // The code here is only temporary and should be moved/removed
+    // once a proper video selector is added
+    mvideo_player->load_video("seq_01.mp4");
+    iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
+    video_slider->setMaximum(mvideo_player->get_num_frames());
 }
