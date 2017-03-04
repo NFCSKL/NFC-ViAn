@@ -66,8 +66,8 @@ void MainWindow::on_playButton_clicked() {
 void MainWindow::on_pauseButton_clicked() {
     // The code here is only temporary and should be moved/removed
     // once a proper video selector is added
-    //mvideo_player->load_video("seq_01.mp4");
-    mvideo_player->load_video("mf.mkv");
+    mvideo_player->load_video("seq_01.mp4");
+    //mvideo_player->load_video("mf.mkv");
     iconOnButtonHandler->setIcon("pause", ui->playButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
 }

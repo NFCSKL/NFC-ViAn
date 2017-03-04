@@ -47,9 +47,8 @@ void video_player::play_pause() {
  */
 void video_player::stop_video() {
     stop = true;
+    set_playback_frame(0);
     if (video_paused) {
-        emit currentFrame(0);
-        current_frame = 0;
         video_paused = false;
     }
 
@@ -70,19 +69,7 @@ void video_player::run()  {
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
 
     while(!stop && !video_paused && capture.read(frame)){
-        //update_frame();
-        emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
-
-        if (frame.channels()== 3) {
-            cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
-            img = QImage((const unsigned char*)(RGBframe.data),
-                              RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
-        } else {
-            img = QImage((const unsigned char*)(frame.data),
-                                 frame.cols,frame.rows,QImage::Format_Indexed8);
-        }
-
-        emit processedImage(img);
+        update_frame();
 
         this->msleep(delay);
 
@@ -91,7 +78,6 @@ void video_player::run()  {
     if (video_paused) {
         current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
     } else if (stop) {
-        emit currentFrame(0);
         current_frame = 0;
     }
 }
@@ -101,6 +87,8 @@ void video_player::run()  {
  * Calculates and emits the current frame to GUI.
  */
 void video_player::update_frame() {
+    emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
+
     if (frame.channels()== 3) {
         cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
@@ -111,9 +99,7 @@ void video_player::update_frame() {
     }
 
     emit processedImage(img);
-    emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
 }
-
 
 /**
  * @brief video_player::msleep
@@ -175,6 +161,7 @@ void video_player::set_frame_height(int new_value) {
  */
 void video_player::set_playback_frame(int frame_num) {
     if (frame_num < get_num_frames() && frame_num >= 0) {
+        capture.set(CAP_PROP_POS_FRAMES, (double)frame_num);
         current_frame = frame_num;
     }
     capture.read(frame);
