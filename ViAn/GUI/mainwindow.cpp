@@ -66,7 +66,6 @@ void MainWindow::on_playButton_clicked() {
 void MainWindow::on_pauseButton_clicked() {
     // The code here is only temporary and should be moved/removed
     // once a proper video selector is added
-    //mvideo_player->load_video("seq_01.mp4");
     mvideo_player->load_video("seq_01.mp4");
     iconOnButtonHandler->setIcon("pause", ui->playButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
@@ -81,7 +80,28 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->setIcon("play", ui->playButton);
     }
+
     mvideo_player->stop_video();
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to play the next frame of the video
+ */
+void MainWindow::on_nextFrameButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        mvideo_player->next_frame();
+    }
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to play the previous frame of the video
+ */
+void MainWindow::on_previousFrameButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        mvideo_player->previous_frame();
+    }
 }
 
 /**

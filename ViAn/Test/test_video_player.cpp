@@ -86,8 +86,29 @@ void test_video_player::test_set_frame_height() {
  * @brief test_video_player::test_set_playback_frame
  */
 void test_video_player::test_set_playback_frame() {
+    mvideo->load_video("seq_01.mp4");
     mvideo->set_playback_frame(100);
     QVERIFY(mvideo->current_frame == 100);
+}
+
+/**
+ * @brief test_video_player::test_next_frame
+ */
+void test_video_player::test_next_frame() {
+    mvideo->load_video("seq_01.mp4");
+    mvideo->set_playback_frame(100);
+    mvideo->next_frame();
+    QVERIFY(mvideo->current_frame == 101);
+}
+
+/**
+ * @brief test_video_player::test_previous_frame
+ */
+void test_video_player::test_previous_frame() {
+    mvideo->load_video("seq_01.mp4");
+    mvideo->set_playback_frame(100);
+    mvideo->previous_frame();
+    QVERIFY(mvideo->current_frame == 99);
 }
 
 /**
