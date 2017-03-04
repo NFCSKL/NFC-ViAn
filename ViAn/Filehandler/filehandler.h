@@ -6,6 +6,7 @@
     #include <windows.h>
     #include "stringhelper.h"
 #elif __APPLE__
+#elif __unix__
 #endif
 #include <vector>
 #include <string>
@@ -19,6 +20,9 @@
     #define WORKSPACE "C:/"
 #elif __APPLE__
     #define WORKSPACE "/Applications"
+#elif __unix__
+    #define  WORKSPACE "~/"
+
 #endif
 
 typedef int FH_ERROR; // file handler error code
