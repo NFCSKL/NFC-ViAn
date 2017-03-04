@@ -14,6 +14,8 @@
 #include "opencv2/core/core.hpp"
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
+#include "Filehandler/filehandler.h"
+#include "inputwindow.h"
 
 using namespace std;
 
@@ -58,9 +60,12 @@ private slots:
 
     void on_bookmarkButton_clicked();
 
+    void on_actionAddProject_triggered();
+
 private:
 
     Ui::MainWindow *ui;
+    inputwindow *input;
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
 

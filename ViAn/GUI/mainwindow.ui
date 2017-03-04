@@ -275,8 +275,8 @@
      <property name="title">
       <string>Add</string>
      </property>
-     <addaction name="actionProject"/>
-     <addaction name="actionVideo"/>
+     <addaction name="actionAddProject"/>
+     <addaction name="actionAddVideo"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
@@ -310,14 +310,20 @@
     <string>Load</string>
    </property>
   </action>
-  <action name="actionProject">
+  <action name="actionAddProject">
    <property name="text">
     <string>Project</string>
    </property>
+   <property name="toolTip">
+    <string>AddProject</string>
+   </property>
   </action>
-  <action name="actionVideo">
+  <action name="actionAddVideo">
    <property name="text">
     <string>Video</string>
+   </property>
+   <property name="toolTip">
+    <string>AddVideo</string>
    </property>
   </action>
   <action name="actionOptions">
