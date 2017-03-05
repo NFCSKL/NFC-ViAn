@@ -29,7 +29,7 @@ filehandlertest::filehandlertest(QObject *parent) : QObject(parent){
  */
 void filehandlertest::projectHandlingTest(){
     FileHandler* fh = new FileHandler();
-    Project* proj =  fh->createProject("/TEST_PROJ");
+    Project* proj =  fh->createProject("TEST_PROJ");
     std::string v1 = "video1.txt"; // names for testfiles
     std::string v2 = "video2.txt";
     std::string v3 = "video3.txt";
@@ -40,21 +40,23 @@ void filehandlertest::projectHandlingTest(){
     fh->addVideo(proj, fh->getFile(vid1)); //add tesfiles as videos to project.
     fh->addVideo(proj, fh->getFile(vid2));
     fh->addVideo(proj, fh->getFile(vid3));
+
     fh->saveProject(proj);
     //check file contents
-    fh->loadProject(fh->getDir(proj->m_dir));
+    Project* proj2 = fh->loadProject(fh->getDir(proj->m_dir));
+    QVERIFY(*proj2 == *proj);
     //check project contentss
-    fh->deleteFile(vid1);
-    fh->deleteFile(vid2);
-    fh->deleteFile(vid3);
-    fh->deleteProject(proj);
+//    fh->deleteFile(vid1);
+//    fh->deleteFile(vid2);
+//    fh->deleteFile(vid3);
+//    fh->deleteProject(proj);
 }
 //
 // Test that creation and deletion of directories are working correctly.
 //
 void filehandlertest::directoryTest(){
     FileHandler* fh = new FileHandler();
-    std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
+    std::string dirpath = std::string(WORKSPACE) + std::string("TEST_PROJ");
     int err = fh->createDirectory(dirpath);
     QCOMPARE(err, 0);
     QCOMPARE(fh->deleteDirectory(dirpath), 0);
@@ -69,7 +71,7 @@ void filehandlertest::directoryTest(){
 
 void filehandlertest::fileTest(){
     FileHandler* fh = new FileHandler();
-    std::string dirpath = std::string(WORKSPACE) + "/TEST_MAP";
+    std::string dirpath = std::string(WORKSPACE) + "TEST_MAP";
     std::string filename = "filetest.txt";
     ID dir = fh->createDirectory(dirpath);
     ID fileID  = fh->createFile(filename,dir); //Create file ID = i    (1)

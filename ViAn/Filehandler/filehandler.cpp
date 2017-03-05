@@ -45,11 +45,29 @@ FH_ERROR FileHandler::deleteDirectory(std::string dirpath){
  * @return void
  */
 void FileHandler::saveProject(Project* proj){
+    ID projfile = -1;
     std::string fileName = proj->m_name + std::string(".txt"); //filename
     ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
     proj->m_dir = dirID;
-    proj->m_file = createFile(fileName, dirID); //create project file
-    updateProjFile(proj);
+
+    projfile = createFile(fileName, dirID); //create project file
+    proj->m_file = projfile;
+
+    fileName = proj->m_name + "_videos.txt";
+    ID id = createFile(fileName, dirID); //create video file
+    writeFile(proj->m_file, fileName);
+
+
+    fileName = proj->m_name + "_analyses.txt";
+    createFile(fileName, dirID); //create analysis file
+    writeFile(proj->m_file, fileName);
+
+    fileName = proj->m_name + "_drawings.txt";
+    createFile(fileName, dirID); //create drawings file
+    writeFile(proj->m_file, fileName);
+
+    proj->m_file = id;
+    updateProjFiles(proj);
 
 }
 /**
@@ -60,30 +78,30 @@ void FileHandler::saveProject(Project* proj){
  * Creates project and associated files.
  * @return void
  */
-void FileHandler::updateProjFile(Project* proj){
-    std::string projstr = "";
-    projstr += "Name:"+proj->m_name + "\n";
-    std::vector<Video> vids = proj->m_videos;
-    for (std::vector<Video>::iterator v = vids.begin();v != vids.end(); ++v) {
-        projstr += "V" + std::to_string(v->id) + ":" + this->m_fileMap.at(v->id) + "\n";
-    }
-    writeFile(proj->m_file, projstr);
+void FileHandler::updateProjFiles(Project* proj){
+    std::string filePath = std::string(WORKSPACE) + "/" + proj->m_name + "/" + proj->m_name + std::string("_videos.txt");
+    std::stringstream sstr;
+    sstr << *proj;
+    writeFile(proj->m_file, sstr.str());
 }
 
 /**
  * @todo unfinished, will be released with parser, needs full
  * project structure and file to program parser to finish.
  * @brief FileHandler::loadProject
- * @param std::string
+ * @param std::string, fileopath to project file
  * Load a project object from a given filepath
  */
 Project* FileHandler::loadProject(std::string filePath){
-    Project* proj;
-    std::ifstream f(filePath);
-    std::string content = "";
-    std::string line = "";
-    proj = createProject(line.substr(0, line.find(":")));
-    //while(proj << f); //pretty magic, see << definition in proj.cpp
+    Project* proj = new Project();
+    std::stringstream sstr;
+    sstr << readFile();
+    is >> *proj; //pretty magic, see << definition in proj.cpp
+    std::cout << "##########";
+    std::cout << proj->m_id << proj->m_name;
+    std::cout << "##########";
+    }
+    return proj;
 }
 
 /**
@@ -106,7 +124,7 @@ FH_ERROR FileHandler::deleteProject(Project* proj){
  * Creates Video object which is accessed further by returned id.
  */
 void FileHandler::addVideo(Project* proj, std::string filePath){
-    Video v (this->m_fid, filePath);
+    Video* v = new Video(this->m_fid, filePath);
     proj->addVideo(v);
     this->addFile(std::make_pair(this->m_fid++,filePath));
 }
@@ -144,8 +162,8 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   */
  void FileHandler::writeFile(ID id, std::string text){
     std::string fileName = this->getFile(id);
-    std::ofstream f (fileName.c_str(),std::ios::in);
-    f << text.c_str();
+    std::ofstream f (fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);
+    f << text.c_str() << std::endl;
  }
 
  /**
@@ -158,10 +176,7 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   */
  void FileHandler::readFile(ID id, size_t linesToRead, std::string& buf){
      std::ifstream f(this->getFile(id));
-     while(linesToRead && std::getline(f,buf))
-     {
-         --linesToRead;
-     }
+     while(linesToRead-- && std::getline(f,buf));
  }
  /**
   * @brief FileHandler::getProject

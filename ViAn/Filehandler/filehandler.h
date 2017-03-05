@@ -13,17 +13,20 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
+#include <sstream>
 #include "project.h"
 #include "dir.h"
 
 #ifdef _WIN32
-    #define WORKSPACE "C:/"
+    #define WORKSPACE "C:"
 #elif __APPLE__
     #define WORKSPACE "/Applications"
 #elif __unix__
-    #define  WORKSPACE "~/"
+    #define  WORKSPACE "~"
 
 #endif
+
+
 
 typedef int FH_ERROR; // file handler error code
 typedef int ID;
@@ -61,7 +64,7 @@ public:
     std::string getFile(ID id);    
 
 private:
-    void updateProjFile(Project* proj); // used to update existing project files and maps
+    void updateProjFiles(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
     void addFile(std::pair<ID,std::string> pair);
     void addProject(std::pair<ID,Project*> pair);
