@@ -94,13 +94,7 @@ void FileHandler::updateProjFiles(Project* proj){
  */
 Project* FileHandler::loadProject(std::string filePath){
     Project* proj = new Project();
-    std::stringstream sstr;
-    sstr << readFile();
-    is >> *proj; //pretty magic, see << definition in proj.cpp
-    std::cout << "##########";
-    std::cout << proj->m_id << proj->m_name;
-    std::cout << "##########";
-    }
+
     return proj;
 }
 
