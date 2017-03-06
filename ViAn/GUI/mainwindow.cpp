@@ -225,4 +225,5 @@ void MainWindow::on_bookmarkButton_clicked(){
     mvideo_player->load_video("seq_01.mp4");
     iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
+    mvideo_player->set_playback_frame(700);
 }
