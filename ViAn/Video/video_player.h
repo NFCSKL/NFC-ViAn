@@ -55,7 +55,9 @@ protected:
     void msleep(int ms);
 
 private:
-    void update_frame();
+    void update_frame(int frame_nbr);
+    void show_frame();
+
 
     cv::VideoCapture capture;
     cv::Mat frame;
