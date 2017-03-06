@@ -28,7 +28,7 @@ public:
     void stop_video();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
-    void set_playback_frame(int frame_num);
+    bool set_playback_frame(int frame_num);
     void next_frame();
     void previous_frame();
     void set_speed_multiplier(double mult);

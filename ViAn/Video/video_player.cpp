@@ -87,6 +87,7 @@ void video_player::run()  {
  * Calculates and emits the current frame to GUI.
  */
 void video_player::update_frame() {
+    cout << "6" << endl;
     emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
 
     if (frame.channels()== 3) {
@@ -159,13 +160,13 @@ void video_player::set_frame_height(int new_value) {
  * Moves the playback to the frame specified by frame_num
  * @param frame_num
  */
-void video_player::set_playback_frame(int frame_num) {
+bool video_player::set_playback_frame(int frame_num) {
+
     if (frame_num < get_num_frames() && frame_num >= 0) {
-        capture.set(CAP_PROP_POS_FRAMES, (double)frame_num);
         current_frame = frame_num;
+        return true;
     }
-    capture.read(frame);
-    update_frame();
+    return false;
 }
 
 /**
@@ -173,7 +174,11 @@ void video_player::set_playback_frame(int frame_num) {
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
-    set_playback_frame(current_frame + 1);
+    if (set_playback_frame(current_frame + 1)) {
+        capture.set(CAP_PROP_POS_FRAMES, current_frame + 1);
+        capture.read(frame);
+        update_frame();
+    }
 }
 
 /**
@@ -181,7 +186,11 @@ void video_player::next_frame() {
  * Moves the playback one frame backward.
  */
 void video_player::previous_frame() {
-    set_playback_frame(current_frame - 1);
+    if (set_playback_frame(current_frame - 1)) {
+        capture.set(CAP_PROP_POS_FRAMES, current_frame - 1);
+        capture.read(frame);
+        update_frame();
+    }
 }
 
 /**
