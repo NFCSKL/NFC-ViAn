@@ -182,6 +182,11 @@ void video_player::previous_frame() {
     update_frame(current_frame - 1);
 }
 
+/**
+ * @brief video_player::update_frame
+ * @param frame_nbr
+ * Updates the current frame if frame_nbr is valid.
+ */
 void video_player::update_frame(int frame_nbr) {
     if (set_playback_frame(frame_nbr)) {
         capture.set(CAP_PROP_POS_FRAMES, frame_nbr);
