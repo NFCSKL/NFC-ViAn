@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QMessageBox>
+#include <iostream>
+#include <QCloseEvent>
 #include <chrono>
 #include <thread>
-#include <iostream>
 #include "icononbuttonhandler.h"
 
 using namespace std;
@@ -15,12 +17,13 @@ using namespace cv;
  */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
+    ui(new Ui::MainWindow){
     ui->setupUi(this);
     video_slider = findChild<QSlider*>("videoSlider");
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
+
+    setShortcuts();
 
     mvideo_player = new video_player();
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
@@ -45,40 +48,65 @@ MainWindow::~MainWindow() {
 }
 
 /**
- * @brief MainWindow::on_playButton_clicked
- * The button supposed to play the video
+ * @brief MainWindow::setShortcuts
+ * Function to set shortcuts on actions
  */
-void MainWindow::on_playButton_clicked() {
+void MainWindow::setShortcuts(){
+    ui->actionExit->setShortcut(tr("Ctrl+e"));
+}
+
+/**
+ * @brief MainWindow::setStatusBar
+ * @param status text to show in the statusbar
+ * @param timer time to show it in the bar in ms, 750ms is standard
+ */
+void MainWindow::setStatusBar(string status, int timer = 750){
+    ui->statusBar->showMessage(QString::fromStdString(status), timer);
+}
+
+/**
+ * @brief MainWindow::on_fastBackwardButton_clicked
+ * The button supposed to play the video slower
+ *
+ */
+void MainWindow::on_fastBackwardButton_clicked(){
+
+}
+
+
+/**
+ * @brief MainWindow::on_playPauseButton_clicked
+ * The button supposed to play and pause the video
+ */
+void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
-        iconOnButtonHandler->setIcon("pause", ui->playButton);//changes the icon on the play button to a pause-icon
+        iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         mvideo_player->start();
     } else {
-        iconOnButtonHandler->setIcon("play", ui->playButton);
+        setStatusBar("Playing");
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
 }
 
-/**
- * @brief MainWindow::on_pauseButton_clicked
- * The button supposed to pause the video
- */
-void MainWindow::on_pauseButton_clicked() {
-    // The code here is only temporary and should be moved/removed
-    // once a proper video selector is added
-    mvideo_player->load_video("seq_01.mp4");
-    iconOnButtonHandler->setIcon("pause", ui->playButton);
-    video_slider->setMaximum(mvideo_player->get_num_frames());
-}
 
+/**
+ * @brief MainWindow::on_fastForwardButton_clicked
+ * The button supposed to play the video faster
+ */
+void MainWindow::on_fastForwardButton_clicked(){
+
+}
 
 /**
  * @brief MainWindow::on_stopButton_clicked
  * The button supposed to stop the video
  */
 void MainWindow::on_stopButton_clicked() {
+    setStatusBar("Stopped");
     if (!mvideo_player->is_paused()) {
-        iconOnButtonHandler->setIcon("play", ui->playButton);
+        iconOnButtonHandler->setIcon("play", ui->playPauseButton);
     }
 
     mvideo_player->stop_video();
@@ -141,8 +169,7 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  * Update the slider to where the mouse is
  * @param newPos current position of the slider
  */
-void MainWindow::on_videoSlider_valueChanged(int newPos)
-{
+void MainWindow::on_videoSlider_valueChanged(int newPos){
     // Make slider to follow the mouse directly and not by pageStep steps
     Qt::MouseButtons btns = QApplication::mouseButtons();
     QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
@@ -162,4 +189,40 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
             return;
         }
     }
+}
+/**
+ * @brief MainWindow::closeEvent
+ * asks if you are sure you want to quit.
+ * @param event closing
+ */
+void MainWindow::closeEvent (QCloseEvent *event){
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
+                                                                tr("Are you sure you want to quit?\n"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::No);
+
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+    } else {
+        event->accept();
+    }
+}
+/**
+ * @brief MainWindow::on_actionExit_triggered
+ * sends a closeEvent when you press exit
+ */
+void MainWindow::on_actionExit_triggered(){
+    this->close();
+}
+
+/**
+ * @brief MainWindow::on_bookmarkButton_clicked
+ * the button supposed to add a bookmark
+ */
+void MainWindow::on_bookmarkButton_clicked(){
+    // The code here is only temporary and should be moved/removed
+    // once a proper video selector is added
+    mvideo_player->load_video("seq_01.mp4");
+    iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
+    video_slider->setMaximum(mvideo_player->get_num_frames());
 }

@@ -51,7 +51,6 @@ void video_player::stop_video() {
     if (video_paused) {
         video_paused = false;
     }
-
 }
 
 /**
@@ -67,7 +66,6 @@ void video_player::run()  {
     int delay = (1000/frame_rate);
     cout << current_frame << endl;
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-
     while(!stop && !video_paused && capture.read(frame)){
         update_frame();
 
