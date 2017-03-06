@@ -73,13 +73,6 @@ void MainWindow::on_fastBackwardButton_clicked(){
 
 }
 
-/**
- * @brief MainWindow::on_previousFrameButton_clicked
- * The button supposed to get to the previous frame
- */
-void MainWindow::on_previousFrameButton_clicked(){
-
-}
 
 /**
  * @brief MainWindow::on_playPauseButton_clicked
@@ -97,14 +90,6 @@ void MainWindow::on_playPauseButton_clicked() {
     }
 }
 
-/**
- * @brief MainWindow::on_nextFrameButton_clicked
- * The button supposed to get to the next frame
- */
-
-void MainWindow::on_nextFrameButton_clicked(){
-
-}
 
 /**
  * @brief MainWindow::on_fastForwardButton_clicked
@@ -123,7 +108,28 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->setIcon("play", ui->playPauseButton);
     }
+
     mvideo_player->stop_video();
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to play the next frame of the video
+ */
+void MainWindow::on_nextFrameButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        mvideo_player->next_frame();
+    }
+}
+
+/**
+ * @brief MainWindow::on_nextFrameButton_clicked
+ * The button supposed to play the previous frame of the video
+ */
+void MainWindow::on_previousFrameButton_clicked() {
+    if (mvideo_player->is_paused()) {
+        mvideo_player->previous_frame();
+    }
 }
 
 /**
