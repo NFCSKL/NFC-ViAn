@@ -24,12 +24,23 @@ Project* FileHandler::createProject(std::string projName){
     this->m_pid++;
     return proj;
 }
+/**
+ * @brief FileHandler::createDirectory
+ * @param dirpath
+ * @return unique directory ID
+ */
 ID FileHandler::createDirectory(std::string dirpath){
     this->lastError = makeDir(dirpath); //varying implementation, OS dependant
     ID id = this->addDir(dirpath);
     return id;
 }
 
+/**
+ * @brief FileHandler::deleteDirectory
+ * @param id
+ * @return errorcode, if deletion was done code is 0;
+ * otherwise see OS relevant directoryfile.
+ */
 FH_ERROR FileHandler::deleteDirectory(ID id){
     FH_ERROR err = removeDir(this->getDir(id)); //varying implementation, OS dependant
     return err;
