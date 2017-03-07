@@ -4,6 +4,7 @@
 #include "GUI/mainwindow.h"
 #include <thread>
 #include <QWaitCondition>
+#include <qpainter.h>
 
 
 using namespace std;
@@ -94,7 +95,25 @@ void video_player::show_frame() {
                              frame.cols,frame.rows,QImage::Format_Indexed8);
     }
 
+    add_overlay(img);
     emit processedImage(img);
+}
+
+/**
+ * @brief video_player::add_overlay
+ * Draws an overlay on top of the specified QImage.
+ * @param img QImage to draw on
+ */
+void video_player::add_overlay(QImage &img) {
+    if (show_overlay) {
+        QPainter painter(&img);
+        QPen pen;
+        pen.setWidth(3);
+        pen.setColor(Qt::red);
+        painter.setPen(pen);
+        painter.drawRect(400,200,400,400);
+        painter.end();
+    }
 }
 
 /**
@@ -228,5 +247,19 @@ void video_player::dec_playback_speed() {
 void video_player::inc_playback_speed() {
     if (this->speed_multiplier > MIN_SPEED_MULT) {
         this->set_speed_multiplier(this->get_speed_multiplier()/SPEED_STEP_MULT);
+    }
+}
+
+/**
+ * @brief video_player::toggle_overlay
+ * Toggles the showing of the overlay, and if video is paused updates
+ * the frame in the GUI to show with/without overlay
+ */
+void video_player::toggle_overlay() {
+    show_overlay = !show_overlay;
+
+    // If paused we need to update the frame shown ourself (otherwise done in the video-thread).
+    if (is_paused()) {
+        show_frame();
     }
 }

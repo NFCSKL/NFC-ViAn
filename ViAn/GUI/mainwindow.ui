@@ -261,7 +261,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -295,8 +295,15 @@
     </property>
     <addaction name="actionOpen_manual"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionShow_hide_overview"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -333,6 +340,11 @@
   <action name="actionOpen_manual">
    <property name="text">
     <string>Open manual</string>
+   </property>
+  </action>
+  <action name="actionShow_hide_overview">
+   <property name="text">
+    <string>Show/hide overview</string>
    </property>
   </action>
  </widget>
