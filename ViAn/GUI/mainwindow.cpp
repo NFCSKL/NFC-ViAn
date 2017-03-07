@@ -264,7 +264,11 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
     }
     delete inputWindow;
 }
-
+/**
+ * @brief MainWindow::on_ProjectTree_itemClicked
+ * @param item the item in the projectTree that was clicked
+ * @param column the column in the tree
+ */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
 
 }
