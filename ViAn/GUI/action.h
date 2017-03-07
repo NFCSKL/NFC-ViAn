@@ -1,6 +1,6 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-enum ACTION {PROJECT_ADD};
+enum ACTION {ADD_PROJECT, CANCELL};
 
 #endif // ACTION_H

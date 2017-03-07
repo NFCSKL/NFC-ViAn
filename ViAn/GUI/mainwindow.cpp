@@ -226,7 +226,7 @@ void MainWindow::on_bookmarkButton_clicked() {
  * @brief MainWindow::on_actionAddProject_triggered
  */
 void MainWindow::on_actionAddProject_triggered() {
-    ACTION action = PROJECT_ADD;
+    ACTION action = ADD_PROJECT;
     inputWindow = new inputwindow(this, action, "Project name:");
     inputWindow->show();
 }
@@ -236,14 +236,26 @@ void MainWindow::on_actionAddProject_triggered() {
  * @param input the input from the user
  * @param action the action that was triggered earlier
  */
-void MainWindow::inputSwitchCase(QString qInput, ACTION action) {
+void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
-    switch (action){
-        case PROJECT_ADD:
-        fileHandler->createProject(input);
-        QTreeWidgetItem *proj = new QTreeWidgetItem();
-        proj->setText(0, qInput);
-        ui->ProjectTree->addTopLevelItem(proj);
+    switch(action){
+        case ADD_PROJECT:{
+            fileHandler->createProject(input);
+            QTreeWidgetItem *projectInTree = new QTreeWidgetItem();
+            projectInTree->setText(0, qInput);
+            ui->ProjectTree->addTopLevelItem(projectInTree);
+            break;
+        }
+        case CANCELL:
+            break;
+        default:
+            break;
+
     }
     delete inputWindow;
+}
+
+void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column)
+{
+
 }

@@ -22,6 +22,8 @@ public:
 private slots:
     void on_okButton_clicked();
 
+    void on_cancleButton_clicked();
+
 private:
     Ui::inputwindow *ui;
     MainWindow *mainWindow;

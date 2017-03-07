@@ -15,9 +15,14 @@ inputwindow::~inputwindow()
     delete ui;
 }
 
-void inputwindow::on_okButton_clicked(){
+void inputwindow::on_okButton_clicked() {
     if(!ui->input->text().isEmpty()){
         QString inputText = ui->input->text();
-        mainWindow->inputSwitchCase(inputText, this->action);
+        mainWindow->inputSwitchCase(this->action, inputText);
     }
+}
+
+void inputwindow::on_cancleButton_clicked() {
+    QString noText = "NoName";
+    mainWindow->inputSwitchCase(CANCELL, noText);
 }

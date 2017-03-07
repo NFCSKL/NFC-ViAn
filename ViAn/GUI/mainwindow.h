@@ -33,7 +33,7 @@ public:
     void setStatusBar(string status, int timer);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void inputSwitchCase(QString qInput, ACTION action);
+    void inputSwitchCase(ACTION action, QString qInput);
 
 private slots:
 
@@ -65,6 +65,8 @@ private slots:
     void on_actionAddProject_triggered();
 
     void on_videoSlider_valueChanged(int newPos);
+
+    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
 
 private:
 

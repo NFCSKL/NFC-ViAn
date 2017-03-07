@@ -85,6 +85,12 @@
               <height>30</height>
              </size>
             </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
             <property name="text">
              <string>&lt;&lt;</string>
             </property>
@@ -155,6 +161,12 @@
               <height>30</height>
              </size>
             </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
             <property name="text">
              <string>&gt;&gt;</string>
             </property>
@@ -185,6 +197,12 @@
           <item>
            <widget class="QPushButton" name="bookmarkButton">
             <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
              <size>
               <width>30</width>
               <height>30</height>
@@ -261,7 +279,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">
