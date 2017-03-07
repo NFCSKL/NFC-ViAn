@@ -16,8 +16,7 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-
+SOURCES += main.cpp
 
 #
 # TEST
@@ -25,9 +24,7 @@ SOURCES += main.cpp \
 SOURCES += Test/test_video_player.cpp \
     Test/filehandlertest.cpp
 HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h \
-    GUI/action.h
-
+    Test/filehandlertest.h
 
 #
 # GUI
@@ -40,8 +37,8 @@ SOURCES += GUI/mainwindow.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
-    GUI/inputwindow.h
-
+    GUI/inputwindow.h \
+    GUI/action.h
 
 
 FORMS    += GUI/mainwindow.ui \

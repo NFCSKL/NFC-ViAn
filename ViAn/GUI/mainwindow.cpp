@@ -205,7 +205,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::No);
 
-    if (resBtn != QMessageBox::Yes){
+    if (resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
         event->accept();
