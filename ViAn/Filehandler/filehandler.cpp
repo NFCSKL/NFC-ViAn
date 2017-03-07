@@ -8,6 +8,7 @@ FileHandler::FileHandler()
     this->m_pid = 0; // zero out counter ids
     this->m_fid = 0;
     this->m_did = 0;
+    this->lastError = 0;
 
 }
 /**
@@ -24,17 +25,15 @@ Project* FileHandler::createProject(std::string projName){
     return proj;
 }
 ID FileHandler::createDirectory(std::string dirpath){
-    int err = makeDir(dirpath); //varying implementation, OS dependant
+    this->lastError = makeDir(dirpath); //varying implementation, OS dependant
     this->addDir(std::make_pair(this->m_did, dirpath));
     return this->m_did++;
 }
 
-FH_ERROR FileHandler::deleteDirectory(std::string dirpath){
-    FH_ERROR err = removeDir(dirpath); //varying implementation, OS dependant
+FH_ERROR FileHandler::deleteDirectory(ID id){
+    FH_ERROR err = removeDir(this->getDir(id)); //varying implementation, OS dependant
     return err;
 }
-
-
 
 /**
  * @todo unfinished, needs full project structure
@@ -48,25 +47,23 @@ void FileHandler::saveProject(Project* proj){
     ID projfile = -1;
     std::string fileName = proj->m_name + std::string(".txt"); //filename
     ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
-    proj->m_dir = dirID;
+    proj->files->dir = dirID;
 
-    projfile = createFile(fileName, dirID); //create project file
-    proj->m_file = projfile;
+    proj->files->f_proj = createFile(fileName, dirID); //create project file
+
 
     fileName = proj->m_name + "_videos.txt";
-    ID id = createFile(fileName, dirID); //create video file
-    writeFile(proj->m_file, fileName);
-
+    proj->files->f_videos = createFile(fileName, dirID); //create video file
+    writeFile(proj->files->f_proj, fileName);
 
     fileName = proj->m_name + "_analyses.txt";
-    createFile(fileName, dirID); //create analysis file
-    writeFile(proj->m_file, fileName);
+    proj->files->f_analysis = createFile(fileName, dirID); //create analysis file
+    writeFile(proj->files->f_proj, fileName);
 
     fileName = proj->m_name + "_drawings.txt";
-    createFile(fileName, dirID); //create drawings file
-    writeFile(proj->m_file, fileName);
+    proj->files->f_drawings =createFile(fileName, dirID); //create drawings file
+    writeFile(proj->files->f_proj, fileName);
 
-    proj->m_file = id;
     updateProjFiles(proj);
 
 }
@@ -82,7 +79,7 @@ void FileHandler::updateProjFiles(Project* proj){
     std::string filePath = std::string(WORKSPACE) + "/" + proj->m_name + "/" + proj->m_name + std::string("_videos.txt");
     std::stringstream sstr;
     sstr << *proj;
-    writeFile(proj->m_file, sstr.str());
+    writeFile(proj->files->f_videos, sstr.str());
 }
 
 /**
@@ -93,8 +90,7 @@ void FileHandler::updateProjFiles(Project* proj){
  * Load a project object from a given filepath
  */
 Project* FileHandler::loadProject(std::string filePath){
-    Project* proj = new Project();
-
+    Project* proj = new Project();    
     return proj;
 }
 
@@ -106,8 +102,11 @@ Project* FileHandler::loadProject(std::string filePath){
  * @return int errorcode
  */
 FH_ERROR FileHandler::deleteProject(Project* proj){
-    deleteFile(proj->m_file);
-    return deleteDirectory(this->getDir(proj->m_dir));
+    deleteFile(proj->files->f_analysis);
+    deleteFile(proj->files->f_videos);
+    deleteFile(proj->files->f_drawings);
+    deleteFile(proj->files->f_proj);
+    return deleteDirectory(proj->files->dir);
 
 }
 /**
@@ -120,7 +119,7 @@ FH_ERROR FileHandler::deleteProject(Project* proj){
 void FileHandler::addVideo(Project* proj, std::string filePath){
     Video* v = new Video(this->m_fid, filePath);
     proj->addVideo(v);
-    this->addFile(std::make_pair(this->m_fid++,filePath));
+    this->addFile(filePath);
 }
 
  /**
@@ -134,8 +133,8 @@ ID FileHandler::createFile(std::string filename, ID dirID){
     std::ofstream f;
     std::string filePath = this->getDir(dirID)+"/"+filename;
     f.open(filePath.c_str());
-    this->addFile(std::make_pair(this->m_fid, filePath));
-    return this->m_fid++;
+    return this->addFile(filePath);
+
   }
 /**
  * @todo make threadsafe
@@ -227,10 +226,12 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   * @param std::pari<<ID, std::string> pair
   * @return void
   */
-void FileHandler::addFile(std::pair<ID,std::string> pair){
+ID FileHandler::addFile(std::string filepath){
+    std::pair<ID,std::string> pair = std::make_pair(this->m_fid, filepath);
     this->fileMapLock.lock();
     this->m_fileMap.insert(pair);
     this->fileMapLock.unlock();
+    return this->m_fid++;
  }
  /**
   * @brief FileHandler::addDir

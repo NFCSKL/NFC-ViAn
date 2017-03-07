@@ -50,7 +50,7 @@ public:
     //directory manipulation
     //varying implementation
     ID createDirectory(std::string dirpath);
-    FH_ERROR deleteDirectory(std::string dirpath);
+    FH_ERROR deleteDirectory(ID id);
 
     //file manipulation
     ID createFile(std::string filename, ID dirID);
@@ -62,11 +62,13 @@ public:
     std::string getDir(ID id);
     Project* getProject(ID id);
     std::string getFile(ID id);    
+    // Last error
+    FH_ERROR lastError;
 
 private:
     void updateProjFiles(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    void addFile(std::pair<ID,std::string> pair);
+    ID addFile(std::string filepath);
     void addProject(std::pair<ID,Project*> pair);
     void addDir(std::pair<ID,std::string> pair);
 

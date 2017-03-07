@@ -11,10 +11,18 @@
 typedef int ID;
 
 struct ProjFiles{
-   std::string f_proj;
-   std::string f_analysis;
-   std::string f_drawings;
-   std::string f_videos;
+   ID dir;
+   ID f_proj;
+   ID f_analysis;
+   ID f_drawings;
+   ID f_videos;
+   ProjFiles(){
+       this->dir = -1;
+       this->f_proj = -1;
+       this->f_analysis = -1;
+       this->f_drawings = -1;
+       this->f_videos = -1;
+   }
 };
 
 /**
@@ -30,7 +38,7 @@ public:
     Project(std::string dirpath);
     void addVideo(Video *vid);
 
-    friend std::ifstream& operator>>(std::stringstream& is, Project& proj);
+    friend std::stringstream& operator>>(std::stringstream& is, Project& proj);
     friend std::stringstream& operator<<(std::stringstream& os, Project const& proj);
     friend bool operator==(Project proj, Project proj2);
 
@@ -42,8 +50,7 @@ private:
 public:
     ID m_id;
     std::string m_name;
-    ID m_dir;
-    ID m_file;
+    ProjFiles* files;
     std::vector<Video*> m_videos;
 };
 

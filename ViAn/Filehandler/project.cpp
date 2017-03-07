@@ -6,19 +6,17 @@
  */
 Project::Project(ID id, std::string name)
 {
+    this->files = new ProjFiles();
     this->m_name = name;
     this->m_id = id;
     this->m_vid = 0;
     this->m_videos.clear();
-    this->m_dir = -1;
-
 }
 Project::Project(){
+    this->files = new ProjFiles();
     this->m_name = "";
     this->m_id = -1;
-    this->m_vid = 0;
     this->m_videos.clear();
-    this->m_dir = -1;
 }
 
 /**
@@ -36,7 +34,7 @@ std::stringstream& operator>>(std::stringstream& is, Project& proj){
     std::string str;
     is >> str;
     std::cout << "*****";
-    std::cout <<str;
+    std::cout << str;
     std::cout << "*****";
     while(vidCounter){
         Video* v = new Video();
@@ -62,8 +60,7 @@ bool operator==(Project proj, Project proj2){
    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
                proj2.m_videos.begin(),
                [](const Video* v, const Video* v2){return *v == *v2;});
-    return proj.m_dir == proj2.m_dir &&
-           proj.m_file == proj2.m_file &&
+    return proj.files == proj2.files &&
            proj.m_id == proj2.m_id &&
            proj.m_name == proj2.m_name &&
            videoEquals;

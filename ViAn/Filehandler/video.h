@@ -12,7 +12,7 @@ public:
     ID id;
     std::string filepath;
     // std::map<A_TYPE, Analysis>
-    friend std::ifstream& operator>>(std::stringstream& is, Video& vid);
+    friend std::stringstream& operator>>(std::stringstream& is, Video& vid);
     friend std::stringstream& operator<<(std::stringstream& os, const Video& vid);
     friend bool operator==(Video v1, Video v2);
 };

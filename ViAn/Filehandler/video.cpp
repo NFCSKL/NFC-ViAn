@@ -10,7 +10,7 @@ Video::Video(ID id, std::string filepath){
     this->filepath = filepath;
 }
 
-std::ifstream& operator>>(std::stringstream& is, Video& vid){
+std::stringstream& operator>>(std::stringstream& is, Video& vid){
     std::cout << "*********" << std::endl;
     std::cout << "IN VIDEO >>" << std::endl;
     std::cout << "*********" << std::endl;
