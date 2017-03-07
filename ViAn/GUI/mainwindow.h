@@ -59,6 +59,12 @@ private slots:
 
     void on_bookmarkButton_clicked();
 
+    void on_videoSlider_sliderPressed();
+
+    void on_videoSlider_sliderReleased();
+
+    void on_videoSlider_valueChanged(int newPos);
+
 private:
 
     Ui::MainWindow *ui;
@@ -66,7 +72,10 @@ private:
     IconOnButtonHandler *iconOnButtonHandler;
 
     QSlider *video_slider;
-    void on_videoSlider_valueChanged(int newPos);
+    bool slider_blocked = false;
+    bool slider_moving = false;
+    int prev_slider_pos = 0;
+
 
 };
 

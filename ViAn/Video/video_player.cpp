@@ -64,7 +64,12 @@ void video_player::run()  {
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
+    prev_frame = current_frame;
     while(!stop && !video_paused && capture.read(frame)){
+        if (prev_frame != current_frame) {
+            capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
+            prev_frame = current_frame;
+        }
         show_frame();
 
         this->msleep(delay);

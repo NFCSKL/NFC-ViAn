@@ -65,6 +65,7 @@ private:
 
     int num_frames;
     unsigned int current_frame = 0;
+    unsigned int prev_frame = 0;
     unsigned int frame_width;
     unsigned int frame_height;
 

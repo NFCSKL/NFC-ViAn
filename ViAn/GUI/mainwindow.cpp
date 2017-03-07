@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
-    video_slider = findChild<QSlider*>("videoSlider");
+    //video_slider = findChild<QSlider*>("videoSlider");
+    video_slider = ui->videoSlider;
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
@@ -70,7 +71,7 @@ void MainWindow::setStatusBar(string status, int timer = 750){
  *
  */
 void MainWindow::on_fastBackwardButton_clicked(){
-
+    mvideo_player->dec_playback_speed();
 }
 
 
@@ -96,7 +97,8 @@ void MainWindow::on_playPauseButton_clicked() {
  * The button supposed to play the video faster
  */
 void MainWindow::on_fastForwardButton_clicked(){
-
+    mvideo_player->inc_playback_speed();
+    setStatusBar("Increased playback speed");
 }
 
 /**
@@ -148,7 +150,8 @@ void MainWindow::update_video(QImage frame) {
  * @param pos
  */
 void MainWindow::set_video_slider_pos(int pos) {
-    if (pos <= video_slider->maximum()) {
+    if (pos <= video_slider->maximum() && !slider_blocked) {
+        prev_slider_pos = video_slider->value();
         video_slider->setSliderPosition(pos);
     }
 }
@@ -171,25 +174,30 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  */
 void MainWindow::on_videoSlider_valueChanged(int newPos){
     // Make slider to follow the mouse directly and not by pageStep steps
+    if (abs(prev_slider_pos - newPos) == 1 || slider_moving) {
+        return;
+    }
+    slider_blocked = true;
     Qt::MouseButtons btns = QApplication::mouseButtons();
     QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
     bool clickOnSlider = (btns & Qt::LeftButton) &&
                          (localMousePos.x() >= 0 && localMousePos.y() >= 0 &&
                           localMousePos.x() < ui->videoSlider->size().width() &&
                           localMousePos.y() < ui->videoSlider->size().height());
-    if (clickOnSlider)
-    {
+    if (clickOnSlider) {
         // Attention! The following works only for Horizontal, Left-to-right sliders
         float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
         int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
         int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
-        if (sliderPosUnderMouse != newPos)
-        {
+        if (sliderPosUnderMouse != newPos) {
             ui->videoSlider->setValue(sliderPosUnderMouse);
+            mvideo_player->set_playback_frame(sliderPosUnderMouse);
             return;
         }
     }
+    slider_blocked = false;
 }
+
 /**
  * @brief MainWindow::closeEvent
  * asks if you are sure you want to quit.
@@ -207,6 +215,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
         event->accept();
     }
 }
+
 /**
  * @brief MainWindow::on_actionExit_triggered
  * sends a closeEvent when you press exit
@@ -226,4 +235,26 @@ void MainWindow::on_bookmarkButton_clicked(){
     iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(700);
+}
+
+
+/**
+ * @brief MainWindow::on_videoSlider_sliderPressed
+ * Block slider update from video_player
+ */
+void MainWindow::on_videoSlider_sliderPressed() {
+    slider_blocked = true;
+    slider_moving = true;
+}
+
+/**
+ * @brief MainWindow::on_videoSlider_sliderReleased
+ * Set video playback pos to slider pos and unblock slider update
+ */
+void MainWindow::on_videoSlider_sliderReleased() {
+    int new_pos = video_slider->value();
+    mvideo_player->set_playback_frame(new_pos);
+    video_slider->setSliderPosition(new_pos);
+    slider_blocked = false;
+    slider_moving = false;
 }
