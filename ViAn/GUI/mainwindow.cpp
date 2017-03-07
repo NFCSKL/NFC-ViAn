@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
+    fileHandler = new FileHandler();
     setShortcuts();
 
     mvideo_player = new video_player();
@@ -46,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
+    delete fileHandler;
+    delete mvideo_player;
     delete ui;
 }
 
@@ -67,8 +70,7 @@ void MainWindow::setStatusBar(string status, int timer = 750){
  * The button supposed to play the video slower
  *
  */
-void MainWindow::on_fastBackwardButton_clicked()
-{
+void MainWindow::on_fastBackwardButton_clicked() {
 
 }
 
@@ -76,8 +78,7 @@ void MainWindow::on_fastBackwardButton_clicked()
  * @brief MainWindow::on_previousFrameButton_clicked
  * The button supposed to get to the previous frame
  */
-void MainWindow::on_previousFrameButton_clicked()
-{
+void MainWindow::on_previousFrameButton_clicked() {
 
 }
 
@@ -102,8 +103,7 @@ void MainWindow::on_playPauseButton_clicked() {
  * The button supposed to get to the next frame
  */
 
-void MainWindow::on_nextFrameButton_clicked()
-{
+void MainWindow::on_nextFrameButton_clicked() {
 
 }
 
@@ -111,8 +111,7 @@ void MainWindow::on_nextFrameButton_clicked()
  * @brief MainWindow::on_fastForwardButton_clicked
  * The button supposed to play the video faster
  */
-void MainWindow::on_fastForwardButton_clicked()
-{
+void MainWindow::on_fastForwardButton_clicked() {
 
 }
 
@@ -165,8 +164,7 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  * Update the slider to where the mouse is
  * @param newPos current position of the slider
  */
-void MainWindow::on_videoSlider_valueChanged(int newPos)
-{
+void MainWindow::on_videoSlider_valueChanged(int newPos) {
     // Make slider to follow the mouse directly and not by pageStep steps
     Qt::MouseButtons btns = QApplication::mouseButtons();
     QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
@@ -192,8 +190,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos)
  * asks if you are sure you want to quit.
  * @param event closing
  */
-void MainWindow::closeEvent (QCloseEvent *event)
-{
+void MainWindow::closeEvent (QCloseEvent *event) {
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
                                                                 tr("Are you sure you want to quit?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
@@ -209,8 +206,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
  * @brief MainWindow::on_actionExit_triggered
  * sends a closeEvent when you press exit
  */
-void MainWindow::on_actionExit_triggered()
-{
+void MainWindow::on_actionExit_triggered() {
     this->close();
 }
 
@@ -218,8 +214,7 @@ void MainWindow::on_actionExit_triggered()
  * @brief MainWindow::on_bookmarkButton_clicked
  * the button supposed to add a bookmark
  */
-void MainWindow::on_bookmarkButton_clicked()
-{
+void MainWindow::on_bookmarkButton_clicked() {
     // The code here is only temporary and should be moved/removed
     // once a proper video selector is added
     mvideo_player->load_video("seq_01.mp4");
@@ -227,10 +222,28 @@ void MainWindow::on_bookmarkButton_clicked()
     video_slider->setMaximum(mvideo_player->get_num_frames());
 }
 
-void MainWindow::on_actionAddProject_triggered()
-{
-    input = new inputwindow("Project name:");
-    input->show();
-    QString output = input->getInputString();
-    cout << qPrintable(output) << endl;
+/**
+ * @brief MainWindow::on_actionAddProject_triggered
+ */
+void MainWindow::on_actionAddProject_triggered() {
+    ACTION action = PROJECT_ADD;
+    inputWindow = new inputwindow(this, action, "Project name:");
+    inputWindow->show();
+}
+
+/**
+ * @brief MainWindow::inputSwitchCase
+ * @param input the input from the user
+ * @param action the action that was triggered earlier
+ */
+void MainWindow::inputSwitchCase(QString qInput, ACTION action) {
+    std::string input = qInput.toStdString();
+    switch (action){
+        case PROJECT_ADD:
+        fileHandler->createProject(input);
+        QTreeWidgetItem *proj = new QTreeWidgetItem();
+        proj->setText(0, qInput);
+        ui->ProjectTree->addTopLevelItem(proj);
+    }
+    delete inputWindow;
 }

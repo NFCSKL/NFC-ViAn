@@ -16,9 +16,10 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
+#include "action.h"
 
 using namespace std;
-
+class inputwindow;
 
 namespace Ui {
 class MainWindow;
@@ -32,6 +33,7 @@ public:
     void setStatusBar(string status, int timer);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void inputSwitchCase(QString qInput, ACTION action);
 
 private slots:
 
@@ -62,15 +64,18 @@ private slots:
 
     void on_actionAddProject_triggered();
 
+    void on_videoSlider_valueChanged(int newPos);
+
 private:
 
     Ui::MainWindow *ui;
-    inputwindow *input;
+    inputwindow *inputWindow;
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
 
     QSlider *video_slider;
-    void on_videoSlider_valueChanged(int newPos);
+
+    FileHandler *fileHandler;
 
 };
 

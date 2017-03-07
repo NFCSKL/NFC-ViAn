@@ -3,7 +3,10 @@
 
 #include <QWidget>
 #include <QString>
+#include "mainwindow.h"
+#include "action.h"
 
+class MainWindow;
 namespace Ui {
 class inputwindow;
 }
@@ -13,12 +16,17 @@ class inputwindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit inputwindow(QString infoText, QWidget *parent = 0);
+    explicit inputwindow(MainWindow *mainWindow, ACTION action, QString infoText, QWidget *parent = 0);
     ~inputwindow();
-    QString getInputString();
+
+private slots:
+    void on_okButton_clicked();
 
 private:
     Ui::inputwindow *ui;
+    MainWindow *mainWindow;
+    ACTION action;
+
 };
 
 #endif // INPUTWINDOW_H
