@@ -150,6 +150,7 @@ void MainWindow::update_video(QImage frame) {
  * @param pos
  */
 void MainWindow::set_video_slider_pos(int pos) {
+    posCounter++;
     if (pos <= video_slider->maximum() && !slider_blocked) {
         prev_slider_pos = video_slider->value();
         video_slider->setSliderPosition(pos);
@@ -173,8 +174,30 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  * @param newPos current position of the slider
  */
 void MainWindow::on_videoSlider_valueChanged(int newPos){
+    changeCounter++;
     // Make slider to follow the mouse directly and not by pageStep steps
-    if (abs(prev_slider_pos - newPos) == 1 || slider_moving) {
+    if (abs(prev_slider_pos - newPos) == 1) {
+        return;
+    } else if (slider_moving) {
+        QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+        float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
+        int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
+        int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
+
+        if (!mvideo_player->is_stopped() && !mvideo_player->is_paused()) {
+            mvideo_player->stop_video();
+        }
+
+        std::chrono::milliseconds current_time = std::chrono::duration_cast<
+                std::chrono::milliseconds >(
+                    std::chrono::system_clock::now().time_since_epoch()
+        );
+        std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
+        if (time_since_last_slider_frame_update.count() >= 200) {
+            mvideo_player->set_slider_frame(sliderPosUnderMouse);
+            slider_timer = current_time;
+        }
+
         return;
     }
     slider_blocked = true;
@@ -185,6 +208,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
                           localMousePos.x() < ui->videoSlider->size().width() &&
                           localMousePos.y() < ui->videoSlider->size().height());
     if (clickOnSlider) {
+        cout << "Click on slider" << endl;
         // Attention! The following works only for Horizontal, Left-to-right sliders
         float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
         int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
@@ -195,6 +219,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
             return;
         }
     }
+    cout << "Done!" << endl;
     slider_blocked = false;
 }
 
@@ -257,4 +282,7 @@ void MainWindow::on_videoSlider_sliderReleased() {
     video_slider->setSliderPosition(new_pos);
     slider_blocked = false;
     slider_moving = false;
+    if (mvideo_player->is_stopped()) {
+        mvideo_player->start();
+    }
 }

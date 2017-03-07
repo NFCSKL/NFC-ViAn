@@ -32,11 +32,12 @@ public:
     void next_frame();
     void previous_frame();
     void set_speed_multiplier(double mult);
-
     double get_speed_multiplier();
 
     void inc_playback_speed();
     void dec_playback_speed();
+
+    void set_slider_frame(int frame_nbr);
     
     
     friend class test_video_player;
@@ -74,6 +75,8 @@ private:
 
     bool stop = false;
     bool video_paused;
+
+    bool slider_moving = false;
 
     QImage img;
     QWaitCondition condition;   

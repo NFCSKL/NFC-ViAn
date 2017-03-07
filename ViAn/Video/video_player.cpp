@@ -59,7 +59,7 @@ void video_player::stop_video() {
  * It houses the main loop for fetching frames from the currently played
  * video file and sending them to the GUI.
  */
-void video_player::run()  {
+void video_player::run() {
     stop = false;
     video_paused = false;
     int delay = (1000/frame_rate);
@@ -196,6 +196,16 @@ void video_player::update_frame(int frame_nbr) {
         capture.read(frame);
         show_frame();
     }
+}
+
+/**
+ * @brief video_player::set_slider_frame
+ * @param frame_nbr
+ * This method is called when the slider is moved and is used to call the private method
+ * update_frame with the desired frame number.
+ */
+void video_player::set_slider_frame(int frame_nbr) {
+    update_frame(frame_nbr);
 }
 
 /**

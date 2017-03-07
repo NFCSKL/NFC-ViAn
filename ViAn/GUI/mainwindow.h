@@ -76,6 +76,12 @@ private:
     bool slider_moving = false;
     int prev_slider_pos = 0;
 
+    int posCounter = 0;
+    int changeCounter = 0;
+
+    std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
+                std::chrono::system_clock::now().time_since_epoch()
+            );
 
 };
 
