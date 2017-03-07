@@ -11,9 +11,6 @@ Video::Video(ID id, std::string filepath){
 }
 
 std::stringstream& operator>>(std::stringstream& is, Video& vid){
-    std::cout << "*********" << std::endl;
-    std::cout << "IN VIDEO >>" << std::endl;
-    std::cout << "*********" << std::endl;
     is >> vid.filepath;
     is >> vid.id;
     return is;

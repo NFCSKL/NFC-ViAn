@@ -12,6 +12,9 @@ Project::Project(ID id, std::string name)
     this->m_vid = 0;
     this->m_videos.clear();
 }
+/**
+ * @brief Project::Project
+ */
 Project::Project(){
     this->files = new ProjFiles();
     this->m_name = "";
@@ -28,14 +31,17 @@ void Project::addVideo(Video* vid)
 {
     this->m_videos.push_back(vid);
 }
-
+/**
+ *  UNSFINISHED
+ * @brief operator >>
+ * @param is
+ * @param proj
+ * @return
+ */
 std::stringstream& operator>>(std::stringstream& is, Project& proj){
     int vidCounter = 0;
     std::string str;
     is >> str;
-    std::cout << "*****";
-    std::cout << str;
-    std::cout << "*****";
     while(vidCounter){
         Video* v = new Video();
         is >> *v;
@@ -43,7 +49,13 @@ std::stringstream& operator>>(std::stringstream& is, Project& proj){
     }
     return is;
 }
-
+/**
+ * @brief operator <<
+ * @param os
+ * @param proj
+ * @return stream
+ * used for reading project to file
+ */
 std::stringstream& operator<<(std::stringstream& os, const Project& proj){
     os << proj.m_id << " " << proj.m_name << " ";
     int vidcounter = 0;
@@ -56,6 +68,12 @@ std::stringstream& operator<<(std::stringstream& os, const Project& proj){
     os << vidcounter;
     return os;
 }
+/**
+ * @brief operator ==
+ * @param proj
+ * @param proj2
+ * @return if projects are same TRUE else False
+ */
 bool operator==(Project proj, Project proj2){
    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
                proj2.m_videos.begin(),
