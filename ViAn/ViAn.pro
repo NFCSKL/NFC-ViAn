@@ -99,8 +99,10 @@ macx {
 }
 
 linux {
-    SOURCES += Filehandler/linuxdir.cpp\
-     Filehandler/macdir.cpp
+    #SOURCES += Filehandler/linuxdir.cpp
+}
+unix {
+    SOURCES += Filehandler/linuxdir.cpp
 }
 
 #

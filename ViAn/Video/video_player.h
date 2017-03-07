@@ -28,7 +28,9 @@ public:
     void stop_video();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
-    void set_playback_frame(int frame_num);
+    bool set_playback_frame(int frame_num);
+    void next_frame();
+    void previous_frame();
     void set_speed_multiplier(double mult);
 
     double get_speed_multiplier();
@@ -37,9 +39,6 @@ public:
     void dec_playback_speed();
     
     
-
-
-
     friend class test_video_player;
 
     const double MAX_SPEED_MULT = 16;
@@ -56,6 +55,9 @@ protected:
     void msleep(int ms);
 
 private:
+    void update_frame(int frame_nbr);
+    void show_frame();
+
 
     cv::VideoCapture capture;
     cv::Mat frame;

@@ -18,7 +18,11 @@ void test_video_player::test_load_video() {
     string non_existing_filename = "ex.biz";
     string existing_non_video = "Makefile";
 
-    QVERIFY(mvideo->load_video(working_filename));
+    QVERIFY(mvideo->capture.open(working_filename));
+    mvideo->frame_rate = mvideo->capture.get(CV_CAP_PROP_FPS);
+    mvideo->num_frames = mvideo->capture.get(cv::CAP_PROP_FRAME_COUNT);
+    mvideo->video_paused = false;
+
     QVERIFY(mvideo->capture.isOpened());
 
 }
@@ -88,6 +92,32 @@ void test_video_player::test_set_frame_height() {
 void test_video_player::test_set_playback_frame() {
     mvideo->set_playback_frame(100);
     QVERIFY(mvideo->current_frame == 100);
+}
+
+/**
+ * @brief test_video_player::test_next_frame
+ * Currently this method cannot be tested because of thread issues.
+ */
+void test_video_player::test_next_frame() {
+    /*
+    mvideo->load_video("seq_01.mp4");
+    mvideo->set_playback_frame(100);
+    mvideo->next_frame();
+    QVERIFY(mvideo->current_frame == 101);
+    */
+}
+
+/**
+ * @brief test_video_player::test_previous_frame
+ * Currently this method cannot be tested because of thread issues.
+ */
+void test_video_player::test_previous_frame() {
+    /*
+    mvideo->load_video("seq_01.mp4");
+    mvideo->set_playback_frame(100);
+    mvideo->previous_frame();
+    QVERIFY(mvideo->current_frame == 99);
+    */
 }
 
 /**

@@ -3,6 +3,11 @@
 
 #include <QObject>
 #include <QTest>
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/videoio/videoio.hpp"
+#include "opencv2/video/video.hpp"
+#include "opencv2/core/core.hpp"
 
 #include "Video/video_player.h"
 
@@ -19,6 +24,8 @@ private slots:
     void test_set_frame_width();
     void test_set_frame_height();
     void test_set_playback_frame();
+    void test_next_frame();
+    void test_previous_frame();
     void test_inc_playback_speed();
     void test_dec_playback_speed();
     void test_stop_video();

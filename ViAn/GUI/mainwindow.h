@@ -48,6 +48,7 @@ private slots:
     void closeEvent (QCloseEvent *event);
 
     void update_video(QImage frame);
+
     void set_video_slider_pos(int pos);
 
     void resizeEvent(QResizeEvent* event);
