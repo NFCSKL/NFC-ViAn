@@ -18,7 +18,7 @@
 #include "dir.h"
 
 #ifdef _WIN32
-    #define WORKSPACE "C:/"
+    #define WORKSPACE "C:"
 #elif __APPLE__
     #define WORKSPACE "/Applications"
 #elif __unix__
