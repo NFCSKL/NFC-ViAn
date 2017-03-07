@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <QApplication>
 #include "GUI/mainwindow.h"
 #include "Video/video_player.h"
@@ -5,6 +6,13 @@
 #include "Test/filehandlertest.h"
 
 
+=======
+#include "Video/video_player.h"
+#include "Test/test_video_player.h"
+#include "Test/filehandlertest.h"
+#include "GUI/mainwindow.h"
+#include <QApplication>
+>>>>>>> master
 
 /**
  * @brief qMain

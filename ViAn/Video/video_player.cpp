@@ -51,7 +51,6 @@ void video_player::stop_video() {
     if (video_paused) {
         video_paused = false;
     }
-
 }
 
 /**
@@ -61,15 +60,12 @@ void video_player::stop_video() {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    cout << "Entering run" << endl;
     stop = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    cout << current_frame << endl;
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-
     while(!stop && !video_paused && capture.read(frame)){
-        update_frame();
+        show_frame();
 
         this->msleep(delay);
 
@@ -86,7 +82,7 @@ void video_player::run()  {
  * @brief update_frame
  * Calculates and emits the current frame to GUI.
  */
-void video_player::update_frame() {
+void video_player::show_frame() {
     emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
 
     if (frame.channels()== 3) {
@@ -159,13 +155,13 @@ void video_player::set_frame_height(int new_value) {
  * Moves the playback to the frame specified by frame_num
  * @param frame_num
  */
-void video_player::set_playback_frame(int frame_num) {
+bool video_player::set_playback_frame(int frame_num) {
+
     if (frame_num < get_num_frames() && frame_num >= 0) {
-        capture.set(CAP_PROP_POS_FRAMES, (double)frame_num);
         current_frame = frame_num;
+        return true;
     }
-    capture.read(frame);
-    update_frame();
+    return false;
 }
 
 /**
@@ -173,7 +169,7 @@ void video_player::set_playback_frame(int frame_num) {
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
-    set_playback_frame(current_frame + 1);
+    update_frame(current_frame + 1);
 }
 
 /**
@@ -181,7 +177,20 @@ void video_player::next_frame() {
  * Moves the playback one frame backward.
  */
 void video_player::previous_frame() {
-    set_playback_frame(current_frame - 1);
+    update_frame(current_frame - 1);
+}
+
+/**
+ * @brief video_player::update_frame
+ * @param frame_nbr
+ * Updates the current frame if frame_nbr is valid.
+ */
+void video_player::update_frame(int frame_nbr) {
+    if (set_playback_frame(frame_nbr)) {
+        capture.set(CAP_PROP_POS_FRAMES, frame_nbr);
+        capture.read(frame);
+        show_frame();
+    }
 }
 
 /**
