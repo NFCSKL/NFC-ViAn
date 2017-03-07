@@ -256,7 +256,7 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
             ui->ProjectTree->addTopLevelItem(projectInTree);
             break;
         }
-        case CANCELL:
+        case CANCEL:
             break;
         default:
             break;

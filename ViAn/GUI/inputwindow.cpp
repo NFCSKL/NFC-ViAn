@@ -41,5 +41,5 @@ void inputwindow::on_okButton_clicked() {
  */
 void inputwindow::on_cancleButton_clicked() {
     QString noText = "NoName";
-    mainWindow->inputSwitchCase(CANCELL, noText);
+    mainWindow->inputSwitchCase(CANCEL, noText);
 }
