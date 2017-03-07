@@ -75,6 +75,9 @@ void filehandlertest::fileTest(){
     std::string filename = "filetest.txt";
     ID dir = fh->createDirectory(dirpath);
     ID fileID  = fh->createFile(filename,dir); //Create file ID = i    (1)
+    QCOMPARE(fh->getDir(dir), dirpath);
+    QCOMPARE(fh->getFile(fileID), dirpath + "/" + filename);
+
     ID fileID2  = fh->createFile(filename,dir); // Create file ID = i+1 (2)
     QCOMPARE(fileID2 - fileID, 1);                         // check if 1 && 2 is true
     QVERIFY(fh->getFile(fileID) == fh->getFile(fileID2)); //check that (1), (2) point to same file.

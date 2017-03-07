@@ -26,8 +26,8 @@ Project* FileHandler::createProject(std::string projName){
 }
 ID FileHandler::createDirectory(std::string dirpath){
     this->lastError = makeDir(dirpath); //varying implementation, OS dependant
-    this->addDir(std::make_pair(this->m_did, dirpath));
-    return this->m_did++;
+    ID id = this->addDir(dirpath);
+    return id;
 }
 
 FH_ERROR FileHandler::deleteDirectory(ID id){
@@ -44,7 +44,6 @@ FH_ERROR FileHandler::deleteDirectory(ID id){
  * @return void
  */
 void FileHandler::saveProject(Project* proj){
-    ID projfile = -1;
     std::string fileName = proj->m_name + std::string(".txt"); //filename
     ID dirID = createDirectory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
     proj->files->dir = dirID;
@@ -102,10 +101,11 @@ Project* FileHandler::loadProject(std::string filePath){
  * @return int errorcode
  */
 FH_ERROR FileHandler::deleteProject(Project* proj){
-    deleteFile(proj->files->f_analysis);
-    deleteFile(proj->files->f_videos);
-    deleteFile(proj->files->f_drawings);
-    deleteFile(proj->files->f_proj);
+    ProjFiles* pf = proj->files;
+    deleteFile(pf->f_proj);
+    deleteFile(pf->f_videos);
+    deleteFile(pf->f_analysis);
+    deleteFile(pf->f_drawings);
     return deleteDirectory(proj->files->dir);
 
 }
@@ -239,9 +239,11 @@ ID FileHandler::addFile(std::string filepath){
   * @param std::pari<<ID, std::string> pair
   * @return void
   */
-void FileHandler::addDir(std::pair<ID,std::string> pair){
+ID FileHandler::addDir(std::string dirpath){
+    std::pair<ID,std::string> pair = std::make_pair(this->m_did, dirpath);
     this->dirMapLock.lock();
     this->m_dirMap.insert(pair);
     this->dirMapLock.unlock();
+    return this->m_did++;
  }
 

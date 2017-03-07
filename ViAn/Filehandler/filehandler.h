@@ -18,7 +18,7 @@
 #include "dir.h"
 
 #ifdef _WIN32
-    #define WORKSPACE "C:"
+    #define WORKSPACE "C:/"
 #elif __APPLE__
     #define WORKSPACE "/Applications"
 #elif __unix__
@@ -70,7 +70,7 @@ private:
     // thread safe add operations for maps
     ID addFile(std::string filepath);
     void addProject(std::pair<ID,Project*> pair);
-    void addDir(std::pair<ID,std::string> pair);
+    ID addDir(std::string dirpath);
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap
