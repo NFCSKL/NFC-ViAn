@@ -84,10 +84,11 @@ void MainWindow::on_fastBackwardButton_clicked(){
  */
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
+        setStatusBar("Playing");
         iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         mvideo_player->start();
     } else {
-        setStatusBar("Playing");
+        setStatusBar("Paused");
         iconOnButtonHandler->setIcon("play", ui->playPauseButton);
         mvideo_player->play_pause();
         mvideo_player->wait();
@@ -122,7 +123,10 @@ void MainWindow::on_stopButton_clicked() {
  */
 void MainWindow::on_nextFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
+        setStatusBar("Went forward a frame");
         mvideo_player->next_frame();
+    } else {
+        setStatusBar("Needs to be paused");
     }
 }
 
@@ -132,7 +136,10 @@ void MainWindow::on_nextFrameButton_clicked() {
  */
 void MainWindow::on_previousFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
+        setStatusBar("Went back a frame");
         mvideo_player->previous_frame();
+    } else {
+        setStatusBar("Needs to be paused");
     }
 }
 
@@ -200,6 +207,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
  * @param event closing
  */
 void MainWindow::closeEvent (QCloseEvent *event){
+    setStatusBar("Closing");
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
                                                                 tr("Are you sure you want to quit?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
@@ -239,6 +247,7 @@ void MainWindow::on_actionAddProject_triggered() {
     ACTION action = ADD_PROJECT;
     inputWindow = new inputwindow(this, action, "Project name:");
     inputWindow->show();
+    setStatusBar("Adding project, need name");
 }
 
 /**
@@ -254,10 +263,13 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
             QTreeWidgetItem *projectInTree = new QTreeWidgetItem();
             projectInTree->setText(0, qInput);
             ui->ProjectTree->addTopLevelItem(projectInTree);
+            setStatusBar("Project " + input + "created.");
             break;
         }
-        case CANCEL:
+        case CANCEL: {
+            setStatusBar("Cancel");
             break;
+        }
         default:
             break;
 
