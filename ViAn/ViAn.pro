@@ -26,7 +26,8 @@ SOURCES += Test/test_video_player.cpp \
     Test/filehandlertest.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Video/overlay.h
+    Video/overlay.h \
+    Video/shapes.h
 
 #
 # GUI

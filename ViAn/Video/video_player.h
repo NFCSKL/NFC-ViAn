@@ -11,6 +11,7 @@
 #include <QImage>
 #include <QWaitCondition>
 #include "overlay.h"
+#include "shapes.h"
 
 #include <chrono>
 
@@ -41,7 +42,9 @@ public:
     void dec_playback_speed();
     
     void toggle_overlay();
-    
+    void set_overlay_tool(SHAPES shape);
+    void set_overlay_colour(QColor colour);
+
     friend class test_video_player;
 
     const double MAX_SPEED_MULT = 16;

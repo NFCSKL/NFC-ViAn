@@ -3,9 +3,11 @@
 #include <QMessageBox>
 #include <iostream>
 #include <QCloseEvent>
+#include <QColorDialog>
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
+#include "Video/shapes.h"
 
 using namespace std;
 using namespace cv;
@@ -234,7 +236,47 @@ void MainWindow::on_bookmarkButton_clicked(){
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
-void MainWindow::on_actionShow_hide_overview_triggered()
-{
+void MainWindow::on_actionShow_hide_overview_triggered() {
     mvideo_player->toggle_overlay();
+}
+
+/**
+ * @brief MainWindow::on_actionColour_triggered
+ * Selects a colour for the overlay drawing tool.
+ */
+void MainWindow::on_actionColour_triggered() {
+    QColor col = QColorDialog::getColor();
+    mvideo_player->set_overlay_colour(col);
+}
+
+/**
+ * @brief MainWindow::on_actionRectangle_triggered
+ * Selects the rectangle shape for the overlay drawing tool.
+ */
+void MainWindow::on_actionRectangle_triggered() {
+    mvideo_player->set_overlay_tool(RECTANGLE);
+}
+
+/**
+ * @brief MainWindow::on_actionCircle_triggered
+ * Selects the circle shape for the overlay drawing tool.
+ */
+void MainWindow::on_actionCircle_triggered() {
+    mvideo_player->set_overlay_tool(CIRCLE);
+}
+
+/**
+ * @brief MainWindow::on_actionLine_triggered
+ * Selects the line shape for the overlay drawing tool.
+ */
+void MainWindow::on_actionLine_triggered() {
+    mvideo_player->set_overlay_tool(LINE);
+}
+
+/**
+ * @brief MainWindow::on_actionArrow_triggered
+ * Selects the arrow shape for the overlay drawing tool.
+ */
+void MainWindow::on_actionArrow_triggered() {
+    mvideo_player->set_overlay_tool(ARROW);
 }

@@ -258,3 +258,21 @@ void video_player::toggle_overlay() {
         show_frame();
     }
 }
+
+/**
+ * @brief video_player::set_overlay_tool
+ * Sets the overlay tool's shape.
+ * @param shape
+ */
+void video_player::set_overlay_tool(SHAPES shape) {
+    video_overlay->set_overlay_tool(shape);
+}
+
+/**
+ * @brief video_player::set_overlay_colour
+ * Sets the overlay tool's colour.
+ * @param colour
+ */
+void video_player::set_overlay_colour(QColor colour) {
+    video_overlay->set_overlay_colour(colour);
+}
