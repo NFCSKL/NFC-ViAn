@@ -15,6 +15,7 @@ overlay::overlay() {
  */
 void overlay::draw_overlay(QImage &img) {
     if (show_overlay) {
+        // For now this function just paints static shapes
         QPainter painter(&img);
         QPen pen;
         pen.setWidth(3);
