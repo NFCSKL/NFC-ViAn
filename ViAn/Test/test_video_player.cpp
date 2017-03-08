@@ -154,9 +154,9 @@ void test_video_player::test_dec_playback_speed(){
  * @brief test_toggle_overlay
  */
 void test_video_player::test_toggle_overlay() {
-    mvideo->show_overlay = false;
+    mvideo->moverlay->set_showing_overlay(false);
     mvideo->toggle_overlay();
-    QVERIFY(mvideo->show_overlay);
+    QVERIFY(mvideo->moverlay->is_showing_overlay());
     mvideo->toggle_overlay();
-    QVERIFY(!mvideo->show_overlay);
+    QVERIFY(!mvideo->moverlay->is_showing_overlay());
 }
