@@ -78,7 +78,7 @@ private:
     QImage img;
     QWaitCondition condition;
 
-    overlay* moverlay;
+    overlay* video_overlay;
 };
 
 #endif // VIDEO_PLAYER_H

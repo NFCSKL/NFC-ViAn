@@ -11,6 +11,7 @@ using namespace std;
 using namespace cv;
 
 video_player::video_player(QObject* parent) : QThread(parent) {
+    video_overlay = new overlay();
 }
 
 /**
@@ -95,7 +96,7 @@ void video_player::show_frame() {
                              frame.cols,frame.rows,QImage::Format_Indexed8);
     }
 
-    moverlay->draw_overlay(img);
+    video_overlay->draw_overlay(img);
     emit processedImage(img);
 }
 
@@ -239,7 +240,7 @@ void video_player::inc_playback_speed() {
  * the frame in the GUI to show with/without overlay
  */
 void video_player::toggle_overlay() {
-    moverlay->toggle_overlay();
+    video_overlay->toggle_overlay();
 
     // If paused we need to update the frame shown ourself (otherwise done in the video-thread).
     if (is_paused()) {
