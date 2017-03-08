@@ -11,8 +11,7 @@
  */
 inputwindow::inputwindow( MainWindow *mainWindow, ACTION action, QString infoText = "Name:", QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::inputwindow)
-{
+    ui(new Ui::inputwindow) {
     this->mainWindow = mainWindow;
     this->action = action;
     ui->setupUi(this);
@@ -21,8 +20,7 @@ inputwindow::inputwindow( MainWindow *mainWindow, ACTION action, QString infoTex
  * @brief inputwindow::~inputwindow
  * Destructor
  */
-inputwindow::~inputwindow()
-{
+inputwindow::~inputwindow() {
     delete ui;
 }
 /**
@@ -30,7 +28,7 @@ inputwindow::~inputwindow()
  * sends the input text back to mainWindow
  */
 void inputwindow::on_okButton_clicked() {
-    if(!ui->input->text().isEmpty()){
+    if(!ui->input->text().isEmpty()) {
         QString inputText = ui->input->text();
         mainWindow->inputSwitchCase(this->action, inputText);
     }

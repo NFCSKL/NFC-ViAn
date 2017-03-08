@@ -249,7 +249,7 @@ void MainWindow::on_actionAddProject_triggered() {
 void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
-        case ADD_PROJECT:{
+        case ADD_PROJECT: {
             fileHandler->createProject(input);
             QTreeWidgetItem *projectInTree = new QTreeWidgetItem();
             projectInTree->setText(0, qInput);
