@@ -36,36 +36,36 @@ public:
     //
     //  Project manipulation
     //
-    Project* openProject(std::string dirpath);
-    Project* createProject(std::string projName);
-    FH_ERROR deleteProject(Project* proj);
-    void saveProject(Project* proj);
-    Project* loadProject(std::string filePath);
+    Project* open_project(std::string dirpath);
+    Project* create_project(std::string projName);
+    FH_ERROR delete_project(Project* proj);
+    void save_project(Project* proj);
+    Project* load_project(std::string filePath);
 
-    void addVideo(Project* proj, std::string filePath);
+    void add_video(Project* proj, std::string filePath);
 
     //directory manipulation
     //varying implementation
-    ID createDirectory(std::string dirpath);
-    FH_ERROR deleteDirectory(std::string dirpath);
+    ID create_directory(std::string dirpath);
+    FH_ERROR delete_directory(std::string dirpath);
 
     //file manipulation
-    ID createFile(std::string filename, ID dirID);
-    FH_ERROR deleteFile(ID id);
-    void writeFile(ID id, std::string text);
-    void readFile(ID id, size_t linesToRead, std::string& buf);
+    ID create_file(std::string filename, ID dirID);
+    FH_ERROR delete_file(ID id);
+    void write_file(ID id, std::string text);
+    void read_file(ID id, size_t linesToRead, std::string& buf);
 
     // thread safe read operations for maps
-    std::string getDir(ID id);
-    Project* getProject(ID id);
-    std::string getFile(ID id);    
+    std::string get_dir(ID id);
+    Project* get_project(ID id);
+    std::string get_file(ID id);
 
 private:
-    void updateProjFile(Project* proj); // used to update existing project files and maps
+    void update_proj_file(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    void addFile(std::pair<ID,std::string> pair);
-    void addProject(std::pair<ID,Project*> pair);
-    void addDir(std::pair<ID,std::string> pair);
+    void add_file(std::pair<ID,std::string> pair);
+    void add_project(std::pair<ID,Project*> pair);
+    void add_dir(std::pair<ID,std::string> pair);
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap

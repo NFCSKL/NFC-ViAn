@@ -18,7 +18,7 @@ Project::Project(ID id, std::string name)
 * @param vid
 * add given video to project
 */
-void Project::addVideo(Video vid)
+void Project::add_video(Video vid)
 {
     this->m_videos.push_back(vid);
 }

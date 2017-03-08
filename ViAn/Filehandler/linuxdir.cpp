@@ -11,7 +11,7 @@
  * OBS! Only compatible with unix based systems
  * @param std::string
  */
-int makeDir(std::string dirpath){    
+int make_dir(std::string dirpath){    
     return mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
 }
@@ -23,6 +23,6 @@ int makeDir(std::string dirpath){
  * non empty directories.
  * OBS! Only compatible with windows systems.
  */
-int removeDir(std::string dirpath){
+int remove_dir(std::string dirpath){
     return rmdir(dirpath.c_str());
 }

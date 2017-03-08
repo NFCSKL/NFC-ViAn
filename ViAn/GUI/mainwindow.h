@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void setStatusBar(string status, int timer);
+    void set_status_bar(string status, int timer);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void inputSwitchCase(ACTION action, QString qInput);
@@ -43,7 +43,7 @@ private slots:
 
     void on_actionExit_triggered();
 
-    void setShortcuts();
+    void set_shortcuts();
 
     void closeEvent (QCloseEvent *event);
 
