@@ -38,6 +38,7 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
+    void toggle_overlay();
     
     friend class test_video_player;
 
@@ -58,6 +59,7 @@ private:
     void update_frame(int frame_nbr);
     void show_frame();
 
+    void add_overlay(QImage &img);
 
     cv::VideoCapture capture;
     cv::Mat frame;
@@ -73,6 +75,8 @@ private:
 
     bool stop = false;
     bool video_paused;
+
+    bool show_overlay = false;
 
     QImage img;
     QWaitCondition condition;   

@@ -270,5 +270,14 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
  * @param column the column in the tree
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
+}
+
+ /** @brief MainWindow::on_actionShow_hide_overview_triggered
+ * Toggles the showing/hiding of the overlay.
+ * Invoked by menu item.
+ */
+void MainWindow::on_actionShow_hide_overview_triggered()
+{
+    mvideo_player->toggle_overlay();
 
 }

@@ -68,6 +68,8 @@ private slots:
     void on_videoSlider_valueChanged(int newPos);
 
     void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
+    
+    void on_actionShow_hide_overview_triggered();
 
 private:
 

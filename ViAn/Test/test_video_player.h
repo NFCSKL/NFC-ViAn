@@ -29,6 +29,7 @@ private slots:
     void test_inc_playback_speed();
     void test_dec_playback_speed();
     void test_stop_video();
+    void test_toggle_overlay();
 
 
 private:
