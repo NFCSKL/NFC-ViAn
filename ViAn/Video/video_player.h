@@ -20,6 +20,7 @@ using namespace std;
 class video_player : public QThread { Q_OBJECT
 public:
     video_player(QObject* parent = 0);
+    ~video_player();
     bool load_video(string filename);
     bool is_paused();
     bool is_stopped();

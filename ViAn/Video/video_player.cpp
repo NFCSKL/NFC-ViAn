@@ -10,8 +10,19 @@
 using namespace std;
 using namespace cv;
 
+/**
+ * @brief video_player::video_player
+ * @param parent
+ */
 video_player::video_player(QObject* parent) : QThread(parent) {
     video_overlay = new overlay();
+}
+
+/**
+ * @brief video_player::~video_player
+ */
+video_player::~video_player() {
+    delete video_overlay;
 }
 
 /**
