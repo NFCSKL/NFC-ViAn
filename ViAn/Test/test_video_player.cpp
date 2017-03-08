@@ -150,4 +150,13 @@ void test_video_player::test_dec_playback_speed(){
     QVERIFY(mvideo->get_speed_multiplier() == 16);
 }
 
-
+/**
+ * @brief test_toggle_overlay
+ */
+void test_video_player::test_toggle_overlay() {
+    mvideo->show_overlay = false;
+    mvideo->toggle_overlay();
+    QVERIFY(mvideo->show_overlay);
+    mvideo->toggle_overlay();
+    QVERIFY(!mvideo->show_overlay);
+}

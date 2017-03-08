@@ -227,3 +227,13 @@ void MainWindow::on_bookmarkButton_clicked(){
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(700);
 }
+
+/**
+ * @brief MainWindow::on_actionShow_hide_overview_triggered
+ * Toggles the showing/hiding of the overlay.
+ * Invoked by menu item.
+ */
+void MainWindow::on_actionShow_hide_overview_triggered()
+{
+    mvideo_player->toggle_overlay();
+}

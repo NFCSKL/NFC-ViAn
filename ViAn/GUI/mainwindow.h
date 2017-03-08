@@ -59,6 +59,8 @@ private slots:
 
     void on_bookmarkButton_clicked();
 
+    void on_actionShow_hide_overview_triggered();
+
 private:
 
     Ui::MainWindow *ui;
