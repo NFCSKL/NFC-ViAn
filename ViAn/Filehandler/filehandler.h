@@ -43,7 +43,7 @@ public:
     Project* createProject(std::string projName);
     FH_ERROR deleteProject(Project* proj);
     void saveProject(Project* proj);
-    Project* loadProject(std::string filePath);
+    Project* loadProject(std::string name, std::string dirpath);
 
     void addVideo(Project* proj, std::string filePath);
 
@@ -56,7 +56,8 @@ public:
     ID createFile(std::string filename, ID dirID);
     FH_ERROR deleteFile(ID id);
     void writeFile(ID id, std::string text);
-    void readFile(ID id, size_t linesToRead, std::string& buf);
+    void readFile(ID id,  std::string& buf, size_t linesToRead = -1);
+
 
     // thread safe read operations for maps
     std::string getDir(ID id);

@@ -40,11 +40,19 @@ void Project::addVideo(Video* vid)
  */
 std::stringstream& operator>>(std::stringstream& is, Project& proj){
     int vidCounter = 0;
-    std::string str;
-    is >> str;
-    while(vidCounter){
+    is >> proj.m_id ;
+    is >> proj.m_name ;
+    is >> vidCounter;
+    std::cout << "id"  << proj.m_id <<std::endl;
+    if( vidCounter < 0) return is;
+    while(vidCounter--){
         Video* v = new Video();
-        is >> *v;
+        int foo;
+        is >> foo;
+        std::cout<< "foo" <<  foo << std::endl;
+//        is >> *v;
+        std::cout << "vid " << v->id << std::endl;
+        std::cout << "vfp" <<  v->filepath << std::endl;
         proj.addVideo(v);
     }
     return is;
@@ -58,14 +66,13 @@ std::stringstream& operator>>(std::stringstream& is, Project& proj){
  */
 std::stringstream& operator<<(std::stringstream& os, const Project& proj){
     os << proj.m_id << " " << proj.m_name << " ";
-    int vidcounter = 0;
-
+    int vidcounter = proj.m_videos.size();
+    os << vidcounter << " ";
     for(auto vid = proj.m_videos.rbegin(); vid != proj.m_videos.rend(); ++vid){
         Video* v = *vid;
         os << *v << " ";
         vidcounter++;
     }
-    os << vidcounter;
     return os;
 }
 /**

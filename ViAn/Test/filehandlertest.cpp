@@ -43,8 +43,8 @@ void filehandlertest::projectHandlingTest(){
 
     fh->saveProject(proj);
     //check file contents
-//    Project* proj2 = fh->loadProject(fh->getDir(proj->m_dir));
-//    QVERIFY(*proj2 == *proj);
+    Project* proj2 = fh->loadProject("TEST_PROJ", std::string(WORKSPACE) + "/TEST_PROJ");
+    QVERIFY(*proj2 == *proj);
     //check project contentss
     fh->deleteFile(vid1);
     fh->deleteFile(vid2);
@@ -86,7 +86,7 @@ void filehandlertest::fileTest(){
     fh->writeFile(fileID, filename);   //write to file "filetest.txt"
     //read and check if file contains filename"
     std::string readText;
-    fh->readFile(fileID,1, readText); // read from file
+    fh->readFile(fileID, readText, 1); // read from file
     QCOMPARE(readText, filename); // d = 0 if test passes
     //delete file and check if it is not there
     QCOMPARE(fh->deleteFile(fileID), 0); // check that delete was done correctly

@@ -99,8 +99,21 @@ void FileHandler::updateProjFiles(Project* proj){
  * @param std::string, fileopath to project file
  * Load a project object from a given filepath
  */
-Project* FileHandler::loadProject(std::string filePath){
-    Project* proj = new Project();    
+Project* FileHandler::loadProject(std::string name, std::string dirpath){
+    Project* proj = new Project();
+    std::ifstream f(dirpath + "/" + name + ".txt");
+    std::string filename;
+    std::getline(f, filename);
+    proj->files->f_videos = addFile(dirpath + "/" +filename);
+    std::stringstream sstr;
+    std::string buf = "";
+    readFile(proj->files->f_videos, buf, 1);
+    sstr << buf;
+    std::cout << "**sstr**" << sstr.str() << std::endl;
+    sstr >> *proj;
+    std::stringstream check;
+    check << *proj;
+    std::cout << "**check**" << check.str() << std::endl;
     return proj;
 }
 
@@ -178,9 +191,10 @@ ID FileHandler::createFile(std::string filename, ID dirID){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::readFile(ID id, size_t linesToRead, std::string& buf){
+ void FileHandler::readFile(ID id,  std::string& buf, size_t linesToRead){
      std::ifstream f(this->getFile(id));
-     while(linesToRead-- && std::getline(f,buf));
+     if(f.is_open())
+        while(linesToRead-- && std::getline(f, buf));
  }
  /**
   * @brief FileHandler::getProject
