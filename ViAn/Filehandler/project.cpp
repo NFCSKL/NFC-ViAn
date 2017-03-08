@@ -14,7 +14,7 @@ Project::Project(ID id, std::string name)
 
 }
 /**
-* @brief Project::addVideo
+* @brief Project::add_video
 * @param vid
 * add given video to project
 */
