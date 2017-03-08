@@ -6,6 +6,7 @@
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
+#include "inputwindow.h"
 
 using namespace std;
 using namespace cv;
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
+    fileHandler = new FileHandler();
     setShortcuts();
 
     mvideo_player = new video_player();
@@ -44,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
+    delete fileHandler;
+    delete mvideo_player;
     delete ui;
 }
 
@@ -229,11 +233,51 @@ void MainWindow::on_bookmarkButton_clicked(){
 }
 
 /**
- * @brief MainWindow::on_actionShow_hide_overview_triggered
+ * @brief MainWindow::on_actionAddProject_triggered
+ */
+void MainWindow::on_actionAddProject_triggered() {
+    ACTION action = ADD_PROJECT;
+    inputWindow = new inputwindow(this, action, "Project name:");
+    inputWindow->show();
+}
+
+/**
+ * @brief MainWindow::inputSwitchCase
+ * @param input the input from the user
+ * @param action the action that was triggered earlier
+ */
+void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
+    std::string input = qInput.toStdString();
+    switch(action){
+        case ADD_PROJECT: {
+            fileHandler->createProject(input);
+            QTreeWidgetItem *projectInTree = new QTreeWidgetItem();
+            projectInTree->setText(0, qInput);
+            ui->ProjectTree->addTopLevelItem(projectInTree);
+            break;
+        }
+        case CANCEL:
+            break;
+        default:
+            break;
+
+    }
+    delete inputWindow;
+}
+/**
+ * @brief MainWindow::on_ProjectTree_itemClicked
+ * @param item the item in the projectTree that was clicked
+ * @param column the column in the tree
+ */
+void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
+}
+
+ /** @brief MainWindow::on_actionShow_hide_overview_triggered
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
 void MainWindow::on_actionShow_hide_overview_triggered()
 {
     mvideo_player->toggle_overlay();
+
 }

@@ -14,9 +14,12 @@
 #include "opencv2/core/core.hpp"
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
+#include "Filehandler/filehandler.h"
+#include "inputwindow.h"
+#include "action.h"
 
 using namespace std;
-
+class inputwindow;
 
 namespace Ui {
 class MainWindow;
@@ -30,6 +33,7 @@ public:
     void setStatusBar(string status, int timer);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void inputSwitchCase(ACTION action, QString qInput);
 
 private slots:
 
@@ -59,16 +63,24 @@ private slots:
 
     void on_bookmarkButton_clicked();
 
+    void on_actionAddProject_triggered();
+
+    void on_videoSlider_valueChanged(int newPos);
+
+    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
+    
     void on_actionShow_hide_overview_triggered();
 
 private:
 
     Ui::MainWindow *ui;
+    inputwindow *inputWindow;
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
 
     QSlider *video_slider;
-    void on_videoSlider_valueChanged(int newPos);
+
+    FileHandler *fileHandler;
 
 };
 
