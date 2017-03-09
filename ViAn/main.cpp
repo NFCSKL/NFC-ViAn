@@ -1,6 +1,7 @@
 #include "Video/video_player.h"
 #include "Test/test_video_player.h"
 #include "Test/filehandlertest.h"
+#include "Test/test_mainwindow.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
 
@@ -22,5 +23,7 @@ int main(int argc, char *argv[])
     //QTest::qExec(video_test);
     //filehandlertest* file_test = new filehandlertest();
     //QTest::qExec(file_test);
+    test_mainwindow* window_test = new test_mainwindow(&w);
+    QTest::qExec(window_test);
     return a.exec();
 }
