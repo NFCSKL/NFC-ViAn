@@ -45,14 +45,14 @@ public:
     void saveProject(Project* proj);
     Project* loadProject(std::string projname, std::string dirpath);
 
-    void addVideo(Project* proj, std::string filePath);
-
+    void add_video(Project* proj, std::string filePath);
     //directory manipulation
     //varying implementation
-    ID createDirectory(std::string dirpath);
-    FH_ERROR deleteDirectory(ID id);
+    ID create_directory(std::string dirpath);
+    FH_ERROR delete_directory(ID id);
 
     //file manipulation
+
     ID createFile(std::string filename, ID dirID);
     FH_ERROR deleteFile(ID id);
     void writeFile(ID id, std::string text);
@@ -60,18 +60,21 @@ public:
 
 
     // thread safe read operations for maps
-    std::string getDir(ID id);
-    Project* getProject(ID id);
-    std::string getFile(ID id);    
+
+
+    std::string get_dir(ID id);
+    Project* get_project(ID id);
+    std::string get_file(ID id);
+
     // Last error
     FH_ERROR lastError;
 
 private:
-    void updateProjFiles(Project* proj); // used to update existing project files and maps
+    void update_proj_files(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    ID addFile(std::string filepath);
-    void addProject(std::pair<ID,Project*> pair);
-    ID addDir(std::string dirpath);
+    ID add_file(std::string filepath);
+    void add_project(std::pair<ID,Project*> pair);
+    ID add_dir(std::string dirpath);
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap

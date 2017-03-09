@@ -66,12 +66,12 @@ void IconOnButtonHandler::set_pictures_to_buttons(Ui::MainWindow *ui){
 
 
 /**
- * @brief IconOnButtonHandler::setIcon
+ * @brief IconOnButtonHandler::set_icon
  * if you send in a non valid number you get an error image
  * @param iconNumber
  * @param button
  */
-void IconOnButtonHandler::setIcon(string icon, QPushButton *button){
+void IconOnButtonHandler::set_icon(string icon, QPushButton *button){
     if(iconMap.find(icon) == iconMap.end()){
         button->setIcon(iconMap["error"]);
     }else{

@@ -4,12 +4,25 @@
 #include "GUI/mainwindow.h"
 #include <thread>
 #include <QWaitCondition>
+#include <qpainter.h>
 
 
 using namespace std;
 using namespace cv;
 
+/**
+ * @brief video_player::video_player
+ * @param parent
+ */
 video_player::video_player(QObject* parent) : QThread(parent) {
+    video_overlay = new overlay();
+}
+
+/**
+ * @brief video_player::~video_player
+ */
+video_player::~video_player() {
+    delete video_overlay;
 }
 
 /**
@@ -94,6 +107,7 @@ void video_player::show_frame() {
                              frame.cols,frame.rows,QImage::Format_Indexed8);
     }
 
+    video_overlay->draw_overlay(img);
     emit processedImage(img);
 }
 
@@ -229,4 +243,36 @@ void video_player::inc_playback_speed() {
     if (this->speed_multiplier > MIN_SPEED_MULT) {
         this->set_speed_multiplier(this->get_speed_multiplier()/SPEED_STEP_MULT);
     }
+}
+
+/**
+ * @brief video_player::toggle_overlay
+ * Toggles the showing of the overlay, and if video is paused updates
+ * the frame in the GUI to show with/without overlay
+ */
+void video_player::toggle_overlay() {
+    video_overlay->toggle_overlay();
+
+    // If paused we need to update the frame shown ourself (otherwise done in the video-thread).
+    if (is_paused()) {
+        show_frame();
+    }
+}
+
+/**
+ * @brief video_player::set_overlay_tool
+ * Sets the overlay tool's shape.
+ * @param shape
+ */
+void video_player::set_overlay_tool(SHAPES shape) {
+    video_overlay->set_overlay_tool(shape);
+}
+
+/**
+ * @brief video_player::set_overlay_colour
+ * Sets the overlay tool's colour.
+ * @param colour
+ */
+void video_player::set_overlay_colour(QColor colour) {
+    video_overlay->set_overlay_colour(colour);
 }

@@ -37,7 +37,7 @@ public:
     Project();
     Project(ID id, std::string name);
     Project(std::string dirpath);
-    void addVideo(Video *vid);
+    void add_video(Video *vid);
 
     friend std::stringstream& operator>>(std::stringstream& is, Project& proj);
     friend std::stringstream& operator<<(std::stringstream& os, Project const& proj);
@@ -45,8 +45,8 @@ public:
     friend bool operator==(Project proj, Project proj2);
 
 // TODO
-//    void addAnalysis();
-//    void addDrawing();
+//    void add_analysis();
+//    void add_drawing();
 private:
     ID m_vid;        
 public:

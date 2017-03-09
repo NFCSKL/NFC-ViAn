@@ -31,7 +31,12 @@ std::stringstream& operator>>(std::stringstream& is, Video& vid){
  * @brief operator <<
  * @param os
  * @param vid
+<<<<<<< HEAD
  * @return used for writing project to file
+=======
+ * @return stream
+ * Writes project information to stringstream
+>>>>>>> master
  */
 std::stringstream& operator<<(std::stringstream& os, const Video& vid){
     os << vid.id << " " << vid.filepath << " ";
@@ -42,7 +47,6 @@ std::stringstream& operator<<(std::stringstream& os, const Video& vid){
  * @param v1
  * @param v2
  * @return if videos the same TRUE
- *
  */
 bool operator==(Video v1, Video v2){
     return v1.id == v2.id &&
