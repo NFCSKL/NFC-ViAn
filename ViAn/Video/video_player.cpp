@@ -10,7 +10,19 @@
 using namespace std;
 using namespace cv;
 
+/**
+ * @brief video_player::video_player
+ * @param parent
+ */
 video_player::video_player(QObject* parent) : QThread(parent) {
+    video_overlay = new overlay();
+}
+
+/**
+ * @brief video_player::~video_player
+ */
+video_player::~video_player() {
+    delete video_overlay;
 }
 
 /**
@@ -95,25 +107,8 @@ void video_player::show_frame() {
                              frame.cols,frame.rows,QImage::Format_Indexed8);
     }
 
-    add_overlay(img);
+    video_overlay->draw_overlay(img);
     emit processedImage(img);
-}
-
-/**
- * @brief video_player::add_overlay
- * Draws an overlay on top of the specified QImage.
- * @param img QImage to draw on
- */
-void video_player::add_overlay(QImage &img) {
-    if (show_overlay) {
-        QPainter painter(&img);
-        QPen pen;
-        pen.setWidth(3);
-        pen.setColor(Qt::red);
-        painter.setPen(pen);
-        painter.drawRect(400,200,400,400);
-        painter.end();
-    }
 }
 
 /**
@@ -256,7 +251,7 @@ void video_player::inc_playback_speed() {
  * the frame in the GUI to show with/without overlay
  */
 void video_player::toggle_overlay() {
-    show_overlay = !show_overlay;
+    video_overlay->toggle_overlay();
 
     // If paused we need to update the frame shown ourself (otherwise done in the video-thread).
     if (is_paused()) {
