@@ -253,7 +253,7 @@ void video_player::inc_playback_speed() {
 void video_player::toggle_overlay() {
     video_overlay->toggle_overlay();
 
-    // If paused we need to update the frame shown ourself (otherwise done in the video-thread).
+    // If paused we need to update the frame ourself (otherwise done in the video-thread).
     if (is_paused()) {
         show_frame();
     }
@@ -275,4 +275,49 @@ void video_player::set_overlay_tool(SHAPES shape) {
  */
 void video_player::set_overlay_colour(QColor colour) {
     video_overlay->set_overlay_colour(colour);
+}
+
+/**
+ * @brief video_player::video_mouse_pressed
+ * Starts drawing on the overlay, if visible.
+ * If the video is paused, the frame the GUI is updated.
+ * @param pos coordinate
+ */
+void video_player::video_mouse_pressed(QPoint pos) {
+    video_overlay->mouse_pressed(pos);
+
+    // If paused we need to update the frame ourself (otherwise done in the video-thread).
+    if (is_paused()) {
+        show_frame();
+    }
+}
+
+/**
+ * @brief video_player::video_mouse_released
+ * Ends drawing on the overlay, if visible.
+ * If the video is paused, the frame the GUI is updated.
+ * @param pos coordinates
+ */
+void video_player::video_mouse_released(QPoint pos) {
+    video_overlay->mouse_released(pos);
+
+    // If paused we need to update the frame ourself (otherwise done in the video-thread).
+    if (is_paused()) {
+        show_frame();
+    }
+}
+
+/**
+ * @brief video_player::video_mouse_moved
+ * Updates drawing on the overlay, if visible.
+ * If the video is paused, the frame the GUI is updated.
+ * @param pos coordinates
+ */
+void video_player::video_mouse_moved(QPoint pos) {
+    video_overlay->mouse_moved(pos);
+
+    // If paused we need to update the frame ourself (otherwise done in the video-thread).
+    if (is_paused()) {
+        show_frame();
+    }
 }

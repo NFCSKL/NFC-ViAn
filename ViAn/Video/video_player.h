@@ -44,6 +44,9 @@ public:
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
+    void video_mouse_pressed(QPoint pos);
+    void video_mouse_released(QPoint pos);
+    void video_mouse_moved(QPoint pos);
 
     friend class test_video_player;
 

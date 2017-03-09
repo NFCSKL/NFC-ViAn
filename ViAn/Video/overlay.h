@@ -16,11 +16,17 @@ public:
     void draw_overlay(QImage &img);
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
+    void mouse_pressed(QPoint pos);
+    void mouse_released(QPoint pos);
+    void mouse_moved(QPoint pos);
 
 private:
     bool show_overlay = false;
     SHAPES shape = RECTANGLE;
     QColor colour = Qt::red;
+
+    QPoint draw_start = QPoint(400, 200);
+    QPoint draw_end = QPoint(800, 600);
 };
 
 #endif // OVERLAY_H

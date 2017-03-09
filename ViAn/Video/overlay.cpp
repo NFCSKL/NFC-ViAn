@@ -21,26 +21,32 @@ void overlay::draw_overlay(QImage &img) {
         pen.setWidth(3);
         pen.setColor(colour);
         painter.setPen(pen);
+        int width = draw_end.x() - draw_start.x();
+        int height = draw_end.y() - draw_start.y();
         switch (shape) {
             case RECTANGLE:
-                painter.drawRect(400,200,400,400);
+                painter.drawRect(draw_start.x(), draw_start.y(), width, height);
                 break;
             case CIRCLE:
-                painter.drawEllipse(400,200,400,400);
+                painter.drawEllipse(draw_start.x(), draw_start.y(), width, height);
                 break;
             case LINE:
-                painter.drawLine(400,200,400,400);
+                painter.drawLine(draw_start.x(), draw_start.y(), width, height);
                 break;
             case ARROW:
                 {
-                    QLineF line(400,200,800,600);
-                    line.normalVector();
-                    QLineF line2(800,600,400,200);
-                    QLineF line3(800,600,400,200);
+                    // Create the main line of the arrow.
+                    QLineF line(draw_start.x(), draw_start.y(), draw_end.x(), draw_end.y());
+                    // Create two lines starting in the main lines end point.
+                    QLineF line2(draw_end.x(), draw_end.y(), draw_start.x(), draw_start.y());
+                    QLineF line3(draw_end.x(), draw_end.y(), draw_start.x(), draw_start.y());
+                    // Set the length of the two shorter lines.
                     line2.setLength(10);
                     line3.setLength(10);
-                    line2.setAngle(line.angle()+145);
-                    line3.setAngle(line.angle()-145);
+                    // Angle the two shorter lines 45 degrees from the main line.
+                    line2.setAngle(line.angle()+135);
+                    line3.setAngle(line.angle()-135);
+                    // Draw the lines.
                     QVector<QLineF> lines{line, line2, line3};
                     painter.drawLines(lines);
                     break;
@@ -93,4 +99,41 @@ void overlay::set_overlay_tool(SHAPES s) {
  */
 void overlay::set_overlay_colour(QColor col) {
     colour = col;
+}
+
+/**
+ * @brief overlay::mouse_pressed
+ * Starts drawing on the overlay when the mouse is
+ * pressed, if the overlay is visible.
+ * @param pos coordinates
+ */
+void overlay::mouse_pressed(QPoint pos) {
+    if (show_overlay) {
+        draw_start = pos;
+        draw_end = pos;
+    }
+}
+
+/**
+ * @brief overlay::mouse_pressed
+ * Ends drawing on the overlay when the mouse is
+ * released, if the overlay is visible.
+ * @param pos coordinates
+ */
+void overlay::mouse_released(QPoint pos) {
+    if (show_overlay) {
+        draw_end = pos;
+    }
+}
+
+/**
+ * @brief overlay::mouse_moved
+ * Updates drawing on the overlay when the mouse is
+ * moved, if the overlay is visible.
+ * @param pos coordinates
+ */
+void overlay::mouse_moved(QPoint pos) {
+    if (show_overlay) {
+        draw_end = pos;
+    }
 }

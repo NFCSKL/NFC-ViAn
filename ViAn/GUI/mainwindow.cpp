@@ -29,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
     fileHandler = new FileHandler();
     set_shortcuts();
 
+    // Adds this as a listener to videoFrame.
+    ui->videoFrame->installEventFilter(this);
+
     mvideo_player = new video_player();
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
                                   this, SLOT(update_video(QImage)));
@@ -293,7 +296,6 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
  */
 void MainWindow::on_actionShow_hide_overview_triggered() {
     mvideo_player->toggle_overlay();
-
 }
 
 /**
@@ -335,4 +337,28 @@ void MainWindow::on_actionLine_triggered() {
  */
 void MainWindow::on_actionArrow_triggered() {
     mvideo_player->set_overlay_tool(ARROW);
+}
+
+/**
+ * @brief MainWindow::eventFilter
+ * Listener function for all eventFilters MainWindow has installed.
+ * @param obj the object invoking the event
+ * @param event the invooked event
+ * @return
+ */
+bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+    // Check who invoked the event.
+    if (qobject_cast<QLabel*>(obj)==ui->videoFrame) {
+        // Cast to a mouse event to get the mouse position.
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        QPoint pos = mouseEvent->pos();
+        // Check what kind of event.
+        if (event->type() == QEvent::MouseButtonPress) {
+            mvideo_player->video_mouse_pressed(pos);
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+            mvideo_player->video_mouse_released(pos);
+        } else if (event->type() == QEvent::MouseMove) {
+            mvideo_player->video_mouse_moved(pos);
+        }
+    }
 }
