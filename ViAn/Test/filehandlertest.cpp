@@ -1,33 +1,18 @@
 #include "filehandlertest.h"
-/**
- * @brief runTestSuite
- * @return all pass errorcode,
- * outputs information about which tests passed if
- * PRINTS set in header to terminal
- *
- */
-//void filehandler_testsuite::runTestSuite(){
-//    FileHandler* fileHandler = new FileHandler();
-//    std::string dirpath = WORKSPACE;
-//    Project* proj  = fileHandler->createProject("POI_PROJ");
-//    directoryTest(fileHandler, proj);
-//    fileTest(fileHandler, proj);
-//    projectHandlingTest(fileHandler, proj);
-//}
 
-//
-// Tests that creation, manipulation and deletion of
-// projects functions as intended
-//
+/**
+ * @brief filehandlertest::filehandlertest
+ * @param parent
+ */
 filehandlertest::filehandlertest(QObject *parent) : QObject(parent){
 
 }
 /**
  * @brief FileHandlerTest::projectHandlingTest
- * not much to test currently, will be extended
- * with furter implementation of project manipulation
+ * Tests project creation and deletion.
+ * TODO : tests project write to file and read from file
  */
-void filehandlertest::projectHandlingTest(){
+void filehandlertest::project_handling_test(){
     FileHandler* fh = new FileHandler();
     Project* proj =  fh->create_project("TEST_PROJ");
     std::string v1 = "video1.txt"; // names for testfiles
@@ -51,25 +36,23 @@ void filehandlertest::projectHandlingTest(){
     fh->delete_file(vid3);
     QCOMPARE(fh->delete_project(proj), 0);
 }
-//
-// Test that creation and deletion of directories are working correctly.
-//
-void filehandlertest::directoryTest(){
+/**
+ * @brief filehandlertest::directoryTest
+ * Test directory creation and deletion
+ */
+void filehandlertest::directory_test(){
     FileHandler* fh = new FileHandler();
     std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
     ID id = fh->create_directory(dirpath);
     QCOMPARE(fh->lastError, 0);
     QCOMPARE(fh->delete_directory(id), 0);
 }
-// fileTest tests following functions, see filehandler.h
-//
-// ID createDirectory(std::string path);
-// int deleteDirectory(std::string dirpath);
-// ID createFile(std::string filename, ID dirID);
-// int deleteFile(ID id);
-// void writeFile(ID id, std::string text);
+/**
+ * @brief filehandlertest::fileTest
+ *  Tests file creation, deletion, writing and reading.
+ */
 
-void filehandlertest::fileTest(){
+void filehandlertest::file_test(){
     FileHandler* fh = new FileHandler();
     std::string dirpath = std::string(WORKSPACE) + "/TEST_MAP";
     std::string filename = "filetest.txt";

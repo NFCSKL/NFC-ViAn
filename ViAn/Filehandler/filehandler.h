@@ -59,9 +59,12 @@ public:
     void read_file(ID id, size_t linesToRead, std::string& buf);
 
     // thread safe read operations for maps
+
+
     std::string get_dir(ID id);
     Project* get_project(ID id);
     std::string get_file(ID id);
+
     // Last error
     FH_ERROR lastError;
 
