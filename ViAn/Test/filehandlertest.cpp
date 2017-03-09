@@ -23,7 +23,7 @@ filehandlertest::filehandlertest(QObject *parent) : QObject(parent){
 
 }
 /**
- * @brief FileHandlerTest::projectHandlingTest
+ * @brief FileHandlerTest::project_handling_test
  * not much to test currently, will be extended
  * with furter implementation of project manipulation
  */
@@ -61,11 +61,11 @@ void filehandlertest::directory_test(){
 }
 // fileTest tests following functions, see filehandler.h
 //
-// ID createDirectory(std::string path);
-// int deleteDirectory(std::string dirpath);
-// ID createFile(std::string filename, ID dirID);
-// int deleteFile(ID id);
-// void writeFile(ID id, std::string text);
+// ID create_directory(std::string path);
+// int delete_directory(std::string dirpath);
+// ID create_file(std::string filename, ID dirID);
+// int delete_file(ID id);
+// void write_file(ID id, std::string text);
 
 void filehandlertest::file_test(){
     FileHandler* fh = new FileHandler();
