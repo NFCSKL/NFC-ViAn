@@ -21,6 +21,8 @@ public:
     void mouse_moved(QPoint pos);
 
 private:
+    void update_drawing_position(QPoint pos);
+
     bool show_overlay = false;
     SHAPES shape = RECTANGLE;
     QColor colour = Qt::red;

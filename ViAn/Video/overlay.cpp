@@ -121,9 +121,7 @@ void overlay::mouse_pressed(QPoint pos) {
  * @param pos coordinates
  */
 void overlay::mouse_released(QPoint pos) {
-    if (show_overlay) {
-        draw_end = pos;
-    }
+    update_drawing_position(pos);
 }
 
 /**
@@ -133,6 +131,10 @@ void overlay::mouse_released(QPoint pos) {
  * @param pos coordinates
  */
 void overlay::mouse_moved(QPoint pos) {
+    update_drawing_position(pos);
+}
+
+void overlay::update_drawing_position(QPoint pos) {
     if (show_overlay) {
         draw_end = pos;
     }
