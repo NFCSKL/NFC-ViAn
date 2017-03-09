@@ -1,7 +1,7 @@
 #include "dir.h"
 /**
  * @todo make threadsafe
- * @brief createDirectory
+ * @brief make_dir
  * create a directory from given path.
  * OBS! Only compatible with windows systems
  * @param std::string
@@ -15,7 +15,7 @@ int make_dir(std::string dirpath){
 }
 /**
  * @todo make threadsafe
- * @brief removeDir
+ * @brief remove_dir
  * @param std::string
  * Delete a direcetory from given path, will not delete
  * non empty directories.
@@ -27,5 +27,4 @@ int make_dir(std::string dirpath){
      }else{
          return 0;
      }
-
  }

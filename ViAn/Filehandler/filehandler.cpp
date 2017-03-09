@@ -12,7 +12,7 @@ FileHandler::FileHandler()
 
 }
 /**
- * @brief FileHandler::createProject
+ * @brief FileHandler::create_project
  * creates project and associated files.
  * @param std::string name
  * @return Project* created project
@@ -24,6 +24,7 @@ Project* FileHandler::create_project(std::string projName){
     this->m_pid++;
     return proj;
 }
+<<<<<<< HEAD
 /**
  * @brief FileHandler::create_directory
  * @param dirpath
@@ -43,6 +44,16 @@ ID FileHandler::create_directory(std::string dirpath){
  */
 FH_ERROR FileHandler::delete_directory(ID id){
     FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
+=======
+ID FileHandler::create_directory(std::string dirpath){
+    int err = make_dir(dirpath); //varying implementation, OS dependant
+    this->add_dir(std::make_pair(this->m_did, dirpath));
+    return this->m_did++;
+}
+
+FH_ERROR FileHandler::delete_directory(std::string dirpath){
+    FH_ERROR err = remove_dir(dirpath); //varying implementation, OS dependant
+>>>>>>> master
     return err;
 }
 
@@ -57,6 +68,7 @@ FH_ERROR FileHandler::delete_directory(ID id){
 void FileHandler::save_project(Project* proj){
     std::string fileName = proj->m_name + std::string(".txt"); //filename
     ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
+<<<<<<< HEAD
     proj->files->dir = dirID;
 
     proj->files->f_proj = create_file(fileName, dirID); //create project file
@@ -75,6 +87,11 @@ void FileHandler::save_project(Project* proj){
     write_file(proj->files->f_proj, fileName);
 
     update_proj_files(proj);
+=======
+    proj->m_dir = dirID;
+    proj->m_file = create_file(fileName, dirID); //create project file
+    update_proj_file(proj);
+>>>>>>> master
 
 }
 /**
@@ -85,23 +102,47 @@ void FileHandler::save_project(Project* proj){
  * Creates project and associated files.
  * @return void
  */
+<<<<<<< HEAD
 void FileHandler::update_proj_files(Project* proj){
     std::string filePath = std::string(WORKSPACE) + "/" + proj->m_name + "/" + proj->m_name + std::string("_videos.txt");
     std::stringstream sstr;
     sstr << *proj;
     write_file(proj->files->f_videos, sstr.str());
+=======
+void FileHandler::update_proj_file(Project* proj){
+    std::string projstr = "";
+    projstr += "Name:"+proj->m_name + "\n";
+    std::vector<Video> vids = proj->m_videos;
+    for (std::vector<Video>::iterator v = vids.begin();v != vids.end(); ++v) {
+        projstr += "V" + std::to_string(v->id) + ":" + this->m_fileMap.at(v->id) + "\n";
+    }
+    write_file(proj->m_file, projstr);
+>>>>>>> master
 }
 
 /**
  * @todo unfinished, will be released with parser, needs full
  * project structure and file to program parser to finish.
  * @brief FileHandler::load_project
+<<<<<<< HEAD
  * @param std::string, fileopath to project file
  * Load a project object from a given filepath
  */
 Project* FileHandler::load_project(std::string filePath){
     Project* proj = new Project();    
     return proj;
+=======
+ * @param std::string
+ * Load a project object from a given filepath
+ */
+Project* FileHandler::load_project(std::string filePath){
+    Project* proj;
+    std::ifstream f(filePath);
+    std::string content = "";
+    std::string line = "";
+    proj = create_project(line.substr(0, line.find(":")));
+    //while(proj << f); //pretty magic, see << definition in proj.cpp
+>>>>>>> master
 }
 
 /**
@@ -112,25 +153,36 @@ Project* FileHandler::load_project(std::string filePath){
  * @return FH_ERROR errorcode
  */
 FH_ERROR FileHandler::delete_project(Project* proj){
+<<<<<<< HEAD
     ProjFiles* pf = proj->files;
     delete_file(pf->f_proj);
     delete_file(pf->f_videos);
     delete_file(pf->f_analysis);
     delete_file(pf->f_drawings);
     return delete_directory(proj->files->dir);
+=======
+    delete_file(proj->m_file);
+    return delete_directory(this->get_dir(proj->m_dir));
+>>>>>>> master
 
 }
 /**
  * @todo make threadsafe
- * @brief FileHandler::addVideo
+ * @brief FileHandler::add_video
  * @param Project*, std::string
  * Add a video filepath to a given project.
  * Creates Video object which is accessed further by returned id.
  */
 void FileHandler::add_video(Project* proj, std::string filePath){
+<<<<<<< HEAD
     Video* v = new Video(this->m_fid, filePath);
     proj->add_video(v);
     this->add_file(filePath);
+=======
+    Video v (this->m_fid, filePath);
+    proj->add_video(v);
+    this->add_file(std::make_pair(this->m_fid++,filePath));
+>>>>>>> master
 }
 
  /**
@@ -144,8 +196,13 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     std::ofstream f;
     std::string filePath = this->get_dir(dirID)+"/"+filename;
     f.open(filePath.c_str());
+<<<<<<< HEAD
     return this->add_file(filePath);
 
+=======
+    this->add_file(std::make_pair(this->m_fid, filePath));
+    return this->m_fid++;
+>>>>>>> master
   }
 /**
  * @todo make threadsafe
@@ -166,8 +223,13 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   */
  void FileHandler::write_file(ID id, std::string text){
     std::string fileName = this->get_file(id);
+<<<<<<< HEAD
     std::ofstream f (fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);
     f << text.c_str() << std::endl;
+=======
+    std::ofstream f (fileName.c_str(),std::ios::in);
+    f << text.c_str();
+>>>>>>> master
  }
 
  /**
@@ -180,7 +242,14 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   */
  void FileHandler::read_file(ID id, size_t linesToRead, std::string& buf){
      std::ifstream f(this->get_file(id));
+<<<<<<< HEAD
      while(linesToRead-- && std::getline(f,buf));
+=======
+     while(linesToRead && std::getline(f,buf))
+     {
+         --linesToRead;
+     }
+>>>>>>> master
  }
  /**
   * @brief FileHandler::get_project
@@ -208,6 +277,10 @@ ID FileHandler::create_file(std::string filename, ID dirID){
  }
  /**
   * @brief FileHandler::get_dir
+<<<<<<< HEAD
+=======
+  * Getter
+>>>>>>> master
   * @param ID directory id
   * @return directory path
   */
@@ -220,6 +293,10 @@ ID FileHandler::create_file(std::string filename, ID dirID){
 
  /**
   * @brief FileHandler::add_project
+<<<<<<< HEAD
+=======
+  * Getter
+>>>>>>> master
   * @param std::pari<<ID, Project*> pair
   * @return void
   */
@@ -231,11 +308,19 @@ ID FileHandler::create_file(std::string filename, ID dirID){
  }
  /**
   * @brief FileHandler::add_file
+<<<<<<< HEAD
   * @param std::string filepath
   * @return void
   */
 ID FileHandler::add_file(std::string filepath){
     std::pair<ID,std::string> pair = std::make_pair(this->m_fid, filepath);
+=======
+  * Getter
+  * @param std::pari<<ID, std::string> pair
+  * @return void
+  */
+void FileHandler::add_file(std::pair<ID,std::string> pair){
+>>>>>>> master
     this->fileMapLock.lock();
     this->m_fileMap.insert(pair);
     this->fileMapLock.unlock();
@@ -243,11 +328,19 @@ ID FileHandler::add_file(std::string filepath){
  }
  /**
   * @brief FileHandler::add_dir
+<<<<<<< HEAD
   * @param std::pari<<ID, std::string> pair
   * @return void
   */
 ID FileHandler::add_dir(std::string dirpath){
     std::pair<ID,std::string> pair = std::make_pair(this->m_did, dirpath);
+=======
+  * Getter
+  * @param std::pari<<ID, std::string> pair
+  * @return void
+  */
+void FileHandler::add_dir(std::pair<ID,std::string> pair){
+>>>>>>> master
     this->dirMapLock.lock();
     this->m_dirMap.insert(pair);
     this->dirMapLock.unlock();

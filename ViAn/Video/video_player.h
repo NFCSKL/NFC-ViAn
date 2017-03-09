@@ -10,6 +10,8 @@
 #include <QMutex>
 #include <QImage>
 #include <QWaitCondition>
+#include "overlay.h"
+#include "shapes.h"
 
 #include <chrono>
 
@@ -19,6 +21,7 @@ using namespace std;
 class video_player : public QThread { Q_OBJECT
 public:
     video_player(QObject* parent = 0);
+    ~video_player();
     bool load_video(string filename);
     bool is_paused();
     bool is_stopped();
@@ -38,7 +41,10 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
-    
+    void toggle_overlay();
+    void set_overlay_tool(SHAPES shape);
+    void set_overlay_colour(QColor colour);
+
     friend class test_video_player;
 
     const double MAX_SPEED_MULT = 16;
@@ -58,7 +64,6 @@ private:
     void update_frame(int frame_nbr);
     void show_frame();
 
-
     cv::VideoCapture capture;
     cv::Mat frame;
     cv::Mat RGBframe;
@@ -75,7 +80,9 @@ private:
     bool video_paused;
 
     QImage img;
-    QWaitCondition condition;   
+    QWaitCondition condition;
+
+    overlay* video_overlay;
 };
 
 #endif // VIDEO_PLAYER_H

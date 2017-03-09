@@ -30,16 +30,19 @@ HEADERS += Test/test_video_player.h \
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/icononbuttonhandler.cpp
+    GUI/icononbuttonhandler.cpp \
+    GUI/inputwindow.cpp
 
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/icononbuttonhandler.h
+    GUI/icononbuttonhandler.h \
+    GUI/inputwindow.h \
+    GUI/action.h
 
 
-
-FORMS    += GUI/mainwindow.ui
+FORMS    += GUI/mainwindow.ui \
+   GUI/inputwindow.ui
 
 RESOURCES += resources.qrc
 #
@@ -47,8 +50,11 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp
-HEADERS += Video/video_player.h
+SOURCES += Video/video_player.cpp \
+    Video/overlay.cpp
+HEADERS += Video/video_player.h \
+    Video/overlay.h \
+    Video/shapes.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll

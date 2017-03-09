@@ -1,0 +1,6 @@
+#ifndef SHAPES_H
+#define SHAPES_H
+
+enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW};
+
+#endif // SHAPES_H

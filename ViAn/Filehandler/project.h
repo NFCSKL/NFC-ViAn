@@ -43,8 +43,8 @@ public:
     friend bool operator==(Project proj, Project proj2);
 
 // TODO
-//    void addAnalysis();
-//    void addDrawing();
+//    void add_analysis();
+//    void add_drawing();
 private:
     ID m_vid;        
 public:

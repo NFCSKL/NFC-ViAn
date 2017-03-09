@@ -10,7 +10,7 @@ public:
     explicit IconOnButtonHandler();
     ~IconOnButtonHandler();
     void set_pictures_to_buttons(Ui::MainWindow *ui);
-    void setIcon(std::string icon, QPushButton *button);
+    void set_icon(std::string icon, QPushButton *button);
 
 
 private slots:

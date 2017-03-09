@@ -21,19 +21,25 @@ void filehandlertest::project_handling_test(){
     ID vid1 = fh->create_file(v1, proj->files->dir);  // create testfiles
     ID vid2 = fh->create_file(v2, proj->files->dir);
     ID vid3 = fh->create_file(v3, proj->files->dir);
-
     fh->add_video(proj, fh->get_file(vid1)); //add tesfiles as videos to project.
     fh->add_video(proj, fh->get_file(vid2));
     fh->add_video(proj, fh->get_file(vid3));
+<<<<<<< HEAD
 
     fh->save_project(proj);
     //check file contents
 //    Project* proj2 = fh->loadProject(fh->getDir(proj->m_dir));
 //    QVERIFY(*proj2 == *proj);
+=======
+    fh->save_project(proj);
+    //check file contents
+    fh->load_project(fh->get_dir(proj->m_dir));
+>>>>>>> master
     //check project contentss
     fh->delete_file(vid1);
     fh->delete_file(vid2);
     fh->delete_file(vid3);
+<<<<<<< HEAD
     QCOMPARE(fh->delete_project(proj), 0);
 }
 /**
@@ -58,6 +64,7 @@ void filehandlertest::file_test(){
     std::string filename = "filetest.txt";
     ID dir = fh->create_directory(dirpath);
     ID fileID  = fh->create_file(filename,dir); //Create file ID = i    (1)
+
     QCOMPARE(fh->get_dir(dir), dirpath);
     QCOMPARE(fh->get_file(fileID), dirpath + "/" + filename);
 
@@ -74,6 +81,5 @@ void filehandlertest::file_test(){
     //delete file and check if it is not there
     QCOMPARE(fh->delete_file(fileID), 0); // check that delete was done correctly
     QCOMPARE(fh->delete_directory(dir), 0); //delete directory
-
 }
 
