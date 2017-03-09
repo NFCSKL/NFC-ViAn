@@ -7,8 +7,11 @@
  * @param std::string
  */
 int make_dir(std::string dirpath){
-     CreateDirectory(s2ws(dirpath).c_str(),NULL);
-     return GetLastError();
+     if(!CreateDirectory(s2ws(dirpath).c_str(),NULL)){//if function fails return val is false
+         return GetLastError();
+     }else{
+         return 0;
+     }
 }
 /**
  * @todo make threadsafe
@@ -19,6 +22,9 @@ int make_dir(std::string dirpath){
  * OBS! Only compatible with windows systems.
  */
  int remove_dir(std::string dirpath){
-     RemoveDirectory(s2ws(dirpath).c_str());
-     return GetLastError();
+     if(!RemoveDirectory(s2ws(dirpath).c_str())){ //if function fails return val is false
+         return GetLastError();
+     }else{
+         return 0;
+     }
  }

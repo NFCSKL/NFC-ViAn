@@ -13,17 +13,20 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
+#include <sstream>
 #include "project.h"
 #include "dir.h"
 
 #ifdef _WIN32
-    #define WORKSPACE "C:/"
+    #define WORKSPACE "C:"
 #elif __APPLE__
     #define WORKSPACE "/Applications"
 #elif __unix__
-    #define  WORKSPACE "~/"
+    #define  WORKSPACE "~"
 
 #endif
+
+
 
 typedef int FH_ERROR; // file handler error code
 typedef int ID;
@@ -47,7 +50,7 @@ public:
     //directory manipulation
     //varying implementation
     ID create_directory(std::string dirpath);
-    FH_ERROR delete_directory(std::string dirpath);
+    FH_ERROR delete_directory(ID id);
 
     //file manipulation
     ID create_file(std::string filename, ID dirID);
@@ -56,16 +59,21 @@ public:
     void read_file(ID id, size_t linesToRead, std::string& buf);
 
     // thread safe read operations for maps
+
+
     std::string get_dir(ID id);
     Project* get_project(ID id);
     std::string get_file(ID id);
 
+    // Last error
+    FH_ERROR lastError;
+
 private:
-    void update_proj_file(Project* proj); // used to update existing project files and maps
+    void update_proj_files(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    void add_file(std::pair<ID,std::string> pair);
+    ID add_file(std::string filepath);
     void add_project(std::pair<ID,Project*> pair);
-    void add_dir(std::pair<ID,std::string> pair);
+    ID add_dir(std::string dirpath);
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap

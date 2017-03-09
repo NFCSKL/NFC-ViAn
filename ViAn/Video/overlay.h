@@ -2,8 +2,9 @@
 #define OVERLAY_H
 
 #include <QImage>
+#include <QColor>
 #include "shapes.h"
-
+#include <QColor>
 
 class overlay {
 

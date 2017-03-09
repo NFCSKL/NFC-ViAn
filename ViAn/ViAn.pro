@@ -21,7 +21,7 @@ SOURCES += main.cpp
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp \
+SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h
@@ -79,11 +79,15 @@ unix {
 # START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/project.cpp
+    Filehandler/project.cpp \
+    Filehandler/analysis.cpp \
+    Filehandler/video.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
-    Filehandler/dir.h
+    Filehandler/dir.h \
+    Filehandler/analysis.h\
+    Filehandler/video.h
 
 win32{
 
