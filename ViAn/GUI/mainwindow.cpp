@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     fileHandler = new FileHandler();
     set_shortcuts();
 
-    // Adds this object as a listener to videoFrame.
+    // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
 
     mvideo_player = new video_player();
