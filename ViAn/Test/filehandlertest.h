@@ -13,9 +13,9 @@ class filehandlertest : public QObject
 public:
     explicit filehandlertest(QObject *parent = 0);
 private slots:
-    void directoryTest();
-    void fileTest();
-    void projectHandlingTest();
+    void directory_test();
+    void file_test();
+    void project_handling_test();
 
 };
 

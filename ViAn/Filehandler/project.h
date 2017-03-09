@@ -26,10 +26,10 @@ struct Project{
 public:
     Project(ID id, std::string name);
     Project(std::string dirpath);
-    void addVideo(Video vid);
+    void add_video(Video vid);
 // TODO
-//    void addAnalysis();
-//    void addDrawing();
+//    void add_analysis();
+//    void add_drawing();
 private:
     ID m_vid;    
 public:

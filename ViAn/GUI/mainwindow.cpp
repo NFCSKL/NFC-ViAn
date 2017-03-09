@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
     fileHandler = new FileHandler();
-    setShortcuts();
+    set_shortcuts();
 
     mvideo_player = new video_player();
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
@@ -52,19 +52,19 @@ MainWindow::~MainWindow() {
 }
 
 /**
- * @brief MainWindow::setShortcuts
+ * @brief MainWindow::set_shortcuts
  * Function to set shortcuts on actions
  */
-void MainWindow::setShortcuts(){
+void MainWindow::set_shortcuts(){
     ui->actionExit->setShortcut(tr("Ctrl+e"));
 }
 
 /**
- * @brief MainWindow::setStatusBar
+ * @brief MainWindow::set_status_bar
  * @param status text to show in the statusbar
  * @param timer time to show it in the bar in ms, 750ms is standard
  */
-void MainWindow::setStatusBar(string status, int timer = 750){
+void MainWindow::set_status_bar(string status, int timer = 750){
     ui->statusBar->showMessage(QString::fromStdString(status), timer);
 }
 
@@ -84,11 +84,11 @@ void MainWindow::on_fastBackwardButton_clicked(){
  */
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
-        iconOnButtonHandler->setIcon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         mvideo_player->start();
     } else {
-        setStatusBar("Playing");
-        iconOnButtonHandler->setIcon("play", ui->playPauseButton);
+        set_status_bar("Playing");
+        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
@@ -108,9 +108,9 @@ void MainWindow::on_fastForwardButton_clicked(){
  * The button supposed to stop the video
  */
 void MainWindow::on_stopButton_clicked() {
-    setStatusBar("Stopped");
+    set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
-        iconOnButtonHandler->setIcon("play", ui->playPauseButton);
+        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     }
 
     mvideo_player->stop_video();
@@ -127,7 +127,7 @@ void MainWindow::on_nextFrameButton_clicked() {
 }
 
 /**
- * @brief MainWindow::on_nextFrameButton_clicked
+ * @brief MainWindow::on_previousFrameButton_clicked
  * The button supposed to play the previous frame of the video
  */
 void MainWindow::on_previousFrameButton_clicked() {
@@ -228,7 +228,7 @@ void MainWindow::on_bookmarkButton_clicked(){
     // once a proper video selector is added
 
     mvideo_player->load_video("seq_01.mp4");
-    iconOnButtonHandler->setIcon("pause", ui->playPauseButton);
+    iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(700);
 }
@@ -251,7 +251,7 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
         case ADD_PROJECT: {
-            fileHandler->createProject(input);
+            fileHandler->create_project(input);
             QTreeWidgetItem *projectInTree = new QTreeWidgetItem();
             projectInTree->setText(0, qInput);
             ui->ProjectTree->addTopLevelItem(projectInTree);
