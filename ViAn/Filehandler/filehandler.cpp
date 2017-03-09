@@ -25,7 +25,7 @@ Project* FileHandler::create_project(std::string projName){
     return proj;
 }
 /**
- * @brief FileHandler::createDirectory
+ * @brief FileHandler::create_directory
  * @param dirpath
  * @return unique directory ID
  */
@@ -36,7 +36,7 @@ ID FileHandler::create_directory(std::string dirpath){
 }
 
 /**
- * @brief FileHandler::deleteDirectory
+ * @brief FileHandler::delete_directory
  * @param id
  * @return errorcode, if deletion was done code is 0;
  * otherwise see OS relevant directoryfile.
@@ -49,7 +49,7 @@ FH_ERROR FileHandler::delete_directory(ID id){
 /**
  * @todo unfinished, needs full project structure
  * and program to file parser to finish
- * @brief FileHandler::saveProject
+ * @brief FileHandler::save_project
  * @param Project* name
  * Creates project and associated files.
  * @return void
@@ -80,7 +80,7 @@ void FileHandler::save_project(Project* proj){
 /**
  * @todo unfinished, will be released with parser
  * however, is needed for creating
- * @brief FileHandler::saveProject
+ * @brief FileHandler::save_project
  * @param Project* name
  * Creates project and associated files.
  * @return void
@@ -95,7 +95,7 @@ void FileHandler::update_proj_files(Project* proj){
 /**
  * @todo unfinished, will be released with parser, needs full
  * project structure and file to program parser to finish.
- * @brief FileHandler::loadProject
+ * @brief FileHandler::load_project
  * @param std::string, fileopath to project file
  * Load a project object from a given filepath
  */
@@ -105,11 +105,11 @@ Project* FileHandler::load_project(std::string filePath){
 }
 
 /**
- * @brief FileHandler::deleteProject
+ * @brief FileHandler::delete_project
  * Deletes project, its associated files and contents.
  * OBS! This operation is as of now irreversible
  * @param Project*
- * @return int errorcode
+ * @return FH_ERROR errorcode
  */
 FH_ERROR FileHandler::delete_project(Project* proj){
     ProjFiles* pf = proj->files;
@@ -134,7 +134,7 @@ void FileHandler::add_video(Project* proj, std::string filePath){
 }
 
  /**
-  * @brief FileHandler::createFile
+  * @brief FileHandler::create_file
   * create a file by given name in already excisting
   * application tracked directory
   * @param std::string file name, ID directory id
@@ -149,7 +149,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   }
 /**
  * @todo make threadsafe
- * @brief FileHandler::deleteFile
+ * @brief FileHandler::delete_file
  * delete application tracked file
  * @param ID file id
  */
@@ -159,7 +159,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
  }
  /**
   * @todo make threadsafe
-  * @brief FileHandler::writeFile
+  * @brief FileHandler::write_file
   *  Write given text to an application tracked file
   * @param ID file id, std::string text
   * @return void
@@ -171,7 +171,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
  }
 
  /**
-  * @brief FileHandler::readFile
+  * @brief FileHandler::read_file
   *  Read given lenght of lines to buffer from application
   *  tracked file. OBS! If number of lines exceeds =>
   *  reads to end of file (EOF)
@@ -183,7 +183,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
      while(linesToRead-- && std::getline(f,buf));
  }
  /**
-  * @brief FileHandler::getProject
+  * @brief FileHandler::get_project
   * Getter
   * @param ID project id
   * @return Project*
@@ -195,7 +195,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     return p;
  }
  /**
-  * @brief FileHandler::getFile
+  * @brief FileHandler::get_file
   * Getter
   * @param ID project file id
   * @return std::string filepath
@@ -207,8 +207,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     return file;
  }
  /**
-  * @brief FileHandler::getProject
-  * Getter
+  * @brief FileHandler::get_dir
   * @param ID directory id
   * @return directory path
   */
@@ -220,8 +219,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
  }
 
  /**
-  * @brief FileHandler::addProject
-  * Getter
+  * @brief FileHandler::add_project
   * @param std::pari<<ID, Project*> pair
   * @return void
   */
@@ -232,9 +230,8 @@ ID FileHandler::create_file(std::string filename, ID dirID){
 
  }
  /**
-  * @brief FileHandler::addFile
-  * Getter
-  * @param std::pari<<ID, std::string> pair
+  * @brief FileHandler::add_file
+  * @param std::string filepath
   * @return void
   */
 ID FileHandler::add_file(std::string filepath){
@@ -245,8 +242,7 @@ ID FileHandler::add_file(std::string filepath){
     return this->m_fid++;
  }
  /**
-  * @brief FileHandler::addDir
-  * Getter
+  * @brief FileHandler::add_dir
   * @param std::pari<<ID, std::string> pair
   * @return void
   */
