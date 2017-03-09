@@ -23,6 +23,7 @@ struct ProjFiles{
        this->f_drawings = -1;
        this->f_videos = -1;
    }
+   friend bool operator==(ProjFiles pf, ProjFiles pf2);
 };
 
 /**
@@ -40,6 +41,7 @@ public:
 
     friend std::stringstream& operator>>(std::stringstream& is, Project& proj);
     friend std::stringstream& operator<<(std::stringstream& os, Project const& proj);
+
     friend bool operator==(Project proj, Project proj2);
 
 // TODO

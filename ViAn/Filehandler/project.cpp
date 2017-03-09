@@ -36,24 +36,23 @@ void Project::addVideo(Video* vid)
  * @brief operator >>
  * @param is
  * @param proj
- * @return
+ * @return stringstream containing project information
  */
 std::stringstream& operator>>(std::stringstream& is, Project& proj){
     int vidCounter = 0;
+    std::vector<Video*> temp; // used to preserve order ov videos, important for == operator
     is >> proj.m_id ;
     is >> proj.m_name ;
     is >> vidCounter;
-    std::cout << "id"  << proj.m_id <<std::endl;
-    if( vidCounter < 0) return is;
+    if( vidCounter < 0) return is; // if negative number of videos, loop below will
+                                   // be infinite. This is unlikely to happen. but just in case!
     while(vidCounter--){
         Video* v = new Video();
-        int foo;
-        is >> foo;
-        std::cout<< "foo" <<  foo << std::endl;
-//        is >> *v;
-        std::cout << "vid " << v->id << std::endl;
-        std::cout << "vfp" <<  v->filepath << std::endl;
-        proj.addVideo(v);
+        is >> *v;
+        temp.push_back(v);
+    }
+    for (auto vidIt = temp.rbegin(); vidIt < temp.rend(); ++vidIt) {  // to preserve order we add videos in reverse
+        proj.addVideo(*vidIt);
     }
     return is;
 }
@@ -82,12 +81,29 @@ std::stringstream& operator<<(std::stringstream& os, const Project& proj){
  * @return if projects are same TRUE else False
  */
 bool operator==(Project proj, Project proj2){
-   bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
+    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
                proj2.m_videos.begin(),
-               [](const Video* v, const Video* v2){return *v == *v2;});
-    return proj.files == proj2.files &&
-           proj.m_id == proj2.m_id &&
+               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
+                                                                        // by dereferencing pointers in vector
+    return //*proj.files == *proj2.files && probably unnecessary as projfiles have projname followed by default suffix
            proj.m_name == proj2.m_name &&
            videoEquals;
 
+}
+/**
+ * @brief operator ==
+ * @param pf
+ * @param pf2
+ * @retur
+ * may not be needed but works as intended,
+ */
+bool operator==(ProjFiles pf, ProjFiles pf2){
+    std::cout << "bool: " << (pf.dir == pf2.dir ) << std::endl;
+    std::cout << "bool: " << (pf.f_analysis == pf2.f_analysis)   << std::endl;
+    std::cout << "bool: " << (pf.f_drawings == pf2.f_drawings  )<< std::endl;
+    std::cout << "bool: " <<  (pf.f_videos == pf2.f_videos) << std::endl;
+    return pf.dir == pf2.dir &&
+            pf.f_analysis == pf2.f_analysis &&
+            pf.f_proj == pf2.f_proj &&
+            pf.f_videos == pf2.f_videos;
 }

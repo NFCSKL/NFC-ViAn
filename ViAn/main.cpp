@@ -22,5 +22,6 @@ int main(int argc, char *argv[])
     //QTest::qExec(video_test);
     filehandlertest* file_test = new filehandlertest();
     QTest::qExec(file_test);
+    return 0;
     return a.exec();
 }

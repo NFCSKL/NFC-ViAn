@@ -93,27 +93,32 @@ void FileHandler::updateProjFiles(Project* proj){
 }
 
 /**
- * @todo unfinished, will be released with parser, needs full
- * project structure and file to program parser to finish.
+ * @todo UNFINISHED, does not load files back into file system during load.
+ * the project however is stored and retrieved correctly.
+ * @todo load analyses
+ * @todo load drawings
+ *
  * @brief FileHandler::loadProject
  * @param std::string, fileopath to project file
  * Load a project object from a given filepath
+ * should specify location of project specific file
+ * dirpath should specify
  */
-Project* FileHandler::loadProject(std::string name, std::string dirpath){
+Project* FileHandler::loadProject(std::string projname, std::string dirpath){
     Project* proj = new Project();
-    std::ifstream f(dirpath + "/" + name + ".txt");
+    std::ifstream f(dirpath + "/" + projname + ".txt");
     std::string filename;
+    // First file is videofile
     std::getline(f, filename);
     proj->files->f_videos = addFile(dirpath + "/" +filename);
     std::stringstream sstr;
     std::string buf = "";
     readFile(proj->files->f_videos, buf, 1);
     sstr << buf;
-    std::cout << "**sstr**" << sstr.str() << std::endl;
     sstr >> *proj;
-    std::stringstream check;
-    check << *proj;
-    std::cout << "**check**" << check.str() << std::endl;
+    // Second file is analysis
+    // Third file is drawings
+    //addProjFiles(Project) // @ Load Project files back into filehandler
     return proj;
 }
 

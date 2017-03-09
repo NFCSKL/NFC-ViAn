@@ -22,12 +22,9 @@ Video::Video(ID id, std::string filepath){
  * @param vid
  * @return UNFINISHED
  */
-std::stringstream& operator>>(std::stringstream& is, Video& vid){
-    std::string hej;
-    is >>hej;
-    std::cout << "********"<< hej << "********";
+std::stringstream& operator>>(std::stringstream& is, Video& vid){    
     is >> vid.id;
-    is >> vid.filepath;
+    is >> vid.filepath;  
     return is;
 }
 /**
