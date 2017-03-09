@@ -71,6 +71,16 @@ private slots:
     
     void on_actionShow_hide_overview_triggered();
 
+    void on_actionColour_triggered();
+
+    void on_actionRectangle_triggered();
+
+    void on_actionCircle_triggered();
+
+    void on_actionArrow_triggered();
+
+    void on_actionLine_triggered();
+
 private:
 
     Ui::MainWindow *ui;

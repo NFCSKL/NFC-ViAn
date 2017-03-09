@@ -53,7 +53,8 @@ RESOURCES += resources.qrc
 SOURCES += Video/video_player.cpp \
     Video/overlay.cpp
 HEADERS += Video/video_player.h \
-    Video/overlay.h
+    Video/overlay.h \
+    Video/shapes.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
