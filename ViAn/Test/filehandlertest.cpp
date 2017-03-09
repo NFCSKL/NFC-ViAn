@@ -1,31 +1,16 @@
 #include "filehandlertest.h"
-/**
- * @brief runTestSuite
- * @return all pass errorcode,
- * outputs information about which tests passed if
- * PRINTS set in header to terminal
- *
- */
-//void filehandler_testsuite::runTestSuite(){
-//    FileHandler* fileHandler = new FileHandler();
-//    std::string dirpath = WORKSPACE;
-//    Project* proj  = fileHandler->createProject("POI_PROJ");
-//    directoryTest(fileHandler, proj);
-//    fileTest(fileHandler, proj);
-//    projectHandlingTest(fileHandler, proj);
-//}
 
-//
-// Tests that creation, manipulation and deletion of
-// projects functions as intended
-//
+/**
+ * @brief filehandlertest::filehandlertest
+ * @param parent
+ */
 filehandlertest::filehandlertest(QObject *parent) : QObject(parent){
 
 }
 /**
  * @brief FileHandlerTest::projectHandlingTest
- * not much to test currently, will be extended
- * with furter implementation of project manipulation
+ * Tests project creation and deletion.
+ * TODO : tests project write to file and read from file
  */
 void filehandlertest::projectHandlingTest(){
     FileHandler* fh = new FileHandler();
@@ -51,9 +36,10 @@ void filehandlertest::projectHandlingTest(){
     fh->deleteFile(vid3);
     QCOMPARE(fh->deleteProject(proj), 0);
 }
-//
-// Test that creation and deletion of directories are working correctly.
-//
+/**
+ * @brief filehandlertest::directoryTest
+ * Test directory creation and deletion
+ */
 void filehandlertest::directoryTest(){
     FileHandler* fh = new FileHandler();
     std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
@@ -61,13 +47,10 @@ void filehandlertest::directoryTest(){
     QCOMPARE(fh->lastError, 0);
     QCOMPARE(fh->deleteDirectory(id), 0);
 }
-// fileTest tests following functions, see filehandler.h
-//
-// ID createDirectory(std::string path);
-// int deleteDirectory(std::string dirpath);
-// ID createFile(std::string filename, ID dirID);
-// int deleteFile(ID id);
-// void writeFile(ID id, std::string text);
+/**
+ * @brief filehandlertest::fileTest
+ *  Tests file creation, deletion, writing and reading.
+ */
 
 void filehandlertest::fileTest(){
     FileHandler* fh = new FileHandler();
