@@ -3,7 +3,7 @@
 
 #include <QImage>
 #include "shapes.h"
-
+#include <QColor>
 
 class overlay {
 
