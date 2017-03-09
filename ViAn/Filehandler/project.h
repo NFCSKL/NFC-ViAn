@@ -36,7 +36,7 @@ public:
     Project();
     Project(ID id, std::string name);
     Project(std::string dirpath);
-    void addVideo(Video *vid);
+    void add_video(Video *vid);
 
     friend std::stringstream& operator>>(std::stringstream& is, Project& proj);
     friend std::stringstream& operator<<(std::stringstream& os, Project const& proj);

@@ -27,7 +27,7 @@ Project::Project(){
 * @param vid
 * add given video to project
 */
-void Project::addVideo(Video* vid)
+void Project::add_video(Video* vid)
 {
     this->m_videos.push_back(vid);
 }
@@ -45,7 +45,7 @@ std::stringstream& operator>>(std::stringstream& is, Project& proj){
     while(vidCounter){
         Video* v = new Video();
         is >> *v;
-        proj.addVideo(v);
+        proj.add_video(v);
     }
     return is;
 }
