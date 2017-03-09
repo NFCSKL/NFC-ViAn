@@ -208,6 +208,17 @@ void video_player::update_frame(int frame_nbr) {
 }
 
 /**
+ * @brief video_player::update_overlay
+ * Updates the current frame if the video is paused.
+ */
+void video_player::update_overlay() {
+    // If paused we need to update the frame ourself (otherwise done in the video-thread).
+    if (is_paused()) {
+        show_frame();
+    }
+}
+
+/**
  * @brief video_player::set_playback_speed
  * Sets the speed multiplyer for playback.
  * High value gives slower playback and vice versa.
@@ -252,11 +263,7 @@ void video_player::inc_playback_speed() {
  */
 void video_player::toggle_overlay() {
     video_overlay->toggle_overlay();
-
-    // If paused we need to update the frame ourself (otherwise done in the video-thread).
-    if (is_paused()) {
-        show_frame();
-    }
+    update_overlay();
 }
 
 /**
@@ -285,11 +292,7 @@ void video_player::set_overlay_colour(QColor colour) {
  */
 void video_player::video_mouse_pressed(QPoint pos) {
     video_overlay->mouse_pressed(pos);
-
-    // If paused we need to update the frame ourself (otherwise done in the video-thread).
-    if (is_paused()) {
-        show_frame();
-    }
+    update_overlay();
 }
 
 /**
@@ -300,11 +303,7 @@ void video_player::video_mouse_pressed(QPoint pos) {
  */
 void video_player::video_mouse_released(QPoint pos) {
     video_overlay->mouse_released(pos);
-
-    // If paused we need to update the frame ourself (otherwise done in the video-thread).
-    if (is_paused()) {
-        show_frame();
-    }
+    update_overlay();
 }
 
 /**
@@ -315,9 +314,5 @@ void video_player::video_mouse_released(QPoint pos) {
  */
 void video_player::video_mouse_moved(QPoint pos) {
     video_overlay->mouse_moved(pos);
-
-    // If paused we need to update the frame ourself (otherwise done in the video-thread).
-    if (is_paused()) {
-        show_frame();
-    }
+    update_overlay();
 }

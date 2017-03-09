@@ -65,6 +65,7 @@ protected:
 
 private:
     void update_frame(int frame_nbr);
+    void update_overlay();
     void show_frame();
 
     cv::VideoCapture capture;
