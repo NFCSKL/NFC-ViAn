@@ -27,11 +27,7 @@ Project::Project(){
 * @param vid
 * add given video to project
 */
-<<<<<<< HEAD
 void Project::add_video(Video* vid)
-=======
-void Project::add_video(Video vid)
->>>>>>> master
 {
     this->m_videos.push_back(vid);
 }
