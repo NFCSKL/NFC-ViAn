@@ -30,16 +30,19 @@ HEADERS += Test/test_video_player.h \
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/icononbuttonhandler.cpp
+    GUI/icononbuttonhandler.cpp \
+    GUI/inputwindow.cpp
 
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/icononbuttonhandler.h
+    GUI/icononbuttonhandler.h \
+    GUI/inputwindow.h \
+    GUI/action.h
 
 
-
-FORMS    += GUI/mainwindow.ui
+FORMS    += GUI/mainwindow.ui \
+   GUI/inputwindow.ui
 
 RESOURCES += resources.qrc
 #
