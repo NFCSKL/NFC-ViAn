@@ -24,22 +24,15 @@ void filehandlertest::project_handling_test(){
     fh->add_video(proj, fh->get_file(vid1)); //add tesfiles as videos to project.
     fh->add_video(proj, fh->get_file(vid2));
     fh->add_video(proj, fh->get_file(vid3));
-<<<<<<< HEAD
 
     fh->save_project(proj);
     //check file contents
 //    Project* proj2 = fh->loadProject(fh->getDir(proj->m_dir));
 //    QVERIFY(*proj2 == *proj);
-=======
-    fh->save_project(proj);
-    //check file contents
-    fh->load_project(fh->get_dir(proj->m_dir));
->>>>>>> master
     //check project contentss
     fh->delete_file(vid1);
     fh->delete_file(vid2);
     fh->delete_file(vid3);
-<<<<<<< HEAD
     QCOMPARE(fh->delete_project(proj), 0);
 }
 /**
