@@ -4,7 +4,7 @@
 #include <QImage>
 #include <qpainter.h>
 
-enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW};
+enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN};
 
 class shape {
 
