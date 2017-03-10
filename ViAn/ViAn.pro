@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/line.cpp \
-    Video/shapes/pen.cpp
+    Video/shapes/pen.cpp \
+    Video/shapes/text.cpp
 
 #
 # TEST
@@ -34,7 +35,8 @@ HEADERS += Test/test_video_player.h \
     Video/shapes/circle.h \
     Video/shapes/arrow.h \
     Video/shapes/line.h \
-    Video/shapes/pen.h
+    Video/shapes/pen.h \
+    Video/shapes/text.h
 
 #
 # GUI

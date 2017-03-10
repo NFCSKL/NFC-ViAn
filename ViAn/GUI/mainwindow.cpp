@@ -348,9 +348,22 @@ void MainWindow::on_actionArrow_triggered() {
     set_status_bar("Tool: arrow.");
 }
 
+/**
+ * @brief MainWindow::on_actionPen_triggered
+ * Selects the pen for the overlay drawing tool.
+ */
 void MainWindow::on_actionPen_triggered() {
     mvideo_player->set_overlay_tool(PEN);
     set_status_bar("Tool: pen.");
+}
+
+/**
+ * @brief MainWindow::on_actionText_triggered
+ * Selects the text for the overlay drawing tool.
+ */
+void MainWindow::on_actionText_triggered() {
+    mvideo_player->set_overlay_tool(TEXT);
+    set_status_bar("Tool: text.");
 }
 
 /**
