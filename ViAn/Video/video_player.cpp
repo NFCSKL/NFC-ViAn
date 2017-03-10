@@ -119,7 +119,7 @@ void video_player::show_frame() {
  */
 void video_player::msleep(int delay) {
     std::chrono::milliseconds dura((int)(delay*this->speed_multiplier));
-    std::this_thread::sleep_for( dura );
+    std::this_thread::sleep_for(dura);
 }
 
 /**

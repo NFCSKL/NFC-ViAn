@@ -1,6 +1,5 @@
 #include "overlay.h"
 #include <iostream>
-#include <qpainter.h>
 
 /**
  * @brief overlay::overlay
@@ -15,46 +14,9 @@ overlay::overlay() {
  */
 void overlay::draw_overlay(QImage &img) {
     if (show_overlay) {
-        // For now this function just paints static shapes
-        QPainter painter(&img);
-        QPen pen;
-        pen.setWidth(3);
-        pen.setColor(colour);
-        painter.setPen(pen);
-        int width = draw_end.x() - draw_start.x();
-        int height = draw_end.y() - draw_start.y();
-        switch (shape) {
-            case RECTANGLE:
-                painter.drawRect(draw_start.x(), draw_start.y(), width, height);
-                break;
-            case CIRCLE:
-                painter.drawEllipse(draw_start.x(), draw_start.y(), width, height);
-                break;
-            case LINE:
-                painter.drawLine(draw_start.x(), draw_start.y(), draw_end.x(), draw_end.y());
-                break;
-            case ARROW:
-                {
-                    // Create the main line of the arrow.
-                    QLineF line(draw_start.x(), draw_start.y(), draw_end.x(), draw_end.y());
-                    // Create two lines starting in the main lines end point.
-                    QLineF line2(draw_end.x(), draw_end.y(), draw_start.x(), draw_start.y());
-                    QLineF line3(draw_end.x(), draw_end.y(), draw_start.x(), draw_start.y());
-                    // Set the length of the two shorter lines.
-                    line2.setLength(10);
-                    line3.setLength(10);
-                    // Angle the two shorter lines 45 degrees from the main line.
-                    line2.setAngle(line.angle()+135);
-                    line3.setAngle(line.angle()-135);
-                    // Draw the lines.
-                    QVector<QLineF> lines{line, line2, line3};
-                    painter.drawLines(lines);
-                    break;
-                }
-            default:
-                break;
+        foreach (shape* s, drawings) {
+            s->draw(img);
         }
-        painter.end();
     }
 }
 
@@ -89,7 +51,7 @@ void overlay::set_showing_overlay(bool value) {
  * @param s
  */
 void overlay::set_tool(SHAPES s) {
-    shape = s;
+    current_shape = s;
 }
 
 /**
@@ -98,7 +60,7 @@ void overlay::set_tool(SHAPES s) {
  * @param col
  */
 void overlay::set_colour(QColor col) {
-    colour = col;
+    current_colour = col;
 }
 
 /**
@@ -106,7 +68,7 @@ void overlay::set_colour(QColor col) {
  * @return The currenty choosen colour.
  */
 QColor overlay::get_colour() {
-    return colour;
+    return current_colour;
 }
 
 /**
@@ -114,19 +76,33 @@ QColor overlay::get_colour() {
  * @return The currently choosen shape
  */
 SHAPES overlay::get_shape() {
-    return shape;
+    return current_shape;
 }
 
 /**
  * @brief overlay::mouse_pressed
- * Starts drawing on the overlay when the mouse is
- * pressed, if the overlay is visible.
+ * Creates a drawing shape with the prechoosen colour
+ * and shape, if the overlay is visible.
  * @param pos coordinates
  */
 void overlay::mouse_pressed(QPoint pos) {
     if (show_overlay) {
-        draw_start = pos;
-        draw_end = pos;
+        switch (current_shape) {
+            case RECTANGLE:
+                drawings.append(new rectangle(current_colour, pos));
+                break;
+            case CIRCLE:
+                drawings.append(new circle(current_colour, pos));
+                break;
+            case LINE:
+                drawings.append(new line(current_colour, pos));
+                break;
+            case ARROW:
+                drawings.append(new arrow(current_colour, pos));
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -150,8 +126,14 @@ void overlay::mouse_moved(QPoint pos) {
     update_drawing_position(pos);
 }
 
+/**
+ * @brief overlay::update_drawing_position
+ * Updates the position of the end point of the shape currently being drawn
+ * @param pos
+ */
 void overlay::update_drawing_position(QPoint pos) {
     if (show_overlay) {
-        draw_end = pos;
+        // The last appended shape is the one we're currently drawing.
+        drawings.last()->update_drawing_pos(pos);
     }
 }
