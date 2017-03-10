@@ -25,6 +25,7 @@ public:
     bool load_video(string filename);
     bool is_paused();
     bool is_stopped();
+    bool is_showing_overlay();
     
     int get_num_frames();    
     void play_pause();
