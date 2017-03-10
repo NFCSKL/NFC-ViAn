@@ -348,6 +348,11 @@ void MainWindow::on_actionArrow_triggered() {
     set_status_bar("Tool: arrow.");
 }
 
+void MainWindow::on_actionPen_triggered() {
+    mvideo_player->set_overlay_tool(PEN);
+    set_status_bar("Tool: pen.");
+}
+
 /**
  * @brief MainWindow::eventFilter
  * Listener function for all eventFilters MainWindow has installed.

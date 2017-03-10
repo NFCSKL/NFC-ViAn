@@ -100,6 +100,9 @@ void overlay::mouse_pressed(QPoint pos) {
             case ARROW:
                 drawings.append(new arrow(current_colour, pos));
                 break;
+            case PEN:
+                drawings.append(new pen(current_colour, pos));
+                break;
             default:
                 break;
         }

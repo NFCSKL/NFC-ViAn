@@ -19,3 +19,11 @@ void line::draw(QImage &img) {
     painter.drawLine(draw_start.x(), draw_start.y(), draw_end.x(), draw_end.y());
     painter.end();
 }
+
+/**
+ * @brief line::add_drawing_pos
+ * Function to handle the new position of the mouse.
+ * @param pos
+ */
+void line::add_drawing_pos(QPoint pos) {
+}

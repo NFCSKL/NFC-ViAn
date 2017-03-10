@@ -6,10 +6,10 @@
 class pen : public shape {
 public:
     pen(QColor col, QPoint pos);
-    void update_drawing_pos(QPoint pos);
     void draw(QImage &img) override;
+    void add_drawing_pos(QPoint pos);
 private:
-    QList<QLine> lines;
+    QVector<QLine> lines;
 };
 
 #endif // PEN_H
