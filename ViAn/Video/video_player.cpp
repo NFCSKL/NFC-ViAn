@@ -218,11 +218,12 @@ void video_player::update_frame(int frame_nbr) {
 
 /**
  * @brief video_player::update_overlay
- * Updates the current frame if the video is paused.
+ * Updates the current frame if the video is loaded and paused.
  */
 void video_player::update_overlay() {
-    // If paused we need to update the frame ourself (otherwise done in the video-thread).
-    if (is_paused()) {
+    // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
+    // but only if there is a video loaded.
+    if (capture.isOpened() && is_paused()) {
         show_frame();
     }
 }
@@ -295,33 +296,39 @@ void video_player::set_overlay_colour(QColor colour) {
 
 /**
  * @brief video_player::video_mouse_pressed
- * Starts drawing on the overlay, if visible.
+ * Starts drawing on the overlay, if visible, and if video is loaded.
  * If the video is paused, the frame the GUI is updated.
  * @param pos coordinate
  */
 void video_player::video_mouse_pressed(QPoint pos) {
-    video_overlay->mouse_pressed(pos);
-    update_overlay();
+    if (capture.isOpened()) {
+        video_overlay->mouse_pressed(pos);
+        update_overlay();
+    }
 }
 
 /**
  * @brief video_player::video_mouse_released
- * Ends drawing on the overlay, if visible.
+ * Ends drawing on the overlay, if visible, and if video is loaded.
  * If the video is paused, the frame the GUI is updated.
  * @param pos coordinates
  */
 void video_player::video_mouse_released(QPoint pos) {
-    video_overlay->mouse_released(pos);
-    update_overlay();
+    if (capture.isOpened()) {
+        video_overlay->mouse_released(pos);
+        update_overlay();
+    }
 }
 
 /**
  * @brief video_player::video_mouse_moved
- * Updates drawing on the overlay, if visible.
+ * Updates drawing on the overlay, if visible, and if video is loaded.
  * If the video is paused, the frame the GUI is updated.
  * @param pos coordinates
  */
 void video_player::video_mouse_moved(QPoint pos) {
-    video_overlay->mouse_moved(pos);
-    update_overlay();
+    if (capture.isOpened()) {
+        video_overlay->mouse_moved(pos);
+        update_overlay();
+    }
 }
