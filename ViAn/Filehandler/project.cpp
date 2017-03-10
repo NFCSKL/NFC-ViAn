@@ -52,7 +52,7 @@ std::stringstream& operator>>(std::stringstream& is, Project& proj){
         temp.push_back(v);
     }
     for (auto vidIt = temp.rbegin(); vidIt < temp.rend(); ++vidIt) {  // to preserve order we add videos in reverse
-        proj.addVideo(*vidIt);
+        proj.add_video(*vidIt);
     }
     return is;
 }

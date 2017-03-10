@@ -105,16 +105,16 @@ void FileHandler::update_proj_files(Project* proj){
  * should specify location of project specific file
  * dirpath should specify
  */
-Project* FileHandler::loadProject(std::string projname, std::string dirpath){
+Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
     std::ifstream f(dirpath + "/" + projname + ".txt");
     std::string filename;
     // First file is videofile
     std::getline(f, filename);
-    proj->files->f_videos = addFile(dirpath + "/" +filename);
+    proj->files->f_videos = add_file(dirpath + "/" +filename);
     std::stringstream sstr;
     std::string buf = "";
-    readFile(proj->files->f_videos, buf, 1);
+    read_file(proj->files->f_videos, buf, 1);
     sstr << buf;
     sstr >> *proj;
     // Second file is analysis
@@ -196,8 +196,8 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::readFile(ID id,  std::string& buf, size_t linesToRead){
-     std::ifstream f(this->getFile(id));
+ void FileHandler::read_file(ID id,  std::string& buf, size_t linesToRead){
+     std::ifstream f(this->get_file(id));
      if(f.is_open())
         while(linesToRead-- && std::getline(f, buf));
  }

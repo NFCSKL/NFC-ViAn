@@ -31,12 +31,7 @@ std::stringstream& operator>>(std::stringstream& is, Video& vid){
  * @brief operator <<
  * @param os
  * @param vid
-<<<<<<< HEAD
  * @return used for writing project to file
-=======
- * @return stream
- * Writes project information to stringstream
->>>>>>> master
  */
 std::stringstream& operator<<(std::stringstream& os, const Video& vid){
     os << vid.id << " " << vid.filepath << " ";
