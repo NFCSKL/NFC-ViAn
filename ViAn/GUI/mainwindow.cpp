@@ -348,6 +348,10 @@ void MainWindow::on_actionArrow_triggered() {
     set_status_bar("Tool: arrow.");
 }
 
+/**
+ * @brief MainWindow::on_actionPen_triggered
+ * Selects the pen for the overlay drawing tool.
+ */
 void MainWindow::on_actionPen_triggered() {
     mvideo_player->set_overlay_tool(PEN);
     set_status_bar("Tool: pen.");
