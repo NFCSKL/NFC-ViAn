@@ -26,6 +26,8 @@ public:
     void mouse_pressed(QPoint pos);
     void mouse_released(QPoint pos);
     void mouse_moved(QPoint pos);
+    void undo();
+    void clear();
 
 private:
     void update_drawing_position(QPoint pos);
@@ -33,7 +35,7 @@ private:
     bool show_overlay = false;
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
-    QList <shape*> drawings;
+    QList<shape*> drawings;
 };
 
 #endif // OVERLAY_H

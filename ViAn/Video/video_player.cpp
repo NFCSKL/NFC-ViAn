@@ -295,6 +295,22 @@ void video_player::set_overlay_colour(QColor colour) {
 }
 
 /**
+ * @brief video_player::undo_overlay
+ * Undo the drawings on the overlay.
+ */
+void video_player::undo_overlay() {
+    video_overlay->undo();
+}
+
+/**
+ * @brief video_player::clear_overlay
+ * Clear the drawings on the overlay.
+ */
+void video_player::clear_overlay() {
+    video_overlay->clear();
+}
+
+/**
  * @brief video_player::video_mouse_pressed
  * Starts drawing on the overlay, if visible, and if video is loaded.
  * If the video is paused, the frame the GUI is updated.

@@ -84,6 +84,10 @@ private slots:
 
     void on_actionPen_triggered();
 
+    void on_actionUndo_triggered();
+
+    void on_actionClear_triggered();
+
 private:
 
     Ui::MainWindow *ui;
