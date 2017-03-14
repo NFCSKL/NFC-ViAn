@@ -141,6 +141,15 @@ bool video_player::is_stopped() {
 }
 
 /**
+ * @brief video_player::is_showing_overlay
+ * Returns true if the overlay tool is showing, else false.
+ * @return
+ */
+bool video_player::is_showing_overlay() {
+    return video_overlay->is_showing_overlay();
+}
+
+/**
  * @brief video_player::get_num_frames
  * @return number of frames in video file
  */
