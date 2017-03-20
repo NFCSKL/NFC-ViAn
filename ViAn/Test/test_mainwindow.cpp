@@ -10,7 +10,8 @@ test_mainwindow::test_mainwindow(MainWindow *mainwindow, QObject *parent) : QObj
 /**
  * @brief test_mainwindow::test_set_status_bar
  */
-test_mainwindow::test_set_status_bar() {
-    mainwindow->set_status_bar("test");
-    QCOMPARE(mainwindow->statusBar()->currentMessage(), QString::fromStdString("test"));
+void test_mainwindow::test_set_status_bar() {
+    std::string s = "test";
+    mainwindow->set_status_bar(s);
+    QCOMPARE(mainwindow->statusBar()->currentMessage(), QString::fromStdString(s));
 }

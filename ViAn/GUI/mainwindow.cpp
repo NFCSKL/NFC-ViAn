@@ -66,7 +66,7 @@ void MainWindow::set_shortcuts(){
  * @param status text to show in the statusbar
  * @param timer time to show it in the bar in ms, 750ms is standard
  */
-void MainWindow::set_status_bar(string status, int timer = 750){
+void MainWindow::set_status_bar(string status, int timer){
     ui->statusBar->showMessage(QString::fromStdString(status), timer);
 }
 
