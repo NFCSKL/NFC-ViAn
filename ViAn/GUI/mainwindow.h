@@ -34,6 +34,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void inputSwitchCase(ACTION action, QString qInput);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
 

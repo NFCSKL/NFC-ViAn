@@ -29,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
     fileHandler = new FileHandler();
     set_shortcuts();
 
+    // Add this object as a listener to videoFrame.
+    ui->videoFrame->installEventFilter(this);
+
     mvideo_player = new video_player();
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
                                   this, SLOT(update_video(QImage)));
@@ -151,7 +154,6 @@ void MainWindow::on_previousFrameButton_clicked() {
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
-
     ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
 }
 
@@ -293,7 +295,11 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
  */
 void MainWindow::on_actionShow_hide_overview_triggered() {
     mvideo_player->toggle_overlay();
-
+    if (mvideo_player->is_showing_overlay()) {
+        set_status_bar("Overlay: On.");
+    } else {
+        set_status_bar("Overlay: Off.");
+    }
 }
 
 /**
@@ -303,6 +309,9 @@ void MainWindow::on_actionShow_hide_overview_triggered() {
 void MainWindow::on_actionColour_triggered() {
     QColor col = QColorDialog::getColor();
     mvideo_player->set_overlay_colour(col);
+    string msg = "Color: ";
+    msg.append(col.name().toStdString());
+    set_status_bar(msg);
 }
 
 /**
@@ -311,6 +320,7 @@ void MainWindow::on_actionColour_triggered() {
  */
 void MainWindow::on_actionRectangle_triggered() {
     mvideo_player->set_overlay_tool(RECTANGLE);
+    set_status_bar("Tool: rectangle.");
 }
 
 /**
@@ -319,6 +329,7 @@ void MainWindow::on_actionRectangle_triggered() {
  */
 void MainWindow::on_actionCircle_triggered() {
     mvideo_player->set_overlay_tool(CIRCLE);
+    set_status_bar("Tool: circle.");
 }
 
 /**
@@ -327,6 +338,7 @@ void MainWindow::on_actionCircle_triggered() {
  */
 void MainWindow::on_actionLine_triggered() {
     mvideo_player->set_overlay_tool(LINE);
+    set_status_bar("Tool: line.");
 }
 
 /**
@@ -335,4 +347,36 @@ void MainWindow::on_actionLine_triggered() {
  */
 void MainWindow::on_actionArrow_triggered() {
     mvideo_player->set_overlay_tool(ARROW);
+    set_status_bar("Tool: arrow.");
+}
+
+/**
+ * @brief MainWindow::eventFilter
+ * Listener function for all eventFilters MainWindow has installed.
+ * @param obj the object invoking the event
+ * @param event the invooked event
+ * @return Returns true if the event matched any of the overlay's
+ *         functionality, else false.
+ *         (Returning false means that the event is sent to the
+ *          target object instead, but not if true is returned.)
+ */
+bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+    // Check who invoked the event.
+    if (qobject_cast<QLabel*>(obj)==ui->videoFrame) {
+        // Cast to a mouse event to get the mouse position.
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        QPoint pos = mouseEvent->pos();
+        // Check what kind of event.
+        if (event->type() == QEvent::MouseButtonPress) {
+            mvideo_player->video_mouse_pressed(pos);
+            return true;
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+            mvideo_player->video_mouse_released(pos);
+            return true;
+        } else if (event->type() == QEvent::MouseMove) {
+            mvideo_player->video_mouse_moved(pos);
+            return true;
+        }
+    }
+    return false;
 }
