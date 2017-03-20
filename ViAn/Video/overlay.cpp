@@ -31,7 +31,7 @@ void overlay::draw_overlay(QImage &img) {
                 painter.drawEllipse(draw_start.x(), draw_start.y(), width, height);
                 break;
             case LINE:
-                painter.drawLine(draw_start.x(), draw_start.y(), width, height);
+                painter.drawLine(draw_start.x(), draw_start.y(), draw_end.x(), draw_end.y());
                 break;
             case ARROW:
                 {
