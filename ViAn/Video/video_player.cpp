@@ -282,7 +282,7 @@ void video_player::toggle_overlay() {
  * @param shape
  */
 void video_player::set_overlay_tool(SHAPES shape) {
-    video_overlay->set_overlay_tool(shape);
+    video_overlay->set_tool(shape);
 }
 
 /**
@@ -291,7 +291,7 @@ void video_player::set_overlay_tool(SHAPES shape) {
  * @param colour
  */
 void video_player::set_overlay_colour(QColor colour) {
-    video_overlay->set_overlay_colour(colour);
+    video_overlay->set_colour(colour);
 }
 
 /**

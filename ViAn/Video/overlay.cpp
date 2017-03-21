@@ -84,21 +84,37 @@ void overlay::set_showing_overlay(bool value) {
 }
 
 /**
- * @brief overlay::set_overlay_tool
+ * @brief overlay::set_tool
  * Sets the overlay tool's shape.
  * @param s
  */
-void overlay::set_overlay_tool(SHAPES s) {
+void overlay::set_tool(SHAPES s) {
     shape = s;
 }
 
 /**
- * @brief overlay::set_overlay_colour
+ * @brief overlay::set_colour
  * Sets the overlay tool's colour.
  * @param col
  */
-void overlay::set_overlay_colour(QColor col) {
+void overlay::set_colour(QColor col) {
     colour = col;
+}
+
+/**
+ * @brief overlay::get_colour
+ * @return The currenty choosen colour.
+ */
+QColor overlay::get_colour() {
+    return colour;
+}
+
+/**
+ * @brief overlay::get_shape
+ * @return The currently choosen shape
+ */
+SHAPES overlay::get_shape() {
+    return shape;
 }
 
 /**
