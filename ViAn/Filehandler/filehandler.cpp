@@ -94,14 +94,32 @@ void FileHandler::update_proj_files(Project* proj){
 }
 
 /**
- * @todo unfinished, will be released with parser, needs full
- * project structure and file to program parser to finish.
- * @brief FileHandler::load_project
+ * @todo UNFINISHED, does not load files back into file system during load.
+ * the project however is stored and retrieved correctly.
+ * @todo load analyses
+ * @todo load drawings
+ *
+ * @brief FileHandler::loadProject
  * @param std::string, fileopath to project file
  * Load a project object from a given filepath
+ * should specify location of project specific file
+ * dirpath should specify
  */
-Project* FileHandler::load_project(std::string filePath){
-    Project* proj = new Project();    
+Project* FileHandler::load_project(std::string projname, std::string dirpath){
+    Project* proj = new Project();
+    std::ifstream f(dirpath + "/" + projname + ".txt");
+    std::string filename;
+    // First file is videofile
+    std::getline(f, filename);
+    proj->files->f_videos = add_file(dirpath + "/" +filename);
+    std::stringstream sstr;
+    std::string buf = "";
+    read_file(proj->files->f_videos, buf, 1);
+    sstr << buf;
+    sstr >> *proj;
+    // Second file is analysis
+    // Third file is drawings
+    //addProjFiles(Project) // @ Load Project files back into filehandler
     return proj;
 }
 
@@ -145,7 +163,6 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     std::ofstream f;
     std::string filePath = this->get_dir(dirID)+"/"+filename;
     f.open(filePath.c_str());
-
     return this->add_file(filePath);
   }
 /**
@@ -179,9 +196,10 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::read_file(ID id, size_t linesToRead, std::string& buf){
+ void FileHandler::read_file(ID id,  std::string& buf, size_t linesToRead){
      std::ifstream f(this->get_file(id));
-     while(linesToRead-- && std::getline(f,buf));
+     if(f.is_open())
+        while(linesToRead-- && std::getline(f, buf));
  }
  /**
   * @brief FileHandler::get_project

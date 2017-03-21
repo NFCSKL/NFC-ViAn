@@ -43,20 +43,21 @@ public:
     Project* create_project(std::string projName);
     FH_ERROR delete_project(Project* proj);
     void save_project(Project* proj);
-    Project* load_project(std::string filePath);
+    Project* load_project(std::string projname, std::string dirpath);
 
     void add_video(Project* proj, std::string filePath);
-
     //directory manipulation
     //varying implementation
     ID create_directory(std::string dirpath);
     FH_ERROR delete_directory(ID id);
 
     //file manipulation
+
     ID create_file(std::string filename, ID dirID);
     FH_ERROR delete_file(ID id);
     void write_file(ID id, std::string text);
-    void read_file(ID id, size_t linesToRead, std::string& buf);
+    void read_file(ID id,  std::string& buf, size_t linesToRead = -1);
+
 
     // thread safe read operations for maps
 

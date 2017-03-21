@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void set_status_bar(string status, int timer);
+    void set_status_bar(string status, int timer = 750);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void inputSwitchCase(ACTION action, QString qInput);
