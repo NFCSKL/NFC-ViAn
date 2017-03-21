@@ -69,7 +69,7 @@ void MainWindow::set_shortcuts(){
  * @param status text to show in the statusbar
  * @param timer time to show it in the bar in ms, 750ms is standard
  */
-void MainWindow::set_status_bar(string status, int timer = 750){
+void MainWindow::set_status_bar(string status, int timer){
     ui->statusBar->showMessage(QString::fromStdString(status), timer);
 }
 
@@ -309,7 +309,9 @@ void MainWindow::on_actionShow_hide_overview_triggered() {
 void MainWindow::on_actionColour_triggered() {
     QColor col = QColorDialog::getColor();
     mvideo_player->set_overlay_colour(col);
-    set_status_bar("Color choosen.");
+    string msg = "Color: ";
+    msg.append(col.name().toStdString());
+    set_status_bar(msg);
 }
 
 /**
@@ -380,7 +382,10 @@ void MainWindow::on_actionClear_triggered() {
  * Listener function for all eventFilters MainWindow has installed.
  * @param obj the object invoking the event
  * @param event the invooked event
- * @return
+ * @return Returns true if the event matched any of the overlay's
+ *         functionality, else false.
+ *         (Returning false means that the event is sent to the
+ *          target object instead, but not if true is returned.)
  */
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     // Check who invoked the event.
@@ -391,10 +396,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         // Check what kind of event.
         if (event->type() == QEvent::MouseButtonPress) {
             mvideo_player->video_mouse_pressed(pos);
+            return true;
         } else if (event->type() == QEvent::MouseButtonRelease) {
             mvideo_player->video_mouse_released(pos);
+            return true;
         } else if (event->type() == QEvent::MouseMove) {
             mvideo_player->video_mouse_moved(pos);
+            return true;
         }
     }
+    return false;
 }
