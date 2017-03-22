@@ -17,6 +17,11 @@ text::text(QColor col, QPoint pos, QString strng) : shape(col, pos) {
 void text::draw(QImage &img) {
     QPainter painter(&img);
     setup_paint_tool(painter);
+
+    QFont font = painter.font() ;
+    font.setPointSize(24);
+    painter.setFont(font);
+
     painter.drawText(draw_end.x(), draw_end.y(), string);
     painter.end();
 }
