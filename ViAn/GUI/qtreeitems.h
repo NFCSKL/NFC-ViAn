@@ -9,18 +9,18 @@
 enum TYPE {PROJECT, VIDEO};
 
 
-class QTreeProjectItem: public QTreeWidgetItem {
+class MyQTreeWidgetItem: public QTreeWidgetItem {
 public:
-    explicit QTreeProjectItem(int id, TYPE type);
-    ~QTreeProjectItem();
+    explicit MyQTreeWidgetItem(TYPE type, QString name = "", int id = 0);
+    ~MyQTreeWidgetItem();
     int id;
     TYPE type;
-};
-class QTreeVideoItem: public QTreeWidgetItem {
-public:
-    explicit QTreeVideoItem(int id);
-    ~QTreeVideoItem();
-    int id;
+    QString name;
+private slots:
+
+private:
+
+
 };
 
 #endif // QTREEITEMS_H

@@ -16,8 +16,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    GUI/qtreeitems.cpp
+SOURCES += main.cpp
+
 
 #
 # TEST
@@ -27,22 +27,23 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h \
-    GUI/qtreeitems.h
+    Test/test_mainwindow.h
+
 
 #
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
-    GUI/inputwindow.cpp
-
+    GUI/inputwindow.cpp \
+    GUI/qtreeitems.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/inputwindow.h \
-    GUI/action.h
+    GUI/action.h \
+    GUI/qtreeitems.h
 
 
 FORMS    += GUI/mainwindow.ui \

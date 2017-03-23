@@ -1,20 +1,12 @@
 #include "qtreeitems.h"
 
-QTreeProjectItem::QTreeProjectItem(int id, TYPE type) {
+MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString string, int id) {
     QTreeWidgetItem();
     this->id = id;
     this->type = type;
+    this->name = string;
 }
 
-QTreeProjectItem::~QTreeProjectItem() {
-
-}
-
-QTreeVideoItem::QTreeVideoItem(int id) {
-    QTreeWidgetItem();
-    this->id = id;
-}
-
-QTreeVideoItem::~QTreeVideoItem() {
+MyQTreeWidgetItem::~MyQTreeWidgetItem() {
 
 }
