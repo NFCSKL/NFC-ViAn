@@ -285,7 +285,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -337,6 +337,7 @@
      <addaction name="actionCircle"/>
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
+     <addaction name="actionPen"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
@@ -417,6 +418,11 @@
   <action name="actionLine">
    <property name="text">
     <string>Line</string>
+   </property>
+  </action>
+  <action name="actionPen">
+   <property name="text">
+    <string>Pen</string>
    </property>
   </action>
  </widget>

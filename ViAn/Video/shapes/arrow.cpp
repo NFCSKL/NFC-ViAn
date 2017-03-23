@@ -32,3 +32,12 @@ void arrow::draw(QImage &img) {
     painter.drawLines(lines);
     painter.end();
 }
+
+/**
+ * @brief arrow::add_drawing_pos
+ * Function to handle the new position of the mouse.
+ * Does not need to store the new position.
+ * @param pos
+ */
+void arrow::handle_new_pos(QPoint pos) {
+}

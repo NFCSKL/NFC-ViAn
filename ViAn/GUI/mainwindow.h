@@ -82,6 +82,8 @@ private slots:
 
     void on_actionLine_triggered();
 
+    void on_actionPen_triggered();
+
 private:
 
     Ui::MainWindow *ui;

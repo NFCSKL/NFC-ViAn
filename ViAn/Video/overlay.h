@@ -8,6 +8,7 @@
 #include "shapes/circle.h"
 #include "shapes/line.h"
 #include "shapes/arrow.h"
+#include "shapes/pen.h"
 
 class overlay {
 

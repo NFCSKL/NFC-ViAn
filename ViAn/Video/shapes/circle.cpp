@@ -21,3 +21,12 @@ void circle::draw(QImage &img) {
     painter.drawEllipse(draw_start.x(), draw_start.y(), width, height);
     painter.end();
 }
+
+/**
+ * @brief circle::add_drawing_pos
+ * Function to handle the new position of the mouse.
+ * Does not need to store the new position.
+ * @param pos
+ */
+void circle::handle_new_pos(QPoint pos) {
+}

@@ -351,6 +351,15 @@ void MainWindow::on_actionArrow_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_actionPen_triggered
+ * Selects the pen for the overlay drawing tool.
+ */
+void MainWindow::on_actionPen_triggered() {
+    mvideo_player->set_overlay_tool(PEN);
+    set_status_bar("Tool: pen.");
+}
+
+/**
  * @brief MainWindow::eventFilter
  * Listener function for all eventFilters MainWindow has installed.
  * @param obj the object invoking the event
