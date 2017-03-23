@@ -10,6 +10,13 @@
 #include "video.h"
 typedef int ID;
 
+struct ProjectStream{
+    std::stringstream projFile;
+    std::stringstream videos;
+    std::stringstream analyzes;
+    std::stringstream drawings;
+};
+
 struct ProjFiles{
    ID dir;
    ID f_proj;
@@ -24,6 +31,8 @@ struct ProjFiles{
        this->f_videos = -1;
    }
    friend bool operator==(ProjFiles pf, ProjFiles pf2);
+   friend ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf);
+   friend ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf);
 };
 
 /**
@@ -39,16 +48,15 @@ public:
     Project(std::string dirpath);
     void add_video(Video *vid);
 
-    friend std::stringstream& operator>>(std::stringstream& is, Project& proj);
-    friend std::stringstream& operator<<(std::stringstream& os, Project const& proj);
+    // read and write operator for Projects
+    friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
+    friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
 
     friend bool operator==(Project proj, Project proj2);
 
 // TODO
 //    void add_analysis();
-//    void add_drawing();
-private:
-    ID m_vid;        
+//    void add_drawing();      
 public:
     ID m_id;
     std::string m_name;

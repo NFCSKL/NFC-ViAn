@@ -9,7 +9,6 @@ Project::Project(ID id, std::string name)
     this->files = new ProjFiles();
     this->m_name = name;
     this->m_id = id;
-    this->m_vid = 0;
     this->m_videos.clear();
 }
 /**
@@ -38,41 +37,51 @@ void Project::add_video(Video* vid)
  * @param proj
  * @return stringstream containing project information
  */
-std::stringstream& operator>>(std::stringstream& is, Project& proj){
+ProjectStream& operator>>(ProjectStream& ps, Project& proj){
+    //write files
+    //Read project id and name
+    ps.projFile >> proj.m_id;
+    ps.projFile >> proj.m_name;
+    ps >> *(proj.files);
+
+    // read videos
     int vidCounter = 0;
     std::vector<Video*> temp; // used to preserve order ov videos, important for == operator
-    is >> proj.m_id ;
-    is >> proj.m_name ;
-    is >> vidCounter;
-    if( vidCounter < 0) return is; // if negative number of videos, loop below will
+    ps.videos >> vidCounter;
+    if( vidCounter < 0) return ps; // if negative number of videos, loop below will
                                    // be infinite. This is unlikely to happen. but just in case!
     while(vidCounter--){
         Video* v = new Video();
-        is >> *v;
+        ps.videos >> *v;
         temp.push_back(v);
     }
     for (auto vidIt = temp.rbegin(); vidIt < temp.rend(); ++vidIt) {  // to preserve order we add videos in reverse
         proj.add_video(*vidIt);
     }
-    return is;
+    return ps;
 }
 /**
  * @brief operator <<
  * @param os
  * @param proj
  * @return stream
- * used for reading project to file
+ * used for writing videos to file
  */
-std::stringstream& operator<<(std::stringstream& os, const Project& proj){
-    os << proj.m_id << " " << proj.m_name << " ";
+ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
+    //write name and id;   
+    ps.projFile << proj.m_id<< " ";
+    ps.projFile << proj.m_name.c_str() << " ";
+    //write files
+    ps << *(proj.files);
+    //write videos
     int vidcounter = proj.m_videos.size();
-    os << vidcounter << " ";
+    ps.videos << vidcounter << " ";
     for(auto vid = proj.m_videos.rbegin(); vid != proj.m_videos.rend(); ++vid){
         Video* v = *vid;
-        os << *v << " ";
+        ps.videos << *v << " ";
         vidcounter++;
     }
-    return os;
+    return ps;
 }
 /**
  * @brief operator ==
@@ -85,11 +94,11 @@ bool operator==(Project proj, Project proj2){
                proj2.m_videos.begin(),
                [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
-    return //*proj.files == *proj2.files && probably unnecessary as projfiles have projname followed by default suffix
+    return *proj.files == *proj2.files && //probably unnecessary as projfiles have projname followed by default suffix
            proj.m_name == proj2.m_name &&
            videoEquals;
-
 }
+
 /**
  * @brief operator ==
  * @param pf
@@ -98,12 +107,28 @@ bool operator==(Project proj, Project proj2){
  * may not be needed but works as intended,
  */
 bool operator==(ProjFiles pf, ProjFiles pf2){
-    std::cout << "bool: " << (pf.dir == pf2.dir ) << std::endl;
-    std::cout << "bool: " << (pf.f_analysis == pf2.f_analysis)   << std::endl;
-    std::cout << "bool: " << (pf.f_drawings == pf2.f_drawings  )<< std::endl;
-    std::cout << "bool: " <<  (pf.f_videos == pf2.f_videos) << std::endl;
-    return pf.dir == pf2.dir &&
+    return  pf.dir == pf2.dir &&
+            // Not used in current implementation
             pf.f_analysis == pf2.f_analysis &&
             pf.f_proj == pf2.f_proj &&
             pf.f_videos == pf2.f_videos;
+}
+ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
+    ps.projFile << pf.f_proj << " ";
+    ps.projFile << pf.dir << " ";
+    ps.projFile << pf.f_analysis << " ";
+    ps.projFile << pf.f_drawings << " ";
+    ps.projFile << pf.f_videos << " ";
+    return ps;
+
+}
+ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
+    std::string dummy;
+
+    ps.projFile >> pf.f_proj;
+    ps.projFile >> pf.dir;
+    ps.projFile >> pf.f_analysis;
+    ps.projFile >> pf.f_drawings;
+    ps.projFile >> pf.f_videos;
+    return ps;
 }
