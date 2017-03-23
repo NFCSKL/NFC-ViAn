@@ -3,8 +3,11 @@
 
 #include <QImage>
 #include <QColor>
-#include "shapes.h"
-#include <QColor>
+#include "shapes/shape.h"
+#include "shapes/rectangle.h"
+#include "shapes/circle.h"
+#include "shapes/line.h"
+#include "shapes/arrow.h"
 
 class overlay {
 
@@ -15,8 +18,8 @@ public:
     void set_showing_overlay(bool value);
     void toggle_overlay();
     void draw_overlay(QImage &img);
-    void set_tool(SHAPES shape);
-    void set_colour(QColor colour);
+    void set_tool(SHAPES s);
+    void set_colour(QColor col);
     QColor get_colour();
     SHAPES get_shape();
     void mouse_pressed(QPoint pos);
@@ -27,11 +30,9 @@ private:
     void update_drawing_position(QPoint pos);
 
     bool show_overlay = false;
-    SHAPES shape = RECTANGLE;
-    QColor colour = Qt::red;
-
-    QPoint draw_start = QPoint(400, 200);
-    QPoint draw_end = QPoint(800, 600);
+    SHAPES current_shape = RECTANGLE;
+    QColor current_colour = Qt::red;
+    QList <shape*> drawings;
 };
 
 #endif // OVERLAY_H

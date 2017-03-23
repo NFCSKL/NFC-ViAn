@@ -11,7 +11,7 @@
 #include <QImage>
 #include <QWaitCondition>
 #include "overlay.h"
-#include "shapes.h"
+#include "shapes/shape.h"
 
 #include <chrono>
 
