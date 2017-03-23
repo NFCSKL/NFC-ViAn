@@ -306,6 +306,7 @@
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
+    <addaction name="actionExport_frame"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -441,6 +442,11 @@
   <action name="actionText">
    <property name="text">
     <string>Text</string>
+   </property>
+  </action>
+  <action name="actionExport_frame">
+   <property name="text">
+    <string>Export frame</string>
    </property>
   </action>
  </widget>

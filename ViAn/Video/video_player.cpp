@@ -365,3 +365,28 @@ void video_player::video_mouse_moved(QPoint pos) {
         update_overlay();
     }
 }
+
+/**
+ * @brief video_player::export_current_frame
+ * Stores the current frame in the specified folder.
+ * @param filename Path to store
+ */
+void video_player::export_current_frame(QString path_to_folder) {
+    if (frame.channels()== 3) {
+        cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
+        img = QImage((const unsigned char*)(RGBframe.data),
+                          RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+    } else {
+        img = QImage((const unsigned char*)(frame.data),
+                             frame.cols,frame.rows,QImage::Format_Indexed8);
+    }
+
+    video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
+
+    path_to_folder.append("/");
+    path_to_folder.append(QString::number(capture.get(CV_CAP_PROP_POS_FRAMES)));
+    path_to_folder.append(".tiff");
+    QImageWriter writer(path_to_folder, "tiff");
+    writer.write(img);
+    std::cout << "export\n";
+}

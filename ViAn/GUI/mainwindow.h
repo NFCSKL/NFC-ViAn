@@ -90,6 +90,8 @@ private slots:
 
     void on_actionText_triggered();
 
+    void on_actionExport_frame_triggered();
+
 private:
 
     Ui::MainWindow *ui;

@@ -416,3 +416,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     }
     return false;
 }
+
+/**
+ * @brief MainWindow::on_actionExport_frame_triggered
+ * Export the current frame in TIFF format.
+ */
+void MainWindow::on_actionExport_frame_triggered() {
+    mvideo_player->export_current_frame("/home/parso/Downloads");
+}
