@@ -13,9 +13,9 @@ overlay::overlay() {
  * Draws an overlay on top of the specified QImage.
  * @param img QImage to draw on
  */
-void overlay::draw_overlay(QImage &img) {
+void overlay::draw_overlay(QImage &img, int frame_nr) {
     if (show_overlay) {
-        foreach (shape* s, drawings) {
+        foreach (shape* s, overlays[frame_nr]) {
             s->draw(img);
         }
     }
@@ -90,26 +90,26 @@ SHAPES overlay::get_shape() {
  * and shape, if the overlay is visible.
  * @param pos coordinates
  */
-void overlay::mouse_pressed(QPoint pos) {
+void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
-                drawings.append(new rectangle(current_colour, pos));
+                overlays[frame_nr].append(new rectangle(current_colour, pos));
                 break;
             case CIRCLE:
-                drawings.append(new circle(current_colour, pos));
+                overlays[frame_nr].append(new circle(current_colour, pos));
                 break;
             case LINE:
-                drawings.append(new line(current_colour, pos));
+                overlays[frame_nr].append(new line(current_colour, pos));
                 break;
             case ARROW:
-                drawings.append(new arrow(current_colour, pos));
+                overlays[frame_nr].append(new arrow(current_colour, pos));
                 break;
             case PEN:
-                drawings.append(new pen(current_colour, pos));
+                overlays[frame_nr].append(new pen(current_colour, pos));
                 break;
             case TEXT:
-                drawings.append(new text(current_colour, pos, current_string));
+                overlays[frame_nr].append(new text(current_colour, pos, current_string));
                 break;
             default:
                 break;
@@ -123,8 +123,8 @@ void overlay::mouse_pressed(QPoint pos) {
  * released, if the overlay is visible.
  * @param pos coordinates
  */
-void overlay::mouse_released(QPoint pos) {
-    update_drawing_position(pos);
+void overlay::mouse_released(QPoint pos, int frame_nr) {
+    update_drawing_position(pos, frame_nr);
 }
 
 /**
@@ -133,8 +133,8 @@ void overlay::mouse_released(QPoint pos) {
  * moved, if the overlay is visible.
  * @param pos coordinates
  */
-void overlay::mouse_moved(QPoint pos) {
-    update_drawing_position(pos);
+void overlay::mouse_moved(QPoint pos, int frame_nr) {
+    update_drawing_position(pos, frame_nr);
 }
 
 /**
@@ -142,25 +142,33 @@ void overlay::mouse_moved(QPoint pos) {
  * Updates the position of the end point of the shape currently being drawn
  * @param pos
  */
-void overlay::update_drawing_position(QPoint pos) {
+void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
         // The last appended shape is the one we're currently drawing.
-        drawings.last()->update_drawing_pos(pos);
+        overlays[frame_nr].last()->update_drawing_pos(pos);
     }
 }
 
 /**
  * @brief overlay::undo
- * Undo the drawings on the overlay.
+ * Undo the drawings on the overlay, if the overlay is visible.
  */
-void overlay::undo() {
-    drawings.takeLast();
+void overlay::undo(int frame_nr) {
+    if (show_overlay) {
+        if (overlays[frame_nr].isEmpty()) {
+            // takeLast() requires a non-empty list, so if empty return
+            return;
+        }
+        overlays[frame_nr].takeLast();
+    }
 }
 
 /**
  * @brief overlay::clear
- * Clear the drawings on the overlay.
+ * Clear the drawings on the overlay, if the overlay is visible.
  */
-void overlay::clear() {
-    drawings.clear();
+void overlay::clear(int frame_nr) {
+    if (show_overlay) {
+        overlays[frame_nr].clear();
+    }
 }
