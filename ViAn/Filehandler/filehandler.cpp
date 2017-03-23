@@ -56,24 +56,24 @@ FH_ERROR FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(Project* proj){
     std::string projFile = proj->m_name + std::string(".txt"); //filename
-    ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
+    if(!proj->saved){
+        ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
 
-    proj->files->dir = dirID;
+        proj->files->dir = dirID;
 
-    proj->files->f_proj = create_file(projFile, dirID); //create project file
+        proj->files->f_proj = create_file(projFile, dirID); //create project file
 
-    std::string vidFile = proj->m_name + "_videos.txt";
-    proj->files->f_videos = create_file(vidFile, dirID); //create video file
-
-
-    std::string analysisFile = proj->m_name + "_analyses.txt";
-    proj->files->f_analysis = create_file(analysisFile, dirID); //create analysis file
+        std::string vidFile = proj->m_name + "_videos.txt";
+        proj->files->f_videos = create_file(vidFile, dirID); //create video file
 
 
-    std::string drawingFile = proj->m_name + "_drawings.txt";
-    proj->files->f_drawings =create_file(drawingFile, dirID); //create drawings file
+        std::string analysisFile = proj->m_name + "_analyses.txt";
+        proj->files->f_analysis = create_file(analysisFile, dirID); //create analysis file
 
 
+        std::string drawingFile = proj->m_name + "_drawings.txt";
+        proj->files->f_drawings =create_file(drawingFile, dirID); //create drawings file
+    }
     update_proj_files(proj);
 
 }
@@ -117,6 +117,7 @@ void FileHandler::load_proj_files(std::string str){
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();    
+    proj->saved = true;
     std::ifstream f(dirpath + "/" + projname + ".txt");
     std::string filename;
     f >> proj->files->f_proj;
