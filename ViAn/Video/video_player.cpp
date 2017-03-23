@@ -38,6 +38,10 @@ bool video_player::load_video(string filename) {
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
         video_paused = false;
+
+        // The overlay need to know the size of the video.
+        video_overlay->set_video_frame_size(capture.get(CV_CAP_PROP_FRAME_WIDTH), capture.get(CV_CAP_PROP_FRAME_HEIGHT));
+
         start();
         return true;
     }
@@ -163,6 +167,7 @@ int video_player::get_num_frames() {
  */
 void video_player::set_frame_width(int new_value) {
     frame_width = new_value;
+    video_overlay->set_window_frame_width(new_value);
 }
 
 /**
@@ -171,6 +176,7 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
+    video_overlay->set_window_frame_height(new_value);
 }
 
 /**

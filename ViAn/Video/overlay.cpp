@@ -9,6 +9,32 @@ overlay::overlay() {
 }
 
 /**
+ * @brief overlay::set_frame_size
+ * @param width Width of the video.
+ * @param height Height of the video.
+ */
+void overlay::set_video_frame_size(int width, int height) {
+    video_frame_width = width;
+    video_frame_height = height;
+}
+
+/**
+ * @brief overlay::set_window_frame_width
+ * @param width Width of the window the video is playing in.
+ */
+void overlay::set_window_frame_width(int width) {
+    window_frame_width = width;
+}
+
+/**
+ * @brief overlay::set_window_frame_height
+ * @param height Height of the window the video is playing in.
+ */
+void overlay::set_window_frame_height(int height) {
+    window_frame_height = height;
+}
+
+/**
  * @brief overlay::draw_overlay
  * Draws an overlay on top of the specified QImage.
  * @param img QImage to draw on
@@ -92,6 +118,12 @@ SHAPES overlay::get_shape() {
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
+        // Calculate the coordinates on the actual video frame
+        // from the coordinates in the window the video is playing in
+        double scalex = (double) video_frame_width/window_frame_width;
+        double scaley = (double) video_frame_height/window_frame_height;
+        pos.setX(scalex*pos.x());
+        pos.setY(scaley*pos.y());
         switch (current_shape) {
             case RECTANGLE:
                 overlays[frame_nr].append(new rectangle(current_colour, pos));
@@ -144,6 +176,12 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
  */
 void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
+        // Calculate the coordinates on the actual video frame
+        // from the coordinates in the window the video is playing in
+        double scalex = (double) video_frame_width/window_frame_width;
+        double scaley = (double) video_frame_height/window_frame_height;
+        pos.setX(scalex*pos.x());
+        pos.setY(scaley*pos.y());
         // The last appended shape is the one we're currently drawing.
         overlays[frame_nr].last()->update_drawing_pos(pos);
     }
@@ -156,10 +194,9 @@ void overlay::update_drawing_position(QPoint pos, int frame_nr) {
 void overlay::undo(int frame_nr) {
     if (show_overlay) {
         if (overlays[frame_nr].isEmpty()) {
-            // takeLast() requires a non-empty list, so if empty return
             return;
         }
-        overlays[frame_nr].takeLast();
+        overlays[frame_nr].takeLast(); // Requires a non-empty list.
     }
 }
 
