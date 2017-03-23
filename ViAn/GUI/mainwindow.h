@@ -17,6 +17,7 @@
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
 #include "action.h"
+#include "qtreeitems.h"
 
 using namespace std;
 class inputwindow;
@@ -88,6 +89,9 @@ private:
     inputwindow *inputWindow;
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
+
+    std::map<int, QTreeWidgetItem> projects;
+
 
     QSlider *video_slider;
 

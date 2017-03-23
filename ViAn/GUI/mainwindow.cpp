@@ -264,11 +264,11 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
         case ADD_PROJECT: {
-            fileHandler->create_project(input);
-            QTreeWidgetItem *projectInTree = new QTreeWidgetItem();
+            int id = fileHandler->create_project(input)->m_id;
+            QTreeProjectItem *projectInTree = new QTreeProjectItem(id, TYPE::PROJECT);
             projectInTree->setText(0, qInput);
             ui->ProjectTree->addTopLevelItem(projectInTree);
-            set_status_bar("Project " + input + "created.");
+            set_status_bar("Project " + input + " created.");
             break;
         }
         case CANCEL: {
@@ -287,6 +287,8 @@ void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
  * @param column the column in the tree
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
+    QTreeProjectItem *newitem = (QTreeProjectItem*)item;
+    std::cout << newitem->id << std::endl;
 }
 
  /** @brief MainWindow::on_actionShow_hide_overview_triggered
