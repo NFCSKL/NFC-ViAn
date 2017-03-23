@@ -7,7 +7,7 @@ class line : public shape {
 public:
     line(QColor col, QPoint pos);
     void draw(QImage &img) override;
-    void add_drawing_pos(QPoint pos);
+    void handle_new_pos(QPoint pos);
 };
 
 #endif // LINE_H
