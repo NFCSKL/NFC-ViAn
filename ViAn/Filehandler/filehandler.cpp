@@ -164,7 +164,7 @@ FH_ERROR FileHandler::delete_project(Project* proj){
 /**
  * @todo make threadsafe
  * @brief FileHandler::add_video
- * @param Project*,
+ * @param Project*,string filepath
  *
  * string
  * Add a video filepath to a given project.
