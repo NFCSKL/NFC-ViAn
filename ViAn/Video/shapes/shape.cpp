@@ -18,8 +18,8 @@ shape::shape(QColor col, QPoint pos) {
  * @param pos
  */
 void shape::update_drawing_pos(QPoint pos) {
-    // Call add_drawing_pos first because it might need the old draw_end value.
-    add_drawing_pos(pos);
+    // Call handle_new_pos first because it might need the old draw_end value.
+    handle_new_pos(pos);
     draw_end = pos;
 }
 

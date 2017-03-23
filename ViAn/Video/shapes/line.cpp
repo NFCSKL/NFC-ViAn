@@ -23,7 +23,8 @@ void line::draw(QImage &img) {
 /**
  * @brief line::add_drawing_pos
  * Function to handle the new position of the mouse.
+ * Does not need to store the new position.
  * @param pos
  */
-void line::add_drawing_pos(QPoint pos) {
+void line::handle_new_pos(QPoint pos) {
 }

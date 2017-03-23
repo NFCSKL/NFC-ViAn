@@ -11,7 +11,7 @@ class shape {
 public:
     shape(QColor col, QPoint pos);
     void update_drawing_pos(QPoint pos);
-    virtual void add_drawing_pos(QPoint pos) = 0;
+    virtual void handle_new_pos(QPoint pos) = 0;
     void setup_paint_tool(QPainter &painter);
     virtual void draw(QImage &img) = 0;
 protected:
