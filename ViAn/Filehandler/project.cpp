@@ -10,6 +10,7 @@ Project::Project(ID id, std::string name)
     this->m_name = name;
     this->m_id = id;
     this->m_videos.clear();
+    this->saved = false;
 }
 /**
  * @brief Project::Project
@@ -40,6 +41,7 @@ void Project::add_video(Video* vid)
 ProjectStream& operator>>(ProjectStream& ps, Project& proj){
     //write files
     //Read project id and name
+    std::string dummy;
     ps.projFile >> proj.m_id;
     ps.projFile >> proj.m_name;
     ps >> *(proj.files);
@@ -108,11 +110,20 @@ bool operator==(Project proj, Project proj2){
  */
 bool operator==(ProjFiles pf, ProjFiles pf2){
     return  pf.dir == pf2.dir &&
+            pf.f_proj == pf2.f_proj &&
+            pf.f_videos == pf2.f_videos &&
             // Not used in current implementation
             pf.f_analysis == pf2.f_analysis &&
-            pf.f_proj == pf2.f_proj &&
-            pf.f_videos == pf2.f_videos;
+            pf.f_drawings == pf2.f_drawings;
+
 }
+/**
+ * @brief operator <<
+ * @param ps
+ * @param pf
+ * @return ps
+ * Writes a projectfile object to projectstream
+ */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
     ps.projFile << pf.f_proj << " ";
     ps.projFile << pf.dir << " ";
@@ -122,6 +133,13 @@ ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
     return ps;
 
 }
+/**
+ * @brief operator >>
+ * @param ps
+ * @param pf
+ * @return ps
+ * Reads files from a ProjFiles struct to a ProjectStream
+ */
 ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
     std::string dummy;
 

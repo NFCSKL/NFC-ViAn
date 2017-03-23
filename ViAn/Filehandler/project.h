@@ -9,14 +9,23 @@
 #include "filehandler.h"
 #include "video.h"
 typedef int ID;
-
+/**
+ * @brief The ProjectStream struct
+ * Used for writing projects to and from files.
+ * Importand for seperation of different types of data.
+ */
 struct ProjectStream{
     std::stringstream projFile;
     std::stringstream videos;
     std::stringstream analyzes;
     std::stringstream drawings;
 };
-
+/**
+ * @brief The ProjFiles struct
+ * project file container, simplifies code for readability,
+ * also easier to pass all files as opposed to every file
+ * seperately
+ */
 struct ProjFiles{
    ID dir;
    ID f_proj;
@@ -24,6 +33,7 @@ struct ProjFiles{
    ID f_drawings;
    ID f_videos;
    ProjFiles(){
+
        this->dir = -1;
        this->f_proj = -1;
        this->f_analysis = -1;
@@ -62,6 +72,7 @@ public:
     std::string m_name;
     ProjFiles* files;
     std::vector<Video*> m_videos;
+    bool saved;
 };
 
 
