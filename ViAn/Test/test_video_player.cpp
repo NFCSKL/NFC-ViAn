@@ -156,7 +156,23 @@ void test_video_player::test_dec_playback_speed(){
 void test_video_player::test_toggle_overlay() {
     mvideo->video_overlay->set_showing_overlay(false);
     mvideo->toggle_overlay();
-    QVERIFY(mvideo->video_overlay->is_showing_overlay());
+    QVERIFY(mvideo->is_showing_overlay());
     mvideo->toggle_overlay();
-    QVERIFY(!mvideo->video_overlay->is_showing_overlay());
+    QVERIFY(!mvideo->is_showing_overlay());
+}
+
+/**
+ * @brief test_video_player::test_set_overlay_tool
+ */
+void test_video_player::test_set_overlay_tool() {
+    mvideo->set_overlay_tool(RECTANGLE);
+    QVERIFY(mvideo->video_overlay->get_shape() == RECTANGLE);
+}
+
+/**
+ * @brief test_video_player::test_set_overlay_colour
+ */
+void test_video_player::test_set_overlay_colour() {
+    mvideo->set_overlay_colour(Qt::black);
+    QVERIFY(mvideo->video_overlay->get_colour() == Qt::black);
 }
