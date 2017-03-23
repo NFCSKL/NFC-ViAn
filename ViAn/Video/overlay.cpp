@@ -1,6 +1,5 @@
 #include "overlay.h"
 #include <iostream>
-#include <qpainter.h>
 
 /**
  * @brief overlay::overlay
@@ -15,40 +14,9 @@ overlay::overlay() {
  */
 void overlay::draw_overlay(QImage &img) {
     if (show_overlay) {
-        // For now this function just paints static shapes
-        QPainter painter(&img);
-        QPen pen;
-        pen.setWidth(3);
-        pen.setColor(colour);
-        painter.setPen(pen);
-        switch (shape) {
-            case RECTANGLE:
-                painter.drawRect(400,200,400,400);
-                break;
-            case CIRCLE:
-                painter.drawEllipse(400,200,400,400);
-                break;
-            case LINE:
-                painter.drawLine(400,200,400,400);
-                break;
-            case ARROW:
-                {
-                    QLineF line(400,200,800,600);
-                    line.normalVector();
-                    QLineF line2(800,600,400,200);
-                    QLineF line3(800,600,400,200);
-                    line2.setLength(10);
-                    line3.setLength(10);
-                    line2.setAngle(line.angle()+145);
-                    line3.setAngle(line.angle()-145);
-                    QVector<QLineF> lines{line, line2, line3};
-                    painter.drawLines(lines);
-                    break;
-                }
-            default:
-                break;
+        foreach (shape* s, drawings) {
+            s->draw(img);
         }
-        painter.end();
     }
 }
 
@@ -78,19 +46,97 @@ void overlay::set_showing_overlay(bool value) {
 }
 
 /**
- * @brief overlay::set_overlay_tool
+ * @brief overlay::set_tool
  * Sets the overlay tool's shape.
  * @param s
  */
-void overlay::set_overlay_tool(SHAPES s) {
-    shape = s;
+void overlay::set_tool(SHAPES s) {
+    current_shape = s;
 }
 
 /**
- * @brief overlay::set_overlay_colour
+ * @brief overlay::set_colour
  * Sets the overlay tool's colour.
  * @param col
  */
-void overlay::set_overlay_colour(QColor col) {
-    colour = col;
+void overlay::set_colour(QColor col) {
+    current_colour = col;
+}
+
+/**
+ * @brief overlay::get_colour
+ * @return The currenty choosen colour.
+ */
+QColor overlay::get_colour() {
+    return current_colour;
+}
+
+/**
+ * @brief overlay::get_shape
+ * @return The currently choosen shape
+ */
+SHAPES overlay::get_shape() {
+    return current_shape;
+}
+
+/**
+ * @brief overlay::mouse_pressed
+ * Creates a drawing shape with the prechoosen colour
+ * and shape, if the overlay is visible.
+ * @param pos coordinates
+ */
+void overlay::mouse_pressed(QPoint pos) {
+    if (show_overlay) {
+        switch (current_shape) {
+            case RECTANGLE:
+                drawings.append(new rectangle(current_colour, pos));
+                break;
+            case CIRCLE:
+                drawings.append(new circle(current_colour, pos));
+                break;
+            case LINE:
+                drawings.append(new line(current_colour, pos));
+                break;
+            case ARROW:
+                drawings.append(new arrow(current_colour, pos));
+                break;
+            case PEN:
+                drawings.append(new pen(current_colour, pos));
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+/**
+ * @brief overlay::mouse_pressed
+ * Ends drawing on the overlay when the mouse is
+ * released, if the overlay is visible.
+ * @param pos coordinates
+ */
+void overlay::mouse_released(QPoint pos) {
+    update_drawing_position(pos);
+}
+
+/**
+ * @brief overlay::mouse_moved
+ * Updates drawing on the overlay when the mouse is
+ * moved, if the overlay is visible.
+ * @param pos coordinates
+ */
+void overlay::mouse_moved(QPoint pos) {
+    update_drawing_position(pos);
+}
+
+/**
+ * @brief overlay::update_drawing_position
+ * Updates the position of the end point of the shape currently being drawn
+ * @param pos
+ */
+void overlay::update_drawing_position(QPoint pos) {
+    if (show_overlay) {
+        // The last appended shape is the one we're currently drawing.
+        drawings.last()->update_drawing_pos(pos);
+    }
 }

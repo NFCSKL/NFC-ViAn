@@ -11,7 +11,7 @@
 #include <QImage>
 #include <QWaitCondition>
 #include "overlay.h"
-#include "shapes.h"
+#include "shapes/shape.h"
 
 #include <chrono>
 
@@ -25,6 +25,7 @@ public:
     bool load_video(string filename);
     bool is_paused();
     bool is_stopped();
+    bool is_showing_overlay();
     
     int get_num_frames();    
     void play_pause();
@@ -44,6 +45,9 @@ public:
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
+    void video_mouse_pressed(QPoint pos);
+    void video_mouse_released(QPoint pos);
+    void video_mouse_moved(QPoint pos);
 
     friend class test_video_player;
 
@@ -62,6 +66,7 @@ protected:
 
 private:
     void update_frame(int frame_nbr);
+    void update_overlay();
     void show_frame();
 
     cv::VideoCapture capture;

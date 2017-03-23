@@ -30,7 +30,8 @@ private slots:
     void test_dec_playback_speed();
     void test_stop_video();
     void test_toggle_overlay();
-
+    void test_set_overlay_tool();
+    void test_set_overlay_colour();
 
 private:
     video_player* mvideo;

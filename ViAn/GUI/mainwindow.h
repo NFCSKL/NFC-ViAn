@@ -30,10 +30,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void set_status_bar(string status, int timer);
+    void set_status_bar(string status, int timer = 750);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void inputSwitchCase(ACTION action, QString qInput);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
 
@@ -80,6 +81,8 @@ private slots:
     void on_actionArrow_triggered();
 
     void on_actionLine_triggered();
+
+    void on_actionPen_triggered();
 
 private:
 

@@ -119,7 +119,7 @@ void video_player::show_frame() {
  */
 void video_player::msleep(int delay) {
     std::chrono::milliseconds dura((int)(delay*this->speed_multiplier));
-    std::this_thread::sleep_for( dura );
+    std::this_thread::sleep_for(dura);
 }
 
 /**
@@ -138,6 +138,15 @@ bool video_player::is_paused() {
  */
 bool video_player::is_stopped() {
     return stop;
+}
+
+/**
+ * @brief video_player::is_showing_overlay
+ * Returns true if the overlay tool is showing, else false.
+ * @return
+ */
+bool video_player::is_showing_overlay() {
+    return video_overlay->is_showing_overlay();
 }
 
 /**
@@ -208,6 +217,18 @@ void video_player::update_frame(int frame_nbr) {
 }
 
 /**
+ * @brief video_player::update_overlay
+ * Updates the current frame if the video is loaded and paused.
+ */
+void video_player::update_overlay() {
+    // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
+    // but only if there is a video loaded.
+    if (capture.isOpened() && is_paused()) {
+        show_frame();
+    }
+}
+
+/**
  * @brief video_player::set_playback_speed
  * Sets the speed multiplyer for playback.
  * High value gives slower playback and vice versa.
@@ -252,11 +273,7 @@ void video_player::inc_playback_speed() {
  */
 void video_player::toggle_overlay() {
     video_overlay->toggle_overlay();
-
-    // If paused we need to update the frame shown ourself (otherwise done in the video-thread).
-    if (is_paused()) {
-        show_frame();
-    }
+    update_overlay();
 }
 
 /**
@@ -265,7 +282,7 @@ void video_player::toggle_overlay() {
  * @param shape
  */
 void video_player::set_overlay_tool(SHAPES shape) {
-    video_overlay->set_overlay_tool(shape);
+    video_overlay->set_tool(shape);
 }
 
 /**
@@ -274,5 +291,44 @@ void video_player::set_overlay_tool(SHAPES shape) {
  * @param colour
  */
 void video_player::set_overlay_colour(QColor colour) {
-    video_overlay->set_overlay_colour(colour);
+    video_overlay->set_colour(colour);
+}
+
+/**
+ * @brief video_player::video_mouse_pressed
+ * Starts drawing on the overlay, if visible, and if video is loaded.
+ * If the video is paused, the frame the GUI is updated.
+ * @param pos coordinate
+ */
+void video_player::video_mouse_pressed(QPoint pos) {
+    if (capture.isOpened()) {
+        video_overlay->mouse_pressed(pos);
+        update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::video_mouse_released
+ * Ends drawing on the overlay, if visible, and if video is loaded.
+ * If the video is paused, the frame the GUI is updated.
+ * @param pos coordinates
+ */
+void video_player::video_mouse_released(QPoint pos) {
+    if (capture.isOpened()) {
+        video_overlay->mouse_released(pos);
+        update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::video_mouse_moved
+ * Updates drawing on the overlay, if visible, and if video is loaded.
+ * If the video is paused, the frame the GUI is updated.
+ * @param pos coordinates
+ */
+void video_player::video_mouse_moved(QPoint pos) {
+    if (capture.isOpened()) {
+        video_overlay->mouse_moved(pos);
+        update_overlay();
+    }
 }

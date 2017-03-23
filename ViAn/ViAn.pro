@@ -16,15 +16,17 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
 
 #
 # TEST
 #
 SOURCES += Test/test_video_player.cpp\
-    Test/filehandlertest.cpp
+    Test/filehandlertest.cpp\
+    Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h
+    Test/filehandlertest.h \
+    Test/test_mainwindow.h
 
 #
 # GUI
@@ -51,10 +53,21 @@ RESOURCES += resources.qrc
 # OPENCV
 #
 SOURCES += Video/video_player.cpp \
-    Video/overlay.cpp
+    Video/overlay.cpp \
+    Video/shapes/shape.cpp \
+    Video/shapes/rectangle.cpp \
+    Video/shapes/circle.cpp \
+    Video/shapes/arrow.cpp \
+    Video/shapes/line.cpp \
+    Video/shapes/pen.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
-    Video/shapes.h
+    Video/shapes/shape.h \
+    Video/shapes/rectangle.h \
+    Video/shapes/circle.h \
+    Video/shapes/arrow.h \
+    Video/shapes/line.h \
+    Video/shapes/pen.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
