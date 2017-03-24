@@ -264,11 +264,8 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
         case ADD_PROJECT: {
-            int id = fileHandler->create_project(input)->m_id;
-            MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, qInput, id);
-            projectInTree->setText(0, qInput);
-            selectedProject = projectInTree;
-            ui->ProjectTree->addTopLevelItem(projectInTree);
+            Project* proj = fileHandler->create_project(input);
+            add_project_to_tree(proj);
             set_status_bar("Project " + input + " created.");
             delete inputWindow;
             break;
@@ -278,10 +275,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
             break;
         }
         case ADD_VIDEO: {
-            fileHandler->add_video(fileHandler->get_project(selectedProject->id), input);
-            MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, qInput);
-            videoInTree->setText(0, qInput);
-            selectedProject->addChild(videoInTree);
+            add_video_to_tree(selectedProject, input);
             set_status_bar("Video " + input + " added.");
             break;
         }
@@ -487,16 +481,11 @@ void MainWindow::play_video() {
  * @param newSelectedProject
  */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
-    /*if(selectedProject) {
-        std::cout << "1" << std::endl;
+    if(selectedProject == nullptr) {
         selectedProject = newSelectedProject;
-        std::cout << "2" << std::endl;
         QString string = selectedProject->text(0);
-        std::cout << "3" << std::endl;
         string.append(" <--");
-        std::cout << "4" << std::endl;
         selectedProject->setText(0, string);
-        std::cout << "5" << std::endl;
     } else if (selectedProject != newSelectedProject) {
         QString string = selectedProject->text(0);
         string.chop(4);
@@ -505,8 +494,7 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         string = selectedProject->text(0);
         string.append(" <--");
         selectedProject->setText(0, string);
-    }*/
-    selectedProject = newSelectedProject;
+    }
 }
 /**
  * @brief MainWindow::on_actionSave_triggered
@@ -523,15 +511,43 @@ void MainWindow::on_actionSave_triggered()
         set_status_bar("Nothing to save");
     }
 }
-
+/**
+ * @brief MainWindow::on_actionLoad_triggered
+ */
 void MainWindow::on_actionLoad_triggered()
 {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
     Project* loadProj= this->fileHandler->load_project(dir.toStdString());
-
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(loadProj->m_name), loadProj->m_id);
-    projectInTree->setText(0, QString::fromStdString(loadProj->m_name));
+    add_project_to_tree(loadProj);
+    set_status_bar("Project " + loadProj->m_name + " loaded.");
+}
+/**
+ * @brief MainWindow::add_project_to_tree
+ * @param proj to add to tree
+ * also adds all videos of the project to the tree
+ */
+void MainWindow::add_project_to_tree(Project* proj){
+    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
+    projectInTree->setText(0, QString::fromStdString(proj->m_name));
     selectedProject = projectInTree;
     ui->ProjectTree->addTopLevelItem(projectInTree);
-    set_status_bar("Project " + loadProj->m_name + " loaded.");
+    for(Video *v: proj->m_videos) {
+        std::stringstream filePath;
+         filePath << *v;
+        std::string treeName = filePath.str();
+        add_video_to_tree(projectInTree, treeName);
+    }
+
+
+}
+/**
+ * @brief MainWindow::add_video_to_tree
+ * @param project to add videos to
+ * @param filePath of the video
+ */
+void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath) {
+    fileHandler->add_video(fileHandler->get_project(project->id), filePath);
+    MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath));
+    videoInTree->setText(0, QString::fromStdString(filePath));
+    project->addChild(videoInTree);
 }

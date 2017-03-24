@@ -116,7 +116,8 @@ private:
     FileHandler *fileHandler;
 
     void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
-
+    void add_project_to_tree(Project* proj);
+    void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 
 };
 
