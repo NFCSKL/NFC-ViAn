@@ -8,7 +8,7 @@
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "inputwindow.h"
-#include "Video/shapes.h"
+#include "Video/shapes/shape.h"
 
 using namespace std;
 using namespace cv;
@@ -355,6 +355,15 @@ void MainWindow::on_actionLine_triggered() {
 void MainWindow::on_actionArrow_triggered() {
     mvideo_player->set_overlay_tool(ARROW);
     set_status_bar("Tool: arrow.");
+}
+
+/**
+ * @brief MainWindow::on_actionPen_triggered
+ * Selects the pen for the overlay drawing tool.
+ */
+void MainWindow::on_actionPen_triggered() {
+    mvideo_player->set_overlay_tool(PEN);
+    set_status_bar("Tool: pen.");
 }
 
 /**

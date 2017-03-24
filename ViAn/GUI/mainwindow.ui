@@ -306,10 +306,10 @@
      <property name="title">
       <string>Delete</string>
      </property>
-     <addaction name="actionProject"/>
-     <addaction name="actionVideo"/>
-     <addaction name="actionAnalys"/>
-     <addaction name="actionRitning"/>
+     <addaction name="actionDeleteProject"/>
+     <addaction name="actionDeleteVideo"/>
+     <addaction name="actionDeleteAnalys"/>
+     <addaction name="actionDeleteRitning"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
@@ -347,6 +347,7 @@
      <addaction name="actionCircle"/>
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
+     <addaction name="actionPen"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
@@ -429,24 +430,41 @@
     <string>Line</string>
    </property>
   </action>
-  <action name="actionProject">
+  <action name="actionDeleteProject">
    <property name="text">
-    <string>Project</string>
+    <string>DeleteProject</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteProject</string>
    </property>
   </action>
-  <action name="actionVideo">
+  <action name="actionDeleteVideo">
    <property name="text">
-    <string>Video</string>
+    <string>DeleteVideo</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteVideo</string>
    </property>
   </action>
-  <action name="actionAnalys">
+  <action name="actionDeleteAnalys">
    <property name="text">
-    <string>Analys</string>
+    <string>DeleteAnalys</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteAnalys</string>
    </property>
   </action>
-  <action name="actionRitning">
+  <action name="actionDeleteRitning">
    <property name="text">
-    <string>Ritning</string>
+    <string>DeleteRitning</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteRitning</string>
+   </property>
+  </action>
+  <action name="actionPen">
+   <property name="text">
+    <string>Pen</string>
    </property>
   </action>
  </widget>
