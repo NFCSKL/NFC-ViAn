@@ -173,15 +173,11 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-<<<<<<< HEAD
-void overlay::update_drawing_position(QPoint pos) {
+void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (choosing_zoom_area) {
         zoom_area->update_drawing_pos(pos);
         return; // While choosing zoom area the regular drawings should not be affected.
     }
-=======
-void overlay::update_drawing_position(QPoint pos, int frame_nr) {
->>>>>>> overlay-scale-export
     if (show_overlay) {
         // The last appended shape is the one we're currently drawing.
         overlays[frame_nr].last()->update_drawing_pos(pos);
