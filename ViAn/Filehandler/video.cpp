@@ -5,15 +5,13 @@
 Video::Video()
 {
     this->filepath = "";
-    this->id = -1;
 }
 /**
  * @brief Video::Video
  * @param id
  * @param filepath
  */
-Video::Video(ID id, std::string filepath){
-    this->id = id;
+Video::Video(std::string filepath){
     this->filepath = filepath;
 }
 /**
@@ -33,7 +31,7 @@ std::stringstream& operator>>(std::stringstream& is, Video& vid){
  * @return used for writing project to file
  */
 std::stringstream& operator<<(std::stringstream& os, const Video& vid){
-    os << vid.filepath << " ";
+    os << vid.filepath.c_str() << " ";
     return os;
 }
 /**
