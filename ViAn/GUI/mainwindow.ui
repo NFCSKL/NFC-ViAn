@@ -306,7 +306,6 @@
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
-    <addaction name="actionExport_frame"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
