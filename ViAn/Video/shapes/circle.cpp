@@ -23,7 +23,7 @@ void circle::draw(QImage &img) {
 }
 
 /**
- * @brief circle::add_drawing_pos
+ * @brief circle::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.
  * @param pos

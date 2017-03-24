@@ -348,6 +348,7 @@
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
      <addaction name="actionPen"/>
+     <addaction name="actionText"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
@@ -477,6 +478,11 @@
   <action name="actionUndo">
    <property name="text">
     <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionText">
+   <property name="text">
+    <string>Text</string>
    </property>
   </action>
  </widget>

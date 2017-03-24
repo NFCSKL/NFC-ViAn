@@ -102,6 +102,8 @@ private slots:
 
     void on_actionLoad_triggered();
 
+    void on_actionText_triggered();
+
 private:
 
     Ui::MainWindow *ui;

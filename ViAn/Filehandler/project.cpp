@@ -41,10 +41,7 @@ void Project::add_video(Video* vid)
 ProjectStream& operator>>(ProjectStream& ps, Project& proj){
     //write files
     //Read project id and name
-    std::string dummy;
-    ps.projFile >> proj.m_id;
     ps.projFile >> proj.m_name;
-    ps >> *(proj.files);
 
     // read videos
     int vidCounter = 0;
@@ -71,10 +68,7 @@ ProjectStream& operator>>(ProjectStream& ps, Project& proj){
  */
 ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write name and id;   
-    ps.projFile << proj.m_id<< " ";
     ps.projFile << proj.m_name.c_str() << " ";
-    //write files
-    ps << *(proj.files);
     //write videos
     int vidcounter = proj.m_videos.size();
     ps.videos << vidcounter << " ";
@@ -109,7 +103,7 @@ bool operator==(Project proj, Project proj2){
  * may not be needed but works as intended,
  */
 bool operator==(ProjFiles pf, ProjFiles pf2){
-    return  pf.dir == pf2.dir &&
+    return  true;pf.dir == pf2.dir &&
             pf.f_proj == pf2.f_proj &&
             pf.f_videos == pf2.f_videos &&
             // Not used in current implementation
@@ -123,13 +117,13 @@ bool operator==(ProjFiles pf, ProjFiles pf2){
  * @param pf
  * @return ps
  * Writes a projectfile object to projectstream
+ * @deprecated
+ * Shouldnt be needed, ids useless and filenames are standard.
  */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
-    ps.projFile << pf.f_proj << " ";
-    ps.projFile << pf.dir << " ";
-    ps.projFile << pf.f_analysis << " ";
-    ps.projFile << pf.f_drawings << " ";
-    ps.projFile << pf.f_videos << " ";
+//    ps.projFile << pf.f_analysis << " ";
+//    ps.projFile << pf.f_drawings << " ";
+//    ps.projFile << pf.f_videos << " ";
     return ps;
 
 }

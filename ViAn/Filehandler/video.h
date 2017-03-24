@@ -8,8 +8,7 @@ class Video
 {
 public:
     Video();
-    Video(ID id, std::string filepath);
-    ID id;
+    Video(std::string filepath);
     std::string filepath;
     friend std::stringstream& operator>>(std::stringstream& is, Video& vid);
     friend std::stringstream& operator<<(std::stringstream& os, const Video& vid);

@@ -371,6 +371,15 @@ void MainWindow::on_actionPen_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_actionText_triggered
+ * Selects the text for the overlay drawing tool.
+ */
+void MainWindow::on_actionText_triggered() {
+    mvideo_player->set_overlay_tool(TEXT);
+    set_status_bar("Tool: text.");
+}
+
+/**
  * @brief MainWindow::on_actionUndo_triggered
  * Undo the drawings on the overlay.
  */
