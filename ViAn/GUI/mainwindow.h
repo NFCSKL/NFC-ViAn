@@ -35,8 +35,8 @@ public:
     void set_status_bar(string status, int timer = 750);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void inputSwitchCase(ACTION action, QString qInput);
-    bool eventFilter(QObject *obj, QEvent *event);
+    void input_switch_case(ACTION action, QString qInput);
+    bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
 
@@ -91,6 +91,8 @@ private slots:
     void add_video();
 
     void play_video();
+
+    void on_actionSave_triggered();
 
 private:
 

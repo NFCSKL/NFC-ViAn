@@ -256,7 +256,7 @@ void MainWindow::on_actionAddProject_triggered() {
  * @param input the input from the user
  * @param action the action that was triggered earlier
  */
-void MainWindow::inputSwitchCase(ACTION action, QString qInput) {
+void MainWindow::input_switch_case(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
         case ADD_PROJECT: {
@@ -387,7 +387,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     }
     return false;
 }
-
+/**
+ * @brief MainWindow::prepare_menu
+ * @param pos
+ * Creates context menu on right-click in tree view
+ */
 void MainWindow::prepare_menu(const QPoint & pos) {
     QTreeWidget *tree = ui->ProjectTree;
 
@@ -416,19 +420,32 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
-
+/**
+ * @brief MainWindow::add_video
+ * Prompts user with file browser to add video
+ * to selected project
+ */
 void MainWindow::add_video() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;;*.mkv;;*.mov"));
-    inputSwitchCase(ACTION::ADD_VIDEO, dir);
+    input_switch_case(ACTION::ADD_VIDEO, dir);
 }
-
+/**
+ * @brief MainWindow::play_video
+ *  Loads selected video, flips playbutton to pause
+ *  plays video from beginning
+ *
+ */
 void MainWindow::play_video() {
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(0);
 }
-
+/**
+ * @todo To be implemented
+ * @brief MainWindow::set_selected_project
+ * @param newSelectedProject
+ */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
     /*if(selectedProject) {
         std::cout << "1" << std::endl;
@@ -450,4 +467,8 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         selectedProject->setText(0, string);
     }*/
     selectedProject = newSelectedProject;
+}
+
+void MainWindow::on_actionSave_triggered()
+{
 }
