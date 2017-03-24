@@ -435,7 +435,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::add_video() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;;*.mkv;;*.mov"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 /**
