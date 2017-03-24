@@ -369,7 +369,8 @@ void video_player::video_mouse_moved(QPoint pos) {
 /**
  * @brief video_player::export_current_frame
  * Stores the current frame in the specified folder.
- * @param filename Path to store
+ * The stored frame will have the sam resolution as the video.
+ * @param filename Path to the folder to store the file in.
  */
 void video_player::export_current_frame(QString path_to_folder) {
     if (frame.channels()== 3) {
@@ -383,9 +384,11 @@ void video_player::export_current_frame(QString path_to_folder) {
 
     video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
 
+    // Add "/FRAME_NR.tiff" to the path.
     path_to_folder.append("/");
     path_to_folder.append(QString::number(capture.get(CV_CAP_PROP_POS_FRAMES)));
     path_to_folder.append(".tiff");
+
     QImageWriter writer(path_to_folder, "tiff");
     writer.write(img);
     std::cout << "export\n";
