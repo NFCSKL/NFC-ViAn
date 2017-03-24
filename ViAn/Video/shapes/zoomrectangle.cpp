@@ -11,7 +11,6 @@ zoomrectangle::zoomrectangle() : shape(QColor(0, 255, 0), QPoint(0, 0)) {
  * @param pos Starting point for the new object
  */
 zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(0, 255, 0), pos) {
-    current_zoom_rect = cv::Rect(0, 0, 0, 0);
 }
 
 /**
@@ -20,6 +19,47 @@ zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(0, 255, 0), pos) {
  */
 void zoomrectangle::set_start_pos(QPoint pos) {
     draw_start = pos;
+}
+
+/**
+ * @brief zoomrectangle::area_choosen
+ * Called when an area has been choosen. If it is a
+ * valid area it's stored as the current zoom level.
+ */
+void zoomrectangle::area_choosen() {
+    int width = draw_end.x() - draw_start.x();
+    int height = draw_end.y() - draw_start.y();
+
+    if (width < 10 || height < 10) {
+        return;
+    }
+
+    current_zoom_rect.x = draw_start.x();
+    current_zoom_rect.y = draw_start.y();
+    current_zoom_rect.width = width;
+    current_zoom_rect.height = height;
+}
+
+/**
+ * @brief zoomrectangle::get_zoom_area
+ * @return Returns the area choosen.
+ */
+cv::Rect zoomrectangle::get_zoom_area() {
+    return current_zoom_rect;
+}
+
+/**
+ * @brief zoomrectangle::set_zoom_area
+ * Sets the zoom area to the specified width and
+ * height, starting in (0,0).
+ * @param width
+ * @param height
+ */
+void  zoomrectangle::set_zoom_area(int width, int height) {
+    current_zoom_rect.x = 0;
+    current_zoom_rect.y = 0;
+    current_zoom_rect.width = width;
+    current_zoom_rect.height = height;
 }
 
 /**

@@ -14,10 +14,13 @@ public:
     zoomrectangle();
     zoomrectangle(QPoint pos);
     void set_start_pos(QPoint pos);
+    void area_choosen();
+    cv::Rect get_zoom_area();
+    void set_zoom_area(int width, int height);
     void draw(QImage &img) override;
     void handle_new_pos(QPoint pos);
 private:
-    cv::Rect current_zoom_rect = cv::Rect(0, 0, 0, 0);
+    cv::Rect current_zoom_rect = cv::Rect(0, 0, 1280, 720);
 };
 
 #endif // ZOOMRECTANGLE_H

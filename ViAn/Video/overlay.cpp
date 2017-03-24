@@ -8,7 +8,8 @@ overlay::overlay() {
 }
 
 cv::Mat overlay::draw_overlay(cv::Mat &frame) {
-    cv::Rect roi(400, 100, 600, 300);
+    //cv::Rect roi(400, 100, 600, 300);
+    cv::Rect roi = zoom_area->get_zoom_area();
 
     cv::Mat zoomed_frame;
     resize(frame(roi), zoomed_frame, frame.size());
@@ -98,6 +99,11 @@ SHAPES overlay::get_shape() {
  */
 void overlay::mouse_pressed(QPoint pos) {
     if (choosing_zoom_area) {
+
+        //TODO: This should not be done.
+        zoom_area->set_zoom_area(1280, 720);
+
+
         zoom_area->set_start_pos(pos);
         zoom_area->update_drawing_pos(pos);
         return;
@@ -133,7 +139,10 @@ void overlay::mouse_pressed(QPoint pos) {
  */
 void overlay::mouse_released(QPoint pos) {
     update_drawing_position(pos); // Needs to be done before resetting choosing_zoom_area.
-    choosing_zoom_area = false; // You can only choose a zoom area during one drag with the mouse.
+    if (choosing_zoom_area) {
+        zoom_area->area_choosen();
+        choosing_zoom_area = false; // You can only choose a zoom area during one drag with the mouse.
+    }
 }
 
 /**
