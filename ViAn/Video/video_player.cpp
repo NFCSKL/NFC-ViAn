@@ -98,29 +98,16 @@ void video_player::run()  {
 void video_player::show_frame() {
     emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
 
+    cv::Mat zoomed_frame;
+    zoomed_frame = video_overlay->draw_overlay(frame);
 
-
-    // Experimenting with the zoom functionality in OpenCV.
-    //cv::Rect roi(400, 100, 600, 300);
-    //cv::Mat part_frame = frame(roi);
-    /*if (true) {
-        cv::Mat color(part_frame.size(), CV_8UC3, cv::Scalar(0, 125, 125));
-        double alpha = 0.6;
-        cv::addWeighted(color, alpha, part_frame, 1.0 - alpha , 0.0, part_frame);
-    }*/
-
-    //cv::Mat zoomed_frame;
-    //resize(frame(roi),zoomed_frame,frame.size());
-
-
-
-    if (frame.channels()== 3) {
-        cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
+    if (zoomed_frame.channels() == 3) {
+        cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
                           RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
     } else {
-        img = QImage((const unsigned char*)(frame.data),
-                             frame.cols,frame.rows,QImage::Format_Indexed8);
+        img = QImage((const unsigned char*)(zoomed_frame.data),
+                             zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
     }
 
     video_overlay->draw_overlay(img);

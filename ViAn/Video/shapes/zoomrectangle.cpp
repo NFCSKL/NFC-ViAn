@@ -3,14 +3,15 @@
 /**
  * @brief zoomrectangle::zoomrectangle
  */
-zoomrectangle::zoomrectangle() : shape(QColor(0,255,0), QPoint(0,0)) {
+zoomrectangle::zoomrectangle() : shape(QColor(0, 255, 0), QPoint(0, 0)) {
 }
 
 /**
  * @brief zoomrectangle::zoomrectangle
  * @param pos Starting point for the new object
  */
-zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(0,255,0), pos) {
+zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(0, 255, 0), pos) {
+    current_zoom_rect = cv::Rect(0, 0, 0, 0);
 }
 
 /**
@@ -27,6 +28,14 @@ void zoomrectangle::set_start_pos(QPoint pos) {
  * @param img QImage to draw on
  */
 void zoomrectangle::draw(QImage &img) {
+
+    // Code for drawing with OpenCV library
+    /*cv::Rect roi(400, 100, 600, 300);
+    cv::Mat part_frame = frame(roi);
+    cv::Mat color(part_frame.size(), CV_8UC3, cv::Scalar(0, 125, 125));
+    double alpha = 0.6;
+    cv::addWeighted(color, alpha, part_frame, 1.0 - alpha , 0.0, part_frame);*/
+
     QPainter painter(&img);
     setup_paint_tool(painter);
     int width = draw_end.x() - draw_start.x();

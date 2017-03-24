@@ -7,6 +7,14 @@
 overlay::overlay() {
 }
 
+cv::Mat overlay::draw_overlay(cv::Mat &frame) {
+    cv::Rect roi(400, 100, 600, 300);
+
+    cv::Mat zoomed_frame;
+    resize(frame(roi), zoomed_frame, frame.size());
+    return zoomed_frame;
+}
+
 /**
  * @brief overlay::draw_overlay
  * Draws an overlay on top of the specified QImage.

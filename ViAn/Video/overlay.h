@@ -1,6 +1,12 @@
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/videoio/videoio.hpp"
+#include "opencv2/video/video.hpp"
+#include "opencv2/core/core.hpp"
+
 #include <QImage>
 #include <QColor>
 #include "shapes/shape.h"
@@ -19,6 +25,7 @@ public:
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
+    cv::Mat draw_overlay(cv::Mat &frame);
     void draw_overlay(QImage &img);
     void set_tool(SHAPES s);
     void set_colour(QColor col);
