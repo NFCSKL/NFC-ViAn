@@ -88,6 +88,8 @@ private slots:
 
     void on_actionClear_triggered();
 
+    void on_actionText_triggered();
+
 private:
 
     Ui::MainWindow *ui;
