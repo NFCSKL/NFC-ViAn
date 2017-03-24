@@ -104,6 +104,8 @@ private slots:
 
     void on_actionText_triggered();
 
+    void on_actionChoose_Workspace_triggered();
+
 private:
 
     Ui::MainWindow *ui;

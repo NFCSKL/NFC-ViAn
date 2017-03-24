@@ -460,7 +460,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::add_video() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),this->fileHandler->workSpace.c_str(),tr("*.avi;*.mkv;*.mov;*.mp4"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 /**
@@ -516,7 +516,7 @@ void MainWindow::on_actionSave_triggered()
  */
 void MainWindow::on_actionLoad_triggered()
 {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->workSpace.c_str(),tr("*.txt"));
     Project* loadProj= this->fileHandler->load_project(dir.toStdString());
     add_project_to_tree(loadProj);
     set_status_bar("Project " + loadProj->m_name + " loaded.");
@@ -550,4 +550,13 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
     MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath));
     videoInTree->setText(0, QString::fromStdString(filePath));
     project->addChild(videoInTree);
+}
+
+void MainWindow::on_actionChoose_Workspace_triggered()
+{
+    std::cout << this->fileHandler->workSpace << std::endl;
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->workSpace.c_str());
+    this->fileHandler->set_workspace(dir.toStdString() + "/");
+    std::cout << this->fileHandler->workSpace << std::endl;
+    set_status_bar("new wokspace set to " + this->fileHandler->workSpace);
 }
