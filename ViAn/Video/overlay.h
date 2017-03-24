@@ -17,9 +17,6 @@ public:
     overlay();
 
     bool is_showing_overlay();
-    void set_video_frame_size(int width, int height);
-    void set_window_frame_width(int width);
-    void set_window_frame_height(int height);
     void set_showing_overlay(bool value);
     void toggle_overlay();
     void draw_overlay(QImage &img, int frame_nr);
@@ -35,14 +32,11 @@ public:
 
 private:
     void update_drawing_position(QPoint pos, int frame_nr);
-    int video_frame_width, video_frame_height;
-    int window_frame_width, window_frame_height;
     bool show_overlay = false;
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
     QString current_string = "";
     std::map<int, QList<shape*>> overlays;
-    QList<shape*> drawings;
 };
 
 #endif // OVERLAY_H
