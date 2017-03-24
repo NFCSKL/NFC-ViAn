@@ -1,5 +1,6 @@
 #include "overlay.h"
 #include <iostream>
+#include <QInputDialog>
 
 /**
  * @brief overlay::overlay
@@ -48,10 +49,14 @@ void overlay::set_showing_overlay(bool value) {
 /**
  * @brief overlay::set_tool
  * Sets the overlay tool's shape.
+ * If the tool is the text-tool the user is prompted to wnter a text.
  * @param s
  */
 void overlay::set_tool(SHAPES s) {
     current_shape = s;
+    if (s == TEXT) {
+        current_string = QInputDialog::getText(NULL, "Text chooser", "Enter a text:");
+    }
 }
 
 /**
@@ -102,6 +107,9 @@ void overlay::mouse_pressed(QPoint pos) {
                 break;
             case PEN:
                 drawings.append(new pen(current_colour, pos));
+                break;
+            case TEXT:
+                drawings.append(new text(current_colour, pos, current_string));
                 break;
             default:
                 break;

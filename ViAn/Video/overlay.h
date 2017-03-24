@@ -9,6 +9,7 @@
 #include "shapes/line.h"
 #include "shapes/arrow.h"
 #include "shapes/pen.h"
+#include "shapes/text.h"
 
 class overlay {
 
@@ -35,6 +36,7 @@ private:
     bool show_overlay = false;
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
+    QString current_string = "";
     QList<shape*> drawings;
 };
 
