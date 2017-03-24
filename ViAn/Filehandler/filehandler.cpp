@@ -133,6 +133,7 @@ Project* FileHandler::load_project(std::string fullProjectPath){
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
+    add_project(std::make_pair(this->m_pid++, proj));
     ProjectStream projStream;
 
     proj->saved = true;
