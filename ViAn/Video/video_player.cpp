@@ -97,7 +97,16 @@ void video_player::run()  {
  */
 void video_player::show_frame() {
     emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
+    convert_frame();
+    emit processedImage(img);
+}
 
+/**
+ * @brief video_player::convert_frame
+ * Converts the current frame, including the overlay, to a QImage.
+ * @param frame The current frame in the video
+ */
+void video_player::convert_frame() {
     if (frame.channels()== 3) {
         cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
@@ -106,9 +115,7 @@ void video_player::show_frame() {
         img = QImage((const unsigned char*)(frame.data),
                              frame.cols,frame.rows,QImage::Format_Indexed8);
     }
-
     video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
-    emit processedImage(img);
 }
 
 /**
@@ -387,16 +394,7 @@ void video_player::scale_position(QPoint &pos) {
  * @param filename Path to the folder to store the file in.
  */
 void video_player::export_current_frame(QString path_to_folder) {
-    if (frame.channels()== 3) {
-        cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
-        img = QImage((const unsigned char*)(RGBframe.data),
-                          RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
-    } else {
-        img = QImage((const unsigned char*)(frame.data),
-                             frame.cols,frame.rows,QImage::Format_Indexed8);
-    }
-
-    video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
+    convert_frame();
 
     // Add "/FRAME_NR.tiff" to the path.
     path_to_folder.append("/");

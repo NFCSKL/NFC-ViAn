@@ -53,7 +53,6 @@ public:
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
-    void scale_position(QPoint &pos);
 
     friend class test_video_player;
 
@@ -74,6 +73,8 @@ private:
     void update_frame(int frame_nbr);
     void update_overlay();
     void show_frame();
+    void convert_frame();
+    void scale_position(QPoint &pos);
 
     cv::VideoCapture capture;
     cv::Mat frame;
