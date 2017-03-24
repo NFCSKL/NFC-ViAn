@@ -391,5 +391,4 @@ void video_player::export_current_frame(QString path_to_folder) {
 
     QImageWriter writer(path_to_folder, "tiff");
     writer.write(img);
-    std::cout << "export\n";
 }
