@@ -28,6 +28,8 @@ public:
     void mouse_moved(QPoint pos);
     void undo();
     void clear();
+    void zoom_in();
+    void zoom_out();
 
 private:
     void update_drawing_position(QPoint pos);

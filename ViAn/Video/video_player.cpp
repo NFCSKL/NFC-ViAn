@@ -98,13 +98,29 @@ void video_player::run()  {
 void video_player::show_frame() {
     emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
 
-    if (frame.channels()== 3) {
-        cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
+
+
+    // Experimenting with the zoom functionality in OpenCV.
+    //cv::Rect roi(400, 100, 600, 300);
+    //cv::Mat part_frame = frame(roi);
+    /*if (true) {
+        cv::Mat color(part_frame.size(), CV_8UC3, cv::Scalar(0, 125, 125));
+        double alpha = 0.6;
+        cv::addWeighted(color, alpha, part_frame, 1.0 - alpha , 0.0, part_frame);
+    }*/
+
+    //cv::Mat zoomed_frame;
+    //resize(frame(roi),zoomed_frame,frame.size());
+
+
+
+    if (zoomed_frame.channels()== 3) {
+        cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
                           RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
     } else {
-        img = QImage((const unsigned char*)(frame.data),
-                             frame.cols,frame.rows,QImage::Format_Indexed8);
+        img = QImage((const unsigned char*)(zoomed_frame.data),
+                             zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
     }
 
     video_overlay->draw_overlay(img);
@@ -315,6 +331,29 @@ void video_player::clear_overlay() {
     if (capture.isOpened()) {
         video_overlay->clear();
         update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::zoom_in
+ * Sets a state in the video overlay
+ * for the user to choose an area,
+ * if there is a video loaded.
+ */
+void video_player::zoom_in() {
+    if (capture.isOpened()) {
+        video_overlay->zoom_in();
+    }
+}
+
+/**
+ * @brief video_player::zoom_out
+ * Resets zoom level to the full video size,
+ * if there is a video loaded.
+ */
+void video_player::zoom_out() {
+    if (capture.isOpened()) {
+        video_overlay->zoom_out();
     }
 }
 

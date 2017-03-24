@@ -156,3 +156,20 @@ void overlay::undo() {
 void overlay::clear() {
     drawings.clear();
 }
+
+/**
+ * @brief overlay::zoom_in
+ * Sets a state in the video overlay
+ * for the user to choose an area.
+ */
+void overlay::zoom_in() {
+
+}
+
+/**
+ * @brief overlay::zoom_out
+ * Resets zoom level to the full video size.
+ */
+void overlay::zoom_out() {
+
+}

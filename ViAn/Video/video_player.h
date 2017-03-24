@@ -48,6 +48,8 @@ public:
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
+    void zoom_in();
+    void zoom_out();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
