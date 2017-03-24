@@ -39,9 +39,6 @@ bool video_player::load_video(string filename) {
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
         video_paused = false;
 
-        // The overlay need to know the size of the video.
-        video_overlay->set_video_frame_size(capture.get(CV_CAP_PROP_FRAME_WIDTH), capture.get(CV_CAP_PROP_FRAME_HEIGHT));
-
         start();
         return true;
     }
@@ -167,7 +164,6 @@ int video_player::get_num_frames() {
  */
 void video_player::set_frame_width(int new_value) {
     frame_width = new_value;
-    video_overlay->set_window_frame_width(new_value);
 }
 
 /**
@@ -176,7 +172,6 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
-    video_overlay->set_window_frame_height(new_value);
 }
 
 /**
@@ -329,10 +324,11 @@ void video_player::clear_overlay() {
  * Starts drawing on the overlay, if the overlay is visible
  * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
- * @param pos coordinate
+ * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_pressed(QPoint pos) {
     if (capture.isOpened() && is_paused()) {
+        scale_position(pos);
         video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
@@ -343,10 +339,11 @@ void video_player::video_mouse_pressed(QPoint pos) {
  * Ends drawing on the overlay, if the overlay is visible
  * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_released(QPoint pos) {
     if (capture.isOpened() && is_paused()) {
+        scale_position(pos);
         video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
@@ -357,11 +354,29 @@ void video_player::video_mouse_released(QPoint pos) {
  * Updates drawing on the overlay, if the overlay is visible
  * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_moved(QPoint pos) {
     if (capture.isOpened() && is_paused()) {
+        scale_position(pos);
         video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
+}
+
+/**
+ * @brief video_player::scale_position
+ * Recalculates the given mouse position from a position in the window
+ * the video is shown in to the position on the video frame.
+ * @param pos The position to be recalculated.
+ */
+void video_player::scale_position(QPoint &pos) {
+    int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    // Calculate the coordinates on the actual video frame from
+    // the coordinates in the window the video is playing in.
+    double scalex = (double) video_frame_width/frame_width;
+    double scaley = (double) video_frame_height/frame_height;
+    pos.setX(scalex*pos.x());
+    pos.setY(scaley*pos.y());
 }

@@ -51,6 +51,7 @@ public:
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
+    void scale_position(QPoint &pos);
 
     friend class test_video_player;
 

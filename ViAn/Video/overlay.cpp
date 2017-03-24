@@ -9,32 +9,6 @@ overlay::overlay() {
 }
 
 /**
- * @brief overlay::set_frame_size
- * @param width Width of the video.
- * @param height Height of the video.
- */
-void overlay::set_video_frame_size(int width, int height) {
-    video_frame_width = width;
-    video_frame_height = height;
-}
-
-/**
- * @brief overlay::set_window_frame_width
- * @param width Width of the window the video is playing in.
- */
-void overlay::set_window_frame_width(int width) {
-    window_frame_width = width;
-}
-
-/**
- * @brief overlay::set_window_frame_height
- * @param height Height of the window the video is playing in.
- */
-void overlay::set_window_frame_height(int height) {
-    window_frame_height = height;
-}
-
-/**
  * @brief overlay::draw_overlay
  * Draws an overlay on top of the specified QImage.
  * @param img QImage to draw on
@@ -114,11 +88,10 @@ SHAPES overlay::get_shape() {
  * @brief overlay::mouse_pressed
  * Creates a drawing shape with the prechoosen colour
  * and shape, if the overlay is visible.
- * @param pos coordinates
+ * @param pos Mouse coordinates on the frame.
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
-        scale_position(pos);
         switch (current_shape) {
             case RECTANGLE:
                 overlays[frame_nr].append(new rectangle(current_colour, pos));
@@ -148,7 +121,7 @@ void overlay::mouse_pressed(QPoint pos, int frame_nr) {
  * @brief overlay::mouse_pressed
  * Ends drawing on the overlay when the mouse is
  * released, if the overlay is visible.
- * @param pos coordinates
+ * @param pos Mouse coordinates on the frame.
  */
 void overlay::mouse_released(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr);
@@ -158,7 +131,7 @@ void overlay::mouse_released(QPoint pos, int frame_nr) {
  * @brief overlay::mouse_moved
  * Updates drawing on the overlay when the mouse is
  * moved, if the overlay is visible.
- * @param pos coordinates
+ * @param pos Mouse coordinates on the frame.
  */
 void overlay::mouse_moved(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr);
@@ -167,23 +140,13 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
 /**
  * @brief overlay::update_drawing_position
  * Updates the position of the end point of the shape currently being drawn
- * @param pos
+ * @param pos Mouse coordinates on the frame.
  */
 void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
-        scale_position(pos);
         // The last appended shape is the one we're currently drawing.
         overlays[frame_nr].last()->update_drawing_pos(pos);
     }
-}
-
-void overlay::scale_position(QPoint &pos) {
-    // Calculate the coordinates on the actual video frame
-    // from the coordinates in the window the video is playing in
-    double scalex = (double) video_frame_width/window_frame_width;
-    double scaley = (double) video_frame_height/window_frame_height;
-    pos.setX(scalex*pos.x());
-    pos.setY(scaley*pos.y());
 }
 
 /**
