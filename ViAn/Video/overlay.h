@@ -32,6 +32,7 @@ public:
 
 private:
     void update_drawing_position(QPoint pos, int frame_nr);
+
     bool show_overlay = false;
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
