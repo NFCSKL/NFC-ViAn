@@ -2,10 +2,15 @@
 
 /**
  * @brief zoomrectangle::zoomrectangle
- * @param col Colour of the new object
+ */
+zoomrectangle::zoomrectangle() : shape(QColor(0,255,0), QPoint(0,0)) {
+}
+
+/**
+ * @brief zoomrectangle::zoomrectangle
  * @param pos Starting point for the new object
  */
-zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(255,0,0), pos) {
+zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(0,255,0), pos) {
 }
 
 /**
@@ -24,18 +29,11 @@ void zoomrectangle::set_start_pos(QPoint pos) {
 void zoomrectangle::draw(QImage &img) {
     QPainter painter(&img);
     setup_paint_tool(painter);
-
     int width = draw_end.x() - draw_start.x();
     int height = draw_end.y() - draw_start.y();
+    painter.setOpacity(0.5);
+    painter.fillRect(draw_start.x(), draw_start.y(), width, height, QColor(100,100,100));
     painter.drawRect(draw_start.x(), draw_start.y(), width, height);
-
-    QPen pen;
-    pen.setWidth(1);
-    pen.setColor(QColor(100,100,100));
-    painter.setPen(pen);
-    painter.setOpacity(0.2);
-    painter.drawRect(draw_start.x(), draw_start.y(), width, height);
-
     painter.end();
 }
 

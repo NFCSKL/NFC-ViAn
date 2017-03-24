@@ -18,6 +18,9 @@ void overlay::draw_overlay(QImage &img) {
             s->draw(img);
         }
     }
+    if (choosing_zoom_area) {
+        zoom_area->draw(img);
+    }
 }
 
 /**
@@ -86,6 +89,11 @@ SHAPES overlay::get_shape() {
  * @param pos coordinates
  */
 void overlay::mouse_pressed(QPoint pos) {
+    if (choosing_zoom_area) {
+        zoom_area->set_start_pos(pos);
+        zoom_area->update_drawing_pos(pos);
+        return;
+    }
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
@@ -116,7 +124,8 @@ void overlay::mouse_pressed(QPoint pos) {
  * @param pos coordinates
  */
 void overlay::mouse_released(QPoint pos) {
-    update_drawing_position(pos);
+    update_drawing_position(pos); // Needs to be done before resetting choosing_zoom_area.
+    choosing_zoom_area = false; // You can only choose a zoom area during one drag with the mouse.
 }
 
 /**
@@ -135,6 +144,10 @@ void overlay::mouse_moved(QPoint pos) {
  * @param pos
  */
 void overlay::update_drawing_position(QPoint pos) {
+    if (choosing_zoom_area) {
+        zoom_area->update_drawing_pos(pos);
+        return; // While choosing zoom area the regular drawings should not be affected.
+    }
     if (show_overlay) {
         // The last appended shape is the one we're currently drawing.
         drawings.last()->update_drawing_pos(pos);
@@ -163,7 +176,7 @@ void overlay::clear() {
  * for the user to choose an area.
  */
 void overlay::zoom_in() {
-
+    choosing_zoom_area = true;
 }
 
 /**

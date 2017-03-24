@@ -5,6 +5,7 @@
 
 class zoomrectangle : public shape {
 public:
+    zoomrectangle();
     zoomrectangle(QPoint pos);
     void set_start_pos(QPoint pos);
     void draw(QImage &img) override;

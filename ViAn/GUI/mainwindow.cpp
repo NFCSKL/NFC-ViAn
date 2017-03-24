@@ -402,6 +402,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
             return true;
         } else if (event->type() == QEvent::MouseMove) {
             mvideo_player->video_mouse_moved(pos);
+
             return true;
         }
     }
@@ -414,7 +415,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
  * for the user to choose an area.
  */
 void MainWindow::on_actionZoom_in_triggered() {
-
+    mvideo_player->zoom_in();
+    set_status_bar("Zoom in. Coose your area.");
 }
 
 /**
@@ -422,5 +424,6 @@ void MainWindow::on_actionZoom_in_triggered() {
  * Zoom out, will reset zoom level to the full video size.
  */
 void MainWindow::on_actionZoom_out_triggered() {
-
+    mvideo_player->zoom_out();
+    set_status_bar("Zoom out.");
 }

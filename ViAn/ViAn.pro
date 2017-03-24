@@ -16,8 +16,7 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    Video/shapes/zoomrectangle.cpp
+SOURCES += main.cpp
 
 #
 # TEST
@@ -27,8 +26,7 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h \
-    Video/shapes/zoomrectangle.h
+    Test/test_mainwindow.h
 
 #
 # GUI
@@ -61,7 +59,8 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/line.cpp \
-    Video/shapes/pen.cpp
+    Video/shapes/pen.cpp \
+    Video/shapes/zoomrectangle.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/shapes/shape.h \
@@ -69,7 +68,8 @@ HEADERS += Video/video_player.h \
     Video/shapes/circle.h \
     Video/shapes/arrow.h \
     Video/shapes/line.h \
-    Video/shapes/pen.h
+    Video/shapes/pen.h \
+    Video/shapes/zoomrectangle.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll

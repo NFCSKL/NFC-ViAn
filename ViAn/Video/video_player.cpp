@@ -114,13 +114,13 @@ void video_player::show_frame() {
 
 
 
-    if (zoomed_frame.channels()== 3) {
-        cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
+    if (frame.channels()== 3) {
+        cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
                           RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
     } else {
-        img = QImage((const unsigned char*)(zoomed_frame.data),
-                             zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
+        img = QImage((const unsigned char*)(frame.data),
+                             frame.cols,frame.rows,QImage::Format_Indexed8);
     }
 
     video_overlay->draw_overlay(img);

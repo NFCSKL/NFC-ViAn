@@ -9,6 +9,7 @@
 #include "shapes/line.h"
 #include "shapes/arrow.h"
 #include "shapes/pen.h"
+#include "shapes/zoomrectangle.h"
 
 class overlay {
 
@@ -35,9 +36,13 @@ private:
     void update_drawing_position(QPoint pos);
 
     bool show_overlay = false;
+    bool choosing_zoom_area = false;
+
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
     QList<shape*> drawings;
+
+    zoomrectangle* zoom_area = new zoomrectangle();
 };
 
 #endif // OVERLAY_H
