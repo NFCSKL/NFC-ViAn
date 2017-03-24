@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QImage>
+#include <QImageWriter>
 #include <QWaitCondition>
 #include "overlay.h"
 #include "shapes/shape.h"
@@ -27,7 +28,8 @@ public:
     bool is_paused();
     bool is_stopped();
     bool is_showing_overlay();
-    
+    void export_current_frame(QString path_to_folder);
+
     int get_num_frames();    
     void play_pause();
     void stop_video();
@@ -73,6 +75,8 @@ private:
     void update_frame(int frame_nbr);
     void update_overlay();
     void show_frame();
+    void convert_frame();
+    void scale_position(QPoint &pos);
 
     cv::VideoCapture capture;
     cv::Mat frame;
