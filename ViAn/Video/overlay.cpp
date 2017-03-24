@@ -140,3 +140,19 @@ void overlay::update_drawing_position(QPoint pos) {
         drawings.last()->update_drawing_pos(pos);
     }
 }
+
+/**
+ * @brief overlay::undo
+ * Undo the drawings on the overlay.
+ */
+void overlay::undo() {
+    drawings.takeLast();
+}
+
+/**
+ * @brief overlay::clear
+ * Clear the drawings on the overlay.
+ */
+void overlay::clear() {
+    drawings.clear();
+}

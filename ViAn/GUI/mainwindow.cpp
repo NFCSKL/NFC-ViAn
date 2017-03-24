@@ -360,6 +360,24 @@ void MainWindow::on_actionPen_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_actionUndo_triggered
+ * Undo the drawings on the overlay.
+ */
+void MainWindow::on_actionUndo_triggered() {
+    mvideo_player->undo_overlay();
+    set_status_bar("Undo drawing.");
+}
+
+/**
+ * @brief MainWindow::on_actionClear_triggered
+ * Clear the drawings on the overlay.
+ */
+void MainWindow::on_actionClear_triggered() {
+    mvideo_player->clear_overlay();
+    set_status_bar("Cleared drawings.");
+}
+
+/**
  * @brief MainWindow::eventFilter
  * Listener function for all eventFilters MainWindow has installed.
  * @param obj the object invoking the event

@@ -18,7 +18,8 @@
 using namespace std;
 
 
-class video_player : public QThread { Q_OBJECT
+class video_player : public QThread {
+    Q_OBJECT
 public:
     video_player(QObject* parent = 0);
     ~video_player();
@@ -45,6 +46,8 @@ public:
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
+    void undo_overlay();
+    void clear_overlay();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
