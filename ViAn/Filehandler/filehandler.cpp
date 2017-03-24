@@ -9,8 +9,26 @@ FileHandler::FileHandler()
     this->m_fid = 0;
     this->m_did = 0;
     this->lastError = 0;
+    #ifdef _WIN32
+        this->workSpace = "C:/";
+    #elif __APPLE__
+        this->workSpace = "/Applications/";
+    #elif __unix__
+        this->workSpace = "~/";
+    #endif
+
+    ID id = add_file("ViAn_config.txt");
+
+
 
 }
+
+void FileHandler::set_workspace(std::string newWorkSpace){
+    this->workSpace = newWorkSpace;
+
+    write_file(0, buf);
+}
+
 /**
  * @brief FileHandler::create_project
  * creates project and associated files.
@@ -64,7 +82,7 @@ void FileHandler::save_project(ID id){
 void FileHandler::save_project(Project* proj){
     std::string projFile = proj->m_name + std::string(".txt"); //filename
     if(!proj->saved){
-        ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
+        ID dirID = create_directory(std::string(workSpace) + proj->m_name);//project directory
 
         proj->files->dir = dirID;
 
@@ -251,7 +269,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   *  @return voi
   */
  void FileHandler::read_file(ID id,  std::string& buf, int linesToRead){
-     std::ifstream f(this->get_file(id));
+     std::ifstream f(this->get_file(id), std::ios::in);
      std::string temp;
      if(f.is_open()){
          while(linesToRead-- && std::getline(f, temp)){
@@ -338,4 +356,3 @@ ID FileHandler::add_dir(std::string dirpath){
     this->dirMapLock.unlock();
     return this->m_did++;
  }
-
