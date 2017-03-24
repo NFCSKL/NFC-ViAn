@@ -23,7 +23,6 @@ Video::Video(ID id, std::string filepath){
  * @return UNFINISHED
  */
 std::stringstream& operator>>(std::stringstream& is, Video& vid){    
-    is >> vid.id;
     is >> vid.filepath;  
     return is;
 }
@@ -34,7 +33,7 @@ std::stringstream& operator>>(std::stringstream& is, Video& vid){
  * @return used for writing project to file
  */
 std::stringstream& operator<<(std::stringstream& os, const Video& vid){
-    os << vid.id << " " << vid.filepath << " ";
+    os << vid.filepath << " ";
     return os;
 }
 /**
@@ -44,6 +43,5 @@ std::stringstream& operator<<(std::stringstream& os, const Video& vid){
  * @return if videos the same TRUE
  */
 bool operator==(Video v1, Video v2){
-    return v1.id == v2.id &&
-           v1.filepath == v2.filepath;
+    return v1.filepath == v2.filepath;
 }
