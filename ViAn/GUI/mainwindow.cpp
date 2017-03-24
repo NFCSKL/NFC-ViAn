@@ -22,6 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
+
+    selectedProject = nullptr;
+
     video_slider = findChild<QSlider*>("videoSlider");
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
@@ -263,7 +266,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
             int id = fileHandler->create_project(input)->m_id;
             MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, qInput, id);
             projectInTree->setText(0, qInput);
-            selectedProject = projectInTree;
+            set_selected_project(projectInTree);
             ui->ProjectTree->addTopLevelItem(projectInTree);
             set_status_bar("Project " + input + " created.");
             delete inputWindow;
@@ -292,8 +295,8 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
  * @param column the column in the tree
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-    MyQTreeWidgetItem *newitem = (MyQTreeWidgetItem*)item;
-    std::cout << newitem->id << std::endl;
+    MyQTreeWidgetItem *newItem = (MyQTreeWidgetItem*)item;
+    if (newItem->type == TYPE::PROJECT) set_selected_project(newItem);
 }
 
  /** @brief MainWindow::on_actionShow_hide_overview_triggered
@@ -411,7 +414,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     if(item == nullptr) {
 
     } else if(item->type == TYPE::PROJECT) {
-        selectedProject = item;
+        set_selected_project(item);
         QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
         addVideo->setStatusTip(tr("Add video"));
         menu.addAction(addVideo);
@@ -456,16 +459,11 @@ void MainWindow::play_video() {
  * @param newSelectedProject
  */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
-    /*if(selectedProject) {
-        std::cout << "1" << std::endl;
+    if(selectedProject == nullptr) {
         selectedProject = newSelectedProject;
-        std::cout << "2" << std::endl;
         QString string = selectedProject->text(0);
-        std::cout << "3" << std::endl;
         string.append(" <--");
-        std::cout << "4" << std::endl;
         selectedProject->setText(0, string);
-        std::cout << "5" << std::endl;
     } else if (selectedProject != newSelectedProject) {
         QString string = selectedProject->text(0);
         string.chop(4);
@@ -474,10 +472,11 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         string = selectedProject->text(0);
         string.append(" <--");
         selectedProject->setText(0, string);
-    }*/
-    selectedProject = newSelectedProject;
+    }
 }
-
+/**
+ * @brief MainWindow::on_actionSave_triggered
+ */
 void MainWindow::on_actionSave_triggered()
 {
 }
