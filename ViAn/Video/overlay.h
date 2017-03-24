@@ -30,6 +30,7 @@ public:
     void mouse_pressed(QPoint pos, int frame_nr);
     void mouse_released(QPoint pos, int frame_nr);
     void mouse_moved(QPoint pos, int frame_nr);
+    void scale_position(QPoint &pos);
     void undo(int frame_nr);
     void clear(int frame_nr);
 

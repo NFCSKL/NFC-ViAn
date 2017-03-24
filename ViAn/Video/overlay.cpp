@@ -118,12 +118,7 @@ SHAPES overlay::get_shape() {
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
-        // Calculate the coordinates on the actual video frame
-        // from the coordinates in the window the video is playing in
-        double scalex = (double) video_frame_width/window_frame_width;
-        double scaley = (double) video_frame_height/window_frame_height;
-        pos.setX(scalex*pos.x());
-        pos.setY(scaley*pos.y());
+        scale_position(pos);
         switch (current_shape) {
             case RECTANGLE:
                 overlays[frame_nr].append(new rectangle(current_colour, pos));
@@ -176,15 +171,19 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
  */
 void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
-        // Calculate the coordinates on the actual video frame
-        // from the coordinates in the window the video is playing in
-        double scalex = (double) video_frame_width/window_frame_width;
-        double scaley = (double) video_frame_height/window_frame_height;
-        pos.setX(scalex*pos.x());
-        pos.setY(scaley*pos.y());
+        scale_position(pos);
         // The last appended shape is the one we're currently drawing.
         overlays[frame_nr].last()->update_drawing_pos(pos);
     }
+}
+
+void overlay::scale_position(QPoint &pos) {
+    // Calculate the coordinates on the actual video frame
+    // from the coordinates in the window the video is playing in
+    double scalex = (double) video_frame_width/window_frame_width;
+    double scaley = (double) video_frame_height/window_frame_height;
+    pos.setX(scalex*pos.x());
+    pos.setY(scaley*pos.y());
 }
 
 /**
