@@ -109,7 +109,19 @@ void FileHandler::load_proj_files(std::string str){
         add_file(id, filepath);
     }
 }
-
+/**
+ * @brief FileHandler::load_project
+ * @param dirpath
+ * @return
+ */
+Project* FileHandler::load_project(std::string fullProjectPath){
+    std::string reverse (fullProjectPath.rbegin(), fullProjectPath.rend());
+    std::string emaNjorp = reverse.substr(0, reverse.find("/"));
+    std::string projName (emaNjorp.rbegin(), emaNjorp.rend());
+    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find("/" + projName));
+    projName = projName.substr(0, projName.find(".txt"));
+    return load_project(projName, dirpath);
+}
 /**
  * @todo UNFINISHED, does not load files back into file system during load.
  * the project however is stored and retrieved correctly.
@@ -123,7 +135,7 @@ void FileHandler::load_proj_files(std::string str){
  * dirpath should specify
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
-    Project* proj = new Project();    
+    Project* proj = new Project();
     proj->saved = true;
     std::ifstream f(dirpath + "/" + projname + ".txt");
     std::string filename;

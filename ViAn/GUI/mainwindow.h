@@ -100,6 +100,8 @@ private slots:
 
     void on_actionClear_triggered();
 
+    void on_actionLoad_triggered();
+
 private:
 
     Ui::MainWindow *ui;
