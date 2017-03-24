@@ -19,7 +19,7 @@ void text::draw(QImage &img) {
     setup_paint_tool(painter);
 
     QFont font = painter.font() ;
-    font.setPointSize(24);
+    font.setPointSize(FONT_SIZE);
     painter.setFont(font);
 
     painter.drawText(draw_end.x(), draw_end.y(), string);
