@@ -9,6 +9,7 @@ public:
     void draw(QImage &img) override;
     void handle_new_pos(QPoint pos);
 private:
+    const int FONT_SIZE = 24;
     QString string;
 };
 

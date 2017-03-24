@@ -12,6 +12,7 @@ overlay::overlay() {
  * @brief overlay::draw_overlay
  * Draws an overlay on top of the specified QImage.
  * @param img QImage to draw on
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::draw_overlay(QImage &img, int frame_nr) {
     if (show_overlay) {
@@ -89,6 +90,7 @@ SHAPES overlay::get_shape() {
  * Creates a drawing shape with the prechoosen colour
  * and shape, if the overlay is visible.
  * @param pos Mouse coordinates on the frame.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
@@ -118,10 +120,11 @@ void overlay::mouse_pressed(QPoint pos, int frame_nr) {
 }
 
 /**
- * @brief overlay::mouse_pressed
+ * @brief overlay::mouse_released
  * Ends drawing on the overlay when the mouse is
  * released, if the overlay is visible.
  * @param pos Mouse coordinates on the frame.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_released(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr);
@@ -132,6 +135,7 @@ void overlay::mouse_released(QPoint pos, int frame_nr) {
  * Updates drawing on the overlay when the mouse is
  * moved, if the overlay is visible.
  * @param pos Mouse coordinates on the frame.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_moved(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr);
@@ -141,6 +145,7 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @brief overlay::update_drawing_position
  * Updates the position of the end point of the shape currently being drawn
  * @param pos Mouse coordinates on the frame.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
@@ -152,6 +157,7 @@ void overlay::update_drawing_position(QPoint pos, int frame_nr) {
 /**
  * @brief overlay::undo
  * Undo the drawings on the overlay, if the overlay is visible.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::undo(int frame_nr) {
     if (show_overlay) {
@@ -165,6 +171,7 @@ void overlay::undo(int frame_nr) {
 /**
  * @brief overlay::clear
  * Clear the drawings on the overlay, if the overlay is visible.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::clear(int frame_nr) {
     if (show_overlay) {

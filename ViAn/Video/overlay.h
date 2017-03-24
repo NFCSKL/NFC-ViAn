@@ -37,7 +37,6 @@ private:
     QColor current_colour = Qt::red;
     QString current_string = "";
     std::map<int, QList<shape*>> overlays;
-    QList<shape*> drawings;
 };
 
 #endif // OVERLAY_H

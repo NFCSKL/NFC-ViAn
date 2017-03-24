@@ -55,26 +55,25 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @return void
  */
 void FileHandler::save_project(Project* proj){
-    std::string fileName = proj->m_name + std::string(".txt"); //filename
-    ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
+    std::string projFile = proj->m_name + std::string(".txt"); //filename
+    if(!proj->saved){
+        ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
 
-    proj->files->dir = dirID;
+        proj->files->dir = dirID;
 
-    proj->files->f_proj = create_file(fileName, dirID); //create project file
+        proj->files->f_proj = create_file(projFile, dirID); //create project file
+
+        std::string vidFile = proj->m_name + "_videos.txt";
+        proj->files->f_videos = create_file(vidFile, dirID); //create video file
 
 
-    fileName = proj->m_name + "_videos.txt";
-    proj->files->f_videos = create_file(fileName, dirID); //create video file
-    write_file(proj->files->f_proj, fileName);
+        std::string analysisFile = proj->m_name + "_analyses.txt";
+        proj->files->f_analysis = create_file(analysisFile, dirID); //create analysis file
 
-    fileName = proj->m_name + "_analyses.txt";
-    proj->files->f_analysis = create_file(fileName, dirID); //create analysis file
-    write_file(proj->files->f_proj, fileName);
 
-    fileName = proj->m_name + "_drawings.txt";
-    proj->files->f_drawings =create_file(fileName, dirID); //create drawings file
-    write_file(proj->files->f_proj, fileName);
-
+        std::string drawingFile = proj->m_name + "_drawings.txt";
+        proj->files->f_drawings =create_file(drawingFile, dirID); //create drawings file
+    }
     update_proj_files(proj);
 
 }
@@ -87,10 +86,21 @@ void FileHandler::save_project(Project* proj){
  * @return void
  */
 void FileHandler::update_proj_files(Project* proj){
-    std::string filePath = std::string(WORKSPACE) + "/" + proj->m_name + "/" + proj->m_name + std::string("_videos.txt");
+    std::string filePath = std::string(WORKSPACE) + "/" + proj->m_name + "/" + proj->m_name + std::string("_videos.txt");    
+    ProjectStream ps;
+    ps << *proj;
+    write_file(proj->files->f_proj, ps.projFile.str());
+    write_file(proj->files->f_videos, ps.videos.str());
+}
+void FileHandler::load_proj_files(std::string str){
+    ID id;
+    std::string filepath;
     std::stringstream sstr;
-    sstr << *proj;
-    write_file(proj->files->f_videos, sstr.str());
+    sstr << str;    
+    //read files until empty
+    while(sstr >> id >> filepath){
+        add_file(id, filepath);
+    }
 }
 
 /**
@@ -106,22 +116,34 @@ void FileHandler::update_proj_files(Project* proj){
  * dirpath should specify
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
-    Project* proj = new Project();
+    Project* proj = new Project();    
+    proj->saved = true;
     std::ifstream f(dirpath + "/" + projname + ".txt");
     std::string filename;
+    f >> proj->files->f_proj;
+    f >> filename;
     // First file is videofile
-    std::getline(f, filename);
-    proj->files->f_videos = add_file(dirpath + "/" +filename);
-    std::stringstream sstr;
+    f >> proj->files->f_videos;
+
+    add_file(proj->files->f_videos, dirpath + "/" +filename);
+    ProjectStream ps;
+
     std::string buf = "";
+    read_file(proj->files->f_proj, buf, 1);
+    ps.projFile << buf;
+    buf = "";
     read_file(proj->files->f_videos, buf, 1);
-    sstr << buf;
-    sstr >> *proj;
+    ps.videos << buf;
+
+    this->load_proj_files(ps.videos.str());
+
     // Second file is analysis
     // Third file is drawings
-    //addProjFiles(Project) // @ Load Project files back into filehandler
+    // @ Load Project files back into filehandler
+    ps >> *proj;
     return proj;
 }
+
 
 /**
  * @brief FileHandler::delete_project
@@ -142,7 +164,9 @@ FH_ERROR FileHandler::delete_project(Project* proj){
 /**
  * @todo make threadsafe
  * @brief FileHandler::add_video
- * @param Project*, std::string
+ * @param Project*,string filepath
+ *
+ * string
  * Add a video filepath to a given project.
  * Creates Video object which is accessed further by returned id.
  */
@@ -254,12 +278,20 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   * @return unique file identifier
   */
 ID FileHandler::add_file(std::string filepath){
-    std::pair<ID,std::string> pair = std::make_pair(this->m_fid, filepath);
+    add_file(this->m_fid, filepath);
+    return this->m_fid++;
+ }
+/**
+ * @brief FileHandler::add_file
+ * @param id
+ * @param filepath
+ */
+void FileHandler::add_file(ID id ,std::string filepath){
+    std::pair<ID,std::string> pair = std::make_pair(id, filepath);
     this->fileMapLock.lock();
     this->m_fileMap.insert(pair);
     this->fileMapLock.unlock();
-    return this->m_fid++;
- }
+}
  /**
   * @brief FileHandler::add_dir
   * @param std::string dirpath
