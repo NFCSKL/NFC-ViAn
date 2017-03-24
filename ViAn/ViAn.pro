@@ -17,6 +17,7 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
+    Video/shapes/zoomrectangle.cpp
 
 #
 # TEST
@@ -26,7 +27,8 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
+    Test/test_mainwindow.h \
+    Video/shapes/zoomrectangle.h
 
 #
 # GUI
