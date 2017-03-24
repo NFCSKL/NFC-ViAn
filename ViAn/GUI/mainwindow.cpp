@@ -22,6 +22,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
+
+    this->selectedProject = nullptr;
+    this->selectedVideo = nullptr;
+
     video_slider = findChild<QSlider*>("videoSlider");
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
@@ -435,7 +439,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::add_video() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;;*.mkv;;*.mov"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;;*.mkv;;*.mov;;*.mp4"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 /**
@@ -477,7 +481,18 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
     }*/
     selectedProject = newSelectedProject;
 }
-
+/**
+ * @brief MainWindow::on_actionSave_triggered
+ * saves project which is selected in tree view,
+ * checks if there is one
+ */
 void MainWindow::on_actionSave_triggered()
 {
+    if(selectedProject != nullptr) {
+        this->fileHandler->save_project(this->selectedProject->id);
+        std::string text = "Saved project " + this->selectedProject->name.toStdString();
+        set_status_bar(text);
+    } else {
+        set_status_bar("Nothing to save");
+    }
 }

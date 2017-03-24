@@ -37,8 +37,8 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-    MyQTreeWidgetItem *selectedProject;
-    MyQTreeWidgetItem *selectedVideo;
+    MyQTreeWidgetItem *selectedProject ;
+    MyQTreeWidgetItem *selectedVideo ;
 
 private slots:
 

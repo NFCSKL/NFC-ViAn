@@ -45,6 +45,13 @@ FH_ERROR FileHandler::delete_directory(ID id){
     FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
     return err;
 }
+/**
+ * @brief FileHandler::save_project
+ * @param id
+ */
+void FileHandler::save_project(ID id){
+    save_project(get_project(id));
+}
 
 /**
  * @todo unfinished, needs full project structure
