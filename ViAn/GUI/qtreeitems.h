@@ -16,6 +16,8 @@ public:
     int id;
     TYPE type;
     QString name;
+    void set_text(std::string text);
+    void set_text_from_filepath(std::string filepath);
 private slots:
 
 private:
