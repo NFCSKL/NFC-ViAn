@@ -124,7 +124,6 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     }
-
     mvideo_player->stop_video();
 }
 
@@ -426,9 +425,6 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         menu.addAction(loadVideo);
         connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
     }
-
-
-
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
