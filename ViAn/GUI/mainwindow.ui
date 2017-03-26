@@ -285,7 +285,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -435,7 +435,7 @@
   </action>
   <action name="actionDeleteProject">
    <property name="text">
-    <string>DeleteProject</string>
+    <string>Project</string>
    </property>
    <property name="toolTip">
     <string>DeleteProject</string>
@@ -443,7 +443,7 @@
   </action>
   <action name="actionDeleteVideo">
    <property name="text">
-    <string>DeleteVideo</string>
+    <string>Video</string>
    </property>
    <property name="toolTip">
     <string>DeleteVideo</string>
@@ -451,7 +451,7 @@
   </action>
   <action name="actionDeleteAnalys">
    <property name="text">
-    <string>DeleteAnalys</string>
+    <string>Analys</string>
    </property>
    <property name="toolTip">
     <string>DeleteAnalys</string>
@@ -459,7 +459,7 @@
   </action>
   <action name="actionDeleteRitning">
    <property name="text">
-    <string>DeleteRitning</string>
+    <string>Ritning</string>
    </property>
    <property name="toolTip">
     <string>DeleteRitning</string>
