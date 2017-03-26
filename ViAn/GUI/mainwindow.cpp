@@ -447,7 +447,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
         addVideo->setStatusTip(tr("Add video"));
         menu.addAction(addVideo);
-        connect(addVideo, SIGNAL(triggered()), this, SLOT(add_video()));
+        connect(addVideo, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
     } else if(item->type == TYPE::VIDEO) {
         set_selected_video(item);
         QAction *loadVideo = new QAction(QIcon(""), tr("&Play video"), this);
@@ -455,21 +455,20 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         menu.addAction(loadVideo);
         connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
     }
-
-
-
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
+
 /**
- * @brief MainWindow::add_video
+ * @brief MainWindow::on_actionAddVideo_triggered
  * Prompts user with file browser to add video
  * to selected project
  */
-void MainWindow::add_video() {
+void MainWindow::on_actionAddVideo_triggered() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
+
 /**
  * @brief MainWindow::play_video
  *  Loads selected video, flips playbutton to pause
@@ -483,8 +482,8 @@ void MainWindow::play_video() {
     mvideo_player->set_playback_frame(0);
 }
 /**
- * puts an arrow pointing at the selected project
  * @brief MainWindow::set_selected_project
+ * puts an arrow pointing at the selected project
  * @param newSelectedProject
  */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
@@ -531,8 +530,7 @@ void MainWindow::set_selected_video(MyQTreeWidgetItem *newSelectedVideo) {
  * saves project which is selected in tree view,
  * checks if there is one
  */
-void MainWindow::on_actionSave_triggered()
-{
+void MainWindow::on_actionSave_triggered() {
     if(selectedProject != nullptr) {
         this->fileHandler->save_project(this->selectedProject->id);
         std::string text = "Saved project " + this->selectedProject->name.toStdString();
@@ -544,8 +542,7 @@ void MainWindow::on_actionSave_triggered()
 /**
  * @brief MainWindow::on_actionLoad_triggered
  */
-void MainWindow::on_actionLoad_triggered()
-{
+void MainWindow::on_actionLoad_triggered() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
     Project* loadProj= this->fileHandler->load_project(dir.toStdString());
     add_project_to_tree(loadProj);
@@ -556,7 +553,7 @@ void MainWindow::on_actionLoad_triggered()
  * @param proj to add to tree
  * also adds all videos of the project to the tree
  */
-void MainWindow::add_project_to_tree(Project* proj){
+void MainWindow::add_project_to_tree(Project* proj) {
     MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
     projectInTree->setText(0, QString::fromStdString(proj->m_name));
     set_selected_project(projectInTree);
@@ -567,8 +564,6 @@ void MainWindow::add_project_to_tree(Project* proj){
         std::string treeName = filePath.str();
         add_video_to_tree(projectInTree, treeName);
     }
-
-
 }
 /**
  * @brief MainWindow::add_video_to_tree
@@ -578,7 +573,7 @@ void MainWindow::add_project_to_tree(Project* proj){
 void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath) {
     fileHandler->add_video(fileHandler->get_project(project->id), filePath);
     MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath));
-    videoInTree->setText(0, QString::fromStdString(filePath));
+    videoInTree->set_text_from_filepath(filePath);
     project->addChild(videoInTree);
     set_selected_video(videoInTree);
 }

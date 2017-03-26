@@ -88,8 +88,6 @@ private slots:
 
     void prepare_menu(const QPoint & pos);
 
-    void add_video();
-
     void play_video();
 
     void on_actionSave_triggered();
@@ -103,6 +101,8 @@ private slots:
     void on_actionLoad_triggered();
 
     void on_actionText_triggered();
+
+    void on_actionAddVideo_triggered();
 
 private:
 
