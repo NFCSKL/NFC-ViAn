@@ -25,8 +25,9 @@ MyQTreeWidgetItem::~MyQTreeWidgetItem() {
  */
 void MyQTreeWidgetItem::set_text(std::string text) {
     QString qText = QString::fromStdString(text);
-    if (qText.length() >= 30) {
-        qText.chop(qText.length()-30);
+    if (qText.length() >= TEXT_LENGHT) {
+        qText.chop(qText.length()-TEXT_LENGHT-2);
+        qText.append("...");
     }
     setText(0, qText);
 }
