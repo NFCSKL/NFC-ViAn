@@ -6,6 +6,7 @@
 #include <string>
 #include <QCloseEvent>
 #include <QSlider>
+#include <QFileDialog>
 #include "Video/video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -17,6 +18,7 @@
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
 #include "action.h"
+#include "qtreeitems.h"
 
 using namespace std;
 class inputwindow;
@@ -33,8 +35,10 @@ public:
     void set_status_bar(string status, int timer = 750);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void inputSwitchCase(ACTION action, QString qInput);
-    bool eventFilter(QObject *obj, QEvent *event);
+    void input_switch_case(ACTION action, QString qInput);
+    bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
+    MyQTreeWidgetItem *selectedProject;
+    MyQTreeWidgetItem *selectedVideo;
 
 private slots:
 
@@ -82,6 +86,14 @@ private slots:
 
     void on_actionLine_triggered();
 
+    void prepare_menu(const QPoint & pos);
+
+    void add_video();
+
+    void play_video();
+
+    void on_actionSave_triggered();
+
     void on_actionPen_triggered();
 
     void on_actionUndo_triggered();
@@ -100,6 +112,9 @@ private:
     QSlider *video_slider;
 
     FileHandler *fileHandler;
+
+    void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
+
 
 };
 

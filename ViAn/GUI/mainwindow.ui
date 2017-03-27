@@ -285,7 +285,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -302,10 +302,20 @@
      <addaction name="actionAddProject"/>
      <addaction name="actionAddVideo"/>
     </widget>
+    <widget class="QMenu" name="menuDelete">
+     <property name="title">
+      <string>Delete</string>
+     </property>
+     <addaction name="actionDeleteProject"/>
+     <addaction name="actionDeleteVideo"/>
+     <addaction name="actionDeleteAnalys"/>
+     <addaction name="actionDeleteRitning"/>
+    </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
+    <addaction name="menuDelete"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -421,6 +431,38 @@
   <action name="actionLine">
    <property name="text">
     <string>Line</string>
+   </property>
+  </action>
+  <action name="actionDeleteProject">
+   <property name="text">
+    <string>DeleteProject</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteProject</string>
+   </property>
+  </action>
+  <action name="actionDeleteVideo">
+   <property name="text">
+    <string>DeleteVideo</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteVideo</string>
+   </property>
+  </action>
+  <action name="actionDeleteAnalys">
+   <property name="text">
+    <string>DeleteAnalys</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteAnalys</string>
+   </property>
+  </action>
+  <action name="actionDeleteRitning">
+   <property name="text">
+    <string>DeleteRitning</string>
+   </property>
+   <property name="toolTip">
+    <string>DeleteRitning</string>
    </property>
   </action>
   <action name="actionPen">
