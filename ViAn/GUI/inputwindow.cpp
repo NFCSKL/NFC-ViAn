@@ -34,10 +34,10 @@ void inputwindow::on_okButton_clicked() {
     }
 }
 /**
- * @brief inputwindow::on_cancleButton_clicked
+ * @brief inputwindow::on_cancelButton_clicked
  * tells mainWindow that we dont want to do this
  */
-void inputwindow::on_cancleButton_clicked() {
+void inputwindow::on_cancelButton_clicked() {
     QString noText = "NoName";
     mainWindow->input_switch_case(CANCEL, noText);
 }
