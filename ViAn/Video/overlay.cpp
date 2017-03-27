@@ -12,10 +12,11 @@ overlay::overlay() {
  * @brief overlay::draw_overlay
  * Draws an overlay on top of the specified QImage.
  * @param img QImage to draw on
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::draw_overlay(QImage &img) {
+void overlay::draw_overlay(QImage &img, int frame_nr) {
     if (show_overlay) {
-        foreach (shape* s, drawings) {
+        foreach (shape* s, overlays[frame_nr]) {
             s->draw(img);
         }
     }
@@ -88,28 +89,29 @@ SHAPES overlay::get_shape() {
  * @brief overlay::mouse_pressed
  * Creates a drawing shape with the prechoosen colour
  * and shape, if the overlay is visible.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::mouse_pressed(QPoint pos) {
+void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
-                drawings.append(new rectangle(current_colour, pos));
+                overlays[frame_nr].append(new rectangle(current_colour, pos));
                 break;
             case CIRCLE:
-                drawings.append(new circle(current_colour, pos));
+                overlays[frame_nr].append(new circle(current_colour, pos));
                 break;
             case LINE:
-                drawings.append(new line(current_colour, pos));
+                overlays[frame_nr].append(new line(current_colour, pos));
                 break;
             case ARROW:
-                drawings.append(new arrow(current_colour, pos));
+                overlays[frame_nr].append(new arrow(current_colour, pos));
                 break;
             case PEN:
-                drawings.append(new pen(current_colour, pos));
+                overlays[frame_nr].append(new pen(current_colour, pos));
                 break;
             case TEXT:
-                drawings.append(new text(current_colour, pos, current_string));
+                overlays[frame_nr].append(new text(current_colour, pos, current_string));
                 break;
             default:
                 break;
@@ -118,49 +120,58 @@ void overlay::mouse_pressed(QPoint pos) {
 }
 
 /**
- * @brief overlay::mouse_pressed
+ * @brief overlay::mouse_released
  * Ends drawing on the overlay when the mouse is
  * released, if the overlay is visible.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::mouse_released(QPoint pos) {
-    update_drawing_position(pos);
+void overlay::mouse_released(QPoint pos, int frame_nr) {
+    update_drawing_position(pos, frame_nr);
 }
 
 /**
  * @brief overlay::mouse_moved
  * Updates drawing on the overlay when the mouse is
  * moved, if the overlay is visible.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::mouse_moved(QPoint pos) {
-    update_drawing_position(pos);
+void overlay::mouse_moved(QPoint pos, int frame_nr) {
+    update_drawing_position(pos, frame_nr);
 }
 
 /**
  * @brief overlay::update_drawing_position
  * Updates the position of the end point of the shape currently being drawn
- * @param pos
+ * @param pos Mouse coordinates.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::update_drawing_position(QPoint pos) {
+void overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
         // The last appended shape is the one we're currently drawing.
-        drawings.last()->update_drawing_pos(pos);
+        overlays[frame_nr].last()->update_drawing_pos(pos);
     }
 }
 
 /**
  * @brief overlay::undo
- * Undo the drawings on the overlay.
+ * Undo the drawings on the overlay, if the overlay is visible.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::undo() {
-    drawings.takeLast();
+void overlay::undo(int frame_nr) {
+    if (show_overlay && !overlays[frame_nr].isEmpty()) {
+        overlays[frame_nr].takeLast(); // Requires a non-empty list.
+    }
 }
 
 /**
  * @brief overlay::clear
- * Clear the drawings on the overlay.
+ * Clear the drawings on the overlay, if the overlay is visible.
+ * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::clear() {
-    drawings.clear();
+void overlay::clear(int frame_nr) {
+    if (show_overlay) {
+        overlays[frame_nr].clear();
+    }
 }
