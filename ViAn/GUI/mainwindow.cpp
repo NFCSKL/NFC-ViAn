@@ -69,6 +69,9 @@ MainWindow::~MainWindow() {
  */
 void MainWindow::set_shortcuts(){
     ui->actionExit->setShortcut(tr("Ctrl+e"));
+    ui->actionSave->setShortcut(tr("Ctrl+s"));
+    ui->actionAddProject->setShortcut(tr("Ctrl+Shift+p"));
+    ui->actionAddVideo->setShortcut(tr("Ctrl+Shift+p"));
 }
 
 /**
@@ -490,20 +493,7 @@ void MainWindow::play_video() {
  * @param newSelectedProject
  */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
-    if(selectedProject == nullptr) {
-        selectedProject = newSelectedProject;
-        QString string = selectedProject->text(0);
-        string.append(" <--");
-        selectedProject->setText(0, string);
-    } else if (selectedProject != newSelectedProject) {
-        QString string = selectedProject->text(0);
-        string.chop(4);
-        selectedProject->setText(0, string);
-        selectedProject = newSelectedProject;
-        string = selectedProject->text(0);
-        string.append(" <--");
-        selectedProject->setText(0, string);
-    }
+    set_selected(selectedProject, newSelectedProject);
 }
 
 /**
@@ -512,21 +502,30 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
  * @param newSelectedVideo
  */
 void MainWindow::set_selected_video(MyQTreeWidgetItem *newSelectedVideo) {
-    if(selectedVideo == nullptr) {
-        selectedVideo = newSelectedVideo;
-        QString string = selectedVideo->text(0);
-        string.append(" <--");
-        selectedVideo->setText(0, string);
-    } else if (selectedProject != newSelectedVideo) {
-        QString string = selectedVideo->text(0);
-        string.chop(4);
-        selectedVideo->setText(0, string);
-        selectedVideo = newSelectedVideo;
-        string = selectedVideo->text(0);
-        string.append(" <--");
-        selectedVideo->setText(0, string);
-    }
+    set_selected(selectedVideo, newSelectedVideo);
     set_selected_project((MyQTreeWidgetItem*)selectedVideo->parent());
+}
+
+/**
+ * @brief MainWindow::set_selected
+ * @param selected old
+ * @param new_selected
+ */
+void MainWindow::set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected) {
+    if(selected == nullptr) {
+        selected = new_selected;
+        QString string = selected->text(0);
+        string.append(" <--");
+        selected->setText(0, string);
+    } else if (selected != new_selected) {
+        QString string = selected->text(0);
+        string.chop(4);
+        selected->setText(0, string);
+        selected = new_selected;
+        string = selected->text(0);
+        string.append(" <--");
+        selected->setText(0, string);
+    }
 }
 
 /**
