@@ -431,7 +431,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 }
 
 /**
-<<<<<<< HEAD
  * @brief MainWindow::on_actionZoom_in_triggered
  * Zoom in, will set a state in the video overlay
  * for the user to choose an area.
@@ -448,7 +447,9 @@ void MainWindow::on_actionZoom_in_triggered() {
 void MainWindow::on_actionZoom_out_triggered() {
     mvideo_player->zoom_out();
     set_status_bar("Zoom out.");
-=======
+}
+
+/**
  * @brief MainWindow::prepare_menu
  * @param pos
  * Creates context menu on right-click in tree view
@@ -536,5 +537,4 @@ void MainWindow::on_actionSave_triggered() {
     } else {
         set_status_bar("Nothing to save");
     }
->>>>>>> origin/master
 }
