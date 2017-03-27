@@ -3,14 +3,14 @@
 /**
  * @brief FileHandler::FileHandler
  */
-FileHandler::FileHandler()
-{
+FileHandler::FileHandler() {
     this->m_pid = 0; // zero out counter ids
     this->m_fid = 0;
     this->m_did = 0;
     this->lastError = 0;
 
 }
+
 /**
  * @brief FileHandler::create_project
  * creates project and associated files.
@@ -24,6 +24,7 @@ Project* FileHandler::create_project(std::string projName){
     this->m_pid++;
     return proj;
 }
+
 /**
  * @brief FileHandler::create_directory
  * @param dirpath
@@ -45,6 +46,14 @@ FH_ERROR FileHandler::delete_directory(ID id){
     FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
     return err;
 }
+/**
+ * @brief FileHandler::save_project
+ * @param id
+ */
+void FileHandler::save_project(ID id){
+    save_project(get_project(id));
+}
+
 /**
  * @brief FileHandler::save_project
  * @param id
@@ -84,6 +93,7 @@ void FileHandler::save_project(Project* proj){
     update_proj_files(proj);
 
 }
+
 /**
  * @todo unfinished, will be released with parser
  * however, is needed for creating
@@ -110,6 +120,7 @@ void FileHandler::load_proj_files(std::string str){
         add_file(id, filepath);
     }
 }
+
 /**
  * @brief FileHandler::load_project
  * @param dirpath
@@ -123,6 +134,7 @@ Project* FileHandler::load_project(std::string fullProjectPath){
     projName = projName.substr(0, projName.find(".txt"));
     return load_project(projName, dirpath);
 }
+
 /**
  * @todo load analyses (in project <</>> operators)
  * @todo load drawings (in project <</>> operators)
@@ -135,7 +147,6 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
     proj->m_id = this->m_pid;
     add_project(std::make_pair(this->m_pid++, proj));
-
     ProjectStream projStream;
 
     proj->saved = true;
@@ -156,6 +167,14 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
     projStream >> *proj;
     return proj;
 }
+
+/**
+ * @brief FileHandler::load_project_file
+ * help function for load_project
+ * @param filePath
+ * @param projFileStream
+ * @return ID
+ */
 ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
     std::string buf;
     ID projFileID = add_file(filePath);
@@ -208,6 +227,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     f.open(filePath.c_str());
     return this->add_file(filePath);
   }
+
 /**
  * @todo make threadsafe
  * @brief FileHandler::delete_file
@@ -218,6 +238,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     std::string file = this->get_file(id);
     return std::remove(file.c_str());
  }
+
  /**
   * @todo make threadsafe
   * @brief FileHandler::write_file
@@ -259,6 +280,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
          }
      }
  }
+
  /**
   * @brief FileHandler::get_project
   * Getter
@@ -271,6 +293,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     this->projMapLock.unlock();
     return p;
  }
+
  /**
   * @brief FileHandler::get_file
   * Getter
@@ -283,6 +306,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     this->fileMapLock.unlock();
     return file;
  }
+
  /**
   * @brief FileHandler::get_dir
   * @param ID directory id
@@ -306,6 +330,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     this->projMapLock.unlock();
 
  }
+
  /**
   * @brief FileHandler::add_file
   * @param std::string filepath
@@ -315,6 +340,7 @@ ID FileHandler::add_file(std::string filepath){
     add_file(this->m_fid, filepath);
     return this->m_fid++;
  }
+
 /**
  * @brief FileHandler::add_file
  * @param id
@@ -326,6 +352,7 @@ void FileHandler::add_file(ID id ,std::string filepath){
     this->m_fileMap.insert(pair);
     this->fileMapLock.unlock();
 }
+
  /**
   * @brief FileHandler::add_dir
   * @param std::string dirpath

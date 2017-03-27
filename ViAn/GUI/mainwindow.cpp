@@ -105,7 +105,6 @@ void MainWindow::on_playPauseButton_clicked() {
     }
 }
 
-
 /**
  * @brief MainWindow::on_fastForwardButton_clicked
  * The button supposed to play the video faster
@@ -477,7 +476,6 @@ void MainWindow::play_video() {
 }
 
 /**
- * @todo To be implemented
  * @brief MainWindow::set_selected_project
  * @param newSelectedProject
  */
@@ -503,8 +501,7 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
  * saves project which is selected in tree view,
  * checks if there is one
  */
-void MainWindow::on_actionSave_triggered()
-{
+void MainWindow::on_actionSave_triggered() {
     if(selectedProject != nullptr) {
         this->fileHandler->save_project(this->selectedProject->id);
         std::string text = "Saved project " + this->selectedProject->name.toStdString();
