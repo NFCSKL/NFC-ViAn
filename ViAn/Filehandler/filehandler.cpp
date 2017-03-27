@@ -113,19 +113,20 @@ void FileHandler::load_proj_files(std::string str){
         add_file(id, filepath);
     }
 }
+
 /**
  * @brief FileHandler::load_project
  * @param dirpath
  * @return
  */
 Project* FileHandler::load_project(std::string fullProjectPath){
-    std::string reverse (fullProjectPath.rbegin(), fullProjectPath.rend());
-    std::string emaNjorp = reverse.substr(0, reverse.find("/"));
-    std::string projName (emaNjorp.rbegin(), emaNjorp.rend());
-    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find("/" + projName));
-    projName = projName.substr(0, projName.find(".txt"));
-    return load_project(projName, dirpath);
+    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
+    std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
+    proj_name = proj_name.substr(0, proj_name.find(".txt"));
+    std::cout << dirpath << "/" << proj_name << std::endl;
+    return load_project(proj_name, dirpath);
 }
+
 /**
  * @todo load analyses (in project <</>> operators)
  * @todo load drawings (in project <</>> operators)
@@ -138,7 +139,6 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
     proj->m_id = this->m_pid;
     add_project(std::make_pair(this->m_pid++, proj));
-
     ProjectStream projStream;
 
     proj->saved = true;

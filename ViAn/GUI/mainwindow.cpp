@@ -54,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
  * @brief MainWindow::~MainWindow
  * Destructor
  */
-
 MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
@@ -91,7 +90,6 @@ void MainWindow::set_status_bar(string status, int timer){
 void MainWindow::on_fastBackwardButton_clicked(){
 
 }
-
 
 /**
  * @brief MainWindow::on_playPauseButton_clicked
@@ -275,6 +273,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
         }
         case CANCEL: {
             set_status_bar("Cancel");
+            delete inputWindow;
             break;
         }
         case ADD_VIDEO: {
@@ -470,7 +469,8 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::on_actionAddVideo_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv;*.m4v"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
+                                               tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 
@@ -542,6 +542,7 @@ void MainWindow::on_actionSave_triggered() {
         set_status_bar("Nothing to save");
     }
 }
+
 /**
  * @brief MainWindow::on_actionLoad_triggered
  */
@@ -551,6 +552,7 @@ void MainWindow::on_actionLoad_triggered() {
     add_project_to_tree(loadProj);
     set_status_bar("Project " + loadProj->m_name + " loaded.");
 }
+
 /**
  * @brief MainWindow::add_project_to_tree
  * @param proj to add to tree
@@ -563,11 +565,12 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->ProjectTree->addTopLevelItem(projectInTree);
     for(Video *v: proj->m_videos) {
         std::stringstream filePath;
-         filePath << *v;
+        filePath << *v;
         std::string treeName = filePath.str();
         add_video_to_tree(projectInTree, treeName);
     }
 }
+
 /**
  * @brief MainWindow::add_video_to_tree
  * @param project to add videos to

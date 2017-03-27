@@ -15,6 +15,7 @@ inputwindow::inputwindow( MainWindow *mainWindow, ACTION action, QString infoTex
     this->mainWindow = mainWindow;
     this->action = action;
     ui->setupUi(this);
+    ui->infoLabel->setText(infoText);
 }
 /**
  * @brief inputwindow::~inputwindow
@@ -34,10 +35,10 @@ void inputwindow::on_okButton_clicked() {
     }
 }
 /**
- * @brief inputwindow::on_cancleButton_clicked
+ * @brief inputwindow::on_cancelButton_clicked
  * tells mainWindow that we dont want to do this
  */
-void inputwindow::on_cancleButton_clicked() {
+void inputwindow::on_cancelButton_clicked() {
     QString noText = "NoName";
     mainWindow->input_switch_case(CANCEL, noText);
 }
