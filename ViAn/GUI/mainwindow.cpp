@@ -455,21 +455,15 @@ void MainWindow::play_video() {
     mvideo_player->set_playback_frame(0);
 }
 /**
- * @todo To be implemented
  * @brief MainWindow::set_selected_project
  * @param newSelectedProject
  */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
-    /*if(selectedProject) {
-        std::cout << "1" << std::endl;
+    if(selectedProject) {
         selectedProject = newSelectedProject;
-        std::cout << "2" << std::endl;
         QString string = selectedProject->text(0);
-        std::cout << "3" << std::endl;
         string.append(" <--");
-        std::cout << "4" << std::endl;
         selectedProject->setText(0, string);
-        std::cout << "5" << std::endl;
     } else if (selectedProject != newSelectedProject) {
         QString string = selectedProject->text(0);
         string.chop(4);
@@ -478,8 +472,7 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         string = selectedProject->text(0);
         string.append(" <--");
         selectedProject->setText(0, string);
-    }*/
-    selectedProject = newSelectedProject;
+    }
 }
 /**
  * @brief MainWindow::on_actionSave_triggered
