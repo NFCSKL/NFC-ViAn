@@ -54,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
  * @brief MainWindow::~MainWindow
  * Destructor
  */
-
 MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
@@ -88,7 +87,6 @@ void MainWindow::set_status_bar(string status, int timer){
 void MainWindow::on_fastBackwardButton_clicked(){
 
 }
-
 
 /**
  * @brief MainWindow::on_playPauseButton_clicked
@@ -125,7 +123,6 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     }
-
     mvideo_player->stop_video();
 }
 
@@ -212,6 +209,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         }
     }
 }
+
 /**
  * @brief MainWindow::closeEvent
  * asks if you are sure you want to quit.
@@ -230,6 +228,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
         event->accept();
     }
 }
+
 /**
  * @brief MainWindow::on_actionExit_triggered
  * sends a closeEvent when you press exit
@@ -284,14 +283,15 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
 
     }
 }
+
 /**
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
  * @param column the column in the tree
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-    MyQTreeWidgetItem *newitem = (MyQTreeWidgetItem*)item;
-    std::cout << newitem->id << std::endl;
+    MyQTreeWidgetItem *newItem = (MyQTreeWidgetItem*)item;
+    if (newItem->type == TYPE::PROJECT) set_selected_project(newItem);
 }
 
  /** @brief MainWindow::on_actionShow_hide_overview_triggered
@@ -421,6 +421,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     }
     return false;
 }
+
 /**
  * @brief MainWindow::prepare_menu
  * @param pos
@@ -436,7 +437,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     if(item == nullptr) {
 
     } else if(item->type == TYPE::PROJECT) {
-        selectedProject = item;
+        set_selected_project(item);
         QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
         addVideo->setStatusTip(tr("Add video"));
         menu.addAction(addVideo);
@@ -448,21 +449,20 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         menu.addAction(loadVideo);
         connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
     }
-
-
-
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
+
 /**
  * @brief MainWindow::add_video
  * Prompts user with file browser to add video
  * to selected project
  */
 void MainWindow::add_video() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv;*.m4v"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
+
 /**
  * @brief MainWindow::play_video
  *  Loads selected video, flips playbutton to pause
@@ -475,6 +475,7 @@ void MainWindow::play_video() {
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(0);
 }
+
 /**
  * @todo To be implemented
  * @brief MainWindow::set_selected_project
@@ -496,6 +497,7 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         selectedProject->setText(0, string);
     }
 }
+
 /**
  * @brief MainWindow::on_actionSave_triggered
  * saves project which is selected in tree view,
@@ -511,6 +513,7 @@ void MainWindow::on_actionSave_triggered()
         set_status_bar("Nothing to save");
     }
 }
+
 /**
  * @brief MainWindow::on_actionLoad_triggered
  */
@@ -521,6 +524,7 @@ void MainWindow::on_actionLoad_triggered()
     add_project_to_tree(loadProj);
     set_status_bar("Project " + loadProj->m_name + " loaded.");
 }
+
 /**
  * @brief MainWindow::add_project_to_tree
  * @param proj to add to tree
@@ -540,6 +544,7 @@ void MainWindow::add_project_to_tree(Project* proj){
 
 
 }
+
 /**
  * @brief MainWindow::add_video_to_tree
  * @param project to add videos to
