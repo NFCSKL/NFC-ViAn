@@ -38,23 +38,27 @@ void zoomrectangle::area_choosen() {
     int width = draw_end.x() - draw_start.x();
     int height = draw_end.y() - draw_start.y();
 
-    std::cout <<"X: "<<newstartx<< "\n";
-    std::cout <<"Y: "<<newstarty<< "\n";
-    std::cout <<"W: "<<width<< "\n";
-    std::cout <<"H: "<<height<< "\n";
-    std::cout <<"W: "<<new_width<< "\n";
-    std::cout <<"H: "<<new_height<< "\n";
+
+
+    std::cout <<"Video Size:  "<<width_video<< " "<<height_video<< "\n";
+    std::cout <<"Mouse Start: "<<draw_start.x()<< " "<<draw_start.y()<< "\n";
+    std::cout <<"Mouse End:   "<<draw_end.x()<< " "<<draw_end.y()<< "\n";
+    std::cout <<"Mouse Size:  "<<width<< " "<<height<< "\n";
+    std::cout <<"Curnt Start: "<<current_zoom_rect.x<< " "<<current_zoom_rect.y<< "\n";
+    std::cout <<"Curnt Size:  "<<current_zoom_rect.width<< " "<<current_zoom_rect.height<< "\n";
+    std::cout <<"Calc  Start: "<<newstartx<< " "<<newstarty<< "\n";
+    std::cout <<"Calc  End:   "<<newendx<< " "<<newendy<< "\n";
+    std::cout <<"Calc  Size:  "<<new_width<< " "<<new_height<< "\n";
     std::cout << "\n";
 
     if (width < 10 || height < 10) {
-        std::cout<<"not zoomed\n";
         return;
     }
 
     current_zoom_rect.x = (int) newstartx;
     current_zoom_rect.y = (int) newstarty;
-    current_zoom_rect.width = width;
-    current_zoom_rect.height = height;
+    current_zoom_rect.width = new_width;
+    current_zoom_rect.height = new_height;
 }
 
 /**
@@ -84,6 +88,8 @@ void  zoomrectangle::reset_zoom_area() {
  * @param height Height of the area.
  */
 void  zoomrectangle::reset_zoom_area(int width, int height) {
+    width_video = width;
+    height_video = height;
     current_zoom_rect.x = 0;
     current_zoom_rect.y = 0;
     current_zoom_rect.width = width;
