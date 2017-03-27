@@ -125,7 +125,6 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     }
-
     mvideo_player->stop_video();
 }
 
@@ -267,7 +266,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
             int id = fileHandler->create_project(input)->m_id;
             MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, qInput, id);
             projectInTree->setText(0, qInput);
-            selectedProject = projectInTree;
+            set_selected_project(projectInTree);
             ui->ProjectTree->addTopLevelItem(projectInTree);
             set_status_bar("Project " + input + " created.");
             delete inputWindow;
@@ -296,8 +295,8 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
  * @param column the column in the tree
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-    MyQTreeWidgetItem *newitem = (MyQTreeWidgetItem*)item;
-    std::cout << newitem->id << std::endl;
+    MyQTreeWidgetItem *newItem = (MyQTreeWidgetItem*)item;
+    if (newItem->type == TYPE::PROJECT) set_selected_project(newItem);
 }
 
  /** @brief MainWindow::on_actionShow_hide_overview_triggered
@@ -371,6 +370,33 @@ void MainWindow::on_actionPen_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_actionText_triggered
+ * Selects the text for the overlay drawing tool.
+ */
+void MainWindow::on_actionText_triggered() {
+    mvideo_player->set_overlay_tool(TEXT);
+    set_status_bar("Tool: text.");
+}
+
+/**
+ * @brief MainWindow::on_actionUndo_triggered
+ * Undo the drawings on the overlay.
+ */
+void MainWindow::on_actionUndo_triggered() {
+    mvideo_player->undo_overlay();
+    set_status_bar("Undo drawing.");
+}
+
+/**
+ * @brief MainWindow::on_actionClear_triggered
+ * Clear the drawings on the overlay.
+ */
+void MainWindow::on_actionClear_triggered() {
+    mvideo_player->clear_overlay();
+    set_status_bar("Cleared drawings.");
+}
+
+/**
  * @brief MainWindow::eventFilter
  * Listener function for all eventFilters MainWindow has installed.
  * @param obj the object invoking the event
@@ -415,7 +441,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     if(item == nullptr) {
 
     } else if(item->type == TYPE::PROJECT) {
-        selectedProject = item;
+        set_selected_project(item);
         QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
         addVideo->setStatusTip(tr("Add video"));
         menu.addAction(addVideo);
@@ -427,9 +453,6 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         menu.addAction(loadVideo);
         connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
     }
-
-
-
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
@@ -439,7 +462,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::add_video() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;;*.mkv;;*.mov;;*.mp4"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv;*.m4v"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 /**
@@ -459,7 +482,7 @@ void MainWindow::play_video() {
  * @param newSelectedProject
  */
 void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
-    if(selectedProject) {
+    if(selectedProject == nullptr) {
         selectedProject = newSelectedProject;
         QString string = selectedProject->text(0);
         string.append(" <--");

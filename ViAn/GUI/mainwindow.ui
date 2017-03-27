@@ -348,9 +348,12 @@
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
      <addaction name="actionPen"/>
+     <addaction name="actionText"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
+    <addaction name="actionUndo"/>
+    <addaction name="actionClear"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -465,6 +468,21 @@
   <action name="actionPen">
    <property name="text">
     <string>Pen</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionText">
+   <property name="text">
+    <string>Text</string>
    </property>
   </action>
  </widget>

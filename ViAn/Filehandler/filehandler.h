@@ -60,6 +60,8 @@ public:
     void read_file(ID id,  std::string& buf, size_t linesToRead = -1);
 
 
+
+
     // thread safe read operations for maps
 
 
@@ -71,12 +73,16 @@ public:
     FH_ERROR lastError;
 
 private:
+
     void update_proj_files(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
     ID add_file(std::string filepath);
     void add_project(std::pair<ID,Project*> pair);
     ID add_dir(std::string dirpath);
 
+    void load_proj_files(std::string str);
+    //add used for loading project from file
+    void add_file(ID id ,std::string filepath);
     /**
      * @brief m_projects, m_fileMap, m_dirMap
      * map structures for keeping track of projects, files and directories.

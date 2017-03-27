@@ -295,9 +295,33 @@ void video_player::set_overlay_colour(QColor colour) {
 }
 
 /**
+ * @brief video_player::undo_overlay
+ * Undo the drawings on the overlay.
+ * If no video is loaded nothing happens.
+ */
+void video_player::undo_overlay() {
+    if (capture.isOpened()) {
+        video_overlay->undo();
+        update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::clear_overlay
+ * Clear the drawings on the overlay.
+ * If no video is loaded nothing happens.
+ */
+void video_player::clear_overlay() {
+    if (capture.isOpened()) {
+        video_overlay->clear();
+        update_overlay();
+    }
+}
+
+/**
  * @brief video_player::video_mouse_pressed
  * Starts drawing on the overlay, if visible, and if video is loaded.
- * If the video is paused, the frame the GUI is updated.
+ * If the video is paused, the frame in the GUI is updated.
  * @param pos coordinate
  */
 void video_player::video_mouse_pressed(QPoint pos) {
@@ -310,7 +334,7 @@ void video_player::video_mouse_pressed(QPoint pos) {
 /**
  * @brief video_player::video_mouse_released
  * Ends drawing on the overlay, if visible, and if video is loaded.
- * If the video is paused, the frame the GUI is updated.
+ * If the video is paused, the frame in the GUI is updated.
  * @param pos coordinates
  */
 void video_player::video_mouse_released(QPoint pos) {
@@ -323,7 +347,7 @@ void video_player::video_mouse_released(QPoint pos) {
 /**
  * @brief video_player::video_mouse_moved
  * Updates drawing on the overlay, if visible, and if video is loaded.
- * If the video is paused, the frame the GUI is updated.
+ * If the video is paused, the frame in the GUI is updated.
  * @param pos coordinates
  */
 void video_player::video_mouse_moved(QPoint pos) {
