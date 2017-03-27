@@ -86,11 +86,12 @@ void FileHandler::save_project(Project* proj){
  * @return void
  */
 void FileHandler::update_proj_files(Project* proj){
-    std::string filePath = std::string(WORKSPACE) + "/" + proj->m_name + "/" + proj->m_name + std::string("_videos.txt");    
     ProjectStream ps;
     ps << *proj;
-    write_file(proj->files->f_proj, ps.projFile.str());
-    write_file(proj->files->f_videos, ps.videos.str());
+    write_file(proj->files->f_proj, ps.projFile.str(), WRITE_OPTION::OVERWRITE);
+    write_file(proj->files->f_videos, ps.videos.str(), WRITE_OPTION::OVERWRITE);
+    write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
+    write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
 }
 void FileHandler::load_proj_files(std::string str){
     ID id;
@@ -104,46 +105,43 @@ void FileHandler::load_proj_files(std::string str){
 }
 
 /**
- * @todo UNFINISHED, does not load files back into file system during load.
- * the project however is stored and retrieved correctly.
- * @todo load analyses
- * @todo load drawings
- *
- * @brief FileHandler::loadProject
- * @param std::string, fileopath to project file
- * Load a project object from a given filepath
- * should specify location of project specific file
- * dirpath should specify
+ * @todo load analyses (in project <</>> operators)
+ * @todo load drawings (in project <</>> operators)
+ * @brief FileHandler::load_project
+ * @param projname
+ * @param dirpath
+ * @return project
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
-    Project* proj = new Project();    
+    Project* proj = new Project();
+    add_project(std::make_pair(this->m_pid++, proj));
+    ProjectStream projStream;
+
     proj->saved = true;
-    std::ifstream f(dirpath + "/" + projname + ".txt");
-    std::string filename;
-    f >> proj->files->f_proj;
-    f >> filename;
-    // First file is videofile
-    f >> proj->files->f_videos;
+//    Read project file
+    std::string projFilePath = dirpath + "/" + projname + ".txt";
+    proj->files->f_proj = load_project_file(projFilePath, projStream.projFile);
 
-    add_file(proj->files->f_videos, dirpath + "/" +filename);
-    ProjectStream ps;
-
-    std::string buf = "";
-    read_file(proj->files->f_proj, buf, 1);
-    ps.projFile << buf;
-    buf = "";
-    read_file(proj->files->f_videos, buf, 1);
-    ps.videos << buf;
-
-    this->load_proj_files(ps.videos.str());
-
-    // Second file is analysis
-    // Third file is drawings
-    // @ Load Project files back into filehandler
-    ps >> *proj;
+//    Read video file
+    std::string videoFilePath = dirpath + "/" + projname + "_videos.txt";
+    proj->files->f_videos = load_project_file(videoFilePath, projStream.videos);
+//    Read Analyzes
+    std::string analysesFilePath = dirpath + "/" + projname + "_analyses.txt";
+    proj->files->f_analysis = load_project_file(analysesFilePath, projStream.videos);
+//    Read Drawings
+    std::string drawingsFilePath = dirpath + "/" + projname + "_drawings.txt";
+    proj->files->f_drawings = load_project_file(drawingsFilePath, projStream.drawings);
+//    Read project from projstream
+    projStream >> *proj;
     return proj;
 }
-
+ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
+    std::string buf;
+    ID projFileID = add_file(filePath);
+    read_file(projFileID, buf);
+    projFileStream << buf; // Read project name
+    return projFileID;
+}
 
 /**
  * @brief FileHandler::delete_project
@@ -171,7 +169,7 @@ FH_ERROR FileHandler::delete_project(Project* proj){
  * Creates Video object which is accessed further by returned id.
  */
 void FileHandler::add_video(Project* proj, std::string filePath){
-    Video* v = new Video(this->m_fid, filePath);
+    Video* v = new Video(filePath);
     proj->add_video(v);
     this->add_file(filePath);
 }
@@ -206,10 +204,21 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   * @param ID file id, std::string text
   * @return void
   */
- void FileHandler::write_file(ID id, std::string text){
+ void FileHandler::write_file(ID id, std::string text, WRITE_OPTION opt){
     std::string fileName = this->get_file(id);
-    std::ofstream f (fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);
-    f << text.c_str() << std::endl;
+    std::ofstream f;
+    switch(opt){
+    case WRITE_OPTION::OVERWRITE:
+        f.open(fileName.c_str(), std::ios::in | std::ios::out);
+        break;
+    case WRITE_OPTION::APPEND:
+        f.open(fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);
+        break;
+    default:
+        return; // no open file
+        break;
+    }
+    if(f.is_open()) f << text.c_str() << std::endl;
  }
 
  /**
@@ -220,10 +229,14 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::read_file(ID id,  std::string& buf, size_t linesToRead){
+ void FileHandler::read_file(ID id,  std::string& buf, int linesToRead){
      std::ifstream f(this->get_file(id));
-     if(f.is_open())
-        while(linesToRead-- && std::getline(f, buf));
+     std::string temp;
+     if(f.is_open()){
+         while(linesToRead-- && std::getline(f, temp)){
+            buf += temp;
+         }
+     }
  }
  /**
   * @brief FileHandler::get_project

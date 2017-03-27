@@ -27,7 +27,7 @@
 #endif
 
 
-
+enum WRITE_OPTION{APPEND, OVERWRITE};
 typedef int FH_ERROR; // file handler error code
 typedef int ID;
 struct Project; // fix for include issue
@@ -55,8 +55,8 @@ public:
 
     ID create_file(std::string filename, ID dirID);
     FH_ERROR delete_file(ID id);
-    void write_file(ID id, std::string text);
-    void read_file(ID id,  std::string& buf, size_t linesToRead = -1);
+    void write_file(ID id, std::string text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
+    void read_file(ID id,  std::string& buf, int linesToRead = -1);
 
 
 
@@ -78,7 +78,7 @@ private:
     ID add_file(std::string filepath);
     void add_project(std::pair<ID,Project*> pair);
     ID add_dir(std::string dirpath);
-
+    ID load_project_file(std::string filePath, std::stringstream& projFileStream);
     void load_proj_files(std::string str);
     //add used for loading project from file
     void add_file(ID id ,std::string filepath);
