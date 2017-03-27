@@ -28,7 +28,7 @@ void filehandlertest::project_handling_test(){
     fh->save_project(proj);
     //check file contents
     Project* proj2 = fh->load_project("TEST_PROJ", std::string(WORKSPACE) + "/TEST_PROJ");
-    QVERIFY(*proj2 == *proj);
+    QVERIFY(fh->proj_equals(*proj2,*proj));
     //check project contentss
     fh->delete_file(vid1);
     fh->delete_file(vid2);

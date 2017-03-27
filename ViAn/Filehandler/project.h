@@ -33,14 +33,13 @@ struct ProjFiles{
    ID f_drawings;
    ID f_videos;
    ProjFiles(){
-
        this->dir = -1;
        this->f_proj = -1;
        this->f_analysis = -1;
        this->f_drawings = -1;
        this->f_videos = -1;
    }
-   friend bool operator==(ProjFiles pf, ProjFiles pf2);
+
    friend ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf);
    friend ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf);
 };
@@ -62,7 +61,7 @@ public:
     friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
     friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
 
-    friend bool operator==(Project proj, Project proj2);
+
 
 // TODO
 //    void add_analysis();
