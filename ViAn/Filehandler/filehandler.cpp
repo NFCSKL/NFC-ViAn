@@ -120,12 +120,11 @@ void FileHandler::load_proj_files(std::string str){
  * @return
  */
 Project* FileHandler::load_project(std::string fullProjectPath){
-    std::string reverse (fullProjectPath.rbegin(), fullProjectPath.rend());
-    std::string emaNjorp = reverse.substr(0, reverse.find("/"));
-    std::string projName (emaNjorp.rbegin(), emaNjorp.rend());
-    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find("/" + projName));
-    projName = projName.substr(0, projName.find(".txt"));
-    return load_project(projName, dirpath);
+    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
+    std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
+    proj_name = proj_name.substr(0, proj_name.find(".txt"));
+    std::cout << dirpath << "/" << proj_name << std::endl;
+    return load_project(proj_name, dirpath);
 }
 
 /**
