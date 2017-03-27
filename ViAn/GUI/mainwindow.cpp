@@ -424,7 +424,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 
 /**
  * @brief MainWindow::on_actionZoom_in_triggered
- * Zoom in, will set a state in the video overlay
+ * Sets a state in the video overlay
  * for the user to choose an area.
  */
 void MainWindow::on_actionZoom_in_triggered() {
@@ -434,7 +434,7 @@ void MainWindow::on_actionZoom_in_triggered() {
 
 /**
  * @brief MainWindow::on_actionZoom_out_triggered
- * Zoom out, will reset zoom level to the full video size.
+ * Reset the zoom level to the full video size.
  */
 void MainWindow::on_actionZoom_out_triggered() {
     mvideo_player->zoom_out();
