@@ -30,7 +30,7 @@ inputwindow::~inputwindow() {
 void inputwindow::on_okButton_clicked() {
     if(!ui->input->text().isEmpty()) {
         QString inputText = ui->input->text();
-        mainWindow->inputSwitchCase(this->action, inputText);
+        mainWindow->input_switch_case(this->action, inputText);
     }
 }
 /**
@@ -39,5 +39,5 @@ void inputwindow::on_okButton_clicked() {
  */
 void inputwindow::on_cancleButton_clicked() {
     QString noText = "NoName";
-    mainWindow->inputSwitchCase(CANCEL, noText);
+    mainWindow->input_switch_case(CANCEL, noText);
 }
