@@ -301,6 +301,8 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
     case TYPE::VIDEO:
         set_selected_video(newItem);
         break;
+    default:
+        break;
     }
 }
 
