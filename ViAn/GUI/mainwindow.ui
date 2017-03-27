@@ -309,7 +309,7 @@
      <addaction name="actionDeleteProject"/>
      <addaction name="actionDeleteVideo"/>
      <addaction name="actionDeleteAnalys"/>
-     <addaction name="actionDeleteRitning"/>
+     <addaction name="actionDeleteDrawing"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
@@ -437,7 +437,7 @@
   </action>
   <action name="actionDeleteProject">
    <property name="text">
-    <string>DeleteProject</string>
+    <string>Project</string>
    </property>
    <property name="toolTip">
     <string>DeleteProject</string>
@@ -445,7 +445,7 @@
   </action>
   <action name="actionDeleteVideo">
    <property name="text">
-    <string>DeleteVideo</string>
+    <string>Video</string>
    </property>
    <property name="toolTip">
     <string>DeleteVideo</string>
@@ -453,18 +453,18 @@
   </action>
   <action name="actionDeleteAnalys">
    <property name="text">
-    <string>DeleteAnalys</string>
+    <string>Analys</string>
    </property>
    <property name="toolTip">
     <string>DeleteAnalys</string>
    </property>
   </action>
-  <action name="actionDeleteRitning">
+  <action name="actionDeleteDrawing">
    <property name="text">
-    <string>DeleteRitning</string>
+    <string>Drawing</string>
    </property>
    <property name="toolTip">
-    <string>DeleteRitning</string>
+    <string>DeleteDrawing</string>
    </property>
   </action>
   <action name="actionPen">

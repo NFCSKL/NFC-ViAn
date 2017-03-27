@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QWidget>
 #include <string>
+#define TEXT_LENGTH 15
 
 enum TYPE {PROJECT, VIDEO};
 
@@ -16,6 +17,8 @@ public:
     int id;
     TYPE type;
     QString name;
+    void set_text(std::string text);
+    void set_text_from_filepath(std::string filepath);
 private slots:
 
 private:

@@ -37,7 +37,7 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-
+    const std::string ARROW_STRING = " <--";
 private slots:
 
     void on_playPauseButton_clicked();
@@ -86,8 +86,6 @@ private slots:
 
     void prepare_menu(const QPoint & pos);
 
-    void add_video();
-
     void play_video();
 
     void on_actionSave_triggered();
@@ -106,6 +104,8 @@ private slots:
 
     void on_actionLoad_triggered();
 
+    void on_actionAddVideo_triggered();
+
 private:
 
     Ui::MainWindow *ui;
@@ -118,6 +118,8 @@ private:
     FileHandler *fileHandler;
 
     void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
+    void set_selected_video(MyQTreeWidgetItem *newSelectedVideo);
+    void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
     void add_project_to_tree(Project* proj);
     void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 

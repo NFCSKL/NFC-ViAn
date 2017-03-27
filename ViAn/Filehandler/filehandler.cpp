@@ -123,7 +123,6 @@ Project* FileHandler::load_project(std::string fullProjectPath){
     std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
     std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
     proj_name = proj_name.substr(0, proj_name.find(".txt"));
-    std::cout << dirpath << "/" << proj_name << std::endl;
     return load_project(proj_name, dirpath);
 }
 
