@@ -16,7 +16,7 @@
 #include <sstream>
 #include "project.h"
 #include "dir.h"
-
+#include <algorithm>
 #ifdef _WIN32
     #define WORKSPACE "C:"
 #elif __APPLE__
@@ -42,9 +42,11 @@ public:
     Project* open_project(std::string dirpath);
     Project* create_project(std::string projName);
     FH_ERROR delete_project(Project* proj);
-    void save_project(Project* proj);
-    void save_project(ID id);
+    Project* load_project(std::string fullProjectPath);
     Project* load_project(std::string projname, std::string dirpath);
+    void save_project(ID id);
+    void save_project(Project* proj);
+
 
     void add_video(Project* proj, std::string filePath);
     //directory manipulation

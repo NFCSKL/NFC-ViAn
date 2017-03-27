@@ -115,6 +115,19 @@ void FileHandler::load_proj_files(std::string str){
 }
 
 /**
+ * @brief FileHandler::load_project
+ * @param dirpath
+ * @return
+ */
+Project* FileHandler::load_project(std::string fullProjectPath){
+    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
+    std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
+    proj_name = proj_name.substr(0, proj_name.find(".txt"));
+    std::cout << dirpath << "/" << proj_name << std::endl;
+    return load_project(proj_name, dirpath);
+}
+
+/**
  * @todo load analyses (in project <</>> operators)
  * @todo load drawings (in project <</>> operators)
  * @brief FileHandler::load_project
@@ -124,6 +137,7 @@ void FileHandler::load_proj_files(std::string str){
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
+    proj->m_id = this->m_pid;
     add_project(std::make_pair(this->m_pid++, proj));
     ProjectStream projStream;
 
@@ -152,7 +166,7 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
  * @param filePath
  * @param projFileStream
  * @return ID
- /
+ */
 ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
     std::string buf;
     ID projFileID = add_file(filePath);

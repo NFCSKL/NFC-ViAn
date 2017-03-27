@@ -54,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
  * @brief MainWindow::~MainWindow
  * Destructor
  */
-
 MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
@@ -88,7 +87,6 @@ void MainWindow::set_status_bar(string status, int timer){
 void MainWindow::on_fastBackwardButton_clicked(){
 
 }
-
 
 /**
  * @brief MainWindow::on_playPauseButton_clicked
@@ -264,11 +262,8 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
         case ADD_PROJECT: {
-            int id = fileHandler->create_project(input)->m_id;
-            MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, qInput, id);
-            projectInTree->setText(0, qInput);
-            set_selected_project(projectInTree);
-            ui->ProjectTree->addTopLevelItem(projectInTree);
+            Project* proj = fileHandler->create_project(input);
+            add_project_to_tree(proj);
             set_status_bar("Project " + input + " created.");
             delete inputWindow;
             break;
@@ -278,10 +273,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
             break;
         }
         case ADD_VIDEO: {
-            fileHandler->add_video(fileHandler->get_project(selectedProject->id), input);
-            MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, qInput);
-            videoInTree->setText(0, qInput);
-            selectedProject->addChild(videoInTree);
+            add_video_to_tree(selectedProject, input);
             set_status_bar("Video " + input + " added.");
             break;
         }
@@ -517,4 +509,46 @@ void MainWindow::on_actionSave_triggered() {
     } else {
         set_status_bar("Nothing to save");
     }
+}
+
+/**
+ * @brief MainWindow::on_actionLoad_triggered
+ */
+void MainWindow::on_actionLoad_triggered() {
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
+    Project* loadProj= this->fileHandler->load_project(dir.toStdString());
+    add_project_to_tree(loadProj);
+    set_status_bar("Project " + loadProj->m_name + " loaded.");
+}
+
+/**
+ * @brief MainWindow::add_project_to_tree
+ * @param proj to add to tree
+ * also adds all videos of the project to the tree
+ */
+void MainWindow::add_project_to_tree(Project* proj){
+    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
+    projectInTree->setText(0, QString::fromStdString(proj->m_name));
+    set_selected_project(projectInTree);
+    ui->ProjectTree->addTopLevelItem(projectInTree);
+    for(Video *v: proj->m_videos) {
+        std::stringstream filePath;
+        filePath << *v;
+        std::string treeName = filePath.str();
+        add_video_to_tree(projectInTree, treeName);
+    }
+
+
+}
+
+/**
+ * @brief MainWindow::add_video_to_tree
+ * @param project to add videos to
+ * @param filePath of the video
+ */
+void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath) {
+    fileHandler->add_video(fileHandler->get_project(project->id), filePath);
+    MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath));
+    videoInTree->setText(0, QString::fromStdString(filePath));
+    project->addChild(videoInTree);
 }

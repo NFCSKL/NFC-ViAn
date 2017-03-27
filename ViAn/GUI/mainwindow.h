@@ -37,8 +37,6 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-    MyQTreeWidgetItem *selectedProject;
-    MyQTreeWidgetItem *selectedVideo;
 
 private slots:
 
@@ -100,6 +98,8 @@ private slots:
 
     void on_actionClear_triggered();
 
+    void on_actionLoad_triggered();
+
     void on_actionText_triggered();
 
 private:
@@ -114,7 +114,11 @@ private:
     FileHandler *fileHandler;
 
     void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
+    void add_project_to_tree(Project* proj);
+    void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 
+    MyQTreeWidgetItem *selectedProject;
+    MyQTreeWidgetItem *selectedVideo;
 
 };
 
