@@ -15,6 +15,7 @@ inputwindow::inputwindow( MainWindow *mainWindow, ACTION action, QString infoTex
     this->mainWindow = mainWindow;
     this->action = action;
     ui->setupUi(this);
+    ui->infoLabel->setText(infoText);
 }
 /**
  * @brief inputwindow::~inputwindow
