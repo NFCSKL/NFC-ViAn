@@ -103,7 +103,7 @@ bool operator==(Project proj, Project proj2){
  * may not be needed but works as intended,
  */
 bool operator==(ProjFiles pf, ProjFiles pf2){
-    return  true;pf.dir == pf2.dir &&
+    return  pf.dir == pf2.dir &&
             pf.f_proj == pf2.f_proj &&
             pf.f_videos == pf2.f_videos &&
             // Not used in current implementation
@@ -119,11 +119,13 @@ bool operator==(ProjFiles pf, ProjFiles pf2){
  * Writes a projectfile object to projectstream
  * @deprecated
  * Shouldnt be needed, ids useless and filenames are standard.
+ * isnt currently used but works as intended.
+ * kept just in case.
  */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
-//    ps.projFile << pf.f_analysis << " ";
-//    ps.projFile << pf.f_drawings << " ";
-//    ps.projFile << pf.f_videos << " ";
+    ps.projFile << pf.f_analysis << " ";
+    ps.projFile << pf.f_drawings << " ";
+    ps.projFile << pf.f_videos << " ";
     return ps;
 
 }
@@ -133,12 +135,12 @@ ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
  * @param pf
  * @return ps
  * Reads files from a ProjFiles struct to a ProjectStream
+ * Shouldnt be needed, ids useless and filenames are standard.
+ * isnt currently used but works as intended.
+ * kept just in case.
  */
 ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
     std::string dummy;
-
-    ps.projFile >> pf.f_proj;
-    ps.projFile >> pf.dir;
     ps.projFile >> pf.f_analysis;
     ps.projFile >> pf.f_drawings;
     ps.projFile >> pf.f_videos;

@@ -107,7 +107,6 @@ void MainWindow::on_playPauseButton_clicked() {
     }
 }
 
-
 /**
  * @brief MainWindow::on_fastForwardButton_clicked
  * The button supposed to play the video faster
@@ -125,7 +124,6 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     }
-
     mvideo_player->stop_video();
 }
 
@@ -212,6 +210,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         }
     }
 }
+
 /**
  * @brief MainWindow::closeEvent
  * asks if you are sure you want to quit.
@@ -230,6 +229,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
         event->accept();
     }
 }
+
 /**
  * @brief MainWindow::on_actionExit_triggered
  * sends a closeEvent when you press exit
@@ -284,6 +284,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
 
     }
 }
+
 /**
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
@@ -428,6 +429,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     }
     return false;
 }
+
 /**
  * @brief MainWindow::prepare_menu
  * @param pos
@@ -465,7 +467,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::on_actionAddVideo_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv;*.m4v"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 
@@ -481,6 +483,7 @@ void MainWindow::play_video() {
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(0);
 }
+
 /**
  * @brief MainWindow::set_selected_project
  * puts an arrow pointing at the selected project
@@ -502,6 +505,7 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         selectedProject->setText(0, string);
     }
 }
+
 /**
  * @brief MainWindow::set_selected_video
  * puts an arrow pointing at the selected video

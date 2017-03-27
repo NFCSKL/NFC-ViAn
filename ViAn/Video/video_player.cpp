@@ -97,7 +97,16 @@ void video_player::run()  {
  */
 void video_player::show_frame() {
     emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
+    convert_frame();
+    emit processedImage(img);
+}
 
+/**
+ * @brief video_player::convert_frame
+ * Converts the current frame, including the overlay, to a QImage.
+ * @param frame The current frame in the video
+ */
+void video_player::convert_frame() {
     if (frame.channels()== 3) {
         cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
@@ -106,9 +115,7 @@ void video_player::show_frame() {
         img = QImage((const unsigned char*)(frame.data),
                              frame.cols,frame.rows,QImage::Format_Indexed8);
     }
-
-    video_overlay->draw_overlay(img);
-    emit processedImage(img);
+    video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
 }
 
 /**
@@ -269,7 +276,7 @@ void video_player::inc_playback_speed() {
 /**
  * @brief video_player::toggle_overlay
  * Toggles the showing of the overlay, and if video is paused updates
- * the frame in the GUI to show with/without overlay
+ * the frame in the GUI to show with/without the overlay.
  */
 void video_player::toggle_overlay() {
     video_overlay->toggle_overlay();
@@ -296,63 +303,104 @@ void video_player::set_overlay_colour(QColor colour) {
 
 /**
  * @brief video_player::undo_overlay
- * Undo the drawings on the overlay.
- * If no video is loaded nothing happens.
+ * Undo the drawings on the overlay, if the overlay is visible
+ * and the video is loaded and paused.
  */
 void video_player::undo_overlay() {
-    if (capture.isOpened()) {
-        video_overlay->undo();
+    if (capture.isOpened() && is_paused()) {
+        video_overlay->undo(capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
 }
 
 /**
  * @brief video_player::clear_overlay
- * Clear the drawings on the overlay.
- * If no video is loaded nothing happens.
+ * Clear the drawings on the overlay, if the overlay is visible
+ * and the video is loaded and paused.
  */
 void video_player::clear_overlay() {
-    if (capture.isOpened()) {
-        video_overlay->clear();
+    if (capture.isOpened() && is_paused()) {
+        video_overlay->clear(capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
 }
 
 /**
  * @brief video_player::video_mouse_pressed
- * Starts drawing on the overlay, if visible, and if video is loaded.
+ * Starts drawing on the overlay, if the overlay is visible
+ * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
- * @param pos coordinate
+ * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_pressed(QPoint pos) {
-    if (capture.isOpened()) {
-        video_overlay->mouse_pressed(pos);
+    if (capture.isOpened() && is_paused()) {
+        scale_position(pos);
+        video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
 }
 
 /**
  * @brief video_player::video_mouse_released
- * Ends drawing on the overlay, if visible, and if video is loaded.
+ * Ends drawing on the overlay, if the overlay is visible
+ * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_released(QPoint pos) {
-    if (capture.isOpened()) {
-        video_overlay->mouse_released(pos);
+    if (capture.isOpened() && is_paused()) {
+        scale_position(pos);
+        video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
 }
 
 /**
  * @brief video_player::video_mouse_moved
- * Updates drawing on the overlay, if visible, and if video is loaded.
+ * Updates drawing on the overlay, if the overlay is visible
+ * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
- * @param pos coordinates
+ * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_moved(QPoint pos) {
-    if (capture.isOpened()) {
-        video_overlay->mouse_moved(pos);
+    if (capture.isOpened() && is_paused()) {
+        scale_position(pos);
+        video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
+}
+
+/**
+ * @brief video_player::scale_position
+ * Recalculates the given mouse position from a position in the window
+ * the video is shown in to the position on the video frame.
+ * @param pos The position to be recalculated.
+ */
+void video_player::scale_position(QPoint &pos) {
+    int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    // Calculate the coordinates on the actual video frame from
+    // the coordinates in the window the video is playing in.
+    double scalex = (double) video_frame_width/frame_width;
+    double scaley = (double) video_frame_height/frame_height;
+    pos.setX(scalex*pos.x());
+    pos.setY(scaley*pos.y());
+}
+
+/**
+ * @brief video_player::export_current_frame
+ * Stores the current frame in the specified folder.
+ * The stored frame will have the sam resolution as the video.
+ * @param filename Path to the folder to store the file in.
+ */
+void video_player::export_current_frame(QString path_to_folder) {
+    convert_frame();
+
+    // Add "/FRAME_NR.tiff" to the path.
+    path_to_folder.append("/");
+    path_to_folder.append(QString::number(capture.get(CV_CAP_PROP_POS_FRAMES)));
+    path_to_folder.append(".tiff");
+
+    QImageWriter writer(path_to_folder, "tiff");
+    writer.write(img);
 }
