@@ -12,7 +12,6 @@
 #include <QImageWriter>
 #include <QWaitCondition>
 #include "overlay.h"
-#include "shapes/shape.h"
 
 #include <chrono>
 
@@ -92,9 +91,12 @@ private:
 
     bool stop = false;
     bool video_paused;
+    bool choosing_zoom_area = false;
 
     QImage img;
     QWaitCondition condition;
+
+    zoomrectangle* zoom_area = new zoomrectangle();
 
     overlay* video_overlay;
 };

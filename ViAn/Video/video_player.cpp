@@ -38,7 +38,7 @@ bool video_player::load_video(string filename) {
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
         video_paused = false;
-        video_overlay->load_video(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
+        zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
         return true;
     }
@@ -109,7 +109,7 @@ void video_player::show_frame() {
  */
 void video_player::convert_frame() {
     cv::Mat zoomed_frame;
-    zoomed_frame = video_overlay->draw_overlay(frame);
+    zoomed_frame = zoom_frame(frame);
 
     if (zoomed_frame.channels() == 3) {
         cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
@@ -120,6 +120,23 @@ void video_player::convert_frame() {
                              zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
     }
     video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
+    if (choosing_zoom_area) {
+        zoom_area->draw(img);
+    }
+}
+
+/**
+ * @brief video_overlay::draw_overlay
+ * Zooms in the frame, with the choosen zoom level.
+ * @param frame Frame to draw on.
+ * @return Returns the frame including the zoom and overlay.
+ */
+cv::Mat video_overlay::zoom_frame(cv::Mat &frame) {
+    cv::Rect roi = zoom_area->get_zoom_area();
+
+    cv::Mat zoomed_frame;
+    resize(frame(roi), zoomed_frame, frame.size());
+    return zoomed_frame;
 }
 
 /**
@@ -337,7 +354,7 @@ void video_player::clear_overlay() {
  */
 void video_player::zoom_in() {
     if (capture.isOpened()) {
-        video_overlay->zoom_in();
+        choosing_zoom_area = true;
     }
 }
 
@@ -349,7 +366,7 @@ void video_player::zoom_in() {
  */
 void video_player::zoom_out() {
     if (capture.isOpened()) {
-        video_overlay->zoom_out();
+        zoom_area->reset_zoom_area();
         update_overlay();
     }
 }
@@ -379,6 +396,11 @@ void video_player::video_mouse_pressed(QPoint pos) {
 void video_player::video_mouse_released(QPoint pos) {
     if (capture.isOpened() && is_paused()) {
         scale_position(pos);
+        if (choosing_zoom_area) {
+            zoom_area->update_drawing_pos(pos);
+            zoom_area->choose_area();
+            choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
+        }
         video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
@@ -394,7 +416,11 @@ void video_player::video_mouse_released(QPoint pos) {
 void video_player::video_mouse_moved(QPoint pos) {
     if (capture.isOpened() && is_paused()) {
         scale_position(pos);
-        video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+        if (choosing_zoom_area) {
+            zoom_area->update_drawing_pos(pos);
+        } else {
+            video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+        }
         update_overlay();
     }
 }

@@ -22,7 +22,6 @@ class overlay {
 
 public:
     overlay();
-    void load_video(int width, int height);
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
@@ -37,22 +36,17 @@ public:
     void mouse_moved(QPoint pos, int frame_nr);
     void undo(int frame_nr);
     void clear(int frame_nr);
-    void zoom_in();
-    void zoom_out();
 
 private:
     void update_drawing_position(QPoint pos, int frame_nr);
 
     bool show_overlay = false;
-    bool choosing_zoom_area = false;
 
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
     QString current_string = "";
 
     std::map<int, QList<shape*>> overlays;
-
-    zoomrectangle* zoom_area = new zoomrectangle();
 };
 
 #endif // OVERLAY_H

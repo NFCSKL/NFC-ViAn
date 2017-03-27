@@ -2,6 +2,7 @@
 #define ZOOMRECTANGLE_H
 
 #include "rectangle.h"
+#include <algorithm>
 
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -14,10 +15,11 @@ public:
     zoomrectangle();
     zoomrectangle(QPoint pos);
     void set_start_pos(QPoint pos);
-    void area_choosen();
+    void choose_area();
     cv::Rect get_zoom_area();
     void reset_zoom_area();
-    void reset_zoom_area(int width, int height);
+    void set_size(int width, int height);
+    void set_zoom_area(int x, int y, int width, int height);
     void draw(QImage &img) override;
 private:
     int width_video = 360;

@@ -9,32 +9,6 @@ overlay::overlay() {
 }
 
 /**
- * @brief overlay::load_video
- * Handles updating of the overlay, when a video has been loaded.
- * @param width Width of the video.
- * @param height Height of the video.
- */
-void overlay::load_video(int width, int height) {
-    zoom_area->reset_zoom_area(width, height);
-}
-
-/**
- * @brief overlay::draw_overlay
- * Draws an overlay on top of the specified frame,
- * and zooms in the frame.
- * @param frame Frame to draw on.
- * @return Returns the frame including the zoom and overlay.
- */
-cv::Mat overlay::draw_overlay(cv::Mat &frame) {
-    //cv::Rect roi(400, 100, 600, 300);
-    cv::Rect roi = zoom_area->get_zoom_area();
-
-    cv::Mat zoomed_frame;
-    resize(frame(roi), zoomed_frame, frame.size());
-    return zoomed_frame;
-}
-
-/**
  * @brief overlay::draw_overlay
  * Draws an overlay on top of the specified QImage.
  * @param img QImage to draw on
@@ -45,9 +19,6 @@ void overlay::draw_overlay(QImage &img, int frame_nr) {
         foreach (shape* s, overlays[frame_nr]) {
             s->draw(img);
         }
-    }
-    if (choosing_zoom_area) {
-        zoom_area->draw(img);
     }
 }
 
@@ -122,11 +93,6 @@ SHAPES overlay::get_shape() {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
-    if (choosing_zoom_area) {
-        zoom_area->set_start_pos(pos);
-        zoom_area->update_drawing_pos(pos);
-        return;
-    }
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
@@ -161,11 +127,7 @@ void overlay::mouse_pressed(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_released(QPoint pos, int frame_nr) {
-    update_drawing_position(pos, frame_nr); // Needs to be done before resetting choosing_zoom_area.
-    if (choosing_zoom_area) {
-        zoom_area->area_choosen();
-        choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
-    }
+    update_drawing_position(pos, frame_nr);
 }
 
 /**
@@ -186,10 +148,6 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::update_drawing_position(QPoint pos, int frame_nr) {
-    if (choosing_zoom_area) {
-        zoom_area->update_drawing_pos(pos);
-        return; // While choosing zoom area the regular drawings should not be affected.
-    }
     if (show_overlay) {
         // The last appended shape is the one we're currently drawing.
         overlays[frame_nr].last()->update_drawing_pos(pos);
@@ -216,25 +174,4 @@ void overlay::clear(int frame_nr) {
     if (show_overlay) {
         overlays[frame_nr].clear();
     }
-}
-
-/**
- * @brief overlay::zoom_in
- * Sets a state in the video overlay
- * for the user to choose an area.
- */
-void overlay::zoom_in() {
-
-    // TODO: Should not be like this.
-    //zoom_out();
-
-    choosing_zoom_area = true;
-}
-
-/**
- * @brief overlay::zoom_out
- * Resets zoom level to the full video size.
- */
-void overlay::zoom_out() {
-    zoom_area->reset_zoom_area();
 }
