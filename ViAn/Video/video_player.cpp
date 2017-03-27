@@ -132,9 +132,10 @@ void video_player::convert_frame() {
  * @return Returns the frame including the zoom and overlay.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &frame) {
+    // The area to zoom in on.
     cv::Rect roi = zoom_area->get_zoom_area();
-
     cv::Mat zoomed_frame;
+    // Crop out the area and resize to video size.
     resize(frame(roi), zoomed_frame, frame.size());
     return zoomed_frame;
 }
@@ -207,7 +208,6 @@ void video_player::set_frame_height(int new_value) {
  * @param frame_num
  */
 bool video_player::set_playback_frame(int frame_num) {
-
     if (frame_num < get_num_frames() && frame_num >= 0) {
         current_frame = frame_num;
         return true;
@@ -373,18 +373,21 @@ void video_player::zoom_out() {
 
 /**
  * @brief video_player::video_mouse_pressed
- * Starts drawing on the overlay, if the overlay is visible
- * and the video is loaded and paused.
- * If the video is paused, the frame in the GUI is updated.
+ * If the user is choosing a zoom area and there
+ * is a video loaded, its position is updated.
+ * Otherwise starts drawing on the overlay, if
+ * the overlay is visible and the video is loaded
+ * and paused.
+ * The frame in the GUI is updated.
  * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_pressed(QPoint pos) {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->set_start_pos(pos);
             zoom_area->update_drawing_pos(pos);
-        } else {
+        } else if (is_paused()) {
             video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         }
         update_overlay();
@@ -393,37 +396,41 @@ void video_player::video_mouse_pressed(QPoint pos) {
 
 /**
  * @brief video_player::video_mouse_released
- * Ends drawing on the overlay, if the overlay is visible
+ * If the user is choosing a zoom area is choosen.
+ * otherwise ends drawing on the overlay, if the overlay is visible
  * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
  * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_released(QPoint pos) {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
             choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
+        } else if (is_paused()) {
+            video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         }
-        video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         update_overlay();
     }
 }
 
 /**
  * @brief video_player::video_mouse_moved
- * Updates drawing on the overlay, if the overlay is visible
+ * If the user is choosing a zoom area and there
+ * is a video loaded, its position is updated.
+ * Otherwise updates drawing on the overlay, if the overlay is visible
  * and the video is loaded and paused.
  * If the video is paused, the frame in the GUI is updated.
  * @param pos Mouse coordinates.
  */
 void video_player::video_mouse_moved(QPoint pos) {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
-        } else {
+        } else if (is_paused()) {
             video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         }
         update_overlay();
