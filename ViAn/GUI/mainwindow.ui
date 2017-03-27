@@ -285,7 +285,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -309,7 +309,7 @@
      <addaction name="actionDeleteProject"/>
      <addaction name="actionDeleteVideo"/>
      <addaction name="actionDeleteAnalys"/>
-     <addaction name="actionDeleteRitning"/>
+     <addaction name="actionDeleteDrawing"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
@@ -457,12 +457,12 @@
     <string>DeleteAnalys</string>
    </property>
   </action>
-  <action name="actionDeleteRitning">
+  <action name="actionDeleteDrawing">
    <property name="text">
-    <string>Ritning</string>
+    <string>Drawing</string>
    </property>
    <property name="toolTip">
-    <string>DeleteRitning</string>
+    <string>DeleteDrawing</string>
    </property>
   </action>
   <action name="actionPen">
