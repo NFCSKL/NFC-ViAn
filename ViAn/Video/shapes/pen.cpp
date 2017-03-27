@@ -21,6 +21,15 @@ void pen::draw(QImage &img) {
 }
 
 /**
+ * @brief pen::draw
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return
+ */
+void pen::draw(cv::Mat &frame) {
+}
+
+/**
  * @brief pen::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.

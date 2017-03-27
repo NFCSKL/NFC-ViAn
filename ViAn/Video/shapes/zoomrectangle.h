@@ -21,6 +21,7 @@ public:
     void set_size(int width, int height);
     void set_zoom_area(int x, int y, int width, int height);
     void draw(QImage &img) override;
+    void draw(cv::Mat &frame) override;
 private:
     int width_video = 360;
     int height_video = 240;

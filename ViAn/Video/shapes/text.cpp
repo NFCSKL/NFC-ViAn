@@ -27,6 +27,15 @@ void text::draw(QImage &img) {
 }
 
 /**
+ * @brief text::draw
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return
+ */
+void text::draw(cv::Mat &frame) {
+}
+
+/**
  * @brief text::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.

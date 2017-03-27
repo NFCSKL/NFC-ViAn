@@ -21,6 +21,15 @@ void line::draw(QImage &img) {
 }
 
 /**
+ * @brief line::draw
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return
+ */
+void line::draw(cv::Mat &frame) {
+}
+
+/**
  * @brief line::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.
