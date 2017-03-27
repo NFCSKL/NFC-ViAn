@@ -105,14 +105,6 @@ void  zoomrectangle::set_zoom_area(int x, int y, int width, int height) {
  * @param img QImage to draw on
  */
 void zoomrectangle::draw(QImage &img) {
-
-    // Code for drawing with OpenCV library
-    /*cv::Rect roi(400, 100, 600, 300);
-    cv::Mat part_frame = frame(roi);
-    cv::Mat color(part_frame.size(), CV_8UC3, cv::Scalar(0, 125, 125));
-    double alpha = 0.6;
-    cv::addWeighted(color, alpha, part_frame, 1.0 - alpha , 0.0, part_frame);*/
-
     QPainter painter(&img);
     setup_paint_tool(painter);
     int width = draw_end.x() - draw_start.x();
