@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QWidget>
 #include <string>
-#define TEXT_LENGHT 15
+#define TEXT_LENGTH 15
 
 enum TYPE {PROJECT, VIDEO};
 
