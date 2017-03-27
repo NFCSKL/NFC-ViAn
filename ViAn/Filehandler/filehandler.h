@@ -43,6 +43,7 @@ public:
     Project* create_project(std::string projName);
     FH_ERROR delete_project(Project* proj);
     void save_project(Project* proj);
+    void save_project(ID id);
     Project* load_project(std::string projname, std::string dirpath);
 
     void add_video(Project* proj, std::string filePath);

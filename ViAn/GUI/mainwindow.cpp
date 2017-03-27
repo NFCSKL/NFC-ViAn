@@ -23,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-    selectedProject = nullptr;
+    this->selectedProject = nullptr;
+    this->selectedVideo = nullptr;
 
     video_slider = findChild<QSlider*>("videoSlider");
     iconOnButtonHandler = new IconOnButtonHandler();
@@ -105,7 +106,6 @@ void MainWindow::on_playPauseButton_clicked() {
         mvideo_player->wait();
     }
 }
-
 
 /**
  * @brief MainWindow::on_fastForwardButton_clicked
@@ -210,6 +210,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         }
     }
 }
+
 /**
  * @brief MainWindow::closeEvent
  * asks if you are sure you want to quit.
@@ -228,6 +229,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
         event->accept();
     }
 }
+
 /**
  * @brief MainWindow::on_actionExit_triggered
  * sends a closeEvent when you press exit
@@ -288,6 +290,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
 
     }
 }
+
 /**
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
@@ -425,6 +428,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     }
     return false;
 }
+
 /**
  * @brief MainWindow::prepare_menu
  * @param pos
@@ -455,6 +459,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
+
 /**
  * @brief MainWindow::add_video
  * Prompts user with file browser to add video
@@ -464,6 +469,7 @@ void MainWindow::add_video() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv;*.m4v"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
+
 /**
  * @brief MainWindow::play_video
  *  Loads selected video, flips playbutton to pause
@@ -476,8 +482,8 @@ void MainWindow::play_video() {
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(0);
 }
+
 /**
- * @todo To be implemented
  * @brief MainWindow::set_selected_project
  * @param newSelectedProject
  */
@@ -497,9 +503,18 @@ void MainWindow::set_selected_project(MyQTreeWidgetItem *newSelectedProject){
         selectedProject->setText(0, string);
     }
 }
+
 /**
  * @brief MainWindow::on_actionSave_triggered
+ * saves project which is selected in tree view,
+ * checks if there is one
  */
-void MainWindow::on_actionSave_triggered()
-{
+void MainWindow::on_actionSave_triggered() {
+    if(selectedProject != nullptr) {
+        this->fileHandler->save_project(this->selectedProject->id);
+        std::string text = "Saved project " + this->selectedProject->name.toStdString();
+        set_status_bar(text);
+    } else {
+        set_status_bar("Nothing to save");
+    }
 }
