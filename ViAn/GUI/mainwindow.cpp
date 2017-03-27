@@ -270,6 +270,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
         }
         case CANCEL: {
             set_status_bar("Cancel");
+            delete inputWindow;
             break;
         }
         case ADD_VIDEO: {
