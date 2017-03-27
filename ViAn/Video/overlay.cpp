@@ -106,11 +106,6 @@ SHAPES overlay::get_shape() {
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (choosing_zoom_area) {
-
-        //TODO: This should not be done.
-        zoom_area->set_zoom_area(1280, 720);
-
-
         zoom_area->set_start_pos(pos);
         zoom_area->update_drawing_pos(pos);
         return;
@@ -215,6 +210,10 @@ void overlay::clear(int frame_nr) {
  * for the user to choose an area.
  */
 void overlay::zoom_in() {
+
+    // TODO: Should not be like this.
+    zoom_out();
+
     choosing_zoom_area = true;
 }
 
@@ -224,4 +223,7 @@ void overlay::zoom_in() {
  */
 void overlay::zoom_out() {
 
+
+    // TODO: Should not be like this.
+    zoom_area->set_zoom_area(1280, 720);
 }

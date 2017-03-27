@@ -3,14 +3,14 @@
 /**
  * @brief zoomrectangle::zoomrectangle
  */
-zoomrectangle::zoomrectangle() : shape(QColor(0, 255, 0), QPoint(0, 0)) {
+zoomrectangle::zoomrectangle() : rectangle(QColor(0, 255, 0), QPoint(0, 0)) {
 }
 
 /**
  * @brief zoomrectangle::zoomrectangle
  * @param pos Starting point for the new object
  */
-zoomrectangle::zoomrectangle(QPoint pos) : shape(QColor(0, 255, 0), pos) {
+zoomrectangle::zoomrectangle(QPoint pos) : rectangle(QColor(0, 255, 0), pos) {
 }
 
 /**
@@ -84,13 +84,4 @@ void zoomrectangle::draw(QImage &img) {
     painter.fillRect(draw_start.x(), draw_start.y(), width, height, QColor(100,100,100));
     painter.drawRect(draw_start.x(), draw_start.y(), width, height);
     painter.end();
-}
-
-/**
- * @brief zoomrectangle::add_drawing_pos
- * Function to handle the new position of the mouse.
- * Does not need to store the new position.
- * @param pos
- */
-void zoomrectangle::handle_new_pos(QPoint pos) {
 }

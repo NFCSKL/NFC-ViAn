@@ -344,10 +344,12 @@ void video_player::zoom_in() {
  * @brief video_player::zoom_out
  * Resets zoom level to the full video size,
  * if there is a video loaded.
+ * Also updates the frame shown in the GUI.
  */
 void video_player::zoom_out() {
     if (capture.isOpened()) {
         video_overlay->zoom_out();
+        update_overlay();
     }
 }
 
