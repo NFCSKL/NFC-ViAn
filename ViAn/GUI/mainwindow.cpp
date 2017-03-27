@@ -515,15 +515,15 @@ void MainWindow::set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *n
     if(selected == nullptr) {
         selected = new_selected;
         QString string = selected->text(0);
-        string.append(" <--");
+        string.append(QString::fromStdString(ARROW_STRING));
         selected->setText(0, string);
     } else if (selected != new_selected) {
         QString string = selected->text(0);
-        string.chop(4);
+        string.chop(ARROW_STRING.length());
         selected->setText(0, string);
         selected = new_selected;
         string = selected->text(0);
-        string.append(" <--");
+        string.append(QString::fromStdString(ARROW_STRING));
         selected->setText(0, string);
     }
 }

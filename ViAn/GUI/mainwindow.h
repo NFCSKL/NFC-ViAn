@@ -37,7 +37,7 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-
+    const std::string ARROW_STRING = " <--";
 private slots:
 
     void on_playPauseButton_clicked();
