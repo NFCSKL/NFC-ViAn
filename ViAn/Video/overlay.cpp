@@ -160,10 +160,8 @@ void overlay::update_drawing_position(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::undo(int frame_nr) {
-    if (show_overlay) {
-        if (!overlays[frame_nr].isEmpty()) {
-            overlays[frame_nr].takeLast(); // Requires a non-empty list.
-        }
+    if (show_overlay && !overlays[frame_nr].isEmpty()) {
+        overlays[frame_nr].takeLast(); // Requires a non-empty list.
     }
 }
 
