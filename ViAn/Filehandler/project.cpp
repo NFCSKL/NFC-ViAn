@@ -103,7 +103,7 @@ bool operator==(Project proj, Project proj2){
  * may not be needed but works as intended,
  */
 bool operator==(ProjFiles pf, ProjFiles pf2){
-    return  true;pf.dir == pf2.dir &&
+    return  pf.dir == pf2.dir &&
             pf.f_proj == pf2.f_proj &&
             pf.f_videos == pf2.f_videos &&
             // Not used in current implementation

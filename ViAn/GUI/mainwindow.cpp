@@ -514,8 +514,7 @@ void MainWindow::on_actionSave_triggered() {
 /**
  * @brief MainWindow::on_actionLoad_triggered
  */
-void MainWindow::on_actionLoad_triggered()
-{
+void MainWindow::on_actionLoad_triggered() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
     Project* loadProj= this->fileHandler->load_project(dir.toStdString());
     add_project_to_tree(loadProj);
@@ -530,11 +529,11 @@ void MainWindow::on_actionLoad_triggered()
 void MainWindow::add_project_to_tree(Project* proj){
     MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
     projectInTree->setText(0, QString::fromStdString(proj->m_name));
-    selectedProject = projectInTree;
+    set_selected_project(projectInTree);
     ui->ProjectTree->addTopLevelItem(projectInTree);
     for(Video *v: proj->m_videos) {
         std::stringstream filePath;
-         filePath << *v;
+        filePath << *v;
         std::string treeName = filePath.str();
         add_video_to_tree(projectInTree, treeName);
     }
