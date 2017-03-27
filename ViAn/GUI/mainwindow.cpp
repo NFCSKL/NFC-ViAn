@@ -585,3 +585,36 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
     project->addChild(videoInTree);
     set_selected_video(videoInTree);
 }
+
+/**
+ * @brief MainWindow::on_actionDeleteProject_triggered
+ */
+void MainWindow::on_actionDeleteProject_triggered() {
+    if(selectedProject != nullptr) {
+        this->fileHandler->delete_project(fileHandler->get_project(this->selectedProject->id));
+        remove_selected_project_from_tree();
+    }
+}
+
+/**
+ * @brief MainWindow::remove_selected_project_from_tree
+ */
+void MainWindow::remove_selected_project_from_tree() {
+    for(int child_number = 0; child_number < selectedProject->childCount(); child_number++) {
+        remove_video_from_tree((MyQTreeWidgetItem*)selectedProject->child(child_number));
+    }
+    ui->ProjectTree->removeItemWidget(selectedProject, 0);
+    delete selectedProject;
+    selectedProject = nullptr;
+}
+
+/**
+ * @brief MainWindow::remove_selected_video_from_tree
+ */
+void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *video) {
+    if (video == selectedVideo) {
+        selectedVideo = nullptr;
+    }
+    ui->ProjectTree->removeItemWidget(video, 0);
+    delete video;
+}
