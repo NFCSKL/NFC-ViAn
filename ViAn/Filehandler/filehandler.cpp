@@ -152,7 +152,7 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
  * @param filePath
  * @param projFileStream
  * @return ID
- /
+ */
 ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
     std::string buf;
     ID projFileID = add_file(filePath);
