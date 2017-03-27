@@ -131,7 +131,7 @@ void video_player::convert_frame() {
  * @param frame Frame to draw on.
  * @return Returns the frame including the zoom and overlay.
  */
-cv::Mat video_overlay::zoom_frame(cv::Mat &frame) {
+cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     cv::Rect roi = zoom_area->get_zoom_area();
 
     cv::Mat zoomed_frame;
