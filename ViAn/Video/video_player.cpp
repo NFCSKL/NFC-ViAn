@@ -381,7 +381,12 @@ void video_player::zoom_out() {
 void video_player::video_mouse_pressed(QPoint pos) {
     if (capture.isOpened() && is_paused()) {
         scale_position(pos);
-        video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+        if (choosing_zoom_area) {
+            zoom_area->set_start_pos(pos);
+            zoom_area->update_drawing_pos(pos);
+        } else {
+            video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+        }
         update_overlay();
     }
 }
