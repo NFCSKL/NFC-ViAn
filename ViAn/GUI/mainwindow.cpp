@@ -423,7 +423,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
             return true;
         } else if (event->type() == QEvent::MouseMove) {
             mvideo_player->video_mouse_moved(pos);
-
             return true;
         }
     }
@@ -486,7 +485,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::add_video() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),WORKSPACE,tr("*.avi;*.mkv;*.mov;*.mp4;*.3gp;*.flv;*.webm;*.ogv;*.m4v"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE, tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
     input_switch_case(ACTION::ADD_VIDEO, dir);
 }
 
