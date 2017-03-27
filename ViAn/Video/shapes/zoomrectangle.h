@@ -19,7 +19,9 @@ public:
     void set_zoom_area(int width, int height);
     void draw(QImage &img) override;
 private:
-    cv::Rect current_zoom_rect = cv::Rect(0, 0, 1280, 720);
+    int width_video = 360;
+    int height_video = 240;
+    cv::Rect current_zoom_rect = cv::Rect(0, 0, 360, 240);
 };
 
 #endif // ZOOMRECTANGLE_H

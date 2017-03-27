@@ -8,6 +8,23 @@
 overlay::overlay() {
 }
 
+/**
+ * @brief overlay::load_video
+ * Handles updating of the overlay, when a video has been loaded.
+ * @param width Width of the video.
+ * @param height Height of the video.
+ */
+void overlay::load_video(int width, int height) {
+    zoom_area->reset_zoom_area(width, height);
+}
+
+/**
+ * @brief overlay::draw_overlay
+ * Draws an overlay on top of the specified frame,
+ * and zooms in the frame.
+ * @param frame Frame to draw on.
+ * @return Returns the frame including the zoom and overlay.
+ */
 cv::Mat overlay::draw_overlay(cv::Mat &frame) {
     //cv::Rect roi(400, 100, 600, 300);
     cv::Rect roi = zoom_area->get_zoom_area();
@@ -147,7 +164,7 @@ void overlay::mouse_released(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr); // Needs to be done before resetting choosing_zoom_area.
     if (choosing_zoom_area) {
         zoom_area->area_choosen();
-        choosing_zoom_area = false; // You can only choose a zoom area during one drag with the mouse.
+        choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
     }
 }
 
@@ -225,5 +242,5 @@ void overlay::zoom_out() {
 
 
     // TODO: Should not be like this.
-    zoom_area->set_zoom_area(1280, 720);
+    zoom_area->reset_zoom_area(1280, 720);
 }
