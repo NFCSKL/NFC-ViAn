@@ -229,7 +229,7 @@ void overlay::clear(int frame_nr) {
 void overlay::zoom_in() {
 
     // TODO: Should not be like this.
-    zoom_out();
+    //zoom_out();
 
     choosing_zoom_area = true;
 }
@@ -239,8 +239,5 @@ void overlay::zoom_in() {
  * Resets zoom level to the full video size.
  */
 void overlay::zoom_out() {
-
-
-    // TODO: Should not be like this.
-    zoom_area->reset_zoom_area(1280, 720);
+    zoom_area->reset_zoom_area();
 }

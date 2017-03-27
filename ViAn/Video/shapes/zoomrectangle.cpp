@@ -27,15 +27,32 @@ void zoomrectangle::set_start_pos(QPoint pos) {
  * valid area it's stored as the current zoom level.
  */
 void zoomrectangle::area_choosen() {
+    double newstartx = current_zoom_rect.x + ((double) draw_start.x()/width_video) * current_zoom_rect.width;
+    double newstarty = current_zoom_rect.y + ((double) draw_start.y()/height_video) * current_zoom_rect.height;
+    double newendx = current_zoom_rect.x + ((double) draw_end.x()/width_video) * current_zoom_rect.width;
+    double newendy = current_zoom_rect.y + ((double) draw_end.y()/height_video) * current_zoom_rect.height;
+
+    int new_width = newendx - newstartx;
+    int new_height = newendy - newstarty;
+
     int width = draw_end.x() - draw_start.x();
     int height = draw_end.y() - draw_start.y();
 
+    std::cout <<"X: "<<newstartx<< "\n";
+    std::cout <<"Y: "<<newstarty<< "\n";
+    std::cout <<"W: "<<width<< "\n";
+    std::cout <<"H: "<<height<< "\n";
+    std::cout <<"W: "<<new_width<< "\n";
+    std::cout <<"H: "<<new_height<< "\n";
+    std::cout << "\n";
+
     if (width < 10 || height < 10) {
+        std::cout<<"not zoomed\n";
         return;
     }
 
-    current_zoom_rect.x = draw_start.x();
-    current_zoom_rect.y = draw_start.y();
+    current_zoom_rect.x = (int) newstartx;
+    current_zoom_rect.y = (int) newstarty;
     current_zoom_rect.width = width;
     current_zoom_rect.height = height;
 }
@@ -49,13 +66,24 @@ cv::Rect zoomrectangle::get_zoom_area() {
 }
 
 /**
- * @brief zoomrectangle::set_zoom_area
- * Sets the zoom area to the specified width and
- * height, starting in (0,0).
- * @param width
- * @param height
+ * @brief zoomrectangle::reset_zoom_area
+ * Resets the zoom area to the video size.
  */
-void  zoomrectangle::set_zoom_area(int width, int height) {
+void  zoomrectangle::reset_zoom_area() {
+    current_zoom_rect.x = 0;
+    current_zoom_rect.y = 0;
+    current_zoom_rect.width = width_video;
+    current_zoom_rect.height = height_video;
+}
+
+/**
+ * @brief zoomrectangle::reset_zoom_area
+ * Resets the zoom area to the specified width and
+ * height, starting in (0,0).
+ * @param width Width of the area.
+ * @param height Height of the area.
+ */
+void  zoomrectangle::reset_zoom_area(int width, int height) {
     current_zoom_rect.x = 0;
     current_zoom_rect.y = 0;
     current_zoom_rect.width = width;

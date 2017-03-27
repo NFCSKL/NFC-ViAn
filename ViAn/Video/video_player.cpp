@@ -38,6 +38,7 @@ bool video_player::load_video(string filename) {
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
         video_paused = false;
+        video_overlay->load_video(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
         return true;
     }

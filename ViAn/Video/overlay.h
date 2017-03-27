@@ -22,7 +22,7 @@ class overlay {
 
 public:
     overlay();
-
+    void load_video(int width, int height);
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();

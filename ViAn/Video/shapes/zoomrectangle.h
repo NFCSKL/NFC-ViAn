@@ -16,7 +16,8 @@ public:
     void set_start_pos(QPoint pos);
     void area_choosen();
     cv::Rect get_zoom_area();
-    void set_zoom_area(int width, int height);
+    void reset_zoom_area();
+    void reset_zoom_area(int width, int height);
     void draw(QImage &img) override;
 private:
     int width_video = 360;
