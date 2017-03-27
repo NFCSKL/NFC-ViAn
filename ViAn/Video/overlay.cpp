@@ -89,7 +89,7 @@ SHAPES overlay::get_shape() {
  * @brief overlay::mouse_pressed
  * Creates a drawing shape with the prechoosen colour
  * and shape, if the overlay is visible.
- * @param pos Mouse coordinates.
+ * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_pressed(QPoint pos, int frame_nr) {
@@ -123,7 +123,7 @@ void overlay::mouse_pressed(QPoint pos, int frame_nr) {
  * @brief overlay::mouse_released
  * Ends drawing on the overlay when the mouse is
  * released, if the overlay is visible.
- * @param pos Mouse coordinates.
+ * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_released(QPoint pos, int frame_nr) {
@@ -134,7 +134,7 @@ void overlay::mouse_released(QPoint pos, int frame_nr) {
  * @brief overlay::mouse_moved
  * Updates drawing on the overlay when the mouse is
  * moved, if the overlay is visible.
- * @param pos Mouse coordinates.
+ * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::mouse_moved(QPoint pos, int frame_nr) {
@@ -144,7 +144,7 @@ void overlay::mouse_moved(QPoint pos, int frame_nr) {
 /**
  * @brief overlay::update_drawing_position
  * Updates the position of the end point of the shape currently being drawn
- * @param pos Mouse coordinates.
+ * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void overlay::update_drawing_position(QPoint pos, int frame_nr) {
