@@ -105,7 +105,6 @@ void video_player::show_frame() {
 /**
  * @brief video_player::convert_frame
  * Converts the current frame, including the overlay, to a QImage.
- * @param frame The current frame in the video
  */
 void video_player::convert_frame() {
     cv::Mat zoomed_frame;
