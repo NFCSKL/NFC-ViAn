@@ -7,9 +7,9 @@
 Project::Project(ID id, std::string name)
 {
     this->files = new ProjFiles();
-    this->m_name = name;
-    this->m_id = id;
-    this->m_videos.clear();
+    this->name = name;
+    this->id = id;
+    this->videos.clear();
     this->saved = false;
 }
 /**
@@ -17,9 +17,9 @@ Project::Project(ID id, std::string name)
  */
 Project::Project(){
     this->files = new ProjFiles();
-    this->m_name = "";
-    this->m_id = -1;
-    this->m_videos.clear();
+    this->name = "";
+    this->id = -1;
+    this->videos.clear();
 }
 
 /**
@@ -29,7 +29,7 @@ Project::Project(){
 */
 void Project::add_video(Video* vid)
 {
-    this->m_videos.push_back(vid);
+    this->videos.push_back(vid);
 }
 /**
  *  UNSFINISHED
@@ -41,7 +41,7 @@ void Project::add_video(Video* vid)
 ProjectStream& operator>>(ProjectStream& ps, Project& proj){
     //write files
     //Read project id and name
-    ps.projFile >> proj.m_name;
+    ps.proj_files >> proj.name;
 
     // read videos
     int vidCounter = 0;
@@ -68,11 +68,11 @@ ProjectStream& operator>>(ProjectStream& ps, Project& proj){
  */
 ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write name and id;   
-    ps.projFile << proj.m_name.c_str() << " ";
+    ps.proj_files << proj.name.c_str() << " ";
     //write videos
-    int vidcounter = proj.m_videos.size();
+    int vidcounter = proj.videos.size();
     ps.videos << vidcounter << " ";
-    for(auto vid = proj.m_videos.rbegin(); vid != proj.m_videos.rend(); ++vid){
+    for(auto vid = proj.videos.rbegin(); vid != proj.videos.rend(); ++vid){
         Video* v = *vid;
         ps.videos << *v << " ";
         vidcounter++;
@@ -92,9 +92,9 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
  * kept just in case.
  */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
-    ps.projFile << pf.f_analysis << " ";
-    ps.projFile << pf.f_drawings << " ";
-    ps.projFile << pf.f_videos << " ";
+    ps.proj_files << pf.f_analysis << " ";
+    ps.proj_files << pf.f_drawings << " ";
+    ps.proj_files << pf.f_videos << " ";
     return ps;
 
 }
@@ -111,8 +111,8 @@ ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
  */
 ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
     std::string dummy;
-    ps.projFile >> pf.f_analysis;
-    ps.projFile >> pf.f_drawings;
-    ps.projFile >> pf.f_videos;
+    ps.proj_files >> pf.f_analysis;
+    ps.proj_files >> pf.f_drawings;
+    ps.proj_files >> pf.f_videos;
     return ps;
 }

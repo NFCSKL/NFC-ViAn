@@ -15,7 +15,7 @@ typedef int ID;
  * Importand for seperation of different types of data.
  */
 struct ProjectStream{
-    std::stringstream projFile;
+    std::stringstream proj_files;
     std::stringstream videos;
     std::stringstream analyzes;
     std::stringstream drawings;
@@ -68,9 +68,9 @@ public:
 //    void add_drawing();      
 public:
     ID m_id;
-    std::string m_name;
+    std::string name;
     ProjFiles* files;
-    std::vector<Video*> m_videos;
+    std::vector<Video*> videos;
     bool saved;
 };
 
