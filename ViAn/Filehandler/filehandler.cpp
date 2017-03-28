@@ -9,11 +9,11 @@ FileHandler::FileHandler() {
     this->m_did = 0;
     this->lastError = 0;
     #ifdef _WIN32
-        this->workSpace = "C:/";
+        this->work_space = "C:/";
     #elif __APPLE__
-        this->workSpace = "/Applications/";
+        this->work_space = "/Applications/";
     #elif __unix__
-        this->workSpace = "~/";
+        this->work_space = "~/";
     #endif
 
     //ID id = add_file("ViAn_config.txt"); Will be used to store current workspace and other run-to-run coonstans
@@ -28,7 +28,7 @@ FileHandler::FileHandler() {
  * @param newWorkSpace
  */
 void FileHandler::set_workspace(std::string newWorkSpace){
-    this->workSpace = newWorkSpace;
+    this->work_space = newWorkSpace;
     //save_workspace();
 }
 
@@ -87,7 +87,7 @@ void FileHandler::save_project(ID id){
 void FileHandler::save_project(Project* proj){
     std::string projFile = proj->m_name + std::string(".txt"); //filename
     if(!proj->saved){
-        ID dirID = create_directory(std::string(workSpace) + proj->m_name);//project directory
+        ID dirID = create_directory(std::string(work_space) + proj->m_name);//project directory
 
         proj->files->dir = dirID;
 
