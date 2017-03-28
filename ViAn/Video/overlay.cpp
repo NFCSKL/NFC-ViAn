@@ -55,10 +55,15 @@ void overlay::set_showing_overlay(bool value) {
  * @param s
  */
 void overlay::set_tool(SHAPES s) {
-    current_shape = s;
     if (s == TEXT) {
-        current_string = QInputDialog::getText(NULL, "Text chooser", "Enter a text:");
+        bool ok;
+        current_string = QInputDialog::getText(NULL, "Text chooser", "Enter a text:", QLineEdit::Normal, QString(), &ok);
+        if (!ok || current_string.isEmpty()) {
+            // Cancelled or empty field.
+            return;
+        }
     }
+    current_shape = s;
 }
 
 /**
