@@ -16,7 +16,8 @@ FileHandler::FileHandler() {
         this->workSpace = "~/";
     #endif
 
-    ID id = add_file("ViAn_config.txt");
+    //ID id = add_file("ViAn_config.txt"); Will be used to store current workspace and other run-to-run coonstans
+
 
 
 
