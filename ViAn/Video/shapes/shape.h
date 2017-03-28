@@ -19,13 +19,12 @@ public:
 protected:
     int LINE_THICKNESS = 2;
 
-    cv::Scalar qcolor2scalar(QColor color);
-    void setup_paint_tool(QPainter &painter);
+    cv::Scalar qcolor_to_scalar(QColor col);
+    cv::Point qpoint_to_point(QPoint pnt);
 
-    QColor colour;
-
-    QPoint draw_start;
-    QPoint draw_end;
+    cv::Scalar colour;
+    cv::Point draw_start;
+    cv::Point draw_end;
 };
 
 #endif // SHAPES_H

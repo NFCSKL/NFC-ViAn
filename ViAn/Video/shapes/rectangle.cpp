@@ -15,12 +15,8 @@ rectangle::rectangle(QColor col, QPoint pos) : shape(col, pos) {
  * @return Returns the frame with drawing.
  */
 cv::Mat rectangle::draw(cv::Mat &frame) {
-    int width = std::abs(draw_end.x() - draw_start.x());
-    int height = std::abs(draw_end.y() - draw_start.y());
-    int x = std::min(draw_start.x(), draw_end.x());
-    int y = std::min(draw_start.y(), draw_end.y());
-    cv::Rect roi(x, y, width, height);
-    cv::rectangle(frame, roi, qcolor2scalar(colour), LINE_THICKNESS);
+    cv::Rect rect(draw_start, draw_end);
+    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
     return frame;
 }
 

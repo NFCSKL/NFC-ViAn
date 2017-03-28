@@ -21,10 +21,7 @@ zoomrectangle::zoomrectangle(QPoint pos) : rectangle(QColor(0, 255, 0), pos) {
  */
 void zoomrectangle::update_drawing_pos(QPoint pos) {
     // The zoom area has to be inside the video.
-    int x = std::min(width_video, std::max(0, pos.x()));
-    int y = std::min(height_video, std::max(0, pos.y()));
-    draw_end.setX(x);
-    draw_end.setY(y);
+    draw_end = bounded_coords(pos);
 }
 
 /**
@@ -34,10 +31,7 @@ void zoomrectangle::update_drawing_pos(QPoint pos) {
  */
 void zoomrectangle::set_start_pos(QPoint pos) {
     // The zoom area has to be inside the video.
-    int x = std::min(width_video, std::max(0, pos.x()));
-    int y = std::min(height_video, std::max(0, pos.y()));
-    draw_start.setX(x);
-    draw_start.setY(y);
+    draw_start = bounded_coords(pos);
 }
 
 /**
@@ -48,21 +42,15 @@ void zoomrectangle::set_start_pos(QPoint pos) {
  */
 void zoomrectangle::choose_area() {
     // Rectangle starts in the top left corner, with positive width and height
-    int start_x = std::min(draw_start.x(), draw_end.x());
-    int start_y = std::min(draw_start.y(), draw_end.y());
-    int width = std::abs(draw_end.x() - draw_start.x());
-    int height = std::abs(draw_end.y() - draw_start.y());
+    cv::Rect rect(draw_start, draw_end);
 
     // Zoom limit
-    if (width < 100 || height < 100) {
+    if (rect.width < MINIMUM_ZOOM_SIZE || rect.height < MINIMUM_ZOOM_SIZE) {
         return;
     }
 
     // Update current zoom level
-    current_zoom_rect.x = start_x;
-    current_zoom_rect.y = start_y;
-    current_zoom_rect.width = width;
-    current_zoom_rect.height = height;
+    current_zoom_rect = rect;
 }
 
 /**
@@ -116,16 +104,13 @@ void  zoomrectangle::set_zoom_area(int x, int y, int width, int height) {
  * @return Returns the frame with drawing.
  */
 cv::Mat zoomrectangle::draw(cv::Mat &frame) {
-    int width = std::abs(draw_end.x() - draw_start.x());
-    int height = std::abs(draw_end.y() - draw_start.y());
-    int x = std::min(draw_start.x(), draw_end.x());
-    int y = std::min(draw_start.y(), draw_end.y());
-    cv::Rect roi(x, y, width, height);
-    cv::Mat part_frame = frame(roi);
-    cv::Mat color(part_frame.size(), CV_8UC3, cv::Scalar(125, 125, 125));
+    cv::Rect rect(draw_start, draw_end);
+    cv::Mat area = frame(rect);
+    // CV_8UC3 means 8-bit unsigned 3-channel array.
+    cv::Mat coloured_area(area.size(), CV_8UC3, cv::Scalar(125, 125, 125));
     double alpha = 0.6;
-    cv::addWeighted(color, alpha, part_frame, 1.0 - alpha , 0.0, part_frame);
-    cv::rectangle(frame, roi, qcolor2scalar(colour), LINE_THICKNESS);
+    cv::addWeighted(coloured_area, alpha, area, 1.0 - alpha , 0.0, area);
+    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
     return frame;
 }
 
@@ -133,7 +118,7 @@ cv::Mat zoomrectangle::draw(cv::Mat &frame) {
  * @brief zoomrectangle::getX
  * @return Returns the x coordinate of the top right corner.
  */
-int zoomrectangle::getX() {
+int zoomrectangle::get_x() {
    return current_zoom_rect.x;
 }
 
@@ -141,7 +126,7 @@ int zoomrectangle::getX() {
  * @brief zoomrectangle::getY
  * @return Returns the y coordinate of the top right corner.
  */
-int zoomrectangle::getY() {
+int zoomrectangle::get_y() {
     return current_zoom_rect.y;
 }
 
@@ -149,7 +134,7 @@ int zoomrectangle::getY() {
  * @brief zoomrectangle::getWidth
  * @return Returns the width.
  */
-int zoomrectangle::getWidth() {
+int zoomrectangle::get_width() {
     return current_zoom_rect.width;
 }
 
@@ -157,6 +142,19 @@ int zoomrectangle::getWidth() {
  * @brief zoomrectangle::getHeight
  * @return Returns the height.
  */
-int zoomrectangle::getHeight() {
+int zoomrectangle::get_height() {
     return current_zoom_rect.height;
+}
+
+/**
+ * @brief zoomrectangle::bounded_coords
+ * Returns coordinates closest to the specified
+ * position within the video frame, converted
+ * to an OpenCV Point.
+ * @param pos Coordinate.
+ * @return
+ */
+cv::Point zoomrectangle::bounded_coords(QPoint pos) {
+    return cv::Point(std::min(width_video, std::max(0, pos.x())),
+                     std::min(height_video, std::max(0, pos.y())));
 }

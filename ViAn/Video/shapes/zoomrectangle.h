@@ -21,11 +21,13 @@ public:
     void set_size(int width, int height);
     void set_zoom_area(int x, int y, int width, int height);
     cv::Mat draw(cv::Mat &frame) override;
-    int getX();
-    int getY();
-    int getWidth();
-    int getHeight();
+    int get_x();
+    int get_y();
+    int get_width();
+    int get_height();
 private:
+    int MINIMUM_ZOOM_SIZE = 100;
+    cv::Point bounded_coords(QPoint pos);
     int width_video = 360;
     int height_video = 240;
     cv::Rect current_zoom_rect = cv::Rect(0, 0, 360, 240);

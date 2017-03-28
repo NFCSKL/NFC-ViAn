@@ -15,14 +15,11 @@ circle::circle(QColor col, QPoint pos) : shape(col, pos) {
  * @return Returns the frame with drawing.
  */
 cv::Mat circle::draw(cv::Mat &frame) {
-    int width = std::abs(draw_end.x() - draw_start.x());
-    int height = std::abs(draw_end.y() - draw_start.y());
-    int x = std::min(draw_start.x(), draw_end.x());
-    int y = std::min(draw_start.y(), draw_end.y());
-    cv::Point center(x+width/2, y+height/2);
-    cv::Size size(width, height);
-    cv::RotatedRect roi(center, size, 0);
-    cv::ellipse(frame, roi, qcolor2scalar(colour), LINE_THICKNESS);
+    cv::Rect rect(draw_start, draw_end);
+    cv::Size size = rect.size();
+    cv::Point center = (rect.br() + rect.tl())*0.5;
+    cv::RotatedRect bounding_rect(center, size, 0);
+    cv::ellipse(frame, bounding_rect, colour, LINE_THICKNESS);
     return frame;
 }
 

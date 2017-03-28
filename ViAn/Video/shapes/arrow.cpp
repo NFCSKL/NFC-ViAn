@@ -15,9 +15,7 @@ arrow::arrow(QColor col, QPoint pos) : shape(col, pos) {
  * @return Returns the frame with drawing.
  */
 cv::Mat arrow::draw(cv::Mat &frame) {
-    cv::Point p1(draw_start.x(), draw_start.y());
-    cv::Point p2(draw_end.x(), draw_end.y());
-    cv::arrowedLine(frame, p1, p2, qcolor2scalar(colour), LINE_THICKNESS);
+    cv::arrowedLine(frame, draw_start, draw_end, colour, LINE_THICKNESS);
     return frame;
 }
 

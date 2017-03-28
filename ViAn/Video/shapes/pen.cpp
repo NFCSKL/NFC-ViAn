@@ -15,10 +15,8 @@ pen::pen(QColor col, QPoint pos) : shape(col, pos) {
  * @return Returns the frame with drawing.
  */
 cv::Mat pen::draw(cv::Mat &frame) {
-    for (QLine line : lines) {
-        cv::Point p1(line.x1(), line.y1());
-        cv::Point p2(line.x2(), line.y2());
-        cv::line(frame, p1, p2, qcolor2scalar(colour), LINE_THICKNESS);
+    for (std::pair<cv::Point, cv::Point> line : lines) {
+        cv::line(frame, line.first, line.second, colour, LINE_THICKNESS);
     }
     return frame;
 }
@@ -30,6 +28,6 @@ cv::Mat pen::draw(cv::Mat &frame) {
  * @param pos
  */
 void pen::handle_new_pos(QPoint pos) {
-    QLine line(draw_end, pos);
+    std::pair<cv::Point, cv::Point> line(draw_end, qpoint_to_point(pos));
     lines.append(line);
 }
