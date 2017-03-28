@@ -9,9 +9,9 @@
 #include <QThread>
 #include <QMutex>
 #include <QImage>
+#include <QImageWriter>
 #include <QWaitCondition>
 #include "overlay.h"
-#include "shapes/shape.h"
 
 #include <chrono>
 
@@ -27,7 +27,8 @@ public:
     bool is_paused();
     bool is_stopped();
     bool is_showing_overlay();
-    
+    void export_current_frame(QString path_to_folder);
+
     int get_num_frames();    
     void play_pause();
     void stop_video();
@@ -48,6 +49,8 @@ public:
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
+    void zoom_in();
+    void zoom_out();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
@@ -69,8 +72,11 @@ protected:
 
 private:
     void update_frame(int frame_nbr);
+    cv::Mat zoom_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
+    void convert_frame();
+    void scale_position(QPoint &pos);
 
     cv::VideoCapture capture;
     cv::Mat frame;
@@ -86,9 +92,12 @@ private:
 
     bool stop = false;
     bool video_paused;
+    bool choosing_zoom_area = false;
 
     QImage img;
     QWaitCondition condition;
+
+    zoomrectangle* zoom_area = new zoomrectangle();
 
     overlay* video_overlay;
 };

@@ -3,8 +3,7 @@
 /**
  * @brief FileHandler::FileHandler
  */
-FileHandler::FileHandler()
-{
+FileHandler::FileHandler() {
     this->m_pid = 0; // zero out counter ids
     this->m_fid = 0;
     this->m_did = 0;
@@ -22,11 +21,14 @@ FileHandler::FileHandler()
 
 
 }
-
+/**
+ * @todo save workspace to file
+ * @brief FileHandler::set_workspace
+ * @param newWorkSpace
+ */
 void FileHandler::set_workspace(std::string newWorkSpace){
     this->workSpace = newWorkSpace;
-
-    write_file(0, buf);
+    //save_workspace();
 }
 
 /**
@@ -42,6 +44,7 @@ Project* FileHandler::create_project(std::string projName){
     this->m_pid++;
     return proj;
 }
+
 /**
  * @brief FileHandler::create_directory
  * @param dirpath
@@ -63,6 +66,7 @@ FH_ERROR FileHandler::delete_directory(ID id){
     FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
     return err;
 }
+
 /**
  * @brief FileHandler::save_project
  * @param id
@@ -102,6 +106,7 @@ void FileHandler::save_project(Project* proj){
     update_proj_files(proj);
 
 }
+
 /**
  * @todo unfinished, will be released with parser
  * however, is needed for creating
@@ -128,19 +133,19 @@ void FileHandler::load_proj_files(std::string str){
         add_file(id, filepath);
     }
 }
+
 /**
  * @brief FileHandler::load_project
  * @param dirpath
  * @return
  */
 Project* FileHandler::load_project(std::string fullProjectPath){
-    std::string reverse (fullProjectPath.rbegin(), fullProjectPath.rend());
-    std::string emaNjorp = reverse.substr(0, reverse.find("/"));
-    std::string projName (emaNjorp.rbegin(), emaNjorp.rend());
-    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find("/" + projName));
-    projName = projName.substr(0, projName.find(".txt"));
-    return load_project(projName, dirpath);
+    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
+    std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
+    proj_name = proj_name.substr(0, proj_name.find(".txt"));
+    return load_project(proj_name, dirpath);
 }
+
 /**
  * @todo load analyses (in project <</>> operators)
  * @todo load drawings (in project <</>> operators)
@@ -152,8 +157,9 @@ Project* FileHandler::load_project(std::string fullProjectPath){
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
     proj->m_id = this->m_pid;
-    add_project(std::make_pair(this->m_pid++, proj));
+    proj->files->dir = add_dir(dirpath);
 
+    add_project(std::make_pair(this->m_pid++, proj));
     ProjectStream projStream;
 
     proj->saved = true;
@@ -174,6 +180,14 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
     projStream >> *proj;
     return proj;
 }
+
+/**
+ * @brief FileHandler::load_project_file
+ * help function for load_project
+ * @param filePath
+ * @param projFileStream
+ * @return ID
+ */
 ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
     std::string buf;
     ID projFileID = add_file(filePath);
@@ -226,6 +240,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     f.open(filePath.c_str());
     return this->add_file(filePath);
   }
+
 /**
  * @todo make threadsafe
  * @brief FileHandler::delete_file
@@ -236,6 +251,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     std::string file = this->get_file(id);
     return std::remove(file.c_str());
  }
+
  /**
   * @todo make threadsafe
   * @brief FileHandler::write_file
@@ -277,6 +293,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
          }
      }
  }
+
  /**
   * @brief FileHandler::get_project
   * Getter
@@ -289,6 +306,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     this->projMapLock.unlock();
     return p;
  }
+
  /**
   * @brief FileHandler::get_file
   * Getter
@@ -301,6 +319,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     this->fileMapLock.unlock();
     return file;
  }
+
  /**
   * @brief FileHandler::get_dir
   * @param ID directory id
@@ -324,6 +343,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     this->projMapLock.unlock();
 
  }
+
  /**
   * @brief FileHandler::add_file
   * @param std::string filepath
@@ -333,6 +353,7 @@ ID FileHandler::add_file(std::string filepath){
     add_file(this->m_fid, filepath);
     return this->m_fid++;
  }
+
 /**
  * @brief FileHandler::add_file
  * @param id
@@ -344,6 +365,7 @@ void FileHandler::add_file(ID id ,std::string filepath){
     this->m_fileMap.insert(pair);
     this->fileMapLock.unlock();
 }
+
  /**
   * @brief FileHandler::add_dir
   * @param std::string dirpath
@@ -356,3 +378,52 @@ ID FileHandler::add_dir(std::string dirpath){
     this->dirMapLock.unlock();
     return this->m_did++;
  }
+/**
+ * @brief FileHandler::proj_equals
+ * @param proj
+ * @param proj2
+ * @return true if project contents are the same
+ */
+bool FileHandler::proj_equals(Project& proj, Project& proj2){
+    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
+               proj2.m_videos.begin(),
+               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
+                                                                        // by dereferencing pointers in vector
+    return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
+           proj.m_name == proj2.m_name &&
+           videoEquals;
+}
+
+/**
+ * @brief FileHandler::projfiles_equal
+ * @param pf
+ * @param pf2
+ * @return true if files are the same paths
+ */
+bool FileHandler::projfiles_equal(ProjFiles& pf, ProjFiles& pf2){
+    return dirs_equal(pf.dir, pf2.dir) &&
+        this->files_equal(pf.f_proj, pf2.f_proj) &&
+        this->files_equal(pf.f_analysis, pf2.f_analysis)&&
+        this->files_equal(pf.f_drawings, pf2.f_drawings) &&
+        this->files_equal(pf.f_videos, pf2.f_videos);
+}
+
+/**
+ * @brief FileHandler::files_equal
+ * @param id
+ * @param id2
+ * @return
+ */
+bool FileHandler::files_equal(ID id, ID id2){
+    return this->get_file(id) == this->get_file(id2);
+}
+
+/**
+ * @brief FileHandler::dirs_equal
+ * @param id
+ * @param id2
+ * @return true if dirs are same path
+ */
+bool FileHandler::dirs_equal(ID id, ID id2){
+    return this->get_dir(id) == this->get_dir(id2);
+}

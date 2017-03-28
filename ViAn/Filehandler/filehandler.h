@@ -22,6 +22,7 @@ enum WRITE_OPTION{APPEND, OVERWRITE};
 typedef int FH_ERROR; // file handler error code
 typedef int ID;
 struct Project; // fix for include issue
+struct ProjFiles;
 class FileHandler
 {
 public:
@@ -53,9 +54,13 @@ public:
     void write_file(ID id, std::string text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
     void read_file(ID id,  std::string& buf, int linesToRead = -1);
 
+    friend bool operator==(ProjFiles& pf, ProjFiles& pf2);
+    friend bool operator==(Project& proj, Project& proj2);
 
-
-
+    bool proj_equals(Project& proj, Project& proj2);
+    bool projfiles_equal(ProjFiles& pf, ProjFiles& pf2);
+    bool dirs_equal(ID id, ID id2);
+    bool files_equal(ID id, ID id2);
     // thread safe read operations for maps
 
 

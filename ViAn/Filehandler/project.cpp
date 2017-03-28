@@ -79,38 +79,7 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     }
     return ps;
 }
-/**
- * @brief operator ==
- * @param proj
- * @param proj2
- * @return if projects are same TRUE else False
- */
-bool operator==(Project proj, Project proj2){
-    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
-               proj2.m_videos.begin(),
-               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
-                                                                        // by dereferencing pointers in vector
-    return *proj.files == *proj2.files && //probably unnecessary as projfiles have projname followed by default suffix
-           proj.m_name == proj2.m_name &&
-           videoEquals;
-}
 
-/**
- * @brief operator ==
- * @param pf
- * @param pf2
- * @retur
- * may not be needed but works as intended,
- */
-bool operator==(ProjFiles pf, ProjFiles pf2){
-    return  true;pf.dir == pf2.dir &&
-            pf.f_proj == pf2.f_proj &&
-            pf.f_videos == pf2.f_videos &&
-            // Not used in current implementation
-            pf.f_analysis == pf2.f_analysis &&
-            pf.f_drawings == pf2.f_drawings;
-
-}
 /**
  * @brief operator <<
  * @param ps
@@ -119,26 +88,29 @@ bool operator==(ProjFiles pf, ProjFiles pf2){
  * Writes a projectfile object to projectstream
  * @deprecated
  * Shouldnt be needed, ids useless and filenames are standard.
+ * isnt currently used but works as intended.
+ * kept just in case.
  */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
-//    ps.projFile << pf.f_analysis << " ";
-//    ps.projFile << pf.f_drawings << " ";
-//    ps.projFile << pf.f_videos << " ";
+    ps.projFile << pf.f_analysis << " ";
+    ps.projFile << pf.f_drawings << " ";
+    ps.projFile << pf.f_videos << " ";
     return ps;
 
 }
+
 /**
  * @brief operator >>
  * @param ps
  * @param pf
  * @return ps
  * Reads files from a ProjFiles struct to a ProjectStream
+ * Shouldnt be needed, ids useless and filenames are standard.
+ * isnt currently used but works as intended.
+ * kept just in case.
  */
 ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
     std::string dummy;
-
-    ps.projFile >> pf.f_proj;
-    ps.projFile >> pf.dir;
     ps.projFile >> pf.f_analysis;
     ps.projFile >> pf.f_drawings;
     ps.projFile >> pf.f_videos;

@@ -309,7 +309,7 @@
      <addaction name="actionDeleteProject"/>
      <addaction name="actionDeleteVideo"/>
      <addaction name="actionDeleteAnalys"/>
-     <addaction name="actionDeleteRitning"/>
+     <addaction name="actionDeleteDrawing"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
@@ -335,6 +335,8 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_hide_overview"/>
+    <addaction name="actionZoom_in"/>
+    <addaction name="actionZoom_out"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -436,7 +438,7 @@
   </action>
   <action name="actionDeleteProject">
    <property name="text">
-    <string>DeleteProject</string>
+    <string>Project</string>
    </property>
    <property name="toolTip">
     <string>DeleteProject</string>
@@ -444,7 +446,7 @@
   </action>
   <action name="actionDeleteVideo">
    <property name="text">
-    <string>DeleteVideo</string>
+    <string>Video</string>
    </property>
    <property name="toolTip">
     <string>DeleteVideo</string>
@@ -452,18 +454,18 @@
   </action>
   <action name="actionDeleteAnalys">
    <property name="text">
-    <string>DeleteAnalys</string>
+    <string>Analys</string>
    </property>
    <property name="toolTip">
     <string>DeleteAnalys</string>
    </property>
   </action>
-  <action name="actionDeleteRitning">
+  <action name="actionDeleteDrawing">
    <property name="text">
-    <string>DeleteRitning</string>
+    <string>Drawing</string>
    </property>
    <property name="toolTip">
-    <string>DeleteRitning</string>
+    <string>DeleteDrawing</string>
    </property>
   </action>
   <action name="actionPen">
@@ -479,6 +481,16 @@
   <action name="actionUndo">
    <property name="text">
     <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionZoom_in">
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+  </action>
+  <action name="actionZoom_out">
+   <property name="text">
+    <string>Zoom out</string>
    </property>
   </action>
   <action name="actionText">

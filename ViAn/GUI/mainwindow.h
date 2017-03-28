@@ -37,9 +37,7 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-    MyQTreeWidgetItem *selectedProject ;
-    MyQTreeWidgetItem *selectedVideo ;
-
+    const std::string ARROW_STRING = " <--";
 private slots:
 
     void on_playPauseButton_clicked();
@@ -88,21 +86,25 @@ private slots:
 
     void prepare_menu(const QPoint & pos);
 
-    void add_video();
-
     void play_video();
 
     void on_actionSave_triggered();
 
     void on_actionPen_triggered();
 
+    void on_actionText_triggered();
+
     void on_actionUndo_triggered();
 
     void on_actionClear_triggered();
 
+    void on_actionZoom_in_triggered();
+
+    void on_actionZoom_out_triggered();
+
     void on_actionLoad_triggered();
 
-    void on_actionText_triggered();
+    void on_actionAddVideo_triggered();
 
     void on_actionChoose_Workspace_triggered();
 
@@ -118,8 +120,13 @@ private:
     FileHandler *fileHandler;
 
     void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
+    void set_selected_video(MyQTreeWidgetItem *newSelectedVideo);
+    void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
     void add_project_to_tree(Project* proj);
     void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
+
+    MyQTreeWidgetItem *selectedProject;
+    MyQTreeWidgetItem *selectedVideo;
 
 };
 
