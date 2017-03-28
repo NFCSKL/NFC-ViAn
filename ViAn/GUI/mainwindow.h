@@ -72,7 +72,7 @@ private slots:
 
     void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
-    void on_actionShow_hide_overview_triggered();
+    void on_actionShow_hide_overlay_triggered();
 
     void on_actionColour_triggered();
 

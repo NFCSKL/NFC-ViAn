@@ -12,6 +12,8 @@
 #include "shapes/text.h"
 #include "shapes/zoomrectangle.h"
 
+#include "opencv2/opencv.hpp"
+
 class overlay {
 
 public:
@@ -19,7 +21,7 @@ public:
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
-    void draw_overlay(QImage &img, int frame_nr);
+    cv::Mat draw_overlay(cv::Mat &frame, int frame_nr);
     void set_tool(SHAPES s);
     void set_colour(QColor col);
     QColor get_colour();

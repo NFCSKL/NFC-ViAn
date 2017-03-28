@@ -34,3 +34,9 @@ void shape::setup_paint_tool(QPainter &painter) {
     pen.setColor(colour);
     painter.setPen(pen);
 }
+
+cv::Scalar shape::qcolor2scalar(QColor col) {
+    int r,g,b;
+    col.getRgb(&r, &g, &b);
+    return cv::Scalar(b,g,r); // swap RGB-->BGR
+}

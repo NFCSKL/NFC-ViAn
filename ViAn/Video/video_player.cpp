@@ -108,28 +108,44 @@ void video_player::show_frame() {
  * @param frame The current frame in the video
  */
 void video_player::convert_frame() {
-    cv::Mat zoomed_frame;
-    zoomed_frame = zoom_frame(frame);
+    cv::Mat processed_frame;
 
-    if (zoomed_frame.channels() == 3) {
-        cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
+    // Process frame (draw overlay, zoom)
+    processed_frame = draw_frame(frame);
+
+    // Convert frame to QImage
+    if (processed_frame.channels() == 3) {
+        cv::cvtColor(processed_frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
                           RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
     } else {
-        img = QImage((const unsigned char*)(zoomed_frame.data),
-                             zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
-    }
-    video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
-    if (choosing_zoom_area) {
-        zoom_area->draw(img);
+        img = QImage((const unsigned char*)(processed_frame.data),
+                             processed_frame.cols,processed_frame.rows,QImage::Format_Indexed8);
     }
 }
 
 /**
- * @brief video_overlay::draw_overlay
- * Zooms in the frame, with the choosen zoom level.
+ * @brief video_player::draw_frame
+ * Draws overlay on the frame and zooms in the frame.
  * @param frame Frame to draw on.
  * @return Returns the frame including the zoom and overlay.
+ */
+cv::Mat video_player::draw_frame(cv::Mat &frame) {
+    // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
+    cv::Mat processed_frame = frame.clone();
+    processed_frame = video_overlay->draw_overlay(processed_frame, capture.get(CV_CAP_PROP_POS_FRAMES));
+    if (choosing_zoom_area) {
+        processed_frame = zoom_area->draw(processed_frame);
+    }
+    processed_frame = zoom_frame(processed_frame);
+    return processed_frame;
+}
+
+/**
+ * @brief video_overlay::zoom_frame
+ * Zooms in the frame, with the choosen zoom level.
+ * @param frame Frame to zoom in on on.
+ * @return Returns the zoomed frame.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     // The area to zoom in on.
@@ -446,12 +462,22 @@ void video_player::video_mouse_moved(QPoint pos) {
 void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    // Calculate the coordinates on the actual video frame from
-    // the coordinates in the window the video is playing in.
-    double scalex = (double) video_frame_width/frame_width;
-    double scaley = (double) video_frame_height/frame_height;
-    pos.setX(scalex*pos.x());
-    pos.setY(scaley*pos.y());
+
+    // Calculate the scale ratio.
+    double x_scale = (double) video_frame_width/frame_width;
+    double y_scale = (double) video_frame_height/frame_height;
+
+    // Calculate the coordinates on the video frame from
+    // the coordinates on the zoomed frame.
+    double x_video = zoom_area->getX() + ((double) zoom_area->getWidth()/video_frame_width) * pos.x();
+    double y_video = zoom_area->getY() + ((double) zoom_area->getHeight()/video_frame_height) * pos.y();
+
+    cout<<"scale: "<< x_video << " "<<y_video<<"\n";
+    cout<<"zoom: "<< zoom_area->getX()<< " "<<zoom_area->getY()<< " "<<zoom_area->getWidth()<< " "<<zoom_area->getHeight()<<"\n";
+    cout<<"\n";
+
+    pos.setX(x_scale * x_video);
+    pos.setY(y_scale * y_video);
 }
 
 /**

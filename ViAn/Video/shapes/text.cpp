@@ -11,28 +11,15 @@ text::text(QColor col, QPoint pos, QString strng) : shape(col, pos) {
 
 /**
  * @brief text::draw
- * Draws the object on top of the specified QImage.
- * @param img QImage to draw on
- */
-void text::draw(QImage &img) {
-    QPainter painter(&img);
-    setup_paint_tool(painter);
-
-    QFont font = painter.font() ;
-    font.setPointSize(FONT_SIZE);
-    painter.setFont(font);
-
-    painter.drawText(draw_end.x(), draw_end.y(), string);
-    painter.end();
-}
-
-/**
- * @brief text::draw
  * Draws the object on top of the specified frame.
  * @param frame Frame to draw on.
- * @return
+ * @return Returns the frame with drawing.
  */
-void text::draw(cv::Mat &frame) {
+cv::Mat text::draw(cv::Mat &frame) {
+    cv::Point p(draw_end.x(), draw_end.y());
+
+    cv::putText(frame, string.toStdString(), p, cv::FONT_HERSHEY_SIMPLEX, 1, qcolor2scalar(colour), LINE_THICKNESS);
+    return frame;
 }
 
 /**

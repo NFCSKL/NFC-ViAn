@@ -10,23 +10,15 @@ line::line(QColor col, QPoint pos) : shape(col, pos) {
 
 /**
  * @brief line::draw
- * Draws the object on top of the specified QImage.
- * @param img QImage to draw on
- */
-void line::draw(QImage &img) {
-    QPainter painter(&img);
-    setup_paint_tool(painter);
-    painter.drawLine(draw_start.x(), draw_start.y(), draw_end.x(), draw_end.y());
-    painter.end();
-}
-
-/**
- * @brief line::draw
  * Draws the object on top of the specified frame.
  * @param frame Frame to draw on.
- * @return
+ * @return Returns the frame with drawing.
  */
-void line::draw(cv::Mat &frame) {
+cv::Mat line::draw(cv::Mat &frame) {
+    cv::Point p1(draw_start.x(), draw_start.y());
+    cv::Point p2(draw_end.x(), draw_end.y());
+    cv::line(frame, p1, p2, qcolor2scalar(colour), LINE_THICKNESS);
+    return frame;
 }
 
 /**

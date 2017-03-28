@@ -10,16 +10,17 @@ overlay::overlay() {
 
 /**
  * @brief overlay::draw_overlay
- * Draws an overlay on top of the specified QImage.
- * @param img QImage to draw on
+ * Draws an overlay on top of the specified frame.
+ * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void overlay::draw_overlay(QImage &img, int frame_nr) {
+cv::Mat overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
         foreach (shape* s, overlays[frame_nr]) {
-            s->draw(img);
+            frame = s->draw(frame);
         }
     }
+    return frame;
 }
 
 /**

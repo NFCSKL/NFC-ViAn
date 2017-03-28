@@ -6,8 +6,7 @@
 class pen : public shape {
 public:
     pen(QColor col, QPoint pos);
-    void draw(QImage &img) override;
-    void draw(cv::Mat &frame) override;
+    cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos);
 private:
     QVector<QLine> lines;

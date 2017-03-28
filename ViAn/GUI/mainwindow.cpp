@@ -306,11 +306,11 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
     }
 }
 
- /** @brief MainWindow::on_actionShow_hide_overview_triggered
+ /** @brief MainWindow::on_actionShow_hide_overlay_triggered
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
-void MainWindow::on_actionShow_hide_overview_triggered() {
+void MainWindow::on_actionShow_hide_overlay_triggered() {
     mvideo_player->toggle_overlay();
     if (mvideo_player->is_showing_overlay()) {
         set_status_bar("Overlay: On.");
