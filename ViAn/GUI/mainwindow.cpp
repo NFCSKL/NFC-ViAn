@@ -616,8 +616,7 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
  * contains drawing tools.
  * This is invoked when the overlay is activated and deactivated.
  */
-void MainWindow::toggle_toolbar()
-{
+void MainWindow::toggle_toolbar() {
     if(mvideo_player->is_showing_overlay()) {
         ui->toolBar_no_overlay->hide();
         ui->toolBar->show();
