@@ -79,38 +79,7 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     }
     return ps;
 }
-/**
- * @brief operator ==
- * @param proj
- * @param proj2
- * @return if projects are same TRUE else False
- */
-bool operator==(Project proj, Project proj2){
-    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
-               proj2.m_videos.begin(),
-               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
-                                                                        // by dereferencing pointers in vector
-    return *proj.files == *proj2.files && //probably unnecessary as projfiles have projname followed by default suffix
-           proj.m_name == proj2.m_name &&
-           videoEquals;
-}
 
-/**
- * @brief operator ==
- * @param pf
- * @param pf2
- * @retur
- * may not be needed but works as intended,
- */
-bool operator==(ProjFiles pf, ProjFiles pf2){
-    return  pf.dir == pf2.dir &&
-            pf.f_proj == pf2.f_proj &&
-            pf.f_videos == pf2.f_videos &&
-            // Not used in current implementation
-            pf.f_analysis == pf2.f_analysis &&
-            pf.f_drawings == pf2.f_drawings;
-
-}
 /**
  * @brief operator <<
  * @param ps

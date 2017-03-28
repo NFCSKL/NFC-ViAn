@@ -490,9 +490,13 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  * to selected project
  */
 void MainWindow::on_actionAddVideo_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
-                                               tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
-    input_switch_case(ACTION::ADD_VIDEO, dir);
+    if(selectedProject != nullptr) {
+        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
+                                                   tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
+        input_switch_case(ACTION::ADD_VIDEO, dir);
+    } else {
+        set_status_bar("No project selected.");
+    }
 }
 
 /**
