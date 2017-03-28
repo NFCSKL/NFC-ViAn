@@ -67,7 +67,7 @@ public:
 //    void add_analysis();
 //    void add_drawing();      
 public:
-    ID m_id;
+    ID id;
     std::string name;
     ProjFiles* files;
     std::vector<Video*> videos;

@@ -41,21 +41,21 @@ void Project::add_video(Video* vid)
 ProjectStream& operator>>(ProjectStream& ps, Project& proj){
     //write files
     //Read project id and name
-    ps.proj_files >> proj.name;
+    ps.projfile >> proj.name;
 
     // read videos
-    int vidCounter = 0;
+    int vid_counter = 0;
     std::vector<Video*> temp; // used to preserve order ov videos, important for == operator
-    ps.videos >> vidCounter;
-    if( vidCounter < 0) return ps; // if negative number of videos, loop below will
+    ps.videos >> vid_counter;
+    if( vid_counter < 0) return ps; // if negative number of videos, loop below will
                                    // be infinite. This is unlikely to happen. but just in case!
-    while(vidCounter--){
+    while(vid_counter--){
         Video* v = new Video();
         ps.videos >> *v;
         temp.push_back(v);
     }
-    for (auto vidIt = temp.rbegin(); vidIt < temp.rend(); ++vidIt) {  // to preserve order we add videos in reverse
-        proj.add_video(*vidIt);
+    for (auto vid_it = temp.rbegin(); vid_it < temp.rend(); ++vid_it) {  // to preserve order we add videos in reverse
+        proj.add_video(*vid_it);
     }
     return ps;
 }
@@ -68,7 +68,7 @@ ProjectStream& operator>>(ProjectStream& ps, Project& proj){
  */
 ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write name and id;   
-    ps.proj_files << proj.name.c_str() << " ";
+    ps.projfile << proj.name.c_str() << " ";
     //write videos
     int vidcounter = proj.videos.size();
     ps.videos << vidcounter << " ";
@@ -92,9 +92,9 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
  * kept just in case.
  */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
-    ps.proj_files << pf.f_analysis << " ";
-    ps.proj_files << pf.f_drawings << " ";
-    ps.proj_files << pf.f_videos << " ";
+    ps.projfile << pf.f_analysis << " ";
+    ps.projfile << pf.f_drawings << " ";
+    ps.projfile << pf.f_videos << " ";
     return ps;
 
 }
@@ -111,8 +111,8 @@ ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
  */
 ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
     std::string dummy;
-    ps.proj_files >> pf.f_analysis;
-    ps.proj_files >> pf.f_drawings;
-    ps.proj_files >> pf.f_videos;
+    ps.projfile >> pf.f_analysis;
+    ps.projfile >> pf.f_drawings;
+    ps.projfile >> pf.f_videos;
     return ps;
 }

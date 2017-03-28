@@ -98,7 +98,7 @@ void FileHandler::save_project(Project* proj){
 void FileHandler::update_proj_files(Project* proj){
     ProjectStream ps;
     ps << *proj;
-    write_file(proj->files->f_proj, ps.proj_files.str(), WRITE_OPTION::OVERWRITE);
+    write_file(proj->files->f_proj, ps.projfile.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_videos, ps.videos.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
@@ -145,7 +145,7 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
     proj->saved = true;
 //    Read project file
     std::string proj_filepath = dirpath + "/" + projname + ".txt";
-    proj->files->f_proj = load_project_file(proj_filepath, proj_stream.proj_files);
+    proj->files->f_proj = load_project_file(proj_filepath, proj_stream.projfile);
 
 //    Read video file
     std::string video_filepath = dirpath + "/" + projname + "_videos.txt";
