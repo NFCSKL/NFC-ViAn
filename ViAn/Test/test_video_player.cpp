@@ -1,13 +1,18 @@
 #include "test_video_player.h"
 #include <thread>
 
+#include <QMutex>
+#include <QWaitCondition>
+
 /**
  * @brief test_video_player::test_video_player
  * constructor
  * @param parent
  */
 test_video_player::test_video_player(QObject *parent) : QObject(parent) {
-    mvideo = new video_player();
+    QMutex mutex;
+    QWaitCondition wait;
+    mvideo = new video_player(&mutex, &wait);
 }
 
 /**

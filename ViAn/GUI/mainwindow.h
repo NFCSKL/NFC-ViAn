@@ -20,6 +20,9 @@
 #include "action.h"
 #include "qtreeitems.h"
 
+#include <QMutex>
+#include <QWaitCondition>
+
 using namespace std;
 class inputwindow;
 
@@ -38,6 +41,12 @@ public:
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
     const std::string ARROW_STRING = " <--";
+
+    // Lock and wait condition to sleep player when video is paused
+    QMutex mutex;
+    QWaitCondition paused_wait;
+
+
 private slots:
 
     void on_playPauseButton_clicked();

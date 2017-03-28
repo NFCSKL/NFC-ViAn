@@ -8,6 +8,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QWaitCondition>
 #include <QImage>
 #include <QImageWriter>
 #include <QWaitCondition>
@@ -21,7 +22,7 @@ using namespace std;
 class video_player : public QThread {
     Q_OBJECT
 public:
-    video_player(QObject* parent = 0);
+    video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent = 0);
     ~video_player();
     bool load_video(string filename);
     bool is_paused();
@@ -95,7 +96,8 @@ private:
     bool choosing_zoom_area = false;
 
     QImage img;
-    QWaitCondition condition;
+    QMutex* m_mutex;
+    QWaitCondition* m_paused_wait;
 
     zoomrectangle* zoom_area = new zoomrectangle();
 

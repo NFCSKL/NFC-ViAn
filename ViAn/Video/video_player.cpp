@@ -14,8 +14,10 @@ using namespace cv;
  * @brief video_player::video_player
  * @param parent
  */
-video_player::video_player(QObject* parent) : QThread(parent) {
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
     video_overlay = new overlay();
+    m_mutex = mutex;
+    m_paused_wait = paused_wait;
 }
 
 /**
@@ -78,11 +80,16 @@ void video_player::run()  {
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-    while(!stop && !video_paused && capture.read(frame)){
+    while(!stop  && capture.read(frame)){
+        m_mutex->lock();
+        if (video_paused) {
+            std::cout << "Video is paused, waiting" << std::endl;
+            m_paused_wait->wait(m_mutex);
+            std::cout << "Notified by gui thread" << std::endl;
+        }
+        m_mutex->unlock();
         show_frame();
-
         this->msleep(delay);
-
     }
     //Saves the current frame of the video if the video is paused.
     if (video_paused) {
@@ -90,6 +97,7 @@ void video_player::run()  {
     } else if (stop) {
         current_frame = 0;
     }
+    std::cout << "Terminating thread" << std::endl;
 }
 
 /**

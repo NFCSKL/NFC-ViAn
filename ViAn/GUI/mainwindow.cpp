@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->ProjectTree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
-    mvideo_player = new video_player();
+    mvideo_player = new video_player(&mutex, &paused_wait);
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
                                   this, SLOT(update_video(QImage)));
     QObject::connect(mvideo_player, SIGNAL(currentFrame(int)),
@@ -99,7 +99,19 @@ void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
-        mvideo_player->start();
+
+        // Video is paused. Flip paused bool, acquire lock and notify video thread
+        std::cout << "Acquire mutex lock GUI" << std::endl;
+        mutex.lock();
+        std::cout << "Flip paused bool" << std::endl;
+        mvideo_player->play_pause();
+        std::cout << "Notify waiting threads" << std::endl;
+        paused_wait.notify_all();
+        std::cout << "Notified" << std::endl;
+        mutex.unlock();
+        std::cout << "Mutex lock released" << std::endl;
+
+        //TODO fix different implementation for pause/stop mvideo_player->start();
     } else {
         set_status_bar("Paused");
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
