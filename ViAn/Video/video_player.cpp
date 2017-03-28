@@ -149,7 +149,6 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
 cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     // The area to zoom in on.
     cv::Rect roi = zoom_area->get_zoom_area();
-    cout << "draw: "<< roi.x<<" "<< roi.y<<" "<< roi.width<<" "<< roi.height<<"\n";
     cv::Mat zoomed_frame;
     // Crop out the area and resize to video size.
     resize(frame(roi), zoomed_frame, frame.size());
@@ -471,11 +470,6 @@ void video_player::scale_position(QPoint &pos) {
     // the coordinates on the zoomed frame.
     double x_video = zoom_area->get_x() + ((double) zoom_area->get_width()/video_frame_width) * pos.x();
     double y_video = zoom_area->get_y() + ((double) zoom_area->get_height()/video_frame_height) * pos.y();
-
-    cout<<"scale: "<< x_video << " "<<y_video<<"\n";
-    cout<<"zoom: "<< zoom_area->get_x()<< " "<<zoom_area->get_y()<< " "
-       <<zoom_area->get_width()<< " "<<zoom_area->get_height()<<"\n";
-    cout<<"\n";
 
     pos.setX(x_scale * x_video);
     pos.setY(y_scale * y_video);

@@ -325,10 +325,12 @@ void MainWindow::on_actionShow_hide_overlay_triggered() {
  */
 void MainWindow::on_actionColour_triggered() {
     QColor col = QColorDialog::getColor();
-    mvideo_player->set_overlay_colour(col);
-    string msg = "Color: ";
-    msg.append(col.name().toStdString());
-    set_status_bar(msg);
+    if (col.isValid()) {
+        mvideo_player->set_overlay_colour(col);
+        string msg = "Color: ";
+        msg.append(col.name().toStdString());
+        set_status_bar(msg);
+    }
 }
 
 /**
