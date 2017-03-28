@@ -73,7 +73,7 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
-    cv::Mat draw_frame(cv::Mat &frame);
+    cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
     void convert_frame();

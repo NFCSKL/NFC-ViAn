@@ -110,7 +110,7 @@ void video_player::convert_frame() {
     cv::Mat processed_frame;
 
     // Process frame (draw overlay, zoom)
-    processed_frame = draw_frame(frame);
+    processed_frame = process_frame(frame);
 
     // Convert frame to QImage
     if (processed_frame.channels() == 3) {
@@ -129,7 +129,7 @@ void video_player::convert_frame() {
  * @param frame Frame to draw on.
  * @return Returns the frame including the zoom and overlay.
  */
-cv::Mat video_player::draw_frame(cv::Mat &frame) {
+cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = frame.clone();
     processed_frame = video_overlay->draw_overlay(processed_frame, capture.get(CV_CAP_PROP_POS_FRAMES));
@@ -149,6 +149,7 @@ cv::Mat video_player::draw_frame(cv::Mat &frame) {
 cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     // The area to zoom in on.
     cv::Rect roi = zoom_area->get_zoom_area();
+    cout << "draw: "<< roi.x<<" "<< roi.y<<" "<< roi.width<<" "<< roi.height<<"\n";
     cv::Mat zoomed_frame;
     // Crop out the area and resize to video size.
     resize(frame(roi), zoomed_frame, frame.size());
@@ -423,7 +424,7 @@ void video_player::video_mouse_released(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
-            choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
+            choosing_zoom_area = false;
         } else if (is_paused()) {
             video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         }
@@ -472,7 +473,8 @@ void video_player::scale_position(QPoint &pos) {
     double y_video = zoom_area->getY() + ((double) zoom_area->getHeight()/video_frame_height) * pos.y();
 
     cout<<"scale: "<< x_video << " "<<y_video<<"\n";
-    cout<<"zoom: "<< zoom_area->getX()<< " "<<zoom_area->getY()<< " "<<zoom_area->getWidth()<< " "<<zoom_area->getHeight()<<"\n";
+    cout<<"zoom: "<< zoom_area->getX()<< " "<<zoom_area->getY()<< " "
+       <<zoom_area->getWidth()<< " "<<zoom_area->getHeight()<<"\n";
     cout<<"\n";
 
     pos.setX(x_scale * x_video);
