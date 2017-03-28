@@ -607,8 +607,8 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
 
 /**
  * @brief MainWindow::on_actionDeleteProject_triggered
- * deletes the saved files of the selected project
- * removes the project from the preoject tree
+ * Deletes the saved files of the selected project.
+ * Removes the project from the preoject tree.
  */
 void MainWindow::on_actionDeleteProject_triggered() {
     if(selectedProject != nullptr) {
@@ -628,7 +628,7 @@ void MainWindow::on_actionDeleteProject_triggered() {
 
 /**
  * @brief MainWindow::remove_selected_project_from_tree
- * removes all videos of the selected project and then the project
+ * Removes all videos of the selected project and then the project.
  */
 void MainWindow::remove_selected_project_from_tree() {
     for(int child_number = 0; child_number < selectedProject->childCount(); child_number++) {
@@ -641,7 +641,8 @@ void MainWindow::remove_selected_project_from_tree() {
 
 /**
  * @brief MainWindow::remove_selected_video_from_tree
- * removes the video from the tree
+ * @param video to be deleted
+ * Removes the video from the tree.
  */
 void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *video) {
     if (video == selectedVideo) {
