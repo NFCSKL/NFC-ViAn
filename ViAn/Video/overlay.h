@@ -10,12 +10,12 @@
 #include "shapes/arrow.h"
 #include "shapes/pen.h"
 #include "shapes/text.h"
+#include "shapes/zoomrectangle.h"
 
 class overlay {
 
 public:
     overlay();
-
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
@@ -34,9 +34,11 @@ private:
     void update_drawing_position(QPoint pos, int frame_nr);
 
     bool show_overlay = false;
+
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
     QString current_string = "";
+
     std::map<int, QList<shape*>> overlays;
 };
 

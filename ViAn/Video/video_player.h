@@ -12,7 +12,6 @@
 #include <QImageWriter>
 #include <QWaitCondition>
 #include "overlay.h"
-#include "shapes/shape.h"
 
 #include <chrono>
 
@@ -50,6 +49,8 @@ public:
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
+    void zoom_in();
+    void zoom_out();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
@@ -71,6 +72,7 @@ protected:
 
 private:
     void update_frame(int frame_nbr);
+    cv::Mat zoom_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
     void convert_frame();
@@ -90,9 +92,12 @@ private:
 
     bool stop = false;
     bool video_paused;
+    bool choosing_zoom_area = false;
 
     QImage img;
     QWaitCondition condition;
+
+    zoomrectangle* zoom_area = new zoomrectangle();
 
     overlay* video_overlay;
 };
