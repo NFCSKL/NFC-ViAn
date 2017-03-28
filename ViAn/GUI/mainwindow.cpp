@@ -40,10 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
     mvideo_player = new video_player();
-    QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
+    QObject::connect(mvideo_player, SIGNAL(processed_image(QImage)),
                                   this, SLOT(update_video(QImage)));
-    QObject::connect(mvideo_player, SIGNAL(currentFrame(int)),
+    QObject::connect(mvideo_player, SIGNAL(update_current_frame(int)),
                                   this, SLOT(set_video_slider_pos(int)));
+    QObject::connect(this, SIGNAL(resize_video_frame(int,int)),
+                     mvideo_player, SLOT(scaling_event(int,int)));
 
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
@@ -58,6 +60,7 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
+    mvideo_player->exit();
     delete mvideo_player;
     delete ui;
 }
@@ -160,7 +163,8 @@ void MainWindow::on_previousFrameButton_clicked() {
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
-    ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
+    cout << "Resolution: " << frame.width() << "x" << frame.height() << endl;
+    ui->videoFrame->setPixmap(QPixmap::fromImage(frame).scaled(frame.width(),frame.height(),Qt::KeepAspectRatio));
 }
 
 /**
@@ -183,6 +187,9 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
    mvideo_player->set_frame_height(ui->videoFrame->height());
    mvideo_player->set_frame_width(ui->videoFrame->width());
+   cout << "Resizing window" << endl;
+   resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
+
 }
 
 /**

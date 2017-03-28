@@ -23,6 +23,7 @@ video_player::video_player(QObject* parent) : QThread(parent) {
  */
 video_player::~video_player() {
     delete video_overlay;
+    capture.release();
 }
 
 /**
@@ -78,10 +79,18 @@ void video_player::run()  {
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-    while(!stop && !video_paused && capture.read(frame)){
-        show_frame();
 
-        this->msleep(delay);
+    while(!stop && !video_paused && capture.read(frame)){
+        const clock_t begin_time = std::clock();
+
+        convert_frame();
+        int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
+        std::cout << "Conversion delay in ms: "<< conversion_time << endl;
+
+        if (delay-conversion_time > 0) {
+            this->msleep(delay-conversion_time);
+        }
+        show_frame();
 
     }
     //Saves the current frame of the video if the video is paused.
@@ -97,9 +106,8 @@ void video_player::run()  {
  * Calculates and emits the current frame to GUI.
  */
 void video_player::show_frame() {
-    emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
-    convert_frame();
-    emit processedImage(img);
+    emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES));
+    emit processed_image(img);
 }
 
 /**
@@ -109,19 +117,48 @@ void video_player::show_frame() {
 void video_player::convert_frame() {
     cv::Mat zoomed_frame;
     zoomed_frame = zoom_frame(frame);
+    cv::Mat scaled_frame;
 
-    if (zoomed_frame.channels() == 3) {
-        cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
-        img = QImage((const unsigned char*)(RGBframe.data),
-                          RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+    if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
+        scaled_frame = scale_frame(zoomed_frame);
     } else {
-        img = QImage((const unsigned char*)(zoomed_frame.data),
-                             zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
+        scaled_frame = zoomed_frame;
     }
+
+    if (scaled_frame.channels() == 3) {
+        cv::Mat RGBframe;
+        cvtColor(scaled_frame, RGBframe,CV_BGR2RGB);
+        img = QImage((const uchar *) RGBframe.data, RGBframe.cols,
+                  RGBframe.rows, RGBframe.step, QImage::Format_RGB888);
+        img.bits(); // enforce deep copy
+    } else {
+        img = QImage((const unsigned char*)(scaled_frame.data),
+                             scaled_frame.cols,scaled_frame.rows,QImage::Format_Indexed8);
+        img.bits(); // enforce deep copy
+    }
+
     video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
     if (choosing_zoom_area) {
         zoom_area->draw(img);
     }
+}
+
+cv::Mat video_player::scale_frame(cv::Mat &src) {
+    // do something
+
+    cv::Size size;
+    if (frame_width <= 0 || frame_height <= 0) {
+        size = cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH),capture.get(CV_CAP_PROP_FRAME_HEIGHT));
+        frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+        frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    } else {
+        size = cv::Size(frame_width,frame_height);
+    }
+
+    cv::Mat dst;
+
+    cv::resize(src,dst,size); //resize image
+    return dst;
 }
 
 /**
@@ -469,4 +506,25 @@ void video_player::export_current_frame(QString path_to_folder) {
 
     QImageWriter writer(path_to_folder, "tiff");
     writer.write(img);
+}
+
+void video_player::scaling_event(int width, int height) {
+    if (!capture.isOpened()) {
+        return;
+    }
+    cout << "Window scaled to " << width << "x" << height << endl;
+    int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    float height_ratio = float(height)/float(video_height);
+    float width_ratio = float(width)/float(video_width);
+
+
+    if (width_ratio >= height_ratio) {
+        frame_width = int(video_width * height_ratio);
+        frame_height = height;
+    } else {
+        frame_width = width;
+        frame_height = int(video_height * width_ratio);
+    }
+    cout << "Scaled to " << frame_width << "x" << frame_height << endl;
 }

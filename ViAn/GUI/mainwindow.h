@@ -106,6 +106,9 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
+signals:
+    void resize_video_frame(int width, int height);
+
 private:
 
     Ui::MainWindow *ui;

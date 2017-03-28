@@ -63,8 +63,11 @@ public:
     const double SPEED_STEP_MULT = 2;
 
 signals:
-    void processedImage(const QImage &image);
-    void currentFrame(const int frame);
+    void processed_image(const QImage &image);
+    void update_current_frame(const int frame);
+
+private slots:
+    void scaling_event(int width, int height);
 
 protected:
     void run() override;
@@ -73,6 +76,7 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
+    cv::Mat scale_frame(cv::Mat &src);
     void update_overlay();
     void show_frame();
     void convert_frame();
