@@ -607,16 +607,28 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
 
 /**
  * @brief MainWindow::on_actionDeleteProject_triggered
+ * deletes the saved files of the selected project
+ * removes the project from the preoject tree
  */
 void MainWindow::on_actionDeleteProject_triggered() {
     if(selectedProject != nullptr) {
-        this->fileHandler->delete_project(fileHandler->get_project(this->selectedProject->id));
-        remove_selected_project_from_tree();
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
+                                                                    tr("Are you sure you want to delete the selected project?\n"),
+                                                                    QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No);
+
+        if (resBtn == QMessageBox::Yes) {
+            this->fileHandler->delete_project(fileHandler->get_project(this->selectedProject->id));
+            remove_selected_project_from_tree();
+        }
+    } else {
+        set_status_bar("No selected project to remove.");
     }
 }
 
 /**
  * @brief MainWindow::remove_selected_project_from_tree
+ * removes all videos of the selected project and then the project
  */
 void MainWindow::remove_selected_project_from_tree() {
     for(int child_number = 0; child_number < selectedProject->childCount(); child_number++) {
@@ -629,6 +641,7 @@ void MainWindow::remove_selected_project_from_tree() {
 
 /**
  * @brief MainWindow::remove_selected_video_from_tree
+ * removes the video from the tree
  */
 void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *video) {
     if (video == selectedVideo) {
