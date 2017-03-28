@@ -30,8 +30,8 @@ public:
     //
     //  Project manipulation
     //
-    std::string workSpace;
-    void set_workspace(std::string newWorkSpace);
+    std::string work_space;
+    void set_workspace(std::string new_work_space);
     Project* open_project(std::string dirpath);
     Project* create_project(std::string projName);
     FH_ERROR delete_project(Project* proj);

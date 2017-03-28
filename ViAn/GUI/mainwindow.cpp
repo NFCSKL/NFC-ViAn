@@ -491,7 +491,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  */
 void MainWindow::on_actionAddVideo_triggered() {
     if(selectedProject != nullptr) {
-        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),  this->fileHandler->workSpace.c_str(),
+        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),  this->fileHandler->work_space.c_str(),
                                                    tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
         input_switch_case(ACTION::ADD_VIDEO, dir);
     } else {
@@ -573,7 +573,7 @@ void MainWindow::on_actionSave_triggered() {
  */
 void MainWindow::on_actionLoad_triggered()
 {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->workSpace.c_str(),tr("*.txt"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->work_space.c_str(),tr("*.txt"));
     Project* loadProj= this->fileHandler->load_project(dir.toStdString());
     add_project_to_tree(loadProj);
     set_status_bar("Project " + loadProj->m_name + " loaded.");
@@ -609,12 +609,16 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
     project->addChild(videoInTree);
     set_selected_video(videoInTree);
 }
-
+/**
+ * @brief MainWindow::on_actionChoose_Workspace_triggered
+ * Opens file explorer and requests a workspace select from user, updates
+ * filehandler workspace accordingly.
+ */
 void MainWindow::on_actionChoose_Workspace_triggered()
 {
-    std::cout << this->fileHandler->workSpace << std::endl;
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->workSpace.c_str());
+    std::cout << this->fileHandler->work_space << std::endl;
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
     this->fileHandler->set_workspace(dir.toStdString() + "/");
-    std::cout << this->fileHandler->workSpace << std::endl;
-    set_status_bar("new wokspace set to " + this->fileHandler->workSpace);
+    std::cout << this->fileHandler->work_space << std::endl;
+    set_status_bar("new wokspace set to " + this->fileHandler->work_space);
 }
