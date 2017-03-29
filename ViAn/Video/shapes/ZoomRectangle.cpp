@@ -1,34 +1,34 @@
-#include "zoomrectangle.h"
+#include "ZoomRectangle.h"
 
 /**
- * @brief zoomrectangle::zoomrectangle
+ * @brief ZoomRectangle::ZoomRectangle
  */
-zoomrectangle::zoomrectangle() : rectangle(QColor(0, 255, 0), QPoint(0, 0)) {
+ZoomRectangle::ZoomRectangle() : Rectangle(QColor(0, 255, 0), QPoint(0, 0)) {
 }
 
 /**
- * @brief zoomrectangle::zoomrectangle
+ * @brief ZoomRectangle::ZoomRectangle
  * @param pos Starting point for the new object
  */
-zoomrectangle::zoomrectangle(QPoint pos) : rectangle(QColor(0, 255, 0), pos) {
+ZoomRectangle::ZoomRectangle(QPoint pos) : Rectangle(QColor(0, 255, 0), pos) {
 }
 
 /**
- * @brief zoomrectangle::set_start_pos
+ * @brief ZoomRectangle::set_start_pos
  * Used when the user presses the mouse button to start choosing an area.
  * @param pos The start position of the object.
  */
-void zoomrectangle::set_start_pos(QPoint pos) {
+void ZoomRectangle::set_start_pos(QPoint pos) {
     draw_start = pos;
 }
 
 /**
- * @brief zoomrectangle::area_choosen
+ * @brief ZoomRectangle::area_choosen
  * Called when the mouse has been released and an area
  * has been choosen. If it is a valid area it's stored
  * as the current zoom level.
  */
-void zoomrectangle::choose_area() {
+void ZoomRectangle::choose_area() {
     // Calculate the the coordinates in realtion to the current zoom level.
     double new_start_x = current_zoom_rect.x + ((double) draw_start.x()/width_video) * current_zoom_rect.width;
     double new_start_y = current_zoom_rect.y + ((double) draw_start.y()/height_video) * current_zoom_rect.height;
@@ -56,43 +56,43 @@ void zoomrectangle::choose_area() {
 }
 
 /**
- * @brief zoomrectangle::get_zoom_area
+ * @brief ZoomRectangle::get_zoom_area
  * @return Returns the area choosen.
  */
-cv::Rect zoomrectangle::get_zoom_area() {
+cv::Rect ZoomRectangle::get_zoom_area() {
     return current_zoom_rect;
 }
 
 /**
- * @brief zoomrectangle::reset_zoom_area
+ * @brief ZoomRectangle::reset_zoom_area
  * Resets the zoom area to the video size.
  */
-void zoomrectangle::reset_zoom_area() {
+void ZoomRectangle::reset_zoom_area() {
     set_zoom_area(0, 0, width_video, height_video);
 }
 
 /**
- * @brief zoomrectangle::set_size
+ * @brief ZoomRectangle::set_size
  * Sets the video size to the specified width and
  * height, and sets the zoom area to the specified
  * width and height, starting in (0,0).
  * @param width Width of the video.
  * @param height Height of the video.
  */
-void zoomrectangle::set_size(int width, int height) {
+void ZoomRectangle::set_size(int width, int height) {
     width_video = width;
     height_video = height;
     reset_zoom_area();
 }
 
 /**
- * @brief zoomrectangle::set_zoom_area
+ * @brief ZoomRectangle::set_zoom_area
  * @param x Top left x coordinate of the area.
  * @param y Top left y coordinate of the area.
  * @param width Width of the area.
  * @param height Height of the area.
  */
-void  zoomrectangle::set_zoom_area(int x, int y, int width, int height) {
+void  ZoomRectangle::set_zoom_area(int x, int y, int width, int height) {
     current_zoom_rect.x = x;
     current_zoom_rect.y = y;
     current_zoom_rect.width = width;
@@ -100,11 +100,11 @@ void  zoomrectangle::set_zoom_area(int x, int y, int width, int height) {
 }
 
 /**
- * @brief zoomrectangle::draw
+ * @brief ZoomRectangle::draw
  * Draws the object on top of the specified QImage.
  * @param img QImage to draw on
  */
-void zoomrectangle::draw(QImage &img) {
+void ZoomRectangle::draw(QImage &img) {
     QPainter painter(&img);
     setup_paint_tool(painter);
     int width = draw_end.x() - draw_start.x();

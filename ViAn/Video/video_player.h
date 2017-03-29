@@ -11,7 +11,7 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QWaitCondition>
-#include "overlay.h"
+#include "Overlay.h"
 
 #include <chrono>
 
@@ -45,7 +45,7 @@ public:
     void dec_playback_speed();
     
     void toggle_overlay();
-    void set_overlay_tool(SHAPES shape);
+    void set_overlay_tool(SHAPES Shape);
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
@@ -97,7 +97,7 @@ private:
     QImage img;
     QWaitCondition condition;
 
-    zoomrectangle* zoom_area = new zoomrectangle();
+    ZoomRectangle* zoom_area = new ZoomRectangle();
 
     overlay* video_overlay;
 };

@@ -1,20 +1,20 @@
-#include "text.h"
+#include "Text.h"
 
 /**
- * @brief text::text
+ * @brief Text::Text
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-text::text(QColor col, QPoint pos, QString strng) : shape(col, pos) {
+Text::Text(QColor col, QPoint pos, QString strng) : Shape(col, pos) {
     string = strng;
 }
 
 /**
- * @brief text::draw
+ * @brief Text::draw
  * Draws the object on top of the specified QImage.
  * @param img QImage to draw on
  */
-void text::draw(QImage &img) {
+void Text::draw(QImage &img) {
     QPainter painter(&img);
     setup_paint_tool(painter);
 
@@ -27,10 +27,10 @@ void text::draw(QImage &img) {
 }
 
 /**
- * @brief text::handle_new_pos
+ * @brief Text::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.
  * @param pos
  */
-void text::handle_new_pos(QPoint pos) {
+void Text::handle_new_pos(QPoint pos) {
 }

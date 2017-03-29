@@ -1,32 +1,32 @@
-#include "rectangle.h"
+#include "Circle.h"
 
 /**
- * @brief rectangle::rectangle
+ * @brief Circle::Circle
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-rectangle::rectangle(QColor col, QPoint pos) : shape(col, pos) {
+Circle::Circle(QColor col, QPoint pos) : Shape(col, pos) {
 }
 
 /**
- * @brief rectangle::draw
+ * @brief Circle::draw
  * Draws the object on top of the specified QImage.
  * @param img QImage to draw on
  */
-void rectangle::draw(QImage &img) {
+void Circle::draw(QImage &img) {
     QPainter painter(&img);
     setup_paint_tool(painter);
     int width = draw_end.x() - draw_start.x();
     int height = draw_end.y() - draw_start.y();
-    painter.drawRect(draw_start.x(), draw_start.y(), width, height);
+    painter.drawEllipse(draw_start.x(), draw_start.y(), width, height);
     painter.end();
 }
 
 /**
- * @brief rectangle::handle_new_pos
+ * @brief Circle::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.
  * @param pos
  */
-void rectangle::handle_new_pos(QPoint pos) {
+void Circle::handle_new_pos(QPoint pos) {
 }

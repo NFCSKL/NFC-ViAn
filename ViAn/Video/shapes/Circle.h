@@ -1,11 +1,11 @@
 #ifndef CIRCLE_H
 #define CIRCLE_H
 
-#include "shape.h"
+#include "Shape.h"
 
-class circle : public shape {
+class Circle : public Shape {
 public:
-    circle(QColor col, QPoint pos);
+    Circle(QColor col, QPoint pos);
     void draw(QImage &img) override;
     void handle_new_pos(QPoint pos);
 };

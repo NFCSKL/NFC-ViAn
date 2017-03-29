@@ -1,7 +1,7 @@
 #ifndef ZOOMRECTANGLE_H
 #define ZOOMRECTANGLE_H
 
-#include "rectangle.h"
+#include "Rectangle.h"
 #include <algorithm>
 
 #include "opencv2/opencv.hpp"
@@ -10,10 +10,10 @@
 #include "opencv2/video/video.hpp"
 #include "opencv2/core/core.hpp"
 
-class zoomrectangle : public rectangle {
+class ZoomRectangle : public Rectangle {
 public:
-    zoomrectangle();
-    zoomrectangle(QPoint pos);
+    ZoomRectangle();
+    ZoomRectangle(QPoint pos);
     void set_start_pos(QPoint pos);
     void choose_area();
     cv::Rect get_zoom_area();

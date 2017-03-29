@@ -1,11 +1,11 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "shape.h"
+#include "Shape.h"
 
-class text : public shape {
+class Text : public Shape {
 public:
-    text(QColor col, QPoint pos, QString strng);
+    Text(QColor col, QPoint pos, QString strng);
     void draw(QImage &img) override;
     void handle_new_pos(QPoint pos);
 private:

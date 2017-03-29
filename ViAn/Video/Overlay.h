@@ -3,14 +3,14 @@
 
 #include <QImage>
 #include <QColor>
-#include "shapes/shape.h"
-#include "shapes/rectangle.h"
-#include "shapes/circle.h"
-#include "shapes/line.h"
-#include "shapes/arrow.h"
-#include "shapes/pen.h"
-#include "shapes/text.h"
-#include "shapes/zoomrectangle.h"
+#include "shapes/Shape.h"
+#include "shapes/Rectangle.h"
+#include "shapes/Circle.h"
+#include "shapes/Line.h"
+#include "shapes/Arrow.h"
+#include "shapes/Pen.h"
+#include "shapes/Text.h"
+#include "shapes/ZoomRectangle.h"
 
 class overlay {
 
@@ -39,7 +39,7 @@ private:
     QColor current_colour = Qt::red;
     QString current_string = "";
 
-    std::map<int, QList<shape*>> overlays;
+    std::map<int, QList<Shape*>> overlays;
 };
 
 #endif // OVERLAY_H

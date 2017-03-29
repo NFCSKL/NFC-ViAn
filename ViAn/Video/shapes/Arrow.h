@@ -1,11 +1,11 @@
 #ifndef ARROW_H
 #define ARROW_H
 
-#include "shape.h"
+#include "Shape.h"
 
-class arrow : public shape {
+class Arrow : public Shape {
 public:
-    arrow(QColor col, QPoint pos);
+    Arrow(QColor col, QPoint pos);
     void draw(QImage &img) override;
     void handle_new_pos(QPoint pos);
 };

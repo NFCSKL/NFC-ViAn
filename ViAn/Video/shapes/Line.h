@@ -1,11 +1,11 @@
 #ifndef LINE_H
 #define LINE_H
 
-#include "shape.h"
+#include "Shape.h"
 
-class line : public shape {
+class Line : public Shape {
 public:
-    line(QColor col, QPoint pos);
+    Line(QColor col, QPoint pos);
     void draw(QImage &img) override;
     void handle_new_pos(QPoint pos);
 };
