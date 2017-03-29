@@ -238,26 +238,37 @@
          </layout>
         </item>
         <item>
-         <widget class="QSlider" name="videoSlider">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="singleStep">
-           <number>1</number>
-          </property>
-          <property name="sliderPosition">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="sliderLayout">
+          <item>
+           <widget class="QLabel" name="sliderLabel">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="videoSlider">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>

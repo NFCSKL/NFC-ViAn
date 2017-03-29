@@ -30,6 +30,7 @@ public:
     void export_current_frame(QString path_to_folder);
 
     int get_num_frames();    
+    int get_current_frame_num();
     void play_pause();
     void stop_video();
     void set_frame_width(int new_value);
