@@ -206,7 +206,7 @@ int video_player::get_num_frames() {
  * @return The number of the current frame.
  */
 int video_player::get_current_frame_num() {
-    // capture.get() gives the number of the next frame, hence the -1.
+    // capture.get() gives the number of the next frame, hence the compensation of -1.
     return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
 }
 
@@ -215,7 +215,7 @@ int video_player::get_current_frame_num() {
  * @param frame_nbr The number to set the current frame to.
  */
 void video_player::set_current_frame_num(int frame_nbr) {
-    // capture.set() sets the number of the next frame, hence the +1.
+    // capture.set() sets the number of the next frame, hence the compensation of +1.
     capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr + 1);
 }
 
@@ -299,7 +299,7 @@ void video_player::on_stop_video() {
  * Updates the current frame if frame_nbr is valid.
  */
 void video_player::update_frame(int frame_nbr) {
-    // capture.read() will advance the video one frame, hence -1.
+    // capture.read() will advance the video one frame, hence compensation of -1.
     if (set_playback_frame(frame_nbr - 1)) {
         set_current_frame_num(frame_nbr - 1);
         capture.read(frame);
