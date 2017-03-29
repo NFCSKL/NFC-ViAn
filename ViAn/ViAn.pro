@@ -16,16 +16,7 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    Video/shapes/Arrow.cpp \
-    Video/shapes/Circle.cpp \
-    Video/shapes/Line.cpp \
-    Video/shapes/Pen.cpp \
-    Video/shapes/Rectangle.cpp \
-    Video/shapes/Shape.cpp \
-    Video/shapes/Text.cpp \
-    Video/Overlay.cpp \
-    Video/shapes/ZoomRectangle.cpp
+SOURCES += main.cpp
 
 
 #
@@ -36,16 +27,7 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h \
-    Video/shapes/Arrow.h \
-    Video/shapes/Circle.h \
-    Video/shapes/Line.h \
-    Video/shapes/Pen.h \
-    Video/shapes/Rectangle.h \
-    Video/shapes/Shape.h \
-    Video/shapes/Text.h \
-    Video/shapes/ZoomRectangle.h \
-    Video/Overlay.h
+    Test/test_mainwindow.h
 
 
 #
@@ -73,8 +55,26 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp
-HEADERS += Video/video_player.h
+SOURCES += Video/video_player.cpp \
+    Video/shapes/Arrow.cpp \
+    Video/shapes/Circle.cpp \
+    Video/shapes/Line.cpp \
+    Video/shapes/Pen.cpp \
+    Video/shapes/Rectangle.cpp \
+    Video/shapes/Shape.cpp \
+    Video/shapes/Text.cpp \
+    Video/Overlay.cpp \
+    Video/shapes/ZoomRectangle.cpp
+HEADERS += Video/video_player.h \
+    Video/shapes/Arrow.h \
+    Video/shapes/Circle.h \
+    Video/shapes/Line.h \
+    Video/shapes/Pen.h \
+    Video/shapes/Rectangle.h \
+    Video/shapes/Shape.h \
+    Video/shapes/Text.h \
+    Video/shapes/ZoomRectangle.h \
+    Video/Overlay.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
