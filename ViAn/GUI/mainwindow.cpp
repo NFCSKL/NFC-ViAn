@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
+
+    // Initially hide overlay toolbar
+    ui->toolBar->hide();
 }
 
 /**
@@ -312,6 +315,7 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
  */
 void MainWindow::on_actionShow_hide_overview_triggered() {
     mvideo_player->toggle_overlay();
+    toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
         set_status_bar("Overlay: On.");
     } else {
@@ -609,6 +613,7 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
     project->addChild(videoInTree);
     set_selected_video(videoInTree);
 }
+
 /**
  * @brief MainWindow::on_actionChoose_Workspace_triggered
  * Opens file explorer and requests a workspace select from user, updates
@@ -619,4 +624,21 @@ void MainWindow::on_actionChoose_Workspace_triggered()
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
     this->fileHandler->set_workspace(dir.toStdString() + "/");
     set_status_bar("new wokspace set to " + this->fileHandler->work_space);
+}
+
+/**
+ * @brief MainWindow::toggle_toolbar
+ * This method will toggle the toolbar depending on wether the overlay is showing or not.
+ * It is switching between a toolbar that contains items as save/add/load and another that
+ * contains drawing tools.
+ * This is invoked when the overlay is activated and deactivated.
+ */
+void MainWindow::toggle_toolbar() {
+    if(mvideo_player->is_showing_overlay()) {
+        ui->toolBar_no_overlay->hide();
+        ui->toolBar->show();
+    }else {
+        ui->toolBar->hide();
+        ui->toolBar_no_overlay->show();
+    }
 }
