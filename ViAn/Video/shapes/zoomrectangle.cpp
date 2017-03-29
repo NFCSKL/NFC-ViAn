@@ -16,6 +16,8 @@ zoomrectangle::zoomrectangle(QPoint pos) : rectangle(QColor(0, 255, 0), pos) {
 /**
  * @brief shape::update_drawing_pos
  * Updates the position of the end point of the drawing.
+ * Coordinates outside the frame are moved to the closest
+ * coordinate on the frame.
  * (Overrides the function in the shape class.)
  * @param pos
  */
@@ -27,6 +29,8 @@ void zoomrectangle::update_drawing_pos(QPoint pos) {
 /**
  * @brief zoomrectangle::set_start_pos
  * Used when the user presses the mouse button to start choosing an area.
+ * Coordinates outside the frame are moved to the closest
+ * coordinate on the frame.
  * @param pos The start position of the object.
  */
 void zoomrectangle::set_start_pos(QPoint pos) {
