@@ -12,6 +12,8 @@
 #include "shapes/text.h"
 #include "shapes/zoomrectangle.h"
 
+#include "opencv2/opencv.hpp"
+
 class Overlay {
 
 public:
