@@ -39,7 +39,7 @@ void ZoomRectangle::set_start_pos(QPoint pos) {
 }
 
 /**
- * @brief ZoomRectangle::area_choosen
+ * @brief ZoomRectangle::choose_area
  * Called when the mouse has been released and an area
  * has been choosen. If it is a valid area it's stored
  * as the current zoom level.
