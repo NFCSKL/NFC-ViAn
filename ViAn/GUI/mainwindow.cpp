@@ -493,7 +493,9 @@ void MainWindow::on_actionAddVideo_triggered() {
     if(selectedProject != nullptr) {
         QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
                                                    tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
-        input_switch_case(ACTION::ADD_VIDEO, dir);
+        if(!dir.isEmpty()) { // Check if you have selected something.
+            input_switch_case(ACTION::ADD_VIDEO, dir);
+        }
     } else {
         set_status_bar("No project selected.");
     }
@@ -573,9 +575,11 @@ void MainWindow::on_actionSave_triggered() {
  */
 void MainWindow::on_actionLoad_triggered() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
-    Project* loadProj= this->fileHandler->load_project(dir.toStdString());
-    add_project_to_tree(loadProj);
-    set_status_bar("Project " + loadProj->m_name + " loaded.");
+    if(!dir.isEmpty()) { // Check if you have selected something.
+        Project* loadProj= this->fileHandler->load_project(dir.toStdString());
+        add_project_to_tree(loadProj);
+        set_status_bar("Project " + loadProj->m_name + " loaded.");
+    }
 }
 
 /**
