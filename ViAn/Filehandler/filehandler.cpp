@@ -137,6 +137,8 @@ Project* FileHandler::load_project(std::string fullProjectPath){
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
     proj->m_id = this->m_pid;
+    proj->files->dir = add_dir(dirpath);
+
     add_project(std::make_pair(this->m_pid++, proj));
     ProjectStream projStream;
 
@@ -357,3 +359,52 @@ ID FileHandler::add_dir(std::string dirpath){
     return this->m_did++;
  }
 
+/**
+ * @brief FileHandler::proj_equals
+ * @param proj
+ * @param proj2
+ * @return true if project contents are the same
+ */
+bool FileHandler::proj_equals(Project& proj, Project& proj2){
+    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
+               proj2.m_videos.begin(),
+               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
+                                                                        // by dereferencing pointers in vector
+    return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
+           proj.m_name == proj2.m_name &&
+           videoEquals;
+}
+
+/**
+ * @brief FileHandler::projfiles_equal
+ * @param pf
+ * @param pf2
+ * @return true if files are the same paths
+ */
+bool FileHandler::projfiles_equal(ProjFiles& pf, ProjFiles& pf2){
+    return dirs_equal(pf.dir, pf2.dir) &&
+        this->files_equal(pf.f_proj, pf2.f_proj) &&
+        this->files_equal(pf.f_analysis, pf2.f_analysis)&&
+        this->files_equal(pf.f_drawings, pf2.f_drawings) &&
+        this->files_equal(pf.f_videos, pf2.f_videos);
+}
+
+/**
+ * @brief FileHandler::files_equal
+ * @param id
+ * @param id2
+ * @return
+ */
+bool FileHandler::files_equal(ID id, ID id2){
+    return this->get_file(id) == this->get_file(id2);
+}
+
+/**
+ * @brief FileHandler::dirs_equal
+ * @param id
+ * @param id2
+ * @return true if dirs are same path
+ */
+bool FileHandler::dirs_equal(ID id, ID id2){
+    return this->get_dir(id) == this->get_dir(id2);
+}
