@@ -27,8 +27,8 @@ FileHandler::FileHandler() {
  * @brief FileHandler::set_workspace
  * @param newWorkSpace
  */
-void FileHandler::set_workspace(std::string newWorkSpace){
-    this->work_space = newWorkSpace;
+void FileHandler::set_workspace(std::string new_work_space){
+    this->work_space = new_work_space;
     //save_workspace();
 }
 
