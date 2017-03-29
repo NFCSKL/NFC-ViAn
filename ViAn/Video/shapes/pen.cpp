@@ -29,5 +29,5 @@ cv::Mat pen::draw(cv::Mat &frame) {
  */
 void pen::handle_new_pos(QPoint pos) {
     std::pair<cv::Point, cv::Point> line(draw_end, qpoint_to_point(pos));
-    lines.append(line);
+    lines.push_back(line);
 }
