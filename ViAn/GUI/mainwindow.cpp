@@ -469,16 +469,16 @@ void MainWindow::prepare_menu(const QPoint & pos) {
 
     } else if(item->type == TYPE::PROJECT) {
         set_selected_project(item);
-        QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
-        addVideo->setStatusTip(tr("Add video"));
-        menu.addAction(addVideo);
-        connect(addVideo, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+        QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
+        add_video->setStatusTip(tr("Add video"));
+        menu.addAction(add_video);
+        connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
     } else if(item->type == TYPE::VIDEO) {
         set_selected_video(item);
-        QAction *loadVideo = new QAction(QIcon(""), tr("&Play video"), this);
-        loadVideo->setStatusTip(tr("Play video"));
-        menu.addAction(loadVideo);
-        connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
+        QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+        load_video->setStatusTip(tr("Play video"));
+        menu.addAction(load_video);
+        connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
