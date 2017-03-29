@@ -286,7 +286,6 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
         }
         default:
             break;
-
     }
 }
 
@@ -294,7 +293,6 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
  * @param column the column in the tree
- * If you click on the selected video it will start playing.
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
     MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
@@ -303,13 +301,32 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
         set_selected_project(q_item);
         break;
     case TYPE::VIDEO:
-        if(q_item == selectedVideo) {
-            play_video();
-        } else {
+        if(q_item != selectedVideo) {
             set_selected_video(q_item);
         }
         break;
     default:
+        break;
+    }
+}
+
+/**
+ * @brief MainWindow::on_ProjectTree_itemDoubleClicked
+ * @param item, the item in the projectTree that was clicked
+ * @param column, the column in the tree
+ * Double clicking on a video will start to play it.
+ * Double clicking on a project will expand it.
+ */
+void MainWindow::on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
+    switch(q_item->type){
+    case TYPE::PROJECT:
+        }else{
+        }
+        break;
+    case TYPE::VIDEO:
+        play_video();
         break;
     }
 }
@@ -452,7 +469,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
  */
 void MainWindow::on_actionZoom_in_triggered() {
     mvideo_player->zoom_in();
-    set_status_bar("Zoom in. Coose your area.");
+    set_status_bar("Zoom in. Choose your area.");
 }
 
 /**
@@ -564,17 +581,8 @@ void MainWindow::set_selected_video(MyQTreeWidgetItem *newSelectedVideo) {
 void MainWindow::set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected) {
     if(selected == nullptr) {
         selected = new_selected;
-        QString string = selected->text(0);
-        string.append(QString::fromStdString(ARROW_STRING));
-        selected->setText(0, string);
     } else if (selected != new_selected) {
-        QString string = selected->text(0);
-        string.chop(ARROW_STRING.length());
-        selected->setText(0, string);
         selected = new_selected;
-        string = selected->text(0);
-        string.append(QString::fromStdString(ARROW_STRING));
-        selected->setText(0, string);
     }
 }
 
@@ -633,6 +641,7 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
     MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath));
     videoInTree->set_text_from_filepath(filePath);
     project->addChild(videoInTree);
+    project->setExpanded(true);
     set_selected_video(videoInTree);
 }
 
