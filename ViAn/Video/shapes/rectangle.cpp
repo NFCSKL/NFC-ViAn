@@ -1,30 +1,30 @@
 #include "rectangle.h"
 
 /**
- * @brief rectangle::rectangle
+ * @brief Rectangle::Rectangle
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-rectangle::rectangle(QColor col, QPoint pos) : shape(col, pos) {
+Rectangle::Rectangle(QColor col, QPoint pos) : Shape(col, pos) {
 }
 
 /**
- * @brief rectangle::draw
+ * @brief Rectangle::draw
  * Draws the object on top of the specified frame.
  * @param frame Frame to draw on.
  * @return Returns the frame with drawing.
  */
-cv::Mat rectangle::draw(cv::Mat &frame) {
+cv::Mat Rectangle::draw(cv::Mat &frame) {
     cv::Rect rect(draw_start, draw_end);
     cv::rectangle(frame, rect, colour, LINE_THICKNESS);
     return frame;
 }
 
 /**
- * @brief rectangle::handle_new_pos
+ * @brief Rectangle::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.
  * @param pos
  */
-void rectangle::handle_new_pos(QPoint pos) {
+void Rectangle::handle_new_pos(QPoint pos) {
 }

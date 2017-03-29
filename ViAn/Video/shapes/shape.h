@@ -9,10 +9,10 @@
 
 enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT};
 
-class shape {
+class Shape {
 
 public:
-    shape(QColor col, QPoint pos);
+    Shape(QColor col, QPoint pos);
     void update_drawing_pos(QPoint pos);
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
