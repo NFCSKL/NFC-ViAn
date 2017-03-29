@@ -10,16 +10,17 @@ Overlay::Overlay() {
 
 /**
  * @brief Overlay::draw_overlay
- * Draws an overlay on top of the specified QImage.
- * @param img QImage to draw on
+ * Draws an overlay on top of the specified frame.
+ * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::draw_overlay(QImage &img, int frame_nr) {
+cv::Mat Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
         foreach (Shape* s, overlays[frame_nr]) {
-            s->draw(img);
+            frame = s->draw(frame);
         }
     }
+    return frame;
 }
 
 /**
@@ -54,10 +55,15 @@ void Overlay::set_showing_overlay(bool value) {
  * @param s
  */
 void Overlay::set_tool(SHAPES s) {
-    current_shape = s;
     if (s == TEXT) {
-        current_string = QInputDialog::getText(NULL, "Text chooser", "Enter a text:");
+        bool ok;
+        current_string = QInputDialog::getText(NULL, "Text chooser", "Enter a text:", QLineEdit::Normal, QString(), &ok);
+        if (!ok || current_string.isEmpty()) {
+            // Cancelled or empty field.
+            return;
+        }
     }
+    current_shape = s;
 }
 
 /**

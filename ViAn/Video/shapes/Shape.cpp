@@ -7,9 +7,9 @@
  * @param pos Starting point for the new object
  */
 Shape::Shape(QColor col, QPoint pos) {
-    colour = col;
-    draw_start = pos;
-    draw_end = pos;
+    colour = qcolor_to_scalar(col);
+    draw_start = qpoint_to_point(pos);
+    draw_end = qpoint_to_point(pos);
 }
 
 /**
@@ -20,17 +20,27 @@ Shape::Shape(QColor col, QPoint pos) {
 void Shape::update_drawing_pos(QPoint pos) {
     // Call handle_new_pos first because it might need the old draw_end value.
     handle_new_pos(pos);
-    draw_end = pos;
+    draw_end = qpoint_to_point(pos);
 }
 
 /**
- * @brief Shape::setup_paint_tool
- * Initiates a painter with the object's colour
- * @param painter
+ * @brief Shape::qcolor_to_scalar
+ * Converts QColor to OpenCV Scalar.
+ * @param col QColor to be converted.
+ * @return Returns converted colour.
  */
-void Shape::setup_paint_tool(QPainter &painter) {
-    QPen pen;
-    pen.setWidth(3);
-    pen.setColor(colour);
-    painter.setPen(pen);
+cv::Scalar Shape::qcolor_to_scalar(QColor col) {
+    int r,g,b;
+    col.getRgb(&r, &g, &b);
+    return cv::Scalar(b,g,r); // swap RGB-->BGR
+}
+
+/**
+ * @brief Shape::qpoint_to_point
+ * Converts QPoint to OpenCV Point.
+ * @param pnt QPoint to be converted.
+ * @return Returns converted Point.
+ */
+cv::Point Shape::qpoint_to_point(QPoint pnt) {
+    return cv::Point(pnt.x(), pnt.y());
 }

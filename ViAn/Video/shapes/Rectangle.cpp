@@ -10,16 +10,14 @@ Rectangle::Rectangle(QColor col, QPoint pos) : Shape(col, pos) {
 
 /**
  * @brief Rectangle::draw
- * Draws the object on top of the specified QImage.
- * @param img QImage to draw on
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return Returns the frame with drawing.
  */
-void Rectangle::draw(QImage &img) {
-    QPainter painter(&img);
-    setup_paint_tool(painter);
-    int width = draw_end.x() - draw_start.x();
-    int height = draw_end.y() - draw_start.y();
-    painter.drawRect(draw_start.x(), draw_start.y(), width, height);
-    painter.end();
+cv::Mat Rectangle::draw(cv::Mat &frame) {
+    cv::Rect rect(draw_start, draw_end);
+    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
+    return frame;
 }
 
 /**

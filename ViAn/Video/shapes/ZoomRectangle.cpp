@@ -8,18 +8,34 @@ ZoomRectangle::ZoomRectangle() : Rectangle(QColor(0, 255, 0), QPoint(0, 0)) {
 
 /**
  * @brief ZoomRectangle::ZoomRectangle
- * @param pos Starting point for the new object
+ * @param pos Starting point for the new object.
  */
 ZoomRectangle::ZoomRectangle(QPoint pos) : Rectangle(QColor(0, 255, 0), pos) {
 }
 
 /**
+ * @brief ZoomRectangle::update_drawing_pos
+ * Updates the position of the end point of the drawing.
+ * Coordinates outside the frame are moved to the closest
+ * coordinate on the frame.
+ * (Overrides the function in the shape class.)
+ * @param pos
+ */
+void ZoomRectangle::update_drawing_pos(QPoint pos) {
+    // The zoom area has to be inside the video.
+    draw_end = bounded_coords(pos);
+}
+
+/**
  * @brief ZoomRectangle::set_start_pos
  * Used when the user presses the mouse button to start choosing an area.
+ * Coordinates outside the frame are moved to the closest
+ * coordinate on the frame.
  * @param pos The start position of the object.
  */
 void ZoomRectangle::set_start_pos(QPoint pos) {
-    draw_start = pos;
+    // The zoom area has to be inside the video.
+    draw_start = bounded_coords(pos);
 }
 
 /**
@@ -29,30 +45,16 @@ void ZoomRectangle::set_start_pos(QPoint pos) {
  * as the current zoom level.
  */
 void ZoomRectangle::choose_area() {
-    // Calculate the the coordinates in realtion to the current zoom level.
-    double new_start_x = current_zoom_rect.x + ((double) draw_start.x()/width_video) * current_zoom_rect.width;
-    double new_start_y = current_zoom_rect.y + ((double) draw_start.y()/height_video) * current_zoom_rect.height;
-    double new_end_x = current_zoom_rect.x + ((double) draw_end.x()/width_video) * current_zoom_rect.width;
-    double new_end_y = current_zoom_rect.y + ((double) draw_end.y()/height_video) * current_zoom_rect.height;
-    int new_width = new_end_x - new_start_x;
-    int new_height = new_end_y - new_start_y;
-
     // Rectangle starts in the top left corner, with positive width and height
-    int use_start_x = std::min(new_start_x, new_end_x);
-    int use_start_y = std::min(new_start_y, new_end_y);
-    int use_width = std::abs(new_width);
-    int use_height = std::abs(new_height);
+    cv::Rect rect(draw_start, draw_end);
 
     // Zoom limit
-    if (use_width < 100 || use_height < 100) {
+    if (rect.width < MINIMUM_ZOOM_SIZE || rect.height < MINIMUM_ZOOM_SIZE) {
         return;
     }
 
     // Update current zoom level
-    current_zoom_rect.x = use_start_x;
-    current_zoom_rect.y = use_start_y;
-    current_zoom_rect.width = use_width;
-    current_zoom_rect.height = use_height;
+    current_zoom_rect = rect;
 }
 
 /**
@@ -101,16 +103,62 @@ void  ZoomRectangle::set_zoom_area(int x, int y, int width, int height) {
 
 /**
  * @brief ZoomRectangle::draw
- * Draws the object on top of the specified QImage.
- * @param img QImage to draw on
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return Returns the frame with drawing.
  */
-void ZoomRectangle::draw(QImage &img) {
-    QPainter painter(&img);
-    setup_paint_tool(painter);
-    int width = draw_end.x() - draw_start.x();
-    int height = draw_end.y() - draw_start.y();
-    painter.setOpacity(0.5);
-    painter.fillRect(draw_start.x(), draw_start.y(), width, height, QColor(100,100,100));
-    painter.drawRect(draw_start.x(), draw_start.y(), width, height);
-    painter.end();
+cv::Mat ZoomRectangle::draw(cv::Mat &frame) {
+    cv::Rect rect(draw_start, draw_end);
+    cv::Mat area = frame(rect);
+    // CV_8UC3 means 8-bit unsigned 3-channel array.
+    cv::Mat coloured_area(area.size(), CV_8UC3, cv::Scalar(125, 125, 125));
+    double alpha = 0.6;
+    cv::addWeighted(coloured_area, alpha, area, 1.0 - alpha , 0.0, area);
+    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
+    return frame;
+}
+
+/**
+ * @brief ZoomRectangle::get_x
+ * @return Returns the x coordinate of the top right corner.
+ */
+int ZoomRectangle::get_x() {
+   return current_zoom_rect.x;
+}
+
+/**
+ * @brief ZoomRectangle::get_y
+ * @return Returns the y coordinate of the top right corner.
+ */
+int ZoomRectangle::get_y() {
+    return current_zoom_rect.y;
+}
+
+/**
+ * @brief ZoomRectangle::get_width
+ * @return Returns the width.
+ */
+int ZoomRectangle::get_width() {
+    return current_zoom_rect.width;
+}
+
+/**
+ * @brief ZoomRectangle::get_height
+ * @return Returns the height.
+ */
+int ZoomRectangle::get_height() {
+    return current_zoom_rect.height;
+}
+
+/**
+ * @brief ZoomRectangle::bounded_coords
+ * Returns coordinates closest to the specified
+ * position within the video frame, converted
+ * to an OpenCV Point.
+ * @param pos Coordinate.
+ * @return
+ */
+cv::Point ZoomRectangle::bounded_coords(QPoint pos) {
+    return cv::Point(std::min(width_video, std::max(0, pos.x())),
+                     std::min(height_video, std::max(0, pos.y())));
 }

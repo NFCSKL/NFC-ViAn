@@ -294,26 +294,31 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
  * @param column the column in the tree
+ * If you click on the selected video it will start playing.
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-    MyQTreeWidgetItem *newItem = (MyQTreeWidgetItem*)item;
-    switch(newItem->type) {
+    MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
+    switch(q_item->type) {
     case TYPE::PROJECT:
-        set_selected_project(newItem);
+        set_selected_project(q_item);
         break;
     case TYPE::VIDEO:
-        set_selected_video(newItem);
+        if(q_item == selectedVideo) {
+            play_video();
+        } else {
+            set_selected_video(q_item);
+        }
         break;
     default:
         break;
     }
 }
 
- /** @brief MainWindow::on_actionShow_hide_overview_triggered
+ /** @brief MainWindow::on_actionShow_hide_overlay_triggered
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
-void MainWindow::on_actionShow_hide_overview_triggered() {
+void MainWindow::on_actionShow_hide_overlay_triggered() {
     mvideo_player->toggle_overlay();
     toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
@@ -329,10 +334,12 @@ void MainWindow::on_actionShow_hide_overview_triggered() {
  */
 void MainWindow::on_actionColour_triggered() {
     QColor col = QColorDialog::getColor();
-    mvideo_player->set_overlay_colour(col);
-    string msg = "Color: ";
-    msg.append(col.name().toStdString());
-    set_status_bar(msg);
+    if (col.isValid()) {
+        mvideo_player->set_overlay_colour(col);
+        string msg = "Color: ";
+        msg.append(col.name().toStdString());
+        set_status_bar(msg);
+    }
 }
 
 /**

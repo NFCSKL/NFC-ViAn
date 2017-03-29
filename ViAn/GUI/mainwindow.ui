@@ -256,26 +256,37 @@
          </layout>
         </item>
         <item>
-         <widget class="QSlider" name="videoSlider">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="singleStep">
-           <number>1</number>
-          </property>
-          <property name="sliderPosition">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="sliderLayout">
+          <item>
+           <widget class="QLabel" name="sliderLabel">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="videoSlider">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -351,7 +362,7 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionShow_hide_overview"/>
+    <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
    </widget>
@@ -368,6 +379,7 @@
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
      <addaction name="actionPen"/>
+     <addaction name="actionText"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
@@ -425,6 +437,7 @@
    <addaction name="actionCircle"/>
    <addaction name="actionArrow"/>
    <addaction name="actionLine"/>
+   <addaction name="actionText"/>
    <addaction name="actionPen"/>
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
@@ -490,12 +503,15 @@
     <string>Open manual</string>
    </property>
   </action>
-  <action name="actionShow_hide_overview">
+  <action name="actionShow_hide_overlay">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/show_hide_overlay.png</normaloff>:/show_hide_overlay.png</iconset>
    </property>
    <property name="text">
+    <string>Show/hide overlay</string>
+   </property>
+   <property name="toolTip">
     <string>Show/hide overlay</string>
    </property>
   </action>
@@ -619,6 +635,27 @@
    </property>
    <property name="text">
     <string>Zoom out</string>
+   </property>
+   <property name="iconText">
+    <string>Zoom out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out</string>
+   </property>
+  </action>
+  <action name="actionText">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/text.png</normaloff>:/text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Text</string>
+   </property>
+   <property name="iconText">
+    <string>Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Text</string>
    </property>
   </action>
  </widget>

@@ -3,6 +3,9 @@
 
 #include <QImage>
 #include <qpainter.h>
+#include <algorithm>
+
+#include "opencv2/opencv.hpp"
 
 enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT};
 
@@ -12,13 +15,16 @@ public:
     Shape(QColor col, QPoint pos);
     void update_drawing_pos(QPoint pos);
     virtual void handle_new_pos(QPoint pos) = 0;
-    void setup_paint_tool(QPainter &painter);
-    virtual void draw(QImage &img) = 0;
+    virtual cv::Mat draw(cv::Mat &frame) = 0;
 protected:
-    QColor colour;
+    int LINE_THICKNESS = 2;
 
-    QPoint draw_start;
-    QPoint draw_end;
+    cv::Scalar qcolor_to_scalar(QColor col);
+    cv::Point qpoint_to_point(QPoint pnt);
+
+    cv::Scalar colour;
+    cv::Point draw_start;
+    cv::Point draw_end;
 };
 
 #endif // SHAPES_H
