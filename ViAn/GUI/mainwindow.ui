@@ -350,6 +350,7 @@
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
      <addaction name="actionPen"/>
+     <addaction name="actionText"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
@@ -407,6 +408,7 @@
    <addaction name="actionCircle"/>
    <addaction name="actionArrow"/>
    <addaction name="actionLine"/>
+   <addaction name="actionText"/>
    <addaction name="actionPen"/>
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
@@ -601,6 +603,27 @@
    </property>
    <property name="text">
     <string>Zoom out</string>
+   </property>
+   <property name="iconText">
+    <string>Zoom out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out</string>
+   </property>
+  </action>
+  <action name="actionText">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/text.png</normaloff>:/text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Text</string>
+   </property>
+   <property name="iconText">
+    <string>Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Text</string>
    </property>
   </action>
  </widget>
