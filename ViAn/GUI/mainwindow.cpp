@@ -294,15 +294,20 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
  * @param column the column in the tree
+ * If you click on the selected video it will start playing.
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-    MyQTreeWidgetItem *newItem = (MyQTreeWidgetItem*)item;
-    switch(newItem->type) {
+    MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
+    switch(q_item->type) {
     case TYPE::PROJECT:
-        set_selected_project(newItem);
+        set_selected_project(q_item);
         break;
     case TYPE::VIDEO:
-        set_selected_video(newItem);
+        if(q_item == selectedVideo) {
+            play_video();
+        } else {
+            set_selected_video(q_item);
+        }
         break;
     default:
         break;
