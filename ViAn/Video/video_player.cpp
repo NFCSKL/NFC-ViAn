@@ -64,9 +64,11 @@ void video_player::play_pause() {
 void video_player::stop_video() {
     stop = true;
     set_playback_frame(0);
+    /*
     if (video_paused) {
         video_paused = false;
     }
+    */
 }
 
 /**
@@ -81,11 +83,13 @@ void video_player::run()  {
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
     while(!stop  && capture.read(frame)){
+        // Wait indefinitly for video to be resumed
+        // TODO Needs to be awakened on stop to exit the loop and finish the thread
         m_mutex->lock();
         if (video_paused) {
-            std::cout << "Video is paused, waiting" << std::endl;
             m_paused_wait->wait(m_mutex);
-            std::cout << "Notified by gui thread" << std::endl;
+            play_pause();
+            std::cout << "Resuming playback" << std::endl;
         }
         m_mutex->unlock();
         show_frame();

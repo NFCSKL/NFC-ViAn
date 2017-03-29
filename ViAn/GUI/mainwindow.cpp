@@ -96,27 +96,22 @@ void MainWindow::on_fastBackwardButton_clicked(){
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked() {
-    if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
+    if (mvideo_player->is_paused()) {
+        // Video thread is paused. Notifying the waitcondition to resume playback
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
-
-        // Video is paused. Flip paused bool, acquire lock and notify video thread
-        std::cout << "Acquire mutex lock GUI" << std::endl;
-        mutex.lock();
-        std::cout << "Flip paused bool" << std::endl;
-        mvideo_player->play_pause();
-        std::cout << "Notify waiting threads" << std::endl;
-        paused_wait.notify_all();
-        std::cout << "Notified" << std::endl;
-        mutex.unlock();
-        std::cout << "Mutex lock released" << std::endl;
-
+        paused_wait.notify_one();
         //TODO fix different implementation for pause/stop mvideo_player->start();
+    } else if (mvideo_player->is_stopped()) {
+        // Video thread has finished. Start a new one
+        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
+        mvideo_player->start();
     } else {
+        // Video thread is running. Pause it
         set_status_bar("Paused");
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
-        mvideo_player->play_pause();
-        mvideo_player->wait();
+        mvideo_player->play_pause();  // TODO Not thread safe
+        // TODO cant block indefinitly?! mvideo_player->wait();
     }
 }
 
@@ -227,6 +222,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
 /**
  * @brief MainWindow::closeEvent
  * asks if you are sure you want to quit.
+ * TODO Needs to close all other threads before exiting the program
  * @param event closing
  */
 void MainWindow::closeEvent (QCloseEvent *event){
