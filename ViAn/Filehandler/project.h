@@ -55,8 +55,8 @@ public:
     Project();
     Project(ID id, std::string name);
     Project(std::string dirpath);
-    void add_video(Video *vid);
-
+    ID add_video(Video *vid);
+    void remove_video(ID id);
     // read and write operator for Projects
     friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
     friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
@@ -67,9 +67,10 @@ public:
 //    void add_drawing();      
 public:
     ID m_id;
+    ID v_id;
     std::string m_name;
     ProjFiles* files;
-    std::vector<Video*> m_videos;
+    std::map<ID,Video*> videos;
     bool saved;
 };
 

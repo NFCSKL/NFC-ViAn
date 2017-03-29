@@ -50,6 +50,7 @@ public:
 
 
     ID add_video(Project* proj, std::string filePath);
+    void remove_video(Project* proj, ID vid_id);
     //directory manipulation
     //varying implementation
     ID create_directory(std::string dirpath);
@@ -86,6 +87,7 @@ private:
     ID add_file(std::string filepath);
     void add_project(std::pair<ID,Project*> pair);
     ID add_dir(std::string dirpath);
+    //load operations
     ID load_project_file(std::string filePath, std::stringstream& projFileStream);
     void load_proj_files(std::string str);
     //add used for loading project from file

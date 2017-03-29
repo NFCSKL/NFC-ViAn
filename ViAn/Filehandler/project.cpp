@@ -23,18 +23,22 @@ Project::Project(){
 }
 
 /**
-* @brief Project::add_video
-* @param vid
-* add given video to project
-*/
-void Project::add_video(Video* vid)
-{
-    this->m_videos.push_back(vid);
-}
+ * @brief Project::remove_video
+ * @param id
+ */
 void Project::remove_video(ID id){
-    auto vid_it = m_videos.begin() + id;
-    delete *vid_it;
-    m_videos.erase(vid_it);
+    Video* temp = this->videos.at(id);
+    m_videos.erase(id);
+    delete temp;
+}
+
+/**
+ * @brief Project::add_video
+ * @return
+ */
+ID Project::add_video(Video* vid){
+    this->videos.insert(std::make_pair(this->v_id, vid));
+    return this->v_id++;
 }
 
 /**
@@ -78,7 +82,7 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write videos
     int vidcounter = proj.m_videos.size();
     ps.videos << vidcounter << " ";
-    for(auto vid = proj.m_videos.rbegin(); vid != proj.m_videos.rend(); ++vid){
+    for(auto vid = proj.videos.rbegin(); vid != proj.videos.rend(); ++vid){
         Video* v = *vid;
         if(v != nullptr){
             ps.videos << *v << " ";

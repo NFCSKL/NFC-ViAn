@@ -207,6 +207,9 @@ ID FileHandler::add_video(Project* proj, std::string filePath){
     return this->add_file(filePath);
 }
 
+void FileHandler::remove_video(Project* proj, ID vid_id){
+    proj->remove_video(vid_id);
+}
  /**
   * @brief FileHandler::create_file
   * create a file by given name in already excisting
