@@ -55,7 +55,7 @@ void test_video_player::test_stop_video() {
     mvideo->stop_video();
     QVERIFY(mvideo->stop == true);
     QVERIFY(mvideo->current_frame == 0);
-    //QVERIFY(mvideo->video_paused == false);
+    QVERIFY(mvideo->video_paused == false);
 }
 
 /**

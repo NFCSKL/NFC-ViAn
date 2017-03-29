@@ -54,6 +54,7 @@ bool video_player::load_video(string filename) {
  * Toggles the video_paused boolean
  */
 void video_player::play_pause() {
+    std::cout << "Play/pause " << video_paused << std::endl;
     video_paused = !video_paused;
 }
 
@@ -62,13 +63,14 @@ void video_player::play_pause() {
  * Sets stop related bools to their correct values and sets the current playback frame to be 0.
  */
 void video_player::stop_video() {
+    std::cout << "Stop" << std::endl;
     stop = true;
     set_playback_frame(0);
-    /*
+
     if (video_paused) {
         video_paused = false;
     }
-    */
+
 }
 
 /**
@@ -83,25 +85,23 @@ void video_player::run()  {
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
     while(!stop  && capture.read(frame)){
-        // Wait indefinitly for video to be resumed
-        // TODO Needs to be awakened on stop to exit the loop and finish the thread
-        m_mutex->lock();
-        if (video_paused) {
-            m_paused_wait->wait(m_mutex);
-            play_pause();
-            std::cout << "Resuming playback" << std::endl;
-        }
         m_mutex->unlock();
         show_frame();
         this->msleep(delay);
+
+        // Waits indefinitly for video to be resumed
+        m_mutex->lock();
+        if (video_paused) {
+            m_paused_wait->wait(m_mutex);
+            video_paused = false;
+            std::cout << "Resuming playback" << std::endl;
+        }
     }
-    //Saves the current frame of the video if the video is paused.
-    if (video_paused) {
-        current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
-    } else if (stop) {
+
+    // Reset frame on stop
+    if (stop) {
         current_frame = 0;
     }
-    std::cout << "Terminating thread" << std::endl;
 }
 
 /**

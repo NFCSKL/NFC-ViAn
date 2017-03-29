@@ -48,6 +48,12 @@ MainWindow::MainWindow(QWidget *parent) :
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
+
+    //TODO REMOVE
+    Project* proj = fileHandler->create_project("test");
+    add_project_to_tree(proj);
+    add_video_to_tree(selectedProject, "seq_01.mp4");
+
 }
 
 /**
@@ -96,6 +102,8 @@ void MainWindow::on_fastBackwardButton_clicked(){
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked() {
+    std::cout << "Paused: " << mvideo_player->is_paused() << std::endl;
+    std::cout << "Stopped: " << mvideo_player->is_stopped() << std::endl;
     if (mvideo_player->is_paused()) {
         // Video thread is paused. Notifying the waitcondition to resume playback
         set_status_bar("Playing");
@@ -131,6 +139,8 @@ void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+    } else {
+        paused_wait.notify_one();
     }
     mvideo_player->stop_video();
 }
