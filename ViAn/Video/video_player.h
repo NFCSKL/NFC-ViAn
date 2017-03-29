@@ -31,6 +31,7 @@ public:
     bool video_open();
 
     int get_num_frames();    
+    int get_current_frame_num();
     void play_pause();
     void stop_video();
     void set_frame_width(int new_value);
@@ -78,6 +79,7 @@ private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
     cv::Mat scale_frame(cv::Mat &src);
+    cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
     void convert_frame();

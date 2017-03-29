@@ -72,7 +72,7 @@ private slots:
 
     void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
-    void on_actionShow_hide_overview_triggered();
+    void on_actionShow_hide_overlay_triggered();
 
     void on_actionColour_triggered();
 
@@ -106,10 +106,13 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
+    void on_actionDeleteProject_triggered();
+
 signals:
     void resize_video_frame(int width, int height);
     void next_video_frame();
     void prev_video_frame();
+
 
 private:
 
@@ -129,8 +132,16 @@ private:
     void add_project_to_tree(Project* proj);
     void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 
+    void remove_selected_project_from_tree();
+    void remove_video_from_tree(MyQTreeWidgetItem *video);
+
+    void toggle_toolbar();
+    void enable_video_buttons();
+
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
+
+
 
 };
 

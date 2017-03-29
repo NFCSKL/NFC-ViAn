@@ -112,35 +112,52 @@ void video_player::show_frame() {
 
 /**
  * @brief video_player::convert_frame
- * Converts the current frame, including the overlay, to a QImage.
+ * Converts the current frame to a QImage,
+ * including the zoom and overlay.
  */
 void video_player::convert_frame() {
-    cv::Mat zoomed_frame;
-    zoomed_frame = zoom_frame(frame);
+    cv::Mat processed_frame;
 
-    cv::Mat scaled_frame;
-    if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
-        scaled_frame = scale_frame(zoomed_frame);
-    } else {
-        scaled_frame = zoomed_frame;
-    }
+    // Process frame (draw overlay, zoom, scaling)
+    processed_frame = process_frame(frame);
 
-    if (scaled_frame.channels() == 3) {
+
+    if (processed_frame.channels() == 3) {
         cv::Mat RGBframe;
-        cvtColor(scaled_frame, RGBframe,CV_BGR2RGB);
+        cvtColor(processed_frame, RGBframe,CV_BGR2RGB);
         img = QImage((const uchar *) RGBframe.data, RGBframe.cols,
                   RGBframe.rows, RGBframe.step, QImage::Format_RGB888);
         img.bits(); // enforce deep copy
     } else {
-        img = QImage((const unsigned char*)(scaled_frame.data),
-                             scaled_frame.cols,scaled_frame.rows,QImage::Format_Indexed8);
+        img = QImage((const unsigned char*)(processed_frame.data),
+                             processed_frame.cols,processed_frame.rows,QImage::Format_Indexed8);
         img.bits(); // enforce deep copy
     }
+}
 
-    video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
+/**
+ * @brief video_player::draw_frame
+ * Draws overlay on the frame and zooms in the frame.
+ * @param frame Frame to draw on.
+ * @return Returns the frame including the zoom and overlay.
+ */
+cv::Mat video_player::process_frame(cv::Mat &frame) {
+    // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
+    cv::Mat processed_frame = frame.clone();
+    processed_frame = video_overlay->draw_overlay(processed_frame, capture.get(CV_CAP_PROP_POS_FRAMES));
+
     if (choosing_zoom_area) {
-        zoom_area->draw(img);
+        processed_frame = zoom_area->draw(processed_frame);
     }
+    processed_frame = zoom_frame(processed_frame);
+
+    cv::Mat scaled_frame;
+    if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
+        scaled_frame = scale_frame(processed_frame);
+    } else {
+        scaled_frame = processed_frame;
+    }
+    return scaled_frame;
 }
 
 /**
@@ -167,10 +184,10 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
 }
 
 /**
- * @brief video_overlay::draw_overlay
+ * @brief video_overlay::zoom_frame
  * Zooms in the frame, with the choosen zoom level.
- * @param frame Frame to draw on.
- * @return Returns the frame including the zoom and overlay.
+ * @param frame Frame to zoom in on on.
+ * @return Returns the zoomed frame.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     // The area to zoom in on.
@@ -225,6 +242,14 @@ bool video_player::is_showing_overlay() {
  */
 int video_player::get_num_frames() {
     return num_frames;
+}
+
+/**
+ * @brief video_player::get_current_frame_num
+ * @return the number of the current frame
+ */
+int video_player::get_current_frame_num() {
+    return capture.get(CV_CAP_PROP_POS_FRAMES);
 }
 
 /**
@@ -295,6 +320,7 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
+        convert_frame();
         show_frame();
     }
 }
@@ -451,7 +477,7 @@ void video_player::video_mouse_released(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
-            choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
+            choosing_zoom_area = false;
         } else if (is_paused()) {
             video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         }
@@ -489,12 +515,21 @@ void video_player::video_mouse_moved(QPoint pos) {
 void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    // Calculate the coordinates on the actual video frame from
-    // the coordinates in the window the video is playing in.
-    double scalex = (double) video_frame_width/frame_width;
-    double scaley = (double) video_frame_height/frame_height;
-    pos.setX(scalex*pos.x());
-    pos.setY(scaley*pos.y());
+
+    // Calculate the scale ratio.
+    double x_scale = (double) video_frame_width/frame_width;
+    double y_scale = (double) video_frame_height/frame_height;
+
+    // Calculate the coordinates on the video frame from
+    // the coordinates on the zoomed frame.
+    double x_zoom_scale = (double) zoom_area->get_width()/video_frame_width;
+    double y_zoom_scale = (double) zoom_area->get_height()/video_frame_height;
+    double x_video = zoom_area->get_x() + (double) x_zoom_scale * pos.x();
+    double y_video = zoom_area->get_y() + (double) y_zoom_scale * pos.y();
+
+    // Calculate the coordinates on the frame.
+    pos.setX(x_scale * x_video);
+    pos.setY(y_scale * y_video);
 }
 
 /**

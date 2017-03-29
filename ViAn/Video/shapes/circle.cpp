@@ -10,16 +10,17 @@ circle::circle(QColor col, QPoint pos) : shape(col, pos) {
 
 /**
  * @brief circle::draw
- * Draws the object on top of the specified QImage.
- * @param img QImage to draw on
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return Returns the frame with drawing.
  */
-void circle::draw(QImage &img) {
-    QPainter painter(&img);
-    setup_paint_tool(painter);
-    int width = draw_end.x() - draw_start.x();
-    int height = draw_end.y() - draw_start.y();
-    painter.drawEllipse(draw_start.x(), draw_start.y(), width, height);
-    painter.end();
+cv::Mat circle::draw(cv::Mat &frame) {
+    cv::Rect rect(draw_start, draw_end);
+    cv::Size size = rect.size();
+    cv::Point center = (rect.br() + rect.tl())*0.5;
+    cv::RotatedRect bounding_rect(center, size, 0);
+    cv::ellipse(frame, bounding_rect, colour, LINE_THICKNESS);
+    return frame;
 }
 
 /**
