@@ -663,6 +663,8 @@ void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *video) {
     ui->ProjectTree->removeItemWidget(video, 0);
     delete video;
 }
+
+/**
  * @brief MainWindow::toggle_toolbar
  * This method will toggle the toolbar depending on wether the overlay is showing or not.
  * It is switching between a toolbar that contains items as save/add/load and another that
