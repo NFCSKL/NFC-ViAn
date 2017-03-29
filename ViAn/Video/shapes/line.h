@@ -6,7 +6,7 @@
 class line : public shape {
 public:
     line(QColor col, QPoint pos);
-    void draw(QImage &img) override;
+    cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos) override;
 };
 

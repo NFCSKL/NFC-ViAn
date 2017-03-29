@@ -10,14 +10,15 @@ pen::pen(QColor col, QPoint pos) : shape(col, pos) {
 
 /**
  * @brief pen::draw
- * Draws the object on top of the specified QImage.
- * @param img QImage to draw on
+ * Draws the object on top of the specified frame.
+ * @param frame Frame to draw on.
+ * @return Returns the frame with drawing.
  */
-void pen::draw(QImage &img) {
-    QPainter painter(&img);
-    setup_paint_tool(painter);
-    painter.drawLines(lines);
-    painter.end();
+cv::Mat pen::draw(cv::Mat &frame) {
+    for (std::pair<cv::Point, cv::Point> line : lines) {
+        cv::line(frame, line.first, line.second, colour, LINE_THICKNESS);
+    }
+    return frame;
 }
 
 /**
@@ -27,6 +28,6 @@ void pen::draw(QImage &img) {
  * @param pos
  */
 void pen::handle_new_pos(QPoint pos) {
-    QLine line(draw_end, pos);
-    lines.append(line);
+    std::pair<cv::Point, cv::Point> line(draw_end, qpoint_to_point(pos));
+    lines.push_back(line);
 }
