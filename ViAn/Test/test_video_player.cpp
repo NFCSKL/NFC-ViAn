@@ -1,6 +1,5 @@
 #include "test_video_player.h"
 #include <thread>
-
 #include <QMutex>
 #include <QWaitCondition>
 
@@ -178,7 +177,6 @@ void test_video_player::test_set_play_video() {
     mvideo->video_paused = true;
     mvideo-> video_stopped = true;
     mvideo->on_play_video();
-
     QVERIFY(!mvideo->video_paused);
     QVERIFY(!mvideo->video_stopped);
 }

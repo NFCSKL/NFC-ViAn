@@ -19,7 +19,6 @@
 #include "inputwindow.h"
 #include "action.h"
 #include "qtreeitems.h"
-
 #include <QMutex>
 #include <QWaitCondition>
 

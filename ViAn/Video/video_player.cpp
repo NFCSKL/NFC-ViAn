@@ -56,7 +56,6 @@ bool video_player::load_video(string filename) {
 void video_player::stop_video() {
     video_stopped = true;
     set_playback_frame(0);
-
     if (video_paused) {
         video_paused = false;
     }

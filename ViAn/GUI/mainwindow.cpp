@@ -49,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(set_pause_video()), mvideo_player, SLOT(on_pause_video()));
     QObject::connect(this, SIGNAL(set_stop_video()), mvideo_player, SLOT(on_stop_video()));
 
-
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
@@ -106,7 +105,6 @@ void MainWindow::on_playPauseButton_clicked() {
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         paused_wait.notify_one();
-        //TODO fix different implementation for pause/stop mvideo_player->start();
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
