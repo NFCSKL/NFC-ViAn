@@ -466,7 +466,12 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     QMenu menu(this);
 
     if(item == nullptr) {
-
+        QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+        QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+        menu.addAction(create_project);
+        menu.addAction(load_project);
+        connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
+        connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
     } else if(item->type == TYPE::PROJECT) {
         set_selected_project(item);
         QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
