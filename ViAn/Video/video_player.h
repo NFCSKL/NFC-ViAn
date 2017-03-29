@@ -114,7 +114,7 @@ private:
     zoomrectangle* zoom_area = new zoomrectangle();
 
     double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
-    int beta = 50;     /* Simple brightness control, beta value [0-100]. */
+    int beta = 0;     /* Simple brightness control, beta value [0-100]. */
 
     overlay* video_overlay;
 };
