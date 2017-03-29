@@ -120,7 +120,7 @@ cv::Mat ZoomRectangle::draw(cv::Mat &frame) {
 
 /**
  * @brief ZoomRectangle::get_x
- * @return Returns the x coordinate of the top right corner.
+ * @return Returns the x coordinate of the top right corner of the choosen zoom area.
  */
 int ZoomRectangle::get_x() {
    return current_zoom_rect.x;
@@ -128,7 +128,7 @@ int ZoomRectangle::get_x() {
 
 /**
  * @brief ZoomRectangle::get_y
- * @return Returns the y coordinate of the top right corner.
+ * @return Returns the y coordinate of the top right corner of the choosen zoom area.
  */
 int ZoomRectangle::get_y() {
     return current_zoom_rect.y;
@@ -136,7 +136,7 @@ int ZoomRectangle::get_y() {
 
 /**
  * @brief ZoomRectangle::get_width
- * @return Returns the width.
+ * @return Returns the width of the choosen zoom area.
  */
 int ZoomRectangle::get_width() {
     return current_zoom_rect.width;
@@ -144,7 +144,7 @@ int ZoomRectangle::get_width() {
 
 /**
  * @brief ZoomRectangle::get_height
- * @return Returns the height.
+ * @return Returns the height of the choosen zoom area.
  */
 int ZoomRectangle::get_height() {
     return current_zoom_rect.height;
