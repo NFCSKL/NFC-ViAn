@@ -637,6 +637,8 @@ void MainWindow::toggle_toolbar() {
 
 /**
  * @brief MainWindow::enable_video_buttons
+ * Enable the videobuttons.
+ * They are disabled as default.
  */
 void MainWindow::enable_video_buttons() {
     ui->nextFrameButton->setEnabled(true);
