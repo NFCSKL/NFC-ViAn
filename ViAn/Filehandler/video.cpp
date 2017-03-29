@@ -4,6 +4,7 @@
  */
 Video::Video()
 {
+    this->id = -1;
     this->filepath = "";
 }
 /**

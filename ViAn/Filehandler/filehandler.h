@@ -50,7 +50,7 @@ public:
 
 
     ID add_video(Project* proj, std::string filePath);
-    void remove_video(Project* proj, ID vid_id);
+    void remove_video(ID proj_id, ID vid_id);
     //directory manipulation
     //varying implementation
     ID create_directory(std::string dirpath);

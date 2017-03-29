@@ -60,7 +60,6 @@ public:
     // read and write operator for Projects
     friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
     friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
-    void remove_video(ID id);
 
 // TODO
 //    void add_analysis();

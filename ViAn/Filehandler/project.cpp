@@ -9,7 +9,7 @@ Project::Project(ID id, std::string name)
     this->files = new ProjFiles();
     this->m_name = name;
     this->m_id = id;
-    this->m_videos.clear();
+    this->videos.clear();
     this->saved = false;
 }
 /**
@@ -19,7 +19,7 @@ Project::Project(){
     this->files = new ProjFiles();
     this->m_name = "";
     this->m_id = -1;
-    this->m_videos.clear();
+    this->videos.clear();
 }
 
 /**
@@ -28,7 +28,7 @@ Project::Project(){
  */
 void Project::remove_video(ID id){
     Video* temp = this->videos.at(id);
-    m_videos.erase(id);
+    videos.erase(id);
     delete temp;
 }
 
@@ -38,6 +38,7 @@ void Project::remove_video(ID id){
  */
 ID Project::add_video(Video* vid){
     this->videos.insert(std::make_pair(this->v_id, vid));
+    vid->id = this->v_id;
     return this->v_id++;
 }
 
@@ -80,10 +81,10 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write name and id;   
     ps.projFile << proj.m_name.c_str() << " ";
     //write videos
-    int vidcounter = proj.m_videos.size();
+    int vidcounter = proj.videos.size();
     ps.videos << vidcounter << " ";
     for(auto vid = proj.videos.rbegin(); vid != proj.videos.rend(); ++vid){
-        Video* v = *vid;
+        Video* v = vid->second;
         if(v != nullptr){
             ps.videos << *v << " ";
             vidcounter++;
