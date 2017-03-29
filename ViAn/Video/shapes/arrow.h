@@ -1,7 +1,7 @@
 #ifndef ARROW_H
 #define ARROW_H
 
-#include "Shape.h"
+#include "shape.h"
 
 class Arrow : public Shape {
 public:

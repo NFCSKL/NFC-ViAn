@@ -8,7 +8,7 @@
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "inputwindow.h"
-#include "Video/shapes/Shape.h"
+#include "Video/shapes/shape.h"
 
 using namespace std;
 using namespace cv;

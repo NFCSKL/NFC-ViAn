@@ -11,7 +11,7 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QWaitCondition>
-#include "Overlay.h"
+#include "overlay.h"
 
 #include <chrono>
 

@@ -1,7 +1,7 @@
 #ifndef ZOOMRECTANGLE_H
 #define ZOOMRECTANGLE_H
 
-#include "Rectangle.h"
+#include "rectangle.h"
 
 class ZoomRectangle : public Rectangle {
 public:

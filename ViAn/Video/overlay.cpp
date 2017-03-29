@@ -1,4 +1,4 @@
-#include "Overlay.h"
+#include "overlay.h"
 #include <iostream>
 #include <QInputDialog>
 

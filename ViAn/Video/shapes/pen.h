@@ -1,7 +1,7 @@
 #ifndef PEN_H
 #define PEN_H
 
-#include "Shape.h"
+#include "shape.h"
 
 class Pen : public Shape {
 public:

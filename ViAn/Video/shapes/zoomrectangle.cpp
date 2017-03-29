@@ -1,4 +1,4 @@
-#include "ZoomRectangle.h"
+#include "zoomrectangle.h"
 
 /**
  * @brief ZoomRectangle::ZoomRectangle

@@ -1,7 +1,7 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "Shape.h"
+#include "shape.h"
 
 class Text : public Shape {
 public:

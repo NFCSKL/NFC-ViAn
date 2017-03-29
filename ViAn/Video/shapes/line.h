@@ -1,7 +1,7 @@
 #ifndef LINE_H
 #define LINE_H
 
-#include "Shape.h"
+#include "shape.h"
 
 class Line : public Shape {
 public:
