@@ -99,7 +99,7 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
 
-    overlay* video_overlay;
+    Overlay* video_overlay;
 };
 
 #endif // VIDEO_PLAYER_H

@@ -5,7 +5,7 @@
 /**
  * @brief Overlay::Overlay
  */
-Overlay::overlay() {
+Overlay::Overlay() {
 }
 
 /**

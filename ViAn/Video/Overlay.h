@@ -12,10 +12,10 @@
 #include "shapes/Text.h"
 #include "shapes/ZoomRectangle.h"
 
-class overlay {
+class Overlay {
 
 public:
-    overlay();
+    Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();

@@ -15,7 +15,7 @@ using namespace cv;
  * @param parent
  */
 video_player::video_player(QObject* parent) : QThread(parent) {
-    video_overlay = new overlay();
+    video_overlay = new Overlay();
 }
 
 /**
