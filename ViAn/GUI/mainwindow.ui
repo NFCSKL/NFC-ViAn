@@ -79,6 +79,9 @@
           </property>
           <item>
            <widget class="QPushButton" name="fastBackwardButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -101,6 +104,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="previousFrameButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -120,6 +126,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="playPauseButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -136,6 +145,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="nextFrameButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -158,6 +170,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="fastForwardButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -180,6 +195,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="stopButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -285,7 +303,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">
