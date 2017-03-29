@@ -18,7 +18,6 @@ public:
     explicit test_video_player(QObject *parent = 0);
 private slots:
     void test_load_video();
-    void test_play_pause();
     void test_is_paused();
     void test_get_num_frames();
     void test_set_frame_width();
@@ -35,6 +34,9 @@ private slots:
     void test_video_open();
     void test_scaling_event();
     void test_scale_frame();
+    void test_set_play_video();
+    void test_set_pause_video();
+    void test_set_stop_video();
 
 private:
     video_player* mvideo;

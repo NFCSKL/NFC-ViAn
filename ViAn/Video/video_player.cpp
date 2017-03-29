@@ -14,8 +14,10 @@ using namespace cv;
  * @brief video_player::video_player
  * @param parent
  */
-video_player::video_player(QObject* parent) : QThread(parent) {
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
     video_overlay = new overlay();
+    m_mutex = mutex;
+    m_paused_wait = paused_wait;
 }
 
 /**
@@ -49,19 +51,11 @@ bool video_player::load_video(string filename) {
 }
 
 /**
- * @brief video_player::play
- * Toggles the video_paused boolean
- */
-void video_player::play_pause() {
-    video_paused = !video_paused;
-}
-
-/**
  * @brief video_player::stop_video
  * Sets stop related bools to their correct values and sets the current playback frame to be 0.
  */
 void video_player::stop_video() {
-    stop = true;
+    video_stopped = true;
     set_playback_frame(0);
     if (video_paused) {
         video_paused = false;
@@ -75,28 +69,34 @@ void video_player::stop_video() {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    stop = false;
+    video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
 
-    while(!stop && !video_paused && capture.read(frame)){
+    while(!video_stopped  && capture.read(frame)){
         const clock_t begin_time = std::clock();
 
         convert_frame();
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
-        std::cout << "Conversion delay in ms: "<< conversion_time << endl;
 
         if (delay-conversion_time > 0) {
             this->msleep(delay-conversion_time);
         }
         show_frame();
 
+
+        // Waits for the video to be resumed
+        m_mutex->lock();
+        if (video_paused) {
+            m_paused_wait->wait(m_mutex);
+            video_paused = false;
+        }
+        m_mutex->unlock();
     }
-    //Saves the current frame of the video if the video is paused.
-    if (video_paused) {
-        current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
-    } else if (stop) {
+
+    // Reset frame on stop
+    if (video_stopped) {
         current_frame = 0;
     }
 }
@@ -224,7 +224,7 @@ bool video_player::is_paused() {
  * @return
  */
 bool video_player::is_stopped() {
-    return stop;
+    return video_stopped;
 }
 
 /**
@@ -286,7 +286,6 @@ bool video_player::set_playback_frame(int frame_num) {
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
-    cout << "Skipping forward" << endl;
     update_frame(current_frame + 1);
 }
 
@@ -296,6 +295,35 @@ void video_player::next_frame() {
  */
 void video_player::previous_frame() {
     update_frame(current_frame - 1);
+}
+
+/**
+ * @brief on_play_video
+ * Slot function to be used from the GUI thread
+ * Sets the paused and stopped bools to false
+ */
+void video_player::on_play_video() {
+    video_paused = false;
+    video_stopped = false;
+}
+
+/**
+ * @brief on_pause_video
+ * Slot function to be used from the GUI thread
+ * Sets the paused bool to true
+ */
+void video_player::on_pause_video() {
+    video_paused = true;
+}
+
+/**
+ * @brief on_stop_video
+ * Slot function to be used from the GUI thread
+ * Sets the stopped bool to true and the paused bool to false
+ */
+void video_player::on_stop_video() {
+    video_stopped = true;
+    video_paused = false;
 }
 
 /**
@@ -576,7 +604,6 @@ void video_player::scaling_event(int new_width, int new_height) {
         frame_width = new_width;
         frame_height = int(video_height * width_ratio);
     }
-    cout << "Scaling to " << frame_width << "x" << frame_height << endl;
 }
 
 /**

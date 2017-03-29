@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
     //Creates and prepares the video_player.
-    mvideo_player = new video_player();
+    mvideo_player = new video_player(&mutex, &paused_wait);
     setup_video_player(mvideo_player);
 
     // Initially hide overlay toolbar
@@ -77,6 +77,12 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(next_frame()));
     QObject::connect(this, SIGNAL(prev_video_frame()),
                      mplayer, SLOT(previous_frame()));
+    QObject::connect(this, SIGNAL(set_play_video()),
+                     mplayer, SLOT(on_play_video()));
+    QObject::connect(this, SIGNAL(set_pause_video()),
+                     mplayer, SLOT(on_pause_video()));
+    QObject::connect(this, SIGNAL(set_stop_video()),
+                     mplayer, SLOT(on_stop_video()));
 }
 
 /**
@@ -113,15 +119,20 @@ void MainWindow::on_fastBackwardButton_clicked(){
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked() {
-    if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
+    if (mvideo_player->is_paused()) {
+        // Video thread is paused. Notifying the waitcondition to resume playback
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+        paused_wait.notify_one();
+    } else if (mvideo_player->is_stopped()) {
+        // Video thread has finished. Start a new one
+        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
         mvideo_player->start();
     } else {
+        // Video thread is running. Pause it
         set_status_bar("Paused");
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
-        mvideo_player->play_pause();
-        mvideo_player->wait();
+        emit set_pause_video();
     }
 }
 
@@ -141,8 +152,10 @@ void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+    } else {
+        paused_wait.notify_one();
     }
-    mvideo_player->stop_video();
+    emit set_stop_video();
 }
 
 /**
@@ -177,9 +190,6 @@ void MainWindow::on_previousFrameButton_clicked() {
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
-    cout << "QImage resolution: " << frame.width() << "x" << frame.height() << endl;
-    cout << "Frame resolution: " << ui->videoFrame->width() << "x" << ui->videoFrame->height() << endl;
-
     ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
 }
 
@@ -201,8 +211,6 @@ void MainWindow::set_video_slider_pos(int pos) {
  */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
-   cout << "Frame resolution: " << ui->videoFrame->width() << "x" << ui->videoFrame->height() << endl;
-   cout << "Resizing window" << endl;
 
    //Scales the current frame when video playback is paused
    if (mvideo_player->video_open() && mvideo_player->is_paused()) {
@@ -250,6 +258,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
  *
  * closeEvent
  * asks if you are sure you want to quit.
+ * TODO Needs to close all other threads before exiting the program
  * @param event closing
  */
 void MainWindow::closeEvent (QCloseEvent *event){
