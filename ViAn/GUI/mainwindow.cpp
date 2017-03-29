@@ -512,6 +512,7 @@ void MainWindow::on_actionAddVideo_triggered() {
  *
  */
 void MainWindow::play_video() {
+    enable_video_buttons();
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
@@ -632,4 +633,16 @@ void MainWindow::toggle_toolbar() {
         ui->toolBar->hide();
         ui->toolBar_no_overlay->show();
     }
+}
+
+/**
+ * @brief MainWindow::enable_video_buttons
+ */
+void MainWindow::enable_video_buttons() {
+    ui->nextFrameButton->setEnabled(true);
+    ui->fastBackwardButton->setEnabled(true);
+    ui->playPauseButton->setEnabled(true);
+    ui->fastForwardButton->setEnabled(true);
+    ui->previousFrameButton->setEnabled(true);
+    ui->stopButton->setEnabled(true);
 }
