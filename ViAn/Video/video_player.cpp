@@ -468,9 +468,12 @@ void video_player::scale_position(QPoint &pos) {
 
     // Calculate the coordinates on the video frame from
     // the coordinates on the zoomed frame.
-    double x_video = zoom_area->get_x() + ((double) zoom_area->get_width()/video_frame_width) * pos.x();
-    double y_video = zoom_area->get_y() + ((double) zoom_area->get_height()/video_frame_height) * pos.y();
+    double x_zoom_scale = (double) zoom_area->get_width()/video_frame_width;
+    double y_zoom_scale = (double) zoom_area->get_height()/video_frame_height;
+    double x_video = zoom_area->get_x() + (double) x_zoom_scale * pos.x();
+    double y_video = zoom_area->get_y() + (double) y_zoom_scale * pos.y();
 
+    // Calculate the coordinates on the frame.
     pos.setX(x_scale * x_video);
     pos.setY(y_scale * y_video);
 }
