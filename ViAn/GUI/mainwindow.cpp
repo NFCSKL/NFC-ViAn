@@ -35,21 +35,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
+    ui->videoFrame->setScaledContents(false);
 
     ui->ProjectTree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
+    //Creates and prepares the video_player.
     mvideo_player = new video_player();
-    QObject::connect(mvideo_player, SIGNAL(processed_image(QImage)),
-                                  this, SLOT(update_video(QImage)));
-    QObject::connect(mvideo_player, SIGNAL(update_current_frame(int)),
-                                  this, SLOT(set_video_slider_pos(int)));
-    QObject::connect(this, SIGNAL(resize_video_frame(int,int)),
-                     mvideo_player, SLOT(scaling_event(int,int)));
-
-    //Used for rescaling the source image for video playback
-    mvideo_player->set_frame_height(ui->videoFrame->height());
-    mvideo_player->set_frame_width(ui->videoFrame->width());
+    setup_video_player(mvideo_player);
 }
 
 /**
@@ -60,14 +53,32 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
-    mvideo_player->exit();
+    mvideo_player->terminate();
     delete mvideo_player;
     delete ui;
 }
 
 /**
+ * @brief MainWindow::setup_video_player
+ * @param mplayer
+ * Connects all signals and slots that are needed between video_player and mainwindow.
+ */
+void MainWindow::setup_video_player(video_player *mplayer) {
+    QObject::connect(mplayer, SIGNAL(processed_image(QImage)),
+                     this, SLOT(update_video(QImage)));
+    QObject::connect(mplayer, SIGNAL(update_current_frame(int)),
+                     this, SLOT(set_video_slider_pos(int)));
+    QObject::connect(this, SIGNAL(resize_video_frame(int,int)),
+                     mplayer, SLOT(scaling_event(int,int)));
+    QObject::connect(this, SIGNAL(next_video_frame()),
+                     mplayer, SLOT(next_frame()));
+    QObject::connect(this, SIGNAL(prev_video_frame()),
+                     mplayer, SLOT(previous_frame()));
+}
+
+/**
  * @brief MainWindow::set_shortcuts
- * Function to set shortcuts on actions
+ * Function to set keyboard shortcuts on actions
  */
 void MainWindow::set_shortcuts(){
     ui->actionExit->setShortcut(tr("Ctrl+e"));
@@ -138,7 +149,7 @@ void MainWindow::on_stopButton_clicked() {
 void MainWindow::on_nextFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went forward a frame");
-        mvideo_player->next_frame();
+        next_video_frame();
     } else {
         set_status_bar("Needs to be paused");
     }
@@ -151,9 +162,9 @@ void MainWindow::on_nextFrameButton_clicked() {
 void MainWindow::on_previousFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went back a frame");
-        mvideo_player->previous_frame();
+        prev_video_frame();
     } else {
-        set_status_bar("Needs to be paused");
+        set_status_bar("Video needs to be paused");
     }
 }
 
@@ -163,8 +174,10 @@ void MainWindow::on_previousFrameButton_clicked() {
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
-    cout << "Resolution: " << frame.width() << "x" << frame.height() << endl;
-    ui->videoFrame->setPixmap(QPixmap::fromImage(frame).scaled(frame.width(),frame.height(),Qt::KeepAspectRatio));
+    cout << "QImage resolution: " << frame.width() << "x" << frame.height() << endl;
+    cout << "Frame resolution: " << ui->videoFrame->width() << "x" << ui->videoFrame->height() << endl;
+
+    ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
 }
 
 /**
@@ -185,11 +198,21 @@ void MainWindow::set_video_slider_pos(int pos) {
  */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
-   mvideo_player->set_frame_height(ui->videoFrame->height());
-   mvideo_player->set_frame_width(ui->videoFrame->width());
+   cout << "Frame resolution: " << ui->videoFrame->width() << "x" << ui->videoFrame->height() << endl;
    cout << "Resizing window" << endl;
-   resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
 
+   //Scales the current frame when video playback is paused
+   if (mvideo_player->video_open() && mvideo_player->is_paused()) {
+       QImage frame( ui->videoFrame->pixmap()->toImage() );
+       ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                     frame.scaled(ui->videoFrame->width(),
+                                                  ui->videoFrame->height(),
+                                                  Qt::KeepAspectRatio))
+                                 );
+   }
+
+   //Sends new QLabel resolution to mvideo_player to update scaling resolution
+   resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
 }
 
 /**
@@ -220,7 +243,9 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
 }
 
 /**
- * @brief MainWindow::closeEvent
+ * @brief
+ *
+ * closeEvent
  * asks if you are sure you want to quit.
  * @param event closing
  */
@@ -234,6 +259,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
     if (resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
+        mvideo_player->exit();
         event->accept();
     }
 }
@@ -509,6 +535,9 @@ void MainWindow::on_actionAddVideo_triggered() {
  *
  */
 void MainWindow::play_video() {
+    //Used for rescaling the source image for video playback
+    resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
+
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());

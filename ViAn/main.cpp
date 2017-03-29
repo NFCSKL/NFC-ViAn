@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
-    bool testing = false;
+
+    bool testing = true;
     if (testing) {
         //For testing video player.
         test_video_player* video_test = new test_video_player();

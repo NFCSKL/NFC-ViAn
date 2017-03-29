@@ -28,6 +28,7 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     void export_current_frame(QString path_to_folder);
+    bool video_open();
 
     int get_num_frames();    
     void play_pause();
@@ -35,8 +36,6 @@ public:
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     bool set_playback_frame(int frame_num);
-    void next_frame();
-    void previous_frame();
     void set_speed_multiplier(double mult);
 
     double get_speed_multiplier();
@@ -67,7 +66,9 @@ signals:
     void update_current_frame(const int frame);
 
 private slots:
-    void scaling_event(int width, int height);
+    void scaling_event(int new_width, int new_height);
+    void next_frame();
+    void previous_frame();
 
 protected:
     void run() override;

@@ -117,8 +117,8 @@ void video_player::show_frame() {
 void video_player::convert_frame() {
     cv::Mat zoomed_frame;
     zoomed_frame = zoom_frame(frame);
-    cv::Mat scaled_frame;
 
+    cv::Mat scaled_frame;
     if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
         scaled_frame = scale_frame(zoomed_frame);
     } else {
@@ -143,8 +143,13 @@ void video_player::convert_frame() {
     }
 }
 
+/**
+ * @brief video_player::scale_frame
+ * Scales the video frame to match the resolution of the video window.
+ * @param src
+ * @return
+ */
 cv::Mat video_player::scale_frame(cv::Mat &src) {
-    // do something
 
     cv::Size size;
     if (frame_width <= 0 || frame_height <= 0) {
@@ -256,11 +261,12 @@ bool video_player::set_playback_frame(int frame_num) {
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
+    cout << "Skipping forward" << endl;
     update_frame(current_frame + 1);
 }
 
 /**
- * @brief video_player::next_frame
+ * @brief video_player::previous_frame
  * Moves the playback one frame backward.
  */
 void video_player::previous_frame() {
@@ -276,6 +282,7 @@ void video_player::update_frame(int frame_nbr) {
     if (set_playback_frame(frame_nbr)) {
         capture.set(CAP_PROP_POS_FRAMES, frame_nbr);
         capture.read(frame);
+        convert_frame();
         show_frame();
     }
 }
@@ -508,23 +515,39 @@ void video_player::export_current_frame(QString path_to_folder) {
     writer.write(img);
 }
 
-void video_player::scaling_event(int width, int height) {
+/**
+ * @brief video_player::scaling_event
+ * This slot gets called when the video QLabel gets resized.
+ * Sets the video width and height to match.
+ * @param width
+ * @param height
+ */
+void video_player::scaling_event(int new_width, int new_height) {
     if (!capture.isOpened()) {
         return;
     }
-    cout << "Window scaled to " << width << "x" << height << endl;
+
+
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    float height_ratio = float(height)/float(video_height);
-    float width_ratio = float(width)/float(video_width);
+    float height_ratio = float(new_height)/float(video_height);
+    float width_ratio = float(new_width)/float(video_width);
 
-
+    //This statement ensures that the original aspect ratio of the video is kept when scaling
     if (width_ratio >= height_ratio) {
         frame_width = int(video_width * height_ratio);
-        frame_height = height;
+        frame_height = new_height;
     } else {
-        frame_width = width;
+        frame_width = new_width;
         frame_height = int(video_height * width_ratio);
     }
-    cout << "Scaled to " << frame_width << "x" << frame_height << endl;
+    cout << "Scaling to " << frame_width << "x" << frame_height << endl;
+}
+
+/**
+ * @brief video_player::video_open
+ * @return a bool that is true as long as a video is open.
+ */
+bool video_player::video_open() {
+    return capture.isOpened();
 }
