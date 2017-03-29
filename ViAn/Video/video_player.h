@@ -46,6 +46,10 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
+    void set_contrast(double contrast);
+    void set_brightness(double brightness);
+    int get_contrast();
+    int get_brightness();
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
@@ -80,6 +84,7 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
+    cv::Mat contrast_frame(cv::Mat &frame);
     cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
@@ -107,6 +112,9 @@ private:
     QWaitCondition* m_paused_wait;
 
     zoomrectangle* zoom_area = new zoomrectangle();
+
+    double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
+    int beta = 50;     /* Simple brightness control, beta value [0-100]. */
 
     overlay* video_overlay;
 };
