@@ -31,6 +31,12 @@ void Project::add_video(Video* vid)
 {
     this->m_videos.push_back(vid);
 }
+void Project::remove_video(ID id){
+    auto vid_it = m_videos.begin() + id;
+    delete *vid_it;
+    m_videos.erase(vid_it);
+}
+
 /**
  *  UNSFINISHED
  * @brief operator >>
@@ -74,8 +80,10 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     ps.videos << vidcounter << " ";
     for(auto vid = proj.m_videos.rbegin(); vid != proj.m_videos.rend(); ++vid){
         Video* v = *vid;
-        ps.videos << *v << " ";
-        vidcounter++;
+        if(v != nullptr){
+            ps.videos << *v << " ";
+            vidcounter++;
+        }
     }
     return ps;
 }

@@ -49,7 +49,7 @@ public:
     void save_project(Project* proj);
 
 
-    void add_video(Project* proj, std::string filePath);
+    ID add_video(Project* proj, std::string filePath);
     //directory manipulation
     //varying implementation
     ID create_directory(std::string dirpath);

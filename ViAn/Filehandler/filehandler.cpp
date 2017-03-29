@@ -201,10 +201,10 @@ FH_ERROR FileHandler::delete_project(Project* proj){
  * Add a video filepath to a given project.
  * Creates Video object which is accessed further by returned id.
  */
-void FileHandler::add_video(Project* proj, std::string filePath){
+ID FileHandler::add_video(Project* proj, std::string filePath){
     Video* v = new Video(filePath);
     proj->add_video(v);
-    this->add_file(filePath);
+    return this->add_file(filePath);
 }
 
  /**
