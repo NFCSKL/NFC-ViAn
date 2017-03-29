@@ -111,12 +111,12 @@ private:
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
 
-    zoomrectangle* zoom_area = new zoomrectangle();
+    ZoomRectangle* zoom_area = new ZoomRectangle();
 
     double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
     int beta = 0;     /* Simple brightness control, beta value [0-100]. */
 
-    overlay* video_overlay;
+    Overlay* video_overlay;
 };
 
 #endif // VIDEO_PLAYER_H

@@ -3,9 +3,9 @@
 
 #include "shape.h"
 
-class circle : public shape {
+class Circle : public Shape {
 public:
-    circle(QColor col, QPoint pos);
+    Circle(QColor col, QPoint pos);
     cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos) override;
 };
