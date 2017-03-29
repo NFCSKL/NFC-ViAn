@@ -619,6 +619,53 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
 }
 
 /**
+ * @brief MainWindow::on_actionDeleteProject_triggered
+ * Deletes the saved files of the selected project.
+ * Removes the project from the preoject tree.
+ */
+void MainWindow::on_actionDeleteProject_triggered() {
+    if(selectedProject != nullptr) {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
+                                                                    tr("Are you sure you want to delete the selected project?\n"),
+                                                                    QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No);
+
+        if (resBtn == QMessageBox::Yes) {
+            this->fileHandler->delete_project(fileHandler->get_project(this->selectedProject->id));
+            remove_selected_project_from_tree();
+        }
+    } else {
+        set_status_bar("No selected project to remove.");
+    }
+}
+
+/**
+ * @brief MainWindow::remove_selected_project_from_tree
+ * Removes all videos of the selected project and then the project.
+ */
+void MainWindow::remove_selected_project_from_tree() {
+    for(int child_number = 0; child_number < selectedProject->childCount(); child_number++) {
+        remove_video_from_tree((MyQTreeWidgetItem*)selectedProject->child(child_number));
+    }
+    ui->ProjectTree->removeItemWidget(selectedProject, 0);
+    delete selectedProject;
+    selectedProject = nullptr;
+}
+
+/**
+ * @brief MainWindow::remove_selected_video_from_tree
+ * @param video to be deleted
+ * Removes the video from the tree.
+ */
+void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *video) {
+    if (video == selectedVideo) {
+        selectedVideo = nullptr;
+    }
+    ui->ProjectTree->removeItemWidget(video, 0);
+    delete video;
+}
+
+/**
  * @brief MainWindow::toggle_toolbar
  * This method will toggle the toolbar depending on wether the overlay is showing or not.
  * It is switching between a toolbar that contains items as save/add/load and another that
