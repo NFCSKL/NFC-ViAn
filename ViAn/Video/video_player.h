@@ -46,7 +46,7 @@ public:
     void dec_playback_speed();
     
     void toggle_overlay();
-    void set_overlay_tool(SHAPES Shape);
+    void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
