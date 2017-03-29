@@ -77,7 +77,7 @@ public:
     std::string get_file(ID id);
 
     // Last error
-    FH_ERROR lastError;
+    FH_ERROR last_error;
 
 private:
 

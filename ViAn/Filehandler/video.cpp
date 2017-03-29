@@ -2,8 +2,7 @@
 /**
  * @brief Video::Video
  */
-Video::Video()
-{
+Video::Video(){
     this->filepath = "";
 }
 /**

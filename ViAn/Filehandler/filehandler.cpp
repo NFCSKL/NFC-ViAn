@@ -216,9 +216,9 @@ void FileHandler::add_video(Project* proj, std::string filepath){
 
 ID FileHandler::create_file(std::string filename, ID dir_id){
     std::ofstream f;
-    std::string filePath = this->get_dir(dir_id)+"/"+filename;
-    f.open(filePath.c_str());
-    return this->add_file(filePath);
+    std::string filepath = this->get_dir(dir_id)+"/"+filename;
+    f.open(filepath.c_str());
+    return this->add_file(filepath);
   }
 
 /**
@@ -240,14 +240,14 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @return void
   */
  void FileHandler::write_file(ID id, std::string text, WRITE_OPTION opt){
-    std::string fileName = this->get_file(id);
+    std::string file_name = this->get_file(id);
     std::ofstream f;
     switch(opt){
     case WRITE_OPTION::OVERWRITE:
-        f.open(fileName.c_str(), std::ios::in | std::ios::out);
+        f.open(file_name.c_str(), std::ios::in | std::ios::out);
         break;
     case WRITE_OPTION::APPEND:
-        f.open(fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);
+        f.open(file_name.c_str(), std::ios::in | std::ios::out | std::ios::ate);
         break;
     default:
         return; // no open file
@@ -264,11 +264,11 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::read_file(ID id,  std::string& buf, int linesToRead){
+ void FileHandler::read_file(ID id,  std::string& buf, int lines_to_read){
      std::ifstream f(this->get_file(id));
      std::string temp;
      if(f.is_open()){
-         while(linesToRead-- && std::getline(f, temp)){
+         while(lines_to_read-- && std::getline(f, temp)){
             buf += temp;
          }
      }
@@ -366,13 +366,13 @@ ID FileHandler::add_dir(std::string dirpath){
  * @return true if project contents are the same
  */
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
-    bool videoEquals =  std::equal(proj.videos.begin(), proj.videos.end(),
+    bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
                [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
     return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
            proj.name == proj2.name &&
-           videoEquals;
+           video_equals;
 }
 
 /**
