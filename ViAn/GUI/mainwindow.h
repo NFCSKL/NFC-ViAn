@@ -129,6 +129,7 @@ private:
     void remove_video_from_tree(MyQTreeWidgetItem *video);
 
     void toggle_toolbar();
+    void enable_video_buttons();
 
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
