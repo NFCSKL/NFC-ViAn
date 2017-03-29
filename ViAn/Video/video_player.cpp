@@ -89,6 +89,7 @@ void video_player::run()  {
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
+            current_frame = capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
             m_paused_wait->wait(m_mutex);
             video_paused = false;
         }
