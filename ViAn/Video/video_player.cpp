@@ -185,6 +185,10 @@ int video_player::get_num_frames() {
     return num_frames;
 }
 
+/**
+ * @brief video_player::get_current_frame_num
+ * @return the number of the current frame
+ */
 int video_player::get_current_frame_num() {
     return capture.get(CV_CAP_PROP_POS_FRAMES);
 }
