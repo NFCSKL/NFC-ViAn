@@ -53,12 +53,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
-
-    //TODO REMOVE
-    Project* proj = fileHandler->create_project("test");
-    add_project_to_tree(proj);
-    add_video_to_tree(selectedProject, "seq_01.mp4");
-
 }
 
 /**
