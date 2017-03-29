@@ -122,9 +122,13 @@ private:
     void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
     void add_project_to_tree(Project* proj);
     void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
+    void toggle_toolbar();
+
 
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
+
+
 
 };
 
