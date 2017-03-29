@@ -63,8 +63,8 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/Rectangle.cpp \
     Video/shapes/Shape.cpp \
     Video/shapes/Text.cpp \
-    Video/Overlay.cpp \
-    Video/shapes/ZoomRectangle.cpp
+    Video/shapes/ZoomRectangle.cpp \
+    Video/Overlay.cpp
 HEADERS += Video/video_player.h \
     Video/shapes/Arrow.h \
     Video/shapes/Circle.h \
