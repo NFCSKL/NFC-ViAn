@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
+
+    // Initially hide overlay toolbar
+    ui->toolBar->hide();
 }
 
 /**
@@ -291,15 +294,20 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
  * @brief MainWindow::on_ProjectTree_itemClicked
  * @param item the item in the projectTree that was clicked
  * @param column the column in the tree
+ * If you click on the selected video it will start playing.
  */
 void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-    MyQTreeWidgetItem *newItem = (MyQTreeWidgetItem*)item;
-    switch(newItem->type) {
+    MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
+    switch(q_item->type) {
     case TYPE::PROJECT:
-        set_selected_project(newItem);
+        set_selected_project(q_item);
         break;
     case TYPE::VIDEO:
-        set_selected_video(newItem);
+        if(q_item == selectedVideo) {
+            play_video();
+        } else {
+            set_selected_video(q_item);
+        }
         break;
     default:
         break;
@@ -312,6 +320,7 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
  */
 void MainWindow::on_actionShow_hide_overview_triggered() {
     mvideo_player->toggle_overlay();
+    toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
         set_status_bar("Overlay: On.");
     } else {
@@ -466,19 +475,30 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     QMenu menu(this);
 
     if(item == nullptr) {
-
+        QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+        QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+        create_project->setStatusTip(tr("Create project"));
+        load_project->setStatusTip(tr("Load project"));
+        menu.addAction(create_project);
+        menu.addAction(load_project);
+        connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
+        connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
     } else if(item->type == TYPE::PROJECT) {
         set_selected_project(item);
-        QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
-        addVideo->setStatusTip(tr("Add video"));
-        menu.addAction(addVideo);
-        connect(addVideo, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+        QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
+        QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+        add_video->setStatusTip(tr("Add video"));
+        delete_project->setStatusTip(tr("Delete project"));
+        menu.addAction(add_video);
+        menu.addAction(delete_project);
+        connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+        connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDeleteProject_triggered()));
     } else if(item->type == TYPE::VIDEO) {
         set_selected_video(item);
-        QAction *loadVideo = new QAction(QIcon(""), tr("&Play video"), this);
-        loadVideo->setStatusTip(tr("Play video"));
-        menu.addAction(loadVideo);
-        connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
+        QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+        load_video->setStatusTip(tr("Play video"));
+        menu.addAction(load_video);
+        connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
@@ -493,7 +513,9 @@ void MainWindow::on_actionAddVideo_triggered() {
     if(selectedProject != nullptr) {
         QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
                                                    tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
-        input_switch_case(ACTION::ADD_VIDEO, dir);
+        if(!dir.isEmpty()) { // Check if you have selected something.
+            input_switch_case(ACTION::ADD_VIDEO, dir);
+        }
     } else {
         set_status_bar("No project selected.");
     }
@@ -506,6 +528,7 @@ void MainWindow::on_actionAddVideo_triggered() {
  *
  */
 void MainWindow::play_video() {
+    enable_video_buttons();
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
@@ -573,9 +596,11 @@ void MainWindow::on_actionSave_triggered() {
  */
 void MainWindow::on_actionLoad_triggered() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
-    Project* loadProj= this->fileHandler->load_project(dir.toStdString());
-    add_project_to_tree(loadProj);
-    set_status_bar("Project " + loadProj->m_name + " loaded.");
+    if(!dir.isEmpty()) { // Check if you have selected something.
+        Project* loadProj= this->fileHandler->load_project(dir.toStdString());
+        add_project_to_tree(loadProj);
+        set_status_bar("Project " + loadProj->m_name + " loaded.");
+    }
 }
 
 /**
@@ -607,4 +632,82 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
     videoInTree->set_text_from_filepath(filePath);
     project->addChild(videoInTree);
     set_selected_video(videoInTree);
+}
+
+/**
+ * @brief MainWindow::on_actionDeleteProject_triggered
+ * Deletes the saved files of the selected project.
+ * Removes the project from the preoject tree.
+ */
+void MainWindow::on_actionDeleteProject_triggered() {
+    if(selectedProject != nullptr) {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
+                                                                    tr("Are you sure you want to delete the selected project?\n"),
+                                                                    QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No);
+
+        if (resBtn == QMessageBox::Yes) {
+            this->fileHandler->delete_project(fileHandler->get_project(this->selectedProject->id));
+            remove_selected_project_from_tree();
+        }
+    } else {
+        set_status_bar("No selected project to remove.");
+    }
+}
+
+/**
+ * @brief MainWindow::remove_selected_project_from_tree
+ * Removes all videos of the selected project and then the project.
+ */
+void MainWindow::remove_selected_project_from_tree() {
+    for(int child_number = 0; child_number < selectedProject->childCount(); child_number++) {
+        remove_video_from_tree((MyQTreeWidgetItem*)selectedProject->child(child_number));
+    }
+    ui->ProjectTree->removeItemWidget(selectedProject, 0);
+    delete selectedProject;
+    selectedProject = nullptr;
+}
+
+/**
+ * @brief MainWindow::remove_selected_video_from_tree
+ * @param video to be deleted
+ * Removes the video from the tree.
+ */
+void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *video) {
+    if (video == selectedVideo) {
+        selectedVideo = nullptr;
+    }
+    ui->ProjectTree->removeItemWidget(video, 0);
+    delete video;
+}
+
+/**
+ * @brief MainWindow::toggle_toolbar
+ * This method will toggle the toolbar depending on wether the overlay is showing or not.
+ * It is switching between a toolbar that contains items as save/add/load and another that
+ * contains drawing tools.
+ * This is invoked when the overlay is activated and deactivated.
+ */
+void MainWindow::toggle_toolbar() {
+    if(mvideo_player->is_showing_overlay()) {
+        ui->toolBar_no_overlay->hide();
+        ui->toolBar->show();
+    }else {
+        ui->toolBar->hide();
+        ui->toolBar_no_overlay->show();
+    }
+}
+
+/**
+ * @brief MainWindow::enable_video_buttons
+ * Enable the videobuttons.
+ * They are disabled as default.
+ */
+void MainWindow::enable_video_buttons() {
+    ui->nextFrameButton->setEnabled(true);
+    ui->fastBackwardButton->setEnabled(true);
+    ui->playPauseButton->setEnabled(true);
+    ui->fastForwardButton->setEnabled(true);
+    ui->previousFrameButton->setEnabled(true);
+    ui->stopButton->setEnabled(true);
 }

@@ -106,6 +106,8 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
+    void on_actionDeleteProject_triggered();
+
 private:
 
     Ui::MainWindow *ui;
@@ -123,8 +125,16 @@ private:
     void add_project_to_tree(Project* proj);
     void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 
+    void remove_selected_project_from_tree();
+    void remove_video_from_tree(MyQTreeWidgetItem *video);
+
+    void toggle_toolbar();
+    void enable_video_buttons();
+
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
+
+
 
 };
 

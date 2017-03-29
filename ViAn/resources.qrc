@@ -6,5 +6,20 @@
     <file alias ="previous_frame.png">Resources/previous_frame.png</file>
     <file alias ="next_frame.png">Resources/next_frame.png</file>
     <file alias ="error.png">Resources/error.png</file>
+    <file alias ="add_video.png">Resources/add_video.png</file>
+    <file alias ="show_hide_overlay.png">Resources/show_hide_overlay.png</file>
+    <file alias ="save_project.png">Resources/save_project.png</file>
+    <file alias ="load_project.png">Resources/load_project.png</file>
+    <file alias ="arrow.png">Resources/arrow.png</file>
+    <file alias ="box.png">Resources/box.png</file>
+    <file alias ="circle.png">Resources/circle.png</file>
+    <file alias ="zoom_in.png">Resources/zoom_in.png</file>
+    <file alias ="zoom_out.png">Resources/zoom_out.png</file>
+    <file alias ="pen.png">Resources/pen.png</file>
+    <file alias ="line.png">Resources/line.png</file>
+    <file alias ="undo.png">Resources/undo.png</file>
+    <file alias ="colour.png">Resources/colour.png</file>
+    <file alias ="clear.png">Resources/clear.png</file>
+    <file alias ="text.png">Resources/text.png</file>
 </qresource>
 </RCC>
