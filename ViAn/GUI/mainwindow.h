@@ -46,6 +46,10 @@ public:
     QMutex mutex;
     QWaitCondition paused_wait;
 
+signals:
+    void set_play_video();
+    void set_pause_video();
+    void set_stop_video();
 
 private slots:
 

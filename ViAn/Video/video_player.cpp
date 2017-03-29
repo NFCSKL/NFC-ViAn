@@ -50,27 +50,16 @@ bool video_player::load_video(string filename) {
 }
 
 /**
- * @brief video_player::play
- * Toggles the video_paused boolean
- */
-void video_player::play_pause() {
-    std::cout << "Play/pause " << video_paused << std::endl;
-    video_paused = !video_paused;
-}
-
-/**
  * @brief video_player::stop_video
  * Sets stop related bools to their correct values and sets the current playback frame to be 0.
  */
 void video_player::stop_video() {
-    std::cout << "Stop" << std::endl;
-    stop = true;
+    video_stopped = true;
     set_playback_frame(0);
 
     if (video_paused) {
         video_paused = false;
     }
-
 }
 
 /**
@@ -80,26 +69,25 @@ void video_player::stop_video() {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    stop = false;
+    video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-    while(!stop  && capture.read(frame)){
-        m_mutex->unlock();
+    while(!video_stopped  && capture.read(frame)){
         show_frame();
         this->msleep(delay);
 
-        // Waits indefinitly for video to be resumed
+        // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
             m_paused_wait->wait(m_mutex);
             video_paused = false;
-            std::cout << "Resuming playback" << std::endl;
         }
+        m_mutex->unlock();
     }
 
     // Reset frame on stop
-    if (stop) {
+    if (video_stopped) {
         current_frame = 0;
     }
 }
@@ -177,7 +165,7 @@ bool video_player::is_paused() {
  * @return
  */
 bool video_player::is_stopped() {
-    return stop;
+    return video_stopped;
 }
 
 /**
@@ -240,6 +228,35 @@ void video_player::next_frame() {
  */
 void video_player::previous_frame() {
     update_frame(current_frame - 1);
+}
+
+/**
+ * @brief on_play_video
+ * Slot function to be used from the GUI thread
+ * Sets the paused and stopped bools to false
+ */
+void video_player::on_play_video() {
+    video_paused = false;
+    video_stopped = false;
+}
+
+/**
+ * @brief on_pause_video
+ * Slot function to be used from the GUI thread
+ * Sets the paused bool to true
+ */
+void video_player::on_pause_video() {
+    video_paused = true;
+}
+
+/**
+ * @brief on_stop_video
+ * Slot function to be used from the GUI thread
+ * Sets the stopped bool to true and the paused bool to false
+ */
+void video_player::on_stop_video() {
+    video_stopped = true;
+    video_paused = false;
 }
 
 /**

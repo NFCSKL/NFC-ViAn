@@ -45,6 +45,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(mvideo_player, SIGNAL(currentFrame(int)),
                                   this, SLOT(set_video_slider_pos(int)));
 
+    QObject::connect(this, SIGNAL(set_play_video()), mvideo_player, SLOT(on_play_video()));
+    QObject::connect(this, SIGNAL(set_pause_video()), mvideo_player, SLOT(on_pause_video()));
+    QObject::connect(this, SIGNAL(set_stop_video()), mvideo_player, SLOT(on_stop_video()));
+
+
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
@@ -102,8 +107,6 @@ void MainWindow::on_fastBackwardButton_clicked(){
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked() {
-    std::cout << "Paused: " << mvideo_player->is_paused() << std::endl;
-    std::cout << "Stopped: " << mvideo_player->is_stopped() << std::endl;
     if (mvideo_player->is_paused()) {
         // Video thread is paused. Notifying the waitcondition to resume playback
         set_status_bar("Playing");
@@ -118,8 +121,7 @@ void MainWindow::on_playPauseButton_clicked() {
         // Video thread is running. Pause it
         set_status_bar("Paused");
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
-        mvideo_player->play_pause();  // TODO Not thread safe
-        // TODO cant block indefinitly?! mvideo_player->wait();
+        emit set_pause_video();
     }
 }
 
@@ -142,7 +144,7 @@ void MainWindow::on_stopButton_clicked() {
     } else {
         paused_wait.notify_one();
     }
-    mvideo_player->stop_video();
+    emit set_stop_video();
 }
 
 /**

@@ -67,6 +67,11 @@ signals:
     void processedImage(const QImage &image);
     void currentFrame(const int frame);
 
+public slots:
+    void on_play_video();
+    void on_pause_video();
+    void on_stop_video();
+
 protected:
     void run() override;
     void msleep(int ms);
@@ -91,7 +96,7 @@ private:
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
 
-    bool stop = false;
+    bool video_stopped = false;
     bool video_paused;
     bool choosing_zoom_area = false;
 
