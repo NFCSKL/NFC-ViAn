@@ -470,19 +470,30 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     QMenu menu(this);
 
     if(item == nullptr) {
-
+        QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+        QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+        create_project->setStatusTip(tr("Create project"));
+        load_project->setStatusTip(tr("Load project"));
+        menu.addAction(create_project);
+        menu.addAction(load_project);
+        connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
+        connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
     } else if(item->type == TYPE::PROJECT) {
         set_selected_project(item);
-        QAction *addVideo = new QAction(QIcon(""), tr("&Add video"), this);
-        addVideo->setStatusTip(tr("Add video"));
-        menu.addAction(addVideo);
-        connect(addVideo, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+        QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
+        QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+        add_video->setStatusTip(tr("Add video"));
+        delete_project->setStatusTip(tr("Delete project"));
+        menu.addAction(add_video);
+        menu.addAction(delete_project);
+        connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+        connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDeleteProject_triggered()));
     } else if(item->type == TYPE::VIDEO) {
         set_selected_video(item);
-        QAction *loadVideo = new QAction(QIcon(""), tr("&Play video"), this);
-        loadVideo->setStatusTip(tr("Play video"));
-        menu.addAction(loadVideo);
-        connect(loadVideo, SIGNAL(triggered()), this, SLOT(play_video()));
+        QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+        load_video->setStatusTip(tr("Play video"));
+        menu.addAction(load_video);
+        connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
