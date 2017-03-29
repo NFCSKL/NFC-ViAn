@@ -1,5 +1,6 @@
 #include "inputwindow.h"
 #include "ui_inputwindow.h"
+#include <QShortcut>
 
 /**
  * @brief inputwindow::inputwindow
@@ -16,6 +17,10 @@ inputwindow::inputwindow( MainWindow *mainWindow, ACTION action, QString infoTex
     this->action = action;
     ui->setupUi(this);
     ui->infoLabel->setText(infoText);
+    QShortcut *ok_shortcut = new QShortcut(QKeySequence(tr("Return")), this);
+    QObject::connect(ok_shortcut, SIGNAL(activated()), this, SLOT(on_okButton_clicked()));
+    QShortcut *cancel_shortcut = new QShortcut(QKeySequence(tr("Esc")), this);
+    QObject::connect(cancel_shortcut, SIGNAL(activated()), this, SLOT(on_cancelButton_clicked()));
 }
 /**
  * @brief inputwindow::~inputwindow
