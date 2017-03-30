@@ -203,9 +203,7 @@ int video_player::get_num_frames() {
 
 /**
  * @brief video_player::get_current_frame_num
- * @return The number of the currently read frame.
- *         The index is 0-based, and -1 if the first
- *         frame has not been read yet.
+ * @return The number of the currently read frame (0-based index).
  */
 int video_player::get_current_frame_num() {
     // capture.get() gives the number of the frame to be read, hence the compensation of -1.
@@ -214,9 +212,7 @@ int video_player::get_current_frame_num() {
 
 /**
  * @brief video_player::set_current_frame_num
- * @param frame_nbr The number to set the currently read frame to.
- *        The index is 0-based, and -1 sets the playback to start
- *        from the first frame (i.e. frame 0 is the frame to be read next).
+ * @param frame_nbr The number to set the currently read frame to (0-based index).
  */
 void video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
