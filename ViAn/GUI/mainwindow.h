@@ -19,6 +19,8 @@
 #include "inputwindow.h"
 #include "action.h"
 #include "qtreeitems.h"
+#include <QMutex>
+#include <QWaitCondition>
 
 using namespace std;
 class inputwindow;
@@ -38,6 +40,19 @@ public:
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
     const std::string ARROW_STRING = " <--";
+
+    // Lock and wait condition to sleep player when video is paused
+    QMutex mutex;
+    QWaitCondition paused_wait;
+
+signals:
+    void set_play_video();
+    void set_pause_video();
+    void set_stop_video();
+    void resize_video_frame(int width, int height);
+    void next_video_frame();
+    void prev_video_frame();
+
 private slots:
 
     void on_playPauseButton_clicked();
@@ -72,7 +87,7 @@ private slots:
 
     void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
-    void on_actionShow_hide_overview_triggered();
+    void on_actionShow_hide_overlay_triggered();
 
     void on_actionColour_triggered();
 
@@ -106,6 +121,8 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
+    void on_actionChoose_Workspace_triggered();
+
     void on_actionDeleteProject_triggered();
 
     void on_actionDeleteVideo_triggered();
@@ -121,6 +138,7 @@ private:
 
     FileHandler *fileHandler;
 
+    void setup_video_player(video_player *mplayer);
     void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
     void set_selected_video(MyQTreeWidgetItem *newSelectedVideo);
     void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
@@ -131,6 +149,7 @@ private:
     void remove_video_from_tree(MyQTreeWidgetItem *video);
 
     void toggle_toolbar();
+    void enable_video_buttons();
 
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;

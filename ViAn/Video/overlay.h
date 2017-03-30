@@ -12,14 +12,16 @@
 #include "shapes/text.h"
 #include "shapes/zoomrectangle.h"
 
-class overlay {
+#include "opencv2/opencv.hpp"
+
+class Overlay {
 
 public:
-    overlay();
+    Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
-    void draw_overlay(QImage &img, int frame_nr);
+    cv::Mat draw_overlay(cv::Mat &frame, int frame_nr);
     void set_tool(SHAPES s);
     void set_colour(QColor col);
     QColor get_colour();
@@ -39,7 +41,7 @@ private:
     QColor current_colour = Qt::red;
     QString current_string = "";
 
-    std::map<int, QList<shape*>> overlays;
+    std::map<int, QList<Shape*>> overlays;
 };
 
 #endif // OVERLAY_H

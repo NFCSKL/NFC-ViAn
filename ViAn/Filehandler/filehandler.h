@@ -5,8 +5,6 @@
 #ifdef _WIN32
     #include <windows.h>
     #include "stringhelper.h"
-#elif __APPLE__
-#elif __unix__
 #endif
 #include <vector>
 #include <string>
@@ -17,14 +15,7 @@
 #include "project.h"
 #include "dir.h"
 #include <algorithm>
-#ifdef _WIN32
-    #define WORKSPACE "C:"
-#elif __APPLE__
-    #define WORKSPACE "/Applications"
-#elif __unix__
-    #define  WORKSPACE "~"
 
-#endif
 
 
 enum WRITE_OPTION{APPEND, OVERWRITE};
@@ -36,10 +27,11 @@ class FileHandler
 {
 public:
     FileHandler();
-    std::string workSpace;
     //
     //  Project manipulation
     //
+    std::string work_space;
+    void set_workspace(std::string new_work_space);
     Project* open_project(std::string dirpath);
     Project* create_project(std::string projName);
     FH_ERROR delete_project(Project* proj);
@@ -92,6 +84,8 @@ private:
     void load_proj_files(std::string str);
     //add used for loading project from file
     void add_file(ID id ,std::string filepath);
+
+
     /**
      * @brief m_projects, m_fileMap, m_dirMap
      * map structures for keeping track of projects, files and directories.

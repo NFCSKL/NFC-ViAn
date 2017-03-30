@@ -79,6 +79,9 @@
           </property>
           <item>
            <widget class="QPushButton" name="fastBackwardButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -101,6 +104,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="previousFrameButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -120,6 +126,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="playPauseButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -136,6 +145,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="nextFrameButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -158,6 +170,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="fastForwardButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -180,6 +195,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="stopButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -238,26 +256,37 @@
          </layout>
         </item>
         <item>
-         <widget class="QSlider" name="videoSlider">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="singleStep">
-           <number>1</number>
-          </property>
-          <property name="sliderPosition">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="sliderLayout">
+          <item>
+           <widget class="QLabel" name="sliderLabel">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="videoSlider">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -285,7 +314,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -316,6 +345,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
     <addaction name="menuDelete"/>
+    <addaction name="actionChoose_Workspace"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -333,7 +363,7 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionShow_hide_overview"/>
+    <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
    </widget>
@@ -350,6 +380,7 @@
      <addaction name="actionLine"/>
      <addaction name="actionArrow"/>
      <addaction name="actionPen"/>
+     <addaction name="actionText"/>
     </widget>
     <addaction name="actionColour"/>
     <addaction name="menuShape"/>
@@ -387,7 +418,7 @@
    <addaction name="actionAddVideo"/>
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
-   <addaction name="actionShow_hide_overview"/>
+   <addaction name="actionShow_hide_overlay"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="enabled">
@@ -407,11 +438,14 @@
    <addaction name="actionCircle"/>
    <addaction name="actionArrow"/>
    <addaction name="actionLine"/>
+   <addaction name="actionText"/>
    <addaction name="actionPen"/>
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
-   <addaction name="actionShow_hide_overview"/>
+   <addaction name="actionShow_hide_overlay"/>
    <addaction name="separator"/>
+   <addaction name="actionZoom_in"/>
+   <addaction name="actionZoom_out"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -472,12 +506,15 @@
     <string>Open manual</string>
    </property>
   </action>
-  <action name="actionShow_hide_overview">
+  <action name="actionShow_hide_overlay">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/show_hide_overlay.png</normaloff>:/show_hide_overlay.png</iconset>
    </property>
    <property name="text">
+    <string>Show/hide overlay</string>
+   </property>
+   <property name="toolTip">
     <string>Show/hide overlay</string>
    </property>
   </action>
@@ -601,6 +638,32 @@
    </property>
    <property name="text">
     <string>Zoom out</string>
+   </property>
+   <property name="iconText">
+    <string>Zoom out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out</string>
+   </property>
+  </action>
+  <action name="actionText">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/text.png</normaloff>:/text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Text</string>
+   </property>
+   <property name="iconText">
+    <string>Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Text</string>
+   </property>
+  </action>
+  <action name="actionChoose_Workspace">
+   <property name="text">
+    <string>Choose Workspace</string>
    </property>
   </action>
  </widget>
