@@ -35,23 +35,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
+    ui->videoFrame->setScaledContents(false);
 
     ui->ProjectTree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
+    //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait);
-    QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
-                                  this, SLOT(update_video(QImage)));
-    QObject::connect(mvideo_player, SIGNAL(currentFrame(int)),
-                                  this, SLOT(set_video_slider_pos(int)));
-
-    QObject::connect(this, SIGNAL(set_play_video()), mvideo_player, SLOT(on_play_video()));
-    QObject::connect(this, SIGNAL(set_pause_video()), mvideo_player, SLOT(on_pause_video()));
-    QObject::connect(this, SIGNAL(set_stop_video()), mvideo_player, SLOT(on_stop_video()));
-
-    //Used for rescaling the source image for video playback
-    mvideo_player->set_frame_height(ui->videoFrame->height());
-    mvideo_player->set_frame_width(ui->videoFrame->width());
+    setup_video_player(mvideo_player);
 
     // Initially hide overlay toolbar
     ui->toolBar->hide();
@@ -65,13 +56,38 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
+    mvideo_player->terminate();
     delete mvideo_player;
     delete ui;
 }
 
 /**
+ * @brief MainWindow::setup_video_player
+ * @param mplayer
+ * Connects all signals and slots that are needed between video_player and mainwindow.
+ */
+void MainWindow::setup_video_player(video_player *mplayer) {
+    QObject::connect(mplayer, SIGNAL(processed_image(QImage)),
+                     this, SLOT(update_video(QImage)));
+    QObject::connect(mplayer, SIGNAL(update_current_frame(int)),
+                     this, SLOT(set_video_slider_pos(int)));
+    QObject::connect(this, SIGNAL(resize_video_frame(int,int)),
+                     mplayer, SLOT(scaling_event(int,int)));
+    QObject::connect(this, SIGNAL(next_video_frame()),
+                     mplayer, SLOT(next_frame()));
+    QObject::connect(this, SIGNAL(prev_video_frame()),
+                     mplayer, SLOT(previous_frame()));
+    QObject::connect(this, SIGNAL(set_play_video()),
+                     mplayer, SLOT(on_play_video()));
+    QObject::connect(this, SIGNAL(set_pause_video()),
+                     mplayer, SLOT(on_pause_video()));
+    QObject::connect(this, SIGNAL(set_stop_video()),
+                     mplayer, SLOT(on_stop_video()));
+}
+
+/**
  * @brief MainWindow::set_shortcuts
- * Function to set shortcuts on actions
+ * Function to set keyboard shortcuts on actions
  */
 void MainWindow::set_shortcuts(){
     ui->actionExit->setShortcut(tr("Ctrl+e"));
@@ -149,7 +165,7 @@ void MainWindow::on_stopButton_clicked() {
 void MainWindow::on_nextFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went forward a frame");
-        mvideo_player->next_frame();
+        emit next_video_frame();
     } else {
         set_status_bar("Needs to be paused");
     }
@@ -162,9 +178,9 @@ void MainWindow::on_nextFrameButton_clicked() {
 void MainWindow::on_previousFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went back a frame");
-        mvideo_player->previous_frame();
+        emit prev_video_frame();
     } else {
-        set_status_bar("Needs to be paused");
+        set_status_bar("Video needs to be paused");
     }
 }
 
@@ -195,8 +211,19 @@ void MainWindow::set_video_slider_pos(int pos) {
  */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
-   mvideo_player->set_frame_height(ui->videoFrame->height());
-   mvideo_player->set_frame_width(ui->videoFrame->width());
+
+   //Scales the current frame when video playback is paused
+   if (mvideo_player->video_open() && mvideo_player->is_paused()) {
+       QImage frame( ui->videoFrame->pixmap()->toImage() );
+       ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                     frame.scaled(ui->videoFrame->width(),
+                                                  ui->videoFrame->height(),
+                                                  Qt::KeepAspectRatio))
+                                 );
+   }
+
+   //Sends new QLabel resolution to mvideo_player to update scaling resolution
+   emit resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
 }
 
 /**
@@ -525,7 +552,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  */
 void MainWindow::on_actionAddVideo_triggered() {
     if(selectedProject != nullptr) {
-        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
+        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),  this->fileHandler->work_space.c_str(),
                                                    tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
         if(!dir.isEmpty()) { // Check if you have selected something.
             input_switch_case(ACTION::ADD_VIDEO, dir);
@@ -542,6 +569,9 @@ void MainWindow::on_actionAddVideo_triggered() {
  *
  */
 void MainWindow::play_video() {
+    //Used for rescaling the source image for video playback
+    emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
+
     enable_video_buttons();
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
@@ -609,7 +639,7 @@ void MainWindow::on_actionSave_triggered() {
  * @brief MainWindow::on_actionLoad_triggered
  */
 void MainWindow::on_actionLoad_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->work_space.c_str(),tr("*.txt"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
@@ -649,6 +679,17 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
 }
 
 /**
+ * @brief MainWindow::on_actionChoose_Workspace_triggered
+ * Opens file explorer and requests a workspace select from user, updates
+ * filehandler workspace accordingly.
+ */
+void MainWindow::on_actionChoose_Workspace_triggered() {
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
+    this->fileHandler->set_workspace(dir.toStdString() + "/");
+    set_status_bar("new wokspace set to " + this->fileHandler->work_space);
+}
+
+    /**
  * @brief MainWindow::on_actionDeleteProject_triggered
  * Deletes the saved files of the selected project.
  * Removes the project from the preoject tree.

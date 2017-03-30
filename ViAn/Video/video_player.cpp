@@ -25,6 +25,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete video_overlay;
+    capture.release();
 }
 
 /**
@@ -71,14 +72,23 @@ void video_player::run()  {
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-    while(!video_stopped  && capture.read(frame)){
+    capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
+    while (!video_stopped && capture.read(frame)) {
+        const clock_t begin_time = std::clock();
+
+        convert_frame();
+        int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
+
+        if (delay - conversion_time > 0) {
+            this->msleep(delay - conversion_time);
+        }
         show_frame();
-        this->msleep(delay);
+
 
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
+            current_frame = capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
             m_paused_wait->wait(m_mutex);
             video_paused = false;
         }
@@ -96,9 +106,8 @@ void video_player::run()  {
  * Calculates and emits the current frame to GUI.
  */
 void video_player::show_frame() {
-    emit currentFrame(capture.get(CV_CAP_PROP_POS_FRAMES));
-    convert_frame();
-    emit processedImage(img);
+    emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES));
+    emit processed_image(img);
 }
 
 /**
@@ -109,17 +118,20 @@ void video_player::show_frame() {
 void video_player::convert_frame() {
     cv::Mat processed_frame;
 
-    // Process frame (draw overlay, zoom)
+    // Process frame (draw overlay, zoom, scaling)
     processed_frame = process_frame(frame);
 
-    // Convert frame to QImage
+
     if (processed_frame.channels() == 3) {
-        cv::cvtColor(processed_frame, RGBframe, CV_BGR2RGB);
-        img = QImage((const unsigned char*)(RGBframe.data),
-                          RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+        cv::Mat RGBframe;
+        cvtColor(processed_frame, RGBframe,CV_BGR2RGB);
+        img = QImage((const uchar *) RGBframe.data, RGBframe.cols,
+                  RGBframe.rows, RGBframe.step, QImage::Format_RGB888);
+        img.bits(); // enforce deep copy
     } else {
         img = QImage((const unsigned char*)(processed_frame.data),
                              processed_frame.cols,processed_frame.rows,QImage::Format_Indexed8);
+        img.bits(); // enforce deep copy
     }
 }
 
@@ -132,13 +144,43 @@ void video_player::convert_frame() {
 cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = frame.clone();
-    processed_frame = video_overlay->draw_overlay(processed_frame, capture.get(CV_CAP_PROP_POS_FRAMES));
+    processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
     }
     processed_frame = zoom_frame(processed_frame);
     processed_frame = contrast_frame(processed_frame);
-    return processed_frame;
+
+    cv::Mat scaled_frame;
+    if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
+        scaled_frame = scale_frame(processed_frame);
+    } else {
+        scaled_frame = processed_frame;
+    }
+    return scaled_frame;
+}
+
+/**
+ * @brief video_player::scale_frame
+ * Scales the video frame to match the resolution of the video window.
+ * @param src
+ * @return
+ */
+cv::Mat video_player::scale_frame(cv::Mat &src) {
+
+    cv::Size size;
+    if (frame_width <= 0 || frame_height <= 0) {
+        size = cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH),capture.get(CV_CAP_PROP_FRAME_HEIGHT));
+        frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+        frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    } else {
+        size = cv::Size(frame_width,frame_height);
+    }
+
+    cv::Mat dst;
+
+    cv::resize(src,dst,size); //resize image
+    return dst;
 }
 
 /**
@@ -226,10 +268,24 @@ int video_player::get_num_frames() {
 
 /**
  * @brief video_player::get_current_frame_num
- * @return the number of the current frame
+ * @return The number of the currently read frame (0-based index).
  */
 int video_player::get_current_frame_num() {
-    return capture.get(CV_CAP_PROP_POS_FRAMES);
+    // capture.get() gives the number of the frame to be read, hence the compensation of -1.
+    return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
+}
+
+/**
+ * @brief video_player::set_current_frame_num
+ * @param frame_nbr The number to set the currently read frame to (0-based index).
+ */
+void video_player::set_current_frame_num(int frame_nbr) {
+    if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
+        // capture.set() sets the number of the frame to be read.
+        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
+        // capture.read() will read the frame and advance one step.
+        capture.read(frame);
+    }
 }
 
 /**
@@ -266,15 +322,15 @@ bool video_player::set_playback_frame(int frame_num) {
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
-    update_frame(current_frame + 1);
+    update_frame(get_current_frame_num() + 1);
 }
 
 /**
- * @brief video_player::next_frame
+ * @brief video_player::previous_frame
  * Moves the playback one frame backward.
  */
 void video_player::previous_frame() {
-    update_frame(current_frame - 1);
+    update_frame(get_current_frame_num() - 1);
 }
 
 /**
@@ -313,8 +369,8 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_playback_frame(frame_nbr)) {
-        capture.set(CAP_PROP_POS_FRAMES, frame_nbr);
-        capture.read(frame);
+        set_current_frame_num(frame_nbr);
+        convert_frame();
         show_frame();
     }
 }
@@ -327,6 +383,7 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
+        convert_frame();
         show_frame();
     }
 }
@@ -442,7 +499,7 @@ void video_player::set_overlay_colour(QColor colour) {
  */
 void video_player::undo_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->undo(capture.get(CV_CAP_PROP_POS_FRAMES));
+        video_overlay->undo(get_current_frame_num());
         update_overlay();
     }
 }
@@ -454,7 +511,7 @@ void video_player::undo_overlay() {
  */
 void video_player::clear_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->clear(capture.get(CV_CAP_PROP_POS_FRAMES));
+        video_overlay->clear(get_current_frame_num());
         update_overlay();
     }
 }
@@ -501,7 +558,7 @@ void video_player::video_mouse_pressed(QPoint pos) {
             zoom_area->set_start_pos(pos);
             zoom_area->update_drawing_pos(pos);
         } else if (is_paused()) {
-            video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+            video_overlay->mouse_pressed(pos, get_current_frame_num());
         }
         update_overlay();
     }
@@ -523,7 +580,7 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->choose_area();
             choosing_zoom_area = false;
         } else if (is_paused()) {
-            video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+            video_overlay->mouse_released(pos, get_current_frame_num());
         }
         update_overlay();
     }
@@ -544,7 +601,7 @@ void video_player::video_mouse_moved(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
         } else if (is_paused()) {
-            video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+            video_overlay->mouse_moved(pos, get_current_frame_num());
         }
         update_overlay();
     }
@@ -587,9 +644,45 @@ void video_player::export_current_frame(QString path_to_folder) {
 
     // Add "/FRAME_NR.tiff" to the path.
     path_to_folder.append("/");
-    path_to_folder.append(QString::number(capture.get(CV_CAP_PROP_POS_FRAMES)));
+    path_to_folder.append(QString::number(get_current_frame_num()));
     path_to_folder.append(".tiff");
 
     QImageWriter writer(path_to_folder, "tiff");
     writer.write(img);
+}
+
+/**
+ * @brief video_player::scaling_event
+ * This slot gets called when the video QLabel gets resized.
+ * Sets the video width and height to match.
+ * @param width
+ * @param height
+ */
+void video_player::scaling_event(int new_width, int new_height) {
+    if (!capture.isOpened()) {
+        return;
+    }
+
+
+    int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    float height_ratio = float(new_height)/float(video_height);
+    float width_ratio = float(new_width)/float(video_width);
+
+    //This statement ensures that the original aspect ratio of the video is kept when scaling
+    if (width_ratio >= height_ratio) {
+        frame_width = int(video_width * height_ratio);
+        frame_height = new_height;
+    } else {
+        frame_width = new_width;
+        frame_height = int(video_height * width_ratio);
+    }
+}
+
+/**
+ * @brief video_player::video_open
+ * @return a bool that is true as long as a video is open.
+ */
+bool video_player::video_open() {
+    return capture.isOpened();
 }
