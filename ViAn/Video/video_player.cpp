@@ -131,7 +131,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
         processed_frame = zoom_area->draw(processed_frame);
     }
     processed_frame = zoom_frame(processed_frame);
-    processed_frame = contrast_frame(processed_frame);
+    //processed_frame = contrast_frame(processed_frame);
 
     cv::Mat scaled_frame;
     if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
