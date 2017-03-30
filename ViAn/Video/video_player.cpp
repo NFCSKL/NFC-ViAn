@@ -208,12 +208,19 @@ cv::Mat video_player::contrast_frame(cv::Mat &frame) {
     // Create image for the modified frame.
     Mat modified_frame = Mat::zeros(frame.size(), frame.type());
 
+    double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
+    double beta = 0;  /* Simple brightness control, beta value [0-100]. */
+    beta = 100 * brightness / 255.0;
+    // Alpha value in [1.0-3.0].
+    alpha = 1 + 2 * contrast / 255.0;
+    // Beta value in [0-100].
+
     // Do the operation new_image(i,j) = alpha*image(i,j) + beta
     for (int y = 0; y < frame.rows; y++) {
         for (int x = 0; x < frame.cols; x++) {
             for (int c = 0; c < 3; c++) {
                 modified_frame.at<Vec3b>(y, x)[c] =
-                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + beta);
+                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + (int)beta);
             }
         }
     }
@@ -393,10 +400,8 @@ void video_player::update_overlay() {
  * Sets the contrast value (alpha value).
  * @param contrast Contrast parameter in range 0 to 255.
  */
-void video_player::set_contrast(double contrast) {
-    contrast = std::min(255.0, std::max(0.0, contrast));
-    // Alpha value in [1.0-3.0].
-    alpha = 1 + 2 * contrast / 255.0;
+void video_player::set_contrast(int c) {
+    contrast = std::min(255, std::max(0, c));
 }
 
 /**
@@ -404,26 +409,24 @@ void video_player::set_contrast(double contrast) {
  * Sets the brightness value (beta value).
  * @param brightness Brightness parameter in range 0 to 255.
  */
-void video_player::set_brightness(double brightness) {
-    // Beta value in [0-100].
-    brightness = std::min(255.0, std::max(0.0, brightness));
-    beta = 100 * brightness / 255.0;
+void video_player::set_brightness(int b) {
+    brightness = std::min(255, std::max(0, b));
 }
 
 /**
  * @brief video_player::get_contrast
- * @return Returns contrast parameter in range 0 to 255
+ * @return Returns contrast parameter in range 0 to 255.
  */
 int video_player::get_contrast() {
-    return 255 * (alpha - 1) / 2;
+    return contrast;
 }
 
 /**
  * @brief video_player::get_brightness
- * @return Returns brightness parameter in range 0 to 255
+ * @return Returns brightness parameter in range 0 to 255.
  */
 int video_player::get_brightness() {
-    return 255 * ((double) beta / 100);
+    return brightness;
 }
 
 /**
