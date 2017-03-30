@@ -27,8 +27,9 @@ void filehandlertest::project_handling_test(){
 
     fh->save_project(proj);
     //check file contents
-    Project* proj2 = fh->load_project("TEST_PROJ", std::string(WORKSPACE) + "/TEST_PROJ");
+    Project* proj2 = fh->load_project("TEST_PROJ", fh->work_space + "TEST_PROJ");
     QVERIFY(fh->proj_equals(*proj2,*proj));
+
     //check project contentss
     fh->delete_file(vid1);
     fh->delete_file(vid2);
@@ -41,7 +42,7 @@ void filehandlertest::project_handling_test(){
  */
 void filehandlertest::directory_test(){
     FileHandler* fh = new FileHandler();
-    std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
+    std::string dirpath = fh->work_space + std::string("TEST_PROJ");
     ID id = fh->create_directory(dirpath);
     QCOMPARE(fh->lastError, 0);
     QCOMPARE(fh->delete_directory(id), 0);
@@ -53,7 +54,7 @@ void filehandlertest::directory_test(){
 
 void filehandlertest::file_test(){
     FileHandler* fh = new FileHandler();
-    std::string dirpath = std::string(WORKSPACE) + "/TEST_MAP";
+    std::string dirpath = fh->work_space + "TEST_MAP";
     std::string filename = "filetest.txt";
     ID dir = fh->create_directory(dirpath);
     ID fileID  = fh->create_file(filename,dir); //Create file ID = i    (1)

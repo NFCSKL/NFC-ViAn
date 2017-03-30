@@ -118,7 +118,10 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
+    void on_actionChoose_Workspace_triggered();
+
     void on_actionDeleteProject_triggered();
+
 
 private:
 

@@ -314,7 +314,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -345,6 +345,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
     <addaction name="menuDelete"/>
+    <addaction name="actionChoose_Workspace"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -443,6 +444,8 @@
    <addaction name="actionClear"/>
    <addaction name="actionShow_hide_overlay"/>
    <addaction name="separator"/>
+   <addaction name="actionZoom_in"/>
+   <addaction name="actionZoom_out"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -656,6 +659,11 @@
    </property>
    <property name="toolTip">
     <string>Text</string>
+   </property>
+  </action>
+  <action name="actionChoose_Workspace">
+   <property name="text">
+    <string>Choose Workspace</string>
    </property>
   </action>
  </widget>
