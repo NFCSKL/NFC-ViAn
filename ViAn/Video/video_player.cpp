@@ -617,20 +617,27 @@ void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-    // Calculate the scale ratio.
-    double x_scale = (double) video_frame_width/frame_width;
-    double y_scale = (double) video_frame_height/frame_height;
+    // Calculate the scale ratio between the actual video
+    // size and the size of the frame shown in the gui.
+    double x_scale_ratio = (double) video_frame_width/frame_width;
+    double y_scale_ratio = (double) video_frame_height/frame_height;
 
-    // Calculate the coordinates on the video frame from
+    // Calculate the coordinates on the original-sized frame,
+    // from the coordinates on the QLabel where the frame is shown.
+    // (Multiply with the ratio, and subtract the empty parts of the QLabel,
+    // only subtracting the top and left side, hence division by 2.)
+    double x_scale = x_scale_ratio * pos.x() - (qlabel_width - frame_width) / 2;
+    double y_scale = y_scale_ratio * pos.y() - (qlabel_height - frame_height) / 2;
+
+    // Calculate the coordinates on the actual video from
     // the coordinates on the zoomed frame.
-    double x_zoom_scale = (double) zoom_area->get_width()/video_frame_width;
-    double y_zoom_scale = (double) zoom_area->get_height()/video_frame_height;
-    double x_video = zoom_area->get_x() + (double) x_zoom_scale * pos.x();
-    double y_video = zoom_area->get_y() + (double) y_zoom_scale * pos.y();
+    double x_zoom_ratio = (double) zoom_area->get_width()/video_frame_width;
+    double y_zoom_ratio = (double) zoom_area->get_height()/video_frame_height;
+    double x_video = zoom_area->get_x() + (double) x_zoom_ratio * x_scale;
+    double y_video = zoom_area->get_y() + (double) y_zoom_ratio * y_scale;
 
-    // Calculate the coordinates on the frame.
-    pos.setX(x_scale * x_video);
-    pos.setY(y_scale * y_video);
+    pos.setX(x_video);
+    pos.setY(y_video);
 }
 
 /**
@@ -663,6 +670,8 @@ void video_player::scaling_event(int new_width, int new_height) {
         return;
     }
 
+    qlabel_width = new_width;
+    qlabel_height = new_height;
 
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
