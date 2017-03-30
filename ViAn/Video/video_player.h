@@ -44,6 +44,7 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
+    void reset_brightness_contrast();
     void set_contrast(int contrast);
     void set_brightness(int brightness);
     int get_contrast();
@@ -118,8 +119,13 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
 
+    int CONTRAST_MIN = 1, CONTRAST_MAX = 5, BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100;
+    // Contrast
     int contrast = 0;   /* Value in range [0-255]. */
-    int brightness = 0; /* Value in range [0-255]. */
+    double alpha = 1;
+    // Brightness
+    int brightness = 128; /* Value in range [0-255]. */
+    int beta = 0;
 
     Overlay* video_overlay;
 };
