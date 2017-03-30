@@ -18,7 +18,6 @@
 
 using namespace std;
 
-enum PLAYBACK_STATES {PLAY, PAUSE, STOP, SET_FRAME};
 class video_player : public QThread {
     Q_OBJECT
 public:
@@ -83,7 +82,6 @@ protected:
     void msleep(int ms);
 
 private:
-    PLAYBACK_STATES current_state, prev_state;
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
     cv::Mat scale_frame(cv::Mat &src);

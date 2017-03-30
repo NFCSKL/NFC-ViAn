@@ -280,17 +280,18 @@ void video_player::set_frame_height(int new_value) {
 
 /**
  * @brief video_player::on_set_playback_frame
- * Moves the playback to the frame specified by frame_num
+ * Updates the frame directly if the video is paused.
+ * Otherwise it saves the frame number which later on
+ * updates in the run function
  * @param frame_num
  */
 void video_player::on_set_playback_frame(int frame_num, bool show_frame) {
-    set_new_frame = true;
-    new_frame_num = frame_num;
-    /*if (show_frame) {
+    if (video_paused) {
         update_frame(frame_num);
     } else {
-        set_current_frame_num(frame_num);
-    }*/
+        set_new_frame = true;
+        new_frame_num = frame_num;
+    }
 }
 
 /**

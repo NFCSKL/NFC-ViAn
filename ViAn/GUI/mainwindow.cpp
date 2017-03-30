@@ -247,6 +247,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
         int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
 
+
         if (!mvideo_player->is_stopped() && !mvideo_player->is_paused()) {
             emit set_pause_video();
         }
@@ -803,6 +804,7 @@ void MainWindow::enable_video_buttons() {
  * Block slider update from video_player
  */
 void MainWindow::on_videoSlider_sliderPressed() {
+    std::cout << "Slider pressed" << std::endl;
     slider_blocked = true;
     slider_moving = true;
 }
@@ -812,6 +814,7 @@ void MainWindow::on_videoSlider_sliderPressed() {
  * Set video playback pos to slider pos and unblock slider update
  */
 void MainWindow::on_videoSlider_sliderReleased() {
+    std::cout << "Slider released " << mvideo_player->is_paused() << std::endl;
     int new_pos = video_slider->value();
     emit set_playback_frame(new_pos);
     video_slider->setSliderPosition(new_pos);
@@ -820,4 +823,5 @@ void MainWindow::on_videoSlider_sliderReleased() {
     if (mvideo_player->is_stopped()) {
         mvideo_player->start();
     }
+
 }
