@@ -141,6 +141,7 @@ private:
 
     bool slider_blocked = false;
     bool slider_moving = false;
+    bool slider_paused_video = false;
     int prev_slider_pos = 0;
 
     int posCounter = 0;

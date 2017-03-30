@@ -70,7 +70,7 @@ private slots:
     void scaling_event(int new_width, int new_height);
     void next_frame();
     void previous_frame();
-    void on_set_playback_frame(int frame_num, bool show_frame = false);
+    void on_set_playback_frame(int frame_num);
 
 public slots:
     void on_play_video();

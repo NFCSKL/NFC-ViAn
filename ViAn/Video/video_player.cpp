@@ -88,6 +88,10 @@ void video_player::run()  {
         }
         m_mutex->unlock();
     }
+
+    video_stopped = true;
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    emit update_current_frame(0);
 }
 
 /**
@@ -285,9 +289,9 @@ void video_player::set_frame_height(int new_value) {
  * updates in the run function
  * @param frame_num
  */
-void video_player::on_set_playback_frame(int frame_num, bool show_frame) {
+void video_player::on_set_playback_frame(int frame_num) {
     if (video_paused) {
-        update_frame(frame_num);
+        update_frame(frame_num - 1);
     } else {
         set_new_frame = true;
         new_frame_num = frame_num;

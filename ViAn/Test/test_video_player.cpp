@@ -65,14 +65,6 @@ void test_video_player::test_set_frame_height() {
 }
 
 /**
- * @brief test_video_player::test_set_playback_frame
- */
-void test_video_player::test_set_playback_frame() {
-    mvideo->on_set_playback_frame(100);
-    QVERIFY(mvideo->current_frame == 100);
-}
-
-/**
  * @brief test_video_player::test_next_frame
  * Currently this method cannot be tested because of thread issues.
  */
@@ -132,11 +124,14 @@ void test_video_player::test_dec_playback_speed(){
  * @brief test_toggle_overlay
  */
 void test_video_player::test_toggle_overlay() {
-    mvideo->video_overlay->set_showing_overlay(false);
-    mvideo->toggle_overlay();
-    QVERIFY(mvideo->is_showing_overlay());
-    mvideo->toggle_overlay();
-    QVERIFY(!mvideo->is_showing_overlay());
+    QMutex mutex;
+    QWaitCondition wait;
+    video_player *v_player = new video_player(&mutex, &wait);
+    v_player->video_overlay->set_showing_overlay(false);
+    v_player->toggle_overlay();
+    QVERIFY(v_player->is_showing_overlay());
+    v_player->toggle_overlay();
+    QVERIFY(!v_player->is_showing_overlay());
 }
 
 /**
@@ -230,4 +225,18 @@ void test_video_player::test_set_stop_video() {
     mvideo->on_stop_video();
     QVERIFY(!mvideo->video_paused);
     QVERIFY(mvideo->video_stopped);
+}
+
+/**
+ * @brief test_video_player::test_on_set_playback_fram
+ */
+void test_video_player::test_on_set_playback_fram() {
+    mvideo->video_paused = false;
+    mvideo->on_set_playback_frame(100);
+    QVERIFY(mvideo->new_frame_num == 100);
+    QVERIFY(mvideo->set_new_frame == true);
+
+    mvideo->video_paused = true;
+    mvideo->on_set_playback_frame(100);
+    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == 100);
 }

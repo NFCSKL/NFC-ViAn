@@ -238,6 +238,7 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  */
 void MainWindow::on_videoSlider_valueChanged(int newPos){
     changeCounter++;
+    bool was_paused = false;
     // Make slider to follow the mouse directly and not by pageStep steps
     if (abs(prev_slider_pos - newPos) == 1) {
         return;
@@ -247,10 +248,12 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
         int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
 
-
+        /*
         if (!mvideo_player->is_stopped() && !mvideo_player->is_paused()) {
+            std::cout << "pausing video" << std::endl;
             emit set_pause_video();
-        }
+            was_paused = true;
+        }*/
 
         std::chrono::milliseconds current_time = std::chrono::duration_cast<
                 std::chrono::milliseconds >(
@@ -807,6 +810,12 @@ void MainWindow::on_videoSlider_sliderPressed() {
     std::cout << "Slider pressed" << std::endl;
     slider_blocked = true;
     slider_moving = true;
+    if (!mvideo_player->is_paused()) {
+        slider_paused_video = true;
+        emit set_pause_video();
+    }
+
+
 }
 
 /**
@@ -820,8 +829,8 @@ void MainWindow::on_videoSlider_sliderReleased() {
     video_slider->setSliderPosition(new_pos);
     slider_blocked = false;
     slider_moving = false;
-    if (mvideo_player->is_stopped()) {
-        mvideo_player->start();
+    if (slider_paused_video) {
+        paused_wait.notify_one();
+        slider_paused_video = false;
     }
-
 }
