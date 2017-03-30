@@ -32,19 +32,6 @@ void test_video_player::test_load_video() {
 }
 
 /**
- * @brief test_video_player::test_stop_video
- * Tests ONLY the case when the video is paused because if the video
- * is running, the stop related commands are executed on another thread.
- */
-void test_video_player::test_stop_video() {
-    mvideo->video_paused = true;
-    mvideo->video_stopped = false;
-    mvideo->on_stop_video();
-    QVERIFY(mvideo->video_stopped == true);
-    QVERIFY(mvideo->video_paused == false);
-}
-
-/**
  * @brief test_video_player::test_is_paused
  */
 void test_video_player::test_is_paused() {
@@ -78,29 +65,32 @@ void test_video_player::test_set_frame_height() {
 }
 
 /**
+ * @brief test_video_player::test_set_current_frame
+ */
+void test_video_player::test_set_current_frame() {
+    mvideo->set_current_frame_num(100);
+    QVERIFY(mvideo->get_current_frame_num() == 100);
+    mvideo->set_current_frame_num(10);
+    mvideo->set_current_frame_num(-10);
+    QVERIFY(mvideo->get_current_frame_num() == 10);
+}
+
+/**
  * @brief test_video_player::test_next_frame
- * Currently this method cannot be tested because of thread issues.
  */
 void test_video_player::test_next_frame() {
-    /*
-    mvideo->load_video("seq_01.mp4");
-    mvideo->set_playback_frame(100);
+    mvideo->set_current_frame_num(100);
     mvideo->next_frame();
-    QVERIFY(mvideo->current_frame == 101);
-    */
+    QVERIFY(mvideo->get_current_frame_num() == 101);
 }
 
 /**
  * @brief test_video_player::test_previous_frame
- * Currently this method cannot be tested because of thread issues.
  */
 void test_video_player::test_previous_frame() {
-    /*
-    mvideo->load_video("seq_01.mp4");
-    mvideo->set_playback_frame(100);
+    mvideo->set_current_frame_num(100);
     mvideo->previous_frame();
-    QVERIFY(mvideo->current_frame == 99);
-    */
+    QVERIFY(mvideo->get_current_frame_num() == 99);
 }
 
 /**
@@ -137,6 +127,7 @@ void test_video_player::test_dec_playback_speed(){
  * @brief test_toggle_overlay
  */
 void test_video_player::test_toggle_overlay() {
+    mvideo->on_stop_video();
     mvideo->video_overlay->set_showing_overlay(false);
     mvideo->toggle_overlay();
     QVERIFY(mvideo->is_showing_overlay());
@@ -188,5 +179,6 @@ void test_video_player::test_set_stop_video() {
     mvideo->video_stopped = false;
     mvideo->on_stop_video();
     QVERIFY(!mvideo->video_paused);
+    QVERIFY(mvideo->get_current_frame_num() == 0);
     QVERIFY(mvideo->video_stopped);
 }
