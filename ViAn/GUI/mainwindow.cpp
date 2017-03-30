@@ -277,12 +277,11 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
         if (sliderPosUnderMouse != newPos) {
             ui->videoSlider->setValue(sliderPosUnderMouse);
-            bool show_frame = false;
-            if (mvideo_player->is_paused()) {
-                show_frame = true;
-            }
             cout << "Setting playback frame " << sliderPosUnderMouse << endl;
-            emit set_playback_frame(sliderPosUnderMouse, show_frame);
+            //emit set_pause_video();
+            emit set_playback_frame(sliderPosUnderMouse, true);
+            std::cout << "yellow" << std::endl;
+            //paused_wait.notify_one();
             return;
         }
     }
@@ -808,6 +807,7 @@ void MainWindow::enable_video_buttons() {
  * Block slider update from video_player
  */
 void MainWindow::on_videoSlider_sliderPressed() {
+    std::cout << "Slider pressed" << std::endl;
     slider_blocked = true;
     slider_moving = true;
 }

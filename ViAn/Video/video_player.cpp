@@ -248,9 +248,11 @@ int video_player::get_current_frame_num() {
 bool video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
         // capture.set() sets the number of the frame to be read.
+        std:: cout << "Capture read " << frame_nbr << std::endl;
         capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
         // capture.read() will read the frame and advance one step.
-        capture.read(frame);
+        //capture.read(frame);
+
         return true;
     }
     return false;
@@ -278,13 +280,13 @@ void video_player::set_frame_height(int new_value) {
  * @param frame_num
  */
 void video_player::on_set_playback_frame(int frame_num, bool show_frame) {
+    std::cout << "Set playbacks lot" << std::endl;
     if (show_frame) {
         update_frame(frame_num);
     } else {
         cout << "Not showing frame " << frame_num << endl;
         set_current_frame_num(frame_num);
     }
-
 }
 
 /**
@@ -339,6 +341,7 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_current_frame_num(frame_nbr)) {
+        capture.read(frame);
         convert_frame();
         show_frame();
     }
