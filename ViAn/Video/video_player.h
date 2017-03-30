@@ -29,6 +29,7 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     void export_current_frame(QString path_to_folder);
+    bool video_open();
 
     int get_num_frames();    
     int get_current_frame_num();
@@ -36,8 +37,6 @@ public:
     void play_pause();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
-    void next_frame();
-    void previous_frame();
     void set_speed_multiplier(double mult);
 
     double get_speed_multiplier();
@@ -45,6 +44,10 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
+    void set_contrast(double contrast);
+    void set_brightness(double brightness);
+    int get_contrast();
+    int get_brightness();
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
@@ -64,8 +67,13 @@ public:
     const double SPEED_STEP_MULT = 2;
 
 signals:
-    void processedImage(const QImage &image);
-    void currentFrame(const int frame);
+    void processed_image(const QImage &image);
+    void update_current_frame(const int frame);
+
+private slots:
+    void scaling_event(int new_width, int new_height);
+    void next_frame();
+    void previous_frame();
 
 public slots:
     void on_play_video();
@@ -79,6 +87,8 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
+    cv::Mat contrast_frame(cv::Mat &frame);
+    cv::Mat scale_frame(cv::Mat &src);
     cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
@@ -105,6 +115,9 @@ private:
     QWaitCondition* m_paused_wait;
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
+
+    double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
+    int beta = 0;     /* Simple brightness control, beta value [0-100]. */
 
     Overlay* video_overlay;
 };

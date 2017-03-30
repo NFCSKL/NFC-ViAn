@@ -49,6 +49,9 @@ signals:
     void set_play_video();
     void set_pause_video();
     void set_stop_video();
+    void resize_video_frame(int width, int height);
+    void next_video_frame();
+    void prev_video_frame();
 
 private slots:
 
@@ -134,6 +137,7 @@ private:
 
     FileHandler *fileHandler;
 
+    void setup_video_player(video_player *mplayer);
     void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
     void set_selected_video(MyQTreeWidgetItem *newSelectedVideo);
     void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
