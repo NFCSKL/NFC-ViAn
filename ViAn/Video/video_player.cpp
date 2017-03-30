@@ -204,6 +204,8 @@ int video_player::get_num_frames() {
 /**
  * @brief video_player::get_current_frame_num
  * @return The number of the currently read frame.
+ *         The index is 0-based, and -1 if the first
+ *         frame has not been read yet.
  */
 int video_player::get_current_frame_num() {
     // capture.get() gives the number of the frame to be read, hence the compensation of -1.
@@ -213,13 +215,15 @@ int video_player::get_current_frame_num() {
 /**
  * @brief video_player::set_current_frame_num
  * @param frame_nbr The number to set the currently read frame to.
+ *        The index is 0-based, and -1 sets the playback to start
+ *        from the first frame (i.e. frame 0 is the frame to be read next).
  */
 void video_player::set_current_frame_num(int frame_nbr) {
-    // capture.set() sets the number of the frame to be read, hence the compensation of +1.
-    frame_nxt = frame_nbr + 1;
-    if (frame_nxt >= 0 && frame_nxt < get_num_frames()) {
-
-        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nxt);
+    if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
+        // capture.set() sets the number of the frame to be read.
+        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
+        // capture.read() will read the frame and advance one step.
+        capture.read(frame);
     }
 }
 
@@ -303,10 +307,8 @@ void video_player::on_stop_video() {
  * Updates the current frame if frame_nbr is valid.
  */
 void video_player::update_frame(int frame_nbr) {
-    // capture.read() will advance the video one frame, hence compensation of -1.
-    if (set_playback_frame(frame_nbr - 1)) {
-        set_current_frame_num(frame_nbr - 1);
-        capture.read(frame);
+    if (set_playback_frame(frame_nbr)) {
+        set_current_frame_num(frame_nbr);
         show_frame();
     }
 }
