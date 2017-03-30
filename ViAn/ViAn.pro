@@ -64,7 +64,8 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/rectangle.cpp \
     Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
-    Video/shapes/zoomrectangle.cpp
+    Video/shapes/zoomrectangle.cpp \
+    Video/shapes/analysarea.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/shapes/arrow.h \
@@ -74,7 +75,8 @@ HEADERS += Video/video_player.h \
     Video/shapes/rectangle.h \
     Video/shapes/shape.h \
     Video/shapes/text.h \
-    Video/shapes/zoomrectangle.h
+    Video/shapes/zoomrectangle.h \
+    Video/shapes/analysarea.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll

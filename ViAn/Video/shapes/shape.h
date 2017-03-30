@@ -19,8 +19,8 @@ public:
 protected:
     int LINE_THICKNESS = 2;
 
-    cv::Scalar qcolor_to_scalar(QColor col);
-    cv::Point qpoint_to_point(QPoint pnt);
+    static cv::Scalar qcolor_to_scalar(QColor col);
+    static cv::Point qpoint_to_point(QPoint pnt);
 
     cv::Scalar colour;
     cv::Point draw_start;
