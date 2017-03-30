@@ -546,7 +546,6 @@ void MainWindow::play_video() {
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
-    mvideo_player->set_playback_frame(0);
 }
 
 /**

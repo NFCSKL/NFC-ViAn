@@ -50,18 +50,6 @@ bool video_player::load_video(string filename) {
 }
 
 /**
- * @brief video_player::stop_video
- * Sets stop related bools to their correct values and sets the current playback frame to be 0.
- */
-void video_player::stop_video() {
-    video_stopped = true;
-    set_current_frame_num(0);
-    if (video_paused) {
-        video_paused = false;
-    }
-}
-
-/**
  * @brief video_player::run
  * This function is called whenever the thread is started or put out of sleep.
  * It houses the main loop for fetching frames from the currently played
@@ -276,11 +264,14 @@ void video_player::on_pause_video() {
 /**
  * @brief on_stop_video
  * Slot function to be used from the GUI thread
- * Sets the stopped bool to true and the paused bool to false
+ * Sets the stopped bool to true and the paused bool to false.
+ * Sets playback frame to the start of the video and updates the GUI.
  */
 void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
+    set_current_frame_num(0);
+    show_frame();
 }
 
 /**

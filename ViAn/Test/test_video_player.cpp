@@ -39,10 +39,8 @@ void test_video_player::test_load_video() {
 void test_video_player::test_stop_video() {
     mvideo->video_paused = true;
     mvideo->video_stopped = false;
-    mvideo->current_frame = 50;
-    mvideo->stop_video();
+    mvideo->on_stop_video();
     QVERIFY(mvideo->video_stopped == true);
-    QVERIFY(mvideo->current_frame == 0);
     QVERIFY(mvideo->video_paused == false);
 }
 
@@ -77,14 +75,6 @@ void test_video_player::test_set_frame_width() {
 void test_video_player::test_set_frame_height() {
     mvideo->set_frame_height(50);
     QVERIFY(mvideo->frame_height == 50);
-}
-
-/**
- * @brief test_video_player::test_set_playback_frame
- */
-void test_video_player::test_set_playback_frame() {
-    mvideo->set_playback_frame(100);
-    QVERIFY(mvideo->current_frame == 100);
 }
 
 /**

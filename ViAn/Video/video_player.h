@@ -34,7 +34,6 @@ public:
     int get_current_frame_num();
     bool set_current_frame_num(int frame_nbr);
     void play_pause();
-    void stop_video();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void next_frame();
