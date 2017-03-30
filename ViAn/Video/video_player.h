@@ -29,6 +29,7 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     void export_current_frame(QString path_to_folder);
+    bool video_open();
 
     int get_num_frames();    
     int get_current_frame_num();
@@ -38,8 +39,6 @@ public:
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     bool set_playback_frame(int frame_num);
-    void next_frame();
-    void previous_frame();
     void set_speed_multiplier(double mult);
 
     double get_speed_multiplier();
@@ -66,8 +65,13 @@ public:
     const double SPEED_STEP_MULT = 2;
 
 signals:
-    void processedImage(const QImage &image);
-    void currentFrame(const int frame);
+    void processed_image(const QImage &image);
+    void update_current_frame(const int frame);
+
+private slots:
+    void scaling_event(int new_width, int new_height);
+    void next_frame();
+    void previous_frame();
 
 public slots:
     void on_play_video();
@@ -81,6 +85,7 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
+    cv::Mat scale_frame(cv::Mat &src);
     cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
