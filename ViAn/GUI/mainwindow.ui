@@ -345,6 +345,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
     <addaction name="menuDelete"/>
+    <addaction name="actionChoose_Workspace"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -658,6 +659,11 @@
    </property>
    <property name="toolTip">
     <string>Text</string>
+   </property>
+  </action>
+  <action name="actionChoose_Workspace">
+   <property name="text">
+    <string>Choose Workspace</string>
    </property>
   </action>
  </widget>
