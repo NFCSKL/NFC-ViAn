@@ -15,7 +15,7 @@ using namespace cv;
  * @param parent
  */
 video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
-    video_overlay = new overlay();
+    video_overlay = new Overlay();
     m_mutex = mutex;
     m_paused_wait = paused_wait;
 }
