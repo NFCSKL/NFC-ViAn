@@ -182,6 +182,7 @@ void test_video_player::test_video_open() {
 
 /**
  * @brief test_video_player::test_scaling_event
+ * Tests that the aspect ratio is kept when the QLabel signals a scaling event.
  */
 void test_video_player::test_scaling_event() {
     mvideo->capture.release();

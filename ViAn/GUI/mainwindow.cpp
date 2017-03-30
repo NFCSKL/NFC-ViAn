@@ -165,7 +165,7 @@ void MainWindow::on_stopButton_clicked() {
 void MainWindow::on_nextFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went forward a frame");
-        next_video_frame();
+        emit next_video_frame();
     } else {
         set_status_bar("Needs to be paused");
     }
@@ -178,7 +178,7 @@ void MainWindow::on_nextFrameButton_clicked() {
 void MainWindow::on_previousFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went back a frame");
-        prev_video_frame();
+        emit prev_video_frame();
     } else {
         set_status_bar("Video needs to be paused");
     }
@@ -223,7 +223,7 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
    }
 
    //Sends new QLabel resolution to mvideo_player to update scaling resolution
-   resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
+   emit resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
 }
 
 /**
@@ -254,9 +254,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
 }
 
 /**
- * @brief
- *
- * closeEvent
+ * @brief MainWindow::closeEvent
  * asks if you are sure you want to quit.
  * TODO Needs to close all other threads before exiting the program
  * @param event closing
@@ -271,7 +269,6 @@ void MainWindow::closeEvent (QCloseEvent *event){
     if (resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
-        mvideo_player->exit();
         event->accept();
     }
 }
@@ -573,7 +570,7 @@ void MainWindow::on_actionAddVideo_triggered() {
  */
 void MainWindow::play_video() {
     //Used for rescaling the source image for video playback
-    resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
+    emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
 
     enable_video_buttons();
     mvideo_player->load_video(selectedVideo->name.toStdString());

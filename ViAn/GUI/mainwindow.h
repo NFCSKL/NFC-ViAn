@@ -49,6 +49,9 @@ signals:
     void set_play_video();
     void set_pause_video();
     void set_stop_video();
+    void resize_video_frame(int width, int height);
+    void next_video_frame();
+    void prev_video_frame();
 
 private slots:
 
@@ -119,12 +122,6 @@ private slots:
     void on_actionAddVideo_triggered();
 
     void on_actionDeleteProject_triggered();
-
-signals:
-    void resize_video_frame(int width, int height);
-    void next_video_frame();
-    void prev_video_frame();
-
 
 private:
 

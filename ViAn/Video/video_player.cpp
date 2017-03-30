@@ -80,8 +80,8 @@ void video_player::run()  {
         convert_frame();
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
 
-        if (delay-conversion_time > 0) {
-            this->msleep(delay-conversion_time);
+        if (delay - conversion_time > 0) {
+            this->msleep(delay - conversion_time);
         }
         show_frame();
 
