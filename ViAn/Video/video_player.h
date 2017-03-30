@@ -18,7 +18,7 @@
 
 using namespace std;
 
-
+enum PLAYBACK_STATES {PLAY, PAUSE, STOP, SET_FRAME};
 class video_player : public QThread {
     Q_OBJECT
 public:
@@ -83,6 +83,7 @@ protected:
     void msleep(int ms);
 
 private:
+    PLAYBACK_STATES current_state, prev_state;
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
     cv::Mat scale_frame(cv::Mat &src);
@@ -97,6 +98,7 @@ private:
     cv::Mat RGBframe;
 
     int num_frames;
+    int new_frame_num;
     unsigned int current_frame = 0;
     unsigned int prev_frame = 0;
     unsigned int frame_width;
@@ -108,6 +110,7 @@ private:
     bool video_stopped = false;
     bool video_paused;
     bool choosing_zoom_area = false;
+    bool set_new_frame = false;
 
     bool slider_moving = false;
 

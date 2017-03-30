@@ -257,7 +257,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         );
         std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
         if (time_since_last_slider_frame_update.count() >= 200) {
-            emit set_playback_frame(sliderPosUnderMouse, true);
+            emit set_playback_frame(sliderPosUnderMouse);
             slider_timer = current_time;
         }
 
@@ -277,11 +277,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
         int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
         if (sliderPosUnderMouse != newPos) {
             ui->videoSlider->setValue(sliderPosUnderMouse);
-            cout << "Setting playback frame " << sliderPosUnderMouse << endl;
-            //emit set_pause_video();
             emit set_playback_frame(sliderPosUnderMouse, true);
-            std::cout << "yellow" << std::endl;
-            //paused_wait.notify_one();
             return;
         }
     }
@@ -807,7 +803,6 @@ void MainWindow::enable_video_buttons() {
  * Block slider update from video_player
  */
 void MainWindow::on_videoSlider_sliderPressed() {
-    std::cout << "Slider pressed" << std::endl;
     slider_blocked = true;
     slider_moving = true;
 }
@@ -824,7 +819,5 @@ void MainWindow::on_videoSlider_sliderReleased() {
     slider_moving = false;
     if (mvideo_player->is_stopped()) {
         mvideo_player->start();
-    } else if (mvideo_player->is_paused()) {
-        paused_wait.notify_one();
     }
 }

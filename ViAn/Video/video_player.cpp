@@ -63,16 +63,21 @@ void video_player::run()  {
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
     while (!video_stopped && capture.read(frame)) {
+
         const clock_t begin_time = std::clock();
-
         convert_frame();
-        int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
 
+        int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
         if (delay - conversion_time > 0) {
             this->msleep(delay - conversion_time);
         }
         show_frame();
 
+        if (set_new_frame) {
+            // A new frame has been set outside the loop, change it
+            capture.set(CV_CAP_PROP_POS_FRAMES, new_frame_num);
+            set_new_frame = false;
+        }
 
         // Waits for the video to be resumed
         m_mutex->lock();
@@ -82,11 +87,6 @@ void video_player::run()  {
             video_paused = false;
         }
         m_mutex->unlock();
-    }
-
-    // Reset frame on stop
-    if (video_stopped) {
-        current_frame = 0;
     }
 }
 
@@ -248,8 +248,12 @@ int video_player::get_current_frame_num() {
 bool video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
         // capture.set() sets the number of the frame to be read.
-        std:: cout << "Capture read " << frame_nbr << std::endl;
-        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
+        if (video_paused) {
+            capture.set(CV_CAP_PROP_POS_FRAMES, (double)frame_nbr);
+        } else {
+            set_new_frame = true;
+            new_frame_num = frame_nbr;
+        }
         // capture.read() will read the frame and advance one step.
         //capture.read(frame);
 
@@ -280,13 +284,13 @@ void video_player::set_frame_height(int new_value) {
  * @param frame_num
  */
 void video_player::on_set_playback_frame(int frame_num, bool show_frame) {
-    std::cout << "Set playbacks lot" << std::endl;
-    if (show_frame) {
+    set_new_frame = true;
+    new_frame_num = frame_num;
+    /*if (show_frame) {
         update_frame(frame_num);
     } else {
-        cout << "Not showing frame " << frame_num << endl;
         set_current_frame_num(frame_num);
-    }
+    }*/
 }
 
 /**
