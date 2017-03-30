@@ -33,12 +33,10 @@ public:
 
     int get_num_frames();    
     int get_current_frame_num();
-    void set_current_frame_num(int frame_nbr);
+    bool set_current_frame_num(int frame_nbr);
     void play_pause();
-    void stop_video();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
-    bool set_playback_frame(int frame_num);
     void set_speed_multiplier(double mult);
 
     double get_speed_multiplier();
@@ -102,7 +100,6 @@ private:
     cv::Mat RGBframe;
 
     int num_frames;
-    unsigned int current_frame = 0;
     unsigned int frame_width;
     unsigned int frame_height;
 

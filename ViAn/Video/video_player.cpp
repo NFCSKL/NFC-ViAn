@@ -51,18 +51,6 @@ bool video_player::load_video(string filename) {
 }
 
 /**
- * @brief video_player::stop_video
- * Sets stop related bools to their correct values and sets the current playback frame to be 0.
- */
-void video_player::stop_video() {
-    video_stopped = true;
-    set_playback_frame(0);
-    if (video_paused) {
-        video_paused = false;
-    }
-}
-
-/**
  * @brief video_player::run
  * This function is called whenever the thread is started or put out of sleep.
  * It houses the main loop for fetching frames from the currently played
@@ -72,7 +60,7 @@ void video_player::run()  {
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
+    set_current_frame_num(0);
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
@@ -88,16 +76,10 @@ void video_player::run()  {
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
-            current_frame = capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
             m_paused_wait->wait(m_mutex);
             video_paused = false;
         }
         m_mutex->unlock();
-    }
-
-    // Reset frame on stop
-    if (video_stopped) {
-        current_frame = 0;
     }
 }
 
@@ -277,15 +259,19 @@ int video_player::get_current_frame_num() {
 
 /**
  * @brief video_player::set_current_frame_num
+ * Sets the current frame to the specified number, if it's within the video.
  * @param frame_nbr The number to set the currently read frame to (0-based index).
+ * @return Return true if successful, false if the specified number is outside the video.
  */
-void video_player::set_current_frame_num(int frame_nbr) {
+bool video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
         // capture.set() sets the number of the frame to be read.
         capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
         // capture.read() will read the frame and advance one step.
         capture.read(frame);
+        return true;
     }
+    return false;
 }
 
 /**
@@ -302,19 +288,6 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
-}
-
-/**
- * @brief video_player::set_playback_frame
- * Moves the playback to the frame specified by frame_num
- * @param frame_num
- */
-bool video_player::set_playback_frame(int frame_num) {
-    if (frame_num < get_num_frames() && frame_num >= 0) {
-        current_frame = frame_num;
-        return true;
-    }
-    return false;
 }
 
 /**
@@ -355,11 +328,14 @@ void video_player::on_pause_video() {
 /**
  * @brief on_stop_video
  * Slot function to be used from the GUI thread
- * Sets the stopped bool to true and the paused bool to false
+ * Sets the stopped bool to true and the paused bool to false.
+ * Sets playback frame to the start of the video and updates the GUI.
  */
 void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
+    set_current_frame_num(0);
+    show_frame();
 }
 
 /**
@@ -368,8 +344,7 @@ void video_player::on_stop_video() {
  * Updates the current frame if frame_nbr is valid.
  */
 void video_player::update_frame(int frame_nbr) {
-    if (set_playback_frame(frame_nbr)) {
-        set_current_frame_num(frame_nbr);
+    if (set_current_frame_num(frame_nbr)) {
         convert_frame();
         show_frame();
     }
