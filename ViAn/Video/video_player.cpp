@@ -100,7 +100,7 @@ void video_player::show_frame() {
 void video_player::convert_frame() {
     cv::Mat processed_frame;
 
-    // Process frame (draw overlay, zoom, scaling)
+    // Process frame (draw overlay, zoom, scaling, contrast/brightness)
     processed_frame = process_frame(frame);
 
 
@@ -118,10 +118,10 @@ void video_player::convert_frame() {
 }
 
 /**
- * @brief video_player::draw_frame
- * Draws overlay on the frame and zooms in the frame.
+ * @brief video_player::process_frame
+ * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
  * @param frame Frame to draw on.
- * @return Returns the frame including the zoom and overlay.
+ * @return Returns the processed frame.
  */
 cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
