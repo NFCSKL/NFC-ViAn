@@ -149,6 +149,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
         processed_frame = zoom_area->draw(processed_frame);
     }
     processed_frame = zoom_frame(processed_frame);
+    processed_frame = contrast_frame(processed_frame);
 
     cv::Mat scaled_frame;
     if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
@@ -195,6 +196,28 @@ cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     // Crop out the area and resize to video size.
     resize(frame(roi), zoomed_frame, frame.size());
     return zoomed_frame;
+}
+
+/**
+ * @brief video_player::contrast_frame
+ * Adds contrast and brightness to the frame.
+ * @param frame Frame to manipulate.
+ * @return Returns the manipulated frame.
+ */
+cv::Mat video_player::contrast_frame(cv::Mat &frame) {
+    // Create image for the modified frame.
+    Mat modified_frame = Mat::zeros(frame.size(), frame.type());
+
+    // Do the operation new_image(i,j) = alpha*image(i,j) + beta
+    for (int y = 0; y < frame.rows; y++) {
+        for (int x = 0; x < frame.cols; x++) {
+            for (int c = 0; c < 3; c++) {
+                modified_frame.at<Vec3b>(y, x)[c] =
+                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + beta);
+            }
+        }
+    }
+    return modified_frame;
 }
 
 /**
@@ -363,6 +386,44 @@ void video_player::update_overlay() {
         convert_frame();
         show_frame();
     }
+}
+
+/**
+ * @brief video_player::set_contrast
+ * Sets the contrast value (alpha value).
+ * @param contrast Contrast parameter in range 0 to 255.
+ */
+void video_player::set_contrast(double contrast) {
+    contrast = std::min(255.0, std::max(0.0, contrast));
+    // Alpha value in [1.0-3.0].
+    alpha = 1 + 2 * contrast / 255.0;
+}
+
+/**
+ * @brief video_player::set_brightness
+ * Sets the brightness value (beta value).
+ * @param brightness Brightness parameter in range 0 to 255.
+ */
+void video_player::set_brightness(double brightness) {
+    // Beta value in [0-100].
+    brightness = std::min(255.0, std::max(0.0, brightness));
+    beta = 100 * brightness / 255.0;
+}
+
+/**
+ * @brief video_player::get_contrast
+ * @return Returns contrast parameter in range 0 to 255
+ */
+int video_player::get_contrast() {
+    return 255 * (alpha - 1) / 2;
+}
+
+/**
+ * @brief video_player::get_brightness
+ * @return Returns brightness parameter in range 0 to 255
+ */
+int video_player::get_brightness() {
+    return 255 * ((double) beta / 100);
 }
 
 /**
