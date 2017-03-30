@@ -23,7 +23,29 @@ ZoomRectangle::ZoomRectangle(QPoint pos) : Rectangle(QColor(0, 255, 0), pos) {
  */
 void ZoomRectangle::update_drawing_pos(QPoint pos) {
     // The zoom area has to be inside the video.
-    draw_end = bounded_coords(pos);
+    cv::Point bounded_pos = bounded_coords(pos);
+    // Calculate the ratio between the choosen area and the video.
+    double width_ratio = (double) std::abs(bounded_pos.x - draw_start.x)/width_video;
+    double height_ratio = (double) std::abs(bounded_pos.y - draw_start.y)/height_video;
+    // Set the area to follow the smallest ratio.
+    if (width_ratio >= height_ratio) {
+        draw_end.x = draw_start.x + width_video * height_ratio;
+        draw_end.y = bounded_pos.y;
+    } else {
+        draw_end.x = bounded_pos.x;
+        draw_end.y = draw_start.y + height_video * width_ratio;
+    }
+}
+
+/**
+ * @brief ZoomRectangle::reset_pos
+ * Resets the start and end mouse positions.
+ */
+void ZoomRectangle::reset_pos() {
+    draw_start.x = 0;
+    draw_start.y = 0;
+    draw_end.x = 0;
+    draw_end.y = 0;
 }
 
 /**

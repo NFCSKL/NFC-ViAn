@@ -525,6 +525,7 @@ void video_player::clear_overlay() {
 void video_player::zoom_in() {
     if (capture.isOpened()) {
         choosing_zoom_area = true;
+        zoom_area->reset_pos();
     }
 }
 
