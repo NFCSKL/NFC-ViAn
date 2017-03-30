@@ -98,6 +98,7 @@ void FileHandler::save_project(Project* proj){
 void FileHandler::update_proj_files(Project* proj){
     ProjectStream ps;
     ps << *proj;
+
     write_file(proj->files->f_proj, ps.projFile.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_videos, ps.videos.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
@@ -158,6 +159,7 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
     proj->files->f_drawings = load_project_file(drawingsFilePath, projStream.drawings);
 //    Read project from projstream
     projStream >> *proj;
+
     return proj;
 }
 
@@ -203,8 +205,8 @@ FH_ERROR FileHandler::delete_project(Project* proj){
  */
 ID FileHandler::add_video(Project* proj, std::string filePath){
     Video* v = new Video(filePath);
-    proj->add_video(v);
-    return this->add_file(filePath);
+    return proj->add_video(v); // video id set in proj->add_video
+  //  return this->add_file(filePath);
 }
 
 void FileHandler::remove_video(ID proj_id, ID vid_id){
@@ -248,7 +250,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
     std::ofstream f;
     switch(opt){
     case WRITE_OPTION::OVERWRITE:
-        f.open(fileName.c_str(), std::ios::in | std::ios::out);
+        f.open(fileName.c_str());
         break;
     case WRITE_OPTION::APPEND:
         f.open(fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);

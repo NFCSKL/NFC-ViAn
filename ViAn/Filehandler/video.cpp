@@ -21,7 +21,7 @@ Video::Video(std::string filepath){
  * @param vid
  * @return UNFINISHED
  */
-std::stringstream& operator>>(std::stringstream& is, Video& vid){    
+std::stringstream& operator>>(std::stringstream& is, Video& vid){
     is >> vid.filepath;  
     return is;
 }

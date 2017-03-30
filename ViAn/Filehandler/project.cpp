@@ -9,6 +9,7 @@ Project::Project(ID id, std::string name)
     this->files = new ProjFiles();
     this->m_name = name;
     this->m_id = id;
+    this->v_id = 0;
     this->videos.clear();
     this->saved = false;
 }
@@ -19,6 +20,7 @@ Project::Project(){
     this->files = new ProjFiles();
     this->m_name = "";
     this->m_id = -1;
+    this->v_id = 0;
     this->videos.clear();
 }
 
@@ -28,8 +30,9 @@ Project::Project(){
  */
 void Project::remove_video(ID id){
     Video* temp = this->videos.at(id);
-    videos.erase(id);
     delete temp;
+    videos.erase(id);
+
 }
 
 /**
@@ -37,8 +40,8 @@ void Project::remove_video(ID id){
  * @return
  */
 ID Project::add_video(Video* vid){
-    this->videos.insert(std::make_pair(this->v_id, vid));
     vid->id = this->v_id;
+    this->videos.insert(std::make_pair(this->v_id, vid));
     return this->v_id++;
 }
 

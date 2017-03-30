@@ -492,9 +492,13 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     } else if(item->type == TYPE::VIDEO) {
         set_selected_video(item);
         QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+        QAction *remove_video = new QAction(QIcon(""), tr("&Remove video"), this);
         load_video->setStatusTip(tr("Play video"));
+        remove_video->setStatusTip(tr("Remove video from project"));
         menu.addAction(load_video);
+        menu.addAction(remove_video);
         connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
+        connect(remove_video, SIGNAL(triggered()), this, SLOT(on_actionDeleteVideo_triggered()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
