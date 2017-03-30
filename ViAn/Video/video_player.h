@@ -8,6 +8,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QWaitCondition>
 #include <QImage>
 #include <QImageWriter>
 #include <QWaitCondition>
@@ -21,7 +22,7 @@ using namespace std;
 class video_player : public QThread {
     Q_OBJECT
 public:
-    video_player(QObject* parent = 0);
+    video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent = 0);
     ~video_player();
     bool load_video(string filename);
     bool is_paused();
@@ -30,6 +31,7 @@ public:
     void export_current_frame(QString path_to_folder);
 
     int get_num_frames();    
+    int get_current_frame_num();
     void play_pause();
     void stop_video();
     void set_frame_width(int new_value);
@@ -66,6 +68,11 @@ signals:
     void processedImage(const QImage &image);
     void currentFrame(const int frame);
 
+public slots:
+    void on_play_video();
+    void on_pause_video();
+    void on_stop_video();
+
 protected:
     void run() override;
     void msleep(int ms);
@@ -73,6 +80,7 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
+    cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
     void show_frame();
     void convert_frame();
@@ -90,16 +98,17 @@ private:
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
 
-    bool stop = false;
+    bool video_stopped = false;
     bool video_paused;
     bool choosing_zoom_area = false;
 
     QImage img;
-    QWaitCondition condition;
+    QMutex* m_mutex;
+    QWaitCondition* m_paused_wait;
 
-    zoomrectangle* zoom_area = new zoomrectangle();
+    ZoomRectangle* zoom_area = new ZoomRectangle();
 
-    overlay* video_overlay;
+    Overlay* video_overlay;
 };
 
 #endif // VIDEO_PLAYER_H

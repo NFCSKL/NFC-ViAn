@@ -14,8 +14,10 @@ using namespace cv;
  * @brief video_player::video_player
  * @param parent
  */
-video_player::video_player(QObject* parent) : QThread(parent) {
-    video_overlay = new overlay();
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
+    video_overlay = new Overlay();
+    m_mutex = mutex;
+    m_paused_wait = paused_wait;
 }
 
 /**
@@ -48,19 +50,11 @@ bool video_player::load_video(string filename) {
 }
 
 /**
- * @brief video_player::play
- * Toggles the video_paused boolean
- */
-void video_player::play_pause() {
-    video_paused = !video_paused;
-}
-
-/**
  * @brief video_player::stop_video
  * Sets stop related bools to their correct values and sets the current playback frame to be 0.
  */
 void video_player::stop_video() {
-    stop = true;
+    video_stopped = true;
     set_playback_frame(0);
     if (video_paused) {
         video_paused = false;
@@ -74,20 +68,25 @@ void video_player::stop_video() {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    stop = false;
+    video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-    while(!stop && !video_paused && capture.read(frame)){
+    while(!video_stopped  && capture.read(frame)){
         show_frame();
-
         this->msleep(delay);
 
+        // Waits for the video to be resumed
+        m_mutex->lock();
+        if (video_paused) {
+            m_paused_wait->wait(m_mutex);
+            video_paused = false;
+        }
+        m_mutex->unlock();
     }
-    //Saves the current frame of the video if the video is paused.
-    if (video_paused) {
-        current_frame = capture.get(CV_CAP_PROP_POS_FRAMES);
-    } else if (stop) {
+
+    // Reset frame on stop
+    if (video_stopped) {
         current_frame = 0;
     }
 }
@@ -104,31 +103,48 @@ void video_player::show_frame() {
 
 /**
  * @brief video_player::convert_frame
- * Converts the current frame, including the overlay, to a QImage.
+ * Converts the current frame to a QImage,
+ * including the zoom and overlay.
  */
 void video_player::convert_frame() {
-    cv::Mat zoomed_frame;
-    zoomed_frame = zoom_frame(frame);
+    cv::Mat processed_frame;
 
-    if (zoomed_frame.channels() == 3) {
-        cv::cvtColor(zoomed_frame, RGBframe, CV_BGR2RGB);
+    // Process frame (draw overlay, zoom)
+    processed_frame = process_frame(frame);
+
+    // Convert frame to QImage
+    if (processed_frame.channels() == 3) {
+        cv::cvtColor(processed_frame, RGBframe, CV_BGR2RGB);
         img = QImage((const unsigned char*)(RGBframe.data),
                           RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
     } else {
-        img = QImage((const unsigned char*)(zoomed_frame.data),
-                             zoomed_frame.cols,zoomed_frame.rows,QImage::Format_Indexed8);
-    }
-    video_overlay->draw_overlay(img, capture.get(CV_CAP_PROP_POS_FRAMES));
-    if (choosing_zoom_area) {
-        zoom_area->draw(img);
+        img = QImage((const unsigned char*)(processed_frame.data),
+                             processed_frame.cols,processed_frame.rows,QImage::Format_Indexed8);
     }
 }
 
 /**
- * @brief video_overlay::draw_overlay
- * Zooms in the frame, with the choosen zoom level.
+ * @brief video_player::draw_frame
+ * Draws overlay on the frame and zooms in the frame.
  * @param frame Frame to draw on.
  * @return Returns the frame including the zoom and overlay.
+ */
+cv::Mat video_player::process_frame(cv::Mat &frame) {
+    // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
+    cv::Mat processed_frame = frame.clone();
+    processed_frame = video_overlay->draw_overlay(processed_frame, capture.get(CV_CAP_PROP_POS_FRAMES));
+    if (choosing_zoom_area) {
+        processed_frame = zoom_area->draw(processed_frame);
+    }
+    processed_frame = zoom_frame(processed_frame);
+    return processed_frame;
+}
+
+/**
+ * @brief video_overlay::zoom_frame
+ * Zooms in the frame, with the choosen zoom level.
+ * @param frame Frame to zoom in on on.
+ * @return Returns the zoomed frame.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &frame) {
     // The area to zoom in on.
@@ -165,7 +181,7 @@ bool video_player::is_paused() {
  * @return
  */
 bool video_player::is_stopped() {
-    return stop;
+    return video_stopped;
 }
 
 /**
@@ -183,6 +199,14 @@ bool video_player::is_showing_overlay() {
  */
 int video_player::get_num_frames() {
     return num_frames;
+}
+
+/**
+ * @brief video_player::get_current_frame_num
+ * @return the number of the current frame
+ */
+int video_player::get_current_frame_num() {
+    return capture.get(CV_CAP_PROP_POS_FRAMES);
 }
 
 /**
@@ -228,6 +252,35 @@ void video_player::next_frame() {
  */
 void video_player::previous_frame() {
     update_frame(current_frame - 1);
+}
+
+/**
+ * @brief on_play_video
+ * Slot function to be used from the GUI thread
+ * Sets the paused and stopped bools to false
+ */
+void video_player::on_play_video() {
+    video_paused = false;
+    video_stopped = false;
+}
+
+/**
+ * @brief on_pause_video
+ * Slot function to be used from the GUI thread
+ * Sets the paused bool to true
+ */
+void video_player::on_pause_video() {
+    video_paused = true;
+}
+
+/**
+ * @brief on_stop_video
+ * Slot function to be used from the GUI thread
+ * Sets the stopped bool to true and the paused bool to false
+ */
+void video_player::on_stop_video() {
+    video_stopped = true;
+    video_paused = false;
 }
 
 /**
@@ -407,7 +460,7 @@ void video_player::video_mouse_released(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
-            choosing_zoom_area = false; // Reset the mode. You can only choose a zoom area during one drag with the mouse.
+            choosing_zoom_area = false;
         } else if (is_paused()) {
             video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
         }
@@ -445,12 +498,21 @@ void video_player::video_mouse_moved(QPoint pos) {
 void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    // Calculate the coordinates on the actual video frame from
-    // the coordinates in the window the video is playing in.
-    double scalex = (double) video_frame_width/frame_width;
-    double scaley = (double) video_frame_height/frame_height;
-    pos.setX(scalex*pos.x());
-    pos.setY(scaley*pos.y());
+
+    // Calculate the scale ratio.
+    double x_scale = (double) video_frame_width/frame_width;
+    double y_scale = (double) video_frame_height/frame_height;
+
+    // Calculate the coordinates on the video frame from
+    // the coordinates on the zoomed frame.
+    double x_zoom_scale = (double) zoom_area->get_width()/video_frame_width;
+    double y_zoom_scale = (double) zoom_area->get_height()/video_frame_height;
+    double x_video = zoom_area->get_x() + (double) x_zoom_scale * pos.x();
+    double y_video = zoom_area->get_y() + (double) y_zoom_scale * pos.y();
+
+    // Calculate the coordinates on the frame.
+    pos.setX(x_scale * x_video);
+    pos.setY(y_scale * y_video);
 }
 
 /**

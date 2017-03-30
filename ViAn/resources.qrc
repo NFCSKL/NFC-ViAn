@@ -20,5 +20,6 @@
     <file alias ="undo.png">Resources/undo.png</file>
     <file alias ="colour.png">Resources/colour.png</file>
     <file alias ="clear.png">Resources/clear.png</file>
+    <file alias ="text.png">Resources/text.png</file>
 </qresource>
 </RCC>
