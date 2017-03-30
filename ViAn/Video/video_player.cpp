@@ -55,7 +55,7 @@ bool video_player::load_video(string filename) {
  */
 void video_player::stop_video() {
     video_stopped = true;
-    set_playback_frame(0);
+    set_current_frame_num(0);
     if (video_paused) {
         video_paused = false;
     }
@@ -71,7 +71,7 @@ void video_player::run()  {
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
+    set_current_frame_num(0);
     while (!video_stopped && capture.read(frame)) {
         show_frame();
         this->msleep(delay);
@@ -83,11 +83,6 @@ void video_player::run()  {
             video_paused = false;
         }
         m_mutex->unlock();
-    }
-
-    // Reset frame on stop
-    if (video_stopped) {
-        current_frame = 0;
     }
 }
 
@@ -212,15 +207,19 @@ int video_player::get_current_frame_num() {
 
 /**
  * @brief video_player::set_current_frame_num
+ * Sets the current frame to the specified number, if it's within the video.
  * @param frame_nbr The number to set the currently read frame to (0-based index).
+ * @return Return true if successful, false if the specified number is outside the video.
  */
-void video_player::set_current_frame_num(int frame_nbr) {
+bool video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
         // capture.set() sets the number of the frame to be read.
         capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
         // capture.read() will read the frame and advance one step.
         capture.read(frame);
+        return true;
     }
+    return false;
 }
 
 /**
@@ -237,19 +236,6 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
-}
-
-/**
- * @brief video_player::set_playback_frame
- * Moves the playback to the frame specified by frame_num
- * @param frame_num
- */
-bool video_player::set_playback_frame(int frame_num) {
-    if (frame_num < get_num_frames() && frame_num >= 0) {
-        current_frame = frame_num;
-        return true;
-    }
-    return false;
 }
 
 /**
@@ -303,8 +289,7 @@ void video_player::on_stop_video() {
  * Updates the current frame if frame_nbr is valid.
  */
 void video_player::update_frame(int frame_nbr) {
-    if (set_playback_frame(frame_nbr)) {
-        set_current_frame_num(frame_nbr);
+    if (set_current_frame_num(frame_nbr)) {
         show_frame();
     }
 }
