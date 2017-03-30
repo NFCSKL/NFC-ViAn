@@ -801,7 +801,6 @@ void MainWindow::enable_video_buttons() {
     ui->stopButton->setEnabled(true);
 }
 
-
 /**
  * @brief MainWindow::on_videoSlider_sliderPressed
  * Block slider update from video_player
@@ -814,8 +813,6 @@ void MainWindow::on_videoSlider_sliderPressed() {
         slider_paused_video = true;
         emit set_pause_video();
     }
-
-
 }
 
 /**

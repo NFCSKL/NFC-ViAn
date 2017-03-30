@@ -168,7 +168,6 @@ private:
 
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
-
 };
 
 #endif // MAINWINDOW_H

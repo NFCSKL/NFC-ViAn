@@ -109,7 +109,6 @@ private:
     bool video_paused;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
-
     bool slider_moving = false;
 
     QImage img;
