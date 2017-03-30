@@ -208,19 +208,17 @@ cv::Mat video_player::contrast_frame(cv::Mat &frame) {
     // Create image for the modified frame.
     Mat modified_frame = Mat::zeros(frame.size(), frame.type());
 
-    double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
-    double beta = 0;  /* Simple brightness control, beta value [0-100]. */
-    beta = 100 * brightness / 255.0;
-    // Alpha value in [1.0-3.0].
-    alpha = 1 + 2 * contrast / 255.0;
-    // Beta value in [0-100].
+    // Contrast control, alpha value in [1.0-3.0].
+    double alpha = 1 + 2 * contrast / 255.0;
+    // Brightness control, beta value in [0-100].
+    int beta = 100 * brightness / 255.0;
 
     // Do the operation new_image(i,j) = alpha*image(i,j) + beta
     for (int y = 0; y < frame.rows; y++) {
         for (int x = 0; x < frame.cols; x++) {
             for (int c = 0; c < 3; c++) {
                 modified_frame.at<Vec3b>(y, x)[c] =
-                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + (int)beta);
+                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + beta);
             }
         }
     }

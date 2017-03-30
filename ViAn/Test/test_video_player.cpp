@@ -198,8 +198,27 @@ void test_video_player::test_set_contrast() {
 }
 
 void test_video_player::test_set_brightness() {
+    // Values should be 0-255
+    mvideo->set_brightness(-10);
+    QVERIFY(mvideo->get_brightness() == 0);
+    mvideo->set_brightness(-0.01);
+    QVERIFY(mvideo->get_brightness() == 0);
+    mvideo->set_brightness(0);
+    QVERIFY(mvideo->get_brightness() == 0);
+    mvideo->set_brightness(1);
+    QVERIFY(mvideo->get_brightness() == 1);
+    mvideo->set_brightness(2);
+    QVERIFY(mvideo->get_brightness() == 2);
     mvideo->set_brightness(126);
     QVERIFY(mvideo->get_brightness() == 126);
+    mvideo->set_brightness(254);
+    QVERIFY(mvideo->get_brightness() == 254);
+    mvideo->set_brightness(255);
+    QVERIFY(mvideo->get_brightness() == 255);
+    mvideo->set_brightness(255.1);
+    QVERIFY(mvideo->get_brightness() == 255);
+    mvideo->set_brightness(270);
+    QVERIFY(mvideo->get_brightness() == 255);
 }
 
 /**
