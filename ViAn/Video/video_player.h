@@ -102,6 +102,8 @@ private:
     int num_frames;
     unsigned int frame_width;
     unsigned int frame_height;
+    unsigned int qlabel_width;
+    unsigned int qlabel_height;
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
