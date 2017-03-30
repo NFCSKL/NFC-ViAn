@@ -33,6 +33,7 @@ public:
 
     int get_num_frames();    
     int get_current_frame_num();
+    void set_current_frame_num(int frame_nbr);
     void play_pause();
     void stop_video();
     void set_frame_width(int new_value);
@@ -111,9 +112,9 @@ private:
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
 
-    zoomrectangle* zoom_area = new zoomrectangle();
+    ZoomRectangle* zoom_area = new ZoomRectangle();
 
-    overlay* video_overlay;
+    Overlay* video_overlay;
 };
 
 #endif // VIDEO_PLAYER_H

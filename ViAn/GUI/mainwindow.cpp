@@ -552,7 +552,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  */
 void MainWindow::on_actionAddVideo_triggered() {
     if(selectedProject != nullptr) {
-        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
+        QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"),  this->fileHandler->work_space.c_str(),
                                                    tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
         if(!dir.isEmpty()) { // Check if you have selected something.
             input_switch_case(ACTION::ADD_VIDEO, dir);
@@ -639,7 +639,7 @@ void MainWindow::on_actionSave_triggered() {
  * @brief MainWindow::on_actionLoad_triggered
  */
 void MainWindow::on_actionLoad_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->work_space.c_str(),tr("*.txt"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
@@ -679,6 +679,17 @@ void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string fileP
 }
 
 /**
+ * @brief MainWindow::on_actionChoose_Workspace_triggered
+ * Opens file explorer and requests a workspace select from user, updates
+ * filehandler workspace accordingly.
+ */
+void MainWindow::on_actionChoose_Workspace_triggered() {
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
+    this->fileHandler->set_workspace(dir.toStdString() + "/");
+    set_status_bar("new wokspace set to " + this->fileHandler->work_space);
+}
+
+    /**
  * @brief MainWindow::on_actionDeleteProject_triggered
  * Deletes the saved files of the selected project.
  * Removes the project from the preoject tree.

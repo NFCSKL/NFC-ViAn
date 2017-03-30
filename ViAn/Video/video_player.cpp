@@ -15,7 +15,7 @@ using namespace cv;
  * @param parent
  */
 video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
-    video_overlay = new overlay();
+    video_overlay = new Overlay();
     m_mutex = mutex;
     m_paused_wait = paused_wait;
 }
@@ -72,9 +72,8 @@ void video_player::run()  {
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    capture.set(CV_CAP_PROP_POS_FRAMES,current_frame);
-
-    while(!video_stopped  && capture.read(frame)){
+    capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
+    while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
         convert_frame();
@@ -145,8 +144,7 @@ void video_player::convert_frame() {
 cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = frame.clone();
-    processed_frame = video_overlay->draw_overlay(processed_frame, capture.get(CV_CAP_PROP_POS_FRAMES));
-
+    processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
     }
@@ -247,10 +245,24 @@ int video_player::get_num_frames() {
 
 /**
  * @brief video_player::get_current_frame_num
- * @return the number of the current frame
+ * @return The number of the currently read frame (0-based index).
  */
 int video_player::get_current_frame_num() {
-    return capture.get(CV_CAP_PROP_POS_FRAMES);
+    // capture.get() gives the number of the frame to be read, hence the compensation of -1.
+    return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
+}
+
+/**
+ * @brief video_player::set_current_frame_num
+ * @param frame_nbr The number to set the currently read frame to (0-based index).
+ */
+void video_player::set_current_frame_num(int frame_nbr) {
+    if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
+        // capture.set() sets the number of the frame to be read.
+        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
+        // capture.read() will read the frame and advance one step.
+        capture.read(frame);
+    }
 }
 
 /**
@@ -287,7 +299,7 @@ bool video_player::set_playback_frame(int frame_num) {
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
-    update_frame(current_frame + 1);
+    update_frame(get_current_frame_num() + 1);
 }
 
 /**
@@ -295,7 +307,7 @@ void video_player::next_frame() {
  * Moves the playback one frame backward.
  */
 void video_player::previous_frame() {
-    update_frame(current_frame - 1);
+    update_frame(get_current_frame_num() - 1);
 }
 
 /**
@@ -334,8 +346,7 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_playback_frame(frame_nbr)) {
-        capture.set(CAP_PROP_POS_FRAMES, frame_nbr);
-        capture.read(frame);
+        set_current_frame_num(frame_nbr);
         convert_frame();
         show_frame();
     }
@@ -427,7 +438,7 @@ void video_player::set_overlay_colour(QColor colour) {
  */
 void video_player::undo_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->undo(capture.get(CV_CAP_PROP_POS_FRAMES));
+        video_overlay->undo(get_current_frame_num());
         update_overlay();
     }
 }
@@ -439,7 +450,7 @@ void video_player::undo_overlay() {
  */
 void video_player::clear_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->clear(capture.get(CV_CAP_PROP_POS_FRAMES));
+        video_overlay->clear(get_current_frame_num());
         update_overlay();
     }
 }
@@ -486,7 +497,7 @@ void video_player::video_mouse_pressed(QPoint pos) {
             zoom_area->set_start_pos(pos);
             zoom_area->update_drawing_pos(pos);
         } else if (is_paused()) {
-            video_overlay->mouse_pressed(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+            video_overlay->mouse_pressed(pos, get_current_frame_num());
         }
         update_overlay();
     }
@@ -508,7 +519,7 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->choose_area();
             choosing_zoom_area = false;
         } else if (is_paused()) {
-            video_overlay->mouse_released(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+            video_overlay->mouse_released(pos, get_current_frame_num());
         }
         update_overlay();
     }
@@ -529,7 +540,7 @@ void video_player::video_mouse_moved(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
         } else if (is_paused()) {
-            video_overlay->mouse_moved(pos, capture.get(CV_CAP_PROP_POS_FRAMES));
+            video_overlay->mouse_moved(pos, get_current_frame_num());
         }
         update_overlay();
     }
@@ -572,7 +583,7 @@ void video_player::export_current_frame(QString path_to_folder) {
 
     // Add "/FRAME_NR.tiff" to the path.
     path_to_folder.append("/");
-    path_to_folder.append(QString::number(capture.get(CV_CAP_PROP_POS_FRAMES)));
+    path_to_folder.append(QString::number(get_current_frame_num()));
     path_to_folder.append(".tiff");
 
     QImageWriter writer(path_to_folder, "tiff");

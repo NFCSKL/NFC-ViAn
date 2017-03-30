@@ -3,10 +3,10 @@
 
 #include "rectangle.h"
 
-class zoomrectangle : public rectangle {
+class ZoomRectangle : public Rectangle {
 public:
-    zoomrectangle();
-    zoomrectangle(QPoint pos);
+    ZoomRectangle();
+    ZoomRectangle(QPoint pos);
     void set_start_pos(QPoint pos);
     void update_drawing_pos(QPoint pos);
     void choose_area();
