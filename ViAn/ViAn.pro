@@ -18,28 +18,36 @@ TEMPLATE = app
 #
 SOURCES += main.cpp
 
+
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp \
-    Test/filehandlertest.cpp
+SOURCES += Test/test_video_player.cpp\
+    Test/filehandlertest.cpp\
+    Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h
+    Test/filehandlertest.h \
+    Test/test_mainwindow.h
+
 
 #
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/icononbuttonhandler.cpp
-
+    GUI/icononbuttonhandler.cpp \
+    GUI/inputwindow.cpp \
+    GUI/qtreeitems.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/icononbuttonhandler.h
+    GUI/icononbuttonhandler.h \
+    GUI/inputwindow.h \
+    GUI/action.h \
+    GUI/qtreeitems.h
 
 
-
-FORMS    += GUI/mainwindow.ui
+FORMS    += GUI/mainwindow.ui \
+   GUI/inputwindow.ui
 
 RESOURCES += resources.qrc
 #
@@ -47,8 +55,26 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp
-HEADERS += Video/video_player.h
+SOURCES += Video/video_player.cpp \
+    Video/overlay.cpp \
+    Video/shapes/arrow.cpp \
+    Video/shapes/circle.cpp \
+    Video/shapes/line.cpp \
+    Video/shapes/pen.cpp \
+    Video/shapes/rectangle.cpp \
+    Video/shapes/shape.cpp \
+    Video/shapes/text.cpp \
+    Video/shapes/zoomrectangle.cpp
+HEADERS += Video/video_player.h \
+    Video/overlay.h \
+    Video/shapes/arrow.h \
+    Video/shapes/circle.h \
+    Video/shapes/line.h \
+    Video/shapes/pen.h \
+    Video/shapes/rectangle.h \
+    Video/shapes/shape.h \
+    Video/shapes/text.h \
+    Video/shapes/zoomrectangle.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
@@ -73,11 +99,15 @@ unix {
 # START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/project.cpp
+    Filehandler/project.cpp \
+    Filehandler/analysis.cpp \
+    Filehandler/video.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
-    Filehandler/dir.h
+    Filehandler/dir.h \
+    Filehandler/analysis.h\
+    Filehandler/video.h
 
 win32{
 

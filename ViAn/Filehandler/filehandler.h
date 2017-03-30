@@ -5,67 +5,84 @@
 #ifdef _WIN32
     #include <windows.h>
     #include "stringhelper.h"
-#elif __APPLE__
-#elif __unix__
 #endif
 #include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <mutex>
+#include <sstream>
 #include "project.h"
 #include "dir.h"
+#include <algorithm>
 
-#ifdef _WIN32
-    #define WORKSPACE "C:/"
-#elif __APPLE__
-    #define WORKSPACE "/Applications"
-#elif __unix__
-    #define  WORKSPACE "~/"
 
-#endif
 
+enum WRITE_OPTION{APPEND, OVERWRITE};
 typedef int FH_ERROR; // file handler error code
 typedef int ID;
 struct Project; // fix for include issue
+struct ProjFiles;
 class FileHandler
 {
 public:
     FileHandler();
-    std::string workSpace;
     //
     //  Project manipulation
     //
-    Project* openProject(std::string dirpath);
-    Project* createProject(std::string projName);
-    FH_ERROR deleteProject(Project* proj);
-    void saveProject(Project* proj);
-    Project* loadProject(std::string filePath);
+    std::string work_space;
+    void set_workspace(std::string new_work_space);
+    Project* open_project(std::string dirpath);
+    Project* create_project(std::string projName);
+    FH_ERROR delete_project(Project* proj);
+    Project* load_project(std::string fullProjectPath);
+    Project* load_project(std::string projname, std::string dirpath);
+    void save_project(ID id);
+    void save_project(Project* proj);
 
-    void addVideo(Project* proj, std::string filePath);
 
+    void add_video(Project* proj, std::string filePath);
     //directory manipulation
     //varying implementation
-    ID createDirectory(std::string dirpath);
-    FH_ERROR deleteDirectory(std::string dirpath);
+    ID create_directory(std::string dirpath);
+    FH_ERROR delete_directory(ID id);
 
     //file manipulation
-    ID createFile(std::string filename, ID dirID);
-    FH_ERROR deleteFile(ID id);
-    void writeFile(ID id, std::string text);
-    void readFile(ID id, size_t linesToRead, std::string& buf);
 
+    ID create_file(std::string filename, ID dirID);
+    FH_ERROR delete_file(ID id);
+    void write_file(ID id, std::string text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
+    void read_file(ID id,  std::string& buf, int linesToRead = -1);
+
+    friend bool operator==(ProjFiles& pf, ProjFiles& pf2);
+    friend bool operator==(Project& proj, Project& proj2);
+
+    bool proj_equals(Project& proj, Project& proj2);
+    bool projfiles_equal(ProjFiles& pf, ProjFiles& pf2);
+    bool dirs_equal(ID id, ID id2);
+    bool files_equal(ID id, ID id2);
     // thread safe read operations for maps
-    std::string getDir(ID id);
-    Project* getProject(ID id);
-    std::string getFile(ID id);    
+
+
+    std::string get_dir(ID id);
+    Project* get_project(ID id);
+    std::string get_file(ID id);
+
+    // Last error
+    FH_ERROR lastError;
 
 private:
-    void updateProjFile(Project* proj); // used to update existing project files and maps
+
+    void update_proj_files(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    void addFile(std::pair<ID,std::string> pair);
-    void addProject(std::pair<ID,Project*> pair);
-    void addDir(std::pair<ID,std::string> pair);
+    ID add_file(std::string filepath);
+    void add_project(std::pair<ID,Project*> pair);
+    ID add_dir(std::string dirpath);
+    ID load_project_file(std::string filePath, std::stringstream& projFileStream);
+    void load_proj_files(std::string str);
+    //add used for loading project from file
+    void add_file(ID id ,std::string filepath);
+
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap

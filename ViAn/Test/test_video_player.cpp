@@ -1,5 +1,7 @@
 #include "test_video_player.h"
 #include <thread>
+#include <QMutex>
+#include <QWaitCondition>
 
 /**
  * @brief test_video_player::test_video_player
@@ -7,7 +9,9 @@
  * @param parent
  */
 test_video_player::test_video_player(QObject *parent) : QObject(parent) {
-    mvideo = new video_player();
+    QMutex mutex;
+    QWaitCondition wait;
+    mvideo = new video_player(&mutex, &wait);
 }
 
 /**
@@ -25,32 +29,6 @@ void test_video_player::test_load_video() {
 
     QVERIFY(mvideo->capture.isOpened());
 
-}
-
-/**
- * @brief test_video_player::test_play_pause
- */
-void test_video_player::test_play_pause() {
-    mvideo->video_paused = false;
-    mvideo->play_pause();
-    QVERIFY(mvideo->is_paused());
-    mvideo->play_pause();
-    QVERIFY(!mvideo->is_paused());
-}
-
-/**
- * @brief test_video_player::test_stop_video
- * Tests ONLY the case when the video is paused because if the video
- * is running, the stop related commands are executed on another thread.
- */
-void test_video_player::test_stop_video() {
-    mvideo->video_paused = true;
-    mvideo->stop = false;
-    mvideo->current_frame = 50;
-    mvideo->stop_video();
-    QVERIFY(mvideo->stop == true);
-    QVERIFY(mvideo->current_frame == 0);
-    QVERIFY(mvideo->video_paused == false);
 }
 
 /**
@@ -90,7 +68,7 @@ void test_video_player::test_set_frame_height() {
  * @brief test_video_player::test_set_playback_frame
  */
 void test_video_player::test_set_playback_frame() {
-    mvideo->set_playback_frame(100);
+    mvideo->on_set_playback_frame(100);
     QVERIFY(mvideo->current_frame == 100);
 }
 
@@ -150,4 +128,106 @@ void test_video_player::test_dec_playback_speed(){
     QVERIFY(mvideo->get_speed_multiplier() == 16);
 }
 
+/**
+ * @brief test_toggle_overlay
+ */
+void test_video_player::test_toggle_overlay() {
+    mvideo->video_overlay->set_showing_overlay(false);
+    mvideo->toggle_overlay();
+    QVERIFY(mvideo->is_showing_overlay());
+    mvideo->toggle_overlay();
+    QVERIFY(!mvideo->is_showing_overlay());
+}
 
+/**
+ * @brief test_video_player::test_set_overlay_tool
+ */
+void test_video_player::test_set_overlay_tool() {
+    mvideo->set_overlay_tool(RECTANGLE);
+    QVERIFY(mvideo->video_overlay->get_shape() == RECTANGLE);
+}
+
+/**
+ * @brief test_video_player::test_set_overlay_colour
+ */
+void test_video_player::test_set_overlay_colour() {
+    mvideo->set_overlay_colour(Qt::black);
+    QVERIFY(mvideo->video_overlay->get_colour() == Qt::black);
+}
+
+/**
+ * @brief test_video_player::test_video_open
+ */
+void test_video_player::test_video_open() {
+    mvideo->capture.release();
+    QVERIFY(!mvideo->video_open());
+    mvideo->capture.open("seq_01.mp4");
+    QVERIFY(mvideo->video_open());
+}
+
+/**
+ * @brief test_video_player::test_scaling_event
+ * Tests that the aspect ratio is kept when the QLabel signals a scaling event.
+ */
+void test_video_player::test_scaling_event() {
+    mvideo->capture.release();
+    mvideo->capture.open("seq_01.mp4");
+    mvideo->scaling_event(640,1080);
+
+    QVERIFY(mvideo->frame_height < 1080);
+
+    mvideo->scaling_event(1920,480);
+    QVERIFY(mvideo->frame_width < 1920);
+}
+
+/**
+ * @brief test_video_player::test_scale_frame
+ */
+void test_video_player::test_scale_frame() {
+    mvideo->capture.release();
+    mvideo->capture.open("seq_01.mp4");
+    int video_width = mvideo->capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    int video_height = mvideo->capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+
+    mvideo->capture.read(mvideo->frame);
+
+    mvideo->scaling_event(video_width*2,
+                          video_height*2);
+    cv::Mat temp = mvideo->scale_frame(mvideo->frame);
+    QVERIFY(temp.cols == video_width*2 && temp.rows == video_height*2);
+
+    mvideo->scaling_event(0,0);
+    temp = mvideo->scale_frame(mvideo->frame);
+    QVERIFY(temp.cols == video_width && temp.rows == video_height);
+}
+
+/**
+ * @brief test_video_player::test_set_play_video
+ */
+void test_video_player::test_set_play_video() {
+    mvideo->video_paused = true;
+    mvideo-> video_stopped = true;
+    mvideo->on_play_video();
+    QVERIFY(!mvideo->video_paused);
+    QVERIFY(!mvideo->video_stopped);
+}
+
+/**
+ * @brief test_video_player::test_set_paused_video
+ */
+void test_video_player::test_set_pause_video() {
+    mvideo->video_paused = false;
+    mvideo->on_pause_video();
+    QVERIFY(mvideo->video_paused);
+}
+
+/**
+ * @brief test_video_player::test_set_stop_video
+ */
+void test_video_player::test_set_stop_video() {
+    mvideo->video_paused = true;
+    mvideo->video_stopped = false;
+    mvideo->on_stop_video();
+    QVERIFY(!mvideo->video_paused);
+    QVERIFY(mvideo->video_stopped);
+}

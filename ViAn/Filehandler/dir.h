@@ -16,7 +16,7 @@
     #include <unistd.h>
 #endif
 
-int makeDir(std::string dirpath);
-int removeDir(std::string dirpath);
+int make_dir(std::string dirpath);
+int remove_dir(std::string dirpath);
 #endif // DIR_H
 
