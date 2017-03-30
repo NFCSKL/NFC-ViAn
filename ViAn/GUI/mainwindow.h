@@ -7,6 +7,7 @@
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
+#include "customdialog.h"
 #include "Video/video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -125,6 +126,7 @@ private slots:
 
     void on_actionDeleteProject_triggered();
 
+    void on_actionContrast_Brightness_triggered();
 
 private:
 

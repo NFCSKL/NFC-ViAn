@@ -765,3 +765,28 @@ void MainWindow::enable_video_buttons() {
     ui->previousFrameButton->setEnabled(true);
     ui->stopButton->setEnabled(true);
 }
+
+/**
+ * @brief MainWindow::on_actionContrast_Brightness_triggered
+ * Opens a window to choose contrast and brightness in.
+ */
+void MainWindow::on_actionContrast_Brightness_triggered() {
+    float contrast = mvideo_player->get_contrast();
+    int brightness = mvideo_player->get_brightness();
+
+    CustomDialog dialog("Contrast & Brightness", this);
+    dialog.addLabel("Enter values:");
+    dialog.addDblSpinBoxF("Contrast [0.00 – 5.00]: ", (float) mvideo_player->CONTRAST_MIN, (float) mvideo_player->CONTRAST_MAX,
+                          &contrast, mvideo_player->CONTRAST_DECIMALS, (float) mvideo_player->CONTRAST_STEP,
+                          "Choose contrast value.");
+    dialog.addSpinBox("Brightness [-100 – 100]: ", mvideo_player->BRIGHTNESS_MIN, mvideo_player->BRIGHTNESS_MAX,
+                      &brightness, mvideo_player->BRIGHTNESS_STEP, "Choose brightness value.");
+
+    dialog.exec();
+
+    if (dialog.wasCancelled()) {
+        return;
+    }
+    mvideo_player->set_contrast(contrast);
+    mvideo_player->set_brightness(brightness);
+}
