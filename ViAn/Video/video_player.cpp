@@ -190,16 +190,8 @@ cv::Mat video_player::contrast_frame(cv::Mat &frame) {
     // Create image for the modified frame.
     Mat modified_frame;
 
-    frame.convertTo(modified_frame, -1, alpha, beta);
     // Do the operation new_image(i,j) = alpha*image(i,j) + beta
-    /*for (int y = 0; y < frame.rows; y++) {
-        for (int x = 0; x < frame.cols; x++) {
-            for (int c = 0; c < 3; c++) {
-                modified_frame.at<Vec3b>(y, x)[c] =
-                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + beta);
-            }
-        }
-    }*/
+    frame.convertTo(modified_frame, -1, alpha, beta);
     return modified_frame;
 }
 
