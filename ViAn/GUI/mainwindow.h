@@ -19,6 +19,8 @@
 #include "inputwindow.h"
 #include "action.h"
 #include "qtreeitems.h"
+#include <QMutex>
+#include <QWaitCondition>
 
 using namespace std;
 class inputwindow;
@@ -37,6 +39,18 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
+    
+    // Lock and wait condition to sleep player when video is paused
+    QMutex mutex;
+    QWaitCondition paused_wait;
+
+signals:
+    void set_play_video();
+    void set_pause_video();
+    void set_stop_video();
+    void resize_video_frame(int width, int height);
+    void next_video_frame();
+    void prev_video_frame();
 
 private slots:
 
@@ -104,6 +118,8 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
+    void on_actionChoose_Workspace_triggered();
+
     void on_actionDeleteProject_triggered();
 
     void on_actionDeleteVideo_triggered();
@@ -123,6 +139,7 @@ private:
 
     FileHandler *fileHandler;
 
+    void setup_video_player(video_player *mplayer);
     void add_project_to_tree(Project* proj);
     void add_video_to_tree(std::string filePath);
 

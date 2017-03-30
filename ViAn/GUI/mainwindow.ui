@@ -352,6 +352,7 @@
     <addaction name="actionSave"/>
     <addaction name="menuDelete"/>
     <addaction name="actionExit"/>
+    <addaction name="actionChoose_Workspace"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -424,6 +425,7 @@
    <addaction name="actionAddVideo"/>
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
+   <addaction name="actionShow_hide_overlay"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="enabled">
@@ -447,7 +449,10 @@
    <addaction name="actionPen"/>
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
+   <addaction name="actionShow_hide_overlay"/>
    <addaction name="separator"/>
+   <addaction name="actionZoom_in"/>
+   <addaction name="actionZoom_out"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -661,6 +666,11 @@
    </property>
    <property name="toolTip">
     <string>Text</string>
+   </property>
+  </action>
+  <action name="actionChoose_Workspace">
+   <property name="text">
+    <string>Choose Workspace</string>
    </property>
   </action>
  </widget>

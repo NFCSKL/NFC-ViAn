@@ -3,9 +3,9 @@
 
 #include "shape.h"
 
-class text : public shape {
+class Text : public Shape {
 public:
-    text(QColor col, QPoint pos, QString strng);
+    Text(QColor col, QPoint pos, QString strng);
     cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos) override;
 private:
