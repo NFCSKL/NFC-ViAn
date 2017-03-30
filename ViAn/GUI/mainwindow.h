@@ -69,6 +69,8 @@ private slots:
     void on_actionAddProject_triggered();
 
     void on_videoSlider_valueChanged(int newPos);
+
+    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
     void on_actionShow_hide_overlay_triggered();
 
@@ -106,11 +108,7 @@ private slots:
 
     void on_actionDeleteProject_triggered();
 
-    void on_actionDeleteVideo_triggered();
-
     void on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
-    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
 
 private:
 
@@ -123,14 +121,23 @@ private:
 
     FileHandler *fileHandler;
 
+    void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
+    void set_selected_video(MyQTreeWidgetItem *newSelectedVideo);
+    void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
     void add_project_to_tree(Project* proj);
-    void add_video_to_tree(std::string filePath);
+    void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 
     void remove_selected_project_from_tree();
-    void remove_video_from_tree(MyQTreeWidgetItem *my_video);
+    void remove_video_from_tree(MyQTreeWidgetItem *video);
 
     void toggle_toolbar();
     void enable_video_buttons();
+
+    MyQTreeWidgetItem *selectedProject;
+    MyQTreeWidgetItem *selectedVideo;
+
+
+
 };
 
 #endif // MAINWINDOW_H

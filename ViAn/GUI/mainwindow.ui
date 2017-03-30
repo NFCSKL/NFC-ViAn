@@ -350,8 +350,8 @@
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
-    <addaction name="menuDelete"/>
     <addaction name="actionExit"/>
+    <addaction name="menuDelete"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
