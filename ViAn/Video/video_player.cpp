@@ -215,9 +215,11 @@ int video_player::get_current_frame_num() {
  * @param frame_nbr The number to set the currently read frame to.
  */
 void video_player::set_current_frame_num(int frame_nbr) {
-    if ((frame_nbr + 1) >= 0 && (frame_nbr + 1) < get_num_frames()) {
-        // capture.set() sets the number of the frame to be read, hence the compensation of +1.
-        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr + 1);
+    // capture.set() sets the number of the frame to be read, hence the compensation of +1.
+    frame_nxt = frame_nbr + 1;
+    if (frame_nxt >= 0 && frame_nxt < get_num_frames()) {
+
+        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nxt);
     }
 }
 
