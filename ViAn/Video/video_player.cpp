@@ -72,7 +72,7 @@ void video_player::run()  {
     video_paused = false;
     int delay = (1000/frame_rate);
     capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
-    while(!video_stopped && capture.read(frame)){
+    while(!video_stopped && capture.read(frame)) {
         show_frame();
         this->msleep(delay);
 
@@ -206,7 +206,7 @@ int video_player::get_num_frames() {
  * @return The number of the currently read frame.
  */
 int video_player::get_current_frame_num() {
-    // capture.get() gives the number of the next frame, hence the compensation of -1.
+    // capture.get() gives the number of the frame to be read, hence the compensation of -1.
     return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
 }
 
@@ -215,8 +215,10 @@ int video_player::get_current_frame_num() {
  * @param frame_nbr The number to set the currently read frame to.
  */
 void video_player::set_current_frame_num(int frame_nbr) {
-    // capture.set() sets the number of the next frame, hence the compensation of +1.
-    capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr + 1);
+    if ((frame_nbr + 1) >= 0 && (frame_nbr + 1) < get_num_frames()) {
+        // capture.set() sets the number of the frame to be read, hence the compensation of +1.
+        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr + 1);
+    }
 }
 
 /**
