@@ -41,7 +41,7 @@ void Project::add_video(Video* vid)
 ProjectStream& operator>>(ProjectStream& ps, Project& proj){
     //write files
     //Read project id and name
-    ps.projfile >> proj.name;
+    ps.proj_file >> proj.name;
 
     // read videos
     int vid_counter = 0;
@@ -68,7 +68,7 @@ ProjectStream& operator>>(ProjectStream& ps, Project& proj){
  */
 ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write name and id;   
-    ps.projfile << proj.name.c_str() << " ";
+    ps.proj_file << proj.name.c_str() << " ";
     //write videos
     int vidcounter = proj.videos.size();
     ps.videos << vidcounter << " ";
@@ -92,9 +92,9 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
  * kept just in case.
  */
 ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
-    ps.projfile << pf.f_analysis << " ";
-    ps.projfile << pf.f_drawings << " ";
-    ps.projfile << pf.f_videos << " ";
+    ps.proj_file << pf.f_analysis << " ";
+    ps.proj_file << pf.f_drawings << " ";
+    ps.proj_file << pf.f_videos << " ";
     return ps;
 
 }
@@ -111,8 +111,8 @@ ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
  */
 ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
     std::string dummy;
-    ps.projfile >> pf.f_analysis;
-    ps.projfile >> pf.f_drawings;
-    ps.projfile >> pf.f_videos;
+    ps.proj_file >> pf.f_analysis;
+    ps.proj_file >> pf.f_drawings;
+    ps.proj_file >> pf.f_videos;
     return ps;
 }

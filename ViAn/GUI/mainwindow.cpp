@@ -582,7 +582,7 @@ void MainWindow::on_actionLoad_triggered() {
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
-        set_status_bar("Project " + loadProj->m_name + " loaded.");
+        set_status_bar("Project " + loadProj->name + " loaded.");
     }
 }
 
