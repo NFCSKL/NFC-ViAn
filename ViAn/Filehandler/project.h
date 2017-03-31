@@ -54,7 +54,7 @@ struct Project{
 public:
     Project();
     Project(ID id, std::string name);
-    Project(std::string dirpath);
+    Project(std::string dir_path);
     void add_video(Video *vid);
 
     // read and write operator for Projects
