@@ -25,6 +25,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete video_overlay;
+    delete analysis_area;
     capture.release();
 }
 
@@ -130,6 +131,9 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
     }
+    if (choosing_analysis_area) {
+        processed_frame = analysis_area->draw(processed_frame);
+    }
     processed_frame = zoom_frame(processed_frame);
     processed_frame = contrast_frame(processed_frame);
 
@@ -225,11 +229,18 @@ bool video_player::is_stopped() {
 
 /**
  * @brief video_player::is_showing_overlay
- * Returns true if the overlay tool is showing, else false.
- * @return
+ * @return Returns true if the overlay tool is showing, else false.
  */
 bool video_player::is_showing_overlay() {
     return video_overlay->is_showing_overlay();
+}
+
+/**
+ * @brief video_player::is_showing_analysis_tool
+ * @return Returns true if the analysis area tool is showing, else false.
+ */
+bool video_player::is_showing_analysis_tool() {
+    return choosing_analysis_area;
 }
 
 /**
@@ -327,6 +338,7 @@ void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
+    convert_frame();
     show_frame();
 }
 
@@ -503,6 +515,17 @@ void video_player::clear_overlay() {
 }
 
 /**
+ * @brief video_player::toggle_analysis_area
+ * Toggles the choosing of an analysis area.
+ */
+void video_player::toggle_analysis_area() {
+    if (capture.isOpened()) {
+        choosing_analysis_area = !choosing_analysis_area;
+        update_overlay();
+    }
+}
+
+/**
  * @brief video_player::zoom_in
  * Sets a state in the video overlay
  * for the user to choose an area,
@@ -544,6 +567,9 @@ void video_player::video_mouse_pressed(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->set_start_pos(pos);
             zoom_area->update_drawing_pos(pos);
+        } else if (choosing_analysis_area) {
+            // When choosing analysis area, a point is choosen when mouse released.
+            return;
         } else if (is_paused()) {
             video_overlay->mouse_pressed(pos, get_current_frame_num());
         }
@@ -566,6 +592,8 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
             choosing_zoom_area = false;
+        } else if (choosing_analysis_area) {
+            analysis_area->add_point(pos);
         } else if (is_paused()) {
             video_overlay->mouse_released(pos, get_current_frame_num());
         }
@@ -587,6 +615,9 @@ void video_player::video_mouse_moved(QPoint pos) {
         scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
+        } else if (choosing_analysis_area) {
+            // When choosing analysis area, a point is choosen when mouse released.
+            return;
         } else if (is_paused()) {
             video_overlay->mouse_moved(pos, get_current_frame_num());
         }

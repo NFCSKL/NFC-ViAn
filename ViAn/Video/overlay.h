@@ -11,6 +11,7 @@
 #include "shapes/pen.h"
 #include "shapes/text.h"
 #include "shapes/zoomrectangle.h"
+#include "shapes/analysarea.h"
 
 #include "opencv2/opencv.hpp"
 
