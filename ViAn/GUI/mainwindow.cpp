@@ -767,6 +767,19 @@ void MainWindow::enable_video_buttons() {
 }
 
 /**
+ * @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+ * Toggles the choosing of an analysis area.
+ */
+void MainWindow::on_actionShow_hide_analysis_area_triggered() {
+    mvideo_player->toggle_analysis_area();
+    if (mvideo_player->is_showing_analysis_tool()) {
+        set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
+    } else {
+        set_status_bar("Hiding analysis area tool.");
+    }
+}
+
+/**
  * @brief MainWindow::on_actionContrast_Brightness_triggered
  * Opens a window to choose contrast and brightness in.
  */
