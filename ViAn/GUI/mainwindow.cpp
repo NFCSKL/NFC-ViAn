@@ -123,7 +123,7 @@ void MainWindow::on_playPauseButton_clicked() {
         // Video thread is paused. Notifying the waitcondition to resume playback
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
@@ -153,7 +153,7 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     } else {
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
     }
     emit set_stop_video();
 }
@@ -581,7 +581,6 @@ void MainWindow::play_video() {
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
-    mvideo_player->set_playback_frame(0);
 }
 
 /**

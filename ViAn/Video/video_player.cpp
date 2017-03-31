@@ -51,18 +51,6 @@ bool video_player::load_video(string filename) {
 }
 
 /**
- * @brief video_player::stop_video
- * Sets stop related bools to their correct values and sets the current playback frame to be 0.
- */
-void video_player::stop_video() {
-    video_stopped = true;
-    set_playback_frame(0);
-    if (video_paused) {
-        video_paused = false;
-    }
-}
-
-/**
  * @brief video_player::run
  * This function is called whenever the thread is started or put out of sleep.
  * It houses the main loop for fetching frames from the currently played
@@ -72,7 +60,7 @@ void video_player::run()  {
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    capture.set(CV_CAP_PROP_POS_FRAMES, current_frame);
+    set_current_frame_num(0);
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
@@ -88,16 +76,10 @@ void video_player::run()  {
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
-            current_frame = capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
             m_paused_wait->wait(m_mutex);
             video_paused = false;
         }
         m_mutex->unlock();
-    }
-
-    // Reset frame on stop
-    if (video_stopped) {
-        current_frame = 0;
     }
 }
 
@@ -118,7 +100,7 @@ void video_player::show_frame() {
 void video_player::convert_frame() {
     cv::Mat processed_frame;
 
-    // Process frame (draw overlay, zoom, scaling)
+    // Process frame (draw overlay, zoom, scaling, contrast/brightness)
     processed_frame = process_frame(frame);
 
 
@@ -136,10 +118,10 @@ void video_player::convert_frame() {
 }
 
 /**
- * @brief video_player::draw_frame
- * Draws overlay on the frame and zooms in the frame.
+ * @brief video_player::process_frame
+ * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
  * @param frame Frame to draw on.
- * @return Returns the frame including the zoom and overlay.
+ * @return Returns the processed frame.
  */
 cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
@@ -149,7 +131,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
         processed_frame = zoom_area->draw(processed_frame);
     }
     processed_frame = zoom_frame(processed_frame);
-    processed_frame = contrast_frame(processed_frame);
+    //processed_frame = contrast_frame(processed_frame);
 
     cv::Mat scaled_frame;
     if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
@@ -207,6 +189,11 @@ cv::Mat video_player::zoom_frame(cv::Mat &frame) {
 cv::Mat video_player::contrast_frame(cv::Mat &frame) {
     // Create image for the modified frame.
     Mat modified_frame = Mat::zeros(frame.size(), frame.type());
+
+    // Contrast control, alpha value in [1.0-3.0].
+    double alpha = 1 + 2 * contrast / 255.0;
+    // Brightness control, beta value in [0-100].
+    int beta = 100 * brightness / 255.0;
 
     // Do the operation new_image(i,j) = alpha*image(i,j) + beta
     for (int y = 0; y < frame.rows; y++) {
@@ -277,15 +264,19 @@ int video_player::get_current_frame_num() {
 
 /**
  * @brief video_player::set_current_frame_num
+ * Sets the current frame to the specified number, if it's within the video.
  * @param frame_nbr The number to set the currently read frame to (0-based index).
+ * @return Return true if successful, false if the specified number is outside the video.
  */
-void video_player::set_current_frame_num(int frame_nbr) {
+bool video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
         // capture.set() sets the number of the frame to be read.
         capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
         // capture.read() will read the frame and advance one step.
         capture.read(frame);
+        return true;
     }
+    return false;
 }
 
 /**
@@ -302,19 +293,6 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
-}
-
-/**
- * @brief video_player::set_playback_frame
- * Moves the playback to the frame specified by frame_num
- * @param frame_num
- */
-bool video_player::set_playback_frame(int frame_num) {
-    if (frame_num < get_num_frames() && frame_num >= 0) {
-        current_frame = frame_num;
-        return true;
-    }
-    return false;
 }
 
 /**
@@ -355,11 +333,14 @@ void video_player::on_pause_video() {
 /**
  * @brief on_stop_video
  * Slot function to be used from the GUI thread
- * Sets the stopped bool to true and the paused bool to false
+ * Sets the stopped bool to true and the paused bool to false.
+ * Sets playback frame to the start of the video and updates the GUI.
  */
 void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
+    set_current_frame_num(0);
+    show_frame();
 }
 
 /**
@@ -368,8 +349,7 @@ void video_player::on_stop_video() {
  * Updates the current frame if frame_nbr is valid.
  */
 void video_player::update_frame(int frame_nbr) {
-    if (set_playback_frame(frame_nbr)) {
-        set_current_frame_num(frame_nbr);
+    if (set_current_frame_num(frame_nbr)) {
         convert_frame();
         show_frame();
     }
@@ -393,10 +373,8 @@ void video_player::update_overlay() {
  * Sets the contrast value (alpha value).
  * @param contrast Contrast parameter in range 0 to 255.
  */
-void video_player::set_contrast(double contrast) {
-    contrast = std::min(255.0, std::max(0.0, contrast));
-    // Alpha value in [1.0-3.0].
-    alpha = 1 + 2 * contrast / 255.0;
+void video_player::set_contrast(int c) {
+    contrast = std::min(255, std::max(0, c));
 }
 
 /**
@@ -404,26 +382,24 @@ void video_player::set_contrast(double contrast) {
  * Sets the brightness value (beta value).
  * @param brightness Brightness parameter in range 0 to 255.
  */
-void video_player::set_brightness(double brightness) {
-    // Beta value in [0-100].
-    brightness = std::min(255.0, std::max(0.0, brightness));
-    beta = 100 * brightness / 255.0;
+void video_player::set_brightness(int b) {
+    brightness = std::min(255, std::max(0, b));
 }
 
 /**
  * @brief video_player::get_contrast
- * @return Returns contrast parameter in range 0 to 255
+ * @return Returns contrast parameter in range 0 to 255.
  */
 int video_player::get_contrast() {
-    return 255 * (alpha - 1) / 2;
+    return contrast;
 }
 
 /**
  * @brief video_player::get_brightness
- * @return Returns brightness parameter in range 0 to 255
+ * @return Returns brightness parameter in range 0 to 255.
  */
 int video_player::get_brightness() {
-    return 255 * ((double) beta / 100);
+    return brightness;
 }
 
 /**
@@ -525,6 +501,7 @@ void video_player::clear_overlay() {
 void video_player::zoom_in() {
     if (capture.isOpened()) {
         choosing_zoom_area = true;
+        zoom_area->reset_pos();
     }
 }
 
@@ -617,20 +594,27 @@ void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-    // Calculate the scale ratio.
-    double x_scale = (double) video_frame_width/frame_width;
-    double y_scale = (double) video_frame_height/frame_height;
+    // Calculate the scale ratio between the actual video
+    // size and the size of the frame shown in the gui.
+    double x_scale_ratio = (double) video_frame_width/frame_width;
+    double y_scale_ratio = (double) video_frame_height/frame_height;
 
-    // Calculate the coordinates on the video frame from
+    // Calculate the coordinates on the original-sized frame,
+    // from the coordinates on the QLabel where the frame is shown.
+    // (Multiply with the ratio, and subtract the empty parts of the QLabel,
+    // only subtracting the top and left side, hence division by 2.)
+    double x_scale = x_scale_ratio * pos.x() - (qlabel_width - frame_width) / 2;
+    double y_scale = y_scale_ratio * pos.y() - (qlabel_height - frame_height) / 2;
+
+    // Calculate the coordinates on the actual video from
     // the coordinates on the zoomed frame.
-    double x_zoom_scale = (double) zoom_area->get_width()/video_frame_width;
-    double y_zoom_scale = (double) zoom_area->get_height()/video_frame_height;
-    double x_video = zoom_area->get_x() + (double) x_zoom_scale * pos.x();
-    double y_video = zoom_area->get_y() + (double) y_zoom_scale * pos.y();
+    double x_zoom_ratio = (double) zoom_area->get_width()/video_frame_width;
+    double y_zoom_ratio = (double) zoom_area->get_height()/video_frame_height;
+    double x_video = zoom_area->get_x() + (double) x_zoom_ratio * x_scale;
+    double y_video = zoom_area->get_y() + (double) y_zoom_ratio * y_scale;
 
-    // Calculate the coordinates on the frame.
-    pos.setX(x_scale * x_video);
-    pos.setY(y_scale * y_video);
+    pos.setX(x_video);
+    pos.setY(y_video);
 }
 
 /**
@@ -663,6 +647,8 @@ void video_player::scaling_event(int new_width, int new_height) {
         return;
     }
 
+    qlabel_width = new_width;
+    qlabel_height = new_height;
 
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);

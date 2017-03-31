@@ -33,12 +33,10 @@ public:
 
     int get_num_frames();    
     int get_current_frame_num();
-    void set_current_frame_num(int frame_nbr);
+    bool set_current_frame_num(int frame_nbr);
     void play_pause();
-    void stop_video();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
-    bool set_playback_frame(int frame_num);
     void set_speed_multiplier(double mult);
 
     double get_speed_multiplier();
@@ -46,8 +44,8 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
-    void set_contrast(double contrast);
-    void set_brightness(double brightness);
+    void set_contrast(int contrast);
+    void set_brightness(int brightness);
     int get_contrast();
     int get_brightness();
     void toggle_overlay();
@@ -102,9 +100,10 @@ private:
     cv::Mat RGBframe;
 
     int num_frames;
-    unsigned int current_frame = 0;
     unsigned int frame_width;
     unsigned int frame_height;
+    unsigned int qlabel_width;
+    unsigned int qlabel_height;
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
@@ -119,8 +118,8 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
 
-    double alpha = 1; /* Simple contrast control, alpha value [1.0-3.0]. */
-    int beta = 0;     /* Simple brightness control, beta value [0-100]. */
+    int contrast = 0;   /* Value in range [0-255]. */
+    int brightness = 0; /* Value in range [0-255]. */
 
     Overlay* video_overlay;
 };

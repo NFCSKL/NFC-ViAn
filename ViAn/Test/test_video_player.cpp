@@ -32,21 +32,6 @@ void test_video_player::test_load_video() {
 }
 
 /**
- * @brief test_video_player::test_stop_video
- * Tests ONLY the case when the video is paused because if the video
- * is running, the stop related commands are executed on another thread.
- */
-void test_video_player::test_stop_video() {
-    mvideo->video_paused = true;
-    mvideo->video_stopped = false;
-    mvideo->current_frame = 50;
-    mvideo->stop_video();
-    QVERIFY(mvideo->video_stopped == true);
-    QVERIFY(mvideo->current_frame == 0);
-    QVERIFY(mvideo->video_paused == false);
-}
-
-/**
  * @brief test_video_player::test_is_paused
  */
 void test_video_player::test_is_paused() {
@@ -80,37 +65,32 @@ void test_video_player::test_set_frame_height() {
 }
 
 /**
- * @brief test_video_player::test_set_playback_frame
+ * @brief test_video_player::test_set_current_frame
  */
-void test_video_player::test_set_playback_frame() {
-    mvideo->set_playback_frame(100);
-    QVERIFY(mvideo->current_frame == 100);
+void test_video_player::test_set_current_frame() {
+    mvideo->set_current_frame_num(100);
+    QVERIFY(mvideo->get_current_frame_num() == 100);
+    mvideo->set_current_frame_num(10);
+    mvideo->set_current_frame_num(-10);
+    QVERIFY(mvideo->get_current_frame_num() == 10);
 }
 
 /**
  * @brief test_video_player::test_next_frame
- * Currently this method cannot be tested because of thread issues.
  */
 void test_video_player::test_next_frame() {
-    /*
-    mvideo->load_video("seq_01.mp4");
-    mvideo->set_playback_frame(100);
+    mvideo->set_current_frame_num(100);
     mvideo->next_frame();
-    QVERIFY(mvideo->current_frame == 101);
-    */
+    QVERIFY(mvideo->get_current_frame_num() == 101);
 }
 
 /**
  * @brief test_video_player::test_previous_frame
- * Currently this method cannot be tested because of thread issues.
  */
 void test_video_player::test_previous_frame() {
-    /*
-    mvideo->load_video("seq_01.mp4");
-    mvideo->set_playback_frame(100);
+    mvideo->set_current_frame_num(100);
     mvideo->previous_frame();
-    QVERIFY(mvideo->current_frame == 99);
-    */
+    QVERIFY(mvideo->get_current_frame_num() == 99);
 }
 
 /**
@@ -147,6 +127,7 @@ void test_video_player::test_dec_playback_speed(){
  * @brief test_toggle_overlay
  */
 void test_video_player::test_toggle_overlay() {
+    mvideo->on_stop_video();
     mvideo->video_overlay->set_showing_overlay(false);
     mvideo->toggle_overlay();
     QVERIFY(mvideo->is_showing_overlay());
@@ -168,6 +149,57 @@ void test_video_player::test_set_overlay_tool() {
 void test_video_player::test_set_overlay_colour() {
     mvideo->set_overlay_colour(Qt::black);
     QVERIFY(mvideo->video_overlay->get_colour() == Qt::black);
+}
+
+/**
+ * @brief test_video_player::test_set_contrast
+ */
+void test_video_player::test_set_contrast() {
+    // Values should be 0-255
+    mvideo->set_contrast(-10);
+    QVERIFY(mvideo->get_contrast() == 0);
+    mvideo->set_contrast(-0.01);
+    QVERIFY(mvideo->get_contrast() == 0);
+    mvideo->set_contrast(0);
+    QVERIFY(mvideo->get_contrast() == 0);
+    mvideo->set_contrast(1);
+    QVERIFY(mvideo->get_contrast() == 1);
+    mvideo->set_contrast(2);
+    QVERIFY(mvideo->get_contrast() == 2);
+    mvideo->set_contrast(126);
+    QVERIFY(mvideo->get_contrast() == 126);
+    mvideo->set_contrast(254);
+    QVERIFY(mvideo->get_contrast() == 254);
+    mvideo->set_contrast(255);
+    QVERIFY(mvideo->get_contrast() == 255);
+    mvideo->set_contrast(255.1);
+    QVERIFY(mvideo->get_contrast() == 255);
+    mvideo->set_contrast(270);
+    QVERIFY(mvideo->get_contrast() == 255);
+}
+
+void test_video_player::test_set_brightness() {
+    // Values should be 0-255
+    mvideo->set_brightness(-10);
+    QVERIFY(mvideo->get_brightness() == 0);
+    mvideo->set_brightness(-0.01);
+    QVERIFY(mvideo->get_brightness() == 0);
+    mvideo->set_brightness(0);
+    QVERIFY(mvideo->get_brightness() == 0);
+    mvideo->set_brightness(1);
+    QVERIFY(mvideo->get_brightness() == 1);
+    mvideo->set_brightness(2);
+    QVERIFY(mvideo->get_brightness() == 2);
+    mvideo->set_brightness(126);
+    QVERIFY(mvideo->get_brightness() == 126);
+    mvideo->set_brightness(254);
+    QVERIFY(mvideo->get_brightness() == 254);
+    mvideo->set_brightness(255);
+    QVERIFY(mvideo->get_brightness() == 255);
+    mvideo->set_brightness(255.1);
+    QVERIFY(mvideo->get_brightness() == 255);
+    mvideo->set_brightness(270);
+    QVERIFY(mvideo->get_brightness() == 255);
 }
 
 /**
@@ -244,5 +276,6 @@ void test_video_player::test_set_stop_video() {
     mvideo->video_stopped = false;
     mvideo->on_stop_video();
     QVERIFY(!mvideo->video_paused);
+    QVERIFY(mvideo->get_current_frame_num() == 0);
     QVERIFY(mvideo->video_stopped);
 }
