@@ -53,7 +53,7 @@ void Overlay::set_showing_overlay(bool value) {
  * Sets the overlay tool's shape.
  * If the tool is the text-tool the user is prompted
  * to enter a text and a font scale.
- * @param s
+ * @param s New tool to be set.
  */
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
@@ -82,7 +82,7 @@ void Overlay::set_tool(SHAPES s) {
 /**
  * @brief Overlay::set_colour
  * Sets the overlay tool's colour.
- * @param col
+ * @param col New colour to be set.
  */
 void Overlay::set_colour(QColor col) {
     current_colour = col;
