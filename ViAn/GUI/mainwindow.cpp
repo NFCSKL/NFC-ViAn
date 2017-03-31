@@ -9,6 +9,7 @@
 #include "icononbuttonhandler.h"
 #include "inputwindow.h"
 #include "Video/shapes/shape.h"
+#include "Analysis/MotionDetection.h"
 
 using namespace std;
 using namespace cv;
@@ -43,6 +44,11 @@ MainWindow::MainWindow(QWidget *parent) :
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait);
     setup_video_player(mvideo_player);
+
+    // TODO The following code is just here to test.
+    // Remove when a proper implementation exists.
+    MotionDetection *md = new MotionDetection("seq_01.mp4");
+    md->start();
 
     // Initially hide overlay toolbar
     ui->toolBar->hide();
