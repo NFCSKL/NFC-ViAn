@@ -51,7 +51,8 @@ void Overlay::set_showing_overlay(bool value) {
 /**
  * @brief Overlay::set_tool
  * Sets the overlay tool's shape.
- * If the tool is the text-tool the user is prompted to wnter a text.
+ * If the tool is the text-tool the user is prompted
+ * to enter a text and a font scale.
  * @param s
  */
 void Overlay::set_tool(SHAPES s) {
