@@ -14,10 +14,10 @@
 
 #include "opencv2/opencv.hpp"
 
-class overlay {
+class Overlay {
 
 public:
-    overlay();
+    Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
@@ -41,7 +41,7 @@ private:
     QColor current_colour = Qt::red;
     QString current_string = "";
 
-    std::map<int, QList<shape*>> overlays;
+    std::map<int, QList<Shape*>> overlays;
 };
 
 #endif // OVERLAY_H
