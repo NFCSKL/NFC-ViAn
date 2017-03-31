@@ -228,15 +228,35 @@ void test_video_player::test_set_stop_video() {
 }
 
 /**
- * @brief test_video_player::test_on_set_playback_fram
+ * @brief test_video_player::test_on_set_playback_frame_pass
+ * Test on_set_playback_frame with valid inputs
  */
-void test_video_player::test_on_set_playback_fram() {
+void test_video_player::test_on_set_playback_frame_pass() {
     mvideo->video_paused = false;
     mvideo->on_set_playback_frame(100);
     QVERIFY(mvideo->new_frame_num == 100);
-    QVERIFY(mvideo->set_new_frame == true);
+    QVERIFY(mvideo->set_new_frame);
 
     mvideo->video_paused = true;
     mvideo->on_set_playback_frame(100);
     QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == 100);
+}
+
+/**
+ * @brief test_video_player::test_on_set_playback_frame_fail
+ * Test on_set_playback_frame with non valid inputs
+ */
+void test_video_player::test_on_set_playback_frame_fail() {
+    int out_of_bounds = mvideo->get_num_frames() + 100;
+    int test_frames[] = {-100, out_of_bounds};
+    for (int &frame : test_frames) {
+        mvideo->video_paused = false;
+        mvideo->on_set_playback_frame(frame);
+        QVERIFY(mvideo->new_frame_num != frame);
+        QVERIFY(!mvideo->set_new_frame);
+
+        mvideo->video_paused = true;
+        mvideo->on_set_playback_frame(frame);
+        QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) != frame);
+    }
 }

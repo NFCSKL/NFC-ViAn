@@ -35,7 +35,8 @@ private slots:
     void test_set_play_video();
     void test_set_pause_video();
     void test_set_stop_video();
-    void test_on_set_playback_fram();
+    void test_on_set_playback_frame_pass();
+    void test_on_set_playback_frame_fail();
 
 private:
     video_player* mvideo;

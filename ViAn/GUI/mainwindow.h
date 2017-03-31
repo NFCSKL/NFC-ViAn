@@ -40,6 +40,7 @@ public:
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
     const std::string ARROW_STRING = " <--";
+    const int SLIDER_UPDATE_TIMER = 200;
 
     // Lock and wait condition to sleep player when video is paused
     QMutex mutex;
@@ -86,7 +87,7 @@ private slots:
 
     void on_videoSlider_sliderReleased();
 
-    void on_videoSlider_valueChanged(int newPos);
+    void on_videoSlider_valueChanged(int new_pos);
 
     void on_actionAddProject_triggered();
 
@@ -144,9 +145,6 @@ private:
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
 
-    int posCounter = 0;
-    int changeCounter = 0;
-
     std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
                 std::chrono::system_clock::now().time_since_epoch()
             );
@@ -168,6 +166,8 @@ private:
 
     MyQTreeWidgetItem *selectedProject;
     MyQTreeWidgetItem *selectedVideo;
+    void on_slider_moving();
+    void on_slider_click(int new_pos, QPoint local_mouse_pos);
 };
 
 #endif // MAINWINDOW_H
