@@ -11,7 +11,7 @@
 #include "shapes/pen.h"
 #include "shapes/text.h"
 #include "shapes/zoomrectangle.h"
-
+#include "Library/customdialog.h"
 #include "opencv2/opencv.hpp"
 
 class Overlay {
@@ -39,7 +39,8 @@ private:
 
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;
-    QString current_string = "";
+    QString current_string = "Enter text";
+    float current_font_scale = 1;
 
     std::map<int, QList<Shape*>> overlays;
 };
