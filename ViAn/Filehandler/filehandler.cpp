@@ -227,9 +227,12 @@ FH_ERROR FileHandler::delete_project(Project* proj){
 ID FileHandler::add_video(Project* proj, std::string filePath){
     Video* v = new Video(filePath);
     return proj->add_video(v); // video id set in proj->add_video
-  //  return this->add_file(filePath);
 }
-
+/**
+ * @brief FileHandler::remove_video
+ * @param proj_id
+ * @param vid_id
+ */
 void FileHandler::remove_video(ID proj_id, ID vid_id){
     Project* proj = this->get_project(proj_id);
     proj->remove_video(vid_id);
@@ -280,7 +283,7 @@ ID FileHandler::create_file(std::string filename, ID dirID){
         return; // no open file
         break;
     }
-    if(f.is_open()) f << text.c_str() << std::endl;
+    if(f.is_open()) f << text.c_str();
  }
 
  /**
