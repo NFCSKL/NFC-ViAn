@@ -120,7 +120,7 @@ void MainWindow::on_playPauseButton_clicked() {
         // Video thread is paused. Notifying the waitcondition to resume playback
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
@@ -150,7 +150,7 @@ void MainWindow::on_stopButton_clicked() {
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     } else {
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
     }
     emit set_stop_video();
 }
@@ -617,7 +617,7 @@ void MainWindow::on_actionLoad_triggered() {
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
-        set_status_bar("Project " + loadProj->m_name + " loaded.");
+        set_status_bar("Project " + loadProj->name + " loaded.");
     }
 }
 
@@ -627,12 +627,12 @@ void MainWindow::on_actionLoad_triggered() {
  * also adds all videos of the project to the tree
  */
 void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
-    projectInTree->setText(0, QString::fromStdString(proj->m_name));
+    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
+    projectInTree->setText(0, QString::fromStdString(proj->name));
     ui->ProjectTree->addTopLevelItem(projectInTree);
     ui->ProjectTree->clearSelection();
     projectInTree->setSelected(true);
-    for(Video *v: proj->m_videos) {
+    for(Video *v: proj->videos) {
         std::stringstream filePath;
         filePath << *v;
         std::string treeName = filePath.str();
