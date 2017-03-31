@@ -190,7 +190,7 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  * Update the slider to where the mouse is
  * @param newPos current position of the slider
  */
-void MainWindow::on_videoSlider_valueChanged(int newPos){
+void MainWindow::on_videoSlider_valueChanged(int newPos) {
     // Make slider to follow the mouse directly and not by pageStep steps
     Qt::MouseButtons btns = QApplication::mouseButtons();
     QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
@@ -198,14 +198,12 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
                          (localMousePos.x() >= 0 && localMousePos.y() >= 0 &&
                           localMousePos.x() < ui->videoSlider->size().width() &&
                           localMousePos.y() < ui->videoSlider->size().height());
-    if (clickOnSlider)
-    {
+    if (clickOnSlider) {
         // Attention! The following works only for Horizontal, Left-to-right sliders
         float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
         int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
         int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
-        if (sliderPosUnderMouse != newPos)
-        {
+        if (sliderPosUnderMouse != newPos) {
             ui->videoSlider->setValue(sliderPosUnderMouse);
             return;
         }
@@ -217,7 +215,7 @@ void MainWindow::on_videoSlider_valueChanged(int newPos){
  * asks if you are sure you want to quit.
  * @param event closing
  */
-void MainWindow::closeEvent (QCloseEvent *event){
+void MainWindow::closeEvent (QCloseEvent *event) {
     set_status_bar("Closing");
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Exit",
                                                                 tr("Are you sure you want to quit?\n"),
@@ -235,7 +233,7 @@ void MainWindow::closeEvent (QCloseEvent *event){
  * @brief MainWindow::on_actionExit_triggered
  * sends a closeEvent when you press exit
  */
-void MainWindow::on_actionExit_triggered(){
+void MainWindow::on_actionExit_triggered() {
     this->close();
 }
 
@@ -243,7 +241,7 @@ void MainWindow::on_actionExit_triggered(){
  * @brief MainWindow::on_bookmarkButton_clicked
  * the button supposed to add a bookmark
  */
-void MainWindow::on_bookmarkButton_clicked(){
+void MainWindow::on_bookmarkButton_clicked() {
 }
 
 /**
@@ -263,25 +261,23 @@ void MainWindow::on_actionAddProject_triggered() {
  */
 void MainWindow::input_switch_case(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
-    switch(action){
-        case ADD_PROJECT: {
-            Project* proj = fileHandler->create_project(input);
-            add_project_to_tree(proj);
-            set_status_bar("Project " + input + " created.");
-            delete inputWindow;
-            break;
-        }
-        case CANCEL: {
+    switch(action) {
+    case ADD_PROJECT: {
+        Project* proj = fileHandler->create_project(input);
+        add_project_to_tree(proj);
+        set_status_bar("Project " + input + " created.");
+        delete inputWindow;
+        break;
+    }
+    case CANCEL:
             set_status_bar("Cancel");
             delete inputWindow;
             break;
-        }
-        case ADD_VIDEO: {
+    case ADD_VIDEO:
             add_video_to_tree(input);
             set_status_bar("Video " + input + " added.");
             break;
-        }
-        default:
+    default:
             break;
     }
 }
@@ -304,11 +300,11 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
  */
 void MainWindow::on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column) {
     MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
-    switch(q_item->type){
+    switch(q_item->type) {
     case TYPE::PROJECT:
-        if (item->isExpanded()){
+        if (item->isExpanded()) {
             item->setExpanded(true);
-        }else{
+        } else {
             item->setExpanded(false);
         }
         break;
@@ -477,9 +473,7 @@ void MainWindow::on_actionZoom_out_triggered() {
  */
 void MainWindow::prepare_menu(const QPoint & pos) {
     QTreeWidget *tree = ui->ProjectTree;
-
     MyQTreeWidgetItem *item = (MyQTreeWidgetItem*)tree->itemAt( pos );
-
     QMenu menu(this);
 
     if(item == nullptr) {
@@ -523,14 +517,14 @@ void MainWindow::on_actionAddVideo_triggered() {
     QTreeWidgetItem *project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if (!project->parent()){
+        if (!project->parent()) {
             QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), WORKSPACE,
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
                 input_switch_case(ACTION::ADD_VIDEO, dir);
             }
-        }else{
-            set_status_bar("No project selected.");
+        } else {
+            //set_status_bar("No project selected.");
         }
     } else {
         set_status_bar("Multiple or no projects selected.");
@@ -562,15 +556,15 @@ void MainWindow::on_actionSave_triggered() {
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if (!project->parent()){
-            my_project = (MyQTreeWidgetItem*)project;
-        }else if (project->parent()){
-            my_project = (MyQTreeWidgetItem*)project->parent();
+
+        while (project->parent()){
+            project = project->parent();
         }
+        my_project = (MyQTreeWidgetItem*)project;
         this->fileHandler->save_project(my_project->id);
         std::string text = "Saved project " + my_project->name.toStdString();
         set_status_bar(text);
-    }else {
+    } else {
         set_status_bar("Nothing to save");
     }
 }
@@ -634,7 +628,7 @@ void MainWindow::on_actionDeleteProject_triggered() {
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if (!project->parent()){
+        if (!project->parent()) {
             QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
                                                                         tr("Are you sure you want to delete the selected project?\n"),
                                                                         QMessageBox::No | QMessageBox::Yes,
@@ -645,10 +639,10 @@ void MainWindow::on_actionDeleteProject_triggered() {
                 this->fileHandler->delete_project(fileHandler->get_project(my_project->id));
                 remove_selected_project_from_tree();
             }
-        }else{
+        } else {
             set_status_bar("No project selected to remove.");
         }
-    }else{
+    } else {
         set_status_bar("Multiple or no projects selected.");
     }
 }
@@ -663,7 +657,7 @@ void MainWindow::on_actionDeleteVideo_triggered() {
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if (project->parent()){
+        if (project->parent()) {
             QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
                                                                         tr("Are you sure you want to delete the selected video?\n"),
                                                                         QMessageBox::No | QMessageBox::Yes,
@@ -674,10 +668,10 @@ void MainWindow::on_actionDeleteVideo_triggered() {
                 //this->fileHandler->delete_project(fileHandler->get_project(my_project->id));
                 remove_video_from_tree(my_project);
             }
-        }else{
+        } else {
             set_status_bar("No video selected to remove.");
         }
-    }else{
+    } else {
         set_status_bar("Multiple or no videos selected.");
     }
 }
@@ -713,7 +707,7 @@ void MainWindow::toggle_toolbar() {
     if(mvideo_player->is_showing_overlay()) {
         ui->toolBar_no_overlay->hide();
         ui->toolBar->show();
-    }else {
+    } else {
         ui->toolBar->hide();
         ui->toolBar_no_overlay->show();
     }
