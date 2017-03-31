@@ -83,11 +83,7 @@ void FileHandler::save_project(ID id){
 void FileHandler::save_project(Project* proj){
     std::string proj_file = proj->name + std::string(".txt"); //filename
     if(!proj->saved){
-<<<<<<< HEAD
-        ID dir_id = create_directory(std::string(WORKSPACE) + "/"+ proj->name);//project directory
-=======
-        ID dirID = create_directory(std::string(work_space) + proj->m_name);//project directory
->>>>>>> master
+        ID dir_id = create_directory(std::string(work_space) + proj->name);//project directory
 
         proj->files->dir = dir_id;
 
