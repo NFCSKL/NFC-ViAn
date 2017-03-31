@@ -69,7 +69,7 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @param id
  */
 void FileHandler::save_project(ID id){
-    save_project(get_project(id)); // get project and
+    save_project(get_project(id)); // get project and save it
 }
 
 /**
