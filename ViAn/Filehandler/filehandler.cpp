@@ -399,8 +399,7 @@ ID FileHandler::add_dir(std::string dirpath){
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
     bool videoEquals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
-               [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return v.first == v2.first &&
-                                                                               *(v.second) == *(v2.second);}); // lambda function comparing using video==
+               [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
     return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
            proj.m_name == proj2.m_name &&
