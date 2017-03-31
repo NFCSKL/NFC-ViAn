@@ -765,3 +765,40 @@ void MainWindow::enable_video_buttons() {
     ui->previousFrameButton->setEnabled(true);
     ui->stopButton->setEnabled(true);
 }
+
+/**
+ * @brief MainWindow::on_actionContrast_Brightness_triggered
+ * Opens a window to choose contrast and brightness in.
+ */
+void MainWindow::on_actionContrast_Brightness_triggered() {
+    float contrast = mvideo_player->get_contrast();
+    int brightness = mvideo_player->get_brightness();
+
+    // Create the texts shown in the dialog
+    std::stringstream contrast_ss;
+    contrast_ss << "Contrast [" << mvideo_player->CONTRAST_MIN << " – " << mvideo_player->CONTRAST_MAX <<
+                   "] (default: "<< mvideo_player->CONTRAST_DEFAULT <<"): ";
+    QString contrast_text = QString::fromStdString(contrast_ss.str());
+    std::stringstream brightness_ss;
+    brightness_ss << "Brightness [" << mvideo_player->BRIGHTNESS_MIN << " – " << mvideo_player->BRIGHTNESS_MAX <<
+                     "] (default: "<< mvideo_player->BRIGHTNESS_DEFAULT <<"): ";
+    QString brightness_text = QString::fromStdString(brightness_ss.str());
+
+    // Create the dialog
+    CustomDialog dialog("Contrast & Brightness", this);
+    dialog.addLabel("Enter values:");
+    dialog.addDblSpinBoxF(contrast_text, (float) mvideo_player->CONTRAST_MIN, (float) mvideo_player->CONTRAST_MAX,
+                          &contrast, mvideo_player->CONTRAST_DECIMALS, (float) mvideo_player->CONTRAST_STEP,
+                          "Choose contrast value with the input box.");
+    dialog.addSpinBox(brightness_text, mvideo_player->BRIGHTNESS_MIN, mvideo_player->BRIGHTNESS_MAX,
+                      &brightness, mvideo_player->BRIGHTNESS_STEP, "Choose brightness value with the input box.");
+
+    // Show the dialog (execution will stop here until the dialog is finished)
+    dialog.exec();
+
+    if (dialog.wasCancelled()) {
+        return;
+    }
+    mvideo_player->set_contrast(contrast);
+    mvideo_player->set_brightness(brightness);
+}
