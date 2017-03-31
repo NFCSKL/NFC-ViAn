@@ -6,8 +6,10 @@
 typedef int ID;
 class Video
 {
+
 public:
     Video();
+    ID id;
     Video(std::string file_path);
     std::string file_path;
     friend std::stringstream& operator>>(std::stringstream& is, Video& vid);

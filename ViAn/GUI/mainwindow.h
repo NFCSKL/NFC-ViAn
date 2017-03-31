@@ -141,13 +141,15 @@ private:
 
     void setup_video_player(video_player *mplayer);
     void add_project_to_tree(Project* proj);
-    void add_video_to_tree(std::string filePath);
+
+    void add_video_to_tree(string file_path, ID id);
 
     void remove_selected_project_from_tree();
     void remove_video_from_tree(MyQTreeWidgetItem *my_video);
 
     void toggle_toolbar();
     void enable_video_buttons();
+    QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
 };
 
 #endif // MAINWINDOW_H
