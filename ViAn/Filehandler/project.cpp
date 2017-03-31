@@ -23,6 +23,15 @@ Project::Project(){
     this->v_id = 0;
     this->videos.clear();
 }
+/**
+ * @brief Project::~Project
+ * Clears contents of video map
+ */
+Project::~Project(){
+    for (auto vidIt = this->videos.begin(); vidIt != this->videos.end(); ++vidIt) {
+        delete vidIt->second;
+    }
+}
 
 /**
  * @brief Project::remove_video
@@ -68,7 +77,7 @@ ProjectStream& operator>>(ProjectStream& ps, Project& proj){
         ps.videos >> *v;
         temp.push_back(v);
     }
-    for (auto vidIt = temp.rbegin(); vidIt < temp.rend(); ++vidIt) {  // to preserve order we add videos in reverse
+    for (auto vidIt = temp.rbegin(); vidIt != temp.rend(); ++vidIt) {  // to preserve order we add videos in reverse
         proj.add_video(*vidIt);
     }
     return ps;

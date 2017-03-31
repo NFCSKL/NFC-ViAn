@@ -212,9 +212,11 @@ FH_ERROR FileHandler::delete_project(Project* proj){
     delete_file(pf->f_videos);
     delete_file(pf->f_analysis);
     delete_file(pf->f_drawings);
-    return delete_directory(proj->files->dir);
-
+    FH_ERROR err = delete_directory(proj->files->dir);
+    delete proj;
+    return err;
 }
+
 /**
  * @todo make threadsafe
  * @brief FileHandler::add_video

@@ -55,6 +55,7 @@ public:
     Project();
     Project(ID id, std::string name);
     Project(std::string dirpath);
+    ~Project();
     ID add_video(Video *vid);
     void remove_video(ID id);
     // read and write operator for Projects
