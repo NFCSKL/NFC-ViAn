@@ -36,6 +36,7 @@ Project::~Project(){
 /**
  * @brief Project::remove_video
  * @param id
+ * Remove video from videos and delete its contents.
  */
 void Project::remove_video(ID id){
     Video* temp = this->videos.at(id);
@@ -46,7 +47,7 @@ void Project::remove_video(ID id){
 
 /**
  * @brief Project::add_video
- * @return
+ * @return Video ID to be used for identifying the video
  */
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
