@@ -152,6 +152,15 @@ void test_video_player::test_set_overlay_colour() {
 }
 
 /**
+ * @brief test_video_player::test_reset_brightness_contrast
+ */
+void test_video_player::test_reset_brightness_contrast() {
+    mvideo->reset_brightness_contrast();
+    QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_DEFAULT);
+    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_DEFAULT);
+}
+
+/**
  * @brief test_video_player::test_set_contrast
  */
 void test_video_player::test_set_contrast() {
@@ -163,6 +172,8 @@ void test_video_player::test_set_contrast() {
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MIN);
     mvideo->set_contrast(mvideo->CONTRAST_MIN + 0.1);
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MIN + 0.1);
+    mvideo->set_contrast(mvideo->CONTRAST_DEFAULT);
+    QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_DEFAULT);
     mvideo->set_contrast(mvideo->CONTRAST_MAX - 0.1);
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MAX - 0.1);
     mvideo->set_contrast(mvideo->CONTRAST_MAX);
@@ -172,15 +183,17 @@ void test_video_player::test_set_contrast() {
     mvideo->set_contrast(mvideo->CONTRAST_MAX + 10);
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MAX);
 
-    // Values should be doubles 0.0 to 5.0
+    // Values should be doubles 0.5 to 5.0
     mvideo->set_contrast(-10);
-    QVERIFY(mvideo->get_contrast() == 0);
-    mvideo->set_contrast(-0.01);
-    QVERIFY(mvideo->get_contrast() == 0);
+    QVERIFY(mvideo->get_contrast() == 0.5);
     mvideo->set_contrast(0);
-    QVERIFY(mvideo->get_contrast() == 0);
-    mvideo->set_contrast(0.1);
-    QVERIFY(mvideo->get_contrast() == 0.1);
+    QVERIFY(mvideo->get_contrast() == 0.5);
+    mvideo->set_contrast(0.49);
+    QVERIFY(mvideo->get_contrast() == 0.5);
+    mvideo->set_contrast(0.5);
+    QVERIFY(mvideo->get_contrast() == 0.5);
+    mvideo->set_contrast(0.51);
+    QVERIFY(mvideo->get_contrast() == 0.51);
     mvideo->set_contrast(1);
     QVERIFY(mvideo->get_contrast() == 1);
     mvideo->set_contrast(2);
@@ -207,6 +220,8 @@ void test_video_player::test_set_brightness() {
     QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
     mvideo->set_brightness(mvideo->BRIGHTNESS_MIN + 1);
     QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN + 1);
+    mvideo->set_brightness(mvideo->BRIGHTNESS_DEFAULT);
+    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_DEFAULT);
     mvideo->set_brightness(mvideo->BRIGHTNESS_MAX - 1);
     QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX - 1);
     mvideo->set_brightness(mvideo->BRIGHTNESS_MAX);

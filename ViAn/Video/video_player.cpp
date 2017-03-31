@@ -360,10 +360,12 @@ void video_player::update_overlay() {
  * Resets contrast and brightness to default values.
  */
 void video_player::reset_brightness_contrast() {
-    alpha = 1;
-    beta = 0;
-    convert_frame();
-    show_frame();
+    alpha = CONTRAST_DEFAULT;
+    beta = BRIGHTNESS_DEFAULT;
+    if (capture.isOpened()) {
+        convert_frame();
+        show_frame();
+    }
 }
 
 /**
@@ -374,8 +376,10 @@ void video_player::reset_brightness_contrast() {
  */
 void video_player::set_contrast(double contrast) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
-    convert_frame();
-    show_frame();
+    if (capture.isOpened()) {
+        convert_frame();
+        show_frame();
+    }
 }
 
 /**
@@ -386,8 +390,10 @@ void video_player::set_contrast(double contrast) {
  */
 void video_player::set_brightness(int brightness) {
     beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
-    convert_frame();
-    show_frame();
+    if (capture.isOpened()) {
+        convert_frame();
+        show_frame();
+    }
 }
 
 /**

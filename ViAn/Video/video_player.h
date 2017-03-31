@@ -66,10 +66,11 @@ public:
     const double MIN_SPEED_MULT = 1.0/16;
     const double DEFAULT_SPEED_MULT = 1;
     const double SPEED_STEP_MULT = 2;
+
     // Constants for the limits and the precision of contrast and brightness values.
-    double CONTRAST_MIN = 0, CONTRAST_MAX = 5, CONTRAST_STEP = 0.01;
-    int CONTRAST_DECIMALS = 2;
-    int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_STEP = 1;
+    const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
+    const int CONTRAST_DECIMALS = 2;
+    const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
 
 signals:
     void processed_image(const QImage &image);

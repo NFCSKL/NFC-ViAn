@@ -30,6 +30,7 @@ private slots:
     void test_toggle_overlay();
     void test_set_overlay_tool();
     void test_set_overlay_colour();
+    void test_reset_brightness_contrast();
     void test_set_contrast();
     void test_set_brightness();
     void test_video_open();
