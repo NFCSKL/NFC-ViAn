@@ -129,7 +129,7 @@ private:
     // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
     int beta = 0;
 
-    Overlay* video_overlay;
+    Overlay* video_overlay = new Overlay();
 };
 
 #endif // VIDEO_PLAYER_H

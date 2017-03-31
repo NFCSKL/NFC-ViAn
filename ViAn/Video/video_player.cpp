@@ -15,7 +15,6 @@ using namespace cv;
  * @param parent
  */
 video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
-    video_overlay = new Overlay();
     m_mutex = mutex;
     m_paused_wait = paused_wait;
 }
@@ -25,6 +24,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete video_overlay;
+    delete zoom_area;
     capture.release();
 }
 
