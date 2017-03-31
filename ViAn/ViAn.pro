@@ -31,21 +31,26 @@ HEADERS += Test/test_video_player.h \
 
 
 #
+# LIBRARY
+#
+SOURCES += Library/customdialog.cpp
+HEADERS += Library/customdialog.h
+
+
+#
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
     GUI/inputwindow.cpp \
-    GUI/qtreeitems.cpp \
-    GUI/customdialog.cpp
+    GUI/qtreeitems.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/inputwindow.h \
     GUI/action.h \
-    GUI/qtreeitems.h \
-    GUI/customdialog.h
+    GUI/qtreeitems.h
 
 
 FORMS    += GUI/mainwindow.ui \

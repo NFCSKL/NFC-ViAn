@@ -7,7 +7,7 @@
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
-#include "customdialog.h"
+#include "Library/customdialog.h"
 #include "Video/video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
