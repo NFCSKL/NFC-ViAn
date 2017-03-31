@@ -25,7 +25,6 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete video_overlay;
-    delete zoom_area;
     delete analysis_area;
     capture.release();
 }
