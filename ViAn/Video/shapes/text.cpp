@@ -4,6 +4,8 @@
  * @brief Text::Text
  * @param col Colour of the new object
  * @param pos Starting point for the new object
+ * @param strng String to be displayed
+ * @param fnt_scl Font scale of the string
  */
 Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(col, pos) {
     string = strng;
