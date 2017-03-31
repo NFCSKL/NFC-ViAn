@@ -647,7 +647,7 @@ void MainWindow::on_actionLoad_triggered() {
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
-        set_status_bar("Project " + loadProj->m_name + " loaded.");
+        set_status_bar("Project " + loadProj->name + " loaded.");
     }
 }
 
@@ -657,12 +657,11 @@ void MainWindow::on_actionLoad_triggered() {
  * also adds all videos of the project to the tree
  */
 void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
-    projectInTree->setText(0, QString::fromStdString(proj->m_name));
+    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
+    projectInTree->setText(0, QString::fromStdString(proj->name));
     set_selected_project(projectInTree);
     ui->ProjectTree->addTopLevelItem(projectInTree);
-    for(auto video_it = proj->videos.begin(); video_it != proj->videos.end(); ++video_it) {
-        Video* v = (*video_it).second;
+    for(Video *v: proj->videos) {
         std::stringstream filePath;
         filePath << *v;
         cout << filePath.str() << endl;

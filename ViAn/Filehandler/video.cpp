@@ -5,15 +5,16 @@
 Video::Video()
 {
     this->id = -1;
-    this->filepath = "";
+    this->file_path = "";
 }
 /**
  * @brief Video::Video
  * @param id
  * @param filepath
  */
-Video::Video(std::string filepath){
-    this->filepath = filepath;
+Video::Video(std::string file_path){
+    this->file_path = file_path;
+    this->id = -1;
 }
 /**
  * @brief operator >>
@@ -21,8 +22,8 @@ Video::Video(std::string filepath){
  * @param vid
  * @return stringstream
  */
-std::stringstream& operator>>(std::stringstream& is, Video& vid){
-    is >> vid.filepath;  
+std::stringstream& operator>>(std::stringstream& is, Video& vid){    
+    is >> vid.file_path;
     return is;
 }
 /**
@@ -32,7 +33,7 @@ std::stringstream& operator>>(std::stringstream& is, Video& vid){
  * @return used for writing project to file
  */
 std::stringstream& operator<<(std::stringstream& os, const Video& vid){
-    os << vid.filepath.c_str() << " ";
+    os << vid.file_path.c_str() << " ";
     return os;
 }
 /**
@@ -42,5 +43,5 @@ std::stringstream& operator<<(std::stringstream& os, const Video& vid){
  * @return if videos the same TRUE
  */
 bool operator==(Video v1, Video v2){
-    return v1.filepath == v2.filepath;
+    return v1.file_path == v2.file_path;
 }
