@@ -789,9 +789,9 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
     dialog.addLabel("Enter values:");
     dialog.addDblSpinBoxF(contrast_text, (float) mvideo_player->CONTRAST_MIN, (float) mvideo_player->CONTRAST_MAX,
                           &contrast, mvideo_player->CONTRAST_DECIMALS, (float) mvideo_player->CONTRAST_STEP,
-                          "Choose contrast value.");
+                          "Choose contrast value with the input box.");
     dialog.addSpinBox(brightness_text, mvideo_player->BRIGHTNESS_MIN, mvideo_player->BRIGHTNESS_MAX,
-                      &brightness, mvideo_player->BRIGHTNESS_STEP, "Choose brightness value.");
+                      &brightness, mvideo_player->BRIGHTNESS_STEP, "Choose brightness value with the input box.");
 
     // Show the dialog (execution will stop here until the dialog is finished)
     dialog.exec();
