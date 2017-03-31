@@ -563,7 +563,7 @@ void MainWindow::on_actionAddVideo_triggered() {
                 input_switch_case(ACTION::ADD_VIDEO, dir);
             }
         } else {
-            //set_status_bar("No project selected.");
+            set_status_bar("No project selected.");
         }
     } else {
         set_status_bar("Multiple or no projects selected.");
