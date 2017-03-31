@@ -73,16 +73,16 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @param id
  */
 void FileHandler::save_project(ID id){
-    save_project(get_project(id));
+    save_project(get_project(id)); // get project and
 }
 
 /**
  * @todo unfinished, needs full project structure
- * and program to file parser to finish
+ * And program to file parser to finish
  * @brief FileHandler::save_project
  * @param Project* name
- * Creates project and associated files.
  * @return void
+ * Creates project and associated files.
  */
 void FileHandler::save_project(Project* proj){
     std::string projFile = proj->m_name + std::string(".txt"); //filename
@@ -119,29 +119,25 @@ void FileHandler::save_project(Project* proj){
 void FileHandler::update_proj_files(Project* proj){
     ProjectStream ps;
     ps << *proj;
-
     write_file(proj->files->f_proj, ps.projFile.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_videos, ps.videos.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
 }
-void FileHandler::load_proj_files(std::string str){
-    ID id;
-    std::string filepath;
-    std::stringstream sstr;
-    sstr << str;    
-    //read files until empty
-    while(sstr >> id >> filepath){
-        add_file(id, filepath);
-    }
-}
 
 /**
  * @brief FileHandler::load_project
  * @param dirpath
- * @return
+ * @return fully loaded project
+ *
+ * Split project full path "C:/this/is/an/example/project/project.txt"
+ * into
+ * dirpath = "C:/this/is/an/example/project/
+ * proj_name = project
+ * Then call load with identified project
  */
 Project* FileHandler::load_project(std::string fullProjectPath){
+
     std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
     std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
     proj_name = proj_name.substr(0, proj_name.find(".txt"));
@@ -155,6 +151,8 @@ Project* FileHandler::load_project(std::string fullProjectPath){
  * @param projname
  * @param dirpath
  * @return project
+ *
+ * Loads a project from file,
  */
 Project* FileHandler::load_project(std::string projname, std::string dirpath){
     Project* proj = new Project();
@@ -186,10 +184,11 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
 
 /**
  * @brief FileHandler::load_project_file
- * help function for load_project
  * @param filePath
  * @param projFileStream
  * @return ID
+ *
+ * Help function for load_project
  */
 ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
     std::string buf;
@@ -201,10 +200,10 @@ ID FileHandler::load_project_file(std::string filePath, std::stringstream& projF
 
 /**
  * @brief FileHandler::delete_project
- * Deletes project, its associated files and contents.
- * OBS! This operation is as of now irreversible
  * @param Project*
  * @return FH_ERROR errorcode
+ * Deletes project, its associated files and contents.
+ * OBS! This operation is as of now irreversible
  */
 FH_ERROR FileHandler::delete_project(Project* proj){
     ProjFiles* pf = proj->files;
@@ -230,15 +229,18 @@ ID FileHandler::add_video(Project* proj, std::string filePath){
     Video* v = new Video(filePath);
     return proj->add_video(v); // video id set in proj->add_video
 }
+
 /**
- * @brief FileHandler::remove_video
+ * @brief FileHandler::remove_video_from_project
  * @param proj_id
  * @param vid_id
+ * Removes video from project according to given ids.
  */
-void FileHandler::remove_video(ID proj_id, ID vid_id){
-    Project* proj = this->get_project(proj_id);
-    proj->remove_video(vid_id);
+void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
+    Project* proj = this->get_project(proj_id); // get Project object from id
+    proj->remove_video(vid_id); // Remove ´the video from project
 }
+
  /**
   * @brief FileHandler::create_file
   * create a file by given name in already excisting
