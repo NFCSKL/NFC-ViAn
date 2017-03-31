@@ -760,19 +760,20 @@ void MainWindow::toggle_toolbar() {
 
 /**
  * @brief MainWindow::on_actionDeleteVideo_triggered
+ * Removes video from a project, in both project tree and filehandler
  */
 void MainWindow::on_actionDeleteVideo_triggered()
 {
     if(selectedVideo != nullptr) {
-        MyQTreeWidgetItem *project = (MyQTreeWidgetItem*)selectedVideo->parent();
+        MyQTreeWidgetItem *project = (MyQTreeWidgetItem*)selectedVideo->parent(); // Get the actual tree project
         QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
                                                                     tr(("Are you sure you want to remove the selected video from " + project->name.toStdString() + "?\n").c_str()),
                                                                     QMessageBox::No | QMessageBox::Yes,
-                                                                    QMessageBox::No);
+                                                                    QMessageBox::No); // Display messagebox
 
         if (resBtn == QMessageBox::Yes) {
-            fileHandler->remove_video(project->id, selectedVideo->id);
-            remove_video_from_tree(selectedVideo);
+            fileHandler->remove_video_from_project(project->id, selectedVideo->id); // Remove video from project
+            remove_video_from_tree(selectedVideo); //Remove video from tree
         }
     } else {
         set_status_bar("No selected video to remove.");
