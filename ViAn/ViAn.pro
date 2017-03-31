@@ -57,22 +57,22 @@ RESOURCES += resources.qrc
 #
 SOURCES += Video/video_player.cpp \
     Video/overlay.cpp \
-    Video/shapes/shape.cpp \
-    Video/shapes/rectangle.cpp \
-    Video/shapes/circle.cpp \
     Video/shapes/arrow.cpp \
+    Video/shapes/circle.cpp \
     Video/shapes/line.cpp \
     Video/shapes/pen.cpp \
+    Video/shapes/rectangle.cpp \
+    Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
-    Video/shapes/shape.h \
-    Video/shapes/rectangle.h \
-    Video/shapes/circle.h \
     Video/shapes/arrow.h \
+    Video/shapes/circle.h \
     Video/shapes/line.h \
     Video/shapes/pen.h \
+    Video/shapes/rectangle.h \
+    Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h
 win32 {

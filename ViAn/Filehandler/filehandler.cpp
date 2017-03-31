@@ -8,7 +8,24 @@ FileHandler::FileHandler() {
     this->file_id = 0;
     this->dir_id = 0;
     this->last_error = 0;
+    #ifdef _WIN32
+        this->work_space = "C:/";
+    #elif __APPLE__
+        this->work_space = "/Applications/";
+    #elif __unix__
+        this->work_space = "~/";
+    #endif
 
+    //ID id = add_file("ViAn_config.txt"); Will be used to store current workspace and other run-to-run coonstans
+}
+/**
+ * @todo save workspace to file
+ * @brief FileHandler::set_workspace
+ * @param newWorkSpace
+ */
+void FileHandler::set_workspace(std::string new_work_space){
+    this->work_space = new_work_space;
+    //save_workspace();
 }
 
 /**
@@ -66,7 +83,11 @@ void FileHandler::save_project(ID id){
 void FileHandler::save_project(Project* proj){
     std::string proj_file = proj->name + std::string(".txt"); //filename
     if(!proj->saved){
+<<<<<<< HEAD
         ID dir_id = create_directory(std::string(WORKSPACE) + "/"+ proj->name);//project directory
+=======
+        ID dirID = create_directory(std::string(work_space) + proj->m_name);//project directory
+>>>>>>> master
 
         proj->files->dir = dir_id;
 
@@ -265,7 +286,7 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
   *  @return voi
   */
  void FileHandler::read_file(ID id,  std::string& buf, int lines_to_read){
-     std::ifstream f(this->get_file(id));
+     std::ifstream f(this->get_file(id), std::ios::in);
      std::string temp;
      if(f.is_open()){
          while(lines_to_read-- && std::getline(f, temp)){
@@ -358,7 +379,6 @@ ID FileHandler::add_dir(std::string dir_path){
     this->dir_map_lock.unlock();
     return this->dir_id++;
  }
-
 /**
  * @brief FileHandler::proj_equals
  * @param proj
