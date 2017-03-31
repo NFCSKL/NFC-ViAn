@@ -171,11 +171,13 @@ void test_video_player::test_set_contrast() {
     mvideo->set_contrast(mvideo->CONTRAST_MIN);
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MIN);
     mvideo->set_contrast(mvideo->CONTRAST_MIN + 0.1);
-    QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MIN + 0.1);
+    double near_min = mvideo->CONTRAST_MIN + 0.1;
+    QVERIFY(mvideo->get_contrast() == near_min);
     mvideo->set_contrast(mvideo->CONTRAST_DEFAULT);
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_DEFAULT);
     mvideo->set_contrast(mvideo->CONTRAST_MAX - 0.1);
-    QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MAX - 0.1);
+    double near_max = mvideo->CONTRAST_MAX - 0.1;
+    QVERIFY(mvideo->get_contrast() == near_max);
     mvideo->set_contrast(mvideo->CONTRAST_MAX);
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MAX);
     mvideo->set_contrast(mvideo->CONTRAST_MAX + 0.01);
@@ -184,28 +186,34 @@ void test_video_player::test_set_contrast() {
     QVERIFY(mvideo->get_contrast() == mvideo->CONTRAST_MAX);
 
     // Values should be doubles 0.5 to 5.0
+    double test05 = 0.5;
+    double test051 = 0.51;
+    double test1 = 1;
+    double test2 = 2;
+    double test499 = 4.99;
+    double test5 = 5;
     mvideo->set_contrast(-10);
-    QVERIFY(mvideo->get_contrast() == 0.5);
+    QVERIFY(mvideo->get_contrast() == test05);
     mvideo->set_contrast(0);
-    QVERIFY(mvideo->get_contrast() == 0.5);
+    QVERIFY(mvideo->get_contrast() == test05);
     mvideo->set_contrast(0.49);
-    QVERIFY(mvideo->get_contrast() == 0.5);
+    QVERIFY(mvideo->get_contrast() == test05);
     mvideo->set_contrast(0.5);
-    QVERIFY(mvideo->get_contrast() == 0.5);
+    QVERIFY(mvideo->get_contrast() == test05);
     mvideo->set_contrast(0.51);
-    QVERIFY(mvideo->get_contrast() == 0.51);
+    QVERIFY(mvideo->get_contrast() == test051);
     mvideo->set_contrast(1);
-    QVERIFY(mvideo->get_contrast() == 1);
+    QVERIFY(mvideo->get_contrast() == test1);
     mvideo->set_contrast(2);
-    QVERIFY(mvideo->get_contrast() == 2);
+    QVERIFY(mvideo->get_contrast() == test2);
     mvideo->set_contrast(4.99);
-    QVERIFY(mvideo->get_contrast() == 4.99);
+    QVERIFY(mvideo->get_contrast() == test499);
     mvideo->set_contrast(5);
-    QVERIFY(mvideo->get_contrast() == 5);
+    QVERIFY(mvideo->get_contrast() == test5);
     mvideo->set_contrast(5.01);
-    QVERIFY(mvideo->get_contrast() == 5);
+    QVERIFY(mvideo->get_contrast() == test5);
     mvideo->set_contrast(500);
-    QVERIFY(mvideo->get_contrast() == 5);
+    QVERIFY(mvideo->get_contrast() == test5);
 }
 
 /**
