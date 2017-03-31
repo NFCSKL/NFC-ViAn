@@ -657,16 +657,17 @@ void MainWindow::on_actionLoad_triggered() {
  * also adds all videos of the project to the tree
  */
 void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
-    projectInTree->setText(0, QString::fromStdString(proj->name));
-    set_selected_project(projectInTree);
-    ui->ProjectTree->addTopLevelItem(projectInTree);
-    for(Video *v: proj->videos) {
-        std::stringstream filePath;
-        filePath << *v;
-        cout << filePath.str() << endl;
-        std::string treeName = filePath.str();
-        add_video_to_tree(projectInTree, treeName, v->id);
+    MyQTreeWidgetItem *project_in_tree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
+    project_in_tree->setText(0, QString::fromStdString(proj->name));
+    set_selected_project(project_in_tree);
+    ui->ProjectTree->addTopLevelItem(project_in_tree);
+    for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
+        std::stringstream file_path;
+        Video* v = vid->second;
+        file_path << *v;
+        cout << file_path.str() << endl;
+        std::string tree_name = file_path.str();
+        add_video_to_tree(project_in_tree, tree_name, v->id);
     }
 }
 
