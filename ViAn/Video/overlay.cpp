@@ -65,7 +65,8 @@ void Overlay::set_tool(SHAPES s) {
         CustomDialog dialog("Choose text", NULL);
         dialog.addLabel("Enter values:");
         dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
-        dialog.addDblSpinBoxF("Font scale:", 0.5, 5.0, &input_font_scale, 1, 0.1,
+        dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
+                              &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
                               "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
 
         // Show the dialog (execution will stop here until the dialog is finished)
