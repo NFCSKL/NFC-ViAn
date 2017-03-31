@@ -613,7 +613,8 @@ void video_player::scale_position(QPoint &pos) {
     // from the coordinates on the QLabel where the frame is shown:
     // The frame is centered vertically, so the empty part of the QLabel
     // at the top needs to be subtracted (only need to subtract from the
-    // top, hence division by 2).
+    // top, hence division by 2). (The frame is not centered horisontally,
+    // it's left-aligned, so no compensation needed.)
     // Then multiply with the ratio to get coordinates on the video frame.
     double x_scale = x_scale_ratio * pos.x();
     double y_scale = y_scale_ratio * (pos.y() - (double) (qlabel_height - frame_height) / 2);
