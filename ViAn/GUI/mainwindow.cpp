@@ -633,10 +633,11 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->ProjectTree->clearSelection();
     projectInTree->setSelected(true);
     for(Video *v: proj->videos) {
-        std::stringstream filePath;
+        stringstream filePath;
         filePath << *v;
-        std::string treeName = filePath.str();
-        add_video_to_tree(treeName);
+        string treeName = filePath.str();
+        string a = "1";
+        add_video_to_tree(a);
     }
 }
 
@@ -654,8 +655,8 @@ void MainWindow::add_video_to_tree(std::string filePath) {
     videoInTree->set_text_from_filepath(filePath);
     project->addChild(videoInTree);
     project->setExpanded(true);
-    ui->ProjectTree->clearSelection();
-    videoInTree->setSelected(true);
+    //ui->ProjectTree->clearSelection();
+    //videoInTree->setSelected(true);
 }
 
 /**
