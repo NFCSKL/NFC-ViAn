@@ -31,6 +31,13 @@ HEADERS += Test/test_video_player.h \
 
 
 #
+# LIBRARY
+#
+SOURCES += Library/customdialog.cpp
+HEADERS += Library/customdialog.h
+
+
+#
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \

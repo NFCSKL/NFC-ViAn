@@ -44,7 +44,7 @@ void filehandlertest::directory_test(){
     FileHandler* fh = new FileHandler();
     std::string dirpath = fh->work_space + std::string("TEST_PROJ");
     ID id = fh->create_directory(dirpath);
-    QCOMPARE(fh->lastError, 0);
+    QCOMPARE(fh->last_error, 0);
     QCOMPARE(fh->delete_directory(id), 0);
 }
 /**

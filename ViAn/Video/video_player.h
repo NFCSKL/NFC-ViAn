@@ -45,9 +45,10 @@ public:
     void inc_playback_speed();
     void dec_playback_speed();
     
-    void set_contrast(int contrast);
+    void reset_brightness_contrast();
+    void set_contrast(double contrast);
     void set_brightness(int brightness);
-    int get_contrast();
+    double get_contrast();
     int get_brightness();
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
@@ -67,6 +68,11 @@ public:
     const double MIN_SPEED_MULT = 1.0/16;
     const double DEFAULT_SPEED_MULT = 1;
     const double SPEED_STEP_MULT = 2;
+
+    // Constants for the limits and the precision of contrast and brightness values.
+    const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
+    const int CONTRAST_DECIMALS = 2;
+    const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
 
 signals:
     void processed_image(const QImage &image);
@@ -122,8 +128,10 @@ private:
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
 
-    int contrast = 0;   /* Value in range [0-255]. */
-    int brightness = 0; /* Value in range [0-255]. */
+    // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
+    double alpha = 1;
+    // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
+    int beta = 0;
 
     Overlay* video_overlay;
 };
