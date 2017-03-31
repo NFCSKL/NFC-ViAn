@@ -7,8 +7,8 @@
 Project::Project(ID id, std::string name)
 {
     this->files = new ProjFiles();
-    this->m_name = name;
-    this->m_id = id;
+    this->name = name;
+    this->id = id;
     this->v_id = 0;
     this->videos.clear();
     this->saved = false;

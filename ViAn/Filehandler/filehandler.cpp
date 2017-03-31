@@ -222,7 +222,7 @@ FH_ERROR FileHandler::delete_project(Project* proj){
  * Creates Video object which is accessed further by returned id.
  */
 ID FileHandler::add_video(Project* proj, std::string file_path){
-    Video* v = new Video(filePath);
+    Video* v = new Video(file_path);
     return proj->add_video(v); // video id set in proj->add_video
 }
 
@@ -274,7 +274,7 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
     std::ofstream f;
     switch(opt){
     case WRITE_OPTION::OVERWRITE:
-        f.open(fileName.c_str());
+        f.open(file_name.c_str());
         break;
     case WRITE_OPTION::APPEND:
         f.open(file_name.c_str(), std::ios::in | std::ios::out | std::ios::ate);
@@ -395,7 +395,7 @@ ID FileHandler::add_dir(std::string dir_path){
  * @return true if project contents are the same
  */
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
-    bool videoEquals =  std::equal(proj.videos.begin(), proj.videos.end(),
+    bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
                [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
