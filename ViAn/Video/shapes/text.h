@@ -10,7 +10,7 @@ public:
     void handle_new_pos(QPoint pos) override;
 private:
     QString string;
-    double font_scale = 1;
+    double font_scale;
 };
 
 #endif // TEXT_H
