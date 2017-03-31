@@ -314,7 +314,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -366,6 +366,7 @@
     <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
+    <addaction name="actionShow_hide_analysis_area"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -664,6 +665,11 @@
   <action name="actionChoose_Workspace">
    <property name="text">
     <string>Choose Workspace</string>
+   </property>
+  </action>
+  <action name="actionShow_hide_analysis_area">
+   <property name="text">
+    <string>Show/hide analysis area</string>
    </property>
   </action>
  </widget>

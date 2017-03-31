@@ -125,6 +125,7 @@ private slots:
 
     void on_actionDeleteProject_triggered();
 
+    void on_actionShow_hide_analysis_area_triggered();
 
 private:
 

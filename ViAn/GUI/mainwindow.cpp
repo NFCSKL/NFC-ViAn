@@ -765,3 +765,16 @@ void MainWindow::enable_video_buttons() {
     ui->previousFrameButton->setEnabled(true);
     ui->stopButton->setEnabled(true);
 }
+
+/**
+ * @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+ * Toggles the choosing of an analysis area.
+ */
+void MainWindow::on_actionShow_hide_analysis_area_triggered() {
+    mvideo_player->toggle_analysis_area();
+    if (mvideo_player->is_showing_analysis_tool()) {
+        set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
+    } else {
+        set_status_bar("Hiding analysis area tool.");
+    }
+}

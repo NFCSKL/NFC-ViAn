@@ -28,6 +28,7 @@ public:
     bool is_paused();
     bool is_stopped();
     bool is_showing_overlay();
+    bool is_showing_analysis_tool();
     void export_current_frame(QString path_to_folder);
     bool video_open();
 
@@ -53,6 +54,7 @@ public:
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
+    void toggle_analysis_area();
     void zoom_in();
     void zoom_out();
     void video_mouse_pressed(QPoint pos);
@@ -111,12 +113,14 @@ private:
     bool video_stopped = false;
     bool video_paused;
     bool choosing_zoom_area = false;
+    bool choosing_analysis_area = false;
 
     QImage img;
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
+    AnalysArea* analysis_area = new AnalysArea();
 
     int contrast = 0;   /* Value in range [0-255]. */
     int brightness = 0; /* Value in range [0-255]. */
