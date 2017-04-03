@@ -98,7 +98,7 @@ void MainWindow::set_shortcuts(){
  * @param status text to show in the statusbar
  * @param timer time to show it in the bar in ms, 750ms is standard
  */
-void MainWindow::set_status_bar(string status, int timer){
+void MainWindow::set_status_bar(std::string status, int timer){
     ui->statusBar->showMessage(QString::fromStdString(status), timer);
 }
 
@@ -299,7 +299,7 @@ void MainWindow::on_actionAddProject_triggered() {
  * @param action the action that was triggered earlier
  */
 void MainWindow::input_switch_case(ACTION action, QString qInput) {
-    string input = qInput.toStdString();
+    std::string input = qInput.toStdString();
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
@@ -385,7 +385,7 @@ void MainWindow::on_actionColour_triggered() {
     QColor col = QColorDialog::getColor();
     if (col.isValid()) {
         mvideo_player->set_overlay_colour(col);
-        string msg = "Color: ";
+        std::string msg = "Color: ";
         msg.append(col.name().toStdString());
         set_status_bar(msg);
     }
@@ -564,7 +564,7 @@ void MainWindow::on_actionAddVideo_triggered() {
     QTreeWidgetItem *project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if (!project->parent()){
+        if ((MyQTreeWidgetItem*)project->type == TYPE::PROJECT){
             QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->work_space.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
@@ -641,7 +641,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
         Video* v = vid->second;
         file_path << *v;
         cout << file_path.str() << endl;
-        string tree_name = file_path.str();
+        std::string tree_name = file_path.str();
         add_video_to_tree(tree_name, v->id);
     }
 }
@@ -650,7 +650,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
  * @brief MainWindow::add_video_to_tree
  * @param file_path of the video
  */
-void MainWindow::add_video_to_tree(string file_path, ID id) {
+void MainWindow::add_video_to_tree(std::string file_path, ID id) {
     QTreeWidgetItem *project;
     project = ui->ProjectTree->selectedItems().first();
     MyQTreeWidgetItem *video_in_tree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(file_path), id);
@@ -680,14 +680,14 @@ void MainWindow::on_actionDeleteProject_triggered() {
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if (!project->parent()) {
+        my_project = (MyQTreeWidgetItem*)project;
+        if (my_project->type == TYPE::PROJECT) {
             QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
                                                                         tr("Are you sure you want to delete the selected project?\n"),
                                                                         QMessageBox::No | QMessageBox::Yes,
                                                                         QMessageBox::No);
 
             if (resBtn == QMessageBox::Yes) {
-                my_project = (MyQTreeWidgetItem*)project;
                 this->fileHandler->delete_project(fileHandler->get_project(my_project->id));
                 remove_selected_project_from_tree();
             }
