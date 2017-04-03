@@ -14,6 +14,12 @@ ZoomRectangle::ZoomRectangle(QPoint pos) : Rectangle(QColor(0, 255, 0), pos) {
 }
 
 /**
+ * @brief ZoomRectangle::~ZoomRectangle
+ */
+ZoomRectangle::~ZoomRectangle() {
+}
+
+/**
  * @brief ZoomRectangle::update_drawing_pos
  * Updates the position of the end point of the drawing.
  * Coordinates outside the frame are moved to the closest
