@@ -636,16 +636,19 @@ void video_player::scale_position(QPoint &pos) {
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
     // Calculate the scale ratio between the actual video
-    // size and the size of the frame shown in the gui.
+    // size and the size of the (scaled) video frame shown in the gui.
     double x_scale_ratio = (double) video_frame_width/frame_width;
     double y_scale_ratio = (double) video_frame_height/frame_height;
 
     // Calculate the coordinates on the original-sized frame,
-    // from the coordinates on the QLabel where the frame is shown.
-    // (Multiply with the ratio, and subtract the empty parts of the QLabel,
-    // only subtracting the top and left side, hence division by 2.)
-    double x_scale = x_scale_ratio * pos.x() - (qlabel_width - frame_width) / 2;
-    double y_scale = y_scale_ratio * pos.y() - (qlabel_height - frame_height) / 2;
+    // from the coordinates on the QLabel where the frame is shown:
+    // The frame is centered vertically, so the empty part of the QLabel
+    // at the top needs to be subtracted (only need to subtract from the
+    // top, hence division by 2). (The frame is not centered horisontally,
+    // it's left-aligned, so no compensation needed.)
+    // Then multiply with the ratio to get coordinates on the video frame.
+    double x_scale = x_scale_ratio * pos.x();
+    double y_scale = y_scale_ratio * (pos.y() - (double) (qlabel_height - frame_height) / 2);
 
     // Calculate the coordinates on the actual video from
     // the coordinates on the zoomed frame.
