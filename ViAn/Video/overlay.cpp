@@ -51,25 +51,39 @@ void Overlay::set_showing_overlay(bool value) {
 /**
  * @brief Overlay::set_tool
  * Sets the overlay tool's shape.
- * If the tool is the text-tool the user is prompted to wnter a text.
- * @param s
+ * If the tool is the text-tool the user is prompted
+ * to enter a text and a font scale.
+ * @param s New tool to be set.
  */
 void Overlay::set_tool(SHAPES s) {
+    current_shape = s;
+
+    // If the text option is choosen, a string and size will be entered by the user.
     if (s == TEXT) {
-        bool ok;
-        current_string = QInputDialog::getText(NULL, "Text chooser", "Enter a text:", QLineEdit::Normal, QString(), &ok);
-        if (!ok || current_string.isEmpty()) {
-            // Cancelled or empty field.
-            return;
+        std::string input_string = current_string.toStdString();
+        float input_font_scale = current_font_scale;
+        CustomDialog dialog("Choose text", NULL);
+        dialog.addLabel("Enter values:");
+        dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
+        dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
+                              &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
+                              "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
+
+        // Show the dialog (execution will stop here until the dialog is finished)
+        dialog.exec();
+
+        if (!dialog.wasCancelled() && !input_string.empty()) {
+            // Not cancelled and not empty field.
+            current_string = QString::fromStdString(input_string);
+            current_font_scale = input_font_scale;
         }
     }
-    current_shape = s;
 }
 
 /**
  * @brief Overlay::set_colour
  * Sets the overlay tool's colour.
- * @param col
+ * @param col New colour to be set.
  */
 void Overlay::set_colour(QColor col) {
     current_colour = col;
@@ -117,7 +131,7 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
                 overlays[frame_nr].append(new Pen(current_colour, pos));
                 break;
             case TEXT:
-                overlays[frame_nr].append(new Text(current_colour, pos, current_string));
+                overlays[frame_nr].append(new Text(current_colour, pos, current_string, current_font_scale));
                 break;
             default:
                 break;
