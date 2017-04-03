@@ -110,8 +110,8 @@ private:
 
     int num_frames;
     int new_frame_num;
-    unsigned int frame_width;
-    unsigned int frame_height;
+    int frame_width; // TODO
+    int frame_height; // Change back to unsigned int?
     unsigned int qlabel_width;
     unsigned int qlabel_height;
 
