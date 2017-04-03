@@ -10,6 +10,7 @@
 #include "icononbuttonhandler.h"
 #include "inputwindow.h"
 #include "Video/shapes/shape.h"
+#include <qdebug.h>
 
 using namespace std;
 using namespace cv;
@@ -130,7 +131,7 @@ void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused()) {
         // Video thread is paused. Notifying the waitcondition to resume playback
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
         set_status_bar("Playing");
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
@@ -165,8 +166,10 @@ void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+    } else if (mvideo_player->is_stopped()){
+        return;
     } else {
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
     }
     emit set_stop_video();
 }
@@ -630,7 +633,7 @@ void MainWindow::play_video() {
     enable_video_buttons();
     mvideo_player->load_video(selectedVideo->name.toStdString());
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
-    video_slider->setMaximum(mvideo_player->get_num_frames());
+    video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
 }
 
 /**
@@ -697,7 +700,7 @@ void MainWindow::on_actionLoad_triggered() {
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
-        set_status_bar("Project " + loadProj->m_name + " loaded.");
+        set_status_bar("Project " + loadProj->name + " loaded.");
     }
 }
 
@@ -707,11 +710,11 @@ void MainWindow::on_actionLoad_triggered() {
  * also adds all videos of the project to the tree
  */
 void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
-    projectInTree->setText(0, QString::fromStdString(proj->m_name));
+    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
+    projectInTree->setText(0, QString::fromStdString(proj->name));
     set_selected_project(projectInTree);
     ui->ProjectTree->addTopLevelItem(projectInTree);
-    for(Video *v: proj->m_videos) {
+    for(Video *v: proj->videos) {
         std::stringstream filePath;
         filePath << *v;
         std::string treeName = filePath.str();
@@ -834,6 +837,18 @@ void MainWindow::on_videoSlider_sliderPressed() {
     }
 }
 
+/** @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+ * Toggles the choosing of an analysis area.
+ */
+void MainWindow::on_actionShow_hide_analysis_area_triggered() {
+    mvideo_player->toggle_analysis_area();
+    if (mvideo_player->is_showing_analysis_tool()) {
+        set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
+    } else {
+        set_status_bar("Hiding analysis area tool.");
+    }
+}
+
 /**
  * @brief MainWindow::on_videoSlider_sliderReleased
  * Set video playback pos to slider pos and unblock slider update
@@ -848,4 +863,40 @@ void MainWindow::on_videoSlider_sliderReleased() {
         paused_wait.notify_one();
         slider_paused_video = false;
     }
+}
+
+/** @brief MainWindow::on_actionContrast_Brightness_triggered
+ * Opens a window to choose contrast and brightness in.
+ */
+void MainWindow::on_actionContrast_Brightness_triggered() {
+    float contrast = mvideo_player->get_contrast();
+    int brightness = mvideo_player->get_brightness();
+
+    // Create the texts shown in the dialog
+    std::stringstream contrast_ss;
+    contrast_ss << "Contrast [" << mvideo_player->CONTRAST_MIN << " – " << mvideo_player->CONTRAST_MAX <<
+                   "] (default: "<< mvideo_player->CONTRAST_DEFAULT <<"): ";
+    QString contrast_text = QString::fromStdString(contrast_ss.str());
+    std::stringstream brightness_ss;
+    brightness_ss << "Brightness [" << mvideo_player->BRIGHTNESS_MIN << " – " << mvideo_player->BRIGHTNESS_MAX <<
+                     "] (default: "<< mvideo_player->BRIGHTNESS_DEFAULT <<"): ";
+    QString brightness_text = QString::fromStdString(brightness_ss.str());
+
+    // Create the dialog
+    CustomDialog dialog("Contrast & Brightness", this);
+    dialog.addLabel("Enter values:");
+    dialog.addDblSpinBoxF(contrast_text, (float) mvideo_player->CONTRAST_MIN, (float) mvideo_player->CONTRAST_MAX,
+                          &contrast, mvideo_player->CONTRAST_DECIMALS, (float) mvideo_player->CONTRAST_STEP,
+                          "Choose contrast value with the input box.");
+    dialog.addSpinBox(brightness_text, mvideo_player->BRIGHTNESS_MIN, mvideo_player->BRIGHTNESS_MAX,
+                      &brightness, mvideo_player->BRIGHTNESS_STEP, "Choose brightness value with the input box.");
+
+    // Show the dialog (execution will stop here until the dialog is finished)
+    dialog.exec();
+
+    if (dialog.wasCancelled()) {
+        return;
+    }
+    mvideo_player->set_contrast(contrast);
+    mvideo_player->set_brightness(brightness);
 }

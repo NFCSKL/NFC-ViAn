@@ -27,6 +27,7 @@ public:
     bool is_paused();
     bool is_stopped();
     bool is_showing_overlay();
+    bool is_showing_analysis_tool();
     void export_current_frame(QString path_to_folder);
     bool video_open();
 
@@ -44,11 +45,17 @@ public:
 
     void set_slider_frame(int frame_nbr);
     
+    void reset_brightness_contrast();
+    void set_contrast(double contrast);
+    void set_brightness(int brightness);
+    double get_contrast();
+    int get_brightness();
     void toggle_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
     void undo_overlay();
     void clear_overlay();
+    void toggle_analysis_area();
     void zoom_in();
     void zoom_out();
     void video_mouse_pressed(QPoint pos);
@@ -61,6 +68,11 @@ public:
     const double MIN_SPEED_MULT = 1.0/16;
     const double DEFAULT_SPEED_MULT = 1;
     const double SPEED_STEP_MULT = 2;
+
+    // Constants for the limits and the precision of contrast and brightness values.
+    const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
+    const int CONTRAST_DECIMALS = 2;
+    const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
 
 signals:
     void processed_image(const QImage &image);
@@ -84,6 +96,7 @@ protected:
 private:
     void update_frame(int frame_nbr);
     cv::Mat zoom_frame(cv::Mat &frame);
+    cv::Mat contrast_frame(cv::Mat &frame);
     cv::Mat scale_frame(cv::Mat &src);
     cv::Mat process_frame(cv::Mat &frame);
     void update_overlay();
@@ -97,10 +110,10 @@ private:
 
     int num_frames;
     int new_frame_num;
-    unsigned int current_frame = 0;
-    unsigned int prev_frame = 0;
     unsigned int frame_width;
     unsigned int frame_height;
+    unsigned int qlabel_width;
+    unsigned int qlabel_height;
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
@@ -110,12 +123,19 @@ private:
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
     bool slider_moving = false;
+    bool choosing_analysis_area = false;
 
     QImage img;
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
+    AnalysArea* analysis_area = new AnalysArea();
+
+    // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
+    double alpha = 1;
+    // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
+    int beta = 0;
 
     Overlay* video_overlay;
 };
