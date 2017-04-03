@@ -7,6 +7,7 @@
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
+#include "Library/customdialog.h"
 #include "Video/video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -127,6 +128,10 @@ private slots:
     void on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
     void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
+    
+    void on_actionShow_hide_analysis_area_triggered();
+
+    void on_actionContrast_Brightness_triggered();
 
 private:
 

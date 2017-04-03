@@ -373,6 +373,7 @@
     <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
+    <addaction name="actionShow_hide_analysis_area"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -393,6 +394,7 @@
     <addaction name="menuShape"/>
     <addaction name="actionUndo"/>
     <addaction name="actionClear"/>
+    <addaction name="actionContrast_Brightness"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -671,6 +673,16 @@
   <action name="actionChoose_Workspace">
    <property name="text">
     <string>Choose Workspace</string>
+   </property>
+  </action>
+  <action name="actionShow_hide_analysis_area">
+   <property name="text">
+    <string>Show/hide analysis area</string>
+   </property>
+  </action>
+  <action name="actionContrast_Brightness">
+   <property name="text">
+    <string>Contrast/Brightness</string>
    </property>
   </action>
  </widget>

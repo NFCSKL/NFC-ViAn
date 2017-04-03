@@ -25,6 +25,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete video_overlay;
+    delete analysis_area;
     capture.release();
 }
 
@@ -130,8 +131,11 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
     }
+    if (choosing_analysis_area) {
+        processed_frame = analysis_area->draw(processed_frame);
+    }
     processed_frame = zoom_frame(processed_frame);
-    //processed_frame = contrast_frame(processed_frame);
+    processed_frame = contrast_frame(processed_frame);
 
     cv::Mat scaled_frame;
     if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
@@ -188,22 +192,9 @@ cv::Mat video_player::zoom_frame(cv::Mat &frame) {
  */
 cv::Mat video_player::contrast_frame(cv::Mat &frame) {
     // Create image for the modified frame.
-    Mat modified_frame = Mat::zeros(frame.size(), frame.type());
-
-    // Contrast control, alpha value in [1.0-3.0].
-    double alpha = 1 + 2 * contrast / 255.0;
-    // Brightness control, beta value in [0-100].
-    int beta = 100 * brightness / 255.0;
-
-    // Do the operation new_image(i,j) = alpha*image(i,j) + beta
-    for (int y = 0; y < frame.rows; y++) {
-        for (int x = 0; x < frame.cols; x++) {
-            for (int c = 0; c < 3; c++) {
-                modified_frame.at<Vec3b>(y, x)[c] =
-                    saturate_cast<uchar>(alpha * (frame.at<Vec3b>(y, x)[c]) + beta);
-            }
-        }
-    }
+    Mat modified_frame;
+    // Do the operation modified_frame = alpha * frame + beta
+    frame.convertTo(modified_frame, -1, alpha, beta);
     return modified_frame;
 }
 
@@ -238,11 +229,18 @@ bool video_player::is_stopped() {
 
 /**
  * @brief video_player::is_showing_overlay
- * Returns true if the overlay tool is showing, else false.
- * @return
+ * @return Returns true if the overlay tool is showing, else false.
  */
 bool video_player::is_showing_overlay() {
     return video_overlay->is_showing_overlay();
+}
+
+/**
+ * @brief video_player::is_showing_analysis_tool
+ * @return Returns true if the analysis area tool is showing, else false.
+ */
+bool video_player::is_showing_analysis_tool() {
+    return choosing_analysis_area;
 }
 
 /**
@@ -340,6 +338,7 @@ void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
+    convert_frame();
     show_frame();
 }
 
@@ -369,29 +368,52 @@ void video_player::update_overlay() {
 }
 
 /**
+ * @brief video_player::reset_brightness_contrast
+ * Resets contrast and brightness to default values.
+ */
+void video_player::reset_brightness_contrast() {
+    alpha = CONTRAST_DEFAULT;
+    beta = BRIGHTNESS_DEFAULT;
+    if (capture.isOpened()) {
+        convert_frame();
+        show_frame();
+    }
+}
+
+/**
  * @brief video_player::set_contrast
  * Sets the contrast value (alpha value).
- * @param contrast Contrast parameter in range 0 to 255.
+ * @param contrast Contrast parameter in range
+ *                 CONTRAST_MIN to CONTRAST_MAX.
  */
-void video_player::set_contrast(int c) {
-    contrast = std::min(255, std::max(0, c));
+void video_player::set_contrast(double contrast) {
+    alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
+    if (capture.isOpened()) {
+        convert_frame();
+        show_frame();
+    }
 }
 
 /**
  * @brief video_player::set_brightness
  * Sets the brightness value (beta value).
- * @param brightness Brightness parameter in range 0 to 255.
+ * @param brightness Brightness parameter in range
+ *                   BRIGHTNESS_MIN to BRIGHTNESS_MAX.
  */
-void video_player::set_brightness(int b) {
-    brightness = std::min(255, std::max(0, b));
+void video_player::set_brightness(int brightness) {
+    beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
+    if (capture.isOpened()) {
+        convert_frame();
+        show_frame();
+    }
 }
 
 /**
  * @brief video_player::get_contrast
  * @return Returns contrast parameter in range 0 to 255.
  */
-int video_player::get_contrast() {
-    return contrast;
+double video_player::get_contrast() {
+    return alpha;
 }
 
 /**
@@ -399,7 +421,7 @@ int video_player::get_contrast() {
  * @return Returns brightness parameter in range 0 to 255.
  */
 int video_player::get_brightness() {
-    return brightness;
+    return beta;
 }
 
 /**
@@ -493,6 +515,17 @@ void video_player::clear_overlay() {
 }
 
 /**
+ * @brief video_player::toggle_analysis_area
+ * Toggles the choosing of an analysis area.
+ */
+void video_player::toggle_analysis_area() {
+    if (capture.isOpened()) {
+        choosing_analysis_area = !choosing_analysis_area;
+        update_overlay();
+    }
+}
+
+/**
  * @brief video_player::zoom_in
  * Sets a state in the video overlay
  * for the user to choose an area,
@@ -534,6 +567,9 @@ void video_player::video_mouse_pressed(QPoint pos) {
         if (choosing_zoom_area) {
             zoom_area->set_start_pos(pos);
             zoom_area->update_drawing_pos(pos);
+        } else if (choosing_analysis_area) {
+            // When choosing analysis area, a point is choosen when mouse released.
+            return;
         } else if (is_paused()) {
             video_overlay->mouse_pressed(pos, get_current_frame_num());
         }
@@ -556,6 +592,8 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
             choosing_zoom_area = false;
+        } else if (choosing_analysis_area) {
+            analysis_area->add_point(pos);
         } else if (is_paused()) {
             video_overlay->mouse_released(pos, get_current_frame_num());
         }
@@ -577,6 +615,9 @@ void video_player::video_mouse_moved(QPoint pos) {
         scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
+        } else if (choosing_analysis_area) {
+            // When choosing analysis area, a point is choosen when mouse released.
+            return;
         } else if (is_paused()) {
             video_overlay->mouse_moved(pos, get_current_frame_num());
         }
