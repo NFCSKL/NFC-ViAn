@@ -1,10 +1,10 @@
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
 
-class AnalysisMethod
+class Analysis
 {
 public:
-    AnalysisMethod();
+    Analysis();
 };
 
 #endif // ANALYSIS_H
