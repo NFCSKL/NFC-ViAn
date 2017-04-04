@@ -14,7 +14,7 @@ void AnalysisMethod::run() {
         while(!aborted && capture.read(frame)) {
             // do frame analysis
             do_analysis();
-            cv::waitKey(10);
+            cv::waitKey(5);
 
             if (paused) {
                 // do pause stuff

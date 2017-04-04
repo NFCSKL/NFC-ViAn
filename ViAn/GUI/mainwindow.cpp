@@ -47,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // TODO The following code is just here to test.
     // Remove when a proper implementation exists.
-    MotionDetection *md = new MotionDetection("seq_01.mp4");
+    //MotionDetection *md = new MotionDetection("seq_01.mp4");
+    MotionDetection *md = new MotionDetection("eng.mov");
     md->start();
 
     // Initially hide overlay toolbar

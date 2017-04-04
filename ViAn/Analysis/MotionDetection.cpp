@@ -4,7 +4,7 @@
 
 
 MotionDetection::MotionDetection(std::string source_file){
-    capture.open(source_file);
+    capture.open("Pumparna.avi");
     if (!capture.isOpened()) {
         // TODO Take care of this
         std::cout << "Failed to load " << source_file << std::endl;
@@ -17,10 +17,12 @@ MotionDetection::MotionDetection(std::string source_file){
  */
 void MotionDetection::setup_analysis(){
 
-    capture.set(CV_CAP_PROP_POS_FRAMES, 750);
+    capture.set(CV_CAP_PROP_POS_FRAMES, 250);
     cv::namedWindow("First frame");
     cv::namedWindow("Current frame");
     cv::namedWindow("Threshold");
+
+    pMOG2 = cv::createBackgroundSubtractorMOG2(500,50,false);
 }
 
 /**
@@ -31,7 +33,28 @@ void MotionDetection::setup_analysis(){
 void MotionDetection::do_analysis(){
     std::vector<std::vector<cv::Point> > contours;
     // Grayscale and blur
-    cv::cvtColor(frame, gray, CV_RGB2GRAY);
+    cv::Mat shown_frame = frame.clone();
+    cv::GaussianBlur(frame, frame, blur_size, 0);
+    pMOG2->apply(frame, fgMaskMOG2,-1);
+    pMOG2->getBackgroundImage(background);
+    cv::imshow("Threshold", background);
+    cv::Mat kernel_ero = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4));
+    cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
+    cv::GaussianBlur(frame, frame, blur_size, 0);
+    cv::GaussianBlur(fgMaskMOG2, fgMaskMOG2, blur_size, 0);
+    cv::threshold(fgMaskMOG2, fgMaskMOG2, 25, 255, cv::THRESH_BINARY);
+    cv::imshow("Current frame",fgMaskMOG2);
+    cv::findContours(fgMaskMOG2.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+
+    cv::Scalar color(0,0,255);
+    for (std::vector<cv::Point> contour : contours) {
+        if (cv::contourArea(contour) > 500) {
+            cv::Rect rect = cv::boundingRect(contour);
+            cv::rectangle(shown_frame, rect, color, 2);
+        }
+    }
+    cv::imshow("First frame", shown_frame);
+    /*cv::cvtColor(frame, gray, CV_RGB2GRAY);
     cv::GaussianBlur(gray, gray, blur_size, 0);
 
     if (first_frame.empty()) {
@@ -61,7 +84,7 @@ void MotionDetection::do_analysis(){
     if (!tmp.empty()) {
         cv::imshow("Threshold", tmp);
     }
-    cv::imshow("Current frame", frame);
+    cv::imshow("Current frame", frame);*/
 
 
 }
