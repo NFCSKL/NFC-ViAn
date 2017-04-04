@@ -1,5 +1,6 @@
 #include "MotionDetection.h"
-#include <iostream>
+#include <qdebug.h>
+
 
 
 MotionDetection::MotionDetection(std::string source_file){
@@ -15,10 +16,11 @@ MotionDetection::MotionDetection(std::string source_file){
  * Initial setup of the analysis
  */
 void MotionDetection::setup_analysis(){
-    bg_sub = cv::createBackgroundSubtractorMOG2();
-    //create GUI windows
-    cv::namedWindow("Frame");
-    cv::namedWindow("FG Mask MOG 2");
+
+    capture.set(CV_CAP_PROP_POS_FRAMES, 750);
+    cv::namedWindow("First frame");
+    cv::namedWindow("Current frame");
+    cv::namedWindow("Threshold");
 }
 
 /**
@@ -27,7 +29,39 @@ void MotionDetection::setup_analysis(){
  * This function is called from the interface thread loop
  */
 void MotionDetection::do_analysis(){
-    bg_sub->apply(frame, fg_mask);  // Updated the background model
-    cv::imshow("Frame", frame);
-    cv::imshow("FG Mask MOG 2", fg_mask);
+    std::vector<std::vector<cv::Point> > contours;
+    // Grayscale and blur
+    cv::cvtColor(frame, gray, CV_RGB2GRAY);
+    cv::GaussianBlur(gray, gray, blur_size, 0);
+
+    if (first_frame.empty()) {
+        // Save first frame to use it to compare for motion
+        first_frame = gray.clone();
+    }
+
+
+
+    cv::absdiff(first_frame, gray, frame_delta);
+    cv::threshold(frame_delta, frame_thresh, 25, 255, cv::THRESH_BINARY);
+
+
+    cv::findContours(frame_thresh.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+
+    cv::Scalar color(0,0,255);
+    cv::Mat tmp;
+    for (std::vector<cv::Point> contour : contours) {
+        if (cv::contourArea(contour) > 200) {
+            cv::Rect rect = cv::boundingRect(contour);
+            qDebug() << rect.x << "::" << rect.y << rect.width << "::" << rect.height;
+            cv::cvtColor(frame_thresh, tmp, CV_GRAY2RGB);
+            cv::rectangle(frame, rect, color, 2);
+            cv::rectangle(tmp, rect, color, 2);
+        }
+    }
+    if (!tmp.empty()) {
+        cv::imshow("Threshold", tmp);
+    }
+    cv::imshow("Current frame", frame);
+
+
 }

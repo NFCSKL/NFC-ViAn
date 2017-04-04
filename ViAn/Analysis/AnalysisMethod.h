@@ -20,9 +20,10 @@ private:
     virtual void do_analysis() = 0;
 
 protected:
-    bool paused, aborted;           // Control states
+    bool paused = false;            // Control states
+    bool aborted = false;
     unsigned int current_frame;     // The current frame number
-    cv::VideoCapture capture;      // Video source
+    cv::VideoCapture capture;       // Video source
     cv::Mat frame;                  // The frame fetched last
     void run() override;
 

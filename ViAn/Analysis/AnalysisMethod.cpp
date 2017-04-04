@@ -1,5 +1,5 @@
 #include "AnalysisMethod.h"
-#include <iostream>
+#include <qdebug.h>
 
 #include "opencv2/highgui/highgui.hpp"
 

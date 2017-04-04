@@ -14,8 +14,11 @@ public:
     MotionDetection(std::string source_file);
 
 private:
-    cv::Mat fg_mask;                                 // Foreground mask
-    cv::Ptr<cv::BackgroundSubtractor> bg_sub;        // MOG2 Background subtractor
+
+    cv::Mat first_frame;                             // First frame in the video
+    cv::Mat gray;                                    // Grayscale of current
+    cv::Mat frame_delta, frame_thresh, frame_dilate;
+    cv::Size blur_size = cv::Size(31,31);
 
     void setup_analysis() override;
     void do_analysis() override;
