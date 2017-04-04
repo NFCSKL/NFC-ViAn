@@ -321,7 +321,7 @@ void video_player::on_set_playback_frame(int frame_num) {
     } else {
         if (frame_num >= 0 && frame_num < get_num_frames()) {
             set_new_frame = true;
-            new_frame_num = frame_num - 1;
+            new_frame_num = frame_num;
         } else {
             set_new_frame = false;
         }
