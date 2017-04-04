@@ -2,7 +2,9 @@
 /**
  * @brief Video::Video
  */
-Video::Video(){
+Video::Video()
+{
+    this->id = -1;
     this->file_path = "";
 }
 /**
@@ -10,14 +12,15 @@ Video::Video(){
  * @param id
  * @param filepath
  */
-Video::Video(std::string filepath){
-    this->file_path = filepath;
+Video::Video(std::string file_path){
+    this->file_path = file_path;
+    this->id = -1;
 }
 /**
  * @brief operator >>
  * @param is
  * @param vid
- * @return UNFINISHED
+ * @return stringstream
  */
 std::stringstream& operator>>(std::stringstream& is, Video& vid){    
     is >> vid.file_path;

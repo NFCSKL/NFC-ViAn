@@ -258,9 +258,9 @@
         <item>
          <layout class="QHBoxLayout" name="sliderLayout">
           <item>
-           <widget class="QLabel" name="sliderLabel">
+           <widget class="QLabel" name="currentTimeLabel">
             <property name="text">
-             <string>TextLabel</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -283,6 +283,13 @@
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="totalTimeLabel">
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -314,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -343,8 +350,8 @@
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
-    <addaction name="actionExit"/>
     <addaction name="menuDelete"/>
+    <addaction name="actionExit"/>
     <addaction name="actionChoose_Workspace"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
