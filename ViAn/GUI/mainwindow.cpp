@@ -640,7 +640,6 @@ void MainWindow::add_project_to_tree(Project* proj) {
         stringstream file_path;
         Video* v = vid->second;
         file_path << *v;
-        cout << file_path.str() << endl;
         std::string tree_name = file_path.str();
         add_video_to_tree(tree_name, v->id);
     }
