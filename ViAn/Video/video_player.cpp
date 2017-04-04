@@ -59,7 +59,6 @@ bool video_player::load_video(string filename) {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    qDebug() << "Starting video thread";
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
@@ -83,7 +82,6 @@ void video_player::run()  {
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
-            qDebug() << "Video paused. Sleeping thread";
             m_paused_wait->wait(m_mutex);
             video_paused = false;
         }
@@ -92,7 +90,6 @@ void video_player::run()  {
     video_stopped = true;
     capture.set(CV_CAP_PROP_POS_FRAMES, 0);
     emit update_current_frame(0);
-    qDebug() << "Terminating video thread";
 }
 
 /**
@@ -110,14 +107,8 @@ void video_player::show_frame() {
  * including the zoom and overlay.
  */
 void video_player::convert_frame() {
-    qDebug() << "Convert frame";
     if (frame.cols == 0 || frame.rows == 0) {
-        // TODO
-        // When reaching the last frame the mat object will sometimes
-        // have cols and rows set to zero and then it cannot be coverted
-        // As a result the program crashes. This needs to be fixed
-        qDebug() << "Error with current frame";
-        qDebug() << frame.cols << " " << frame.rows;
+        // Do nothing
         return;
     }
     cv::Mat processed_frame;
@@ -147,9 +138,7 @@ void video_player::convert_frame() {
  */
 cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
-    qDebug() << "Process frame" << frame.rows << " " << frame.cols;
     cv::Mat processed_frame = frame.clone();
-    qDebug() << "Cloned";
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
@@ -176,16 +165,11 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
  * @return
  */
 cv::Mat video_player::scale_frame(cv::Mat &src) {
-    qDebug() << frame_width << " " << frame_height;
     cv::Size size;
     if (frame_width <= 0 || frame_height <= 0) {
-        // TODO
-        // Both frame_width and frame_height are unsigned ints and thus never < 0
-        // Need to check for bigger sizes
         size = cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH),capture.get(CV_CAP_PROP_FRAME_HEIGHT));
         frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
         frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-        qDebug() << frame_width << " " << frame_height;
     } else {
         size = cv::Size(frame_width,frame_height);
     }
