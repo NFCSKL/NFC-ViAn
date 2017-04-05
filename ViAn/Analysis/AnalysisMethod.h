@@ -18,13 +18,16 @@ public:
 private:
     virtual void setup_analysis() = 0;
     virtual void do_analysis() = 0;
+    void set_exclude_area(std::vector<cv::Point> points);
+    bool sample_current_frame();
 
 protected:
     bool paused = false;            // Control states
     bool aborted = false;
-    unsigned int current_frame;     // The current frame number
+    unsigned int sample_freq = 5;
+    unsigned int current_frame = 0; // The current frame number
     cv::VideoCapture capture;       // Video source
-    cv::Mat frame;                  // The frame fetched last
+    cv::Mat frame, exclude_frame;                  // The frame fetched last
     void run() override;
 
 signals:

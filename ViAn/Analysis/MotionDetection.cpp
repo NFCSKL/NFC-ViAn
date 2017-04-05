@@ -1,5 +1,6 @@
 #include "MotionDetection.h"
 #include <qdebug.h>
+#include <vector>
 
 
 
@@ -33,58 +34,82 @@ void MotionDetection::setup_analysis(){
 void MotionDetection::do_analysis(){
     std::vector<std::vector<cv::Point> > contours;
     // Grayscale and blur
-    cv::Mat shown_frame = frame.clone();
+
+    shown_frame = frame.clone();
     cv::GaussianBlur(frame, frame, blur_size, 0);
     pMOG2->apply(frame, fgMaskMOG2,-1);
     pMOG2->getBackgroundImage(background);
-    cv::imshow("Threshold", background);
-    cv::Mat kernel_ero = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4));
-    cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
-    cv::GaussianBlur(frame, frame, blur_size, 0);
-    cv::GaussianBlur(fgMaskMOG2, fgMaskMOG2, blur_size, 0);
+
+
+    cv::Mat kernel_ero = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilation_degree,dilation_degree));
+    //cv::GaussianBlur(fgMaskMOG2, fgMaskMOG2, blur_size, 0);
     cv::threshold(fgMaskMOG2, fgMaskMOG2, 25, 255, cv::THRESH_BINARY);
-    cv::imshow("Current frame",fgMaskMOG2);
-    cv::findContours(fgMaskMOG2.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+    cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
+
+
+    if (!diff_prev.empty() && current_frame % sample_freq == 0) {
+        cv::Mat gray_frame = shown_frame.clone();
+        cv::cvtColor(gray_frame, gray_frame, CV_RGB2GRAY);
+        cv::absdiff(diff_prev,gray_frame,diff_frame);
+        cv::GaussianBlur(diff_frame, diff_frame, blur_size, 0);
+        cv::threshold(diff_frame, diff_frame, 25, 255, cv::THRESH_BINARY);
+        cv::dilate(diff_frame, diff_frame, kernel_ero);
+        cv::bitwise_and(diff_frame, fgMaskMOG2, result);
+        cv::imshow("Current frame",diff_frame);
+    } else if (!diff_prev.empty() && !diff_frame.empty()) {
+        cv::bitwise_and(diff_frame, fgMaskMOG2, result);
+    } else {
+        result = fgMaskMOG2.clone();
+    }
+
+    if (current_frame % sample_freq == 0) {
+        diff_prev = shown_frame.clone();
+        cv::cvtColor(diff_prev, diff_prev, CV_RGB2GRAY);
+    }
+    prev_frame = shown_frame.clone();
+    cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
+
+    cv::imshow("Threshold", result);
+    cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
 
     cv::Scalar color(0,0,255);
+    std::vector<cv::Rect> rects;
     for (std::vector<cv::Point> contour : contours) {
-        if (cv::contourArea(contour) > 500) {
+        if (cv::contourArea(contour) > smallest_object_size) {
             cv::Rect rect = cv::boundingRect(contour);
+            rects.push_back(rect);
+        }
+    }
+    if (!rects.empty()) {
+        merge_bounding_rects(rects);
+        for(cv::Rect rect : rects) {
             cv::rectangle(shown_frame, rect, color, 2);
         }
     }
-    cv::imshow("First frame", shown_frame);
-    /*cv::cvtColor(frame, gray, CV_RGB2GRAY);
-    cv::GaussianBlur(gray, gray, blur_size, 0);
+    cv::imshow("First frame", exclude_frame);
 
-    if (first_frame.empty()) {
-        // Save first frame to use it to compare for motion
-        first_frame = gray.clone();
-    }
+}
 
+void MotionDetection::merge_bounding_rects(std::vector<cv::Rect> &rects) {
+    std::vector<cv::Rect> result;
+    std::vector<int> removed_rects;
 
-
-    cv::absdiff(first_frame, gray, frame_delta);
-    cv::threshold(frame_delta, frame_thresh, 25, 255, cv::THRESH_BINARY);
-
-
-    cv::findContours(frame_thresh.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-
-    cv::Scalar color(0,0,255);
-    cv::Mat tmp;
-    for (std::vector<cv::Point> contour : contours) {
-        if (cv::contourArea(contour) > 200) {
-            cv::Rect rect = cv::boundingRect(contour);
-            qDebug() << rect.x << "::" << rect.y << rect.width << "::" << rect.height;
-            cv::cvtColor(frame_thresh, tmp, CV_GRAY2RGB);
-            cv::rectangle(frame, rect, color, 2);
-            cv::rectangle(tmp, rect, color, 2);
+    while (rects.size() > 1) {
+        cv::Rect rect1 = rects.back();
+        rects.pop_back();
+        for(int i = 0; i < rects.size(); ++i) {
+            cv::Rect rect2 = rects[i];
+            if ((rect1 & rect2).area() > 0) {
+                rect1 = (rect1 | rect2);
+                removed_rects.push_back(i);
+            }
         }
+        std::reverse(removed_rects.begin(),removed_rects.end());
+        for(int i : removed_rects) {
+            rects.erase(rects.begin() + i);
+        }
+        result.push_back(rect1);
     }
-    if (!tmp.empty()) {
-        cv::imshow("Threshold", tmp);
-    }
-    cv::imshow("Current frame", frame);*/
-
-
+    result.push_back(rects.front());
+    rects = result;
 }
