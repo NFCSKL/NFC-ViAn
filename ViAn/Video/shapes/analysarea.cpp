@@ -61,7 +61,9 @@ void AnalysArea::add_point(QPoint pos) {
  * Removes the last added point from the selected area.
  */
 void AnalysArea::undo() {
-    points->pop_back();
+    if (!points->empty()) {
+        points->pop_back();
+    }
 }
 
 /**
