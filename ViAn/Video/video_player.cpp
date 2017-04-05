@@ -144,6 +144,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
         scaled_frame = processed_frame;
     }
 
+    // Rotates the frame, according to the choosen direction.
     if (0 <= rotate_direction && rotate_direction < 3) {
         cv::rotate(scaled_frame, scaled_frame, rotate_direction);
     }
