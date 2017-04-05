@@ -133,6 +133,10 @@ private slots:
 
     void on_actionContrast_Brightness_triggered();
 
+    void on_actionRotate_right_triggered();
+
+    void on_actionRotate_left_triggered();
+
 private:
 
     Ui::MainWindow *ui;

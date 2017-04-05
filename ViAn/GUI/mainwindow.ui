@@ -321,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -371,9 +371,11 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_hide_overlay"/>
+    <addaction name="actionShow_hide_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
-    <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="actionRotate_right"/>
+    <addaction name="actionRotate_left"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -683,6 +685,16 @@
   <action name="actionContrast_Brightness">
    <property name="text">
     <string>Contrast/Brightness</string>
+   </property>
+  </action>
+  <action name="actionRotate_right">
+   <property name="text">
+    <string>Rotate right</string>
+   </property>
+  </action>
+  <action name="actionRotate_left">
+   <property name="text">
+    <string>Rotate left</string>
    </property>
   </action>
  </widget>

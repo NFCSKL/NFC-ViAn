@@ -839,3 +839,19 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
     mvideo_player->set_contrast(contrast);
     mvideo_player->set_brightness(brightness);
 }
+
+/**
+ * @brief MainWindow::on_actionRotate_right_triggered
+ * Rotates video to the right by 90 degrees.
+ */
+void MainWindow::on_actionRotate_right_triggered() {
+    mvideo_player->rotate_right();
+}
+
+/**
+ * @brief MainWindow::on_actionRotate_left_triggered
+ * Rotates video to the left by 90 degrees.
+ */
+void MainWindow::on_actionRotate_left_triggered() {
+    mvideo_player->rotate_left();
+}

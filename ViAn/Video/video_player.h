@@ -58,6 +58,8 @@ public:
     void toggle_analysis_area();
     void zoom_in();
     void zoom_out();
+    void rotate_right();
+    void rotate_left();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
@@ -127,6 +129,9 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
+
+    // 0 = 90 deg, 1 = 180 deg, 2 = 270 deg, 3 = 0 deg.
+    int rotate_direction = 3;
 
     // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
     double alpha = 1;
