@@ -144,9 +144,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
         scaled_frame = processed_frame;
     }
 
-    //cv::transpose(processed_frame, processed_frame);
-    //cv::flip(processed_frame, processed_frame, 1);
-    if (0 <= rotate_direction < 3) {
+    if (0 <= rotate_direction && rotate_direction < 3) {
         cv::rotate(scaled_frame, scaled_frame, rotate_direction);
     }
 
@@ -679,21 +677,17 @@ void video_player::scale_position(QPoint &pos) {
     int rotated_x;
     int rotated_y;
     if (rotate_direction == 0) {
-        rotated_x = pos.y();
+        rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
         rotated_y = frame_height - pos.x();
-        rotated_x = (rotated_x - (double) (qlabel_height - frame_width) / 2);
     } else if (rotate_direction == 1) {
         rotated_x = frame_width - pos.x();
-        rotated_y = qlabel_height - pos.y();
-        rotated_y = (rotated_y - (double) (qlabel_height - frame_height) / 2);
+        rotated_y = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_height) / 2);
     } else if (rotate_direction == 2) {
-        rotated_x = qlabel_height - pos.y();
+        rotated_x = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_width) / 2);
         rotated_y = pos.x();
-        rotated_x = (rotated_x - (double) (qlabel_height - frame_width) / 2);
     } else if (rotate_direction == 3) {
         rotated_x = pos.x();
-        rotated_y = pos.y();
-        rotated_y = (rotated_y - (double) (qlabel_height - frame_height) / 2);
+        rotated_y = (pos.y() - (double) (qlabel_height - frame_height) / 2);
     }
 
     // Calculate the scale ratio between the actual video
