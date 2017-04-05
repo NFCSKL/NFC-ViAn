@@ -564,7 +564,7 @@ void MainWindow::on_actionAddVideo_triggered() {
     QTreeWidgetItem *project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
-        if ((MyQTreeWidgetItem*)project->type == TYPE::PROJECT){
+        if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
             QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->work_space.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
@@ -640,7 +640,6 @@ void MainWindow::add_project_to_tree(Project* proj) {
         stringstream file_path;
         Video* v = vid->second;
         file_path << *v;
-        cout << file_path.str() << endl;
         std::string tree_name = file_path.str();
         add_video_to_tree(tree_name, v->id);
     }
@@ -789,7 +788,7 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
         project = project->parent();
     }
     return project;
-
+}
 /**
  * @brief MainWindow::on_actionShow_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
