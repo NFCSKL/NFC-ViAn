@@ -1,16 +1,17 @@
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
 #include <vector>
-#include "../Video/shapes/rectangle.h"
 #include "video.h"
+#include "Video/shapes/analysarea.h"
 typedef size_t Frame; // Defined for readability
+class Video;
 
 struct POI{
-    Rectangle area; // Area of interest
+    AnalysArea area; // Area of interest
     Frame start;    // First frame of interest
     Frame end;      // Last frame of interest
-    POI(Rectangle rect, Frame start, Frame end){
-        this->area = rect;
+    POI(AnalysArea area, Frame start, Frame end){
+        this->area = area;
         this->start = start;
         this->end = end;
     }
@@ -22,7 +23,7 @@ class Analysis{
 
 public:    
     Analysis(Video *analyzed_video);
-    void add_poi(Rectangle rect, Frame start, Frame end); // POI:s are added continuosly
+    void add_poi(AnalysArea rect, Frame start, Frame end); // POI:s are added continuosly
 };
 
 #endif // ANALYSIS_H
