@@ -639,7 +639,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
         stringstream file_path;
-        Video* v = vid->second;
+        Video* v = vid->second->get_video();
         file_path << *v;
         std::string tree_name = file_path.str();
         add_video_to_tree(tree_name, v->id);
