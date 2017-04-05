@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include "filehandler.h"
+#include "videoproject.h"
 #include "video.h"
 typedef int ID;
 /**
@@ -57,7 +58,7 @@ public:
     Project(std::string dir_path);
     ~Project();
     ID add_video(Video *vid);
-    void remove_video(ID id);
+    void remove_video_project(ID id);
     // read and write operator for Projects
     friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
     friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
@@ -70,7 +71,7 @@ public:
     ID v_id;
     std::string name;
     ProjFiles* files;
-    std::map<ID,Video*> videos;
+    std::map<ID,VideoProject*> videos;
     bool saved;
 };
 
