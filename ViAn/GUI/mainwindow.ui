@@ -321,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -428,6 +428,7 @@
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
    <addaction name="actionShow_hide_overlay"/>
+   <addaction name="actionShow_hide_analysis_area"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="enabled">
@@ -455,6 +456,20 @@
    <addaction name="separator"/>
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_analysis">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionUndo"/>
+   <addaction name="actionClear"/>
+   <addaction name="actionShow_hide_analysis_area"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
