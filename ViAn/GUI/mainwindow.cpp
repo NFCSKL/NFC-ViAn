@@ -89,6 +89,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
 void MainWindow::set_shortcuts(){
     ui->actionExit->setShortcut(tr("Ctrl+e"));
     ui->actionSave->setShortcut(tr("Ctrl+s"));
+    ui->actionLoad->setShortcut(tr("Ctrl+l"));
     ui->actionAddProject->setShortcut(tr("Ctrl+Shift+p"));
     ui->actionAddVideo->setShortcut(tr("Ctrl+Shift+v"));
 }
