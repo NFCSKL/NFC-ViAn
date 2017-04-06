@@ -658,7 +658,7 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
 void MainWindow::on_actionChoose_Workspace_triggered() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
     this->fileHandler->set_workspace(dir.toStdString() + "/");
-    set_status_bar("new wokspace set to " + this->fileHandler->work_space);
+    set_status_bar("New wokspace set to " + this->fileHandler->work_space);
 }
 
 /**
@@ -672,12 +672,12 @@ void MainWindow::on_actionDelete_triggered() {
     if(ui->ProjectTree->selectedItems().size() == 1) {
         item = ui->ProjectTree->selectedItems().first();
         my_item = (MyQTreeWidgetItem*)item;
-        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
+        QMessageBox::StandardButton res_btn = QMessageBox::question( this, "Delete",
                                                                     tr(("Are you sure you want to delete " + my_item->get_name() + "?\n").c_str()),
                                                                     QMessageBox::No | QMessageBox::Yes,
                                                                     QMessageBox::No);
 
-        if (resBtn == QMessageBox::Yes) {
+        if (res_btn == QMessageBox::Yes) {
             remove_item_from_tree(my_item);
             if (my_item->type == TYPE::VIDEO) {
                 my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
