@@ -23,6 +23,7 @@ int BookmarkView::get_num_bookmarks() {
  * @brief BookmarkView::add_bookmark
  * Adds a bookmark containing an image (thumbnail)
  * and a text description of the bookmark.
+ * @param frame_nbr Frame number associated with the bookmark.
  * @param file_path Path to the image of the bookmark.
  */
 void BookmarkView::add_bookmark(int frame_nbr, std::string file_path) {

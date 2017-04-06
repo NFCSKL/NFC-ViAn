@@ -2,6 +2,7 @@
 
 /**
  * @brief Bookmark::Bookmark
+ * @param frame_nbr Frame number associated with the bookmark.
  * @param img Thumbnail image.
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.

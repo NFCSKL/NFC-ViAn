@@ -97,10 +97,10 @@ private:
     cv::Mat zoom_frame(cv::Mat &frame);
     cv::Mat contrast_frame(cv::Mat &frame);
     cv::Mat scale_frame(cv::Mat &src);
-    cv::Mat process_frame(cv::Mat &frame);
+    cv::Mat process_frame(cv::Mat &frame, bool scale);
     void update_overlay();
     void show_frame();
-    void convert_frame();
+    void convert_frame(bool scale);
     void scale_position(QPoint &pos);
 
     cv::VideoCapture capture;
