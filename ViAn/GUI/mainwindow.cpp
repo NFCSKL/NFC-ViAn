@@ -535,7 +535,7 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
     } else if(item->type == TYPE::VIDEO) {
         QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
-        QAction *delete_video = new QAction(QIcon(""), tr("&Delete video"), this);
+        QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
         load_video->setStatusTip(tr("Play video"));
         delete_video->setStatusTip(tr("Remove video from project"));
         menu.addAction(load_video);
@@ -678,13 +678,13 @@ void MainWindow::on_actionDelete_triggered() {
                                                                     QMessageBox::No);
 
         if (res_btn == QMessageBox::Yes) {
-            remove_item_from_tree(my_item);
             if (my_item->type == TYPE::VIDEO) {
                 my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
                 this->fileHandler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
             } else if (my_item->type == TYPE::PROJECT) {
                 this->fileHandler->delete_project(my_item->id);
             }
+            remove_item_from_tree(my_item);
         }
     } else {
         set_status_bar("Multiple or no videos selected.");
