@@ -145,7 +145,8 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     }
 
     // Rotates the frame, according to the choosen direction.
-    if (0 <= rotate_direction && rotate_direction < 3) {
+    // If direction is in the valid range the frame is rotated.
+    if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
         cv::rotate(scaled_frame, scaled_frame, rotate_direction);
     }
 
@@ -563,10 +564,9 @@ void video_player::zoom_out() {
  */
 void video_player::rotate_right() {
     if (capture.isOpened()) {
-        // rotate_direction is in range [0,3].
         // Rotaing right means adding 1 and
-        // starting over if larger than 3,
-        rotate_direction = (rotate_direction + 1) % 4;
+        // starting over if larger than maximum,
+        rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
         update_overlay();
     }
 }
@@ -577,12 +577,11 @@ void video_player::rotate_right() {
  */
 void video_player::rotate_left() {
     if (capture.isOpened()) {
-        // rotate_direction is in range [0,3].
         // Rotaing left means subtracting 1 and
-        // starting over if larger than 3.
+        // starting over if larger than maximum.
         // Modulo handles positive values, so
-        // minus 1 and plus 3 are the same (when using mod 4).
-        rotate_direction = (rotate_direction + 3) % 4;
+        // minus 1 is the same as adding maximum-1.
+        rotate_direction = (rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
         update_overlay();
     }
 }
@@ -677,16 +676,16 @@ void video_player::scale_position(QPoint &pos) {
     // at the top needs to be subtracted.
     int rotated_x;
     int rotated_y;
-    if (rotate_direction == 0) {
+    if (rotate_direction == ROTATE_90) {
         rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
         rotated_y = frame_height - pos.x();
-    } else if (rotate_direction == 1) {
+    } else if (rotate_direction == ROTATE_180) {
         rotated_x = frame_width - pos.x();
         rotated_y = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_height) / 2);
-    } else if (rotate_direction == 2) {
+    } else if (rotate_direction == ROTATE_270) {
         rotated_x = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_width) / 2);
         rotated_y = pos.x();
-    } else if (rotate_direction == 3) {
+    } else if (rotate_direction == ROTATE_NONE) {
         rotated_x = pos.x();
         rotated_y = (pos.y() - (double) (qlabel_height - frame_height) / 2);
     }

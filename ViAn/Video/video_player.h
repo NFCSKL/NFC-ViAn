@@ -130,8 +130,13 @@ private:
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
 
-    // 0 = 90 deg, 1 = 180 deg, 2 = 270 deg, 3 = 0 deg.
-    int rotate_direction = 3;
+    // Constants for the directions of the rotation.
+    int const ROTATE_90 = 0, ROTATE_180 = 1, ROTATE_270 = 2, ROTATE_NONE = 3;
+    // The limits of the rotation. This should not include the no-rotaion option.
+    int const ROTATE_MIN = 0, ROTATE_MAX = 2;
+    // Number of directions.
+    int const ROTATE_NUM = 4;
+    int rotate_direction = ROTATE_NONE;
 
     // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
     double alpha = 1;
