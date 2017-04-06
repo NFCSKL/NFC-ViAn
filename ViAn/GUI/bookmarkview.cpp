@@ -42,12 +42,12 @@ void BookmarkView::add_bookmark(std::string file_path) {
  *         obtained from the user.
  */
 QString BookmarkView::get_input_text() {
-    std::string contrast_text = "";
+    std::string bookmark_text = "";
 
     // Create the dialog
     CustomDialog dialog("Bookmark description", NULL);
     dialog.addLabel("Write a description of the bookmark:");
-    dialog.addTextEdit(&contrast_text, false, false, TEXT_EDIT_HEIGHT,
+    dialog.addTextEdit(&bookmark_text, false, false, TEXT_EDIT_HEIGHT,
                           "Write a description of the bookmark. This will be used when creating a report.");
 
     // Show the dialog (execution will stop here until the dialog is finished)
@@ -57,5 +57,5 @@ QString BookmarkView::get_input_text() {
         return "";
     }
 
-    return QString::fromStdString(contrast_text);
+    return QString::fromStdString(bookmark_text);
 }
