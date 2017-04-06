@@ -879,5 +879,8 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
  */
 void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
     Bookmark* bookmark = (Bookmark*) item;
-    set_status_bar("Jump to frame " + to_string(bookmark->get_frame_number()));
+    if (mvideo_player->is_paused()) {
+        mvideo_player->set_current_frame_num(bookmark->get_frame_number());
+        set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
+    }
 }
