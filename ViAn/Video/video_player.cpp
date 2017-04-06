@@ -496,7 +496,11 @@ void video_player::set_overlay_colour(QColor colour) {
  */
 void video_player::undo_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->undo(get_current_frame_num());
+        if (choosing_analysis_area) {
+            analysis_area->undo();
+        } else {
+            video_overlay->undo(get_current_frame_num());
+        }
         update_overlay();
     }
 }
@@ -508,7 +512,11 @@ void video_player::undo_overlay() {
  */
 void video_player::clear_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->clear(get_current_frame_num());
+        if (choosing_analysis_area) {
+            analysis_area->clear();
+        } else {
+            video_overlay->clear(get_current_frame_num());
+        }
         update_overlay();
     }
 }
@@ -518,10 +526,8 @@ void video_player::clear_overlay() {
  * Toggles the choosing of an analysis area.
  */
 void video_player::toggle_analysis_area() {
-    if (capture.isOpened()) {
-        choosing_analysis_area = !choosing_analysis_area;
-        update_overlay();
-    }
+    choosing_analysis_area = !choosing_analysis_area;
+    update_overlay();
 }
 
 /**

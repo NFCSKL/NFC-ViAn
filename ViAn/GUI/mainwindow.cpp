@@ -44,8 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mvideo_player = new video_player(&mutex, &paused_wait);
     setup_video_player(mvideo_player);
 
-    // Initially hide overlay toolbar
-    ui->toolBar->hide();
+    // Initially hide overlay and analysis toolbar
+    ui->toolBar_overlay->hide();
+    ui->toolBar_analysis->hide();
 }
 
 /**
@@ -778,18 +779,24 @@ void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *my_video) {
 
 /**
  * @brief MainWindow::toggle_toolbar
- * This method will toggle the toolbar depending on whether the overlay is showing or not.
+ * This method will toggle the toolbar depending on whether the overlay and analysis is showing or not.
  * It is switching between a toolbar that contains items as save/add/load and another that
- * contains drawing tools.
- * This is invoked when the overlay is activated and deactivated.
+ * contains drawing tools, and a third containing analysis tools.
+ * This is invoked when the overlay and analysis tool is activated and deactivated.
  */
 void MainWindow::toggle_toolbar() {
-    if(mvideo_player->is_showing_overlay()) {
-        ui->toolBar_no_overlay->hide();
-        ui->toolBar->show();
-    } else {
+    if (mvideo_player->is_showing_analysis_tool()) {
+        ui->toolBar_analysis->show();
         ui->toolBar->hide();
-        ui->toolBar_no_overlay->show();
+        ui->toolBar_overlay->hide();
+    } else if (mvideo_player->is_showing_overlay()) {
+        ui->toolBar_analysis->hide();
+        ui->toolBar->hide();
+        ui->toolBar_overlay->show();
+    } else {
+        ui->toolBar_analysis->hide();
+        ui->toolBar->show();
+        ui->toolBar_overlay->hide();
     }
 }
 
@@ -820,6 +827,7 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
  */
 void MainWindow::on_actionShow_hide_analysis_area_triggered() {
     mvideo_player->toggle_analysis_area();
+    toggle_toolbar();
     if (mvideo_player->is_showing_analysis_tool()) {
         set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
     } else {
