@@ -403,7 +403,7 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar_no_overlay">
+  <widget class="QToolBar" name="toolBar">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -430,7 +430,7 @@
    <addaction name="actionShow_hide_overlay"/>
    <addaction name="actionShow_hide_analysis_area"/>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="toolBar_overlay">
    <property name="enabled">
     <bool>true</bool>
    </property>

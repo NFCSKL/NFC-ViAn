@@ -527,10 +527,8 @@ void video_player::clear_overlay() {
  * Toggles the choosing of an analysis area.
  */
 void video_player::toggle_analysis_area() {
-    if (capture.isOpened()) {
-        choosing_analysis_area = !choosing_analysis_area;
-        update_overlay();
-    }
+    choosing_analysis_area = !choosing_analysis_area;
+    update_overlay();
 }
 
 /**

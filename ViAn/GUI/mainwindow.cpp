@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setup_video_player(mvideo_player);
 
     // Initially hide overlay and analysis toolbar
-    ui->toolBar->hide();
+    ui->toolBar_overlay->hide();
     ui->toolBar_analysis->hide();
 }
 
@@ -763,16 +763,16 @@ void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *my_video) {
 void MainWindow::toggle_toolbar() {
     if (mvideo_player->is_showing_analysis_tool()) {
         ui->toolBar_analysis->show();
-        ui->toolBar_no_overlay->hide();
         ui->toolBar->hide();
+        ui->toolBar_overlay->hide();
     } else if (mvideo_player->is_showing_overlay()) {
         ui->toolBar_analysis->hide();
-        ui->toolBar_no_overlay->hide();
-        ui->toolBar->show();
+        ui->toolBar->hide();
+        ui->toolBar_overlay->show();
     } else {
         ui->toolBar_analysis->hide();
-        ui->toolBar->hide();
-        ui->toolBar_no_overlay->show();
+        ui->toolBar->show();
+        ui->toolBar_overlay->hide();
     }
 }
 
