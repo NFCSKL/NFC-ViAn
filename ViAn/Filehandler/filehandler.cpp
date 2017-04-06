@@ -201,7 +201,10 @@ ID FileHandler::load_project_file(std::string file_path, std::stringstream& proj
  * Deletes project, its associated files and contents.
  * OBS! This operation is as of now irreversible
  */
-FH_ERROR FileHandler::delete_project(Project* proj){
+FH_ERROR FileHandler::delete_project(ID id){
+    this->proj_map_lock.lock();
+    Project* proj = this->projects.at(id);
+    this->proj_map_lock.unlock();
     ProjFiles* pf = proj->files;
     delete_file(pf->f_proj);
     delete_file(pf->f_videos);

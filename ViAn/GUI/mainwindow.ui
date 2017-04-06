@@ -342,17 +342,16 @@
      <property name="title">
       <string>Delete</string>
      </property>
-     <addaction name="actionDeleteProject"/>
-     <addaction name="actionDeleteVideo"/>
      <addaction name="actionDeleteAnalys"/>
      <addaction name="actionDeleteDrawing"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
-    <addaction name="menuDelete"/>
+    <addaction name="actionDelete"/>
     <addaction name="actionExit"/>
     <addaction name="actionChoose_Workspace"/>
+    <addaction name="menuDelete"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -683,6 +682,11 @@
   <action name="actionContrast_Brightness">
    <property name="text">
     <string>Contrast/Brightness</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete selected</string>
    </property>
   </action>
  </widget>

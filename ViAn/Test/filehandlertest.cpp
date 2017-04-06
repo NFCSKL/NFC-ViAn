@@ -30,11 +30,11 @@ void filehandlertest::project_handling_test(){
     Project* proj2 = fh->load_project("TEST_PROJ", fh->work_space + "TEST_PROJ");
     QVERIFY(fh->proj_equals(*proj2,*proj));
 
-    //check project contentss
+    //check project contents
     fh->delete_file(vid1);
     fh->delete_file(vid2);
     fh->delete_file(vid3);
-    QCOMPARE(fh->delete_project(proj), 0);
+    QCOMPARE(fh->delete_project(proj->id), 0);
 }
 /**
  * @brief filehandlertest::directoryTest
