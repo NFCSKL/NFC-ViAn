@@ -667,14 +667,14 @@ void video_player::scale_position(QPoint &pos) {
  * @param path_to_folder Path to the folder to store the file in.
  * @return The path to the stored image.
  */
-std::string video_player::export_current_frame(std::string path_to_folder) {
+std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
     convert_frame();
 
     QString path = QString::fromStdString(path_to_folder);
 
-    // Add "/FRAME_NR.tiff" to the path.
+    // Add "/file_name.tiff" to the path.
     path.append("/");
-    path.append(QString::number(get_current_frame_num()));
+    path.append(QString::fromStdString(file_name));
     path.append(".tiff");
 
     QImageWriter writer(path, "tiff");

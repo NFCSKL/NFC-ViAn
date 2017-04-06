@@ -295,7 +295,9 @@ void MainWindow::on_bookmarkButton_clicked() {
         proj_path.append("/bookmarks");
         ID dir_id = fileHandler->create_directory(proj_path);
         std::string dir_path = fileHandler->get_dir(dir_id);
-        std::string file_path = mvideo_player->export_current_frame(dir_path);
+
+        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
+        std::string file_path = mvideo_player->export_current_frame(dir_path, file_name);
 
         bookmark_view->add_bookmark(file_path);
         set_status_bar("Saved bookmark.");
