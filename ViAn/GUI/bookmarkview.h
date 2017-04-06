@@ -12,7 +12,7 @@ private:
     QString get_input_text();
 
     const int BOOKMARK_HEIGHT = 64;
-    const int TEXT_EDIT_HEIGHT = 32;
+    const int TEXT_EDIT_MIN_HEIGHT = 32;
 
     QListWidget* view;
 };
