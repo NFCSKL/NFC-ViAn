@@ -134,6 +134,8 @@ private slots:
 
     void on_actionContrast_Brightness_triggered();
 
+    void on_documentList_itemClicked(QListWidgetItem *item);
+
 private:
 
     Ui::MainWindow *ui;
