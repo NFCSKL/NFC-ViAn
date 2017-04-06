@@ -30,18 +30,23 @@ void BookmarkView::add_bookmark(std::string file_path) {
     QImage img = QImage(QString::fromStdString(file_path), "TIFF");
     img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
 
-    QListWidgetItem *item = new QListWidgetItem(get_input_text(), view);
-    item->setData(Qt::DecorationRole, QPixmap::fromImage(img));
+    bool ok;
+    QString bookmark_text = get_input_text(&ok);
+    if (ok) {
+        QListWidgetItem *item = new QListWidgetItem(bookmark_text, view);
+        item->setData(Qt::DecorationRole, QPixmap::fromImage(img));
 
-    view->addItem(item);
+        view->addItem(item);
+    }
 }
 
 /**
  * @brief BookmarkView::get_input_text
+ * @param ok Parameter set to false if the user cancels.
  * @return Returns a description for the bookmark,
  *         obtained from the user.
  */
-QString BookmarkView::get_input_text() {
+QString BookmarkView::get_input_text(bool* ok) {
     std::string bookmark_text = "";
 
     // Create the dialog
@@ -54,8 +59,9 @@ QString BookmarkView::get_input_text() {
     dialog.exec();
 
     if (dialog.wasCancelled()) {
+        *ok = false;
         return "";
     }
-
+    *ok = true;
     return QString::fromStdString(bookmark_text);
 }
