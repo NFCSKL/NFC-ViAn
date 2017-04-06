@@ -18,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
+#include "bookmarkview.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
@@ -139,6 +140,7 @@ private:
     inputwindow *inputWindow;
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
+    BookmarkView* bookmark_view;
 
     QSlider *video_slider;
 
