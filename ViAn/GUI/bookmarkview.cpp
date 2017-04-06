@@ -34,8 +34,6 @@ void BookmarkView::add_bookmark(std::string file_path) {
     item->setData(Qt::DecorationRole, QPixmap::fromImage(img));
 
     view->addItem(item);
-
-    //view->addItem(QString::fromStdString(file_path));
 }
 
 /**
@@ -44,8 +42,6 @@ void BookmarkView::add_bookmark(std::string file_path) {
  *         obtained from the user.
  */
 QString BookmarkView::get_input_text() {
-
-    // Create the texts shown in the dialog
     std::string contrast_text = "";
 
     // Create the dialog
