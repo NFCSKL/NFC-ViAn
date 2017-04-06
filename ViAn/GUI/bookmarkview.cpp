@@ -28,7 +28,7 @@ int BookmarkView::get_num_bookmarks() {
  */
 void BookmarkView::add_bookmark(std::string file_path) {
     QImage img = QImage(QString::fromStdString(file_path), "TIFF");
-    img = img.scaledToHeight(BOOKMARK_HEIGHT);
+    img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
 
     QListWidgetItem *item = new QListWidgetItem(get_input_text(), view);
     item->setData(Qt::DecorationRole, QPixmap::fromImage(img));
