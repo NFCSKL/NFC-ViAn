@@ -133,6 +133,10 @@ private slots:
 
     void on_actionContrast_Brightness_triggered();
 
+    void on_action_restore_original_size_triggered();
+
+    void on_action_fill_screen_triggered();
+
 private:
 
     Ui::MainWindow *ui;

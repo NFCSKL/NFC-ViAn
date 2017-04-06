@@ -847,3 +847,30 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
     mvideo_player->set_contrast(contrast);
     mvideo_player->set_brightness(brightness);
 }
+
+
+/**
+ * @brief MainWindow::on_action_restore_original_size_triggered
+ * restores the video to original size
+ */
+void MainWindow::on_action_restore_original_size_triggered() {
+    emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
+}
+
+/**
+ * @brief MainWindow::on_action_fill_screen_triggered
+ */
+void MainWindow::on_action_fill_screen_triggered() {
+    //Scales the current frame when video playback is paused
+    if (mvideo_player->video_open() && mvideo_player->is_paused()) {
+        QImage frame( ui->videoFrame->pixmap()->toImage() );
+        ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                      frame.scaled(ui->frame_scroll_area->width(),
+                                                   ui->frame_scroll_area->height(),
+                                                   Qt::KeepAspectRatio))
+                                  );
+    }
+
+    //Sends new QLabel resolution to mvideo_player to update scaling resolution
+    emit resize_video_frame(ui->frame_scroll_area->width(), ui->frame_scroll_area->height());
+}
