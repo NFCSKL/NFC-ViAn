@@ -39,7 +39,7 @@ private slots:
     void file_read_lines_test();
 
     // Project tests
-    void project_handling_test();
+    void project_handling_test(); // Old test
 
     void project_init_tests();
     void project_create_test();
