@@ -35,7 +35,6 @@ public:
     int get_num_frames();    
     int get_current_frame_num();
     bool set_current_frame_num(int frame_nbr);
-    void play_pause();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
