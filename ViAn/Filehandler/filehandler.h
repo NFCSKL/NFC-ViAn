@@ -34,7 +34,7 @@ public:
     void set_workspace(std::string new_work_space);
     Project* open_project(std::string dirpath);
     Project* create_project(std::string proj_name);
-    FH_ERROR delete_project(Project* proj);
+    FH_ERROR delete_project(ID id);
     Project* load_project(std::string full_project_path);
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(ID id);

@@ -122,19 +122,15 @@ private slots:
 
     void on_actionChoose_Workspace_triggered();
 
-    void on_actionDeleteProject_triggered();
-
-    void on_actionDeleteVideo_triggered();
-
     void on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
-    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
     void on_actionShow_hide_analysis_area_triggered();
 
     void on_actionContrast_Brightness_triggered();
 
     void on_documentList_itemClicked(QListWidgetItem *item);
+
+    void on_actionDelete_triggered();
 
 private:
 
@@ -153,8 +149,7 @@ private:
 
     void add_video_to_tree(string file_path, ID id);
 
-    void remove_selected_project_from_tree();
-    void remove_video_from_tree(MyQTreeWidgetItem *my_video);
+    void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
     void toggle_toolbar();
     void enable_video_buttons();
