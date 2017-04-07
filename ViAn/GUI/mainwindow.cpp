@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
+    // Setup a Bookmark View in the right sidebar in the GUI.
+    bookmark_view = new BookmarkView(ui->documentList);
+
     fileHandler = new FileHandler();
     set_shortcuts();
 
@@ -57,6 +60,7 @@ MainWindow::~MainWindow() {
     mvideo_player->terminate();
     delete mvideo_player;
     delete ui;
+    delete bookmark_view;
 }
 
 /**
@@ -280,9 +284,29 @@ void MainWindow::on_actionExit_triggered() {
 
 /**
  * @brief MainWindow::on_bookmarkButton_clicked
- * the button supposed to add a bookmark
+ * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmarkButton_clicked() {
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->ProjectTree->selectedItems().size() == 1) {
+        // Get current project.
+        item = ui->ProjectTree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
+        std::string proj_path = fileHandler->get_dir(my_project->id);
+        // Add bookmarks-folder to the project-folder.
+        proj_path.append("/bookmarks");
+        ID dir_id = fileHandler->create_directory(proj_path);
+        std::string dir_path = fileHandler->get_dir(dir_id);
+
+        // Export the current frame in the bookmarks-folder.
+        // The names of the stored files will have increasing numbers.
+        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
+        std::string file_path = mvideo_player->export_current_frame(dir_path, file_name);
+
+        bookmark_view->add_bookmark(file_path);
+        set_status_bar("Saved bookmark.");
+    }
 }
 
 /**

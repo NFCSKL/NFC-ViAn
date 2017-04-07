@@ -101,9 +101,8 @@ void video_player::show_frame() {
 void video_player::convert_frame() {
     cv::Mat processed_frame;
 
-    // Process frame (draw overlay, zoom, scaling, contrast/brightness)
+    // Process frame (draw overlay, zoom, scaling, contrast/brightness, rotation)
     processed_frame = process_frame(frame);
-
 
     if (processed_frame.channels() == 3) {
         cv::Mat RGBframe;
@@ -671,18 +670,23 @@ void video_player::scale_position(QPoint &pos) {
  * @brief video_player::export_current_frame
  * Stores the current frame in the specified folder.
  * The stored frame will have the sam resolution as the video.
- * @param filename Path to the folder to store the file in.
+ * @param path_to_folder Path to the folder to store the file in.
+ * @return The path to the stored image.
  */
-void video_player::export_current_frame(QString path_to_folder) {
+std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
     convert_frame();
 
-    // Add "/FRAME_NR.tiff" to the path.
-    path_to_folder.append("/");
-    path_to_folder.append(QString::number(get_current_frame_num()));
-    path_to_folder.append(".tiff");
+    QString path = QString::fromStdString(path_to_folder);
 
-    QImageWriter writer(path_to_folder, "tiff");
+    // Add "/file_name.tiff" to the path.
+    path.append("/");
+    path.append(QString::fromStdString(file_name));
+    path.append(".tiff");
+
+    QImageWriter writer(path, "tiff");
     writer.write(img);
+
+    return path.toStdString();
 }
 
 /**
