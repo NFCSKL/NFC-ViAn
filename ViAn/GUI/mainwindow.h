@@ -62,8 +62,6 @@ private slots:
 
     void on_actionExit_triggered();
 
-    void set_shortcuts();
-
     void closeEvent (QCloseEvent *event);
 
     void update_video(QImage frame);
