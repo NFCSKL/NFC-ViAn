@@ -65,7 +65,7 @@ void video_player::run()  {
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
-        convert_frame();
+        convert_frame(true);
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
 
         if (delay - conversion_time > 0) {
@@ -97,12 +97,13 @@ void video_player::show_frame() {
  * @brief video_player::convert_frame
  * Converts the current frame to a QImage,
  * including the zoom and overlay.
+ * @param scale Bool indicating if the frame should be scaled or not.
  */
-void video_player::convert_frame() {
+void video_player::convert_frame(bool scale) {
     cv::Mat processed_frame;
 
     // Process frame (draw overlay, zoom, scaling, contrast/brightness, rotation)
-    processed_frame = process_frame(frame);
+    processed_frame = process_frame(frame, scale);
 
     if (processed_frame.channels() == 3) {
         cv::Mat RGBframe;
@@ -121,9 +122,10 @@ void video_player::convert_frame() {
  * @brief video_player::process_frame
  * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
  * @param frame Frame to draw on.
+ * @param scale Bool indicating if the frame should be scaled or not.
  * @return Returns the processed frame.
  */
-cv::Mat video_player::process_frame(cv::Mat &frame) {
+cv::Mat video_player::process_frame(cv::Mat &frame, bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = frame.clone();
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
@@ -136,12 +138,10 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     processed_frame = zoom_frame(processed_frame);
     processed_frame = contrast_frame(processed_frame);
 
-    cv::Mat scaled_frame;
-    if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
-        scaled_frame = scale_frame(processed_frame);
-    } else {
-        scaled_frame = processed_frame;
+    if (scale && (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT))) {
+        processed_frame = scale_frame(processed_frame);
     }
+
 
     // Rotates the frame, according to the choosen direction.
     // If direction is in the valid range the frame is rotated.
@@ -149,7 +149,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
         cv::rotate(scaled_frame, scaled_frame, rotate_direction);
     }
 
-    return scaled_frame;
+    return processed_frame;
 }
 
 /**
@@ -344,7 +344,7 @@ void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
-    convert_frame();
+    convert_frame(true);
     show_frame();
 }
 
@@ -355,7 +355,7 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_current_frame_num(frame_nbr)) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -368,7 +368,7 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -381,7 +381,7 @@ void video_player::reset_brightness_contrast() {
     alpha = CONTRAST_DEFAULT;
     beta = BRIGHTNESS_DEFAULT;
     if (capture.isOpened()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -395,7 +395,7 @@ void video_player::reset_brightness_contrast() {
 void video_player::set_contrast(double contrast) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
     if (capture.isOpened()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -409,7 +409,7 @@ void video_player::set_contrast(double contrast) {
 void video_player::set_brightness(int brightness) {
     beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
     if (capture.isOpened()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -724,7 +724,7 @@ void video_player::scale_position(QPoint &pos) {
  * @return The path to the stored image.
  */
 std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
-    convert_frame();
+    convert_frame(false);
 
     QString path = QString::fromStdString(path_to_folder);
 

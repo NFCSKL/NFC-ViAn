@@ -9,7 +9,6 @@
  */
 BookmarkView::BookmarkView(QListWidget* parent) {
     view = parent;
-    view->addItem("Bookmarks:");
 }
 
 /**
@@ -24,19 +23,18 @@ int BookmarkView::get_num_bookmarks() {
  * @brief BookmarkView::add_bookmark
  * Adds a bookmark containing an image (thumbnail)
  * and a text description of the bookmark.
+ * @param frame_nbr Frame number associated with the bookmark.
  * @param file_path Path to the image of the bookmark.
  */
-void BookmarkView::add_bookmark(std::string file_path) {
+void BookmarkView::add_bookmark(int frame_nbr, std::string file_path) {
     QImage img = QImage(QString::fromStdString(file_path), "TIFF");
     img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
 
     bool ok;
     QString bookmark_text = get_input_text(&ok);
     if (ok) {
-        QListWidgetItem *item = new QListWidgetItem(bookmark_text, view);
-        item->setData(Qt::DecorationRole, QPixmap::fromImage(img));
-
-        view->addItem(item);
+        Bookmark* bookmark = new Bookmark(frame_nbr, img, bookmark_text, view);
+        view->addItem(bookmark);
     }
 }
 

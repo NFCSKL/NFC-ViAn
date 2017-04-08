@@ -132,6 +132,8 @@ private slots:
 
     void on_actionRotate_left_triggered();
 
+    void on_documentList_itemClicked(QListWidgetItem *item);
+
     void on_actionDelete_triggered();
 
 private:
