@@ -43,14 +43,16 @@ HEADERS += Library/customdialog.h
 SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
     GUI/inputwindow.cpp \
-    GUI/qtreeitems.cpp
+    GUI/qtreeitems.cpp \
+    GUI/bookmarkview.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/inputwindow.h \
     GUI/action.h \
-    GUI/qtreeitems.h
+    GUI/qtreeitems.h \
+    GUI/bookmarkview.h
 
 
 FORMS    += GUI/mainwindow.ui \

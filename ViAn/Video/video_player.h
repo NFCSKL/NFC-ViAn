@@ -29,13 +29,12 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     bool is_showing_analysis_tool();
-    void export_current_frame(QString path_to_folder);
+    std::string export_current_frame(std::string path_to_folder, std::string file_name);
     bool video_open();
 
     int get_num_frames();    
     int get_current_frame_num();
     bool set_current_frame_num(int frame_nbr);
-    void play_pause();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);

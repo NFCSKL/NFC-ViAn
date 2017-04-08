@@ -18,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
+#include "bookmarkview.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
@@ -121,13 +122,7 @@ private slots:
 
     void on_actionChoose_Workspace_triggered();
 
-    void on_actionDeleteProject_triggered();
-
-    void on_actionDeleteVideo_triggered();
-
     void on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
-
-    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
     void on_actionShow_hide_analysis_area_triggered();
 
@@ -137,12 +132,15 @@ private slots:
 
     void on_actionRotate_left_triggered();
 
+    void on_actionDelete_triggered();
+
 private:
 
     Ui::MainWindow *ui;
     inputwindow *inputWindow;
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
+    BookmarkView* bookmark_view;
 
     QSlider *video_slider;
 
@@ -153,8 +151,7 @@ private:
 
     void add_video_to_tree(string file_path, ID id);
 
-    void remove_selected_project_from_tree();
-    void remove_video_from_tree(MyQTreeWidgetItem *my_video);
+    void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
     void toggle_toolbar();
     void enable_video_buttons();
