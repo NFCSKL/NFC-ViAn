@@ -30,16 +30,18 @@ ZoomRectangle::~ZoomRectangle() {
 void ZoomRectangle::update_drawing_pos(QPoint pos) {
     // The zoom area has to be inside the video.
     cv::Point bounded_pos = bounded_coords(pos);
-    // Calculate the ratio between the choosen area and the video.
-    double width_ratio = (double) std::abs(bounded_pos.x - draw_start.x)/width_video;
-    double height_ratio = (double) std::abs(bounded_pos.y - draw_start.y)/height_video;
+    // Calculate the signed ratio between the choosen area and the video.
+    double width_ratio = (double) (bounded_pos.x - draw_start.x)/width_video;
+    double height_ratio = (double) (bounded_pos.y - draw_start.y)/height_video;
     // Set the area to follow the smallest ratio.
-    if (width_ratio >= height_ratio) {
-        draw_end.x = draw_start.x + width_video * height_ratio;
+    if (std::abs(width_ratio) >= std::abs(height_ratio)) {
+        // Need to keep the original sign when forcing the ratio
+        draw_end.x = draw_start.x + std::copysign(width_video * height_ratio, width_ratio);
         draw_end.y = bounded_pos.y;
     } else {
         draw_end.x = bounded_pos.x;
-        draw_end.y = draw_start.y + height_video * width_ratio;
+        // Need to keep the original sign when forcing the ratio
+        draw_end.y = draw_start.y + std::copysign(height_video * width_ratio, height_ratio);
     }
 }
 

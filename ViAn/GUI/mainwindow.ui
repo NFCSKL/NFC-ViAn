@@ -370,9 +370,11 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_hide_overlay"/>
+    <addaction name="actionShow_hide_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
-    <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="actionRotate_right"/>
+    <addaction name="actionRotate_left"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -426,6 +428,8 @@
    <addaction name="actionAddVideo"/>
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
+   <addaction name="actionRotate_right"/>
+   <addaction name="actionRotate_left"/>
    <addaction name="actionShow_hide_overlay"/>
    <addaction name="actionShow_hide_analysis_area"/>
   </widget>
@@ -697,6 +701,24 @@
   <action name="actionContrast_Brightness">
    <property name="text">
     <string>Contrast/Brightness</string>
+   </property>
+  </action>
+  <action name="actionRotate_right">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/rotate_right.png</normaloff>:/rotate_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate right</string>
+   </property>
+  </action>
+  <action name="actionRotate_left">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/rotate_left.png</normaloff>:/rotate_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate left</string>
    </property>
   </action>
   <action name="actionDelete">

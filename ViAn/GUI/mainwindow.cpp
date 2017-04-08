@@ -827,6 +827,23 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_actionRotate_right_triggered
+ * Rotates video to the right by 90 degrees.
+ */
+void MainWindow::on_actionRotate_right_triggered() {
+    mvideo_player->rotate_right();
+    set_status_bar("Video rotated 90 degrees to the right.");
+}
+
+/**
+ * @brief MainWindow::on_actionRotate_left_triggered
+ * Rotates video to the left by 90 degrees.
+ */
+void MainWindow::on_actionRotate_left_triggered() {
+    mvideo_player->rotate_left();
+    set_status_bar("Video rotated 90 degrees to the left.");
+}
+/**
  * @brief MainWindow::on_documentList_itemClicked
  * Invoked when an item in the bookmark view has been clicked.
  * @param item The bookmark that has been clicked.

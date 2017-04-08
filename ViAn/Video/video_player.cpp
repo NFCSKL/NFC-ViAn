@@ -141,6 +141,14 @@ cv::Mat video_player::process_frame(cv::Mat &frame, bool scale) {
     if (scale && (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT))) {
         processed_frame = scale_frame(processed_frame);
     }
+
+
+    // Rotates the frame, according to the choosen direction.
+    // If direction is in the valid range the frame is rotated.
+    if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
+        cv::rotate(processed_frame, processed_frame, rotate_direction);
+    }
+
     return processed_frame;
 }
 
@@ -556,6 +564,34 @@ void video_player::zoom_out() {
 }
 
 /**
+ * @brief video_player::rotate_right
+ * Rotates the video to the right by 90 degrees.
+ */
+void video_player::rotate_right() {
+    if (capture.isOpened()) {
+        // Rotaing right means adding 1 and
+        // starting over if larger than maximum,
+        rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
+        update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::rotate_left
+ * Rotates the video to the left by 90 degrees.
+ */
+void video_player::rotate_left() {
+    if (capture.isOpened()) {
+        // Rotaing left means subtracting 1 and
+        // starting over if larger than maximum.
+        // Modulo handles positive values, so
+        // minus 1 is the same as adding maximum-1.
+        rotate_direction = (rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
+        update_overlay();
+    }
+}
+
+/**
  * @brief video_player::video_mouse_pressed
  * If the user is choosing a zoom area and there
  * is a video loaded, its position is updated.
@@ -639,20 +675,35 @@ void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
+    // Calculate rotated coordinates from the coordinates
+    // on the QLabel where the frame is shown. The frame is
+    // centered vertically, so the empty part of the QLabel
+    // at the top needs to be subtracted.
+    int rotated_x;
+    int rotated_y;
+    if (rotate_direction == ROTATE_90) {
+        rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
+        rotated_y = frame_height - pos.x();
+    } else if (rotate_direction == ROTATE_180) {
+        rotated_x = frame_width - pos.x();
+        rotated_y = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_height) / 2);
+    } else if (rotate_direction == ROTATE_270) {
+        rotated_x = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_width) / 2);
+        rotated_y = pos.x();
+    } else if (rotate_direction == ROTATE_NONE) {
+        rotated_x = pos.x();
+        rotated_y = (pos.y() - (double) (qlabel_height - frame_height) / 2);
+    }
+
     // Calculate the scale ratio between the actual video
     // size and the size of the (scaled) video frame shown in the gui.
     double x_scale_ratio = (double) video_frame_width/frame_width;
     double y_scale_ratio = (double) video_frame_height/frame_height;
 
     // Calculate the coordinates on the original-sized frame,
-    // from the coordinates on the QLabel where the frame is shown:
-    // The frame is centered vertically, so the empty part of the QLabel
-    // at the top needs to be subtracted (only need to subtract from the
-    // top, hence division by 2). (The frame is not centered horisontally,
-    // it's left-aligned, so no compensation needed.)
-    // Then multiply with the ratio to get coordinates on the video frame.
-    double x_scale = x_scale_ratio * pos.x();
-    double y_scale = y_scale_ratio * (pos.y() - (double) (qlabel_height - frame_height) / 2);
+    // by multiplying with the ratio.
+    double x_scale = x_scale_ratio * rotated_x;
+    double y_scale = y_scale_ratio * rotated_y;
 
     // Calculate the coordinates on the actual video from
     // the coordinates on the zoomed frame.
