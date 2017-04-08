@@ -1,12 +1,13 @@
 #ifndef BOOKMARKVIEW_H
 #define BOOKMARKVIEW_H
 
+#include "bookmark.h"
 #include <QListWidget>
 
 class BookmarkView {
 public:
     BookmarkView(QListWidget* parent);
-    void add_bookmark(std::string file_path);
+    void add_bookmark(int frame_nbr, std::string file_path);
     int get_num_bookmarks();
 private:
     QString get_input_text(bool* ok);
