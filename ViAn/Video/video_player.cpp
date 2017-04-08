@@ -146,7 +146,7 @@ cv::Mat video_player::process_frame(cv::Mat &frame, bool scale) {
     // Rotates the frame, according to the choosen direction.
     // If direction is in the valid range the frame is rotated.
     if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
-        cv::rotate(scaled_frame, scaled_frame, rotate_direction);
+        cv::rotate(processed_frame, processed_frame, rotate_direction);
     }
 
     return processed_frame;
