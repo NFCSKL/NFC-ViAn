@@ -823,20 +823,21 @@ void MainWindow::on_action_restore_original_size_triggered() {
 
 /**
  * @brief MainWindow::on_action_fill_screen_triggered
+ * reseizes the video to fit the size of the screen
  */
 void MainWindow::on_action_fill_screen_triggered() {
     //Scales the current frame when video playback is paused
     if (mvideo_player->video_open() && mvideo_player->is_paused()) {
         QImage frame( ui->videoFrame->pixmap()->toImage() );
         ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                      frame.scaled(ui->frame_scroll_area->width(),
-                                                   ui->frame_scroll_area->height(),
+                                      frame.scaled(ui->frame_scroll_area->width()-SCROLLAREAMARGIN,
+                                                   ui->frame_scroll_area->height()-SCROLLAREAMARGIN,
                                                    Qt::KeepAspectRatio))
                                   );
     }
 
     //Sends new QLabel resolution to mvideo_player to update scaling resolution
-    emit resize_video_frame((ui->frame_scroll_area->width())-50, ui->frame_scroll_area->height());
+    emit resize_video_frame((ui->frame_scroll_area->width())-SCROLLAREAMARGIN, (ui->frame_scroll_area->height())-SCROLLAREAMARGIN);
 }
 
 /**

@@ -29,24 +29,18 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayoutLeft">
-        <item>
-         <widget class="QTreeWidget" name="ProjectTree">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <column>
-           <property name="text">
-            <string/>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
+      <widget class="QTreeWidget" name="ProjectTree">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayoutMiddle">
@@ -79,7 +73,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>232</width>
-                <height>281</height>
+                <height>282</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -340,19 +334,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayoutRight">
-        <item>
-         <widget class="QListWidget" name="documentList">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <widget class="QListWidget" name="documentList">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
       </widget>
      </widget>
     </item>
@@ -364,7 +352,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -521,7 +509,7 @@
   </widget>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/save_project.png</normaloff>:/save_project.png</iconset>
    </property>
    <property name="text">
@@ -539,7 +527,7 @@
   </action>
   <action name="actionLoad">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/load_project.png</normaloff>:/load_project.png</iconset>
    </property>
    <property name="text">
@@ -562,7 +550,7 @@
   </action>
   <action name="actionAddVideo">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/add_video.png</normaloff>:/add_video.png</iconset>
    </property>
    <property name="text">
@@ -595,7 +583,7 @@
   </action>
   <action name="actionShow_hide_overlay">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/show_hide_overlay.png</normaloff>:/show_hide_overlay.png</iconset>
    </property>
    <property name="text">
@@ -607,7 +595,7 @@
   </action>
   <action name="actionColour">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/colour.png</normaloff>:/colour.png</iconset>
    </property>
    <property name="text">
@@ -619,7 +607,7 @@
   </action>
   <action name="actionRectangle">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/box.png</normaloff>:/box.png</iconset>
    </property>
    <property name="text">
@@ -631,7 +619,7 @@
   </action>
   <action name="actionCircle">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/circle.png</normaloff>:/circle.png</iconset>
    </property>
    <property name="text">
@@ -643,7 +631,7 @@
   </action>
   <action name="actionArrow">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/arrow.png</normaloff>:/arrow.png</iconset>
    </property>
    <property name="text">
@@ -655,7 +643,7 @@
   </action>
   <action name="actionLine">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/line.png</normaloff>:/line.png</iconset>
    </property>
    <property name="text">
@@ -699,7 +687,7 @@
   </action>
   <action name="actionPen">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/pen.png</normaloff>:/pen.png</iconset>
    </property>
    <property name="text">
@@ -711,7 +699,7 @@
   </action>
   <action name="actionClear">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
    </property>
    <property name="text">
@@ -720,7 +708,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/undo.png</normaloff>:/undo.png</iconset>
    </property>
    <property name="text">
@@ -732,7 +720,7 @@
   </action>
   <action name="actionZoom_in">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/zoom_in.png</normaloff>:/zoom_in.png</iconset>
    </property>
    <property name="text">
@@ -744,7 +732,7 @@
   </action>
   <action name="actionZoom_out">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/zoom_out.png</normaloff>:/zoom_out.png</iconset>
    </property>
    <property name="text">
@@ -762,7 +750,7 @@
   </action>
   <action name="actionText">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/text.png</normaloff>:/text.png</iconset>
    </property>
    <property name="text">
@@ -805,7 +793,7 @@
   </action>
   <action name="actionRotate_right">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/rotate_right.png</normaloff>:/rotate_right.png</iconset>
    </property>
    <property name="text">
@@ -814,7 +802,7 @@
   </action>
   <action name="actionRotate_left">
    <property name="icon">
-    <iconset>
+    <iconset resource="../resources.qrc">
      <normaloff>:/rotate_left.png</normaloff>:/rotate_left.png</iconset>
    </property>
    <property name="text">
@@ -831,6 +819,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
