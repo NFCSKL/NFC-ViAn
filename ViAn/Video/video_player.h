@@ -62,6 +62,8 @@ public:
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
+    int get_video_width();
+    int get_video_height();
 
     friend class test_video_player;
 
@@ -74,6 +76,7 @@ public:
     const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
     const int CONTRAST_DECIMALS = 2;
     const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
+
 
 signals:
     void processed_image(const QImage &image);

@@ -781,3 +781,19 @@ void video_player::scaling_event(int new_width, int new_height) {
 bool video_player::video_open() {
     return capture.isOpened();
 }
+
+/**
+ * @brief video_player::get_video_width
+ * @return original width of the video
+ */
+int video_player::get_video_width() {
+    return capture.get(CV_CAP_PROP_FRAME_WIDTH);
+}
+
+/**
+ * @brief video_player::get_video_height
+ * @return original height of the video
+ */
+int video_player::get_video_height() {
+    return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+}

@@ -818,6 +818,14 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
  * restores the video to original size
  */
 void MainWindow::on_action_restore_original_size_triggered() {
+    if (mvideo_player->video_open() && mvideo_player->is_paused()) {
+        QImage frame( ui->videoFrame->pixmap()->toImage() );
+        ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                      frame.scaled(mvideo_player->get_video_width(),
+                                                   mvideo_player->get_video_height(),
+                                                   Qt::KeepAspectRatio))
+                                  );
+    }
     emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
 }
 
