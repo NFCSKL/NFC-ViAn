@@ -796,6 +796,9 @@
    <property name="text">
     <string>Fill screen</string>
    </property>
+   <property name="toolTip">
+    <string>Fill screen</string>
+   </property>
   </action>
   <action name="actionRotate_right">
    <property name="icon">

@@ -807,7 +807,8 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
 
 /**
  * @brief MainWindow::on_action_fill_screen_triggered
- * reseizes the video to fit the size of the screen
+ * Reseizes the video to fit the size of the screen.
+ * Will not work if you have set it to original size.
  */
 void MainWindow::on_action_fill_screen_triggered() {
     if(!original_size) {
@@ -821,7 +822,8 @@ void MainWindow::on_action_fill_screen_triggered() {
                                       );
         }
 
-        //Sends new QLabel resolution to mvideo_player to update scaling resolution
+        //Sends new scroll area resolution to mvideo_player to update scaling resolution
+        // Video frame is in the scroll area
         emit resize_video_frame((ui->frame_scroll_area->width())-SCROLLAREAMARGIN, (ui->frame_scroll_area->height())-SCROLLAREAMARGIN);
     }
 }
@@ -858,24 +860,33 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
 
 /**
  * @brief MainWindow::on_action_original_size_triggered
- * restores the video to original size
+ * Restores the video to original size and keeps it there until you activate again.
  */
 void MainWindow::on_action_original_size_triggered() {
-    if (!original_size && mvideo_player->video_open()) {
-        if (mvideo_player->is_paused()) {
-            QImage frame( ui->videoFrame->pixmap()->toImage() );
-            ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                          frame.scaled(mvideo_player->get_video_width(),
-                                                       mvideo_player->get_video_height(),
-                                                       Qt::KeepAspectRatio))
-                                      );
+    if(mvideo_player->video_open()) {
+        if (!original_size) {
+            //Scales the current frame when video playback is paused
+            if (mvideo_player->is_paused()) {
+                QImage frame( ui->videoFrame->pixmap()->toImage() );
+                ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                              frame.scaled(mvideo_player->get_video_width(),
+                                                           mvideo_player->get_video_height(),
+                                                           Qt::KeepAspectRatio))
+                                          );
+            }
+            emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
+            original_size = true;
+            ui->action_fill_screen->setEnabled(false);
+            set_status_bar("Original size set. Press again to fill screen.");
+        } else {
+            original_size = false;
+            ui->action_fill_screen->setEnabled(true);
+            on_action_fill_screen_triggered();
+            set_status_bar("Filling the screen with the video.");
         }
-        emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
-        original_size = true;
-        if(!ui->action_original_size->isChecked()) (ui->action_original_size->toggle());
+
     } else {
-        original_size = false;
-        on_action_fill_screen_triggered();
-        if(ui->action_original_size->isChecked()) (ui->action_original_size->toggle());
+        set_status_bar("No video loaded.");
+        ui->action_original_size->toggle(); // unchecks it again
     }
 }
