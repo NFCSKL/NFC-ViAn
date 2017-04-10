@@ -754,10 +754,6 @@ void video_player::scaling_event(int new_width, int new_height) {
 
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    if (new_width == -1 && new_height == -1) {
-        new_width = video_width;
-        new_height = video_height;
-    }
     float height_ratio = float(new_height)/float(video_height);
     float width_ratio = float(new_width)/float(video_width);
 

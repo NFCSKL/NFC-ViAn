@@ -874,7 +874,7 @@ void MainWindow::on_action_original_size_triggered() {
                                                            Qt::KeepAspectRatio))
                                           );
             }
-            emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
+            emit resize_video_frame(mvideo_player->get_video_width(), mvideo_player->get_video_height());
             original_size = true;
             ui->action_fill_screen->setEnabled(false);
             set_status_bar("Original size set. Press again to fill screen.");
