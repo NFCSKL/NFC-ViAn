@@ -10,7 +10,7 @@ QT       += testlib
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+#CONFIG      += no_keywords
 TARGET = ViAn
 TEMPLATE = app
 #
@@ -35,8 +35,13 @@ HEADERS += Test/test_video_player.h \
 #
 SOURCES += Library/customdialog.cpp
 HEADERS += Library/customdialog.h
-
-
+#
+# Boost
+#
+win32{
+    INCLUDEPATH += C:\boost\boost_1_64_0\bin
+#    LIBS += "C:\boost\boost_1_63_0\stage\" -lboost_filesystem-vc120-mt-1_63
+}
 #
 # GUI
 #

@@ -15,9 +15,9 @@
 #include "project.h"
 #include "dir.h"
 #include <algorithm>
-
-
-
+#include <QJsonObject>
+#include <QFile>
+#include <QJsonDocument>
 enum WRITE_OPTION{APPEND, OVERWRITE};
 typedef int FH_ERROR; // file handler error code
 typedef int ID;
@@ -25,7 +25,12 @@ struct Project; // fix for include issue
 struct ProjFiles;
 class FileHandler
 {
+    enum SaveFormat {
+        Json, Binary
+    };
+
 public:
+
     FileHandler();
     //
     //  Project manipulation
@@ -35,10 +40,14 @@ public:
     Project* open_project(std::string dirpath);
     Project* create_project(std::string proj_name);
     FH_ERROR delete_project(Project* proj);
+
     Project* load_project(std::string full_project_path);
+    Project* load_project(std::string full_project_path, SaveFormat save_format);
     Project* load_project(std::string proj_name, std::string dir_path);
+
     void save_project(ID id);
-    void save_project(Project* proj);
+    bool save_project(Project* proj, std::string dir_path, FileHandler::SaveFormat save_format);
+    //void save_project(Project* proj);
     // Video operations
     void remove_video_from_project(ID proj_id, ID vid_id);
     ID add_video(Project* proj, std::string file_path);
@@ -73,7 +82,7 @@ public:
 
 private:
 
-    void update_proj_files(Project* proj); // used to update existing project files and maps
+    void update_proj_file(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
     ID add_file(std::string file_path);
     void add_project(std::pair<ID,Project*> pair);

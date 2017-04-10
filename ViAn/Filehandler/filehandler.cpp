@@ -9,7 +9,7 @@ FileHandler::FileHandler() {
     this->dir_id = 0;
     this->last_error = 0;
     #ifdef _WIN32
-        this->work_space = "C:/";
+        this->work_space = "C:/ViAn/";
     #elif __APPLE__
         this->work_space = "/Applications/";
     #elif __unix__
@@ -37,7 +37,7 @@ void FileHandler::set_workspace(std::string new_work_space){
 Project* FileHandler::create_project(std::string proj_name){
     Project* proj =  new Project(this->project_id, proj_name);
     this->projects.insert(std::make_pair(proj->id, proj));
-    save_project(proj);
+    save_project(proj, this->work_space,Json);
     this->project_id++;
     return proj;
 }
@@ -69,147 +69,66 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @param id
  */
 void FileHandler::save_project(ID id){
-    save_project(get_project(id)); // get project and save it
+    this->save_project(get_project(id),this->work_space, FileHandler::SaveFormat::Json); // get project and save it
 }
 
 /**
- * @todo unfinished, needs full project structure
- * And program to file parser to finish
  * @brief FileHandler::save_project
- * @param Project* name
- * @return void
- * Creates project and associated files.
- */
-void FileHandler::save_project(Project* proj){
-    std::string proj_file = proj->name + std::string(".txt"); //filename
-    if(!proj->saved){
-        ID dir_id = create_directory(std::string(work_space) + proj->name);//project directory
-
-        proj->files->dir = dir_id;
-
-        proj->files->f_proj = create_file(proj_file, dir_id); //create project file
-
-        std::string vid_file = proj->name + "_videos.txt";
-        proj->files->f_videos = create_file(vid_file, dir_id); //create video file
-
-
-        std::string analysis_file = proj->name + "_analyses.txt";
-        proj->files->f_analysis = create_file(analysis_file, dir_id); //create analysis file
-
-
-        std::string drawing_file = proj->name + "_drawings.txt";
-        proj->files->f_drawings =create_file(drawing_file, dir_id); //create drawings file
-    }
-    update_proj_files(proj);
-
-}
-
-/**
- * @todo unfinished, will be released with parser
- * however, is needed for creating
- * @brief FileHandler::save_project
- * @param Project* name
- * Creates project and associated files.
- * @return void
- */
-void FileHandler::update_proj_files(Project* proj){
-    ProjectStream ps;
-    ps << *proj;
-    write_file(proj->files->f_proj, ps.proj_file.str(), WRITE_OPTION::OVERWRITE);
-    write_file(proj->files->f_videos, ps.videos.str(), WRITE_OPTION::OVERWRITE);
-    write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
-    write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
-}
-
-/**
- * @brief FileHandler::load_project
- * @param dirpath
- * @return fully loaded project
- *
- * Split project full path "C:/this/is/an/example/project/project.txt"
- * into
- * dirpath = "C:/this/is/an/example/project/
- * proj_name = project
- * Then call load with identified project
- */
-Project* FileHandler::load_project(std::string full_proj_path){
-    std::string dir_path = full_proj_path.substr(0, full_proj_path.find_last_of("/"));
-    std::string proj_name = full_proj_path.substr(full_proj_path.find_last_of("/")+1, full_proj_path.length());
-    proj_name = proj_name.substr(0, proj_name.find(".txt"));
-    return load_project(proj_name, dir_path);
-}
-
-/**
- * @todo load analyses (in project <</>> operators)
- * @todo load drawings (in project <</>> operators)
- * @brief FileHandler::load_project
- * @param projname
+ * @param proj
  * @param dir_path
- * @return project
- *
- * Loads a project from file,
+ * @param save_format
+ * @return
  */
-Project* FileHandler::load_project(std::string proj_name, std::string dir_path){
+bool FileHandler::save_project(Project* proj, std::string dir_path, FileHandler::SaveFormat save_format){
+    std::string file_path = dir_path + proj->name;
+    QFile save_file(save_format == Json
+                    ? QString::fromStdString(file_path + ".json")
+                    : QString::fromStdString(file_path + ".dat"));
+    if(!save_file.open(QIODevice::WriteOnly)){
+        return false;
+    }
+    QJsonObject json_proj;
+    proj->write(json_proj);
+    QJsonDocument save_doc(json_proj);
+    save_file.write(save_format == Json
+            ? save_doc.toJson()
+            : save_doc.toBinaryData());
+    return true;
+}
+
+Project* FileHandler::load_project(std::string full_project_path){
+    return load_project(full_project_path, Json);
+}
+
+Project* FileHandler::load_project(std::string full_project_path, FileHandler::SaveFormat save_format){
+    QFile load_file(save_format == Json
+        ? QString::fromStdString(full_project_path)
+        : QString::fromStdString(full_project_path));
+
+    if (!load_file.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't open save file.");
+        return false;
+    }
+    QByteArray save_data = load_file.readAll();
+
+    QJsonDocument load_doc(save_format == Json
+        ? QJsonDocument::fromJson(save_data)
+        : QJsonDocument::fromBinaryData(save_data));
+
     Project* proj = new Project();
-    proj->id = this->project_id;
-    proj->files->dir = add_dir(dir_path);
-
-    add_project(std::make_pair(this->project_id++, proj));
-    ProjectStream proj_stream;
-
     proj->saved = true;
-//    Read project file
-    std::string proj_file_path = dir_path + "/" + proj_name + ".txt";
-    proj->files->f_proj = load_project_file(proj_file_path, proj_stream.proj_file);
 
-//    Read video file
-    std::string video_file_path = dir_path + "/" + proj_name + "_videos.txt";
-    proj->files->f_videos = load_project_file(video_file_path, proj_stream.videos);
-//    Read Analyzes
-    std::string analysis_file_path = dir_path + "/" + proj_name + "_analyses.txt";
-    proj->files->f_analysis = load_project_file(analysis_file_path, proj_stream.videos);
-//    Read Drawings
-    std::string drawing_file_path = dir_path + "/" + proj_name + "_drawings.txt";
-    proj->files->f_drawings = load_project_file(drawing_file_path, proj_stream.drawings);
-//    Read project from projstream
-
-    proj_stream >> *proj;
+    proj->read(load_doc.object());
+    proj->id = this->project_id++;
     return proj;
 }
 
-/**
- * @brief FileHandler::load_project_file
- * help function for load_project
- * @param file_path
- * @param projFileStream
- * @return ID
- *
- * Help function for load_project
- */
-ID FileHandler::load_project_file(std::string file_path, std::stringstream& proj_file_stream){
-    std::string buf;
-    ID proj_file_id = add_file(file_path);
-    read_file(proj_file_id, buf);
-    proj_file_stream << buf; // Read project name
-    return proj_file_id;
+Project* FileHandler::load_project(std::string proj_name, std::string dir_path){
+    return new Project(this->project_id++, "dummy");
 }
 
-/**
- * @brief FileHandler::delete_project
- * @param Project*
- * @return FH_ERROR errorcode
- * Deletes project, its associated files and contents.
- * OBS! This operation is as of now irreversible
- */
 FH_ERROR FileHandler::delete_project(Project* proj){
-    ProjFiles* pf = proj->files;
-    delete_file(pf->f_proj);
-    delete_file(pf->f_videos);
-    delete_file(pf->f_analysis);
-    delete_file(pf->f_drawings);
-    FH_ERROR err = delete_directory(proj->files->dir);
-    delete proj;
-    return err;
+    return 0;
 }
 
 /**

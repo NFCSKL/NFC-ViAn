@@ -8,18 +8,10 @@
 #include <sstream>
 #include "filehandler.h"
 #include "video.h"
+#include <QJsonObject>
+#include <QJsonArray>
 typedef int ID;
-/**
- * @brief The ProjectStream struct
- * Used for writing projects to and from files.
- * Importand for seperation of different types of data.
- */
-struct ProjectStream{
-    std::stringstream proj_file;
-    std::stringstream videos;
-    std::stringstream analyzes;
-    std::stringstream drawings;
-};
+
 /**
  * @brief The ProjFiles struct
  * project file container, simplifies code for readability,
@@ -39,9 +31,6 @@ struct ProjFiles{
        this->f_drawings = -1;
        this->f_videos = -1;
    }
-
-   friend ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf);
-   friend ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf);
 };
 
 /**
@@ -59,8 +48,8 @@ public:
     ID add_video(Video *vid);
     void remove_video(ID id);
     // read and write operator for Projects
-    friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
-    friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
 
 // TODO
 //    void add_analysis();
