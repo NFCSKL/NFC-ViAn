@@ -31,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent) :
     bookmark_view = new BookmarkView(ui->documentList);
 
     fileHandler = new FileHandler();
-    set_shortcuts();
 
     // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
@@ -85,18 +84,6 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_pause_video()));
     QObject::connect(this, SIGNAL(set_stop_video()),
                      mplayer, SLOT(on_stop_video()));
-}
-
-/**
- * @brief MainWindow::set_shortcuts
- * Function to set keyboard shortcuts on actions
- */
-void MainWindow::set_shortcuts(){
-    ui->actionExit->setShortcut(tr("Ctrl+e"));
-    ui->actionSave->setShortcut(tr("Ctrl+s"));
-    ui->actionLoad->setShortcut(tr("Ctrl+l"));
-    ui->actionAddProject->setShortcut(tr("Ctrl+Shift+p"));
-    ui->actionAddVideo->setShortcut(tr("Ctrl+Shift+v"));
 }
 
 /**
