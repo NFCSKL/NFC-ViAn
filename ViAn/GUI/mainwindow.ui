@@ -404,7 +404,7 @@
     <addaction name="actionShow_hide_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
-    <addaction name="action_restore_original_size"/>
+    <addaction name="action_original_size"/>
     <addaction name="action_fill_screen"/>
     <addaction name="actionRotate_right"/>
     <addaction name="actionRotate_left"/>
@@ -781,9 +781,15 @@
     <string>Contrast/Brightness</string>
    </property>
   </action>
-  <action name="action_restore_original_size">
+  <action name="action_original_size">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Restore original size</string>
+    <string>Original size</string>
+   </property>
+   <property name="toolTip">
+    <string>Original size (on/off)</string>
    </property>
   </action>
   <action name="action_fill_screen">

@@ -46,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Initially hide overlay and analysis toolbar
     ui->toolBar_overlay->hide();
     ui->toolBar_analysis->hide();
+
+    // The video player is not in original size.
+    original_size = false;
 }
 
 /**
@@ -201,19 +204,8 @@ void MainWindow::set_video_slider_pos(int pos) {
  */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
+   on_action_fill_screen_triggered();
 
-   //Scales the current frame when video playback is paused
-   if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-       QImage frame( ui->videoFrame->pixmap()->toImage() );
-       ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                     frame.scaled(ui->videoFrame->width(),
-                                                  ui->videoFrame->height(),
-                                                  Qt::KeepAspectRatio))
-                                 );
-   }
-
-   //Sends new QLabel resolution to mvideo_player to update scaling resolution
-   emit resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
 }
 
 /**
@@ -814,38 +806,24 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
 }
 
 /**
- * @brief MainWindow::on_action_restore_original_size_triggered
- * restores the video to original size
- */
-void MainWindow::on_action_restore_original_size_triggered() {
-    if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-        QImage frame( ui->videoFrame->pixmap()->toImage() );
-        ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                      frame.scaled(mvideo_player->get_video_width(),
-                                                   mvideo_player->get_video_height(),
-                                                   Qt::KeepAspectRatio))
-                                  );
-    }
-    emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
-}
-
-/**
  * @brief MainWindow::on_action_fill_screen_triggered
  * reseizes the video to fit the size of the screen
  */
 void MainWindow::on_action_fill_screen_triggered() {
-    //Scales the current frame when video playback is paused
-    if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-        QImage frame( ui->videoFrame->pixmap()->toImage() );
-        ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                      frame.scaled(ui->frame_scroll_area->width()-SCROLLAREAMARGIN,
-                                                   ui->frame_scroll_area->height()-SCROLLAREAMARGIN,
-                                                   Qt::KeepAspectRatio))
-                                  );
-    }
+    if(!original_size) {
+        //Scales the current frame when video playback is paused
+        if (mvideo_player->video_open() && mvideo_player->is_paused()) {
+            QImage frame( ui->videoFrame->pixmap()->toImage() );
+            ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                          frame.scaled(ui->frame_scroll_area->width()-SCROLLAREAMARGIN,
+                                                       ui->frame_scroll_area->height()-SCROLLAREAMARGIN,
+                                                       Qt::KeepAspectRatio))
+                                      );
+        }
 
-    //Sends new QLabel resolution to mvideo_player to update scaling resolution
-    emit resize_video_frame((ui->frame_scroll_area->width())-SCROLLAREAMARGIN, (ui->frame_scroll_area->height())-SCROLLAREAMARGIN);
+        //Sends new QLabel resolution to mvideo_player to update scaling resolution
+        emit resize_video_frame((ui->frame_scroll_area->width())-SCROLLAREAMARGIN, (ui->frame_scroll_area->height())-SCROLLAREAMARGIN);
+    }
 }
 
 /**
@@ -875,5 +853,29 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
     if (mvideo_player->is_paused()) {
         mvideo_player->set_current_frame_num(bookmark->get_frame_number());
         set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_original_size_triggered
+ * restores the video to original size
+ */
+void MainWindow::on_action_original_size_triggered() {
+    if (!original_size && mvideo_player->video_open()) {
+        if (mvideo_player->is_paused()) {
+            QImage frame( ui->videoFrame->pixmap()->toImage() );
+            ui->videoFrame->setPixmap(QPixmap::fromImage(
+                                          frame.scaled(mvideo_player->get_video_width(),
+                                                       mvideo_player->get_video_height(),
+                                                       Qt::KeepAspectRatio))
+                                      );
+        }
+        emit resize_video_frame(-1, -1);//-1, -1 sets it to original size
+        original_size = true;
+        if(!ui->action_original_size->isChecked()) (ui->action_original_size->toggle());
+    } else {
+        original_size = false;
+        on_action_fill_screen_triggered();
+        if(ui->action_original_size->isChecked()) (ui->action_original_size->toggle());
     }
 }

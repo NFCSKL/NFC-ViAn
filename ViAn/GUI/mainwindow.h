@@ -127,8 +127,6 @@ private slots:
 
     void on_actionContrast_Brightness_triggered();
 
-    void on_action_restore_original_size_triggered();
-
     void on_action_fill_screen_triggered();
 
     void on_actionRotate_right_triggered();
@@ -138,6 +136,8 @@ private slots:
     void on_documentList_itemClicked(QListWidgetItem *item);
 
     void on_actionDelete_triggered();
+
+    void on_action_original_size_triggered();
 
 private:
 
@@ -161,6 +161,8 @@ private:
     void toggle_toolbar();
     void enable_video_buttons();
     QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
+
+    bool original_size;
 };
 
 #endif // MAINWINDOW_H
