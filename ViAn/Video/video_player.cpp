@@ -770,6 +770,8 @@ void video_player::scaling_event(int new_width, int new_height) {
         frame_width = new_width;
         frame_height = int(video_height * width_ratio);
     }
+
+    update_overlay();
 }
 
 /**
