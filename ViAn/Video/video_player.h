@@ -29,13 +29,12 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     bool is_showing_analysis_tool();
-    void export_current_frame(QString path_to_folder);
+    std::string export_current_frame(std::string path_to_folder, std::string file_name);
     bool video_open();
 
     int get_num_frames();    
     int get_current_frame_num();
     bool set_current_frame_num(int frame_nbr);
-    void play_pause();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
@@ -58,6 +57,8 @@ public:
     void toggle_analysis_area();
     void zoom_in();
     void zoom_out();
+    void rotate_right();
+    void rotate_left();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
@@ -97,10 +98,10 @@ private:
     cv::Mat zoom_frame(cv::Mat &frame);
     cv::Mat contrast_frame(cv::Mat &frame);
     cv::Mat scale_frame(cv::Mat &src);
-    cv::Mat process_frame(cv::Mat &frame);
+    cv::Mat process_frame(cv::Mat &frame, bool scale);
     void update_overlay();
     void show_frame();
-    void convert_frame();
+    void convert_frame(bool scale);
     void scale_position(QPoint &pos);
 
     cv::VideoCapture capture;
@@ -127,6 +128,14 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
+
+    // Constants for the directions of the rotation.
+    int const ROTATE_90 = 0, ROTATE_180 = 1, ROTATE_270 = 2, ROTATE_NONE = 3;
+    // The limits of the rotation. This should not include the no-rotaion option.
+    int const ROTATE_MIN = 0, ROTATE_MAX = 2;
+    // Number of directions.
+    int const ROTATE_NUM = 4;
+    int rotate_direction = ROTATE_NONE;
 
     // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
     double alpha = 1;
