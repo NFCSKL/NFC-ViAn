@@ -37,10 +37,10 @@ public:
     //
     //  Project manipulation
     //
-    std::string work_space;
+    QDir* work_space;
     void set_workspace(std::string new_work_space);
     Project* open_project(std::string dirpath);
-    Project* create_project(std::string proj_name);
+    Project* create_project(QString proj_name);
     FH_ERROR delete_project(Project* proj);
 
     Project* load_project(std::string full_project_path);
@@ -48,7 +48,7 @@ public:
     Project* load_project(std::string proj_name, std::string dir_path);
 
     void save_project(ID id);
-    bool save_project(Project* proj, std::string dir_path, FileHandler::SaveFormat save_format);
+    bool save_project(Project* proj, QDir *dir, FileHandler::SaveFormat save_format);
     //void save_project(Project* proj);
     // Video operations
     void remove_video_from_project(ID proj_id, ID vid_id);
@@ -60,7 +60,7 @@ public:
 
     //file manipulation
 
-    ID create_file(QString file_name, QDir dir);
+    ID create_file(QString file_name, QDir *dir);
     FH_ERROR delete_file(ID id);
     void write_file(ID id, QString text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
     void read_file(ID id, QString& buf, int lines_to_read = -1);

@@ -9,7 +9,7 @@ FileHandler::FileHandler() {
     this->dir_id = 0;
     this->last_error = 0;
     #ifdef _WIN32
-        this->work_space = "C:/ViAn/";
+        this->work_space = get_dir(create_directory("C:/ViAn/"));
     #elif __APPLE__
         this->work_space = "/Applications/";
     #elif __unix__
@@ -24,7 +24,7 @@ FileHandler::FileHandler() {
  * @param newWorkSpace
  */
 void FileHandler::set_workspace(std::string new_work_space){
-    this->work_space = new_work_space;
+    //this->work_space = new_work_space;
     //save_workspace();
 }
 
@@ -34,10 +34,10 @@ void FileHandler::set_workspace(std::string new_work_space){
  * @param std::string name
  * @return Project* created project
  */
-Project* FileHandler::create_project(std::string proj_name){
-    Project* proj =  new Project(this->project_id, proj_name);
+Project* FileHandler::create_project(QString proj_name){
+    Project* proj =  new Project(this->project_id, proj_name.toStdString());
     this->projects.insert(std::make_pair(proj->id, proj));
-    save_project(proj, this->work_space,Json);
+    save_project(proj, proj->dir ,Json);
     this->project_id++;
     return proj;
 }
@@ -69,7 +69,8 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @param id
  */
 void FileHandler::save_project(ID id){
-    this->save_project(get_project(id),this->work_space, FileHandler::SaveFormat::Json); // get project and save it
+    Project* proj = get_project(id);
+    this->save_project(proj, this->work_space, FileHandler::SaveFormat::Json); // get project and save it
 }
 
 /**
@@ -79,8 +80,8 @@ void FileHandler::save_project(ID id){
  * @param save_format
  * @return
  */
-bool FileHandler::save_project(Project* proj, std::string dir_path, FileHandler::SaveFormat save_format){
-    std::string file_path = dir_path + proj->name;
+bool FileHandler::save_project(Project* proj, QDir* dir, FileHandler::SaveFormat save_format){
+    std::string file_path = dir->filePath(QString::fromStdString(proj->name)).toStdString();
     QFile save_file(save_format == Json
                     ? QString::fromStdString(file_path + ".json")
                     : QString::fromStdString(file_path + ".dat"));
@@ -173,8 +174,8 @@ void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
   * @param std::string file name, ID directory id
   */
 
-ID FileHandler::create_file(QString file_name, QDir dir){
-    QFile* file = new QFile(dir.filePath(file_name));
+ID FileHandler::create_file(QString file_name, QDir* dir){
+    QFile* file = new QFile(dir->filePath(file_name));
     if(!file->open(QIODevice::ReadWrite)){
         qWarning("Cannot create file %s", file->fileName().toStdString().c_str());
         return 1; // File could not be created

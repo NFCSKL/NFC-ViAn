@@ -10,28 +10,8 @@
 #include "video.h"
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDir>
 typedef int ID;
-
-/**
- * @brief The ProjFiles struct
- * project file container, simplifies code for readability,
- * also easier to pass all files as opposed to every file
- * seperately
- */
-struct ProjFiles{
-   ID dir;
-   ID f_proj;
-   ID f_analysis;
-   ID f_drawings;
-   ID f_videos;
-   ProjFiles(){
-       this->dir = -1;
-       this->f_proj = -1;
-       this->f_analysis = -1;
-       this->f_drawings = -1;
-       this->f_videos = -1;
-   }
-};
 
 /**
  * @brief The Project struct
@@ -58,7 +38,7 @@ public:
     ID id;
     ID v_id;
     std::string name;
-    ProjFiles* files;
+    QDir* dir;
     std::map<ID,Video*> videos;
     bool saved;
 };

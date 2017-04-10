@@ -6,7 +6,6 @@
  */
 Project::Project(ID id, std::string name)
 {
-    this->files = new ProjFiles();
     this->name = name;
     this->id = id;
     this->v_id = 0;
@@ -17,7 +16,6 @@ Project::Project(ID id, std::string name)
  * @brief Project::Project
  */
 Project::Project(){
-    this->files = new ProjFiles();
     this->name = "";
     this->id = -1;
     this->id = 0;
