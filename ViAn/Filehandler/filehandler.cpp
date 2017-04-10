@@ -48,7 +48,12 @@ Project* FileHandler::create_project(QString proj_name){
  * @return unique directory ID
  */
 ID FileHandler::create_directory(QString dir_path){
-    QDir* dir = new QDir(dir_path);
+    QDir* dir = new QDir(QDir::root());
+    last_error = dir->mkpath(dir_path);
+    if(!last_error){
+        qWarning("Could not create directory %s",dir_path.toStdString().c_str());
+    }
+    dir->setPath(dir_path);
     ID id = this->add_dir(dir);
     return id;
 }
@@ -60,7 +65,13 @@ ID FileHandler::create_directory(QString dir_path){
  * otherwise see OS relevant directoryfile.
  */
 FH_ERROR FileHandler::delete_directory(ID id){
-    return this->dir_map.erase(id);
+    QDir* temp = dir_map.at(id);
+    if(temp->rmdir(temp->absolutePath())){
+        this->dir_map.erase(id);
+        delete temp;
+        return 0;
+    }
+    return 1;
 
 }
 
@@ -190,7 +201,10 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
  */
  FH_ERROR FileHandler::delete_file(ID id){
     QFile* file = this->get_file(id);
-    if(file->remove()) return this->file_map.erase(id); // File removed
+    if(file->remove()){
+        this->file_map.erase(id); // File removed
+        return 0;
+    }
     delete file;
     return 1; // Error
  }
