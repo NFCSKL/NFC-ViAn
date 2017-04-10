@@ -22,7 +22,7 @@ using namespace std;
 class video_player : public QThread {
     Q_OBJECT
 public:
-    video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent = 0);
+    video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent = 0);
     ~video_player();
     bool load_video(string filename);
     bool is_paused();
@@ -104,6 +104,8 @@ private:
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
 
+    QLabel* video_frame;
+
     cv::VideoCapture capture;
     cv::Mat frame;
     cv::Mat RGBframe;
@@ -111,8 +113,6 @@ private:
     int num_frames;
     unsigned int frame_width;
     unsigned int frame_height;
-    unsigned int qlabel_width;
-    unsigned int qlabel_height;
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;

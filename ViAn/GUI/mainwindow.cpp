@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
     //Creates and prepares the video_player.
-    mvideo_player = new video_player(&mutex, &paused_wait);
+    mvideo_player = new video_player(&mutex, &paused_wait, ui->videoFrame);
     setup_video_player(mvideo_player);
 
     // Initially hide overlay and analysis toolbar

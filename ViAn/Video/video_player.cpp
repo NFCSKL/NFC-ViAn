@@ -14,9 +14,10 @@ using namespace cv;
  * @brief video_player::video_player
  * @param parent
  */
-video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent) : QThread(parent) {
     m_mutex = mutex;
     m_paused_wait = paused_wait;
+    video_frame = label;
 }
 
 /**
@@ -682,17 +683,17 @@ void video_player::scale_position(QPoint &pos) {
     int rotated_x;
     int rotated_y;
     if (rotate_direction == ROTATE_90) {
-        rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
+        rotated_x = (pos.y() - (double) (video_frame->height() - frame_width) / 2);
         rotated_y = frame_height - pos.x();
     } else if (rotate_direction == ROTATE_180) {
         rotated_x = frame_width - pos.x();
-        rotated_y = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_height) / 2);
+        rotated_y = ((video_frame->height() - pos.y()) - (double) (video_frame->height() - frame_height) / 2);
     } else if (rotate_direction == ROTATE_270) {
-        rotated_x = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_width) / 2);
+        rotated_x = ((video_frame->height() - pos.y()) - (double) (video_frame->height() - frame_width) / 2);
         rotated_y = pos.x();
     } else if (rotate_direction == ROTATE_NONE) {
         rotated_x = pos.x();
-        rotated_y = (pos.y() - (double) (qlabel_height - frame_height) / 2);
+        rotated_y = (pos.y() - (double) (video_frame->height() - frame_height) / 2);
     }
 
     // Calculate the scale ratio between the actual video
@@ -750,9 +751,6 @@ void video_player::scaling_event(int new_width, int new_height) {
     if (!capture.isOpened()) {
         return;
     }
-
-    qlabel_width = new_width;
-    qlabel_height = new_height;
 
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
