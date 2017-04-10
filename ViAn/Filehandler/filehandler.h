@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <QJsonObject>
 #include <QFile>
+#include <QDir>
+#include <QTextStream>
 #include <QJsonDocument>
 enum WRITE_OPTION{APPEND, OVERWRITE};
 typedef int FH_ERROR; // file handler error code
@@ -53,15 +55,15 @@ public:
     ID add_video(Project* proj, std::string file_path);
     //directory manipulation
     //varying implementation
-    ID create_directory(std::string dir_path);
+    ID create_directory(QString dir_path);
     FH_ERROR delete_directory(ID id);
 
     //file manipulation
 
-    ID create_file(std::string file_name, ID dir_id);
+    ID create_file(QString file_name, QDir dir);
     FH_ERROR delete_file(ID id);
-    void write_file(ID id, std::string text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
-    void read_file(ID id,  std::string& buf, int lines_to_read = -1);
+    void write_file(ID id, QString text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
+    void read_file(ID id, QString& buf, int lines_to_read = -1);
 
     friend bool operator==(ProjFiles& pf, ProjFiles& pf2);
     friend bool operator==(Project& proj, Project& proj2);
@@ -73,9 +75,9 @@ public:
     // thread safe read operations for maps
 
 
-    std::string get_dir(ID id);
+    QDir *get_dir(ID id);
     Project* get_project(ID id);
-    std::string get_file(ID id);
+    QFile *get_file(ID id);
 
     // Last error
     FH_ERROR last_error;
@@ -84,22 +86,22 @@ private:
 
     void update_proj_file(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    ID add_file(std::string file_path);
+    ID add_file(QFile* file);
     void add_project(std::pair<ID,Project*> pair);
 
-    ID add_dir(std::string dir_path);
+    ID add_dir(QDir *dir);
     ID load_project_file(std::string file_path, std::stringstream& proj_file_stream);
     void load_proj_files(std::string str);
     //add used for loading project from file
-    void add_file(ID id , std::string file_path);
+    void add_file(ID id , QFile* file);
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap
      * map structures for keeping track of projects, files and directories.
      */
     std::map<ID,Project*> projects;
-    std::map<ID, std::string> file_map;
-    std::map<ID, std::string> dir_map;
+    std::map<ID, QFile*> file_map;
+    std::map<ID, QDir*> dir_map;
     /**
      * @todo implement smarter lock mechanism to avoid overhead
      * of only 1 reader/writer at a time

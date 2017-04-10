@@ -47,9 +47,9 @@ Project* FileHandler::create_project(std::string proj_name){
  * @param dir_path
  * @return unique directory ID
  */
-ID FileHandler::create_directory(std::string dir_path){
-    this->last_error = make_dir(dir_path); //varying implementation, OS dependant
-    ID id = this->add_dir(dir_path);
+ID FileHandler::create_directory(QString dir_path){
+    QDir* dir = new QDir(dir_path);
+    ID id = this->add_dir(dir);
     return id;
 }
 
@@ -60,8 +60,8 @@ ID FileHandler::create_directory(std::string dir_path){
  * otherwise see OS relevant directoryfile.
  */
 FH_ERROR FileHandler::delete_directory(ID id){
-    FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
-    return err;
+    return this->dir_map.erase(id);
+
 }
 
 /**
@@ -95,11 +95,22 @@ bool FileHandler::save_project(Project* proj, std::string dir_path, FileHandler:
             : save_doc.toBinaryData());
     return true;
 }
-
+/**
+ * @brief FileHandler::load_project
+ * @param full_project_path
+ * @return loaded Project
+ * Public load function
+ */
 Project* FileHandler::load_project(std::string full_project_path){
-    return load_project(full_project_path, Json);
+    return load_project(full_project_path, Json); // Decide format internally, here for flexibility
 }
-
+/**
+ * @brief FileHandler::load_project
+ * @param full_project_path
+ * @param save_format
+ * @return loaded Project
+ * Loads project from json file and returns it
+ */
 Project* FileHandler::load_project(std::string full_project_path, FileHandler::SaveFormat save_format){
     QFile load_file(save_format == Json
         ? QString::fromStdString(full_project_path)
@@ -123,12 +134,11 @@ Project* FileHandler::load_project(std::string full_project_path, FileHandler::S
     return proj;
 }
 
-Project* FileHandler::load_project(std::string proj_name, std::string dir_path){
-    return new Project(this->project_id++, "dummy");
-}
-
 FH_ERROR FileHandler::delete_project(Project* proj){
-    return 0;
+    Project* temp = proj;
+    this->projects.erase(proj->id);
+    delete temp;
+    //this->update_proj_file();
 }
 
 /**
@@ -163,22 +173,25 @@ void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
   * @param std::string file name, ID directory id
   */
 
-ID FileHandler::create_file(std::string file_name, ID dir_id){
-    std::ofstream f;
-    std::string file_path = this->get_dir(dir_id)+"/"+file_name;
-    f.open(file_path.c_str());
-    return this->add_file(file_path);
+ID FileHandler::create_file(QString file_name, QDir dir){
+    QFile* file = new QFile(dir.filePath(file_name));
+    if(!file->open(QIODevice::ReadWrite)){
+        qWarning("Cannot create file %s", file->fileName().toStdString().c_str());
+        return 1; // File could not be created
+    }
+    return this->add_file(file); // File created
   }
 
 /**
- * @todo make threadsafe
  * @brief FileHandler::delete_file
  * delete application tracked file
  * @param ID file id
  */
  FH_ERROR FileHandler::delete_file(ID id){
-    std::string file = this->get_file(id);
-    return std::remove(file.c_str());
+    QFile* file = this->get_file(id);
+    if(file->remove()) return this->file_map.erase(id); // File removed
+    delete file;
+    return 1; // Error
  }
 
  /**
@@ -188,21 +201,12 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
   * @param ID file id, std::string text
   * @return void
   */
- void FileHandler::write_file(ID id, std::string text, WRITE_OPTION opt){
-    std::string file_name = this->get_file(id);
-    std::ofstream f;
-    switch(opt){
-    case WRITE_OPTION::OVERWRITE:
-        f.open(file_name.c_str());
-        break;
-    case WRITE_OPTION::APPEND:
-        f.open(file_name.c_str(), std::ios::in | std::ios::out | std::ios::ate);
-        break;
-    default:
-        return; // no open file
-        break;
-    }
-    if(f.is_open()) f << text.c_str();
+ void FileHandler::write_file(ID id, QString text, WRITE_OPTION opt){
+    QFile* file = this->get_file(id);
+    if(opt == OVERWRITE) file->flush(); // Empty file
+    if(!file->open(QIODevice::WriteOnly | QIODevice::Text)) return; // File can not be written
+    QTextStream out(file);
+    out << text;
  }
 
  /**
@@ -213,14 +217,16 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::read_file(ID id,  std::string& buf, int lines_to_read){
-     std::ifstream f(this->get_file(id), std::ios::in);
-     std::string temp;
-     if(f.is_open()){
-         while(lines_to_read-- && std::getline(f, temp)){
-            buf += temp;
-         }
-     }
+ void FileHandler::read_file(ID id,  QString& buf, int lines_to_read){
+    QFile* file = this->get_file(id);
+    if(!file->open(QIODevice::ReadOnly | QIODevice::Text)) return; // File can not be read
+    QTextStream in(file);
+    QString line = in.readLine();
+    lines_to_read--;
+    while(lines_to_read-- && !line.isNull()){
+        buf += line;
+        line = in.readLine();
+    }
  }
 
  /**
@@ -242,9 +248,9 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
   * @param ID project file id
   * @return std::string file_path
   */
- std::string FileHandler::get_file(ID id){
+ QFile* FileHandler::get_file(ID id){
     this->file_map_lock.lock();
-    std::string file = this->file_map.at(id);
+    QFile* file = this->file_map.at(id);
     this->file_map_lock.unlock();
     return file;
  }
@@ -254,9 +260,9 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
   * @param ID directory id
   * @return directory path
   */
- std::string FileHandler::get_dir(ID id){
+ QDir* FileHandler::get_dir(ID id){
     this->dir_map_lock.lock();
-    std::string dir = this->dir_map.at(id);
+    QDir* dir = this->dir_map.at(id);
     this->dir_map_lock.unlock();
     return dir;
  }
@@ -278,8 +284,8 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
   * @param std::string file_path
   * @return unique file identifier
   */
-ID FileHandler::add_file(std::string file_path){
-    add_file(this->file_id, file_path);
+ID FileHandler::add_file(QFile* file){
+    add_file(this->file_id, file);
     return this->file_id++;
  }
 
@@ -288,8 +294,8 @@ ID FileHandler::add_file(std::string file_path){
  * @param id
  * @param file_path
  */
-void FileHandler::add_file(ID id ,std::string file_path){
-    std::pair<ID,std::string> pair = std::make_pair(id, file_path);
+void FileHandler::add_file(ID id , QFile *file){
+    std::pair<ID,QFile*> pair = std::make_pair(id, file);
     this->file_map_lock.lock();
     this->file_map.insert(pair);
     this->file_map_lock.unlock();
@@ -300,8 +306,8 @@ void FileHandler::add_file(ID id ,std::string file_path){
   * @param std::string dir_path
   * @return unique directory identifier
   */
-ID FileHandler::add_dir(std::string dir_path){
-    std::pair<ID,std::string> pair = std::make_pair(this->dir_id, dir_path);
+ID FileHandler::add_dir(QDir* dir){
+    std::pair<ID,QDir*> pair = std::make_pair(this->dir_id, dir);
     this->dir_map_lock.lock();
     this->dir_map.insert(pair);
     this->dir_map_lock.unlock();
@@ -318,41 +324,7 @@ bool FileHandler::proj_equals(Project& proj, Project& proj2){
                proj2.videos.begin(),
                [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
-    return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
-           proj.name == proj2.name &&
+    return proj.name == proj2.name &&
            video_equals;
 }
 
-/**
- * @brief FileHandler::projfiles_equal
- * @param pf
- * @param pf2
- * @return true if files are the same paths
- */
-bool FileHandler::projfiles_equal(ProjFiles& pf, ProjFiles& pf2){
-    return dirs_equal(pf.dir, pf2.dir) &&
-        this->files_equal(pf.f_proj, pf2.f_proj) &&
-        this->files_equal(pf.f_analysis, pf2.f_analysis)&&
-        this->files_equal(pf.f_drawings, pf2.f_drawings) &&
-        this->files_equal(pf.f_videos, pf2.f_videos);
-}
-
-/**
- * @brief FileHandler::files_equal
- * @param id
- * @param id2
- * @return
- */
-bool FileHandler::files_equal(ID id, ID id2){
-    return this->get_file(id) == this->get_file(id2);
-}
-
-/**
- * @brief FileHandler::dirs_equal
- * @param id
- * @param id2
- * @return true if dirs are same path
- */
-bool FileHandler::dirs_equal(ID id, ID id2){
-    return this->get_dir(id) == this->get_dir(id2);
-}
