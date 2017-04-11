@@ -331,3 +331,18 @@ void test_video_player::test_set_stop_video() {
     QVERIFY(mvideo->get_current_frame_num() == 0);
     QVERIFY(mvideo->video_stopped);
 }
+
+/**
+ * @brief test_video_player::test_set_zoom_area
+ */
+void test_video_player::test_set_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(0, 0, 10, 10);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 10);
+    QVERIFY(mvideo->zoom_area->get_height() == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().x == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().y == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().width == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().height == 10);
+}
