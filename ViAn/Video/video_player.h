@@ -107,6 +107,7 @@ private:
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
 
+    // The QLabel where the video is shown.
     QLabel* video_frame;
 
     cv::VideoCapture capture;

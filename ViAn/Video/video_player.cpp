@@ -12,6 +12,9 @@ using namespace cv;
 
 /**
  * @brief video_player::video_player
+ * @param mutex
+ * @param paused_wait
+ * @param label The QLabel where the frame is shown.
  * @param parent
  */
 video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent) : QThread(parent) {
