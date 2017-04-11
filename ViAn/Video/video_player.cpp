@@ -17,7 +17,6 @@ using namespace cv;
  * @param parent
  */
 video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
-    video_overlay = new Overlay();
     m_mutex = mutex;
     m_paused_wait = paused_wait;
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -30,6 +29,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete video_overlay;
+    delete zoom_area;
     delete analysis_area;
     capture.release();
 }
@@ -69,12 +69,14 @@ void video_player::run()  {
     set_current_frame_num(0);
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
-        convert_frame();
+
+        convert_frame(true);
 
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
         if (delay - conversion_time > 0) {
             this->msleep(delay - conversion_time);
         }
+
         show_frame();
 
         if (set_new_frame) {
@@ -109,17 +111,17 @@ void video_player::show_frame() {
  * @brief video_player::convert_frame
  * Converts the current frame to a QImage,
  * including the zoom and overlay.
+ * @param scale Bool indicating if the frame should be scaled or not.
  */
-void video_player::convert_frame() {
+void video_player::convert_frame(bool scale) {
     if (frame.cols == 0 || frame.rows == 0) {
         // Do nothing
         return;
     }
     cv::Mat processed_frame;
 
-    // Process frame (draw overlay, zoom, scaling, contrast/brightness)
-    processed_frame = process_frame(frame);
-
+    // Process frame (draw overlay, zoom, scaling, contrast/brightness, rotation)
+    processed_frame = process_frame(frame, scale);
 
     if (processed_frame.channels() == 3) {
         cv::Mat RGBframe;
@@ -138,11 +140,12 @@ void video_player::convert_frame() {
  * @brief video_player::process_frame
  * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
  * @param frame Frame to draw on.
+ * @param scale Bool indicating if the frame should be scaled or not.
  * @return Returns the processed frame.
  */
-cv::Mat video_player::process_frame(cv::Mat &frame) {
+cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
-    cv::Mat processed_frame = frame.clone();
+    cv::Mat processed_frame = src.clone();
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
@@ -150,8 +153,9 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     if (choosing_analysis_area) {
         processed_frame = analysis_area->draw(processed_frame);
     }
-    processed_frame = zoom_frame(processed_frame);
-    processed_frame = contrast_frame(processed_frame);
+
+    zoom_frame(processed_frame).copyTo(processed_frame);
+    contrast_frame(processed_frame).copyTo(processed_frame);
 
     //Check if the dimensions of the frame are reasonable
     bool frame_dimensions_limited = frame_width > 0 && frame_height > 0 &&
@@ -161,14 +165,18 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     bool original_dimensions_shown = frame_width == capture.get(CV_CAP_PROP_FRAME_WIDTH) &&
             frame_height == capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-    cv::Mat scaled_frame;
-    if (frame_dimensions_limited && !original_dimensions_shown) {
-        scale_frame(processed_frame).copyTo(scaled_frame);
-    } else {
-        processed_frame.copyTo(scaled_frame);
+    //Scales the frame if these criteria are met
+    if (scale && frame_dimensions_limited && !original_dimensions_shown) {
+        scale_frame(processed_frame).copyTo(processed_frame);
     }
-    processed_frame.release();
-    return scaled_frame;
+
+    // Rotates the frame, according to the choosen direction.
+    // If direction is in the valid range the frame is rotated.
+    if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
+        cv::rotate(processed_frame, processed_frame, rotate_direction);
+    }
+
+    return processed_frame;
 }
 
 
@@ -200,12 +208,12 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
  * @param frame Frame to zoom in on on.
  * @return Returns the zoomed frame.
  */
-cv::Mat video_player::zoom_frame(cv::Mat &frame) {
+cv::Mat video_player::zoom_frame(cv::Mat &src) {
     // The area to zoom in on.
     cv::Rect roi = zoom_area->get_zoom_area();
     cv::Mat zoomed_frame;
     // Crop out the area and resize to video size.
-    resize(frame(roi), zoomed_frame, frame.size());
+    resize(src(roi), zoomed_frame, src.size());
     return zoomed_frame;
 }
 
@@ -215,11 +223,11 @@ cv::Mat video_player::zoom_frame(cv::Mat &frame) {
  * @param frame Frame to manipulate.
  * @return Returns the manipulated frame.
  */
-cv::Mat video_player::contrast_frame(cv::Mat &frame) {
+cv::Mat video_player::contrast_frame(cv::Mat &src) {
     // Create image for the modified frame.
     Mat modified_frame;
     // Do the operation modified_frame = alpha * frame + beta
-    frame.convertTo(modified_frame, -1, alpha, beta);
+    src.convertTo(modified_frame, -1, alpha, beta);
     return modified_frame;
 }
 
@@ -387,7 +395,7 @@ void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
-    convert_frame();
+    convert_frame(true);
     show_frame();
 }
 
@@ -398,7 +406,7 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_current_frame_num(frame_nbr)) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -411,7 +419,7 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -434,7 +442,7 @@ void video_player::reset_brightness_contrast() {
     alpha = CONTRAST_DEFAULT;
     beta = BRIGHTNESS_DEFAULT;
     if (capture.isOpened()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -448,7 +456,7 @@ void video_player::reset_brightness_contrast() {
 void video_player::set_contrast(double contrast) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
     if (capture.isOpened()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -462,7 +470,7 @@ void video_player::set_contrast(double contrast) {
 void video_player::set_brightness(int brightness) {
     beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
     if (capture.isOpened()) {
-        convert_frame();
+        convert_frame(true);
         show_frame();
     }
 }
@@ -556,7 +564,11 @@ void video_player::set_overlay_colour(QColor colour) {
  */
 void video_player::undo_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->undo(get_current_frame_num());
+        if (choosing_analysis_area) {
+            analysis_area->undo();
+        } else {
+            video_overlay->undo(get_current_frame_num());
+        }
         update_overlay();
     }
 }
@@ -568,7 +580,11 @@ void video_player::undo_overlay() {
  */
 void video_player::clear_overlay() {
     if (capture.isOpened() && is_paused()) {
-        video_overlay->clear(get_current_frame_num());
+        if (choosing_analysis_area) {
+            analysis_area->clear();
+        } else {
+            video_overlay->clear(get_current_frame_num());
+        }
         update_overlay();
     }
 }
@@ -578,10 +594,8 @@ void video_player::clear_overlay() {
  * Toggles the choosing of an analysis area.
  */
 void video_player::toggle_analysis_area() {
-    if (capture.isOpened()) {
-        choosing_analysis_area = !choosing_analysis_area;
-        update_overlay();
-    }
+    choosing_analysis_area = !choosing_analysis_area;
+    update_overlay();
 }
 
 /**
@@ -606,6 +620,34 @@ void video_player::zoom_in() {
 void video_player::zoom_out() {
     if (capture.isOpened()) {
         zoom_area->reset_zoom_area();
+        update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::rotate_right
+ * Rotates the video to the right by 90 degrees.
+ */
+void video_player::rotate_right() {
+    if (capture.isOpened()) {
+        // Rotaing right means adding 1 and
+        // starting over if larger than maximum,
+        rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
+        update_overlay();
+    }
+}
+
+/**
+ * @brief video_player::rotate_left
+ * Rotates the video to the left by 90 degrees.
+ */
+void video_player::rotate_left() {
+    if (capture.isOpened()) {
+        // Rotaing left means subtracting 1 and
+        // starting over if larger than maximum.
+        // Modulo handles positive values, so
+        // minus 1 is the same as adding maximum-1.
+        rotate_direction = (rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
         update_overlay();
     }
 }
@@ -694,17 +736,35 @@ void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
+    // Calculate rotated coordinates from the coordinates
+    // on the QLabel where the frame is shown. The frame is
+    // centered vertically, so the empty part of the QLabel
+    // at the top needs to be subtracted.
+    int rotated_x;
+    int rotated_y;
+    if (rotate_direction == ROTATE_90) {
+        rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
+        rotated_y = frame_height - pos.x();
+    } else if (rotate_direction == ROTATE_180) {
+        rotated_x = frame_width - pos.x();
+        rotated_y = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_height) / 2);
+    } else if (rotate_direction == ROTATE_270) {
+        rotated_x = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_width) / 2);
+        rotated_y = pos.x();
+    } else if (rotate_direction == ROTATE_NONE) {
+        rotated_x = pos.x();
+        rotated_y = (pos.y() - (double) (qlabel_height - frame_height) / 2);
+    }
+
     // Calculate the scale ratio between the actual video
-    // size and the size of the frame shown in the gui.
+    // size and the size of the (scaled) video frame shown in the gui.
     double x_scale_ratio = (double) video_frame_width/frame_width;
     double y_scale_ratio = (double) video_frame_height/frame_height;
 
     // Calculate the coordinates on the original-sized frame,
-    // from the coordinates on the QLabel where the frame is shown.
-    // (Multiply with the ratio, and subtract the empty parts of the QLabel,
-    // only subtracting the top and left side, hence division by 2.)
-    double x_scale = x_scale_ratio * pos.x() - (qlabel_width - frame_width) / 2;
-    double y_scale = y_scale_ratio * pos.y() - (qlabel_height - frame_height) / 2;
+    // by multiplying with the ratio.
+    double x_scale = x_scale_ratio * rotated_x;
+    double y_scale = y_scale_ratio * rotated_y;
 
     // Calculate the coordinates on the actual video from
     // the coordinates on the zoomed frame.
@@ -721,18 +781,23 @@ void video_player::scale_position(QPoint &pos) {
  * @brief video_player::export_current_frame
  * Stores the current frame in the specified folder.
  * The stored frame will have the sam resolution as the video.
- * @param filename Path to the folder to store the file in.
+ * @param path_to_folder Path to the folder to store the file in.
+ * @return The path to the stored image.
  */
-void video_player::export_current_frame(QString path_to_folder) {
-    convert_frame();
+std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
+    convert_frame(false);
 
-    // Add "/FRAME_NR.tiff" to the path.
-    path_to_folder.append("/");
-    path_to_folder.append(QString::number(get_current_frame_num()));
-    path_to_folder.append(".tiff");
+    QString path = QString::fromStdString(path_to_folder);
 
-    QImageWriter writer(path_to_folder, "tiff");
+    // Add "/file_name.tiff" to the path.
+    path.append("/");
+    path.append(QString::fromStdString(file_name));
+    path.append(".tiff");
+
+    QImageWriter writer(path, "tiff");
     writer.write(img);
+
+    return path.toStdString();
 }
 
 /**

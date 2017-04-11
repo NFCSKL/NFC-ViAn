@@ -10,6 +10,8 @@ public:
     ~AnalysArea();
     cv::Mat draw(cv::Mat &frame);
     void add_point(QPoint pos);
+    void undo();
+    void clear();
 private:
     std::vector<cv::Point>* points = new std::vector<cv::Point>();
 };

@@ -21,5 +21,7 @@
     <file alias ="colour.png">Resources/colour.png</file>
     <file alias ="clear.png">Resources/clear.png</file>
     <file alias ="text.png">Resources/text.png</file>
+    <file alias ="rotate_right.png">Resources/rotate_right.png</file>
+    <file alias ="rotate_left.png">Resources/rotate_left.png</file>
 </qresource>
 </RCC>

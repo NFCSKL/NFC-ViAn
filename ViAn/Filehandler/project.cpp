@@ -9,6 +9,7 @@ Project::Project(ID id, std::string name)
     this->files = new ProjFiles();
     this->name = name;
     this->id = id;
+    this->v_id = 0;
     this->videos.clear();
     this->saved = false;
 }
@@ -19,18 +20,41 @@ Project::Project(){
     this->files = new ProjFiles();
     this->name = "";
     this->id = -1;
+    this->id = 0;
     this->videos.clear();
+}
+/**
+ * @brief Project::~Project
+ * Clears contents of video map
+ */
+Project::~Project(){
+    for (auto vidIt = this->videos.begin(); vidIt != this->videos.end(); ++vidIt) {
+        delete vidIt->second;
+    }
 }
 
 /**
-* @brief Project::add_video
-* @param vid
-* add given video to project
-*/
-void Project::add_video(Video* vid)
-{
-    this->videos.push_back(vid);
+ * @brief Project::remove_video
+ * @param id
+ * Remove video from videos and delete its contents.
+ */
+void Project::remove_video(ID id){
+    Video* temp = this->videos.at(id);
+    delete temp;
+    videos.erase(id);
+
 }
+
+/**
+ * @brief Project::add_video
+ * @return Video ID to be used for identifying the video
+ */
+ID Project::add_video(Video* vid){
+    vid->id = this->v_id;
+    this->videos.insert(std::make_pair(this->v_id, vid));
+    return this->v_id++;
+}
+
 /**
  *  UNSFINISHED
  * @brief operator >>
@@ -73,9 +97,9 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     int vidcounter = proj.videos.size();
     ps.videos << vidcounter << " ";
     for(auto vid = proj.videos.rbegin(); vid != proj.videos.rend(); ++vid){
-        Video* v = *vid;
-        ps.videos << *v << " ";
-        vidcounter++;
+        Video* v = vid->second;
+            ps.videos << *v << " ";
+            vidcounter++;
     }
     return ps;
 }

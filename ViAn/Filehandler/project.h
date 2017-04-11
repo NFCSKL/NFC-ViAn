@@ -55,22 +55,22 @@ public:
     Project();
     Project(ID id, std::string name);
     Project(std::string dir_path);
-    void add_video(Video *vid);
-
+    ~Project();
+    ID add_video(Video *vid);
+    void remove_video(ID id);
     // read and write operator for Projects
     friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
     friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
-
-
 
 // TODO
 //    void add_analysis();
 //    void add_drawing();      
 public:
     ID id;
+    ID v_id;
     std::string name;
     ProjFiles* files;
-    std::vector<Video*> videos;
+    std::map<ID,Video*> videos;
     bool saved;
 };
 

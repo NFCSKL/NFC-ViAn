@@ -258,9 +258,9 @@
         <item>
          <layout class="QHBoxLayout" name="sliderLayout">
           <item>
-           <widget class="QLabel" name="sliderLabel">
+           <widget class="QLabel" name="currentTimeLabel">
             <property name="text">
-             <string>TextLabel</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -283,6 +283,13 @@
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="totalTimeLabel">
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -314,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -335,17 +342,16 @@
      <property name="title">
       <string>Delete</string>
      </property>
-     <addaction name="actionDeleteProject"/>
-     <addaction name="actionDeleteVideo"/>
      <addaction name="actionDeleteAnalys"/>
      <addaction name="actionDeleteDrawing"/>
     </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
+    <addaction name="actionDelete"/>
     <addaction name="actionExit"/>
-    <addaction name="menuDelete"/>
     <addaction name="actionChoose_Workspace"/>
+    <addaction name="menuDelete"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -364,9 +370,11 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_hide_overlay"/>
+    <addaction name="actionShow_hide_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
-    <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="actionRotate_right"/>
+    <addaction name="actionRotate_left"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -396,7 +404,7 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar_no_overlay">
+  <widget class="QToolBar" name="toolBar">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -420,9 +428,12 @@
    <addaction name="actionAddVideo"/>
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
+   <addaction name="actionRotate_right"/>
+   <addaction name="actionRotate_left"/>
    <addaction name="actionShow_hide_overlay"/>
+   <addaction name="actionShow_hide_analysis_area"/>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="toolBar_overlay">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -449,6 +460,20 @@
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
   </widget>
+  <widget class="QToolBar" name="toolBar_analysis">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionUndo"/>
+   <addaction name="actionClear"/>
+   <addaction name="actionShow_hide_analysis_area"/>
+  </widget>
   <action name="actionSave">
    <property name="icon">
     <iconset resource="../resources.qrc">
@@ -463,6 +488,9 @@
    <property name="toolTip">
     <string>Save project</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="actionLoad">
    <property name="icon">
@@ -472,6 +500,9 @@
    <property name="text">
     <string>Load</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
   <action name="actionAddProject">
    <property name="text">
@@ -479,6 +510,9 @@
    </property>
    <property name="toolTip">
     <string>AddProject</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
    </property>
   </action>
   <action name="actionAddVideo">
@@ -492,6 +526,9 @@
    <property name="toolTip">
     <string>AddVideo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
   </action>
   <action name="actionOptions">
    <property name="text">
@@ -501,6 +538,9 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="actionOpen_manual">
@@ -528,6 +568,9 @@
    <property name="text">
     <string>Colour</string>
    </property>
+   <property name="shortcut">
+    <string>Shift+C</string>
+   </property>
   </action>
   <action name="actionRectangle">
    <property name="icon">
@@ -536,6 +579,9 @@
    </property>
    <property name="text">
     <string>Rectangle</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+R</string>
    </property>
   </action>
   <action name="actionCircle">
@@ -546,6 +592,9 @@
    <property name="text">
     <string>Circle</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
+   </property>
   </action>
   <action name="actionArrow">
    <property name="icon">
@@ -555,6 +604,9 @@
    <property name="text">
     <string>Arrow</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+A</string>
+   </property>
   </action>
   <action name="actionLine">
    <property name="icon">
@@ -563,6 +615,9 @@
    </property>
    <property name="text">
     <string>Line</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+L</string>
    </property>
   </action>
   <action name="actionDeleteProject">
@@ -605,6 +660,9 @@
    <property name="text">
     <string>Pen</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
+   </property>
   </action>
   <action name="actionClear">
    <property name="icon">
@@ -623,6 +681,9 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionZoom_in">
    <property name="icon">
@@ -631,6 +692,9 @@
    </property>
    <property name="text">
     <string>Zoom in</string>
+   </property>
+   <property name="shortcut">
+    <string>+</string>
    </property>
   </action>
   <action name="actionZoom_out">
@@ -647,6 +711,9 @@
    <property name="toolTip">
     <string>Zoom out</string>
    </property>
+   <property name="shortcut">
+    <string>-</string>
+   </property>
   </action>
   <action name="actionText">
    <property name="icon">
@@ -662,6 +729,9 @@
    <property name="toolTip">
     <string>Text</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
+   </property>
   </action>
   <action name="actionChoose_Workspace">
    <property name="text">
@@ -676,6 +746,32 @@
   <action name="actionContrast_Brightness">
    <property name="text">
     <string>Contrast/Brightness</string>
+   </property>
+  </action>
+  <action name="actionRotate_right">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/rotate_right.png</normaloff>:/rotate_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate right</string>
+   </property>
+  </action>
+  <action name="actionRotate_left">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/rotate_left.png</normaloff>:/rotate_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate left</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete selected</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

@@ -69,16 +69,16 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @param id
  */
 void FileHandler::save_project(ID id){
-    save_project(get_project(id));
+    save_project(get_project(id)); // get project and save it
 }
 
 /**
  * @todo unfinished, needs full project structure
- * and program to file parser to finish
+ * And program to file parser to finish
  * @brief FileHandler::save_project
  * @param Project* name
- * Creates project and associated files.
  * @return void
+ * Creates project and associated files.
  */
 void FileHandler::save_project(Project* proj){
     std::string proj_file = proj->name + std::string(".txt"); //filename
@@ -120,21 +120,17 @@ void FileHandler::update_proj_files(Project* proj){
     write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
 }
-void FileHandler::load_proj_files(std::string str){
-    ID id;
-    std::string file_path;
-    std::stringstream sstr;
-    sstr << str;    
-    //read files until empty
-    while(sstr >> id >> file_path){
-        add_file(id, file_path);
-    }
-}
 
 /**
  * @brief FileHandler::load_project
- * @param dir_path
- * @return
+ * @param dirpath
+ * @return fully loaded project
+ *
+ * Split project full path "C:/this/is/an/example/project/project.txt"
+ * into
+ * dirpath = "C:/this/is/an/example/project/
+ * proj_name = project
+ * Then call load with identified project
  */
 Project* FileHandler::load_project(std::string full_proj_path){
     std::string dir_path = full_proj_path.substr(0, full_proj_path.find_last_of("/"));
@@ -150,6 +146,8 @@ Project* FileHandler::load_project(std::string full_proj_path){
  * @param projname
  * @param dir_path
  * @return project
+ *
+ * Loads a project from file,
  */
 Project* FileHandler::load_project(std::string proj_name, std::string dir_path){
     Project* proj = new Project();
@@ -174,6 +172,7 @@ Project* FileHandler::load_project(std::string proj_name, std::string dir_path){
     std::string drawing_file_path = dir_path + "/" + proj_name + "_drawings.txt";
     proj->files->f_drawings = load_project_file(drawing_file_path, proj_stream.drawings);
 //    Read project from projstream
+
     proj_stream >> *proj;
     return proj;
 }
@@ -184,6 +183,8 @@ Project* FileHandler::load_project(std::string proj_name, std::string dir_path){
  * @param file_path
  * @param projFileStream
  * @return ID
+ *
+ * Help function for load_project
  */
 ID FileHandler::load_project_file(std::string file_path, std::stringstream& proj_file_stream){
     std::string buf;
@@ -195,20 +196,25 @@ ID FileHandler::load_project_file(std::string file_path, std::stringstream& proj
 
 /**
  * @brief FileHandler::delete_project
- * Deletes project, its associated files and contents.
- * OBS! This operation is as of now irreversible
  * @param Project*
  * @return FH_ERROR errorcode
+ * Deletes project, its associated files and contents.
+ * OBS! This operation is as of now irreversible
  */
-FH_ERROR FileHandler::delete_project(Project* proj){
+FH_ERROR FileHandler::delete_project(ID id){
+    this->proj_map_lock.lock();
+    Project* proj = this->projects.at(id);
     ProjFiles* pf = proj->files;
     delete_file(pf->f_proj);
     delete_file(pf->f_videos);
     delete_file(pf->f_analysis);
     delete_file(pf->f_drawings);
-    return delete_directory(proj->files->dir);
-
+    FH_ERROR err = delete_directory(proj->files->dir);
+    delete proj;
+    this->proj_map_lock.unlock();
+    return err;
 }
+
 /**
  * @todo make threadsafe
  * @brief FileHandler::add_video
@@ -218,10 +224,20 @@ FH_ERROR FileHandler::delete_project(Project* proj){
  * Add a video file_path to a given project.
  * Creates Video object which is accessed further by returned id.
  */
-void FileHandler::add_video(Project* proj, std::string file_path){
+ID FileHandler::add_video(Project* proj, std::string file_path){
     Video* v = new Video(file_path);
-    proj->add_video(v);
-    this->add_file(file_path);
+    return proj->add_video(v); // video id set in proj->add_video
+}
+
+/**
+ * @brief FileHandler::remove_video_from_project
+ * @param proj_id
+ * @param vid_id
+ * Removes video from project according to given ids.
+ */
+void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
+    Project* proj = this->get_project(proj_id); // get Project object from id
+    proj->remove_video(vid_id); // Remove ´the video from project
 }
 
  /**
@@ -261,7 +277,7 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
     std::ofstream f;
     switch(opt){
     case WRITE_OPTION::OVERWRITE:
-        f.open(file_name.c_str(), std::ios::in | std::ios::out);
+        f.open(file_name.c_str());
         break;
     case WRITE_OPTION::APPEND:
         f.open(file_name.c_str(), std::ios::in | std::ios::out | std::ios::ate);
@@ -270,7 +286,7 @@ ID FileHandler::create_file(std::string file_name, ID dir_id){
         return; // no open file
         break;
     }
-    if(f.is_open()) f << text.c_str() << std::endl;
+    if(f.is_open()) f << text.c_str();
  }
 
  /**
@@ -384,7 +400,7 @@ ID FileHandler::add_dir(std::string dir_path){
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
     bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
-               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
+               [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
     return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
            proj.name == proj2.name &&

@@ -34,14 +34,14 @@ public:
     void set_workspace(std::string new_work_space);
     Project* open_project(std::string dirpath);
     Project* create_project(std::string proj_name);
-    FH_ERROR delete_project(Project* proj);
+    FH_ERROR delete_project(ID id);
     Project* load_project(std::string full_project_path);
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(ID id);
     void save_project(Project* proj);
-
-
-    void add_video(Project* proj, std::string file_path);
+    // Video operations
+    void remove_video_from_project(ID proj_id, ID vid_id);
+    ID add_video(Project* proj, std::string file_path);
     //directory manipulation
     //varying implementation
     ID create_directory(std::string dir_path);
@@ -77,6 +77,7 @@ private:
     // thread safe add operations for maps
     ID add_file(std::string file_path);
     void add_project(std::pair<ID,Project*> pair);
+
     ID add_dir(std::string dir_path);
     ID load_project_file(std::string file_path, std::stringstream& proj_file_stream);
     void load_proj_files(std::string str);

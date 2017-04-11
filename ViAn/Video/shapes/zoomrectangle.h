@@ -7,6 +7,7 @@ class ZoomRectangle : public Rectangle {
 public:
     ZoomRectangle();
     ZoomRectangle(QPoint pos);
+    virtual ~ZoomRectangle();
     void set_start_pos(QPoint pos);
     void reset_pos();
     void update_drawing_pos(QPoint pos);

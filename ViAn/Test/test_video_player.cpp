@@ -399,12 +399,12 @@ void test_video_player::test_convert_frame() {
 
     //Testing with empty frame
     mvideo->frame = cv::Mat(0,0,CV_8U);
-    mvideo->convert_frame();
+    mvideo->convert_frame(true);
     QVERIFY(mvideo->img.byteCount() == 0);
 
     //Testing with color frame
     mvideo->capture.read(mvideo->frame);
-    mvideo->convert_frame();
+    mvideo->convert_frame(true);
     QVERIFY(mvideo->img.format() == QImage::Format_RGB888);
     QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
 
@@ -414,7 +414,7 @@ void test_video_player::test_convert_frame() {
     cv::cvtColor(mvideo->frame, grayMat, cv::COLOR_BGR2GRAY);
     grayMat.copyTo(mvideo->frame);
     grayMat.release();
-    mvideo->convert_frame();
+    mvideo->convert_frame(true);
     QVERIFY(mvideo->img.format() == QImage::Format_Indexed8);
     QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
 }

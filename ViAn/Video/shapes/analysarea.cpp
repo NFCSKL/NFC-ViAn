@@ -55,3 +55,21 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
 void AnalysArea::add_point(QPoint pos) {
     points->push_back(Shape::qpoint_to_point(pos));
 }
+
+/**
+ * @brief AnalysArea::undo
+ * Removes the last added point from the selected area.
+ */
+void AnalysArea::undo() {
+    if (!points->empty()) {
+        points->pop_back();
+    }
+}
+
+/**
+ * @brief AnalysArea::clear
+ * Removes all added points from the selected area.
+ */
+void AnalysArea::clear() {
+    points->clear();
+}
