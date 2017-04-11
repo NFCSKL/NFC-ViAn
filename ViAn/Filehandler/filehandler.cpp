@@ -9,7 +9,7 @@ FileHandler::FileHandler() {
     this->dir_id = 0;
     this->last_error = 0;
     #ifdef _WIN32
-        this->work_space = get_dir(create_directory("C:/ViAn/"));
+        this->work_space = create_directory("C:/ViAn/");
     #elif __APPLE__
         this->work_space = "/Applications/";
     #elif __unix__
@@ -23,9 +23,14 @@ FileHandler::FileHandler() {
  * @brief FileHandler::set_workspace
  * @param newWorkSpace
  */
-void FileHandler::set_workspace(std::string new_work_space){
+void FileHandler::set_work_space(std::string new_work_space){
     //this->work_space = new_work_space;
     //save_workspace();
+}
+
+QDir FileHandler::get_work_space()
+{
+    return this->get_dir(this->work_space);
 }
 
 /**
@@ -34,11 +39,20 @@ void FileHandler::set_workspace(std::string new_work_space){
  * @param std::string name
  * @return Project* created project
  */
-Project* FileHandler::create_project(QString proj_name){
-    Project* proj =  new Project(this->project_id, proj_name.toStdString());
-    this->projects.insert(std::make_pair(proj->id, proj));
-    save_project(proj, proj->dir ,Json);
-    this->project_id++;
+Project* FileHandler::create_project(QString proj_name, std::string dir_path){
+    Project* proj =  new Project(this->project_id, proj_name.toStdString());   
+    ID dir;
+    if(dir_path != "")
+        dir = create_directory(QString::fromStdString(dir_path));
+    else if(dir_path != "" && !proj->saved)
+        dir = this->work_space;
+    else if(dir_path == "" && proj->saved)
+        dir = proj->dir;
+    else
+        dir = this->work_space;
+    proj->dir = dir;
+    add_project(proj);
+    save_project(proj, dir ,Json);
     return proj;
 }
 
@@ -48,12 +62,12 @@ Project* FileHandler::create_project(QString proj_name){
  * @return unique directory ID
  */
 ID FileHandler::create_directory(QString dir_path){
-    QDir* dir = new QDir(QDir::root());
-    last_error = dir->mkpath(dir_path);
+    QDir dir (QDir::root());
+    last_error = dir.mkpath(dir_path);
     if(!last_error){
         qWarning("Could not create directory %s",dir_path.toStdString().c_str());
     }
-    dir->setPath(dir_path);
+    dir.setPath(dir_path);
     ID id = this->add_dir(dir);
     return id;
 }
@@ -65,10 +79,9 @@ ID FileHandler::create_directory(QString dir_path){
  * otherwise see OS relevant directoryfile.
  */
 FH_ERROR FileHandler::delete_directory(ID id){
-    QDir* temp = dir_map.at(id);
-    if(temp->rmdir(temp->absolutePath())){
+    QDir temp = this->get_dir(id);
+    if(temp.rmdir(temp.absolutePath())){
         this->dir_map.erase(id);
-        delete temp;
         return 0;
     }
     return 1;
@@ -83,6 +96,9 @@ void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
     this->save_project(proj, this->work_space, FileHandler::SaveFormat::Json); // get project and save it
 }
+void FileHandler::save_project(Project* proj){
+    this->save_project(proj, this->work_space, FileHandler::SaveFormat::Json);
+}
 
 /**
  * @brief FileHandler::save_project
@@ -91,8 +107,9 @@ void FileHandler::save_project(ID id){
  * @param save_format
  * @return
  */
-bool FileHandler::save_project(Project* proj, QDir* dir, FileHandler::SaveFormat save_format){
-    std::string file_path = dir->filePath(QString::fromStdString(proj->name)).toStdString();
+bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format){
+    QDir dir = get_dir(dir_id);
+    std::string file_path = dir.filePath(QString::fromStdString(proj->name)).toStdString();
     QFile save_file(save_format == Json
                     ? QString::fromStdString(file_path + ".json")
                     : QString::fromStdString(file_path + ".dat"));
@@ -123,18 +140,18 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Project* FileHandler::load_project(std::string full_project_path, FileHandler::SaveFormat save_format){
-    QFile load_file(save_format == Json
-        ? QString::fromStdString(full_project_path)
-        : QString::fromStdString(full_project_path));
+Project* FileHandler::load_project(std::string full_path, FileHandler::SaveFormat save_form){
+    QFile load_file(save_form == Json
+        ? QString::fromStdString(full_path)
+        : QString::fromStdString(full_path));
 
     if (!load_file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open save file.");
-        return false;
+        return nullptr;
     }
     QByteArray save_data = load_file.readAll();
 
-    QJsonDocument load_doc(save_format == Json
+    QJsonDocument load_doc(save_form == Json
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
 
@@ -142,15 +159,20 @@ Project* FileHandler::load_project(std::string full_project_path, FileHandler::S
     proj->saved = true;
 
     proj->read(load_doc.object());
-    proj->id = this->project_id++;
+    proj->id = add_project(proj);
+    proj->dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")))));
     return proj;
 }
 
-FH_ERROR FileHandler::delete_project(Project* proj){
-    Project* temp = proj;
-    this->projects.erase(proj->id);
-    delete temp;
-    //this->update_proj_file();
+FH_ERROR FileHandler::delete_project(ID proj_id){
+    Project* temp = get_project(proj_id);
+    QFile file(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
+    if(this->projects.erase(proj_id)){
+        file.remove();
+        delete temp;
+        return 0;
+    }
+    return 1;
 }
 
 /**
@@ -185,13 +207,8 @@ void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
   * @param std::string file name, ID directory id
   */
 
-ID FileHandler::create_file(QString file_name, QDir* dir){
-    QFile* file = new QFile(dir->filePath(file_name));
-    if(!file->open(QIODevice::ReadWrite)){
-        qWarning("Cannot create file %s", file->fileName().toStdString().c_str());
-        return 1; // File could not be created
-    }
-    return this->add_file(file); // File created
+ID FileHandler::create_file(QString file_name, QDir dir){
+    return this->add_file(dir.absoluteFilePath(file_name)); // File created
   }
 
 /**
@@ -200,12 +217,9 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
  * @param ID file id
  */
  FH_ERROR FileHandler::delete_file(ID id){
-    QFile* file = this->get_file(id);
-    if(file->remove()){
-        this->file_map.erase(id); // File removed
-        return 0;
-    }
-    delete file;
+    QFile file(this->get_file(id));
+    file.remove();
+    if(this->file_map.erase(id)) return 0;
     return 1; // Error
  }
 
@@ -217,11 +231,23 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
   * @return void
   */
  void FileHandler::write_file(ID id, QString text, WRITE_OPTION opt){
-    QFile* file = this->get_file(id);
-    if(opt == OVERWRITE) file->flush(); // Empty file
-    if(!file->open(QIODevice::WriteOnly | QIODevice::Text)) return; // File can not be written
-    QTextStream out(file);
+    QFile file;
+    file.setFileName(this->get_file(id));
+
+    switch(opt){
+    case OVERWRITE:
+        if(!file.open(QIODevice::ReadWrite | QIODevice::QIODevice::Truncate |QIODevice::Text))return; // Empty file
+        break;
+    case APPEND:
+        if(!file.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Append)) return; // File can not be written
+        break;
+    default:
+        if(!file.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) return; // File can not be written
+        break;
+    }
+    QTextStream out(&file);
     out << text;
+    file.close();
  }
 
  /**
@@ -233,15 +259,18 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
   *  @return voi
   */
  void FileHandler::read_file(ID id,  QString& buf, int lines_to_read){
-    QFile* file = this->get_file(id);
-    if(!file->open(QIODevice::ReadOnly | QIODevice::Text)) return; // File can not be read
-    QTextStream in(file);
-    QString line = in.readLine();
-    lines_to_read--;
-    while(lines_to_read-- && !line.isNull()){
-        buf += line;
-        line = in.readLine();
+    QFile file (this->get_file(id));
+    if(!file.open(QIODevice::ReadWrite | QIODevice::Text)){
+        qWarning("File %s could not be read", file.fileName().toStdString().c_str());
+        return; // File can not be read
     }
+    QTextStream in(&file);
+    QString line;
+    while(lines_to_read-- && !in.atEnd()){
+        line = in.readLine();
+        buf.append(line);
+    };
+    file.close();
  }
 
  /**
@@ -263,9 +292,9 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
   * @param ID project file id
   * @return std::string file_path
   */
- QFile* FileHandler::get_file(ID id){
+ QString FileHandler::get_file(ID id){
     this->file_map_lock.lock();
-    QFile* file = this->file_map.at(id);
+    QString file = this->file_map.at(id);
     this->file_map_lock.unlock();
     return file;
  }
@@ -275,19 +304,28 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
   * @param ID directory id
   * @return directory path
   */
- QDir* FileHandler::get_dir(ID id){
+ QDir FileHandler::get_dir(ID id){
     this->dir_map_lock.lock();
-    QDir* dir = this->dir_map.at(id);
+    QDir dir = this->dir_map.at(id);
     this->dir_map_lock.unlock();
     return dir;
  }
+ /**
+  * @brief FileHandler::add_project
+  * @param proj
+  */
+ ID FileHandler::add_project(Project* proj){
+     add_project(this->project_id, proj);
+     return this->project_id++;
+ }
 
  /**
-  * @brief FileHandler::add_projectr
+  * @brief FileHandler::add_project
   * @param std::pari<<ID, Project*> pair
   * @return void
   */
- void FileHandler::add_project(std::pair<ID,Project*> pair){
+ void FileHandler::add_project(ID id, Project* proj){
+    std::pair<ID,Project*> pair = std::make_pair(id,proj);
     this->proj_map_lock.lock();
     this->projects.insert(pair);
     this->proj_map_lock.unlock();
@@ -299,7 +337,7 @@ ID FileHandler::create_file(QString file_name, QDir* dir){
   * @param std::string file_path
   * @return unique file identifier
   */
-ID FileHandler::add_file(QFile* file){
+ID FileHandler::add_file(QString file){
     add_file(this->file_id, file);
     return this->file_id++;
  }
@@ -309,8 +347,8 @@ ID FileHandler::add_file(QFile* file){
  * @param id
  * @param file_path
  */
-void FileHandler::add_file(ID id , QFile *file){
-    std::pair<ID,QFile*> pair = std::make_pair(id, file);
+void FileHandler::add_file(ID id ,QString file){
+    std::pair<ID,QString> pair = std::make_pair(id, file);
     this->file_map_lock.lock();
     this->file_map.insert(pair);
     this->file_map_lock.unlock();
@@ -321,8 +359,8 @@ void FileHandler::add_file(ID id , QFile *file){
   * @param std::string dir_path
   * @return unique directory identifier
   */
-ID FileHandler::add_dir(QDir* dir){
-    std::pair<ID,QDir*> pair = std::make_pair(this->dir_id, dir);
+ID FileHandler::add_dir(QDir dir){
+    std::pair<ID,QDir> pair = std::make_pair(this->dir_id, dir);
     this->dir_map_lock.lock();
     this->dir_map.insert(pair);
     this->dir_map_lock.unlock();

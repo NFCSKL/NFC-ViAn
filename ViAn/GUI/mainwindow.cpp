@@ -566,7 +566,7 @@ void MainWindow::on_actionAddVideo_triggered() {
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
         if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
-            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->work_space->absolutePath().toStdString().c_str(),
+            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
                 input_switch_case(ACTION::ADD_VIDEO, dir);
@@ -618,7 +618,7 @@ void MainWindow::on_actionSave_triggered() {
  * @brief MainWindow::on_actionLoad_triggered
  */
 void MainWindow::on_actionLoad_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->work_space->absolutePath().toStdString().c_str(),tr("*.json"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
@@ -662,9 +662,9 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
  * filehandler workspace accordingly.
  */
 void MainWindow::on_actionChoose_Workspace_triggered() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space->absolutePath().toStdString().c_str());
-    this->fileHandler->set_workspace(dir.toStdString() + "/");
-    set_status_bar("new wokspace set to " + this->fileHandler->work_space->absolutePath().toStdString());
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str());
+    this->fileHandler->set_work_space(dir.toStdString() + "/");
+    set_status_bar("new wokspace set to " + this->fileHandler->get_work_space().absolutePath().toStdString());
 }
 
     /**
@@ -685,7 +685,7 @@ void MainWindow::on_actionDeleteProject_triggered() {
                                                                         QMessageBox::No);
 
             if (resBtn == QMessageBox::Yes) {
-                this->fileHandler->delete_project(fileHandler->get_project(my_project->id));
+                this->fileHandler->delete_project(my_project->id);
                 remove_selected_project_from_tree();
             }
         } else {

@@ -16,11 +16,12 @@ FileHandlerTest::FileHandlerTest(QObject *parent) : QObject(parent){
 
 void FileHandlerTest::project_handling_test(){
     Project* proj =  file_handler->create_project("TEST_PROJ");
-    //file_handler->save_project(proj);
+    file_handler->save_project(proj);
     //check file contents
-    Project* proj2 = file_handler->load_project(file_handler->work_space->filePath("TEST_PROJ").toStdString());
+    Project* proj2 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ.json").toStdString());
     QVERIFY(file_handler->proj_equals(*proj2,*proj));
-    QCOMPARE(file_handler->delete_project(proj), 0);
+    QCOMPARE(file_handler->delete_project(proj2->id), 0);
+    QCOMPARE(file_handler->delete_project(proj->id), 0);
 }
 
 void FileHandlerTest::project_create_test()
@@ -31,7 +32,7 @@ void FileHandlerTest::project_create_test()
 
 void FileHandlerTest::project_cleanup()
 {
-    QCOMPARE(file_handler->delete_project(this->proj),0);
+    QCOMPARE(file_handler->delete_project(this->proj->id),0);
 }
 
 /**
@@ -39,10 +40,10 @@ void FileHandlerTest::project_cleanup()
  * Tests directory creation.
  */
 void FileHandlerTest::directory_create_test(){
-    QString dirpath = file_handler->work_space->absoluteFilePath("TEST_PROJ");
+    QString dirpath = file_handler->get_work_space().absoluteFilePath("TEST_PROJ");
     dir_id = file_handler->create_directory(dirpath);
     QCOMPARE(file_handler->last_error, 1);
-    QCOMPARE(file_handler->get_dir(dir_id)->absolutePath(), dirpath);
+    QCOMPARE(file_handler->get_dir(dir_id).absolutePath(), dirpath);
 
 }
 /**
@@ -59,7 +60,7 @@ void FileHandlerTest::directory_delete_test(){
  *  Tests file creation, deletion, writing and reading.
  */
 void FileHandlerTest::file_test_init(){
-    QString dirpath = file_handler->work_space->absoluteFilePath("TEST_MAP");
+    QString dirpath = file_handler->get_work_space().absoluteFilePath("TEST_MAP");
     dir_id = file_handler->create_directory(dirpath);
 }
 /**
@@ -67,9 +68,9 @@ void FileHandlerTest::file_test_init(){
  * Tests creating a single file.
  */
 void FileHandlerTest::file_create_test(){
-    QDir* dir = file_handler->get_dir(dir_id);
-    this->file_id  = file_handler->create_file(dir->absoluteFilePath("test_file.txt"),dir);
-    QCOMPARE(file_handler->get_file(this->file_id)->fileName(), dir->absoluteFilePath("test_file.txt")); // See if file was created in directory
+    QDir dir = file_handler->get_dir(dir_id);
+    this->file_id  = file_handler->create_file(dir.absoluteFilePath("test_file.txt"),dir);
+    QCOMPARE(file_handler->get_file(this->file_id), dir.absoluteFilePath("test_file.txt")); // See if file was created in directory
 }
 /**
  * @brief filehandlertest::file_delete_test
@@ -84,7 +85,7 @@ void FileHandlerTest::file_delete_test(){
  */
 void FileHandlerTest::file_create_delete_multiple(){
     // Used directory
-    QDir* directory = file_handler->get_dir(dir_id);
+    QDir directory = file_handler->get_dir(dir_id);
     // File names
     QString f1 ("filetest1.txt");
     QString f2 ("filetest2.txt");
@@ -94,9 +95,9 @@ void FileHandlerTest::file_create_delete_multiple(){
     ID id2 = file_handler->create_file(f2,directory);
     ID id3 = file_handler->create_file(f3,directory);
     // Check if all files assigned correct ids
-    QCOMPARE(file_handler->get_file(id1)->fileName(), directory->absoluteFilePath(f1));
-    QCOMPARE(file_handler->get_file(id2)->fileName(), directory->absoluteFilePath(f2));
-    QCOMPARE(file_handler->get_file(id3)->fileName(), directory->absoluteFilePath(f3));
+    QCOMPARE(file_handler->get_file(id1), directory.absoluteFilePath(f1));
+    QCOMPARE(file_handler->get_file(id2), directory.absoluteFilePath(f2));
+    QCOMPARE(file_handler->get_file(id3), directory.absoluteFilePath(f3));
     // Delete files
     QCOMPARE(file_handler->delete_file(id1), 0);
     QCOMPARE(file_handler->delete_file(id2), 0);
@@ -105,7 +106,8 @@ void FileHandlerTest::file_create_delete_multiple(){
 
 void FileHandlerTest::file_read_write_init()
 {
-    this->dir_id = this->file_handler->create_directory(file_handler->work_space->absoluteFilePath("TEST_MAP"));
+    this->dir_id = this->file_handler->create_directory(file_handler->get_work_space().absoluteFilePath("TEST_MAP"));
+    this->file_id = this->file_handler->create_file("test_file", this->file_handler->get_dir(dir_id));
 }
 
 
@@ -130,18 +132,20 @@ void FileHandlerTest::file_read_write_option_test() {
     QString test_text ("test_text");
     QString appended_text("appended_text");
     QString overwrite_text("overwrite_text");
-    QString read_text;                                     // Store read text
 
-    file_handler->write_file(this->file_id, test_text);   // Write test_text to file
-    file_handler->read_file(this->file_id, read_text, 1); // Read test_text from file
-    QCOMPARE(read_text, test_text);                 // Confirm
+    QString read_text1;                                     // Store read text
+    QString read_text2;
+    QString read_text3;
+
+    file_handler->write_file(this->file_id, test_text, WRITE_OPTION::OVERWRITE);   // Write test_text to file
+    file_handler->read_file(this->file_id, read_text1, 1); // Read test_text from file
+    QCOMPARE(read_text1, test_text);                 // Confirm
     file_handler->write_file(this->file_id, appended_text, WRITE_OPTION::APPEND);     // Append this text
-    file_handler->read_file(this->file_id, read_text, 1);
-    QCOMPARE(read_text, test_text + appended_text);                             // Confirm append
-
+    file_handler->read_file(this->file_id, read_text2, 1);
+    QCOMPARE(read_text2, test_text + appended_text);                             // Confirm append
     file_handler->write_file(this->file_id, overwrite_text, WRITE_OPTION::OVERWRITE); // Overwrite previous text
-    file_handler->read_file(this->file_id, read_text, 1);
-    QCOMPARE(read_text, overwrite_text);                                        // Confirm Overwrite
+    file_handler->read_file(this->file_id, read_text3, 1);
+    QCOMPARE(read_text3, overwrite_text);                                        // Confirm Overwrite
 }
 /**
  * @brief filehandlertest::file_read_lines_test
@@ -149,24 +153,30 @@ void FileHandlerTest::file_read_write_option_test() {
  */
 void FileHandlerTest::file_read_lines_test(){
     QString read_text;
-    QString line1 ("line1\n");
-    QString line2 ("line2\n");
-    QString line3 ("line3\n");
 
+    QString line1 ("line1");
+    QString line2 ("line2");
+    QString line3 ("line3");
     QString past_lines ("This should not be read");
-    file_handler->write_file(this->file_id, read_text, WRITE_OPTION::OVERWRITE); // Write three lines to file
+
+    QString written_text  = line1 + "\n" + line2 + "\n" + line3 + "\n" +past_lines;
+
+    file_handler->write_file(this->file_id, written_text, WRITE_OPTION::OVERWRITE); // Write three lines to file, empty
+
     file_handler->read_file(this->file_id, read_text, 1);                         // Read one line
     QCOMPARE(read_text, line1);
+    read_text.clear();
     file_handler->read_file(this->file_id, read_text, 2);                         // Read two lines
     QCOMPARE(read_text, line1 + line2);
+    read_text.clear();
     file_handler->read_file(this->file_id, read_text, 3);                         // Read three lines
     QCOMPARE(read_text, line1 + line2 + line3);
-    file_handler->read_file(this->file_id, read_text, 4);                         // Read four lines
-    QCOMPARE(read_text, line1 + line2 + line3);
+    read_text.clear();
 }
 
 void FileHandlerTest::file_read_write_cleanup()
 {
+    file_handler->delete_file(this->file_id);
     file_handler->delete_directory(this->dir_id);
 }
 

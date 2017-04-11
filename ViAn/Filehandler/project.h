@@ -38,7 +38,7 @@ public:
     ID id;
     ID v_id;
     std::string name;
-    QDir* dir;
+    ID dir;
     std::map<ID,Video*> videos;
     bool saved;
 };

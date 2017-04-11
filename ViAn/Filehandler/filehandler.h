@@ -37,18 +37,20 @@ public:
     //
     //  Project manipulation
     //
-    QDir* work_space;
-    void set_workspace(std::string new_work_space);
+    ID work_space;
+    void set_work_space(std::string new_work_space);
+    QDir get_work_space();
     Project* open_project(std::string dirpath);
-    Project* create_project(QString proj_name);
-    FH_ERROR delete_project(Project* proj);
+    Project* create_project(QString proj_name, std::string dir_path="");
+    FH_ERROR delete_project(ID proj_id);
 
     Project* load_project(std::string full_project_path);
-    Project* load_project(std::string full_project_path, SaveFormat save_format);
+    Project* load_project(std::string full_path, SaveFormat save_form);
     Project* load_project(std::string proj_name, std::string dir_path);
 
     void save_project(ID id);
-    bool save_project(Project* proj, QDir *dir, FileHandler::SaveFormat save_format);
+    void save_project(Project* proj);
+    bool save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format);
     //void save_project(Project* proj);
     // Video operations
     void remove_video_from_project(ID proj_id, ID vid_id);
@@ -60,7 +62,7 @@ public:
 
     //file manipulation
 
-    ID create_file(QString file_name, QDir *dir);
+    ID create_file(QString file_name, QDir dir);
     FH_ERROR delete_file(ID id);
     void write_file(ID id, QString text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
     void read_file(ID id, QString& buf, int lines_to_read = -1);
@@ -75,9 +77,9 @@ public:
     // thread safe read operations for maps
 
 
-    QDir *get_dir(ID id);
+    QDir get_dir(ID id);
     Project* get_project(ID id);
-    QFile *get_file(ID id);
+    QString get_file(ID id);
 
     // Last error
     FH_ERROR last_error;
@@ -86,22 +88,23 @@ private:
 
     void update_proj_file(Project* proj); // used to update existing project files and maps
     // thread safe add operations for maps
-    ID add_file(QFile* file);
-    void add_project(std::pair<ID,Project*> pair);
+    ID add_file(QString file);
+    ID add_project(Project* proj);
+    void add_project(ID id, Project *proj);
 
-    ID add_dir(QDir *dir);
+    ID add_dir(QDir dir);
     ID load_project_file(std::string file_path, std::stringstream& proj_file_stream);
     void load_proj_files(std::string str);
     //add used for loading project from file
-    void add_file(ID id , QFile* file);
+    void add_file(ID id , QString file);
 
     /**
      * @brief m_projects, m_fileMap, m_dirMap
      * map structures for keeping track of projects, files and directories.
      */
     std::map<ID,Project*> projects;
-    std::map<ID, QFile*> file_map;
-    std::map<ID, QDir*> dir_map;
+    std::map<ID, QString> file_map;
+    std::map<ID, QDir> dir_map;
     /**
      * @todo implement smarter lock mechanism to avoid overhead
      * of only 1 reader/writer at a time
