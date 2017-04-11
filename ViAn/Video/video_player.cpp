@@ -86,8 +86,6 @@ void video_player::run()  {
         }
         m_mutex->unlock();
     }
-
-    this->finished();
 }
 
 /**
