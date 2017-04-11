@@ -4,6 +4,7 @@
 #include "GUI/mainwindow.h"
 #include <thread>
 #include <QWaitCondition>
+#include <QDesktopWidget>
 #include <qpainter.h>
 #include <qdebug.h>
 
@@ -19,6 +20,9 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
     video_overlay = new Overlay();
     m_mutex = mutex;
     m_paused_wait = paused_wait;
+    QRect rec = QApplication::desktop()->screenGeometry();
+    screen_height = rec.height();
+    screen_width = rec.width();
 }
 
 /**
@@ -93,7 +97,7 @@ void video_player::run()  {
 }
 
 /**
- * @brief update_frame
+ * @brief show_frame
  * Calculates and emits the current frame to GUI.
  */
 void video_player::show_frame() {
@@ -149,14 +153,25 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
     processed_frame = zoom_frame(processed_frame);
     processed_frame = contrast_frame(processed_frame);
 
+    //Check if the dimensions of the frame are reasonable
+    bool frame_dimensions_limited = frame_width > 0 && frame_height > 0 &&
+            frame_width <= screen_width && frame_height <= screen_height;
+
+    //Check if video is shown in original dimensions, which means no scaling is needed
+    bool original_dimensions_shown = frame_width == capture.get(CV_CAP_PROP_FRAME_WIDTH) &&
+            frame_height == capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+
     cv::Mat scaled_frame;
-    if (frame_width != capture.get(CV_CAP_PROP_FRAME_WIDTH) || frame_height != capture.get(CV_CAP_PROP_FRAME_HEIGHT)) {
-        scaled_frame = scale_frame(processed_frame);
+    if (frame_dimensions_limited && !original_dimensions_shown) {
+        scale_frame(processed_frame).copyTo(scaled_frame);
     } else {
-        scaled_frame = processed_frame;
+        processed_frame.copyTo(scaled_frame);
     }
+    processed_frame.release();
     return scaled_frame;
 }
+
+
 
 /**
  * @brief video_player::scale_frame
@@ -173,8 +188,7 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
     } else {
         size = cv::Size(frame_width,frame_height);
     }
-
-    cv::Mat dst;
+    cv::Mat dst(size,src.type());
 
     cv::resize(src,dst,size); //resize image
     return dst;

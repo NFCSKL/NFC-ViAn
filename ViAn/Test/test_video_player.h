@@ -40,6 +40,8 @@ private slots:
     void test_set_stop_video();
     void test_on_set_playback_frame_pass();
     void test_on_set_playback_frame_fail();
+    void test_set_current_frame_num();
+    void test_convert_frame();
 
 private:
     video_player* mvideo;

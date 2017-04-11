@@ -253,6 +253,8 @@ void MainWindow::on_slider_moving(){
     int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
     int slider_pos_under_mouse = ui->videoSlider->minimum() + slider_range * pos_ratio;
 
+    //This code makes sure that the currently shown frame is not updated more often than
+    //every SLIDER_UPDATE_TIMER milliseconds for performance reasons.
     std::chrono::milliseconds current_time = std::chrono::duration_cast<
             std::chrono::milliseconds >(
                 std::chrono::system_clock::now().time_since_epoch()
@@ -272,7 +274,6 @@ void MainWindow::on_slider_moving(){
  * @param local_mouse_pos
  */
 void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
-    // Attention! The following works only for Horizontal, Left-to-right sliders
     float pos_ratio = local_mouse_pos.x() / (float )ui->videoSlider->size().width();
     int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
     int slider_pos_under_mouse = ui->videoSlider->minimum() + slider_range * pos_ratio;

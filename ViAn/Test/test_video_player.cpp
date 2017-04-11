@@ -358,3 +358,63 @@ void test_video_player::test_on_set_playback_frame_fail() {
         QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) != frame);
     }
 }
+
+/**
+ * @brief test_video_player::test_set_current_frame_num
+ * Testing if setting the current frame to a specific frame in a video works as expected.
+ */
+void test_video_player::test_set_current_frame_num() {
+    mvideo->capture.release();
+    mvideo->capture.open("seq_01.mp4");
+
+    const int LEGAL_FRAME = 100;
+    const int ILLEGAL_FRAME = 999999;
+
+    //Testing different branches with legal frame number
+    mvideo->frame.release();
+    mvideo->video_paused = true;
+    QVERIFY(mvideo->set_current_frame_num(LEGAL_FRAME));
+    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == LEGAL_FRAME+1);
+    QVERIFY(mvideo->frame.elemSize()*mvideo->frame.cols*mvideo->frame.rows != 0);
+
+    mvideo->video_paused = false;
+    mvideo->new_frame_num = -1;
+    mvideo->set_new_frame = false;
+    mvideo->set_current_frame_num(LEGAL_FRAME);
+    QVERIFY(mvideo->new_frame_num == LEGAL_FRAME && mvideo->set_new_frame == true);
+
+    //Testing illegal frame number
+    QVERIFY(!mvideo->set_current_frame_num(ILLEGAL_FRAME));
+}
+
+/**
+ * @brief test_video_player::test_convert_frame
+ * Testing if frames are converted correctly.
+ */
+void test_video_player::test_convert_frame() {
+    mvideo->capture.release();
+    mvideo->frame.release();
+    mvideo->img = QPixmap(0, 0).toImage();
+    mvideo->capture.open("seq_01.mp4");
+
+    //Testing with empty frame
+    mvideo->frame = cv::Mat(0,0,CV_8U);
+    mvideo->convert_frame();
+    QVERIFY(mvideo->img.byteCount() == 0);
+
+    //Testing with color frame
+    mvideo->capture.read(mvideo->frame);
+    mvideo->convert_frame();
+    QVERIFY(mvideo->img.format() == QImage::Format_RGB888);
+    QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
+
+    //Testing with grayscale frame
+    mvideo->capture.read(mvideo->frame);
+    cv::Mat grayMat;
+    cv::cvtColor(mvideo->frame, grayMat, cv::COLOR_BGR2GRAY);
+    grayMat.copyTo(mvideo->frame);
+    grayMat.release();
+    mvideo->convert_frame();
+    QVERIFY(mvideo->img.format() == QImage::Format_Indexed8);
+    QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
+}

@@ -103,6 +103,7 @@ private:
     void show_frame();
     void convert_frame();
     void scale_position(QPoint &pos);
+    bool limited_frame_dimensions();
 
     cv::VideoCapture capture;
     cv::Mat frame;
@@ -114,6 +115,8 @@ private:
     int frame_height;
     unsigned int qlabel_width;
     unsigned int qlabel_height;
+    int screen_width;
+    int screen_height;
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
