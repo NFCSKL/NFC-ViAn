@@ -78,7 +78,6 @@ public:
 signals:
     void processed_image(const QImage &image);
     void update_current_frame(const int frame);
-    void finished();
 
 private slots:
     void scaling_event(int new_width, int new_height);
