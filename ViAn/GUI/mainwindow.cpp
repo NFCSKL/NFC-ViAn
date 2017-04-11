@@ -205,7 +205,6 @@ void MainWindow::set_video_slider_pos(int pos) {
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
    on_action_fill_screen_triggered();
-
 }
 
 /**
@@ -812,16 +811,6 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
  */
 void MainWindow::on_action_fill_screen_triggered() {
     if(!original_size) {
-        //Scales the current frame when video playback is paused
-        if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-            QImage frame( ui->videoFrame->pixmap()->toImage() );
-            ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                          frame.scaled(ui->frame_scroll_area->width()-SCROLLAREAMARGIN,
-                                                       ui->frame_scroll_area->height()-SCROLLAREAMARGIN,
-                                                       Qt::KeepAspectRatio))
-                                      );
-        }
-
         //Sends new scroll area resolution to mvideo_player to update scaling resolution
         // Video frame is in the scroll area
         emit resize_video_frame((ui->frame_scroll_area->width())-SCROLLAREAMARGIN, (ui->frame_scroll_area->height())-SCROLLAREAMARGIN);
@@ -865,15 +854,6 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
 void MainWindow::on_action_original_size_triggered() {
     if(mvideo_player->video_open()) {
         if (!original_size) {
-            //Scales the current frame when video playback is paused
-            if (mvideo_player->is_paused()) {
-                QImage frame( ui->videoFrame->pixmap()->toImage() );
-                ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                              frame.scaled(mvideo_player->get_video_width(),
-                                                           mvideo_player->get_video_height(),
-                                                           Qt::KeepAspectRatio))
-                                          );
-            }
             emit resize_video_frame(mvideo_player->get_video_width(), mvideo_player->get_video_height());
             original_size = true;
             ui->action_fill_screen->setEnabled(false);
