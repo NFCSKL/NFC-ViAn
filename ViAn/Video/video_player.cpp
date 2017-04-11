@@ -36,6 +36,9 @@ video_player::~video_player() {
  * @return whether video is loaded
  */
 bool video_player::load_video(string filename) {
+    if (capture.isOpened())
+        capture.release();
+
     capture.open(filename);
 
     if (capture.isOpened()) {
@@ -46,9 +49,10 @@ bool video_player::load_video(string filename) {
         start();
         return true;
     }
-    else
+    else {
         cout << "Could not load file \"" << filename << "\"" << endl;
         return false;
+    }
 }
 
 /**
@@ -82,6 +86,8 @@ void video_player::run()  {
         }
         m_mutex->unlock();
     }
+
+    this->finished();
 }
 
 /**
@@ -776,3 +782,5 @@ void video_player::scaling_event(int new_width, int new_height) {
 bool video_player::video_open() {
     return capture.isOpened();
 }
+
+

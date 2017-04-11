@@ -78,6 +78,7 @@ public:
 signals:
     void processed_image(const QImage &image);
     void update_current_frame(const int frame);
+    void finished();
 
 private slots:
     void scaling_event(int new_width, int new_height);
@@ -88,6 +89,7 @@ public slots:
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
+
 
 protected:
     void run() override;
