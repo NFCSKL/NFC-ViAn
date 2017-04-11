@@ -855,3 +855,11 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
         set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
     }
 }
+
+/**
+ * @brief MainWindow::on_actionInvert_analysis_area_triggered
+ * Switches between choosing area for analysing and area for not analysing.
+ */
+void MainWindow::on_actionInvert_analysis_area_triggered() {
+    mvideo_player->invert_analysis_area();
+}

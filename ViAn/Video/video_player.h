@@ -55,6 +55,7 @@ public:
     void undo_overlay();
     void clear_overlay();
     void toggle_analysis_area();
+    void invert_analysis_area();
     void zoom_in();
     void zoom_out();
     void rotate_right();

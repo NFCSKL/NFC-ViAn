@@ -371,6 +371,7 @@
     </property>
     <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="actionInvert_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
     <addaction name="actionRotate_right"/>
@@ -473,6 +474,7 @@
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
    <addaction name="actionShow_hide_analysis_area"/>
+   <addaction name="actionInvert_analysis_area"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -724,6 +726,11 @@
   <action name="actionDelete">
    <property name="text">
     <string>Delete selected</string>
+   </property>
+  </action>
+  <action name="actionInvert_analysis_area">
+   <property name="text">
+    <string>Invert analysis area</string>
    </property>
   </action>
  </widget>

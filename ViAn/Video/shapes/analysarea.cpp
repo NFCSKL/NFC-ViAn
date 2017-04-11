@@ -25,10 +25,6 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
     if (size > 0) {
         cv::Point rook_points[1][size];
 
-        // Copy the frame.
-        cv::Mat area;
-        frame.copyTo(area);
-
         // Create array of points for the polygon.
         for (int i = 0; i < size; i++) {
             rook_points[0][i] = points->at(i);
@@ -36,13 +32,47 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
         const cv::Point* ppt[1] = {rook_points[0]};
         int npt[] = {size};
 
-        // Draw polygon on the copied frame.
-        cv::fillPoly(area, ppt, npt, 1, cv::Scalar(255, 255, 255));
-        cv::polylines(area, ppt, npt, 1, true, cv::Scalar(255, 0, 0), Shape::LINE_THICKNESS);
+        if (inverted) {
+            // Frame with white polygon, otherwise zeros.
+            cv::Mat inside_area;
+            inside_area = frame.zeros(frame.rows, frame.cols, frame.type());
+            cv::fillPoly(inside_area, ppt, npt, 1, cv::Scalar(255, 255, 255));
 
-        // Add opacity and blend with the original frame.
-        double alpha = 0.6;
-        cv::addWeighted(area, alpha, frame, 1.0 - alpha , 0.0, frame);
+            // Inverted frame.
+            cv::Mat outside_area;
+            cv::bitwise_not(inside_area, outside_area);
+
+            // Completely white frame.
+            cv::Mat white_frame = frame.zeros(frame.rows, frame.cols, frame.type());
+            white_frame = cv::Scalar(255,255,255);
+
+            // Original frame with opacity.
+            cv::Mat opacityframe;
+            cv::addWeighted(white_frame, Shape::ALPHA, frame, 1.0 - Shape::ALPHA, 0.0, opacityframe);
+
+            cv::Mat original_cut, opacity_cut;
+
+            // Cut out the polygon from the frame with opacity.
+            cv::bitwise_and(outside_area, opacityframe, opacity_cut);
+
+            // Cut out everything but the polygon from the original frame.
+            cv::bitwise_and(inside_area, frame, original_cut);
+
+            // Unite the images using OR.
+            cv::bitwise_or(opacity_cut, original_cut, frame);
+        } else {
+            // Copy the frame.
+            cv::Mat area;
+            frame.copyTo(area);
+
+            // Draw polygon on the copied frame.
+            cv::fillPoly(area, ppt, npt, 1, cv::Scalar(255, 255, 255));
+
+            // Add opacity and blend with the original frame.
+            cv::addWeighted(area, Shape::ALPHA, frame, 1.0 - Shape::ALPHA, 0.0, frame);
+        }
+        // Draw contour of the polygon.
+        cv::polylines(frame, ppt, npt, 1, true, cv::Scalar(255, 0, 0), Shape::LINE_THICKNESS);
     }
     return frame;
 }
@@ -54,6 +84,14 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
  */
 void AnalysArea::add_point(QPoint pos) {
     points->push_back(Shape::qpoint_to_point(pos));
+}
+
+/**
+ * @brief AnalysArea::invert_area
+ * Inverts the area being drawn.
+ */
+void AnalysArea::invert_area() {
+    inverted = !inverted;
 }
 
 /**

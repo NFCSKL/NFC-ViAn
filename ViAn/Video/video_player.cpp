@@ -538,6 +538,15 @@ void video_player::toggle_analysis_area() {
 }
 
 /**
+ * @brief video_player::invert_analysis_area
+ * Switches between choosing area for analysing and area for not analysing.
+ */
+void video_player::invert_analysis_area() {
+    analysis_area->invert_area();
+    update_overlay();
+}
+
+/**
  * @brief video_player::zoom_in
  * Sets a state in the video overlay
  * for the user to choose an area,

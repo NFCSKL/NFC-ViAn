@@ -136,6 +136,8 @@ private slots:
 
     void on_actionDelete_triggered();
 
+    void on_actionInvert_analysis_area_triggered();
+
 private:
 
     Ui::MainWindow *ui;
