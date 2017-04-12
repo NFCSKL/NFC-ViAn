@@ -144,6 +144,7 @@ void video_player::convert_frame(bool scale) {
  * @return Returns the processed frame.
  */
 cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
+    bool copy_to = false;
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = src.clone();
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
@@ -154,8 +155,8 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
         processed_frame = analysis_area->draw(processed_frame);
     }
 
-    zoom_frame(processed_frame).copyTo(processed_frame);
-    contrast_frame(processed_frame).copyTo(processed_frame);
+    processed_frame = zoom_frame(processed_frame);
+    processed_frame = contrast_frame(processed_frame);
 
     //Check if the dimensions of the frame are reasonable
     bool frame_dimensions_limited = frame_width > 0 && frame_height > 0 &&
@@ -167,7 +168,7 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
 
     //Scales the frame if these criteria are met
     if (scale && frame_dimensions_limited && !original_dimensions_shown) {
-        scale_frame(processed_frame).copyTo(processed_frame);
+        processed_frame = scale_frame(processed_frame);
     }
 
     // Rotates the frame, according to the choosen direction.
@@ -184,21 +185,15 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
 /**
  * @brief video_player::scale_frame
  * Scales the video frame to match the resolution of the video window.
+ * Before using this method, a check that frame_width and frame_height
+ * have reasonable values is needed.
  * @param src
  * @return
  */
 cv::Mat video_player::scale_frame(cv::Mat &src) {
-    cv::Size size;
-    if (frame_width <= 0 || frame_height <= 0) {
-        size = cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH),capture.get(CV_CAP_PROP_FRAME_HEIGHT));
-        frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
-        frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    } else {
-        size = cv::Size(frame_width,frame_height);
-    }
+    cv::Size size(frame_width,frame_height);
     cv::Mat dst(size,src.type());
-
-    cv::resize(src,dst,size); //resize image
+    cv::resize(src,dst,size); //resize frame
     return dst;
 }
 

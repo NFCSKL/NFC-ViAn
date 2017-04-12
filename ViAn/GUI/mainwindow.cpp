@@ -10,7 +10,6 @@
 #include "icononbuttonhandler.h"
 #include "inputwindow.h"
 #include "Video/shapes/shape.h"
-#include <qdebug.h>
 
 using namespace std;
 using namespace cv;
@@ -239,11 +238,6 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
  * Sends frame numbers to the video player whilst the slider is moving
  */
 void MainWindow::on_slider_moving(){
-    QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
-    float pos_ratio = local_mouse_pos.x() / (float )ui->videoSlider->size().width();
-    int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
-    int slider_pos_under_mouse = ui->videoSlider->minimum() + slider_range * pos_ratio;
-
     //This code makes sure that the currently shown frame is not updated more often than
     //every SLIDER_UPDATE_TIMER milliseconds for performance reasons.
     std::chrono::milliseconds current_time = std::chrono::duration_cast<
@@ -252,7 +246,8 @@ void MainWindow::on_slider_moving(){
     );
     std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
     if (time_since_last_slider_frame_update.count() >= SLIDER_UPDATE_TIMER) {
-        emit set_playback_frame(slider_pos_under_mouse);
+        QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+        emit set_playback_frame(slider_pos_under_mouse(local_mouse_pos));
         slider_timer = current_time;
     }
 }
@@ -265,13 +260,24 @@ void MainWindow::on_slider_moving(){
  * @param local_mouse_pos
  */
 void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
+    int slider_pos = slider_pos_under_mouse(local_mouse_pos);
+    if (slider_pos != new_pos) {
+        ui->videoSlider->setValue(slider_pos);
+        emit set_playback_frame(slider_pos, true);
+    }
+}
+
+/**
+ * @brief MainWindow::slider_pos_under_mouse
+ * Takes the general position of the mouse pointer and calculates which
+ * position on the slider it relates to.
+ * @param local_mouse_pos is the general position of the mouse pointer
+ * @return The current position of the mouse pointer on the slider
+ */
+int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
     float pos_ratio = local_mouse_pos.x() / (float )ui->videoSlider->size().width();
     int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
-    int slider_pos_under_mouse = ui->videoSlider->minimum() + slider_range * pos_ratio;
-    if (slider_pos_under_mouse != new_pos) {
-        ui->videoSlider->setValue(slider_pos_under_mouse);
-        emit set_playback_frame(slider_pos_under_mouse, true);
-    }
+    return ui->videoSlider->minimum() + slider_range * pos_ratio;
 }
 
 /**
@@ -821,7 +827,6 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
  */
 void MainWindow::on_videoSlider_sliderPressed() {
     slider_blocked = true;
-    slider_moving = true;
     if (!mvideo_player->is_paused()) {
         slider_paused_video = true;
         emit set_pause_video();
@@ -850,7 +855,6 @@ void MainWindow::on_videoSlider_sliderReleased() {
     emit set_playback_frame(new_pos);
     video_slider->setSliderPosition(new_pos);
     slider_blocked = false;
-    slider_moving = false;
     if (slider_paused_video) {
         paused_wait.notify_one();
         slider_paused_video = false;
@@ -917,8 +921,7 @@ void MainWindow::on_actionRotate_left_triggered() {
  */
 void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
     Bookmark* bookmark = (Bookmark*) item;
-    if (mvideo_player->is_paused()) {
-        mvideo_player->set_current_frame_num(bookmark->get_frame_number());
-        set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
-    }
+    emit set_playback_frame(bookmark->get_frame_number());
+    set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
+
 }

@@ -150,7 +150,6 @@ private:
     QSlider *video_slider;
 
     bool slider_blocked = false;
-    bool slider_moving = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
 
@@ -173,6 +172,7 @@ private:
     void on_slider_moving();
     void on_slider_click(int new_pos, QPoint local_mouse_pos);
     QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
+    int slider_pos_under_mouse(QPoint local_mouse_pos);
 };
 
 #endif // MAINWINDOW_H

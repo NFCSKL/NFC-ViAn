@@ -33,7 +33,6 @@ public:
 
     int get_num_frames();    
     int get_current_frame_num();
-    bool set_current_frame_num(int frame_nbr);
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
@@ -105,6 +104,7 @@ private:
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
     bool limited_frame_dimensions();
+    bool set_current_frame_num(int frame_nbr);
 
     cv::VideoCapture capture;
     cv::Mat frame;

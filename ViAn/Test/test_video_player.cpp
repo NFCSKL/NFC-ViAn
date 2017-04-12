@@ -287,10 +287,6 @@ void test_video_player::test_scale_frame() {
                           video_height*2);
     cv::Mat temp = mvideo->scale_frame(mvideo->frame);
     QVERIFY(temp.cols == video_width*2 && temp.rows == video_height*2);
-
-    mvideo->scaling_event(0,0);
-    temp = mvideo->scale_frame(mvideo->frame);
-    QVERIFY(temp.cols == video_width && temp.rows == video_height);
 }
 
 /**
@@ -381,7 +377,7 @@ void test_video_player::test_set_current_frame_num() {
     mvideo->new_frame_num = -1;
     mvideo->set_new_frame = false;
     mvideo->set_current_frame_num(LEGAL_FRAME);
-    QVERIFY(mvideo->new_frame_num == LEGAL_FRAME && mvideo->set_new_frame == true);
+    QVERIFY(mvideo->new_frame_num == LEGAL_FRAME && mvideo->set_new_frame);
 
     //Testing illegal frame number
     QVERIFY(!mvideo->set_current_frame_num(ILLEGAL_FRAME));
