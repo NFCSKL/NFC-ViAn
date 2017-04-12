@@ -48,8 +48,7 @@ bool video_player::load_video(string filename) {
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
         return true;
-    }
-    else {
+    } else {
         cout << "Could not load file \"" << filename << "\"" << endl;
         return false;
     }
