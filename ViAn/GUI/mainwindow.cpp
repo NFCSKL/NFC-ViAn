@@ -344,16 +344,15 @@ void MainWindow::on_bookmarkButton_clicked() {
         // Get current project.
         item = ui->ProjectTree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        std::string proj_path = fileHandler->get_dir(my_project->id);
+        QDir proj_path = fileHandler->get_dir(my_project->id);
         // Add bookmarks-folder to the project-folder.
-        proj_path.append("/bookmarks");
-        ID dir_id = fileHandler->create_directory(proj_path);
-        std::string dir_path = fileHandler->get_dir(dir_id);
+        proj_path.mkpath(proj_path.absoluteFilePath("Bookmarks"));
+        proj_path.cd(proj_path.absoluteFilePath("Bookmarks"));
 
         // Export the current frame in the bookmarks-folder.
         // The names of the stored files will have increasing numbers.
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(dir_path, file_name);
+        std::string file_path = mvideo_player->export_current_frame(proj_path.absolutePath().toStdString(), file_name);
 
         bookmark_view->add_bookmark(mvideo_player->get_current_frame_num(), file_path);
         set_status_bar("Saved bookmark.");
@@ -375,8 +374,7 @@ void MainWindow::on_actionAddProject_triggered() {
  * @param input the input from the user
  * @param action the action that was triggered earlier
  */
-void MainWindow::input_switch_case(ACTION action, QString qInput) {
-    std::string input = qInput.toStdString();
+void MainWindow::input_switch_case(ACTION action, QString qInput) {    
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
@@ -385,9 +383,9 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
     }
     switch(action) {
     case ADD_PROJECT: {
-        Project* proj = fileHandler->create_project(input);
+        Project* proj = fileHandler->create_project(qInput);
         add_project_to_tree(proj);
-        set_status_bar("Project " + input + " created.");
+        set_status_bar("Project " + qInput.toStdString() + " created.");
         delete inputWindow;
         break;
     }
@@ -396,9 +394,9 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
         delete inputWindow;
         break;
     case ADD_VIDEO: {
-        ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), input);
-        add_video_to_tree(input, id);
-        set_status_bar("Video " + input + " added.");
+        ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), qInput.toStdString());
+        add_video_to_tree(qInput.toStdString(), id);
+        set_status_bar("Video " + qInput.toStdString() + " added.");
         break;
     }
     default:
@@ -634,7 +632,7 @@ void MainWindow::on_actionAddVideo_triggered() {
     if(ui->ProjectTree->selectedItems().size() == 1) {
         project = ui->ProjectTree->selectedItems().first();
         if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
-            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->work_space.c_str(),
+            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
                 input_switch_case(ACTION::ADD_VIDEO, dir);
@@ -696,7 +694,7 @@ void MainWindow::on_actionSave_triggered() {
  * @brief MainWindow::on_actionLoad_triggered
  */
 void MainWindow::on_actionLoad_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->work_space.c_str(),tr("*.txt"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
@@ -716,11 +714,8 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->ProjectTree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
-        stringstream file_path;
         Video* v = vid->second->get_video();
-        file_path << *v;
-        std::string tree_name = file_path.str();
-        add_video_to_tree(tree_name, v->id);
+        add_video_to_tree(v->file_path, v->id);
     }
 }
 
@@ -743,8 +738,8 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
  * filehandler workspace accordingly.
  */
 void MainWindow::on_actionChoose_Workspace_triggered() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
-    this->fileHandler->set_workspace(dir.toStdString() + "/");
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str());
+    this->fileHandler->set_work_space(dir.toStdString() + "/");
     set_status_bar("New wokspace set to " + this->fileHandler->work_space);
 }
 
