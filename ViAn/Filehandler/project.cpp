@@ -25,6 +25,7 @@ Project::Project(){
     this->dir_videos = -1;
     this->videos.clear();
 }
+
 /**
  * @brief Project::~Project
  * Clears contents of video map
@@ -72,6 +73,7 @@ void Project::read(const QJsonObject& json){
         this->add_video(v);
     }
 }
+
 /**
  * @brief Project::write
  * @param json
