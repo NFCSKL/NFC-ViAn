@@ -76,7 +76,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
 ID FileHandler::create_directory(QString dir_path){
     QDir dir (QDir::root());
     last_error = !dir.mkpath(dir_path);
-    if(!last_error){
+    if(last_error){
         qWarning("Could not create directory %s",dir_path.toStdString().c_str());
     }
 
