@@ -42,7 +42,8 @@ public:
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
     bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-    
+    const int SLIDER_UPDATE_TIMER = 200;
+
     // Lock and wait condition to sleep player when video is paused
     QMutex mutex;
     QWaitCondition paused_wait;
@@ -54,6 +55,7 @@ signals:
     void resize_video_frame(int width, int height);
     void next_video_frame();
     void prev_video_frame();
+    void set_playback_frame(int frame, bool show_frame = false);
 
 private slots:
 
@@ -81,9 +83,13 @@ private slots:
 
     void on_bookmarkButton_clicked();
 
-    void on_actionAddProject_triggered();
+    void on_videoSlider_sliderPressed();
 
-    void on_videoSlider_valueChanged(int newPos);
+    void on_videoSlider_sliderReleased();
+
+    void on_videoSlider_valueChanged(int new_pos);
+
+    void on_actionAddProject_triggered();
     
     void on_actionShow_hide_overlay_triggered();
 
@@ -146,8 +152,15 @@ private:
     video_player* mvideo_player;
     IconOnButtonHandler *iconOnButtonHandler;
     BookmarkView* bookmark_view;
-
     QSlider *video_slider;
+
+    bool slider_blocked = false;
+    bool slider_paused_video = false;
+    int prev_slider_pos = 0;
+
+    std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
+                std::chrono::system_clock::now().time_since_epoch()
+            );
 
     FileHandler *fileHandler;
 
@@ -160,9 +173,15 @@ private:
 
     void toggle_toolbar();
     void enable_video_buttons();
+
+    void on_slider_moving();
+    void on_slider_click(int new_pos, QPoint local_mouse_pos);
     QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
 
     bool original_size;
+
+    int slider_pos_under_mouse(QPoint local_mouse_pos);
+
 };
 
 #endif // MAINWINDOW_H
