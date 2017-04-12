@@ -47,13 +47,13 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
             white_frame = cv::Scalar(255,255,255);
 
             // Original frame with opacity.
-            cv::Mat opacityframe;
-            cv::addWeighted(white_frame, Shape::ALPHA, frame, 1.0 - Shape::ALPHA, 0.0, opacityframe);
+            cv::Mat opacity_frame;
+            cv::addWeighted(white_frame, Shape::ALPHA, frame, 1.0 - Shape::ALPHA, 0.0, opacity_frame);
 
             cv::Mat original_cut, opacity_cut;
 
             // Cut out the polygon from the frame with opacity.
-            cv::bitwise_and(outside_area, opacityframe, opacity_cut);
+            cv::bitwise_and(outside_area, opacity_frame, opacity_cut);
 
             // Cut out everything but the polygon from the original frame.
             cv::bitwise_and(inside_area, frame, original_cut);
