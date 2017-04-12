@@ -176,11 +176,10 @@ private:
 
     void on_slider_moving();
     void on_slider_click(int new_pos, QPoint local_mouse_pos);
+    int slider_pos_under_mouse(QPoint local_mouse_pos);
     QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
 
     bool original_size;
-
-    int slider_pos_under_mouse(QPoint local_mouse_pos);
 
 };
 
