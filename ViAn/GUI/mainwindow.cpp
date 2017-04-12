@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <iostream>
+#include <sstream>
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <chrono>
@@ -22,13 +23,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
+    video_slider = ui->videoSlider;
 
-    video_slider = findChild<QSlider*>("videoSlider");
+
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
+    // Setup a Bookmark View in the right sidebar in the GUI.
+    bookmark_view = new BookmarkView(ui->documentList);
+
     fileHandler = new FileHandler();
-    set_shortcuts();
 
     // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
@@ -41,8 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mvideo_player = new video_player(&mutex, &paused_wait);
     setup_video_player(mvideo_player);
 
-    // Initially hide overlay toolbar
-    ui->toolBar->hide();
+    // Initially hide overlay and analysis toolbar
+    ui->toolBar_overlay->hide();
+    ui->toolBar_analysis->hide();
 }
 
 /**
@@ -53,9 +58,16 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
-    mvideo_player->terminate();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    emit set_stop_video(); //Signaling the run function in mvideo_player to stop executing
+    mvideo_player->wait(); //Waiting for video_player to finish executing
     delete mvideo_player;
+
     delete ui;
+    delete bookmark_view;
 }
 
 /**
@@ -80,18 +92,8 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_pause_video()));
     QObject::connect(this, SIGNAL(set_stop_video()),
                      mplayer, SLOT(on_stop_video()));
-}
-
-/**
- * @brief MainWindow::set_shortcuts
- * Function to set keyboard shortcuts on actions
- */
-void MainWindow::set_shortcuts(){
-    ui->actionExit->setShortcut(tr("Ctrl+e"));
-    ui->actionSave->setShortcut(tr("Ctrl+s"));
-    ui->actionLoad->setShortcut(tr("Ctrl+l"));
-    ui->actionAddProject->setShortcut(tr("Ctrl+Shift+p"));
-    ui->actionAddVideo->setShortcut(tr("Ctrl+Shift+v"));
+    QObject::connect(this, SIGNAL(set_playback_frame(int)),
+                     mplayer, SLOT(on_set_playback_frame(int)));
 }
 
 /**
@@ -105,51 +107,63 @@ void MainWindow::set_status_bar(std::string status, int timer){
 
 /**
  * @brief MainWindow::on_fastBackwardButton_clicked
- * The button supposed to play the video slower
+ * Calls upon a video player function which decreases the playback speed
  *
  */
 void MainWindow::on_fastBackwardButton_clicked(){
-
+    mvideo_player->dec_playback_speed();
+    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
+    std::ostringstream speed_str;
+    speed_str << curr_speed_factor;
+    set_status_bar("Playback speed decreased (x" + speed_str.str() + ")");
 }
 
 /**
  * @brief MainWindow::on_playPauseButton_clicked
- * The button supposed to play and pause the video
+ * Calls upon video player functions based on current playback status
+ * Starts/resumes a stopped/paused video, pauses a playing one
  */
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused()) {
         // Video thread is paused. Notifying the waitcondition to resume playback
-        set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         paused_wait.wakeOne();
+        set_status_bar("Playing");
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
         mvideo_player->start();
+        set_status_bar("Playing");
     } else {
         // Video thread is running. Pause it
-        set_status_bar("Paused");
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
         emit set_pause_video();
+        set_status_bar("Paused");
     }
 }
 
 /**
  * @brief MainWindow::on_fastForwardButton_clicked
- * The button supposed to play the video faster
+ * Calls upon video player function which in turn increases the playback speed
  */
 void MainWindow::on_fastForwardButton_clicked(){
-
+    mvideo_player->inc_playback_speed();
+    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
+    std::ostringstream speed_str;
+    speed_str << curr_speed_factor;
+    set_status_bar("Playback speed increased (x" + speed_str.str() + ")");
 }
 
 /**
  * @brief MainWindow::on_stopButton_clicked
- * The button supposed to stop the video
+ * Calls upon video player function which in turn stops the video
  */
 void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+    } else if (mvideo_player->is_stopped()){
+        return;
     } else {
         paused_wait.wakeOne();
     }
@@ -158,7 +172,7 @@ void MainWindow::on_stopButton_clicked() {
 
 /**
  * @brief MainWindow::on_nextFrameButton_clicked
- * The button supposed to play the next frame of the video
+ * Calls upon video player function which in turn skips to the next frame
  */
 void MainWindow::on_nextFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
@@ -171,12 +185,12 @@ void MainWindow::on_nextFrameButton_clicked() {
 
 /**
  * @brief MainWindow::on_previousFrameButton_clicked
- * The button supposed to play the previous frame of the video
+ * Calls upon video player function which in turn steps back to the previous frame
  */
 void MainWindow::on_previousFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
-        set_status_bar("Went back a frame");
         emit prev_video_frame();
+        set_status_bar("Went back a frame");
     } else {
         set_status_bar("Video needs to be paused");
     }
@@ -197,7 +211,8 @@ void MainWindow::update_video(QImage frame) {
  * @param pos
  */
 void MainWindow::set_video_slider_pos(int pos) {
-    if (pos <= video_slider->maximum()) {
+    if (pos <= video_slider->maximum() && !slider_blocked) {
+        prev_slider_pos = video_slider->value();
         video_slider->setSliderPosition(pos);
     }
 }
@@ -225,28 +240,69 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 }
 
 /**
+ * @brief MainWindow::on_slider_moving
+ * Sends frame numbers to the video player whilst the slider is moving
+ */
+void MainWindow::on_slider_moving(){
+    //This code makes sure that the currently shown frame is not updated more often than
+    //every SLIDER_UPDATE_TIMER milliseconds for performance reasons.
+    std::chrono::milliseconds current_time = std::chrono::duration_cast<
+            std::chrono::milliseconds >(
+                std::chrono::system_clock::now().time_since_epoch()
+    );
+    std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
+    if (time_since_last_slider_frame_update.count() >= SLIDER_UPDATE_TIMER) {
+        QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+        emit set_playback_frame(slider_pos_under_mouse(local_mouse_pos));
+        slider_timer = current_time;
+    }
+}
+
+/**
+ * @brief MainWindow::on_slider_click
+ * Enables the slider marker to be moved to the position where a click occured
+ * It also sends the clicked frame value to the video player
+ * @param new_pos
+ * @param local_mouse_pos
+ */
+void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
+    int slider_pos = slider_pos_under_mouse(local_mouse_pos);
+    if (slider_pos != new_pos) {
+        ui->videoSlider->setValue(slider_pos);
+        emit set_playback_frame(slider_pos, true);
+    }
+}
+
+/**
+ * @brief MainWindow::slider_pos_under_mouse
+ * Takes the general position of the mouse pointer and calculates which
+ * position on the slider it relates to.
+ * @param local_mouse_pos is the general position of the mouse pointer
+ * @return The current position of the mouse pointer on the slider
+ */
+int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
+    float pos_ratio = local_mouse_pos.x() / (float )ui->videoSlider->size().width();
+    int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
+    return ui->videoSlider->minimum() + slider_range * pos_ratio;
+}
+
+/**
  * @brief MainWindow::on_videoSlider_valueChanged
- * Update the slider to where the mouse is
+ * Gets called when the value of the slider is changed
+ * Moves the slider marker and sends the new frame number to the video player
  * @param newPos current position of the slider
  */
-void MainWindow::on_videoSlider_valueChanged(int newPos) {
-    // Make slider to follow the mouse directly and not by pageStep steps
+
+void MainWindow::on_videoSlider_valueChanged(int new_pos) {
+    slider_blocked = true;
     Qt::MouseButtons btns = QApplication::mouseButtons();
-    QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
-    bool clickOnSlider = (btns & Qt::LeftButton) &&
-                         (localMousePos.x() >= 0 && localMousePos.y() >= 0 &&
-                          localMousePos.x() < ui->videoSlider->size().width() &&
-                          localMousePos.y() < ui->videoSlider->size().height());
-    if (clickOnSlider) {
-        // Attention! The following works only for Horizontal, Left-to-right sliders
-        float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
-        int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
-        int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
-        if (sliderPosUnderMouse != newPos) {
-            ui->videoSlider->setValue(sliderPosUnderMouse);
-            return;
-        }
-    }
+    QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+    bool click_on_slider = (btns & Qt::LeftButton) &&
+                         (local_mouse_pos.x() >= 0 && local_mouse_pos.y() >= 0 &&
+                          local_mouse_pos.x() < ui->videoSlider->size().width() &&
+                          local_mouse_pos.y() < ui->videoSlider->size().height());
+    if (click_on_slider) on_slider_click(new_pos, local_mouse_pos);
+    slider_blocked = false;
 }
 
 /**
@@ -279,9 +335,29 @@ void MainWindow::on_actionExit_triggered() {
 
 /**
  * @brief MainWindow::on_bookmarkButton_clicked
- * the button supposed to add a bookmark
+ * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmarkButton_clicked() {
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->ProjectTree->selectedItems().size() == 1) {
+        // Get current project.
+        item = ui->ProjectTree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
+        std::string proj_path = fileHandler->get_dir(my_project->id);
+        // Add bookmarks-folder to the project-folder.
+        proj_path.append("/bookmarks");
+        ID dir_id = fileHandler->create_directory(proj_path);
+        std::string dir_path = fileHandler->get_dir(dir_id);
+
+        // Export the current frame in the bookmarks-folder.
+        // The names of the stored files will have increasing numbers.
+        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
+        std::string file_path = mvideo_player->export_current_frame(dir_path, file_name);
+
+        bookmark_view->add_bookmark(mvideo_player->get_current_frame_num(), file_path);
+        set_status_bar("Saved bookmark.");
+    }
 }
 
 /**
@@ -328,15 +404,6 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
     default:
         break;
     }
-}
-
-/**
- * @brief MainWindow::on_ProjectTree_itemClicked
- * @param item
- * @param column
- */
-void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
-
 }
 
 /**
@@ -524,33 +591,34 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     MyQTreeWidgetItem *item = (MyQTreeWidgetItem*)tree->itemAt( pos );
     QMenu menu(this);
 
-    if(item == nullptr) {
-        QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
-        QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
-        create_project->setStatusTip(tr("Create project"));
-        load_project->setStatusTip(tr("Load project"));
-        menu.addAction(create_project);
-        menu.addAction(load_project);
-        connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
-        connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
-    } else if(item->type == TYPE::PROJECT) {
-        QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
-        QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
-        add_video->setStatusTip(tr("Add video"));
-        delete_project->setStatusTip(tr("Delete project"));
-        menu.addAction(add_video);
-        menu.addAction(delete_project);
-        connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
-        connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDeleteProject_triggered()));
-    } else if(item->type == TYPE::VIDEO) {
-        QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
-        QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
-        load_video->setStatusTip(tr("Play video"));
-        delete_video->setStatusTip(tr("Remove video from project"));
-        menu.addAction(load_video);
-        menu.addAction(delete_video);
-        connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
-        connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDeleteVideo_triggered()));
+    QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+    create_project->setStatusTip(tr("Create project"));
+    load_project->setStatusTip(tr("Load project"));
+    menu.addAction(create_project);
+    menu.addAction(load_project);
+    connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
+    connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
+    if(item != nullptr) {
+        if(item->type == TYPE::PROJECT) {
+            QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
+            QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+            add_video->setStatusTip(tr("Add video"));
+            delete_project->setStatusTip(tr("Delete project"));
+            menu.addAction(add_video);
+            menu.addAction(delete_project);
+            connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+            connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+        } else if(item->type == TYPE::VIDEO) {
+            QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+            QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
+            load_video->setStatusTip(tr("Play video"));
+            delete_video->setStatusTip(tr("Remove video from project"));
+            menu.addAction(load_video);
+            menu.addAction(delete_video);
+            connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
+            connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+        }
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
@@ -587,12 +655,22 @@ void MainWindow::on_actionAddVideo_triggered() {
 void MainWindow::play_video() {
     MyQTreeWidgetItem *my_project;
     my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    if (mvideo_player->isRunning()) {
+        emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player = new video_player(&mutex, &paused_wait);
+        setup_video_player(mvideo_player);
+    }
     mvideo_player->load_video(my_project->name.toStdString());
+
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
     enable_video_buttons();
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
-    video_slider->setMaximum(mvideo_player->get_num_frames());
+    video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
 }
 
 /**
@@ -667,65 +745,33 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
 void MainWindow::on_actionChoose_Workspace_triggered() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
     this->fileHandler->set_workspace(dir.toStdString() + "/");
-    set_status_bar("new wokspace set to " + this->fileHandler->work_space);
-}
-
-    /**
- * @brief MainWindow::on_actionDeleteProject_triggered
- * Deletes the saved files of the selected project.
- * Removes the project from the project tree.
- */
-void MainWindow::on_actionDeleteProject_triggered() {
-    QTreeWidgetItem *project;
-    MyQTreeWidgetItem *my_project;
-    if(ui->ProjectTree->selectedItems().size() == 1) {
-        project = ui->ProjectTree->selectedItems().first();
-        my_project = (MyQTreeWidgetItem*)project;
-        if (my_project->type == TYPE::PROJECT) {
-            QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
-                                                                        tr("Are you sure you want to delete the selected project?\n"),
-                                                                        QMessageBox::No | QMessageBox::Yes,
-                                                                        QMessageBox::No);
-
-            if (resBtn == QMessageBox::Yes) {
-                this->fileHandler->delete_project(fileHandler->get_project(my_project->id));
-                remove_selected_project_from_tree();
-            }
-        } else {
-            set_status_bar("No project selected to remove.");
-        }
-    } else {
-        set_status_bar("Multiple or no projects selected.");
-    }
+    set_status_bar("New wokspace set to " + this->fileHandler->work_space);
 }
 
 /**
- * @brief MainWindow::on_actionDeleteVideo_triggered
- * Deletes the saved files of the selected video.
- * Removes the video from the project tree.
+ * @brief MainWindow::on_actionDelete_triggered
+ * Deletes the selected item in the tree
  */
-void MainWindow::on_actionDeleteVideo_triggered() {
+void MainWindow::on_actionDelete_triggered() {
     QTreeWidgetItem *item;
-    QTreeWidgetItem *project;
     MyQTreeWidgetItem *my_item;
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
         item = ui->ProjectTree->selectedItems().first();
         my_item = (MyQTreeWidgetItem*)item;
-        project = get_project_from_object(item);
-        my_project = (MyQTreeWidgetItem*)project;
-        if (item->parent()) {
-            QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
-                                                                        tr(("Are you sure you want to delete " + my_item->name.toStdString() + " from " + my_project->name.toStdString() + "?\n").c_str()),
-                                                                        QMessageBox::No | QMessageBox::Yes,
-                                                                        QMessageBox::No);
+        QMessageBox::StandardButton res_btn = QMessageBox::question( this, "Delete",
+                                                                    tr(("Are you sure you want to delete " + my_item->get_name() + "?\n").c_str()),
+                                                                    QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No);
 
-            if (resBtn == QMessageBox::Yes) {
-                fileHandler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
-                remove_video_from_tree(my_item);
+        if (res_btn == QMessageBox::Yes) {
+            if (my_item->type == TYPE::VIDEO) {
+                my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
+                this->fileHandler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
+            } else if (my_item->type == TYPE::PROJECT) {
+                this->fileHandler->delete_project(my_item->id);
             }
-        } else {
-            set_status_bar("No video selected to remove.");
+            remove_item_from_tree(my_item);
         }
     } else {
         set_status_bar("Multiple or no videos selected.");
@@ -733,39 +779,34 @@ void MainWindow::on_actionDeleteVideo_triggered() {
 }
 
 /**
- * @brief MainWindow::remove_selected_project_from_tree
- * Removes all videos of the selected project and then the project.
+ * @brief MainWindow::remove_item_from_tree
+ * @param my_item item to be removed from tree
  */
-void MainWindow::remove_selected_project_from_tree() {
-    QTreeWidgetItem *project;
-    project = ui->ProjectTree->selectedItems().first();
-    delete project;
-}
-
-/**
- * @brief MainWindow::remove_video_from_tree
- * @param video to be deleted
- * Removes the video from the tree.
- */
-void MainWindow::remove_video_from_tree(MyQTreeWidgetItem *my_video) {
-    set_status_bar("Remove video");
-    delete my_video;
+void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
+    set_status_bar("Remove item");
+    delete my_item;
 }
 
 /**
  * @brief MainWindow::toggle_toolbar
- * This method will toggle the toolbar depending on whether the overlay is showing or not.
+ * This method will toggle the toolbar depending on whether the overlay and analysis is showing or not.
  * It is switching between a toolbar that contains items as save/add/load and another that
- * contains drawing tools.
- * This is invoked when the overlay is activated and deactivated.
+ * contains drawing tools, and a third containing analysis tools.
+ * This is invoked when the overlay and analysis tool is activated and deactivated.
  */
 void MainWindow::toggle_toolbar() {
-    if(mvideo_player->is_showing_overlay()) {
-        ui->toolBar_no_overlay->hide();
-        ui->toolBar->show();
-    } else {
+    if (mvideo_player->is_showing_analysis_tool()) {
+        ui->toolBar_analysis->show();
         ui->toolBar->hide();
-        ui->toolBar_no_overlay->show();
+        ui->toolBar_overlay->hide();
+    } else if (mvideo_player->is_showing_overlay()) {
+        ui->toolBar_analysis->hide();
+        ui->toolBar->hide();
+        ui->toolBar_overlay->show();
+    } else {
+        ui->toolBar_analysis->hide();
+        ui->toolBar->show();
+        ui->toolBar_overlay->hide();
     }
 }
 
@@ -783,6 +824,11 @@ void MainWindow::enable_video_buttons() {
     ui->stopButton->setEnabled(true);
 }
 
+/**
+ * @brief MainWindow::get_project_from_object
+ * @param item item you want to get the topmost parent of.
+ * @return
+ */
 QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
     QTreeWidgetItem *project = item;
     while (project->parent()){
@@ -790,12 +836,25 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
     }
     return project;
 }
+
 /**
- * @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+ * @brief MainWindow::on_videoSlider_sliderPressed
+ * Block slider update from video_player
+ */
+void MainWindow::on_videoSlider_sliderPressed() {
+    slider_blocked = true;
+    if (!mvideo_player->is_paused()) {
+        slider_paused_video = true;
+        emit set_pause_video();
+    }
+}
+
+/** @brief MainWindow::on_actionShow_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
  */
 void MainWindow::on_actionShow_hide_analysis_area_triggered() {
     mvideo_player->toggle_analysis_area();
+    toggle_toolbar();
     if (mvideo_player->is_showing_analysis_tool()) {
         set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
     } else {
@@ -804,7 +863,21 @@ void MainWindow::on_actionShow_hide_analysis_area_triggered() {
 }
 
 /**
- * @brief MainWindow::on_actionContrast_Brightness_triggered
+ * @brief MainWindow::on_videoSlider_sliderReleased
+ * Set video playback pos to slider pos and unblock slider update
+ */
+void MainWindow::on_videoSlider_sliderReleased() {
+    int new_pos = video_slider->value();
+    emit set_playback_frame(new_pos);
+    video_slider->setSliderPosition(new_pos);
+    slider_blocked = false;
+    if (slider_paused_video) {
+        paused_wait.notify_one();
+        slider_paused_video = false;
+    }
+}
+
+/** @brief MainWindow::on_actionContrast_Brightness_triggered
  * Opens a window to choose contrast and brightness in.
  */
 void MainWindow::on_actionContrast_Brightness_triggered() {
@@ -838,4 +911,33 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
     }
     mvideo_player->set_contrast(contrast);
     mvideo_player->set_brightness(brightness);
+}
+
+/**
+ * @brief MainWindow::on_actionRotate_right_triggered
+ * Rotates video to the right by 90 degrees.
+ */
+void MainWindow::on_actionRotate_right_triggered() {
+    mvideo_player->rotate_right();
+    set_status_bar("Video rotated 90 degrees to the right.");
+}
+
+/**
+ * @brief MainWindow::on_actionRotate_left_triggered
+ * Rotates video to the left by 90 degrees.
+ */
+void MainWindow::on_actionRotate_left_triggered() {
+    mvideo_player->rotate_left();
+    set_status_bar("Video rotated 90 degrees to the left.");
+}
+/**
+ * @brief MainWindow::on_documentList_itemClicked
+ * Invoked when an item in the bookmark view has been clicked.
+ * @param item The bookmark that has been clicked.
+ */
+void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
+    Bookmark* bookmark = (Bookmark*) item;
+    emit set_playback_frame(bookmark->get_frame_number());
+    set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
+
 }

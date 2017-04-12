@@ -65,20 +65,10 @@ void test_video_player::test_set_frame_height() {
 }
 
 /**
- * @brief test_video_player::test_set_current_frame
- */
-void test_video_player::test_set_current_frame() {
-    mvideo->set_current_frame_num(100);
-    QVERIFY(mvideo->get_current_frame_num() == 100);
-    mvideo->set_current_frame_num(10);
-    mvideo->set_current_frame_num(-10);
-    QVERIFY(mvideo->get_current_frame_num() == 10);
-}
-
-/**
  * @brief test_video_player::test_next_frame
  */
 void test_video_player::test_next_frame() {
+    mvideo->video_paused = true;
     mvideo->set_current_frame_num(100);
     mvideo->next_frame();
     QVERIFY(mvideo->get_current_frame_num() == 101);
@@ -88,6 +78,7 @@ void test_video_player::test_next_frame() {
  * @brief test_video_player::test_previous_frame
  */
 void test_video_player::test_previous_frame() {
+    mvideo->video_paused = true;
     mvideo->set_current_frame_num(100);
     mvideo->previous_frame();
     QVERIFY(mvideo->get_current_frame_num() == 99);
@@ -127,12 +118,14 @@ void test_video_player::test_dec_playback_speed(){
  * @brief test_toggle_overlay
  */
 void test_video_player::test_toggle_overlay() {
-    mvideo->on_stop_video();
-    mvideo->video_overlay->set_showing_overlay(false);
-    mvideo->toggle_overlay();
-    QVERIFY(mvideo->is_showing_overlay());
-    mvideo->toggle_overlay();
-    QVERIFY(!mvideo->is_showing_overlay());
+    QMutex mutex;
+    QWaitCondition wait;
+    video_player *v_player = new video_player(&mutex, &wait);
+    v_player->video_overlay->set_showing_overlay(false);
+    v_player->toggle_overlay();
+    QVERIFY(v_player->is_showing_overlay());
+    v_player->toggle_overlay();
+    QVERIFY(!v_player->is_showing_overlay());
 }
 
 /**
@@ -294,10 +287,6 @@ void test_video_player::test_scale_frame() {
                           video_height*2);
     cv::Mat temp = mvideo->scale_frame(mvideo->frame);
     QVERIFY(temp.cols == video_width*2 && temp.rows == video_height*2);
-
-    mvideo->scaling_event(0,0);
-    temp = mvideo->scale_frame(mvideo->frame);
-    QVERIFY(temp.cols == video_width && temp.rows == video_height);
 }
 
 /**
@@ -330,4 +319,125 @@ void test_video_player::test_set_stop_video() {
     QVERIFY(!mvideo->video_paused);
     QVERIFY(mvideo->get_current_frame_num() == 0);
     QVERIFY(mvideo->video_stopped);
+}
+
+/**
+ * @brief test_video_player::test_on_set_playback_frame_pass
+ * Test on_set_playback_frame with valid inputs
+ */
+void test_video_player::test_on_set_playback_frame_pass() {
+    mvideo->video_paused = false;
+    mvideo->on_set_playback_frame(100);
+    QVERIFY(mvideo->new_frame_num == 100);
+    QVERIFY(mvideo->set_new_frame);
+
+    mvideo->video_paused = true;
+    mvideo->on_set_playback_frame(100);
+    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == 100);
+}
+
+/**
+ * @brief test_video_player::test_on_set_playback_frame_fail
+ * Test on_set_playback_frame with non valid inputs
+ */
+void test_video_player::test_on_set_playback_frame_fail() {
+    int out_of_bounds = mvideo->get_num_frames() + 100;
+    int test_frames[] = {-100, out_of_bounds};
+    for (int &frame : test_frames) {
+        mvideo->video_paused = false;
+        mvideo->on_set_playback_frame(frame);
+        QVERIFY(mvideo->new_frame_num != frame);
+        QVERIFY(!mvideo->set_new_frame);
+
+        mvideo->video_paused = true;
+        mvideo->on_set_playback_frame(frame);
+        QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) != frame);
+    }
+}
+
+/**
+ * @brief test_video_player::test_set_current_frame_num
+ * Testing if setting the current frame to a specific frame in a video works as expected.
+ */
+void test_video_player::test_set_current_frame_num() {
+    mvideo->capture.release();
+    mvideo->capture.open("seq_01.mp4");
+
+    const int LEGAL_FRAME = 100;
+    const int ILLEGAL_FRAME = 999999;
+
+    //Testing different branches with legal frame number
+    mvideo->frame.release();
+    mvideo->video_paused = true;
+    QVERIFY(mvideo->set_current_frame_num(LEGAL_FRAME));
+    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == LEGAL_FRAME+1);
+    QVERIFY(mvideo->frame.elemSize()*mvideo->frame.cols*mvideo->frame.rows != 0);
+
+    mvideo->video_paused = false;
+    mvideo->new_frame_num = -1;
+    mvideo->set_new_frame = false;
+    mvideo->set_current_frame_num(LEGAL_FRAME);
+    QVERIFY(mvideo->new_frame_num == LEGAL_FRAME && mvideo->set_new_frame);
+
+    //Testing illegal frame number
+    QVERIFY(!mvideo->set_current_frame_num(ILLEGAL_FRAME));
+}
+
+/**
+ * @brief test_video_player::test_convert_frame
+ * Testing if frames are converted correctly.
+ */
+void test_video_player::test_convert_frame() {
+    mvideo->capture.release();
+    mvideo->frame.release();
+    mvideo->img = QPixmap(0, 0).toImage();
+    mvideo->capture.open("seq_01.mp4");
+
+    //Testing with empty frame
+    mvideo->frame = cv::Mat(0,0,CV_8U);
+    mvideo->convert_frame(true);
+    QVERIFY(mvideo->img.byteCount() == 0);
+
+    //Testing with color frame
+    mvideo->capture.read(mvideo->frame);
+    mvideo->convert_frame(true);
+    QVERIFY(mvideo->img.format() == QImage::Format_RGB888);
+    QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
+
+    //Testing with grayscale frame
+    mvideo->capture.read(mvideo->frame);
+    cv::Mat grayMat;
+    cv::cvtColor(mvideo->frame, grayMat, cv::COLOR_BGR2GRAY);
+    grayMat.copyTo(mvideo->frame);
+    grayMat.release();
+    mvideo->convert_frame(true);
+    QVERIFY(mvideo->img.format() == QImage::Format_Indexed8);
+    QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
+}
+
+/**
+ * @brief test_video_player::test_set_zoom_area
+ */
+void test_video_player::test_set_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(0, 0, 10, 10);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 10);
+    QVERIFY(mvideo->zoom_area->get_height() == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().x == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().y == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().width == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().height == 10);
+}
+
+/**
+ * @brief test_reset_zoom_area
+ */
+void test_video_player::test_reset_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(10, 10, 100, 100);
+    mvideo->zoom_area->set_size(128, 128);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 128);
+    QVERIFY(mvideo->zoom_area->get_height() == 128);
 }
