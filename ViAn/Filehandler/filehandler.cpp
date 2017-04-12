@@ -17,8 +17,6 @@ FileHandler::FileHandler() {
     #elif __unix__
         this->work_space =  create_directory("~/");
     #endif
-
-    //ID id = add_file("ViAn_config.txt"); Will be used to store current workspace and other run-to-run coonstans
 }
 
 /**
@@ -28,8 +26,7 @@ FileHandler::FileHandler() {
  * Change default work_space, ie where project files are saved.
  */
 void FileHandler::set_work_space(std::string new_work_space){
-    //this->work_space = new_work_space;
-    //save_workspace();
+    this->work_space = create_directory(QString::fromStdString(new_work_space));
 }
 
 /**
@@ -417,7 +414,7 @@ ID FileHandler::add_dir(QDir dir){
  * Inserts directory by id in directories.
  */
 void FileHandler::add_dir(ID dir_id, QDir dir){
-    std::pair<ID,QDir> pair = std::make_pair(this->dir_id, dir);
+    std::pair<ID,QDir> pair = std::make_pair(dir_id, dir);
     this->dir_map_lock.lock();
     this->dir_map.insert(pair);
     this->dir_map_lock.unlock();
