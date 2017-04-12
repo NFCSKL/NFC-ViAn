@@ -59,8 +59,14 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
-    mvideo_player->terminate();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    emit set_stop_video(); //Signaling the run function in mvideo_player to stop executing
+    mvideo_player->wait(); //Waiting for video_player to finish executing
     delete mvideo_player;
+
     delete ui;
     delete bookmark_view;
 }
@@ -518,33 +524,34 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     MyQTreeWidgetItem *item = (MyQTreeWidgetItem*)tree->itemAt( pos );
     QMenu menu(this);
 
-    if(item == nullptr) {
-        QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
-        QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
-        create_project->setStatusTip(tr("Create project"));
-        load_project->setStatusTip(tr("Load project"));
-        menu.addAction(create_project);
-        menu.addAction(load_project);
-        connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
-        connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
-    } else if(item->type == TYPE::PROJECT) {
-        QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
-        QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
-        add_video->setStatusTip(tr("Add video"));
-        delete_project->setStatusTip(tr("Delete project"));
-        menu.addAction(add_video);
-        menu.addAction(delete_project);
-        connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
-        connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
-    } else if(item->type == TYPE::VIDEO) {
-        QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
-        QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
-        load_video->setStatusTip(tr("Play video"));
-        delete_video->setStatusTip(tr("Remove video from project"));
-        menu.addAction(load_video);
-        menu.addAction(delete_video);
-        connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
-        connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+    QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+    create_project->setStatusTip(tr("Create project"));
+    load_project->setStatusTip(tr("Load project"));
+    menu.addAction(create_project);
+    menu.addAction(load_project);
+    connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
+    connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
+    if(item != nullptr) {
+        if(item->type == TYPE::PROJECT) {
+            QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
+            QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+            add_video->setStatusTip(tr("Add video"));
+            delete_project->setStatusTip(tr("Delete project"));
+            menu.addAction(add_video);
+            menu.addAction(delete_project);
+            connect(add_video, SIGNAL(triggered()), this, SLOT(on_actionAddVideo_triggered()));
+            connect(delete_project, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+        } else if(item->type == TYPE::VIDEO) {
+            QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+            QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
+            load_video->setStatusTip(tr("Play video"));
+            delete_video->setStatusTip(tr("Remove video from project"));
+            menu.addAction(load_video);
+            menu.addAction(delete_video);
+            connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
+            connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+        }
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
@@ -581,7 +588,17 @@ void MainWindow::on_actionAddVideo_triggered() {
 void MainWindow::play_video() {
     MyQTreeWidgetItem *my_project;
     my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    if (mvideo_player->isRunning()) {
+        emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player = new video_player(&mutex, &paused_wait);
+        setup_video_player(mvideo_player);
+    }
     mvideo_player->load_video(my_project->name.toStdString());
+
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
     enable_video_buttons();

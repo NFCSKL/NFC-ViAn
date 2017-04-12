@@ -92,6 +92,7 @@ public slots:
     void on_pause_video();
     void on_stop_video();
 
+
 protected:
     void run() override;
     void msleep(int ms);

@@ -40,6 +40,9 @@ video_player::~video_player() {
  * @return whether video is loaded
  */
 bool video_player::load_video(string filename) {
+    if (capture.isOpened())
+        capture.release();
+
     capture.open(filename);
 
     if (capture.isOpened()) {
@@ -49,10 +52,10 @@ bool video_player::load_video(string filename) {
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
         return true;
-    }
-    else
+    } else {
         cout << "Could not load file \"" << filename << "\"" << endl;
         return false;
+    }
 }
 
 /**
