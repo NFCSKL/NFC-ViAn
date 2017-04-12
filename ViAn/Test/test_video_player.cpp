@@ -333,18 +333,18 @@ void test_video_player::test_set_stop_video() {
 }
 
 /**
- * @brief test_video_player::test_analys_area_toggle
+ * @brief test_video_player::test_analysis_area_toggle
  */
-void test_video_player::test_analys_area_toggle() {
+void test_video_player::test_analysis_area_toggle() {
     bool original_value = mvideo->analysis_area->is_including_area();
     mvideo->analysis_area->invert_area();
     QVERIFY(mvideo->analysis_area->is_including_area() != original_value);
 }
 
 /**
- * @brief test_video_player::test_analys_area_points
+ * @brief test_video_player::test_analysis_area_points
  */
-void test_video_player::test_analys_area_points() {
+void test_video_player::test_analysis_area_points() {
     std::vector<QPoint> original_points;
     original_points.push_back(QPoint(0, 10));
     original_points.push_back(QPoint(210, 150));

@@ -39,8 +39,8 @@ private slots:
     void test_set_play_video();
     void test_set_pause_video();
     void test_set_stop_video();
-    void test_analys_area_toggle();
-    void test_analys_area_points();
+    void test_analysis_area_toggle();
+    void test_analysis_area_points();
 
 private:
     video_player* mvideo;
