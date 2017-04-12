@@ -9,7 +9,7 @@ FileHandler::FileHandler() {
     this->project_id = 0; // zero out counter ids
     this->file_id = 0;
     this->dir_id = 0;
-    this->last_error = 0;
+    this->last_error = false;
     #ifdef _WIN32
         this->work_space = create_directory("C:/");
     #elif __APPLE__
@@ -75,7 +75,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
  */
 ID FileHandler::create_directory(QString dir_path){
     QDir dir (QDir::root());
-    last_error = dir.mkpath(dir_path);
+    last_error = !dir.mkpath(dir_path);
     if(!last_error){
         qWarning("Could not create directory %s",dir_path.toStdString().c_str());
     }

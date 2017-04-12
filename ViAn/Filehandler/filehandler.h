@@ -81,7 +81,7 @@ public:
     QString get_file(ID id);
 
     // Last error
-    FH_ERROR last_error;
+    bool last_error;
 
 private:
 

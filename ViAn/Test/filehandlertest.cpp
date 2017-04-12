@@ -27,9 +27,9 @@ void FileHandlerTest::project_create_delete_test()
     Project* proj1 = file_handler->create_project("TEST_PROJ1");
     Project* proj2 = file_handler->create_project("TEST_PROJ2");
     Project* proj3 = file_handler->create_project("TEST_PROJ3");
-    QCOMPARE(file_handler->delete_project(proj1->id), 0);
-    QCOMPARE(file_handler->delete_project(proj2->id), 0);
-    QCOMPARE(file_handler->delete_project(proj3->id), 0);
+    QVERIFY(file_handler->delete_project(proj1->id));
+    QVERIFY(file_handler->delete_project(proj2->id));
+    QVERIFY(file_handler->delete_project(proj3->id));
 }
 
 /**
@@ -53,9 +53,9 @@ void FileHandlerTest::project_save_load_test(){
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));
     QVERIFY(file_handler->proj_equals(*proj3,*l_proj3));
 
-    QCOMPARE(file_handler->delete_project(proj1->id), 0);
-    QCOMPARE(file_handler->delete_project(proj2->id), 0);
-    QCOMPARE(file_handler->delete_project(proj3->id), 0);
+    QVERIFY(file_handler->delete_project(proj1->id));
+    QVERIFY(file_handler->delete_project(proj2->id));
+    QVERIFY(file_handler->delete_project(proj3->id));
 }
 
 /**
@@ -85,9 +85,9 @@ void FileHandlerTest::project_add_remove_items(){
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));
     QVERIFY(file_handler->proj_equals(*proj3,*l_proj3));
 
-    QCOMPARE(file_handler->delete_project(proj1->id), 0);
-    QCOMPARE(file_handler->delete_project(proj2->id), 0);
-    QCOMPARE(file_handler->delete_project(proj3->id), 0);
+    QVERIFY(file_handler->delete_project(proj1->id));
+    QVERIFY(file_handler->delete_project(proj2->id));
+    QVERIFY(file_handler->delete_project(proj3->id));
 }
 
 /**
@@ -106,7 +106,7 @@ void FileHandlerTest::project_cleanup()
 void FileHandlerTest::directory_create_test(){
     QString dirpath = file_handler->get_work_space().absoluteFilePath("TEST_PROJ");
     dir_id = file_handler->create_directory(dirpath);
-    QCOMPARE(file_handler->last_error, 1);
+    QCOMPARE(file_handler->last_error, false);
     QCOMPARE(file_handler->get_dir(dir_id).absolutePath(), dirpath);
 
 }
