@@ -414,3 +414,30 @@ void test_video_player::test_convert_frame() {
     QVERIFY(mvideo->img.format() == QImage::Format_Indexed8);
     QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
 }
+
+/**
+ * @brief test_video_player::test_set_zoom_area
+ */
+void test_video_player::test_set_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(0, 0, 10, 10);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 10);
+    QVERIFY(mvideo->zoom_area->get_height() == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().x == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().y == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().width == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().height == 10);
+}
+
+/**
+ * @brief test_reset_zoom_area
+ */
+void test_video_player::test_reset_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(10, 10, 100, 100);
+    mvideo->zoom_area->set_size(128, 128);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 128);
+    QVERIFY(mvideo->zoom_area->get_height() == 128);
+}
