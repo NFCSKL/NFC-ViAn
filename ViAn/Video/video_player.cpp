@@ -147,7 +147,6 @@ void video_player::convert_frame(bool scale) {
  * @return Returns the processed frame.
  */
 cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
-    bool copy_to = false;
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = src.clone();
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
