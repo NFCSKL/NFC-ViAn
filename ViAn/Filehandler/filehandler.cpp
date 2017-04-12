@@ -13,9 +13,9 @@ FileHandler::FileHandler() {
     #ifdef _WIN32
         this->work_space = create_directory("C:/ViAn/");
     #elif __APPLE__
-        this->work_space = "/Applications/";
+        this->work_space =  create_directory("/Applications/");
     #elif __unix__
-        this->work_space = "~/";
+        this->work_space =  create_directory("~/");
     #endif
 
     //ID id = add_file("ViAn_config.txt"); Will be used to store current workspace and other run-to-run coonstans
