@@ -2,7 +2,7 @@
 
 /**
  * @brief FileHandler::FileHandler
- * Initilize filehandler and set
+ * Initialize filehandler and set
  * default value for workspace
  */
 FileHandler::FileHandler() {
@@ -289,8 +289,8 @@ ID FileHandler::create_file(QString file_name, QDir dir){
  /**
   * @brief FileHandler::read_file
   * @param ID file id, std::string text
-  * @return voi
-  * Read given lenght of lines to buffer from application
+  * @return void
+  * Read given length of lines to buffer from application
   * tracked file. OBS! If number of lines exceeds lines in file,
   * reads to end of file (EOF)
   */
