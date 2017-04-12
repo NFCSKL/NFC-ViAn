@@ -22,7 +22,7 @@ void FileHandlerTest::project_test_init()
  * @brief FileHandlerTest::project_create_test
  * Test creating and deleting project.
  */
-void FileHandlerTest::project_create_test()
+void FileHandlerTest::project_create_delete_test()
 {
     Project* proj1 = file_handler->create_project("TEST_PROJ1");
     Project* proj2 = file_handler->create_project("TEST_PROJ2");
@@ -44,9 +44,9 @@ void FileHandlerTest::project_save_load_test(){
     file_handler->save_project(proj2->id);
     file_handler->save_project(proj3->id);
 
-    Project* l_proj1 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ1.json").toStdString());
-    Project* l_proj2 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ2.json").toStdString());
-    Project* l_proj3 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ3.json").toStdString());
+    Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.json").toStdString());
+    Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.json").toStdString());
+    Project* l_proj3 = file_handler->load_project(file_handler->get_dir(proj3->dir).absoluteFilePath("TEST_PROJ3.json").toStdString());
 
     QVERIFY(file_handler->proj_equals(*proj1,*l_proj1));
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));
@@ -75,9 +75,9 @@ void FileHandlerTest::project_add_remove_items(){
     file_handler->save_project(proj3->id);
 
 
-    Project* l_proj1 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ1.json").toStdString());
-    Project* l_proj2 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ2.json").toStdString());
-    Project* l_proj3 = file_handler->load_project(file_handler->get_work_space().absoluteFilePath("TEST_PROJ3.json").toStdString());
+    Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.json").toStdString());
+    Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.json").toStdString());
+    Project* l_proj3 = file_handler->load_project(file_handler->get_dir(proj3->dir).absoluteFilePath("TEST_PROJ3.json").toStdString());
 
     QVERIFY(file_handler->proj_equals(*proj1,*l_proj1));
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));

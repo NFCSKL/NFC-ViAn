@@ -18,7 +18,6 @@
 
 using namespace std;
 
-
 class video_player : public QThread {
     Q_OBJECT
 public:
@@ -29,21 +28,20 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     bool is_showing_analysis_tool();
-    void export_current_frame(QString path_to_folder);
+    std::string export_current_frame(std::string path_to_folder, std::string file_name);
     bool video_open();
 
     int get_num_frames();    
     int get_current_frame_num();
-    bool set_current_frame_num(int frame_nbr);
-    void play_pause();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
-
     double get_speed_multiplier();
 
     void inc_playback_speed();
     void dec_playback_speed();
+
+    void set_slider_frame(int frame_nbr);
     
     void reset_brightness_contrast();
     void set_contrast(double contrast);
@@ -58,6 +56,8 @@ public:
     void toggle_analysis_area();
     void zoom_in();
     void zoom_out();
+    void rotate_right();
+    void rotate_left();
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
@@ -82,11 +82,13 @@ private slots:
     void scaling_event(int new_width, int new_height);
     void next_frame();
     void previous_frame();
+    void on_set_playback_frame(int frame_num);
 
 public slots:
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
+
 
 protected:
     void run() override;
@@ -94,24 +96,29 @@ protected:
 
 private:
     void update_frame(int frame_nbr);
-    cv::Mat zoom_frame(cv::Mat &frame);
-    cv::Mat contrast_frame(cv::Mat &frame);
+    cv::Mat zoom_frame(cv::Mat &src);
+    cv::Mat contrast_frame(cv::Mat &src);
     cv::Mat scale_frame(cv::Mat &src);
-    cv::Mat process_frame(cv::Mat &frame);
+    cv::Mat process_frame(cv::Mat &src, bool scale);
     void update_overlay();
     void show_frame();
-    void convert_frame();
+    void convert_frame(bool scale);
     void scale_position(QPoint &pos);
+    bool limited_frame_dimensions();
+    bool set_current_frame_num(int frame_nbr);
 
     cv::VideoCapture capture;
     cv::Mat frame;
     cv::Mat RGBframe;
 
     int num_frames;
-    unsigned int frame_width;
-    unsigned int frame_height;
+    int new_frame_num;
+    int frame_width;
+    int frame_height;
     unsigned int qlabel_width;
     unsigned int qlabel_height;
+    int screen_width;
+    int screen_height;
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
@@ -119,6 +126,8 @@ private:
     bool video_stopped = false;
     bool video_paused;
     bool choosing_zoom_area = false;
+    bool set_new_frame = false;
+    bool slider_moving = false;
     bool choosing_analysis_area = false;
 
     QImage img;
@@ -127,6 +136,14 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
+
+    // Constants for the directions of the rotation.
+    int const ROTATE_90 = 0, ROTATE_180 = 1, ROTATE_270 = 2, ROTATE_NONE = 3;
+    // The limits of the rotation. This should not include the no-rotaion option.
+    int const ROTATE_MIN = 0, ROTATE_MAX = 2;
+    // Number of directions.
+    int const ROTATE_NUM = 4;
+    int rotate_direction = ROTATE_NONE;
 
     // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
     double alpha = 1;

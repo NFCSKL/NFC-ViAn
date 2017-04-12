@@ -41,8 +41,10 @@ public:
     void set_work_space(std::string new_work_space);
     QDir get_work_space();
     Project* open_project(std::string dirpath);
+
     Project* create_project(QString proj_name, std::string dir_path="");
     FH_ERROR delete_project(ID proj_id);
+
 
     Project* load_project(std::string full_project_path);
     Project* load_project(std::string full_path, SaveFormat save_form);

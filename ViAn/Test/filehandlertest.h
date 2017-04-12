@@ -41,12 +41,10 @@ private slots:
     // Project tests
     //void project_init_tests();
     void project_test_init();
-    void project_create_test();
+    void project_create_delete_test();
     void project_save_load_test();
     void project_add_remove_items();
     void project_cleanup();
-//    void project_delete_test();
-//    void project_load_save_test();
 
 };
 

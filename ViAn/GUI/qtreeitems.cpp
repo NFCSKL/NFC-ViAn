@@ -44,3 +44,15 @@ void MyQTreeWidgetItem::set_text_from_filepath(std::string filepath) {
     set_text(text);
 }
 
+/**
+ * @brief MyQTreeWidgetItem::get_name
+ * @return returns the name of the object without the rest of the filepath
+ */
+std::string MyQTreeWidgetItem::get_name() {
+    std::string stdname = name.toStdString();
+    std::string reverse (stdname.rbegin(), stdname.rend());
+    std::string txet = reverse.substr(0, reverse.find("/")); // txet = text in reverse
+    std::string text (txet.rbegin(), txet.rend());
+    return text;
+}
+

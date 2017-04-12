@@ -49,7 +49,7 @@ void Project::remove_video(ID id){
 
 /**
  * @brief Project::add_video
- * @return Video ID to be used for identifying the video
+ * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
@@ -57,7 +57,11 @@ ID Project::add_video(Video* vid){
     return this->v_id++;
 }
 
-
+/**
+ * @brief Project::read
+ * @param json
+ * Read project parameters from json object.
+ */
 void Project::read(const QJsonObject& json){
     this->name = json["name"].toString().toStdString();
     QJsonArray json_videos = json["videos"].toArray();
@@ -68,7 +72,11 @@ void Project::read(const QJsonObject& json){
         this->add_video(v);
     }
 }
-
+/**
+ * @brief Project::write
+ * @param json
+ * Write project parameters to json object.
+ */
 void Project::write(QJsonObject& json){
     QJsonArray json_proj;
     json["name"] = QString::fromStdString(this->name);

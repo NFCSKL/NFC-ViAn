@@ -47,18 +47,21 @@ QDir FileHandler::get_work_space()
  */
 Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     Project* proj =  new Project(this->project_id, proj_name.toStdString());   
-    ID dir;
-    if(dir_path != "") //Directory name provided
-        dir = create_directory(QString::fromStdString(dir_path));
+    ID root_dir;
+    if(dir_path != "")                          //Directory name provided
+        root_dir = create_directory(QString::fromStdString(dir_path));
     else if(dir_path != "" && proj->dir == -1)  // No directory name provided, project has no directory.
-        dir = this->work_space;                 // Default save location to workspace
+        root_dir = this->work_space;                 // Default save location to workspace
     else if(dir_path == "" && proj->dir != -1)  // No Directory provided and project previosuly saved
-        dir = proj->dir;                        // Use present save location
+        root_dir = proj->dir;                        // Use present save location
     else
-        dir = this->work_space;
-    proj->dir = dir;
+        root_dir = this->work_space;
+
+
+    proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
+    get_dir(proj->dir).cd(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     add_project(proj);                          // Add project to file sytstem
-    save_project(proj, dir ,Json);              // Save project file
+    save_project(proj);                         // Save project file
     return proj;
 }
 
@@ -88,10 +91,13 @@ ID FileHandler::create_directory(QString dir_path){
  */
 bool FileHandler::delete_directory(ID id){
     QDir temp = this->get_dir(id);
+    this->dir_map_lock.lock(); // Order important, locked in getter
     if(temp.rmdir(temp.absolutePath())){
         this->dir_map.erase(id);
+        this->dir_map_lock.unlock();
         return false;
     }
+    this->dir_map_lock.unlock();
     return true;
 
 }
@@ -104,7 +110,7 @@ bool FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
-    this->save_project(proj, this->work_space, FileHandler::SaveFormat::Json); // get project and save it
+    this->save_project(proj, proj->dir, FileHandler::SaveFormat::Json); // get project and save it
 }
 /**
  * @brief FileHandler::save_project
@@ -113,7 +119,7 @@ void FileHandler::save_project(ID id){
  * project pointer is still available
  */
 void FileHandler::save_project(Project* proj){
-    this->save_project(proj, this->work_space, FileHandler::SaveFormat::Json);
+    this->save_project(proj, proj->dir, FileHandler::SaveFormat::Json);
 }
 
 /**
@@ -125,7 +131,7 @@ void FileHandler::save_project(Project* proj){
  */
 bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format){
     QDir dir = get_dir(dir_id);
-    std::string file_path = dir.filePath(QString::fromStdString(proj->name)).toStdString();
+    std::string file_path = dir.absoluteFilePath(QString::fromStdString(proj->name)).toStdString();
     QFile save_file(save_format == Json
                     ? QString::fromStdString(file_path + ".json")
                     : QString::fromStdString(file_path + ".dat"));
@@ -187,15 +193,22 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SaveForma
  * @return Deletes project entirely
  * Deletes project and frees allocated memory.
  */
-FH_ERROR FileHandler::delete_project(ID proj_id){
+FH_ERROR FileHandler::delete_project(ID proj_id){    
     Project* temp = get_project(proj_id);
+    this->proj_map_lock.lock();
     QFile file(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
     if(this->projects.erase(proj_id)){
         file.remove();
+
+
+        delete_directory(temp->dir);
         delete temp;
+        this->proj_map_lock.unlock();
         return 0;
     }
+    this->proj_map_lock.unlock();
     return 1;
+
 }
 
 /**
