@@ -34,13 +34,13 @@ class FileHandler
 public:
 
     FileHandler();
-    //
-    //  Project manipulation
-    //
+
     ID work_space;
     void set_work_space(std::string new_work_space);
     QDir get_work_space();
-    Project* open_project(std::string dirpath);
+//  Project methods
+//  Project* open_project(ID id); // To be added
+//  Project* close_project(ID id);
 
     Project* create_project(QString proj_name, std::string dir_path="");
     FH_ERROR delete_project(ID proj_id);
@@ -53,27 +53,24 @@ public:
     void save_project(ID id);
     void save_project(Project* proj);
     bool save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format);
-    //void save_project(Project* proj);
-    // Video operations
+
+//  Video methods
     void remove_video_from_project(ID proj_id, ID vid_id);
     ID add_video(Project* proj, std::string file_path);
-    //directory manipulation
-    //varying implementation
+//  Directory methods
     ID create_directory(QString dir_path);
     bool delete_directory(ID id);
 
-    //file manipulation
+//  File methods
 
     ID create_file(QString file_name, QDir dir);
     FH_ERROR delete_file(ID id);
     void write_file(ID id, QString text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
     void read_file(ID id, QString& buf, int lines_to_read = -1);
 
-    friend bool operator==(ProjFiles& pf, ProjFiles& pf2);
     friend bool operator==(Project& proj, Project& proj2);
 
     bool proj_equals(Project& proj, Project& proj2);
-    bool projfiles_equal(ProjFiles& pf, ProjFiles& pf2);
     bool dirs_equal(ID id, ID id2);
     bool files_equal(ID id, ID id2);
     // thread safe read operations for maps
