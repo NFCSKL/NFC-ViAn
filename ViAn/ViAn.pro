@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += testlib
+QT += axcontainer
 
 CONFIG += c++11
 
@@ -16,7 +17,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    GUI/reportgenererator.cpp
 
 
 #
@@ -27,7 +29,8 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
+    Test/test_mainwindow.h \
+    GUI/reportgenererator.h
 
 
 #

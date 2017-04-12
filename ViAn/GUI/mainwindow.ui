@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
+    <width>674</width>
     <height>466</height>
    </rect>
   </property>
@@ -320,8 +320,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>616</width>
-     <height>20</height>
+     <width>674</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -348,6 +348,7 @@
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
+    <addaction name="actionCreate_report"/>
     <addaction name="actionDelete"/>
     <addaction name="actionExit"/>
     <addaction name="actionChoose_Workspace"/>
@@ -772,6 +773,14 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="actionCreate_report">
+   <property name="text">
+    <string>Create report</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a .docx document based on all bookmarks</string>
    </property>
   </action>
  </widget>

@@ -23,6 +23,7 @@
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
+#include "reportgenererator.h"
 
 using namespace std;
 class inputwindow;
@@ -140,6 +141,8 @@ private slots:
 
     void on_actionDelete_triggered();
 
+    void on_actionCreate_report_triggered();
+
 private:
 
     Ui::MainWindow *ui;
@@ -148,7 +151,7 @@ private:
     IconOnButtonHandler *iconOnButtonHandler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
-
+    ReportGenererator *report;
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;

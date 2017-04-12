@@ -11,6 +11,7 @@
 #include "inputwindow.h"
 #include "Video/shapes/shape.h"
 
+
 using namespace std;
 using namespace cv;
 
@@ -48,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Initially hide overlay and analysis toolbar
     ui->toolBar_overlay->hide();
     ui->toolBar_analysis->hide();
+
 }
 
 /**
@@ -58,6 +60,7 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
+    delete report;
 
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
@@ -940,4 +943,14 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
     emit set_playback_frame(bookmark->get_frame_number());
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
 
+}
+
+/**
+ * @brief MainWindow::on_actionCreate_report_triggered
+ * Invoked when the Create report button is clicked.
+ * This will create a new document in Word.
+ */
+void MainWindow::on_actionCreate_report_triggered()
+{
+    report = new ReportGenererator();
 }
