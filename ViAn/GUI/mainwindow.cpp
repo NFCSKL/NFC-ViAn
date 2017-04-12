@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <iostream>
+#include <sstream>
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <chrono>
@@ -22,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
+    video_slider = ui->videoSlider;
 
-    video_slider = findChild<QSlider*>("videoSlider");
+
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
@@ -56,8 +58,14 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
-    mvideo_player->terminate();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    emit set_stop_video(); //Signaling the run function in mvideo_player to stop executing
+    mvideo_player->wait(); //Waiting for video_player to finish executing
     delete mvideo_player;
+
     delete ui;
     delete bookmark_view;
 }
@@ -84,6 +92,8 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_pause_video()));
     QObject::connect(this, SIGNAL(set_stop_video()),
                      mplayer, SLOT(on_stop_video()));
+    QObject::connect(this, SIGNAL(set_playback_frame(int)),
+                     mplayer, SLOT(on_set_playback_frame(int)));
 }
 
 /**
@@ -97,51 +107,63 @@ void MainWindow::set_status_bar(std::string status, int timer){
 
 /**
  * @brief MainWindow::on_fastBackwardButton_clicked
- * The button supposed to play the video slower
+ * Calls upon a video player function which decreases the playback speed
  *
  */
 void MainWindow::on_fastBackwardButton_clicked(){
-
+    mvideo_player->dec_playback_speed();
+    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
+    std::ostringstream speed_str;
+    speed_str << curr_speed_factor;
+    set_status_bar("Playback speed decreased (x" + speed_str.str() + ")");
 }
 
 /**
  * @brief MainWindow::on_playPauseButton_clicked
- * The button supposed to play and pause the video
+ * Calls upon video player functions based on current playback status
+ * Starts/resumes a stopped/paused video, pauses a playing one
  */
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused()) {
         // Video thread is paused. Notifying the waitcondition to resume playback
-        set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
         paused_wait.wakeOne();
+        set_status_bar("Playing");
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
         mvideo_player->start();
+        set_status_bar("Playing");
     } else {
         // Video thread is running. Pause it
-        set_status_bar("Paused");
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
         emit set_pause_video();
+        set_status_bar("Paused");
     }
 }
 
 /**
  * @brief MainWindow::on_fastForwardButton_clicked
- * The button supposed to play the video faster
+ * Calls upon video player function which in turn increases the playback speed
  */
 void MainWindow::on_fastForwardButton_clicked(){
-
+    mvideo_player->inc_playback_speed();
+    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
+    std::ostringstream speed_str;
+    speed_str << curr_speed_factor;
+    set_status_bar("Playback speed increased (x" + speed_str.str() + ")");
 }
 
 /**
  * @brief MainWindow::on_stopButton_clicked
- * The button supposed to stop the video
+ * Calls upon video player function which in turn stops the video
  */
 void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+    } else if (mvideo_player->is_stopped()){
+        return;
     } else {
         paused_wait.wakeOne();
     }
@@ -150,7 +172,7 @@ void MainWindow::on_stopButton_clicked() {
 
 /**
  * @brief MainWindow::on_nextFrameButton_clicked
- * The button supposed to play the next frame of the video
+ * Calls upon video player function which in turn skips to the next frame
  */
 void MainWindow::on_nextFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
@@ -163,12 +185,12 @@ void MainWindow::on_nextFrameButton_clicked() {
 
 /**
  * @brief MainWindow::on_previousFrameButton_clicked
- * The button supposed to play the previous frame of the video
+ * Calls upon video player function which in turn steps back to the previous frame
  */
 void MainWindow::on_previousFrameButton_clicked() {
     if (mvideo_player->is_paused()) {
-        set_status_bar("Went back a frame");
         emit prev_video_frame();
+        set_status_bar("Went back a frame");
     } else {
         set_status_bar("Video needs to be paused");
     }
@@ -189,7 +211,8 @@ void MainWindow::update_video(QImage frame) {
  * @param pos
  */
 void MainWindow::set_video_slider_pos(int pos) {
-    if (pos <= video_slider->maximum()) {
+    if (pos <= video_slider->maximum() && !slider_blocked) {
+        prev_slider_pos = video_slider->value();
         video_slider->setSliderPosition(pos);
     }
 }
@@ -217,28 +240,69 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 }
 
 /**
+ * @brief MainWindow::on_slider_moving
+ * Sends frame numbers to the video player whilst the slider is moving
+ */
+void MainWindow::on_slider_moving(){
+    //This code makes sure that the currently shown frame is not updated more often than
+    //every SLIDER_UPDATE_TIMER milliseconds for performance reasons.
+    std::chrono::milliseconds current_time = std::chrono::duration_cast<
+            std::chrono::milliseconds >(
+                std::chrono::system_clock::now().time_since_epoch()
+    );
+    std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
+    if (time_since_last_slider_frame_update.count() >= SLIDER_UPDATE_TIMER) {
+        QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+        emit set_playback_frame(slider_pos_under_mouse(local_mouse_pos));
+        slider_timer = current_time;
+    }
+}
+
+/**
+ * @brief MainWindow::on_slider_click
+ * Enables the slider marker to be moved to the position where a click occured
+ * It also sends the clicked frame value to the video player
+ * @param new_pos
+ * @param local_mouse_pos
+ */
+void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
+    int slider_pos = slider_pos_under_mouse(local_mouse_pos);
+    if (slider_pos != new_pos) {
+        ui->videoSlider->setValue(slider_pos);
+        emit set_playback_frame(slider_pos, true);
+    }
+}
+
+/**
+ * @brief MainWindow::slider_pos_under_mouse
+ * Takes the general position of the mouse pointer and calculates which
+ * position on the slider it relates to.
+ * @param local_mouse_pos is the general position of the mouse pointer
+ * @return The current position of the mouse pointer on the slider
+ */
+int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
+    float pos_ratio = local_mouse_pos.x() / (float )ui->videoSlider->size().width();
+    int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
+    return ui->videoSlider->minimum() + slider_range * pos_ratio;
+}
+
+/**
  * @brief MainWindow::on_videoSlider_valueChanged
- * Update the slider to where the mouse is
+ * Gets called when the value of the slider is changed
+ * Moves the slider marker and sends the new frame number to the video player
  * @param newPos current position of the slider
  */
-void MainWindow::on_videoSlider_valueChanged(int newPos) {
-    // Make slider to follow the mouse directly and not by pageStep steps
+
+void MainWindow::on_videoSlider_valueChanged(int new_pos) {
+    slider_blocked = true;
     Qt::MouseButtons btns = QApplication::mouseButtons();
-    QPoint localMousePos = ui->videoSlider->mapFromGlobal(QCursor::pos());
-    bool clickOnSlider = (btns & Qt::LeftButton) &&
-                         (localMousePos.x() >= 0 && localMousePos.y() >= 0 &&
-                          localMousePos.x() < ui->videoSlider->size().width() &&
-                          localMousePos.y() < ui->videoSlider->size().height());
-    if (clickOnSlider) {
-        // Attention! The following works only for Horizontal, Left-to-right sliders
-        float posRatio = localMousePos.x() / (float )ui->videoSlider->size().width();
-        int sliderRange = ui->videoSlider->maximum() - ui->videoSlider->minimum();
-        int sliderPosUnderMouse = ui->videoSlider->minimum() + sliderRange * posRatio;
-        if (sliderPosUnderMouse != newPos) {
-            ui->videoSlider->setValue(sliderPosUnderMouse);
-            return;
-        }
-    }
+    QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+    bool click_on_slider = (btns & Qt::LeftButton) &&
+                         (local_mouse_pos.x() >= 0 && local_mouse_pos.y() >= 0 &&
+                          local_mouse_pos.x() < ui->videoSlider->size().width() &&
+                          local_mouse_pos.y() < ui->videoSlider->size().height());
+    if (click_on_slider) on_slider_click(new_pos, local_mouse_pos);
+    slider_blocked = false;
 }
 
 /**
@@ -591,12 +655,22 @@ void MainWindow::on_actionAddVideo_triggered() {
 void MainWindow::play_video() {
     MyQTreeWidgetItem *my_project;
     my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    if (mvideo_player->isRunning()) {
+        emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player = new video_player(&mutex, &paused_wait);
+        setup_video_player(mvideo_player);
+    }
     mvideo_player->load_video(my_project->name.toStdString());
+
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
     enable_video_buttons();
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
-    video_slider->setMaximum(mvideo_player->get_num_frames());
+    video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
 }
 
 /**
@@ -764,7 +838,18 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
 }
 
 /**
- * @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+ * @brief MainWindow::on_videoSlider_sliderPressed
+ * Block slider update from video_player
+ */
+void MainWindow::on_videoSlider_sliderPressed() {
+    slider_blocked = true;
+    if (!mvideo_player->is_paused()) {
+        slider_paused_video = true;
+        emit set_pause_video();
+    }
+}
+
+/** @brief MainWindow::on_actionShow_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
  */
 void MainWindow::on_actionShow_hide_analysis_area_triggered() {
@@ -778,7 +863,21 @@ void MainWindow::on_actionShow_hide_analysis_area_triggered() {
 }
 
 /**
- * @brief MainWindow::on_actionContrast_Brightness_triggered
+ * @brief MainWindow::on_videoSlider_sliderReleased
+ * Set video playback pos to slider pos and unblock slider update
+ */
+void MainWindow::on_videoSlider_sliderReleased() {
+    int new_pos = video_slider->value();
+    emit set_playback_frame(new_pos);
+    video_slider->setSliderPosition(new_pos);
+    slider_blocked = false;
+    if (slider_paused_video) {
+        paused_wait.notify_one();
+        slider_paused_video = false;
+    }
+}
+
+/** @brief MainWindow::on_actionContrast_Brightness_triggered
  * Opens a window to choose contrast and brightness in.
  */
 void MainWindow::on_actionContrast_Brightness_triggered() {
@@ -838,8 +937,7 @@ void MainWindow::on_actionRotate_left_triggered() {
  */
 void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
     Bookmark* bookmark = (Bookmark*) item;
-    if (mvideo_player->is_paused()) {
-        mvideo_player->set_current_frame_num(bookmark->get_frame_number());
-        set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
-    }
+    emit set_playback_frame(bookmark->get_frame_number());
+    set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
+
 }
