@@ -11,7 +11,7 @@ FileHandler::FileHandler() {
     this->dir_id = 0;
     this->last_error = 0;
     #ifdef _WIN32
-        this->work_space = create_directory("C:/ViAn/");
+        this->work_space = create_directory("C:/");
     #elif __APPLE__
         this->work_space =  create_directory("/Applications/");
     #elif __unix__
