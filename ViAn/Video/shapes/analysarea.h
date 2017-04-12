@@ -11,7 +11,7 @@ public:
     cv::Mat draw(cv::Mat &frame);
     void add_point(QPoint pos);
     void invert_area();
-    bool including_area();
+    bool is_including_area();
     std::vector<cv::Point>* get_polygon();
     void undo();
     void clear();

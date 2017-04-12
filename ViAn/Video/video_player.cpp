@@ -534,6 +534,10 @@ void video_player::clear_overlay() {
  */
 void video_player::toggle_analysis_area() {
     choosing_analysis_area = !choosing_analysis_area;
+    // Reset the area selection to including an area.
+    if (!is_including_area()) {
+        analysis_area->invert_area();
+    }
     update_overlay();
 }
 
@@ -544,6 +548,15 @@ void video_player::toggle_analysis_area() {
 void video_player::invert_analysis_area() {
     analysis_area->invert_area();
     update_overlay();
+}
+
+/**
+ * @brief video_player::is_including_area
+ * @return Returns true if the area should be included in the
+ *         analysis, false if it should be excluded.
+ */
+bool video_player::is_including_area() {
+    return analysis_area->is_including_area();
 }
 
 /**
@@ -688,8 +701,8 @@ void video_player::scale_position(QPoint &pos) {
     // on the QLabel where the frame is shown. The frame is
     // centered vertically, so the empty part of the QLabel
     // at the top needs to be subtracted.
-    int rotated_x;
-    int rotated_y;
+    int rotated_x = 0;
+    int rotated_y = 0;
     if (rotate_direction == ROTATE_90) {
         rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
         rotated_y = frame_height - pos.x();

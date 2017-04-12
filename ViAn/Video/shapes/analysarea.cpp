@@ -99,7 +99,7 @@ void AnalysArea::invert_area() {
  * @return Returns true if the area should be included in the
  *         analysis, false if it should be excluded.
  */
-bool AnalysArea::including_area() {
+bool AnalysArea::is_including_area() {
     return include_area_to_analyse;
 }
 

@@ -336,9 +336,9 @@ void test_video_player::test_set_stop_video() {
  * @brief test_video_player::test_analys_area_toggle
  */
 void test_video_player::test_analys_area_toggle() {
-    bool original_value = mvideo->analysis_area->including_area();
+    bool original_value = mvideo->analysis_area->is_including_area();
     mvideo->analysis_area->invert_area();
-    QVERIFY(mvideo->analysis_area->including_area() != original_value);
+    QVERIFY(mvideo->analysis_area->is_including_area() != original_value);
 }
 
 /**

@@ -862,4 +862,9 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
  */
 void MainWindow::on_actionInvert_analysis_area_triggered() {
     mvideo_player->invert_analysis_area();
+    if (mvideo_player->is_including_area()) {
+        set_status_bar("Choose an area to run the analysis on.");
+    } else {
+        set_status_bar("Choose an area to exclude from the analysis.");
+    }
 }
