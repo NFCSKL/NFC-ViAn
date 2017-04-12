@@ -22,7 +22,6 @@ private slots:
     void test_get_num_frames();
     void test_set_frame_width();
     void test_set_frame_height();
-    void test_set_current_frame();
     void test_next_frame();
     void test_previous_frame();
     void test_inc_playback_speed();
@@ -41,6 +40,10 @@ private slots:
     void test_set_stop_video();
     void test_analysis_area_toggle();
     void test_analysis_area_points();
+    void test_on_set_playback_frame_pass();
+    void test_on_set_playback_frame_fail();
+    void test_set_current_frame_num();
+    void test_convert_frame();
 
 private:
     video_player* mvideo;
