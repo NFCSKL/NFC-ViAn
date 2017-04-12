@@ -10,7 +10,6 @@ QT       += testlib
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-#CONFIG      += no_keywords
 TARGET = ViAn
 TEMPLATE = app
 #

@@ -429,7 +429,7 @@ bool FileHandler::proj_equals(Project& proj, Project& proj2){
     bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
                [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
-                                                                        // by dereferencing pointers in vector
+                                                                                                                      // by dereferencing pointers in vector
     return proj.name == proj2.name &&
            video_equals;
 }
