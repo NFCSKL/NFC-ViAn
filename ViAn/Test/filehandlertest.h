@@ -14,8 +14,8 @@ public:
     explicit FileHandlerTest(QObject *parent = 0);
 private:
     FileHandler* file_handler;
-    ID dir_id;
-    ID file_id;
+    ID dir_id = -1;
+    ID file_id = -1;
     Project* proj;
 private slots:
     // Directory test

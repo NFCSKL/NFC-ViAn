@@ -43,7 +43,7 @@ public:
 //  Project* close_project(ID id);
 
     Project* create_project(QString proj_name, std::string dir_path="");
-    FH_ERROR delete_project(ID proj_id);
+    bool delete_project(ID proj_id);
 
 
     Project* load_project(std::string full_project_path);
@@ -64,7 +64,7 @@ public:
 //  File methods
 
     ID create_file(QString file_name, QDir dir);
-    FH_ERROR delete_file(ID id);
+    bool delete_file(ID id);
     void write_file(ID id, QString text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
     void read_file(ID id, QString& buf, int lines_to_read = -1);
 

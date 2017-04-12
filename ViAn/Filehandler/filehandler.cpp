@@ -77,6 +77,7 @@ ID FileHandler::create_directory(QString dir_path){
     if(!last_error){
         qWarning("Could not create directory %s",dir_path.toStdString().c_str());
     }
+
     dir.setPath(dir_path);
     ID id = this->add_dir(dir);
     return id;
@@ -94,10 +95,10 @@ bool FileHandler::delete_directory(ID id){
     if(temp.rmdir(temp.absolutePath())){
         this->dir_map.erase(id);
         this->dir_map_lock.unlock();
-        return false;
+        return true;
     }
     this->dir_map_lock.unlock();
-    return true;
+    return false;
 
 }
 
@@ -192,7 +193,7 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SaveForma
  * @return Deletes project entirely
  * Deletes project and frees allocated memory.
  */
-FH_ERROR FileHandler::delete_project(ID proj_id){    
+bool FileHandler::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
     this->proj_map_lock.lock();
     QFile file(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
@@ -203,10 +204,10 @@ FH_ERROR FileHandler::delete_project(ID proj_id){
         delete_directory(temp->dir);
         delete temp;
         this->proj_map_lock.unlock();
-        return 0;
+        return true;
     }
     this->proj_map_lock.unlock();
-    return 1;
+    return false;
 
 }
 
@@ -251,11 +252,10 @@ ID FileHandler::create_file(QString file_name, QDir dir){
  * delete application tracked file
  * @param ID file id
  */
- FH_ERROR FileHandler::delete_file(ID id){
+ bool FileHandler::delete_file(ID id){
     QFile file(this->get_file(id));
     file.remove();
-    if(this->file_map.erase(id)) return 0;
-    return 1; // Error
+    return this->file_map.erase(id);
  }
 
  /**

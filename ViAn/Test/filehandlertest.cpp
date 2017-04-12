@@ -115,7 +115,7 @@ void FileHandlerTest::directory_create_test(){
  */
 
 void FileHandlerTest::directory_delete_test(){
-    QCOMPARE(file_handler->delete_directory(dir_id), 0);
+    QVERIFY(file_handler->delete_directory(dir_id));
 }
 
 /**
@@ -140,7 +140,7 @@ void FileHandlerTest::file_create_test(){
  * Tests deleting a single file.
  */
 void FileHandlerTest::file_delete_test(){
-    QCOMPARE(file_handler->delete_file(this->file_id), 0);
+    QVERIFY(file_handler->delete_file(this->file_id));
 }
 /**
  * @brief filehandlertest::file_create_delete_multiple
@@ -162,9 +162,9 @@ void FileHandlerTest::file_create_delete_multiple(){
     QCOMPARE(file_handler->get_file(id2), directory.absoluteFilePath(f2));
     QCOMPARE(file_handler->get_file(id3), directory.absoluteFilePath(f3));
     // Delete files
-    QCOMPARE(file_handler->delete_file(id1), 0);
-    QCOMPARE(file_handler->delete_file(id2), 0);
-    QCOMPARE(file_handler->delete_file(id3), 0);
+    QVERIFY(file_handler->delete_file(id1));
+    QVERIFY(file_handler->delete_file(id2));
+    QVERIFY(file_handler->delete_file(id3));
 }
 /**
  * @brief FileHandlerTest::file_read_write_init
@@ -245,8 +245,8 @@ void FileHandlerTest::file_read_lines_test(){
  */
 void FileHandlerTest::file_read_write_cleanup()
 {
-    file_handler->delete_file(this->file_id);
-    file_handler->delete_directory(this->dir_id);
+    QVERIFY(file_handler->delete_file(this->file_id));
+    QVERIFY(file_handler->delete_directory(this->dir_id));
 }
 
 
