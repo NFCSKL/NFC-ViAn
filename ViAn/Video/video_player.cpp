@@ -576,10 +576,10 @@ void video_player::undo_overlay() {
  * and the video is loaded and paused.
  */
 void video_player::clear_overlay() {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         if (choosing_analysis_area) {
             analysis_area->clear();
-        } else {
+        } else if (is_paused()) {
             video_overlay->clear(get_current_frame_num());
         }
         update_overlay();
@@ -592,10 +592,6 @@ void video_player::clear_overlay() {
  */
 void video_player::toggle_analysis_area() {
     choosing_analysis_area = !choosing_analysis_area;
-    // Reset the area selection to including an area.
-    if (!is_including_area()) {
-        analysis_area->invert_area();
-    }
     update_overlay();
 }
 

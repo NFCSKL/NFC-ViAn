@@ -321,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -777,6 +777,9 @@
    </property>
   </action>
   <action name="actionInvert_analysis_area">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Invert analysis area</string>
    </property>

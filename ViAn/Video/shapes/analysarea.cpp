@@ -73,6 +73,10 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
         }
         // Draw contour of the polygon.
         cv::polylines(frame, ppt, npt, 1, true, cv::Scalar(255, 0, 0), Shape::LINE_THICKNESS);
+
+        // Draw a circle indicating the last choosen point.
+        int RADIUS = 8;
+        cv::circle(frame, points->back(), RADIUS, cv::Scalar(0, 255, 255), Shape::LINE_THICKNESS);
     }
     return frame;
 }
