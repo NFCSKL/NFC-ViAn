@@ -28,87 +28,81 @@ struct ProjFiles;
 class FileHandler
 {
     enum SaveFormat {
-        Json, Binary
+        JSON, BINARY
     };
 
 public:
 
     FileHandler();
-
+    //  Workspace methods
     ID work_space;
     void set_work_space(std::string new_work_space);
     QDir get_work_space();
-//  Project methods
-//  Project* open_project(ID id); // To be added
-//  Project* close_project(ID id);
 
+
+    //  Project methods
+    //  Project* open_project(ID id); // To be added
+    //  Project* close_project(ID id);
+    Project* get_project(ID id);
     Project* create_project(QString proj_name, std::string dir_path="");
     bool delete_project(ID proj_id);
-
 
     Project* load_project(std::string full_project_path);
     Project* load_project(std::string full_path, SaveFormat save_form);
     Project* load_project(std::string proj_name, std::string dir_path);
-
     void save_project(ID id);
     void save_project(Project* proj);
     bool save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format);
 
-//  Video methods
+    bool proj_equals(Project& proj, Project& proj2);
+    friend bool operator==(Project& proj, Project& proj2);
+
+    //  Video methods
     void remove_video_from_project(ID proj_id, ID vid_id);
     ID add_video(Project* proj, std::string file_path);
-//  Directory methods
+
+    //  Directory methods
     ID create_directory(QString dir_path);
     bool delete_directory(ID id);
+    bool dirs_equal(ID id, ID id2);
+    QDir get_dir(ID id);
 
-//  File methods
-
+    //  File methods
     ID create_file(QString file_name, QDir dir);
     bool delete_file(ID id);
     void write_file(ID id, QString text, WRITE_OPTION opt = WRITE_OPTION::APPEND);
     void read_file(ID id, QString& buf, int lines_to_read = -1);
-
-    friend bool operator==(Project& proj, Project& proj2);
-
-    bool proj_equals(Project& proj, Project& proj2);
-    bool dirs_equal(ID id, ID id2);
     bool files_equal(ID id, ID id2);
-    // thread safe read operations for maps
-
-
-    QDir get_dir(ID id);
-    Project* get_project(ID id);
     QString get_file(ID id);
 
     // Last error
     bool last_error;
 
-private:
-
-    void update_proj_file(Project* proj); // used to update existing project files and maps
-    // thread safe add operations for maps
+private:    
+    // File methods
     ID add_file(QString file);
+    void add_file(ID id , QString file);
+
+    // Project methods
     ID add_project(Project* proj);
     void add_project(ID id, Project *proj);
 
+    // Directory methods
     ID add_dir(QDir dir);
     void add_dir(ID dir_id, QDir dir);
-    ID load_project_file(std::string file_path, std::stringstream& proj_file_stream);
-    void load_proj_files(std::string str);
-    //add used for loading project from file
-    void add_file(ID id , QString file);
 
     /**
-     * @brief m_projects, m_fileMap, m_dirMap
+     * @brief projects, file_map, dir_map
      * map structures for keeping track of projects, files and directories.
      */
     std::map<ID,Project*> projects;
     std::map<ID, QString> file_map;
     std::map<ID, QDir> dir_map;
+
     /**
      * @todo implement smarter lock mechanism to avoid overhead
      * of only 1 reader/writer at a time
-     * @brief dirMapLock, fileMapLock, projMapLock
+     * @brief dir_map_lock, file_map_lock, proj_map_lock
      */
     std::mutex dir_map_lock;    // lock for handling directory write/read
     std::mutex file_map_lock;   // lock for handling file write/read

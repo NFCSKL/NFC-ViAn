@@ -52,7 +52,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     ID root_dir;
     if(dir_path != "")                          //Directory name provided
         root_dir = create_directory(QString::fromStdString(dir_path));
-    else if(dir_path != "" && proj->dir == -1)  // No directory name provided, project has no directory.
+    else if(dir_path == "" && proj->dir == -1)  // No directory name provided, project has no directory.
         root_dir = this->work_space;                 // Default save location to workspace
     else if(dir_path == "" && proj->dir != -1)  // No Directory provided and project previosuly saved
         root_dir = proj->dir;                        // Use present save location
@@ -112,7 +112,7 @@ bool FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
-    this->save_project(proj, proj->dir, FileHandler::SaveFormat::Json); // get project and save it
+    this->save_project(proj, proj->dir, FileHandler::SaveFormat::JSON); // get project and save it
 }
 
 /**
@@ -122,7 +122,7 @@ void FileHandler::save_project(ID id){
  * project pointer is still available
  */
 void FileHandler::save_project(Project* proj){
-    this->save_project(proj, proj->dir, FileHandler::SaveFormat::Json);
+    this->save_project(proj, proj->dir, FileHandler::SaveFormat::JSON);
 }
 
 /**
@@ -135,7 +135,7 @@ void FileHandler::save_project(Project* proj){
 bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format){
     QDir dir = get_dir(dir_id);
     std::string file_path = dir.absoluteFilePath(QString::fromStdString(proj->name)).toStdString();
-    QFile save_file(save_format == Json
+    QFile save_file(save_format == JSON
                     ? QString::fromStdString(file_path + ".json")
                     : QString::fromStdString(file_path + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){
@@ -144,7 +144,7 @@ bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat
     QJsonObject json_proj;
     proj->write(json_proj);
     QJsonDocument save_doc(json_proj);
-    save_file.write(save_format == Json
+    save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
     return true;
@@ -159,7 +159,7 @@ bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-    return load_project(full_project_path, Json); // Decide format internally, here for flexibility
+    return load_project(full_project_path, JSON); // Decide format internally, here for flexibility
 }
 
 /**
@@ -170,7 +170,7 @@ Project* FileHandler::load_project(std::string full_project_path){
  * Loads project from json file and returns it
  */
 Project* FileHandler::load_project(std::string full_path, FileHandler::SaveFormat save_form){
-    QFile load_file(save_form == Json
+    QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
 
@@ -180,7 +180,7 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SaveForma
     }
     QByteArray save_data = load_file.readAll();
 
-    QJsonDocument load_doc(save_form == Json
+    QJsonDocument load_doc(save_form == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
 
@@ -437,4 +437,3 @@ bool FileHandler::proj_equals(Project& proj, Project& proj2){
     return proj.name == proj2.name &&
            video_equals;
 }
-

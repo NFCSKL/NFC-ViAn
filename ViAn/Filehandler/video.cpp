@@ -7,6 +7,7 @@ Video::Video()
     this->id = -1;
     this->file_path = "";
 }
+
 /**
  * @brief Video::Video
  * @param id
@@ -26,6 +27,7 @@ Video::Video(std::string file_path){
 bool operator==(Video v1, Video v2){
     return v1.file_path == v2.file_path;
 }
+
 /**
  * @brief Video::read
  * @param json
@@ -34,6 +36,7 @@ bool operator==(Video v1, Video v2){
 void Video::read(const QJsonObject& json){
     this->file_path = json["file_path"].toString().toStdString();
 }
+
 /**
  * @brief Video::write
  * @param json

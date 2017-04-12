@@ -61,9 +61,9 @@ void FileHandlerTest::project_save_load_test(){
 /**
  * @brief FileHandlerTest::project_add_remove_items
  * Tests adding and removing videos from project, also
- * test information is saved and loaded correctly.
+ * tests if information is saved and loaded correctly.
  */
-void FileHandlerTest::project_add_remove_items(){
+void FileHandlerTest::project_add_remove_items_test(){
     Project* proj1 = file_handler->create_project("TEST_PROJ1");
     Project* proj2 = file_handler->create_project("TEST_PROJ2");
     Project* proj3 = file_handler->create_project("TEST_PROJ3");
@@ -150,7 +150,7 @@ void FileHandlerTest::file_delete_test(){
  * @brief filehandlertest::file_create_delete_multiple
  * Tests creating multiple files, then deletes these.
  */
-void FileHandlerTest::file_create_delete_multiple(){
+void FileHandlerTest::file_create_delete_multiple_test(){
     // Used directory
     QDir directory = file_handler->get_dir(dir_id);
     // File names
@@ -175,8 +175,7 @@ void FileHandlerTest::file_create_delete_multiple(){
  * @brief FileHandlerTest::file_read_write_init
  * Create test file and test directory.
  */
-void FileHandlerTest::file_read_write_init()
-{
+void FileHandlerTest::file_read_write_test_init(){
     this->dir_id = this->file_handler->create_directory(file_handler->get_work_space().absoluteFilePath("TEST_MAP"));
     this->file_id = this->file_handler->create_file("test_file", this->file_handler->get_dir(dir_id));
 }
@@ -250,11 +249,7 @@ void FileHandlerTest::file_read_lines_test(){
  * @brief FileHandlerTest::file_read_write_cleanup
  * Delete test file and test directory.
  */
-void FileHandlerTest::file_read_write_cleanup()
-{
+void FileHandlerTest::file_read_write_cleanup(){
     QVERIFY(file_handler->delete_file(this->file_id));
     QVERIFY(file_handler->delete_directory(this->dir_id));
 }
-
-
-
