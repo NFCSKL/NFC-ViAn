@@ -560,10 +560,10 @@ void video_player::set_overlay_colour(QColor colour) {
  * and the video is loaded and paused.
  */
 void video_player::undo_overlay() {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         if (choosing_analysis_area) {
             analysis_area->undo();
-        } else {
+        } else if (is_paused()) {
             video_overlay->undo(get_current_frame_num());
         }
         update_overlay();
