@@ -96,7 +96,7 @@ void FileHandlerTest::project_add_remove_items(){
  */
 void FileHandlerTest::project_cleanup()
 {
-    QCOMPARE(file_handler->delete_project(this->proj->id),0);
+    QVERIFY(file_handler->delete_project(this->proj->id));
 }
 
 /**

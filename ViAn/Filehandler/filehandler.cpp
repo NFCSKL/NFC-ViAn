@@ -205,8 +205,6 @@ bool FileHandler::delete_project(ID proj_id){
     QFile file(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
     if(this->projects.erase(proj_id)){
         file.remove();
-
-
         delete_directory(temp->dir);
         delete temp;
         this->proj_map_lock.unlock();
