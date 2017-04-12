@@ -872,7 +872,7 @@ void MainWindow::on_videoSlider_sliderReleased() {
     video_slider->setSliderPosition(new_pos);
     slider_blocked = false;
     if (slider_paused_video) {
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
         slider_paused_video = false;
     }
 }
