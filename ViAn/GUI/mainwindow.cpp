@@ -913,7 +913,7 @@ void MainWindow::on_action_fill_screen_triggered() {
     if(!original_size) {
         //Sends new scroll area resolution to mvideo_player to update scaling resolution
         // Video frame is in the scroll area
-        emit resize_video_frame((ui->frame_scroll_area->width())-SCROLLAREAMARGIN, (ui->frame_scroll_area->height())-SCROLLAREAMARGIN);
+        emit resize_video_frame((ui->frame_scroll_area->width())-SCROLL_AREA_MARGIN, (ui->frame_scroll_area->height())-SCROLL_AREA_MARGIN);
     }
 }
 

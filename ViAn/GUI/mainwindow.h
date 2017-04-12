@@ -23,7 +23,7 @@
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
-#define SCROLLAREAMARGIN 25
+#define SCROLL_AREA_MARGIN 25
 
 using namespace std;
 class inputwindow;

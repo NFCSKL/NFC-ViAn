@@ -118,7 +118,6 @@ private:
     cv::Mat RGBframe;
 
     int num_frames;
-
     int new_frame_num;
     int frame_width;
     int frame_height;
