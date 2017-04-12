@@ -1,35 +1,37 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
-#define WINDOWS 1
-#define UNIX 2
+// OS specific
 #ifdef _WIN32
     #include <windows.h>
     #include "stringhelper.h"
 #endif
-#include <vector>
+// I/O
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <mutex>
 #include <sstream>
-#include "project.h"
-#include "dir.h"
+//  STD
+#include <mutex>
+#include <vector>
 #include <algorithm>
+// QT
 #include <QJsonObject>
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
 #include <QJsonDocument>
+// ViAn files
+#include "project.h"
+
 enum WRITE_OPTION{APPEND, OVERWRITE};
-typedef int FH_ERROR; // file handler error code
-typedef int ID;
+
+typedef int ID;       // ID, defined for code readability.
+
 struct Project; // fix for include issue
-struct ProjFiles;
+
 class FileHandler
 {
-    enum SaveFormat {
-        JSON, BINARY
-    };
+    enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
 
 public:
 
@@ -48,11 +50,11 @@ public:
     bool delete_project(ID proj_id);
 
     Project* load_project(std::string full_project_path);
-    Project* load_project(std::string full_path, SaveFormat save_form);
+    Project* load_project(std::string full_path, SAVE_FORMAT save_form);
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(ID id);
     void save_project(Project* proj);
-    bool save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format);
+    bool save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
     bool proj_equals(Project& proj, Project& proj2);
     friend bool operator==(Project& proj, Project& proj2);

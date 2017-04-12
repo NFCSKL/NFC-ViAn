@@ -109,7 +109,7 @@ bool FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
-    this->save_project(proj, proj->dir, FileHandler::SaveFormat::JSON); // get project and save it
+    this->save_project(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
 }
 
 /**
@@ -119,7 +119,7 @@ void FileHandler::save_project(ID id){
  * project pointer is still available
  */
 void FileHandler::save_project(Project* proj){
-    this->save_project(proj, proj->dir, FileHandler::SaveFormat::JSON);
+    this->save_project(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
 }
 
 /**
@@ -129,7 +129,7 @@ void FileHandler::save_project(Project* proj){
  * @param save_format
  * @return Saves a Json file to provided directory
  */
-bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat save_format){
+bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format){
     QDir dir = get_dir(dir_id);
     std::string file_path = dir.absoluteFilePath(QString::fromStdString(proj->name)).toStdString();
     QFile save_file(save_format == JSON
@@ -166,7 +166,7 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Project* FileHandler::load_project(std::string full_path, FileHandler::SaveFormat save_form){
+Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORMAT save_form){
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
@@ -361,7 +361,7 @@ ID FileHandler::create_file(QString file_name, QDir dir){
 
  /**
   * @brief FileHandler::add_project
-  * @param std::pari<<ID, Project*> pair
+  * @param std::pair<<ID, Project*> pair
   * @return void
   * Adds project to projects, locks in doing so.
   */
