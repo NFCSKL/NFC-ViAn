@@ -8,6 +8,7 @@ FileHandlerTest::FileHandlerTest(QObject *parent) : QObject(parent){
     file_handler = new FileHandler();
 
 }
+
 /**
  * @brief FileHandlerTest::project_test_init
  * creates project for project tests.
@@ -16,7 +17,6 @@ void FileHandlerTest::project_test_init()
 {
     this->proj = file_handler->create_project("TEST_PROJ");
 }
-
 
 /**
  * @brief FileHandlerTest::project_create_test
@@ -31,6 +31,7 @@ void FileHandlerTest::project_create_delete_test()
     QCOMPARE(file_handler->delete_project(proj2->id), 0);
     QCOMPARE(file_handler->delete_project(proj3->id), 0);
 }
+
 /**
  * @brief FileHandler::project_save_load_test
  * Tests saving and loading projects.
@@ -56,6 +57,7 @@ void FileHandlerTest::project_save_load_test(){
     QCOMPARE(file_handler->delete_project(proj2->id), 0);
     QCOMPARE(file_handler->delete_project(proj3->id), 0);
 }
+
 /**
  * @brief FileHandlerTest::project_add_remove_items
  * Tests adding and removing videos from project, also
@@ -87,6 +89,7 @@ void FileHandlerTest::project_add_remove_items(){
     QCOMPARE(file_handler->delete_project(proj2->id), 0);
     QCOMPARE(file_handler->delete_project(proj3->id), 0);
 }
+
 /**
  * @brief FileHandlerTest::project_cleanup
  * Deletes project used for project tests.
@@ -95,8 +98,6 @@ void FileHandlerTest::project_cleanup()
 {
     QCOMPARE(file_handler->delete_project(this->proj->id),0);
 }
-
-
 
 /**
  * @brief directory_create_test
@@ -109,11 +110,11 @@ void FileHandlerTest::directory_create_test(){
     QCOMPARE(file_handler->get_dir(dir_id).absolutePath(), dirpath);
 
 }
+
 /**
  * @brief directory_delete_test
  * Tests deleting directory.
  */
-
 void FileHandlerTest::directory_delete_test(){
     QVERIFY(file_handler->delete_directory(dir_id));
 }
@@ -126,6 +127,7 @@ void FileHandlerTest::file_test_init(){
     QString dirpath = file_handler->get_work_space().absoluteFilePath("TEST_MAP");
     dir_id = file_handler->create_directory(dirpath);
 }
+
 /**
  * @brief filehandlertest::file_create_test
  * Tests creating a single file.
@@ -135,6 +137,7 @@ void FileHandlerTest::file_create_test(){
     this->file_id  = file_handler->create_file(dir.absoluteFilePath("test_file.txt"),dir);
     QCOMPARE(file_handler->get_file(this->file_id), dir.absoluteFilePath("test_file.txt")); // See if file was created in directory
 }
+
 /**
  * @brief filehandlertest::file_delete_test
  * Tests deleting a single file.
@@ -142,6 +145,7 @@ void FileHandlerTest::file_create_test(){
 void FileHandlerTest::file_delete_test(){
     QVERIFY(file_handler->delete_file(this->file_id));
 }
+
 /**
  * @brief filehandlertest::file_create_delete_multiple
  * Tests creating multiple files, then deletes these.
@@ -166,6 +170,7 @@ void FileHandlerTest::file_create_delete_multiple(){
     QVERIFY(file_handler->delete_file(id2));
     QVERIFY(file_handler->delete_file(id3));
 }
+
 /**
  * @brief FileHandlerTest::file_read_write_init
  * Create test file and test directory.
@@ -175,7 +180,6 @@ void FileHandlerTest::file_read_write_init()
     this->dir_id = this->file_handler->create_directory(file_handler->get_work_space().absoluteFilePath("TEST_MAP"));
     this->file_id = this->file_handler->create_file("test_file", this->file_handler->get_dir(dir_id));
 }
-
 
 /**
  * @brief filehandlertest::file_read_write_test
@@ -190,6 +194,7 @@ void FileHandlerTest::file_read_write_test(){
     file_handler->read_file(this->file_id, read_text, 1);
     QCOMPARE(read_text, written_text);
 }
+
 /**
  * @brief filehandlertest::file_read_write_option_test
  * Test read and write options.
@@ -213,6 +218,7 @@ void FileHandlerTest::file_read_write_option_test() {
     file_handler->read_file(this->file_id, read_text3, 1);
     QCOMPARE(read_text3, overwrite_text);                                                  // Confirm Overwrite
 }
+
 /**
  * @brief filehandlertest::file_read_lines_test
  * Tests reading multiple lines.
@@ -239,6 +245,7 @@ void FileHandlerTest::file_read_lines_test(){
     QCOMPARE(read_text, line1 + line2 + line3);
     read_text.clear();
 }
+
 /**
  * @brief FileHandlerTest::file_read_write_cleanup
  * Delete test file and test directory.

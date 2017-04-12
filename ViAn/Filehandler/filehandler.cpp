@@ -20,6 +20,7 @@ FileHandler::FileHandler() {
 
     //ID id = add_file("ViAn_config.txt"); Will be used to store current workspace and other run-to-run coonstans
 }
+
 /**
  * @todo save workspace to file
  * @brief FileHandler::set_workspace
@@ -30,6 +31,7 @@ void FileHandler::set_work_space(std::string new_work_space){
     //this->work_space = new_work_space;
     //save_workspace();
 }
+
 /**
  * @brief FileHandler::get_work_space
  * @return default work_space
@@ -112,6 +114,7 @@ void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
     this->save_project(proj, proj->dir, FileHandler::SaveFormat::Json); // get project and save it
 }
+
 /**
  * @brief FileHandler::save_project
  * @param proj
@@ -146,6 +149,7 @@ bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat
             : save_doc.toBinaryData());
     return true;
 }
+
 /**
  * @brief FileHandler::load_project
  * @param full_project_path
@@ -157,6 +161,7 @@ bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SaveFormat
 Project* FileHandler::load_project(std::string full_project_path){
     return load_project(full_project_path, Json); // Decide format internally, here for flexibility
 }
+
 /**
  * @brief FileHandler::load_project
  * @param full_project_path
@@ -187,6 +192,7 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SaveForma
     proj->dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")))));
     return proj;
 }
+
 /**
  * @brief FileHandler::delete_project
  * @param proj_id
@@ -234,15 +240,14 @@ void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
     proj->remove_video(vid_id); // Remove ´the video from project
 }
 
- /**
-  * @brief FileHandler::create_file
-  * @param std::string file name, ID directory id
-  * create a file by given name in already existing
-  * application tracked directory.
-  * Note that the file is not actually created
-  * in the file system until the file is written to.
-  */
-
+/**
+ * @brief FileHandler::create_file
+ * @param std::string file name, ID directory id
+ * create a file by given name in already existing
+ * application tracked directory.
+ * Note that the file is not actually created
+ * in the file system until the file is written to.
+ */
 ID FileHandler::create_file(QString file_name, QDir dir){
     return this->add_file(dir.absoluteFilePath(file_name)); // File created
   }
@@ -348,6 +353,7 @@ ID FileHandler::create_file(QString file_name, QDir dir){
     this->dir_map_lock.unlock();
     return dir;
  }
+
  /**
   * @brief FileHandler::add_project
   * @param proj
@@ -406,6 +412,7 @@ ID FileHandler::add_dir(QDir dir){
     add_dir(this->dir_id, dir);
     return this->dir_id++;
  }
+
 /**
  * @brief FileHandler::add_dir
  * @param dir
