@@ -56,8 +56,14 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
-    mvideo_player->terminate();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    emit set_stop_video(); //Signaling the run function in mvideo_player to stop executing
+    mvideo_player->wait(); //Waiting for video_player to finish executing
     delete mvideo_player;
+
     delete ui;
     delete bookmark_view;
 }
@@ -591,7 +597,17 @@ void MainWindow::on_actionAddVideo_triggered() {
 void MainWindow::play_video() {
     MyQTreeWidgetItem *my_project;
     my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
+
+    if (mvideo_player->is_paused())
+        paused_wait.wakeOne();
+
+    if (mvideo_player->isRunning()) {
+        emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player = new video_player(&mutex, &paused_wait);
+        setup_video_player(mvideo_player);
+    }
     mvideo_player->load_video(my_project->name.toStdString());
+
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
     enable_video_buttons();
