@@ -58,7 +58,7 @@ public:
     //directory manipulation
     //varying implementation
     ID create_directory(QString dir_path);
-    FH_ERROR delete_directory(ID id);
+    bool delete_directory(ID id);
 
     //file manipulation
 
@@ -93,6 +93,7 @@ private:
     void add_project(ID id, Project *proj);
 
     ID add_dir(QDir dir);
+    void add_dir(ID dir_id, QDir dir);
     ID load_project_file(std::string file_path, std::stringstream& proj_file_stream);
     void load_proj_files(std::string str);
     //add used for loading project from file
@@ -110,12 +111,12 @@ private:
      * of only 1 reader/writer at a time
      * @brief dirMapLock, fileMapLock, projMapLock
      */
-    std::mutex dir_map_lock; // lock for handling directory write/read
-    std::mutex file_map_lock;// lock for handling file write/read
-    std::mutex proj_map_lock;// lock for handling project write/read
-    ID project_id; //counter for project ids
-    ID file_id; //counter for file ids
-    ID dir_id; //counter for directory ids
+    std::mutex dir_map_lock;    // lock for handling directory write/read
+    std::mutex file_map_lock;   // lock for handling file write/read
+    std::mutex proj_map_lock;   // lock for handling project write/read
+    ID project_id;              //counter for project ids
+    ID file_id;                 //counter for file ids
+    ID dir_id;                  //counter for directory ids
 
 };
 

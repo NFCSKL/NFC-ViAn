@@ -26,10 +26,19 @@ Video::Video(std::string file_path){
 bool operator==(Video v1, Video v2){
     return v1.file_path == v2.file_path;
 }
+/**
+ * @brief Video::read
+ * @param json
+ * Read video parameters from json object.
+ */
 void Video::read(const QJsonObject& json){
     this->file_path = json["file_path"].toString().toStdString();
 }
-
+/**
+ * @brief Video::write
+ * @param json
+ * Write video parameters to json object.
+ */
 void Video::write(QJsonObject& json){
     json["file_path"] = QString::fromStdString(this->file_path);
 }

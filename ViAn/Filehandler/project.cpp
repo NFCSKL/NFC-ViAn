@@ -8,6 +8,8 @@ Project::Project(ID id, std::string name)
 {
     this->name = name;
     this->id = id;
+    this->dir = -1;
+    this->dir_videos = -1;
     this->v_id = 0;
     this->videos.clear();
     this->saved = false;
@@ -19,6 +21,8 @@ Project::Project(){
     this->name = "";
     this->id = -1;
     this->id = 0;
+    this->dir = -1;
+    this->dir_videos = -1;
     this->videos.clear();
 }
 /**

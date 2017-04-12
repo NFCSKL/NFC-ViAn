@@ -39,7 +39,9 @@ public:
     ID v_id;
     std::string name;
     ID dir;
+    ID dir_videos;
     std::map<ID,Video*> videos;
+
     bool saved;
 };
 
