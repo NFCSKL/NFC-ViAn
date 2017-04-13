@@ -26,7 +26,7 @@ int BookmarkView::get_num_bookmarks() {
  * @param frame_nbr Frame number associated with the bookmark.
  * @param file_path Path to the image of the bookmark.
  */
-void BookmarkView::add_bookmark(int frame_nbr, std::string file_path) {
+void BookmarkView::add_bookmark(int frame_nbr, QString file_path) {
     bool ok;
     QString bookmark_text = get_input_text(&ok);
     if (ok) {

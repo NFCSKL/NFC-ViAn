@@ -344,17 +344,15 @@ void MainWindow::on_bookmarkButton_clicked() {
         // Get current project.
         item = ui->ProjectTree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        QDir proj_path = fileHandler->get_dir(my_project->id);
         // Add bookmarks-folder to the project-folder.
-        proj_path.mkpath(proj_path.absoluteFilePath("Bookmarks"));
-        proj_path.cd(proj_path.absoluteFilePath("Bookmarks"));
-
+        Project* proj = fileHandler->get_project(my_project->id);
+        QDir dir = fileHandler->get_dir(proj->bookmark_dir);
         // Export the current frame in the bookmarks-folder.
         // The names of the stored files will have increasing numbers.
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(proj_path.absolutePath().toStdString(), file_name);
+        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
 
-        bookmark_view->add_bookmark(mvideo_player->get_current_frame_num(), file_path);
+        bookmark_view->add_bookmark(mvideo_player->get_current_frame_num(),QString::fromStdString(file_path));
         set_status_bar("Saved bookmark.");
     }
 }

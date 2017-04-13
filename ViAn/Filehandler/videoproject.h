@@ -4,7 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <QJsonArray>
 #include "analysis.h"
+#include "bookmark.h"
 enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
 /**
  * @todo change map to include ID for flexibility.. I.E allow multiple analyses of each type.
@@ -14,10 +16,16 @@ enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
  */
 class VideoProject{
     std::map<ANALYSIS_TYPE, Analysis> analyses; // Only one analysis of each type
-    Video* video;
-public:
+    std::vector<Bookmark*> bookmarks;
+    Video* video = nullptr;
 
+
+public:
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
+    void add_bookmark(Bookmark* bookmark);
     VideoProject(Video* v); //Needs to have a video
+    VideoProject();
     Video* get_video();
 
 };

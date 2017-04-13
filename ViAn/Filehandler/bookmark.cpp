@@ -6,10 +6,17 @@
  * @param file_pth Path to the stored image.
  * @param string Text description of the bookmark.
  */
-Bookmark::Bookmark(int frame_nbr, std::string file_pth, QString string) {
+Bookmark::Bookmark(int frame_nbr, QString file_pth, QString string) {
     frame_number = frame_nbr;
     file_path = file_pth;
     description = string;
+}
+
+Bookmark::Bookmark()
+{
+    frame_number = 0;
+    file_path = QString();;
+    description = QString();
 }
 
 /**
@@ -24,7 +31,7 @@ int Bookmark::get_frame_number() {
  * @brief Bookmark::get_file_path
  * @return Returns the file path to the stored image associated with the bookmark.
  */
-std::string Bookmark::get_file_path() {
+QString Bookmark::get_file_path() {
     return file_path;
 }
 
@@ -34,4 +41,23 @@ std::string Bookmark::get_file_path() {
  */
 QString Bookmark::get_description() {
     return description;
+}
+/**
+ * @brief Bookmark::read
+ * @param json
+ */
+void Bookmark::read(const QJsonObject& json){
+    json["frame"] = this->frame_number;
+    json["path"] = this->file_path;
+    json["note"] = this->description;
+
+}
+/**
+ * @brief Bookmark::write
+ * @param json
+ */
+void Bookmark::write(QJsonObject& json){
+    this->frame_number = json["frame"].toInt();
+    this->file_path = json["path"].toString();
+    this->description = json["note"].toString();
 }

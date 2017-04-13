@@ -56,7 +56,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     else
         root_dir = this->work_space;
 
-
+    proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file

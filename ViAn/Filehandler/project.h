@@ -27,6 +27,8 @@ public:
     Project(std::string dir_path);
     ~Project();
     ID add_video(Video *vid);
+    ID add_video_project(VideoProject* vid_proj);
+
     void remove_video_project(ID id);
     // read and write operator for Projects
     void read(const QJsonObject& json);
@@ -41,6 +43,7 @@ public:
     std::string name;
     std::map<ID,VideoProject*> videos;
     ID dir;
+    ID bookmark_dir;
     ID dir_videos;
     bool saved;
 };

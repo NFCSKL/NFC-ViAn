@@ -7,9 +7,9 @@
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
-    bookmark = new Bookmark(frame_nbr, file_path, string);
-    QImage img = QImage(QString::fromStdString(file_path), "TIFF");
+BookmarkItem::BookmarkItem(int frame_nbr, QString file_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
+    Bookmark* bookmark = new Bookmark(frame_nbr, file_path, string);
+    QImage img = QImage(file_path, "TIFF");
     img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
     setData(Qt::DecorationRole, QPixmap::fromImage(img));
 }

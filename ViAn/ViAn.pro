@@ -16,7 +16,8 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    Filehandler/videoproject.cpp
+    Filehandler/videoproject.cpp \
+    Filehandler/bookmark.cpp
 
 
 #
@@ -28,7 +29,8 @@ SOURCES += Test/test_video_player.cpp\
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    Filehandler/videoproject.h
+    Filehandler/videoproject.h \
+    Filehandler/bookmark.h
 
 
 #
@@ -51,8 +53,7 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/inputwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
-    GUI/bookmarkitem.cpp \
-    GUI/bookmark.cpp
+    GUI/bookmarkitem.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -61,8 +62,7 @@ HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
-    GUI/bookmarkitem.h \
-    GUI/bookmark.h
+    GUI/bookmarkitem.h
 
 
 FORMS    += GUI/mainwindow.ui \
