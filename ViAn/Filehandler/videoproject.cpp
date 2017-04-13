@@ -47,3 +47,12 @@ void VideoProject::write(QJsonObject& json){
 void VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.push_back(bookmark);
 }
+
+void VideoProject::delete_artifacts(){
+    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
+        Bookmark* temp = *it;
+        QFile file (temp->get_file_path());
+        file.remove();
+    }
+}
+

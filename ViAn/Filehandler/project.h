@@ -28,7 +28,7 @@ public:
     ~Project();
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
-
+    void delete_artifacts();
     void remove_video_project(ID id);
     // read and write operator for Projects
     void read(const QJsonObject& json);

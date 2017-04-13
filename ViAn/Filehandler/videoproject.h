@@ -5,6 +5,7 @@
 #include <sstream>
 #include <map>
 #include <QJsonArray>
+#include <QFile>
 #include "analysis.h"
 #include "bookmark.h"
 enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
@@ -24,6 +25,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void add_bookmark(Bookmark* bookmark);
+    void delete_artifacts();
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();

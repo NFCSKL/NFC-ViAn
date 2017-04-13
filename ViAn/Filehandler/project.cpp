@@ -70,6 +70,14 @@ ID Project::add_video_project(VideoProject* vid_proj){
     return this->v_id++;
 }
 
+void Project::delete_artifacts()
+{
+    for(auto it = videos.begin(); it != videos.end(); it++){
+        VideoProject* vp = it->second;
+        vp->delete_artifacts();
+    }
+}
+
 
 /**
  * @brief Project::read

@@ -15,7 +15,7 @@ FileHandler::FileHandler() {
     #elif __APPLE__
         this->work_space =  create_directory("/Applications/");
     #elif __unix__
-        this->work_space =  create_directory("~/");
+        this->work_space =  create_dire§ctory("~/");
     #endif
 }
 
@@ -198,18 +198,19 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORM
  */
 bool FileHandler::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
-    this->proj_map_lock.lock();
-    QFile file(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
+    this->proj_map_lock.lock();    
     if(this->projects.erase(proj_id)){
+        temp->delete_artifacts();
+        QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
         file.remove();
+        delete_directory(temp->bookmark_dir);
         delete_directory(temp->dir);
-        delete temp;
+        delete temp;        
         this->proj_map_lock.unlock();
         return true;
     }
     this->proj_map_lock.unlock();
     return false;
-
 }
 
 /**
