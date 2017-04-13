@@ -11,6 +11,7 @@ public:
     Bookmark* get_bookmark();
     int get_frame_number();
 private:
+    void create_thumbnail(std::string file_path);
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
     Bookmark* bookmark;
 };

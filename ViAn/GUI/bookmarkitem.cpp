@@ -9,9 +9,7 @@
  */
 BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
     bookmark = new Bookmark(frame_nbr, file_path, string);
-    QImage img = QImage(QString::fromStdString(file_path), "TIFF");
-    img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
-    setData(Qt::DecorationRole, QPixmap::fromImage(img));
+    create_thumbnail(file_path);
 }
 
 /**
@@ -21,7 +19,16 @@ BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string,
  */
 BookmarkItem::BookmarkItem(Bookmark bookmrk, QListWidget* view) : QListWidgetItem(bookmrk.get_description(), view) {
     bookmark = &bookmrk;
-    QImage img = QImage(QString::fromStdString(bookmrk.get_file_path()), "TIFF");
+    create_thumbnail(bookmrk.get_file_path());
+}
+
+/**
+ * @brief BookmarkItem::create_thumbnail
+ * Creates and adds a thumbnail.
+ * @param file_path Path to the stored image.
+ */
+void BookmarkItem::create_thumbnail(std::string file_path) {
+    QImage img = QImage(QString::fromStdString(file_path), "TIFF");
     img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
     setData(Qt::DecorationRole, QPixmap::fromImage(img));
 }
