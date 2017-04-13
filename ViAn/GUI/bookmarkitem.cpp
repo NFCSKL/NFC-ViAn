@@ -15,6 +15,18 @@ BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string,
 }
 
 /**
+ * @brief BookmarkItem::BookmarkItem
+ * @param bookmrk Bookmark containing relevant.
+ * @param view Parent widget of the bookmark.
+ */
+BookmarkItem::BookmarkItem(Bookmark bookmrk, QListWidget* view) : QListWidgetItem(bookmrk.get_description(), view) {
+    bookmark = &bookmrk;
+    QImage img = QImage(QString::fromStdString(bookmrk.get_file_path()), "TIFF");
+    img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
+    setData(Qt::DecorationRole, QPixmap::fromImage(img));
+}
+
+/**
  * @brief BookmarkItem::get_bookmark
  * @return Returns the bookmark representation.
  */

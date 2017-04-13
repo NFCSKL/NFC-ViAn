@@ -30,9 +30,19 @@ void BookmarkView::add_bookmark(int frame_nbr, std::string file_path) {
     bool ok;
     QString bookmark_text = get_input_text(&ok);
     if (ok) {
-        BookmarkItem* bookmark = new BookmarkItem(frame_nbr, file_path, bookmark_text, view);
-        view->addItem(bookmark);
+        BookmarkItem* bookmark_item = new BookmarkItem(frame_nbr, file_path, bookmark_text, view);
+        view->addItem(bookmark_item);
     }
+}
+
+/**
+ * @brief BookmarkView::add_bookmark
+ * Adds a bookmark to the bookmark view.
+ * @param bookmark Bookmark to add.
+ */
+void BookmarkView::add_bookmark(Bookmark bookmark) {
+    BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
+    view->addItem(bookmark_item);
 }
 
 /**
