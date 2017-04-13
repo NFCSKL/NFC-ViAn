@@ -952,5 +952,15 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
  */
 void MainWindow::on_actionCreate_report_triggered()
 {
-    report = new ReportGenererator();
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->ProjectTree->selectedItems().size() == 1) {
+        // Get current project.
+        item = ui->ProjectTree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
+        std::string proj_path = fileHandler->get_dir(my_project->id);
+
+        //TODO make sure to stop here if there is no bookmarks
+        report = new ReportGenerator(proj_path);
+    }
 }

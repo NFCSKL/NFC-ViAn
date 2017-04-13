@@ -19,11 +19,12 @@
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
 #include "bookmarkview.h"
+#include "reportgenerator.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
-#include "reportgenererator.h"
+
 
 using namespace std;
 class inputwindow;
@@ -151,7 +152,7 @@ private:
     IconOnButtonHandler *iconOnButtonHandler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
-    ReportGenererator *report;
+    ReportGenerator *report;
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;

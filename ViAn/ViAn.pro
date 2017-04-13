@@ -18,7 +18,7 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    GUI/reportgenererator.cpp
+    GUI/reportgenerator.cpp
 
 
 #
@@ -30,7 +30,7 @@ SOURCES += Test/test_video_player.cpp\
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    GUI/reportgenererator.h
+    GUI/reportgenerator.h
 
 
 #
