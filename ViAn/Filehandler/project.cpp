@@ -41,8 +41,8 @@ Project::~Project(){
  * @param id
  * Remove video from videos and delete its contents.
  */
-void Project::remove_video(ID id){
-    Video* temp = this->videos.at(id);
+void Project::remove_video_project(ID id){
+    VideoProject* temp = this->videos.at(id);
     delete temp;
     videos.erase(id);
 
@@ -54,7 +54,7 @@ void Project::remove_video(ID id){
  */
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
-    this->videos.insert(std::make_pair(this->v_id, vid));
+    this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
     return this->v_id++;
 }
 
@@ -84,7 +84,7 @@ void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(this->name);
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){
         QJsonObject json_video;
-        Video* v = it->second;
+        Video* v = it->second->get_video();
         v->write(json_video);
         json_proj.append(json_video);
     }

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include "filehandler.h"
+#include "videoproject.h"
 #include "video.h"
 #include <QJsonObject>
 #include <QJsonArray>
@@ -26,7 +27,7 @@ public:
     Project(std::string dir_path);
     ~Project();
     ID add_video(Video *vid);
-    void remove_video(ID id);
+    void remove_video_project(ID id);
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
@@ -38,10 +39,9 @@ public:
     ID id;
     ID v_id;
     std::string name;
+    std::map<ID,VideoProject*> videos;
     ID dir;
     ID dir_videos;
-    std::map<ID,Video*> videos;
-
     bool saved;
 };
 

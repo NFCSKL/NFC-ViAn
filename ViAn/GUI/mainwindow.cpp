@@ -714,7 +714,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->ProjectTree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
-        Video* v = vid->second;        
+        Video* v = vid->second->get_video();
         add_video_to_tree(v->file_path, v->id);
     }
 }

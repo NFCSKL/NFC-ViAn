@@ -232,7 +232,7 @@ ID FileHandler::add_video(Project* proj, std::string file_path){
  */
 void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
     Project* proj = this->get_project(proj_id); // get Project object from id
-    proj->remove_video(vid_id); // Remove ´the video from project
+    proj->remove_video_project(vid_id); // Remove ´the video from project
 }
 
 /**
@@ -429,7 +429,7 @@ void FileHandler::add_dir(ID dir_id, QDir dir){
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
     bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
-               [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
+               [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
                                                                                                                       // by dereferencing pointers in vector
     return proj.name == proj2.name &&
            video_equals;
