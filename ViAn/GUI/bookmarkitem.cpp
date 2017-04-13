@@ -3,7 +3,7 @@
 /**
  * @brief BookmarkItem::BookmarkItem
  * @param frame_nbr Frame number associated with the bookmark.
- * @param img Thumbnail image.
+ * @param file_path Path to the stored image.
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
@@ -14,6 +14,10 @@ BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string,
     setData(Qt::DecorationRole, QPixmap::fromImage(img));
 }
 
+/**
+ * @brief BookmarkItem::get_bookmark
+ * @return Returns the bookmark representation.
+ */
 Bookmark* BookmarkItem::get_bookmark() {
     return bookmark;
 }
