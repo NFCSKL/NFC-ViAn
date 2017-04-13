@@ -27,13 +27,10 @@ int BookmarkView::get_num_bookmarks() {
  * @param file_path Path to the image of the bookmark.
  */
 void BookmarkView::add_bookmark(int frame_nbr, std::string file_path) {
-    QImage img = QImage(QString::fromStdString(file_path), "TIFF");
-    img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
-
     bool ok;
     QString bookmark_text = get_input_text(&ok);
     if (ok) {
-        Bookmark* bookmark = new Bookmark(frame_nbr, img, bookmark_text, view);
+        BookmarkItem* bookmark = new BookmarkItem(frame_nbr, file_path, bookmark_text, view);
         view->addItem(bookmark);
     }
 }

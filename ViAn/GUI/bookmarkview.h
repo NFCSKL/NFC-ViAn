@@ -1,7 +1,7 @@
 #ifndef BOOKMARKVIEW_H
 #define BOOKMARKVIEW_H
 
-#include "bookmark.h"
+#include "bookmarkitem.h"
 #include <QListWidget>
 
 class BookmarkView {
@@ -12,7 +12,6 @@ public:
 private:
     QString get_input_text(bool* ok);
 
-    const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
     const int TEXT_EDIT_MIN_HEIGHT = 32;
 
     QListWidget* view;
