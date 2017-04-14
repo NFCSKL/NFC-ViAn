@@ -78,7 +78,7 @@
            <enum>QLayout::SetNoConstraint</enum>
           </property>
           <item>
-           <widget class="QPushButton" name="fastBackwardButton">
+           <widget class="QPushButton" name="decrease_speed_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -103,7 +103,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="previousFrameButton">
+           <widget class="QPushButton" name="previous_frame_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -125,7 +125,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="playPauseButton">
+           <widget class="QPushButton" name="play_pause_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -144,7 +144,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="nextFrameButton">
+           <widget class="QPushButton" name="next_frame_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -169,7 +169,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="fastForwardButton">
+           <widget class="QPushButton" name="increase_speed_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -194,7 +194,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="stopButton">
+           <widget class="QPushButton" name="stop_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -219,7 +219,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="bookmarkButton">
+           <widget class="QPushButton" name="bookmark_button">
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -321,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">

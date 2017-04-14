@@ -26,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     video_slider = ui->videoSlider;
 
 
-    iconOnButtonHandler = new IconOnButtonHandler();
-    iconOnButtonHandler->set_pictures_to_buttons(ui);
+    icon_on_button_handler = new IconOnButtonHandler();
+    icon_on_button_handler->set_pictures_to_buttons(ui);
 
     // Setup a Bookmark View in the right sidebar in the GUI.
     bookmark_view = new BookmarkView(ui->documentList);
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
  */
 MainWindow::~MainWindow() {
 
-    delete iconOnButtonHandler;
+    delete icon_on_button_handler;
     delete fileHandler;
 
     if (mvideo_player->is_paused())
@@ -106,11 +106,11 @@ void MainWindow::set_status_bar(std::string status, int timer){
 }
 
 /**
- * @brief MainWindow::on_fastBackwardButton_clicked
+ * @brief MainWindow::on_decrease_speed_button_clicked
  * Calls upon a video player function which decreases the playback speed
  *
  */
-void MainWindow::on_fastBackwardButton_clicked(){
+void MainWindow::on_decrease_speed_button_clicked(){
     mvideo_player->dec_playback_speed();
     double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
     std::ostringstream speed_str;
@@ -119,34 +119,34 @@ void MainWindow::on_fastBackwardButton_clicked(){
 }
 
 /**
- * @brief MainWindow::on_playPauseButton_clicked
+ * @brief MainWindow::on_play_pause_button_clicked
  * Calls upon video player functions based on current playback status
  * Starts/resumes a stopped/paused video, pauses a playing one
  */
-void MainWindow::on_playPauseButton_clicked() {
+void MainWindow::on_play_pause_button_clicked() {
     if (mvideo_player->is_paused()) {
         // Video thread is paused. Notifying the waitcondition to resume playback
-        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+        icon_on_button_handler->set_icon("pause", ui->play_pause_button);//changes the icon on the play button to a pause-icon
         paused_wait.wakeOne();
         set_status_bar("Playing");
     } else if (mvideo_player->is_stopped()) {
         // Video thread has finished. Start a new one
-        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
+        icon_on_button_handler->set_icon("pause", ui->play_pause_button);
         mvideo_player->start();
         set_status_bar("Playing");
     } else {
         // Video thread is running. Pause it
-        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+        icon_on_button_handler->set_icon("play", ui->play_pause_button);
         emit set_pause_video();
         set_status_bar("Paused");
     }
 }
 
 /**
- * @brief MainWindow::on_fastForwardButton_clicked
+ * @brief MainWindow::on_increase_speed_button_clicked
  * Calls upon video player function which in turn increases the playback speed
  */
-void MainWindow::on_fastForwardButton_clicked(){
+void MainWindow::on_increase_speed_button_clicked(){
     mvideo_player->inc_playback_speed();
     double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
     std::ostringstream speed_str;
@@ -155,13 +155,13 @@ void MainWindow::on_fastForwardButton_clicked(){
 }
 
 /**
- * @brief MainWindow::on_stopButton_clicked
+ * @brief MainWindow::on_stop_button_clicked
  * Calls upon video player function which in turn stops the video
  */
-void MainWindow::on_stopButton_clicked() {
+void MainWindow::on_stop_button_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
-        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+        icon_on_button_handler->set_icon("play", ui->play_pause_button);
     } else if (mvideo_player->is_stopped()){
         return;
     } else {
@@ -171,10 +171,10 @@ void MainWindow::on_stopButton_clicked() {
 }
 
 /**
- * @brief MainWindow::on_nextFrameButton_clicked
+ * @brief MainWindow::on_next_frame_button_clicked
  * Calls upon video player function which in turn skips to the next frame
  */
-void MainWindow::on_nextFrameButton_clicked() {
+void MainWindow::on_next_frame_button_clicked() {
     if (mvideo_player->is_paused()) {
         set_status_bar("Went forward a frame");
         emit next_video_frame();
@@ -184,10 +184,10 @@ void MainWindow::on_nextFrameButton_clicked() {
 }
 
 /**
- * @brief MainWindow::on_previousFrameButton_clicked
+ * @brief MainWindow::on_previous_frame_button_clicked
  * Calls upon video player function which in turn steps back to the previous frame
  */
-void MainWindow::on_previousFrameButton_clicked() {
+void MainWindow::on_previous_frame_button_clicked() {
     if (mvideo_player->is_paused()) {
         emit prev_video_frame();
         set_status_bar("Went back a frame");
@@ -334,10 +334,10 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 /**
- * @brief MainWindow::on_bookmarkButton_clicked
+ * @brief MainWindow::on_bookmark_button_clicked
  * Button to add a bookmark to the bookmark view.
  */
-void MainWindow::on_bookmarkButton_clicked() {
+void MainWindow::on_bookmark_button_clicked() {
     QTreeWidgetItem *item;
     MyQTreeWidgetItem *my_project;
     if(ui->ProjectTree->selectedItems().size() == 1) {
@@ -365,8 +365,8 @@ void MainWindow::on_bookmarkButton_clicked() {
  */
 void MainWindow::on_actionAddProject_triggered() {
     ACTION action = ADD_PROJECT;
-    inputWindow = new inputwindow(this, action, "Project name:");
-    inputWindow->show();
+    input_window = new inputwindow(this, action, "Project name:");
+    input_window->show();
     set_status_bar("Adding project, need name");
 }
 
@@ -388,12 +388,12 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
         Project* proj = fileHandler->create_project(input);
         add_project_to_tree(proj);
         set_status_bar("Project " + input + " created.");
-        delete inputWindow;
+        delete input_window;
         break;
     }
     case CANCEL:
         set_status_bar("Cancel");
-        delete inputWindow;
+        delete input_window;
         break;
     case ADD_VIDEO: {
         ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), input);
@@ -669,7 +669,7 @@ void MainWindow::play_video() {
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
     enable_video_buttons();
-    iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
+    icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
 }
 
@@ -816,12 +816,12 @@ void MainWindow::toggle_toolbar() {
  * They are disabled as default.
  */
 void MainWindow::enable_video_buttons() {
-    ui->nextFrameButton->setEnabled(true);
-    ui->fastBackwardButton->setEnabled(true);
-    ui->playPauseButton->setEnabled(true);
-    ui->fastForwardButton->setEnabled(true);
-    ui->previousFrameButton->setEnabled(true);
-    ui->stopButton->setEnabled(true);
+    ui->next_frame_button->setEnabled(true);
+    ui->decrease_speed_button->setEnabled(true);
+    ui->play_pause_button->setEnabled(true);
+    ui->increase_speed_button->setEnabled(true);
+    ui->previous_frame_button->setEnabled(true);
+    ui->stop_button->setEnabled(true);
 }
 
 /**

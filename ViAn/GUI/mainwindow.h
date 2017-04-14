@@ -40,7 +40,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
-    bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
+    bool eventFilter(QObject *obj, QEvent *event); //can not follow namestandard, generated code
     const int SLIDER_UPDATE_TIMER = 200;
 
     // Lock and wait condition to sleep player when video is paused
@@ -58,29 +58,29 @@ signals:
 
 private slots:
 
-    void on_playPauseButton_clicked();
+    void on_play_pause_button_clicked();
 
-    void on_stopButton_clicked();
+    void on_stop_button_clicked();
 
     void on_actionExit_triggered();
 
-    void closeEvent (QCloseEvent *event);
+    void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
 
     void update_video(QImage frame);
 
     void set_video_slider_pos(int pos);
 
-    void resizeEvent(QResizeEvent* event);
+    void resizeEvent(QResizeEvent* event); //can not follow namestandard, generated code
 
-    void on_previousFrameButton_clicked();
+    void on_previous_frame_button_clicked();
 
-    void on_nextFrameButton_clicked();
+    void on_next_frame_button_clicked();
 
-    void on_fastBackwardButton_clicked();
+    void on_decrease_speed_button_clicked();
 
-    void on_fastForwardButton_clicked();
+    void on_increase_speed_button_clicked();
 
-    void on_bookmarkButton_clicked();
+    void on_bookmark_button_clicked();
 
     void on_videoSlider_sliderPressed();
 
@@ -143,9 +143,9 @@ private slots:
 private:
 
     Ui::MainWindow *ui;
-    inputwindow *inputWindow;
+    inputwindow *input_window;
     video_player* mvideo_player;
-    IconOnButtonHandler *iconOnButtonHandler;
+    IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
 
