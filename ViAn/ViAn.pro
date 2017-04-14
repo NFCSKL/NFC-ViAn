@@ -45,6 +45,7 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/inputwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
+    GUI/bookmarkitem.cpp \
     GUI/bookmark.cpp
 
 
@@ -54,6 +55,7 @@ HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
+    GUI/bookmarkitem.h \
     GUI/bookmark.h
 
 

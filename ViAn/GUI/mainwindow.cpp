@@ -930,14 +930,14 @@ void MainWindow::on_actionRotate_left_triggered() {
     mvideo_player->rotate_left();
     set_status_bar("Video rotated 90 degrees to the left.");
 }
+
 /**
  * @brief MainWindow::on_document_list_itemClicked
  * Invoked when an item in the bookmark view has been clicked.
  * @param item The bookmark that has been clicked.
  */
 void MainWindow::on_document_list_itemClicked(QListWidgetItem *item) {
-    Bookmark* bookmark = (Bookmark*) item;
+    BookmarkItem* bookmark = (BookmarkItem*) item;
     emit set_playback_frame(bookmark->get_frame_number());
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
-
 }
