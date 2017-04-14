@@ -265,7 +265,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSlider" name="videoSlider">
+           <widget class="QSlider" name="video_slider">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>

@@ -82,11 +82,11 @@ private slots:
 
     void on_bookmark_button_clicked();
 
-    void on_videoSlider_sliderPressed();
+    void on_video_slider_sliderPressed();
 
-    void on_videoSlider_sliderReleased();
+    void on_video_slider_sliderReleased();
 
-    void on_videoSlider_valueChanged(int new_pos);
+    void on_video_slider_valueChanged(int new_pos);
 
     void on_actionAddProject_triggered();
     

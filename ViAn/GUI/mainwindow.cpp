@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
-    video_slider = ui->videoSlider;
+    video_slider = ui->video_slider;
 
 
     icon_on_button_handler = new IconOnButtonHandler();
@@ -252,7 +252,7 @@ void MainWindow::on_slider_moving(){
     );
     std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
     if (time_since_last_slider_frame_update.count() >= SLIDER_UPDATE_TIMER) {
-        QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+        QPoint local_mouse_pos = ui->video_slider->mapFromGlobal(QCursor::pos());
         emit set_playback_frame(slider_pos_under_mouse(local_mouse_pos));
         slider_timer = current_time;
     }
@@ -268,7 +268,7 @@ void MainWindow::on_slider_moving(){
 void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
     int slider_pos = slider_pos_under_mouse(local_mouse_pos);
     if (slider_pos != new_pos) {
-        ui->videoSlider->setValue(slider_pos);
+        ui->video_slider->setValue(slider_pos);
         emit set_playback_frame(slider_pos, true);
     }
 }
@@ -281,26 +281,26 @@ void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
  * @return The current position of the mouse pointer on the slider
  */
 int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
-    float pos_ratio = local_mouse_pos.x() / (float )ui->videoSlider->size().width();
-    int slider_range = ui->videoSlider->maximum() - ui->videoSlider->minimum();
-    return ui->videoSlider->minimum() + slider_range * pos_ratio;
+    float pos_ratio = local_mouse_pos.x() / (float )ui->video_slider->size().width();
+    int slider_range = ui->video_slider->maximum() - ui->video_slider->minimum();
+    return ui->video_slider->minimum() + slider_range * pos_ratio;
 }
 
 /**
- * @brief MainWindow::on_videoSlider_valueChanged
+ * @brief MainWindow::on_video_slider_valueChanged
  * Gets called when the value of the slider is changed
  * Moves the slider marker and sends the new frame number to the video player
  * @param newPos current position of the slider
  */
 
-void MainWindow::on_videoSlider_valueChanged(int new_pos) {
+void MainWindow::on_video_slider_valueChanged(int new_pos) {
     slider_blocked = true;
     Qt::MouseButtons btns = QApplication::mouseButtons();
-    QPoint local_mouse_pos = ui->videoSlider->mapFromGlobal(QCursor::pos());
+    QPoint local_mouse_pos = ui->video_slider->mapFromGlobal(QCursor::pos());
     bool click_on_slider = (btns & Qt::LeftButton) &&
                          (local_mouse_pos.x() >= 0 && local_mouse_pos.y() >= 0 &&
-                          local_mouse_pos.x() < ui->videoSlider->size().width() &&
-                          local_mouse_pos.y() < ui->videoSlider->size().height());
+                          local_mouse_pos.x() < ui->video_slider->size().width() &&
+                          local_mouse_pos.y() < ui->video_slider->size().height());
     if (click_on_slider) on_slider_click(new_pos, local_mouse_pos);
     slider_blocked = false;
 }
@@ -838,10 +838,10 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
 }
 
 /**
- * @brief MainWindow::on_videoSlider_sliderPressed
+ * @brief MainWindow::on_video_slider_sliderPressed
  * Block slider update from video_player
  */
-void MainWindow::on_videoSlider_sliderPressed() {
+void MainWindow::on_video_slider_sliderPressed() {
     slider_blocked = true;
     if (!mvideo_player->is_paused()) {
         slider_paused_video = true;
@@ -863,10 +863,10 @@ void MainWindow::on_actionShow_hide_analysis_area_triggered() {
 }
 
 /**
- * @brief MainWindow::on_videoSlider_sliderReleased
+ * @brief MainWindow::on_video_slider_sliderReleased
  * Set video playback pos to slider pos and unblock slider update
  */
-void MainWindow::on_videoSlider_sliderReleased() {
+void MainWindow::on_video_slider_sliderReleased() {
     int new_pos = video_slider->value();
     emit set_playback_frame(new_pos);
     video_slider->setSliderPosition(new_pos);
