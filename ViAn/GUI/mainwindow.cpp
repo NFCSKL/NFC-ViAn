@@ -30,16 +30,16 @@ MainWindow::MainWindow(QWidget *parent) :
     icon_on_button_handler->set_pictures_to_buttons(ui);
 
     // Setup a Bookmark View in the right sidebar in the GUI.
-    bookmark_view = new BookmarkView(ui->documentList);
+    bookmark_view = new BookmarkView(ui->document_list);
 
     fileHandler = new FileHandler();
 
-    // Add this object as a listener to videoFrame.
-    ui->videoFrame->installEventFilter(this);
-    ui->videoFrame->setScaledContents(false);
+    // Add this object as a listener to video_frame.
+    ui->video_frame->installEventFilter(this);
+    ui->video_frame->setScaledContents(false);
 
-    ui->ProjectTree->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
+    ui->project_tree->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait);
@@ -198,11 +198,11 @@ void MainWindow::on_previous_frame_button_clicked() {
 
 /**
  * @brief MainWindow::update_video
- * Sets the videoFrame pixmap to the current frame from video
+ * Sets the video_frame pixmap to the current frame from video
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
-    ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
+    ui->video_frame->setPixmap(QPixmap::fromImage(frame));
 }
 
 /**
@@ -227,16 +227,16 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 
    //Scales the current frame when video playback is paused
    if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-       QImage frame( ui->videoFrame->pixmap()->toImage() );
-       ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                     frame.scaled(ui->videoFrame->width(),
-                                                  ui->videoFrame->height(),
+       QImage frame( ui->video_frame->pixmap()->toImage() );
+       ui->video_frame->setPixmap(QPixmap::fromImage(
+                                     frame.scaled(ui->video_frame->width(),
+                                                  ui->video_frame->height(),
                                                   Qt::KeepAspectRatio))
                                  );
    }
 
    //Sends new QLabel resolution to mvideo_player to update scaling resolution
-   emit resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
+   emit resize_video_frame(ui->video_frame->width(), ui->video_frame->height());
 }
 
 /**
@@ -340,9 +340,9 @@ void MainWindow::on_actionExit_triggered() {
 void MainWindow::on_bookmark_button_clicked() {
     QTreeWidgetItem *item;
     MyQTreeWidgetItem *my_project;
-    if(ui->ProjectTree->selectedItems().size() == 1) {
+    if(ui->project_tree->selectedItems().size() == 1) {
         // Get current project.
-        item = ui->ProjectTree->selectedItems().first();
+        item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
         std::string proj_path = fileHandler->get_dir(my_project->id);
         // Add bookmarks-folder to the project-folder.
@@ -378,8 +378,8 @@ void MainWindow::on_actionAddProject_triggered() {
 void MainWindow::input_switch_case(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     MyQTreeWidgetItem *my_project;
-    if(ui->ProjectTree->selectedItems().size() == 1) {
-        my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
+    if(ui->project_tree->selectedItems().size() == 1) {
+        my_project = (MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
     } else {
         set_status_bar("Multiple or no things selected.");
     }
@@ -407,13 +407,13 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
 }
 
 /**
- * @brief MainWindow::on_ProjectTree_itemDoubleClicked
- * @param item, the item in the projectTree that was clicked
+ * @brief MainWindow::on_project_tree_itemDoubleClicked
+ * @param item, the item in the project_tree that was clicked
  * @param column, the column in the tree
  * Double clicking on a video will start to play it.
  * Double clicking on a project will expand or collapse it.
  */
-void MainWindow::on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column) {
+void MainWindow::on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column) {
     MyQTreeWidgetItem *q_item = (MyQTreeWidgetItem*)item;
     switch(q_item->type) {
     case TYPE::PROJECT:
@@ -543,7 +543,7 @@ void MainWindow::on_actionClear_triggered() {
  */
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     // Check who invoked the event.
-    if (qobject_cast<QLabel*>(obj)==ui->videoFrame) {
+    if (qobject_cast<QLabel*>(obj)==ui->video_frame) {
         // Cast to a mouse event to get the mouse position.
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         QPoint pos = mouseEvent->pos();
@@ -587,7 +587,7 @@ void MainWindow::on_actionZoom_out_triggered() {
  * Creates context menu on right-click in tree view
  */
 void MainWindow::prepare_menu(const QPoint & pos) {
-    QTreeWidget *tree = ui->ProjectTree;
+    QTreeWidget *tree = ui->project_tree;
     MyQTreeWidgetItem *item = (MyQTreeWidgetItem*)tree->itemAt( pos );
     QMenu menu(this);
 
@@ -631,8 +631,8 @@ void MainWindow::prepare_menu(const QPoint & pos) {
  */
 void MainWindow::on_actionAddVideo_triggered() {
     QTreeWidgetItem *project;
-    if(ui->ProjectTree->selectedItems().size() == 1) {
-        project = ui->ProjectTree->selectedItems().first();
+    if(ui->project_tree->selectedItems().size() == 1) {
+        project = ui->project_tree->selectedItems().first();
         if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
             QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->work_space.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
@@ -654,7 +654,7 @@ void MainWindow::on_actionAddVideo_triggered() {
  */
 void MainWindow::play_video() {
     MyQTreeWidgetItem *my_project;
-    my_project = (MyQTreeWidgetItem*)ui->ProjectTree->selectedItems().first();
+    my_project = (MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
 
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
@@ -667,7 +667,7 @@ void MainWindow::play_video() {
     mvideo_player->load_video(my_project->name.toStdString());
 
     //Used for rescaling the source image for video playback
-    emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
+    emit resize_video_frame(ui->video_frame->width(),ui->video_frame->height());
     enable_video_buttons();
     icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
@@ -681,8 +681,8 @@ void MainWindow::play_video() {
 void MainWindow::on_actionSave_triggered() {
     QTreeWidgetItem *item;
     MyQTreeWidgetItem *my_project;
-    if(ui->ProjectTree->selectedItems().size() == 1) {
-        item = ui->ProjectTree->selectedItems().first();
+    if(ui->project_tree->selectedItems().size() == 1) {
+        item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
         this->fileHandler->save_project(my_project->id);
         std::string text = "Saved project " + my_project->name.toStdString();
@@ -712,8 +712,8 @@ void MainWindow::on_actionLoad_triggered() {
 void MainWindow::add_project_to_tree(Project* proj) {
     MyQTreeWidgetItem *project_in_tree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
     project_in_tree->setText(0, QString::fromStdString(proj->name));
-    ui->ProjectTree->addTopLevelItem(project_in_tree);
-    ui->ProjectTree->clearSelection();
+    ui->project_tree->addTopLevelItem(project_in_tree);
+    ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
         stringstream file_path;
@@ -730,7 +730,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
  */
 void MainWindow::add_video_to_tree(std::string file_path, ID id) {
     QTreeWidgetItem *project;
-    project = ui->ProjectTree->selectedItems().first();
+    project = ui->project_tree->selectedItems().first();
     MyQTreeWidgetItem *video_in_tree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(file_path), id);
     video_in_tree->set_text_from_filepath(file_path);
     project->addChild(video_in_tree);
@@ -756,8 +756,8 @@ void MainWindow::on_actionDelete_triggered() {
     QTreeWidgetItem *item;
     MyQTreeWidgetItem *my_item;
     MyQTreeWidgetItem *my_project;
-    if(ui->ProjectTree->selectedItems().size() == 1) {
-        item = ui->ProjectTree->selectedItems().first();
+    if(ui->project_tree->selectedItems().size() == 1) {
+        item = ui->project_tree->selectedItems().first();
         my_item = (MyQTreeWidgetItem*)item;
         QMessageBox::StandardButton res_btn = QMessageBox::question( this, "Delete",
                                                                     tr(("Are you sure you want to delete " + my_item->get_name() + "?\n").c_str()),
@@ -931,11 +931,11 @@ void MainWindow::on_actionRotate_left_triggered() {
     set_status_bar("Video rotated 90 degrees to the left.");
 }
 /**
- * @brief MainWindow::on_documentList_itemClicked
+ * @brief MainWindow::on_document_list_itemClicked
  * Invoked when an item in the bookmark view has been clicked.
  * @param item The bookmark that has been clicked.
  */
-void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
+void MainWindow::on_document_list_itemClicked(QListWidgetItem *item) {
     Bookmark* bookmark = (Bookmark*) item;
     emit set_playback_frame(bookmark->get_frame_number());
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");

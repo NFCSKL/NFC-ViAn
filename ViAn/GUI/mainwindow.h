@@ -126,7 +126,7 @@ private slots:
 
     void on_actionChoose_Workspace_triggered();
 
-    void on_ProjectTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);
     
     void on_actionShow_hide_analysis_area_triggered();
 
@@ -136,7 +136,7 @@ private slots:
 
     void on_actionRotate_left_triggered();
 
-    void on_documentList_itemClicked(QListWidgetItem *item);
+    void on_document_list_itemClicked(QListWidgetItem *item);
 
     void on_actionDelete_triggered();
 
