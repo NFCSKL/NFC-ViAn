@@ -11,7 +11,7 @@
 test_video_player::test_video_player(QObject *parent) : QObject(parent) {
     QMutex mutex;
     QWaitCondition wait;
-    mvideo = new video_player(&mutex, &wait);
+    mvideo = new video_player(&mutex, &wait, NULL);
 }
 
 /**
@@ -120,7 +120,8 @@ void test_video_player::test_dec_playback_speed(){
 void test_video_player::test_toggle_overlay() {
     QMutex mutex;
     QWaitCondition wait;
-    video_player *v_player = new video_player(&mutex, &wait);
+    QLabel label;
+    video_player *v_player = new video_player(&mutex, &wait, &label);
     v_player->video_overlay->set_showing_overlay(false);
     v_player->toggle_overlay();
     QVERIFY(v_player->is_showing_overlay());

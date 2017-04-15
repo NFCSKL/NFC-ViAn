@@ -42,12 +42,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ProjectTree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
     //Creates and prepares the video_player.
-    mvideo_player = new video_player(&mutex, &paused_wait);
+    mvideo_player = new video_player(&mutex, &paused_wait, ui->videoFrame);
     setup_video_player(mvideo_player);
 
     // Initially hide overlay and analysis toolbar
     ui->toolBar_overlay->hide();
     ui->toolBar_analysis->hide();
+
+    // The video player is not in original size.
+    original_size = false;
 }
 
 /**
@@ -224,19 +227,7 @@ void MainWindow::set_video_slider_pos(int pos) {
  */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
-
-   //Scales the current frame when video playback is paused
-   if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-       QImage frame( ui->videoFrame->pixmap()->toImage() );
-       ui->videoFrame->setPixmap(QPixmap::fromImage(
-                                     frame.scaled(ui->videoFrame->width(),
-                                                  ui->videoFrame->height(),
-                                                  Qt::KeepAspectRatio))
-                                 );
-   }
-
-   //Sends new QLabel resolution to mvideo_player to update scaling resolution
-   emit resize_video_frame(ui->videoFrame->width(), ui->videoFrame->height());
+   on_action_fill_screen_triggered();
 }
 
 /**
@@ -661,7 +652,7 @@ void MainWindow::play_video() {
 
     if (mvideo_player->isRunning()) {
         emit set_stop_video(); //This signal will make the QThread finish executing
-        mvideo_player = new video_player(&mutex, &paused_wait);
+        mvideo_player = new video_player(&mutex, &paused_wait, ui->videoFrame);
         setup_video_player(mvideo_player);
     }
     mvideo_player->load_video(my_project->name.toStdString());
@@ -914,6 +905,19 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_action_fill_screen_triggered
+ * Reseizes the video to fit the size of the screen.
+ * Will not work if you have set it to original size.
+ */
+void MainWindow::on_action_fill_screen_triggered() {
+    if(!original_size) {
+        //Sends new scroll area resolution to mvideo_player to update scaling resolution
+        // Video frame is in the scroll area
+        emit resize_video_frame((ui->frame_scroll_area->width())-SCROLL_AREA_MARGIN, (ui->frame_scroll_area->height())-SCROLL_AREA_MARGIN);
+    }
+}
+
+/**
  * @brief MainWindow::on_actionRotate_right_triggered
  * Rotates video to the right by 90 degrees.
  */
@@ -942,6 +946,29 @@ void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
 
 }
 
+/**
+ * @brief MainWindow::on_action_original_size_triggered
+ * Restores the video to original size and keeps it there until you activate again.
+ */
+void MainWindow::on_action_original_size_triggered() {
+    if(mvideo_player->video_open()) {
+        if (!original_size) {
+            emit resize_video_frame(mvideo_player->get_video_width(), mvideo_player->get_video_height());
+            original_size = true;
+            ui->action_fill_screen->setEnabled(false);
+            set_status_bar("Original size set. Press again to fill screen.");
+        } else {
+            original_size = false;
+            ui->action_fill_screen->setEnabled(true);
+            on_action_fill_screen_triggered();
+            set_status_bar("Filling the screen with the video.");
+        }
+
+    } else {
+        set_status_bar("No video loaded.");
+        ui->action_original_size->toggle(); // unchecks it again
+    }
+}
 /**
  * @brief MainWindow::on_actionInvert_analysis_area_triggered
  * Switches between choosing area for analysing and area for not analysing.
