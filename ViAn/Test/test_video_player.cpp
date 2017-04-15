@@ -322,6 +322,33 @@ void test_video_player::test_set_stop_video() {
 }
 
 /**
+ * @brief test_video_player::test_analysis_area_toggle
+ */
+void test_video_player::test_analysis_area_toggle() {
+    bool original_value = mvideo->analysis_area->is_including_area();
+    mvideo->analysis_area->invert_area();
+    QVERIFY(mvideo->analysis_area->is_including_area() != original_value);
+}
+
+/**
+ * @brief test_video_player::test_analysis_area_points
+ */
+void test_video_player::test_analysis_area_points() {
+    std::vector<QPoint> original_points;
+    original_points.push_back(QPoint(0, 10));
+    original_points.push_back(QPoint(210, 150));
+    original_points.push_back(QPoint(255, 255));
+    original_points.push_back(QPoint(1024, 0));
+    for (std::vector<int>::size_type i = 0; i != original_points.size(); i++) {
+        mvideo->analysis_area->add_point(original_points[i]);
+    }
+    std::vector<cv::Point>* points = mvideo->analysis_area->get_polygon();
+    for (std::vector<int>::size_type i = 0; i != points->size(); i++) {
+        QVERIFY((*points)[i].x == original_points[i].x());
+    }
+}
+
+/**
  * @brief test_video_player::test_on_set_playback_frame_pass
  * Test on_set_playback_frame with valid inputs
  */
