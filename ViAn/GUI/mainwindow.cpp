@@ -290,7 +290,7 @@ int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
  * @brief MainWindow::on_video_slider_valueChanged
  * Gets called when the value of the slider is changed
  * Moves the slider marker and sends the new frame number to the video player
- * @param newPos current position of the slider
+ * @param new_pos current position of the slider
  */
 
 void MainWindow::on_video_slider_valueChanged(int new_pos) {
