@@ -145,6 +145,8 @@ private slots:
 
     void on_action_original_size_triggered();
 
+    void on_actionInvert_analysis_area_triggered();
+
 private:
 
     Ui::MainWindow *ui;

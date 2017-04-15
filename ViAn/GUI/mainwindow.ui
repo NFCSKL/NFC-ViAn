@@ -352,7 +352,7 @@
      <x>0</x>
      <y>0</y>
      <width>616</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -402,6 +402,7 @@
     </property>
     <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="actionInvert_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
     <addaction name="action_original_size"/>
@@ -506,6 +507,7 @@
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
    <addaction name="actionShow_hide_analysis_area"/>
+   <addaction name="actionInvert_analysis_area"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -824,6 +826,14 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="actionInvert_analysis_area">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Invert analysis area</string>
    </property>
   </action>
  </widget>

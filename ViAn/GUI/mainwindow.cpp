@@ -940,7 +940,7 @@ void MainWindow::on_actionRotate_left_triggered() {
  * @param item The bookmark that has been clicked.
  */
 void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
-    Bookmark* bookmark = (Bookmark*) item;
+    BookmarkItem* bookmark = (BookmarkItem*) item;
     emit set_playback_frame(bookmark->get_frame_number());
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
 
@@ -967,5 +967,17 @@ void MainWindow::on_action_original_size_triggered() {
     } else {
         set_status_bar("No video loaded.");
         ui->action_original_size->toggle(); // unchecks it again
+    }
+}
+/**
+ * @brief MainWindow::on_actionInvert_analysis_area_triggered
+ * Switches between choosing area for analysing and area for not analysing.
+ */
+void MainWindow::on_actionInvert_analysis_area_triggered() {
+    mvideo_player->invert_analysis_area();
+    if (mvideo_player->is_including_area()) {
+        set_status_bar("Choose an area to run the analysis on.");
+    } else {
+        set_status_bar("Choose an area to exclude from the analysis.");
     }
 }
