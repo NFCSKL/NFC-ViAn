@@ -349,7 +349,7 @@ void MainWindow::on_bookmarkButton_clicked() {
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
 
-        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), bookmark_text.toStdString());
+        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), std::to_string(mvideo_player->get_current_frame_num()));
         Bookmark* bookmark = new Bookmark(mvideo_player->get_current_frame_num(),QString::fromStdString(file_path), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
