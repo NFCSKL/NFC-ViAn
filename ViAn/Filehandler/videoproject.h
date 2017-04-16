@@ -21,14 +21,16 @@ class VideoProject{
     Video* video = nullptr;
 
 
+
 public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void add_bookmark(Bookmark* bookmark);
-    void delete_artifacts();
+    void delete_artifacts();    
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
+    std::vector<Bookmark*> get_bookmarks();
 
 };
 

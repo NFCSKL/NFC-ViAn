@@ -187,6 +187,7 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORM
     proj->read(load_doc.object());
     proj->id = add_project(proj);
     proj->dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")))));
+    proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")) + "/Bookmarks")));
     return proj;
 }
 

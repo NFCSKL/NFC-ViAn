@@ -1,16 +1,39 @@
 #include "videoproject.h"
 
+/**
+ * @brief VideoProject::VideoProject
+ * @param v
+ * set video
+ */
 VideoProject::VideoProject(Video* v){
     this->video = v;
 }
 
+/**
+ * @brief VideoProject::VideoProject
+ * Create empty video
+ */
 VideoProject::VideoProject(){
     this->video = new Video();
 }
 
+/**
+ * @brief VideoProject::get_video
+ * @return video
+ */
 Video* VideoProject::get_video(){
     return this->video;
 }
+
+/**
+ * @brief VideoProject::get_bookmarks
+ * @return bookmarks
+ */
+std::vector<Bookmark *> VideoProject::get_bookmarks()
+{
+    return this->bookmarks;
+}
+
 /**
  * @brief Video::read
  * @param json
@@ -44,10 +67,19 @@ void VideoProject::write(QJsonObject& json){
     json["bookmarks"] = json_bookmarks;
 }
 
+/**
+ * @brief VideoProject::add_bookmark
+ * @param bookmark
+ * Add new bookmark
+ */
 void VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.push_back(bookmark);
 }
 
+/**
+ * @brief VideoProject::delete_artifacts
+ * Delete bookmark files.
+ */
 void VideoProject::delete_artifacts(){
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         Bookmark* temp = *it;

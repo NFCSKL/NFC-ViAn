@@ -69,7 +69,10 @@ ID Project::add_video_project(VideoProject* vid_proj){
     this->videos.insert(std::make_pair(this->v_id, vid_proj));
     return this->v_id++;
 }
-
+/**
+ * @brief Project::delete_artifacts
+ * Delete all proects files.
+ */
 void Project::delete_artifacts()
 {
     for(auto it = videos.begin(); it != videos.end(); it++){
