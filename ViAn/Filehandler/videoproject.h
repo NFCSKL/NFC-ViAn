@@ -30,7 +30,7 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
-    std::vector<Bookmark*> get_bookmarks();
+    std::vector<Bookmark *> get_bookmarks();
 
 };
 
