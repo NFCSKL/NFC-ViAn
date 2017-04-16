@@ -343,10 +343,12 @@ void MainWindow::on_bookmarkButton_clicked() {
         // The names of the stored files will have increasing numbers.
 
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
+        // Get bookmark description
         QString bookmark_text("");
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
+
         std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), bookmark_text.toStdString());
         Bookmark* bookmark = new Bookmark(mvideo_player->get_current_frame_num(),QString::fromStdString(file_path), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
