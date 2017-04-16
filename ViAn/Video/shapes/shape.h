@@ -20,7 +20,8 @@ public:
     static cv::Scalar qcolor_to_scalar(QColor col);
     static cv::Point qpoint_to_point(QPoint pnt);
 
-    static const int LINE_THICKNESS = 2;
+    static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
+    static constexpr double ALPHA = 0.6; // Costant used for the opacity.
 
 protected:
     cv::Scalar colour;

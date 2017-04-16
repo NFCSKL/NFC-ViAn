@@ -11,7 +11,7 @@
 test_video_player::test_video_player(QObject *parent) : QObject(parent) {
     QMutex mutex;
     QWaitCondition wait;
-    mvideo = new video_player(&mutex, &wait);
+    mvideo = new video_player(&mutex, &wait, NULL);
 }
 
 /**
@@ -120,7 +120,8 @@ void test_video_player::test_dec_playback_speed(){
 void test_video_player::test_toggle_overlay() {
     QMutex mutex;
     QWaitCondition wait;
-    video_player *v_player = new video_player(&mutex, &wait);
+    QLabel label;
+    video_player *v_player = new video_player(&mutex, &wait, &label);
     v_player->video_overlay->set_showing_overlay(false);
     v_player->toggle_overlay();
     QVERIFY(v_player->is_showing_overlay());
@@ -319,6 +320,33 @@ void test_video_player::test_set_stop_video() {
     QVERIFY(!mvideo->video_paused);
     QVERIFY(mvideo->get_current_frame_num() == 0);
     QVERIFY(mvideo->video_stopped);
+}
+
+/**
+ * @brief test_video_player::test_analysis_area_toggle
+ */
+void test_video_player::test_analysis_area_toggle() {
+    bool original_value = mvideo->analysis_area->is_including_area();
+    mvideo->analysis_area->invert_area();
+    QVERIFY(mvideo->analysis_area->is_including_area() != original_value);
+}
+
+/**
+ * @brief test_video_player::test_analysis_area_points
+ */
+void test_video_player::test_analysis_area_points() {
+    std::vector<QPoint> original_points;
+    original_points.push_back(QPoint(0, 10));
+    original_points.push_back(QPoint(210, 150));
+    original_points.push_back(QPoint(255, 255));
+    original_points.push_back(QPoint(1024, 0));
+    for (std::vector<int>::size_type i = 0; i != original_points.size(); i++) {
+        mvideo->analysis_area->add_point(original_points[i]);
+    }
+    std::vector<cv::Point>* points = mvideo->analysis_area->get_polygon();
+    for (std::vector<int>::size_type i = 0; i != points->size(); i++) {
+        QVERIFY((*points)[i].x == original_points[i].x());
+    }
 }
 
 /**
