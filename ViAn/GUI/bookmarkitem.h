@@ -7,7 +7,7 @@
 class BookmarkItem : public QListWidgetItem {
 public:
     BookmarkItem(int frame_nbr, QString file_path, QString string, QListWidget* view);
-    BookmarkItem(Bookmark bookmrk, QListWidget* view);
+    BookmarkItem(Bookmark *bookmrk, QListWidget *view);
     Bookmark* get_bookmark();
     int get_frame_number();
 private:

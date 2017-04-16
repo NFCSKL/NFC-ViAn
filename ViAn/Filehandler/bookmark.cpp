@@ -7,15 +7,15 @@
  * @param string Text description of the bookmark.
  */
 Bookmark::Bookmark(int frame_nbr, QString file_pth, QString string) {
-    frame_number = frame_nbr;
-    file_path = file_pth;
-    description = string;
+    this->frame_number = frame_nbr;
+    this->file_path = file_pth;
+    this->description = string;
 }
 
 Bookmark::Bookmark()
 {
     frame_number = 0;
-    file_path = QString();;
+    file_path = QString();
     description = QString();
 }
 
@@ -47,9 +47,10 @@ QString Bookmark::get_description() {
  * @param json
  */
 void Bookmark::read(const QJsonObject& json){
-    json["frame"] = this->frame_number;
-    json["path"] = this->file_path;
-    json["note"] = this->description;
+    this->frame_number = json["frame"].toInt();
+    this->file_path = json["path"].toString();
+    this->description = json["note"].toString();
+
 
 }
 /**
@@ -57,7 +58,7 @@ void Bookmark::read(const QJsonObject& json){
  * @param json
  */
 void Bookmark::write(QJsonObject& json){
-    this->frame_number = json["frame"].toInt();
-    this->file_path = json["path"].toString();
-    this->description = json["note"].toString();
+    json["frame"] = this->frame_number;
+    json["path"] = this->file_path;
+    json["note"] = this->description;
 }

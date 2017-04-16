@@ -26,11 +26,11 @@ int BookmarkView::get_num_bookmarks() {
  * @param frame_nbr Frame number associated with the bookmark.
  * @param file_path Path to the image of the bookmark.
  */
-void BookmarkView::add_bookmark(int frame_nbr, QString file_path) {
+void BookmarkView::add_bookmark(Bookmark* bookmark) {
     bool ok;
     QString bookmark_text = get_input_text(&ok);
     if (ok) {
-        BookmarkItem* bookmark_item = new BookmarkItem(frame_nbr, file_path, bookmark_text, view);
+        BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
         view->addItem(bookmark_item);
     }
 }
@@ -41,8 +41,9 @@ void BookmarkView::add_bookmark(int frame_nbr, QString file_path) {
  * @param bookmark Bookmark to add.
  */
 void BookmarkView::add_bookmark(Bookmark bookmark) {
-    BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
-    view->addItem(bookmark_item);
+//    BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
+//    view->addItem(bookmark_item);
+    std::cout << "lol xDD" << std::endl;
 }
 
 /**

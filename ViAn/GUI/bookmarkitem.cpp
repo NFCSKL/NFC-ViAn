@@ -18,9 +18,9 @@ BookmarkItem::BookmarkItem(int frame_nbr, QString file_path, QString string, QLi
  * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(Bookmark bookmrk, QListWidget* view) : QListWidgetItem(bookmrk.get_description(), view) {
-    bookmark = &bookmrk;
-    create_thumbnail(bookmrk.get_file_path());
+BookmarkItem::BookmarkItem(Bookmark* bookmrk, QListWidget* view) : QListWidgetItem(bookmrk->get_description(), view) {
+    this->bookmark = bookmrk;
+    create_thumbnail(bookmrk->get_file_path());
 }
 
 /**

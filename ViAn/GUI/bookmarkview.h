@@ -8,8 +8,8 @@ class BookmarkView {
 public:
     BookmarkView(QListWidget* parent);
 
-    void add_bookmark(int frame_nbr, QString file_path);
     void add_bookmark(Bookmark bookmark);
+    void add_bookmark(Bookmark *bookmark);
     int get_num_bookmarks();
 private:
     QString get_input_text(bool* ok);
