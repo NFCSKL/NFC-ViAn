@@ -6,13 +6,12 @@
 
 class BookmarkView {
 public:
-    BookmarkView(QListWidget* parent);
-
-    void add_bookmark(Bookmark bookmark);
+    BookmarkView(QListWidget* parent);    
     void add_bookmark(Bookmark *bookmark);
     int get_num_bookmarks();
-private:
     QString get_input_text(bool* ok);
+private:
+
 
     const int TEXT_EDIT_MIN_HEIGHT = 32;
 
