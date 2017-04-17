@@ -19,7 +19,6 @@ SOURCES += main.cpp \
     Filehandler/videoproject.cpp \
     Filehandler/bookmark.cpp
 
-
 #
 # TEST
 #
