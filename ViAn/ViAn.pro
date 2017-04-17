@@ -114,13 +114,11 @@ unix {
 #
 SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
-    Filehandler/analysis.cpp \
     Filehandler/video.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
-    Filehandler/analysis.h\
     Filehandler/video.h
 
 win32{
