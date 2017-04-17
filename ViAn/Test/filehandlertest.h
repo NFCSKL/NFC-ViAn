@@ -6,17 +6,44 @@
 #include <QObject>
 
 
-class filehandlertest : public QObject
+class FileHandlerTest : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit filehandlertest(QObject *parent = 0);
+    explicit FileHandlerTest(QObject *parent = 0);
+private:
+    FileHandler* file_handler;
+    ID dir_id = -1;
+    ID file_id = -1;
+    Project* proj;
 private slots:
-    void directory_test();
-    void file_test();
-    void project_handling_test();
+    // Directory test
+    void directory_create_test();
+    void directory_delete_test();
+    // Workspace test
+    // void workspace_set_test();
 
+    // File tests
+    void file_test_init();                      // Create directory
+    // File create and deletion tests
+    void file_create_test();                    // Create file
+    void file_delete_test();                    // Delete file
+    void file_create_delete_multiple_test();    // Create a number of files, check ids and then delete them
+
+    // File read and write tests
+    void file_read_write_test_init();
+    void file_read_write_test();
+    void file_read_write_option_test();
+    void file_read_lines_test();
+    void file_read_write_cleanup();
+
+    // Project tests
+    //void project_init_tests();
+    void project_test_init();
+    void project_create_delete_test();
+    void project_save_load_test();
+    void project_add_remove_items_test();
+    void project_cleanup();
 };
-
 #endif // FILEHANDLER_TESTSUITE_H

@@ -10,14 +10,12 @@ QT       += testlib
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = ViAn
 TEMPLATE = app
 #
 # GENERAL
 #
 SOURCES += main.cpp
-
 
 #
 # TEST
@@ -35,8 +33,7 @@ HEADERS += Test/test_video_player.h \
 #
 SOURCES += Library/customdialog.cpp
 HEADERS += Library/customdialog.h
-
-
+´
 #
 # GUI
 #
