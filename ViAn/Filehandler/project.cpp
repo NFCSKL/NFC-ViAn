@@ -71,7 +71,7 @@ ID Project::add_video_project(VideoProject* vid_proj){
 }
 /**
  * @brief Project::delete_artifacts
- * Delete all proects files.
+ * Delete all projects files.
  */
 void Project::delete_artifacts()
 {
@@ -80,7 +80,6 @@ void Project::delete_artifacts()
         vp->delete_artifacts();
     }
 }
-
 
 /**
  * @brief Project::read
