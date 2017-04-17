@@ -15,7 +15,7 @@ FileHandler::FileHandler() {
     #elif __APPLE__
         this->work_space =  create_directory("/Applications/");
     #elif __unix__
-        this->work_space =  create_dire§ctory("~/");
+        this->work_space =  create_directory("~/");
     #endif
 }
 

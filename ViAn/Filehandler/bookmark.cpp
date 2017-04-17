@@ -11,7 +11,10 @@ Bookmark::Bookmark(int frame_nbr, QString file_pth, QString string) {
     this->file_path = file_pth;
     this->description = string;
 }
-
+/**
+ * @brief Bookmark::Bookmark
+ * Null initializing constructor.
+ */
 Bookmark::Bookmark()
 {
     frame_number = 0;
@@ -45,6 +48,7 @@ QString Bookmark::get_description() {
 /**
  * @brief Bookmark::read
  * @param json
+ * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
     this->frame_number = json["frame"].toInt();
@@ -56,6 +60,7 @@ void Bookmark::read(const QJsonObject& json){
 /**
  * @brief Bookmark::write
  * @param json
+ * Writes a bookmark to a Json object.
  */
 void Bookmark::write(QJsonObject& json){
     json["frame"] = this->frame_number;
