@@ -50,11 +50,11 @@ public:
     bool delete_project(ID proj_id);
 
     Project* load_project(std::string full_project_path);
-    Project* load_project(std::string full_path, SAVE_FORMAT save_form);
-    Project* load_project(std::string proj_name, std::string dir_path);
+
+
     void save_project(ID id);
-    void save_project(Project* proj);
-    bool save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format);
+
+
 
     bool proj_equals(Project& proj, Project& proj2);
     friend bool operator==(Project& proj, Project& proj2);
@@ -88,6 +88,10 @@ private:
     // Project methods
     ID add_project(Project* proj);
     void add_project(ID id, Project *proj);
+    Project* load_project(std::string full_path, SAVE_FORMAT save_form);
+    Project* load_project(std::string proj_name, std::string dir_path);
+    void save_project(Project* proj);
+    bool save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
     // Directory methods
     ID add_dir(QDir dir);
