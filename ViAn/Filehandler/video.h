@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <QJsonObject>
+#include <QString>
 typedef int ID;
 class Video
 {
@@ -12,8 +14,8 @@ public:
     ID id;
     Video(std::string file_path);
     std::string file_path;
-    friend std::stringstream& operator>>(std::stringstream& is, Video& vid);
-    friend std::stringstream& operator<<(std::stringstream& os, const Video& vid);
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);
 };
 

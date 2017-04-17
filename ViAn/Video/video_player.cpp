@@ -14,11 +14,15 @@ using namespace cv;
 
 /**
  * @brief video_player::video_player
+ * @param mutex
+ * @param paused_wait
+ * @param label The QLabel where the frame is shown.
  * @param parent
  */
-video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent) : QThread(parent) {
     m_mutex = mutex;
     m_paused_wait = paused_wait;
+    video_frame = label;
     QRect rec = QApplication::desktop()->screenGeometry();
     screen_height = rec.height();
     screen_width = rec.width();
@@ -147,7 +151,6 @@ void video_player::convert_frame(bool scale) {
  * @return Returns the processed frame.
  */
 cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
-    bool copy_to = false;
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = src.clone();
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
@@ -561,10 +564,10 @@ void video_player::set_overlay_colour(QColor colour) {
  * and the video is loaded and paused.
  */
 void video_player::undo_overlay() {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         if (choosing_analysis_area) {
             analysis_area->undo();
-        } else {
+        } else if (is_paused()) {
             video_overlay->undo(get_current_frame_num());
         }
         update_overlay();
@@ -577,10 +580,10 @@ void video_player::undo_overlay() {
  * and the video is loaded and paused.
  */
 void video_player::clear_overlay() {
-    if (capture.isOpened() && is_paused()) {
+    if (capture.isOpened()) {
         if (choosing_analysis_area) {
             analysis_area->clear();
-        } else {
+        } else if (is_paused()) {
             video_overlay->clear(get_current_frame_num());
         }
         update_overlay();
@@ -594,6 +597,24 @@ void video_player::clear_overlay() {
 void video_player::toggle_analysis_area() {
     choosing_analysis_area = !choosing_analysis_area;
     update_overlay();
+}
+
+/**
+ * @brief video_player::invert_analysis_area
+ * Switches between choosing area for analysing and area for not analysing.
+ */
+void video_player::invert_analysis_area() {
+    analysis_area->invert_area();
+    update_overlay();
+}
+
+/**
+ * @brief video_player::is_including_area
+ * @return Returns true if the area should be included in the
+ *         analysis, false if it should be excluded.
+ */
+bool video_player::is_including_area() {
+    return analysis_area->is_including_area();
 }
 
 /**
@@ -738,20 +759,20 @@ void video_player::scale_position(QPoint &pos) {
     // on the QLabel where the frame is shown. The frame is
     // centered vertically, so the empty part of the QLabel
     // at the top needs to be subtracted.
-    int rotated_x;
-    int rotated_y;
+    int rotated_x = 0;
+    int rotated_y = 0;
     if (rotate_direction == ROTATE_90) {
-        rotated_x = (pos.y() - (double) (qlabel_height - frame_width) / 2);
+        rotated_x = (pos.y() - (double) (video_frame->height() - frame_width) / 2);
         rotated_y = frame_height - pos.x();
     } else if (rotate_direction == ROTATE_180) {
         rotated_x = frame_width - pos.x();
-        rotated_y = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_height) / 2);
+        rotated_y = ((video_frame->height() - pos.y()) - (double) (video_frame->height() - frame_height) / 2);
     } else if (rotate_direction == ROTATE_270) {
-        rotated_x = ((qlabel_height - pos.y()) - (double) (qlabel_height - frame_width) / 2);
+        rotated_x = ((video_frame->height() - pos.y()) - (double) (video_frame->height() - frame_width) / 2);
         rotated_y = pos.x();
     } else if (rotate_direction == ROTATE_NONE) {
         rotated_x = pos.x();
-        rotated_y = (pos.y() - (double) (qlabel_height - frame_height) / 2);
+        rotated_y = (pos.y() - (double) (video_frame->height() - frame_height) / 2);
     }
 
     // Calculate the scale ratio between the actual video
@@ -810,13 +831,11 @@ void video_player::scaling_event(int new_width, int new_height) {
         return;
     }
 
-    qlabel_width = new_width;
-    qlabel_height = new_height;
-
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
     float height_ratio = float(new_height)/float(video_height);
     float width_ratio = float(new_width)/float(video_width);
+
 
     //This statement ensures that the original aspect ratio of the video is kept when scaling
     if (width_ratio >= height_ratio) {
@@ -826,6 +845,8 @@ void video_player::scaling_event(int new_width, int new_height) {
         frame_width = new_width;
         frame_height = int(video_height * width_ratio);
     }
+
+    update_overlay();
 }
 
 /**
@@ -836,4 +857,18 @@ bool video_player::video_open() {
     return capture.isOpened();
 }
 
+/**
+ * @brief video_player::get_video_width
+ * @return original width of the video
+ */
+int video_player::get_video_width() {
+    return capture.get(CV_CAP_PROP_FRAME_WIDTH);
+}
 
+/**
+ * @brief video_player::get_video_height
+ * @return original height of the video
+ */
+int video_player::get_video_height() {
+    return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+}

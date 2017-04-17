@@ -42,12 +42,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
     //Creates and prepares the video_player.
-    mvideo_player = new video_player(&mutex, &paused_wait);
+    mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
     setup_video_player(mvideo_player);
 
     // Initially hide overlay and analysis toolbar
     ui->toolBar_overlay->hide();
     ui->toolBar_analysis->hide();
+
+    // The video player is not in original size.
+    original_size = false;
 }
 
 /**
@@ -225,18 +228,7 @@ void MainWindow::set_video_slider_pos(int pos) {
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
 
-   //Scales the current frame when video playback is paused
-   if (mvideo_player->video_open() && mvideo_player->is_paused()) {
-       QImage frame( ui->video_frame->pixmap()->toImage() );
-       ui->video_frame->setPixmap(QPixmap::fromImage(
-                                     frame.scaled(ui->video_frame->width(),
-                                                  ui->video_frame->height(),
-                                                  Qt::KeepAspectRatio))
-                                 );
-   }
-
-   //Sends new QLabel resolution to mvideo_player to update scaling resolution
-   emit resize_video_frame(ui->video_frame->width(), ui->video_frame->height());
+   on_action_fill_screen_triggered();
 }
 
 /**
@@ -344,16 +336,15 @@ void MainWindow::on_bookmark_button_clicked() {
         // Get current project.
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        std::string proj_path = fileHandler->get_dir(my_project->id);
+        QDir proj_path = fileHandler->get_dir(my_project->id);
         // Add bookmarks-folder to the project-folder.
-        proj_path.append("/bookmarks");
-        ID dir_id = fileHandler->create_directory(proj_path);
-        std::string dir_path = fileHandler->get_dir(dir_id);
+        proj_path.mkpath(proj_path.absoluteFilePath("Bookmarks"));
+        proj_path.cd(proj_path.absoluteFilePath("Bookmarks"));
 
         // Export the current frame in the bookmarks-folder.
         // The names of the stored files will have increasing numbers.
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(dir_path, file_name);
+        std::string file_path = mvideo_player->export_current_frame(proj_path.absolutePath().toStdString(), file_name);
 
         bookmark_view->add_bookmark(mvideo_player->get_current_frame_num(), file_path);
         set_status_bar("Saved bookmark.");
@@ -375,8 +366,7 @@ void MainWindow::on_actionAddProject_triggered() {
  * @param input the input from the user
  * @param action the action that was triggered earlier
  */
-void MainWindow::input_switch_case(ACTION action, QString qInput) {
-    std::string input = qInput.toStdString();
+void MainWindow::input_switch_case(ACTION action, QString qInput) {    
     MyQTreeWidgetItem *my_project;
     if(ui->project_tree->selectedItems().size() == 1) {
         my_project = (MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
@@ -385,9 +375,9 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
     }
     switch(action) {
     case ADD_PROJECT: {
-        Project* proj = fileHandler->create_project(input);
+        Project* proj = fileHandler->create_project(qInput);
         add_project_to_tree(proj);
-        set_status_bar("Project " + input + " created.");
+        set_status_bar("Project " + qInput.toStdString() + " created.");
         delete input_window;
         break;
     }
@@ -396,9 +386,9 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
         delete input_window;
         break;
     case ADD_VIDEO: {
-        ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), input);
-        add_video_to_tree(input, id);
-        set_status_bar("Video " + input + " added.");
+        ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), qInput.toStdString());
+        add_video_to_tree(qInput.toStdString(), id);
+        set_status_bar("Video " + qInput.toStdString() + " added.");
         break;
     }
     default:
@@ -634,7 +624,7 @@ void MainWindow::on_actionAddVideo_triggered() {
     if(ui->project_tree->selectedItems().size() == 1) {
         project = ui->project_tree->selectedItems().first();
         if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
-            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->work_space.c_str(),
+            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
                 input_switch_case(ACTION::ADD_VIDEO, dir);
@@ -661,7 +651,7 @@ void MainWindow::play_video() {
 
     if (mvideo_player->isRunning()) {
         emit set_stop_video(); //This signal will make the QThread finish executing
-        mvideo_player = new video_player(&mutex, &paused_wait);
+        mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
         setup_video_player(mvideo_player);
     }
     mvideo_player->load_video(my_project->name.toStdString());
@@ -696,7 +686,7 @@ void MainWindow::on_actionSave_triggered() {
  * @brief MainWindow::on_actionLoad_triggered
  */
 void MainWindow::on_actionLoad_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->work_space.c_str(),tr("*.txt"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
@@ -716,11 +706,8 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
-        stringstream file_path;
-        Video* v = vid->second;
-        file_path << *v;
-        std::string tree_name = file_path.str();
-        add_video_to_tree(tree_name, v->id);
+        Video* v = vid->second;        
+        add_video_to_tree(v->file_path, v->id);
     }
 }
 
@@ -743,8 +730,8 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
  * filehandler workspace accordingly.
  */
 void MainWindow::on_actionChoose_Workspace_triggered() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->work_space.c_str());
-    this->fileHandler->set_workspace(dir.toStdString() + "/");
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str());
+    this->fileHandler->set_work_space(dir.toStdString() + "/");
     set_status_bar("New wokspace set to " + this->fileHandler->work_space);
 }
 
@@ -872,7 +859,7 @@ void MainWindow::on_video_slider_sliderReleased() {
     video_slider->setSliderPosition(new_pos);
     slider_blocked = false;
     if (slider_paused_video) {
-        paused_wait.notify_one();
+        paused_wait.wakeOne();
         slider_paused_video = false;
     }
 }
@@ -914,6 +901,19 @@ void MainWindow::on_actionContrast_Brightness_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_action_fill_screen_triggered
+ * Reseizes the video to fit the size of the screen.
+ * Will not work if you have set it to original size.
+ */
+void MainWindow::on_action_fill_screen_triggered() {
+    if(!original_size) {
+        //Sends new scroll area resolution to mvideo_player to update scaling resolution
+        // Video frame is in the scroll area
+        emit resize_video_frame((ui->frame_scroll_area->width())-SCROLL_AREA_MARGIN, (ui->frame_scroll_area->height())-SCROLL_AREA_MARGIN);
+    }
+}
+
+/**
  * @brief MainWindow::on_actionRotate_right_triggered
  * Rotates video to the right by 90 degrees.
  */
@@ -940,4 +940,40 @@ void MainWindow::on_document_list_itemClicked(QListWidgetItem *item) {
     BookmarkItem* bookmark = (BookmarkItem*) item;
     emit set_playback_frame(bookmark->get_frame_number());
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
+}
+
+/**
+ * @brief MainWindow::on_action_original_size_triggered
+ * Restores the video to original size and keeps it there until you activate again.
+ */
+void MainWindow::on_action_original_size_triggered() {
+    if(mvideo_player->video_open()) {
+        if (!original_size) {
+            emit resize_video_frame(mvideo_player->get_video_width(), mvideo_player->get_video_height());
+            original_size = true;
+            ui->action_fill_screen->setEnabled(false);
+            set_status_bar("Original size set. Press again to fill screen.");
+        } else {
+            original_size = false;
+            ui->action_fill_screen->setEnabled(true);
+            on_action_fill_screen_triggered();
+            set_status_bar("Filling the screen with the video.");
+        }
+
+    } else {
+        set_status_bar("No video loaded.");
+        ui->action_original_size->toggle(); // unchecks it again
+    }
+}
+/**
+ * @brief MainWindow::on_actionInvert_analysis_area_triggered
+ * Switches between choosing area for analysing and area for not analysing.
+ */
+void MainWindow::on_actionInvert_analysis_area_triggered() {
+    mvideo_player->invert_analysis_area();
+    if (mvideo_player->is_including_area()) {
+        set_status_bar("Choose an area to run the analysis on.");
+    } else {
+        set_status_bar("Choose an area to exclude from the analysis.");
+    }
 }
