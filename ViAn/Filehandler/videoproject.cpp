@@ -3,7 +3,7 @@
 /**
  * @brief VideoProject::VideoProject
  * @param v
- * set video
+ * Set video.
  */
 VideoProject::VideoProject(Video* v){
     this->video = v;
@@ -11,7 +11,7 @@ VideoProject::VideoProject(Video* v){
 
 /**
  * @brief VideoProject::VideoProject
- * Create empty video
+ * Create empty video.
  */
 VideoProject::VideoProject(){
     this->video = new Video();
@@ -20,6 +20,7 @@ VideoProject::VideoProject(){
 /**
  * @brief VideoProject::get_video
  * @return video
+ * Return associated video.
  */
 Video* VideoProject::get_video(){
     return this->video;
@@ -28,6 +29,7 @@ Video* VideoProject::get_video(){
 /**
  * @brief VideoProject::get_bookmarks
  * @return bookmarks
+ * Return all bookmarks.
  */
 std::vector<Bookmark *> VideoProject::get_bookmarks()
 {
@@ -70,7 +72,7 @@ void VideoProject::write(QJsonObject& json){
 /**
  * @brief VideoProject::add_bookmark
  * @param bookmark
- * Add new bookmark
+ * Add new bookmark.
  */
 void VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.push_back(bookmark);

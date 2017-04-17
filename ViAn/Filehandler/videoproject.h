@@ -10,7 +10,6 @@
 #include "video.h"
 enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
 /**
- * @todo change map to include ID for flexibility.. I.E allow multiple analyses of each type.
  * @brief The VideoProject class
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
@@ -29,7 +28,7 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
-    std::vector<Bookmark *> get_bookmarks();
+    std::vector<Bookmark*> get_bookmarks();
 
 };
 
