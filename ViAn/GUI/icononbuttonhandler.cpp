@@ -58,10 +58,10 @@ IconOnButtonHandler::~IconOnButtonHandler(){
  * @param ui the window you want to add the icons to
  */
 void IconOnButtonHandler::set_pictures_to_buttons(Ui::MainWindow *ui){
-    ui->playPauseButton->setIcon(iconMap["play"]);
-    ui->stopButton->setIcon(iconMap["stop"]);
-    ui->nextFrameButton->setIcon(iconMap["next"]);
-    ui->previousFrameButton->setIcon(iconMap["previous"]);
+    ui->play_pause_button->setIcon(iconMap["play"]);
+    ui->stop_button->setIcon(iconMap["stop"]);
+    ui->next_frame_button->setIcon(iconMap["next"]);
+    ui->previous_frame_button->setIcon(iconMap["previous"]);
 }
 
 
