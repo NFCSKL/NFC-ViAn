@@ -342,15 +342,17 @@ void MainWindow::on_bookmarkButton_clicked() {
         // Export the current frame in the bookmarks-folder.
         // The names of the stored files will have increasing numbers.
 
-        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
+
         // Get bookmark description
         QString bookmark_text("");
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
+        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
+        int frame = mvideo_player->get_current_frame_num();
+        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
 
-        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), std::to_string(mvideo_player->get_current_frame_num()));
-        Bookmark* bookmark = new Bookmark(mvideo_player->get_current_frame_num(),QString::fromStdString(file_path), bookmark_text);
+        Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
         set_status_bar("Saved bookmark.");
