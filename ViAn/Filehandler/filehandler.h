@@ -22,6 +22,7 @@
 #include <QJsonDocument>
 // ViAn files
 #include "project.h"
+#include "saveable.h"
 
 enum WRITE_OPTION{APPEND, OVERWRITE};
 
@@ -36,6 +37,7 @@ class FileHandler
 public:
 
     FileHandler();
+    ~FileHandler();
     //  Workspace methods
     ID work_space;
     void set_work_space(std::string new_work_space);
@@ -52,7 +54,7 @@ public:
     Project* load_project(std::string full_project_path);
 
 
-    void save_project(ID id);
+    void save_saveable(ID id);
 
 
 
@@ -86,12 +88,14 @@ private:
     void add_file(ID id , QString file);
 
     // Project methods
+    void open_project(ID id);
+    void close_project(ID id);
     ID add_project(Project* proj);
     void add_project(ID id, Project *proj);
-    Project* load_project(std::string full_path, SAVE_FORMAT save_form);
+    Project* load_saveable(std::string full_path, SAVE_FORMAT save_form);
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(Project* proj);
-    bool save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format);
+    bool save_saveable(Saveable* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
     // Directory methods
     ID add_dir(QDir dir);
@@ -113,6 +117,7 @@ private:
     std::mutex dir_map_lock;    // lock for handling directory write/read
     std::mutex file_map_lock;   // lock for handling file write/read
     std::mutex proj_map_lock;   // lock for handling project write/read
+    std::vector<ID> open_projects;
     ID project_id;              //counter for project ids
     ID file_id;                 //counter for file ids
     ID dir_id;                  //counter for directory ids

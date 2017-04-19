@@ -10,6 +10,7 @@ FileHandler::FileHandler() {
     this->file_id = 0;
     this->dir_id = 0;
     this->last_error = false;
+    open_projects.clear();
     #ifdef _WIN32
         this->work_space = create_directory("C:/");
     #elif __APPLE__
@@ -18,6 +19,19 @@ FileHandler::FileHandler() {
         this->work_space =  create_directory("~/");
     #endif
 }
+
+FileHandler::~FileHandler(){
+
+}
+
+void FileHandler::open_project(ID id){
+    this->open_projects.push_back(id);
+}
+
+void FileHandler::close_project(ID id){
+    //this->open_projects.erase(id);
+}
+
 
 /**
  * @todo save workspace to file
@@ -107,9 +121,9 @@ bool FileHandler::delete_directory(ID id){
  * Save projects, exposed interface.
  * Here for simplicity of call as well as hiding save format.
  */
-void FileHandler::save_project(ID id){
+void FileHandler::save_saveable(ID id){
     Project* proj = get_project(id);
-    this->save_project(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
+    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
 }
 
 /**
@@ -118,29 +132,30 @@ void FileHandler::save_project(ID id){
  * Exposed interface, added for simplicity of call when
  * project pointer is still available
  */
-void FileHandler::save_project(Project* proj){
-    this->save_project(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
+void FileHandler::save_project(Project *proj){
+    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
 }
 
 /**
- * @brief FileHandler::save_project
- * @param proj
+ * @brief FileHandler::save_saveable
+ * @param savable
  * @param dir_path
  * @param save_format
  * @return Saves a Json file to provided directory
  */
-bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format){
+bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format){
     QDir dir = get_dir(dir_id);
-    std::string file_path = dir.absoluteFilePath(QString::fromStdString(proj->name)).toStdString();
+    std::string file_path = dir.absoluteFilePath(QString::fromStdString(saveable->save_name)).toStdString();
     QFile save_file(save_format == JSON
                     ? QString::fromStdString(file_path + ".json")
-                    : QString::fromStdString(file_path + ".dat"));
+                    : QString::fromStdString(file_path + ".dat"));    
     if(!save_file.open(QIODevice::WriteOnly)){
+        qWarning("Couldn't open save file.");
         return false;
     }
-    QJsonObject json_proj;
-    proj->write(json_proj);
-    QJsonDocument save_doc(json_proj);
+    QJsonObject json_saveable;
+    saveable->write(json_saveable);
+    QJsonDocument save_doc(json_saveable);
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
@@ -156,23 +171,22 @@ bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMA
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-    return load_project(full_project_path, JSON); // Decide format internally, here for flexibility
+    return load_saveable(full_project_path, JSON); // Decide format internally, here for flexibility
 }
 
 /**
- * @brief FileHandler::load_project
- * @param full_project_path
+ * @brief FileHandler::load_savable
+ * @param full savable path
  * @param save_format
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORMAT save_form){
+Project* FileHandler::load_saveable(std::string full_path, FileHandler::SAVE_FORMAT save_form){
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
-
     if (!load_file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open save file.");
+        qWarning("Couldn't open load file.");
         return nullptr;
     }
     QByteArray save_data = load_file.readAll();

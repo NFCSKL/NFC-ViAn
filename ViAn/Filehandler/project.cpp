@@ -7,6 +7,7 @@
 Project::Project(ID id, std::string name)
 {
     this->name = name;
+    this->save_name = name;
     this->id = id;
     this->dir = -1;
     this->dir_videos = -1;
@@ -20,6 +21,7 @@ Project::Project(ID id, std::string name)
  */
 Project::Project(){
     this->name = "";
+    this->save_name = "";
     this->id = -1;
     this->id = 0;
     this->dir = -1;
@@ -88,6 +90,7 @@ void Project::delete_artifacts()
  */
 void Project::read(const QJsonObject& json){
     this->name = json["name"].toString().toStdString();
+    this->save_name = this->name;
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
         QJsonObject json_vid_proj = json_vid_projs[i].toObject();
