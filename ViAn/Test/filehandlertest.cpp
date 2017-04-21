@@ -41,9 +41,9 @@ void FileHandlerTest::project_save_load_test(){
     Project* proj2 = file_handler->create_project("TEST_PROJ2");
     Project* proj3 = file_handler->create_project("TEST_PROJ3");
 
-    file_handler->save_saveable(proj1->id);
-    file_handler->save_saveable(proj2->id);
-    file_handler->save_saveable(proj3->id);
+    file_handler->save_project(proj1->id);
+    file_handler->save_project(proj2->id);
+    file_handler->save_project(proj3->id);
 
     Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.json").toStdString());
     Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.json").toStdString());
@@ -53,6 +53,11 @@ void FileHandlerTest::project_save_load_test(){
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));
     QVERIFY(file_handler->proj_equals(*proj3,*l_proj3));
 
+    file_handler->open_project(proj1->id);
+    file_handler->open_project(proj2->id);
+    file_handler->open_project(proj3->id);
+    file_handler->save();
+    file_handler->load();
     QVERIFY(file_handler->delete_project(proj1->id));
     QVERIFY(file_handler->delete_project(proj2->id));
     QVERIFY(file_handler->delete_project(proj3->id));
@@ -72,9 +77,9 @@ void FileHandlerTest::project_add_remove_items_test(){
     file_handler->add_video(proj2, "TEST_VID2");
     file_handler->add_video(proj3, "TEST_VID3");
 
-    file_handler->save_saveable(proj1->id);
-    file_handler->save_saveable(proj2->id);
-    file_handler->save_saveable(proj3->id);
+    file_handler->save_project(proj1->id);
+    file_handler->save_project(proj2->id);
+    file_handler->save_project(proj3->id);
 
 
     Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.json").toStdString());

@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent) :
     bookmark_view = new BookmarkView(ui->document_list);
 
     fileHandler = new FileHandler();
-
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
     ui->video_frame->setScaledContents(false);
@@ -683,7 +682,7 @@ void MainWindow::on_actionSave_triggered() {
     if(ui->project_tree->selectedItems().size() == 1) {
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        this->fileHandler->save_saveable(my_project->id);
+        this->fileHandler->save_project(my_project->id);
         std::string text = "Saved project " + my_project->name.toStdString();
         set_status_bar(text);
     } else {

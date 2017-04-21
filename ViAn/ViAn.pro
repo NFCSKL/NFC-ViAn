@@ -18,8 +18,7 @@ TEMPLATE = app
 SOURCES += main.cpp \
     Filehandler/videoproject.cpp \
     Filehandler/bookmark.cpp \
-    Filehandler/saveable.cpp \
-    Filehandler/fhstate.cpp
+    Filehandler/saveable.cpp
 
 #
 # TEST
@@ -32,8 +31,7 @@ HEADERS += Test/test_video_player.h \
     Test/test_mainwindow.h \
     Filehandler/videoproject.h \
     Filehandler/bookmark.h \
-    Filehandler/saveable.h \
-    Filehandler/fhstate.h
+    Filehandler/saveable.h
 
 
 #

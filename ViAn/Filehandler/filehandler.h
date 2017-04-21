@@ -30,8 +30,7 @@ typedef int ID;       // ID, defined for code readability.
 
 struct Project; // fix for include issue
 
-class FileHandler
-{
+class FileHandler : Saveable{
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
 
 public:
@@ -43,6 +42,10 @@ public:
     void set_work_space(std::string new_work_space);
     QDir get_work_space();
 
+    void save();
+    void load();
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
 
     //  Project methods
     //  Project* open_project(ID id); // To be added
@@ -50,12 +53,10 @@ public:
     Project* get_project(ID id);
     Project* create_project(QString proj_name, std::string dir_path="");
     bool delete_project(ID proj_id);
-
     Project* load_project(std::string full_project_path);
-
-
-    void save_saveable(ID id);
-
+    void save_project(ID id);
+    void open_project(ID id);
+    void close_project(ID id);
 
 
     bool proj_equals(Project& proj, Project& proj2);
@@ -88,14 +89,13 @@ private:
     void add_file(ID id , QString file);
 
     // Project methods
-    void open_project(ID id);
-    void close_project(ID id);
+
     ID add_project(Project* proj);
     void add_project(ID id, Project *proj);
-    Project* load_saveable(std::string full_path, SAVE_FORMAT save_form);
+    Saveable* load_saveable(std::string full_path, SAVE_FORMAT save_form);
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(Project* proj);
-    bool save_saveable(Saveable* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format);
+    bool save_saveable(Saveable* saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
     // Directory methods
     ID add_dir(QDir dir);

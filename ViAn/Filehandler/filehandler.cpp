@@ -9,7 +9,7 @@ FileHandler::FileHandler() {
     this->project_id = 0; // zero out counter ids
     this->file_id = 0;
     this->dir_id = 0;
-    this->last_error = false;
+    this->last_error = false;    
     open_projects.clear();
     #ifdef _WIN32
         this->work_space = create_directory("C:/");
@@ -18,20 +18,34 @@ FileHandler::FileHandler() {
     #elif __unix__
         this->work_space =  create_directory("~/");
     #endif
+    load();
 }
 
 FileHandler::~FileHandler(){
 
 }
+void FileHandler::save(){
+    QDir dir;
+    dir.cd(".");
+    this->save_name = dir.absoluteFilePath("state").toStdString();
+    save_saveable(this,add_dir(dir), JSON);
+}
+
+void FileHandler::load(){
+    QDir dir;
+    dir.cd(".");
+    this->save_name = dir.absoluteFilePath("state").toStdString();
+    load_saveable(this->save_name, JSON);
+}
+
 
 void FileHandler::open_project(ID id){
     this->open_projects.push_back(id);
 }
 
 void FileHandler::close_project(ID id){
-    //this->open_projects.erase(id);
+    open_projects.erase(std::remove(open_projects.begin(), open_projects.end(), id), open_projects.end());
 }
-
 
 /**
  * @todo save workspace to file
@@ -47,9 +61,30 @@ void FileHandler::set_work_space(std::string new_work_space){
  * @brief FileHandler::get_work_space
  * @return default work_space
  */
-QDir FileHandler::get_work_space()
-{
+QDir FileHandler::get_work_space(){
     return this->get_dir(this->work_space);
+}
+
+void FileHandler::read(const QJsonObject &json){
+    QJsonArray json_projs = json["open"].toArray();
+    for(int i = 0; i != json_projs.size(); i++){
+        QJsonObject json_path = json_projs[i].toObject();
+        load_project(json_path["path"].toString().toStdString());
+    }
+}
+
+void FileHandler::write(QJsonObject &json){
+    QJsonArray json_projs;
+    for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
+        QJsonObject json_path;
+        ID id = *it;
+        Project* proj = get_project(id);
+        QDir dir = get_dir(proj->dir);
+        QString path = dir.absoluteFilePath((proj->name + ".json").c_str());
+        json_path["path"] = path;
+        json_projs.append(json_path);
+    }
+    json["open"] = json_projs;
 }
 
 /**
@@ -121,7 +156,7 @@ bool FileHandler::delete_directory(ID id){
  * Save projects, exposed interface.
  * Here for simplicity of call as well as hiding save format.
  */
-void FileHandler::save_saveable(ID id){
+void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
     this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
 }
@@ -171,7 +206,11 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-    return load_saveable(full_project_path, JSON); // Decide format internally, here for flexibility
+     Project* proj = (Project*) load_saveable(full_project_path, JSON); // Decide format internally, here for flexibility
+     proj->id = add_project(proj);
+     proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
+     proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
+     return proj;
 }
 
 /**
@@ -181,7 +220,7 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Project* FileHandler::load_saveable(std::string full_path, FileHandler::SAVE_FORMAT save_form){
+Saveable *FileHandler::load_saveable(std::string full_path, FileHandler::SAVE_FORMAT save_form){
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
@@ -199,9 +238,6 @@ Project* FileHandler::load_saveable(std::string full_path, FileHandler::SAVE_FOR
     proj->saved = true;
 
     proj->read(load_doc.object());
-    proj->id = add_project(proj);
-    proj->dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")))));
-    proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")) + "/Bookmarks")));
     return proj;
 }
 
