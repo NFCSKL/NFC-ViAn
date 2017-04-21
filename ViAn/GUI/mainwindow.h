@@ -17,7 +17,6 @@
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
-#include "inputwindow.h"
 #include "bookmarkview.h"
 #include "action.h"
 #include "qtreeitems.h"
@@ -152,7 +151,6 @@ private slots:
 private:
 
     Ui::MainWindow *ui;
-    inputwindow *input_window;
     video_player* mvideo_player;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;

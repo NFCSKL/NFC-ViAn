@@ -16,7 +16,6 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    GUI/makeproject.cpp
 
 #
 # TEST
@@ -27,39 +26,32 @@ SOURCES += Test/test_video_player.cpp\
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    GUI/makeproject.h
-
 
 #
 # LIBRARY
 #
 SOURCES += Library/customdialog.cpp
 HEADERS += Library/customdialog.h
-´
+
 #
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
-    GUI/inputwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
-    GUI/bookmark.cpp
-
-
+    GUI/bookmark.cpp \
+    GUI/makeproject.cpp
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
-    GUI/inputwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
-    GUI/bookmark.h
-
-
+    GUI/bookmark.h \
+    GUI/makeproject.h
 FORMS    += GUI/mainwindow.ui \
-   GUI/inputwindow.ui \
     GUI/makeproject.ui
 
 RESOURCES += resources.qrc
