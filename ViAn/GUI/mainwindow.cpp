@@ -731,8 +731,10 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
  */
 void MainWindow::on_actionChoose_Workspace_triggered() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str());
-    this->fileHandler->set_work_space(dir.toStdString() + "/");
-    set_status_bar("New wokspace set to " + this->fileHandler->work_space);
+    if (!dir.isEmpty()) {
+        this->fileHandler->set_work_space(dir.toStdString() + "/");
+        set_status_bar("New wokspace set to " + this->fileHandler->work_space);
+    }
 }
 
 /**
