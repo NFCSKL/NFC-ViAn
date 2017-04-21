@@ -82,7 +82,7 @@ public:
 
     // Last error
     bool last_error;
-
+    std::vector<ID> open_projects;
 private:    
     // File methods
     ID add_file(QString file);
@@ -117,7 +117,7 @@ private:
     std::mutex dir_map_lock;    // lock for handling directory write/read
     std::mutex file_map_lock;   // lock for handling file write/read
     std::mutex proj_map_lock;   // lock for handling project write/read
-    std::vector<ID> open_projects;
+
     ID project_id;              //counter for project ids
     ID file_id;                 //counter for file ids
     ID dir_id;                  //counter for directory ids
