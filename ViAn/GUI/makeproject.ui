@@ -43,7 +43,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="project_path_input"/>
+           <widget class="QLineEdit" name="project_path_input">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="project_path_search_button">
@@ -64,7 +68,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="video_path_input"/>
+           <widget class="QLineEdit" name="video_path_input">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="video_path_search_button">

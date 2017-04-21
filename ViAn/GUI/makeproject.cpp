@@ -41,6 +41,7 @@ void MakeProject::on_project_path_search_button_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose path to project"),this->project_path);
     if(!dir.isEmpty()) {
         ui->project_path_input->setText(dir);
+        this->project_path = dir;
     }
 }
 
@@ -52,6 +53,7 @@ void MakeProject::on_video_path_search_button_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose path to videos"),this->video_path);
     if(!dir.isEmpty()) {
         ui->video_path_input->setText(dir);
+        this->video_path = dir;
     }
 }
 
@@ -61,10 +63,18 @@ void MakeProject::on_video_path_search_button_clicked() {
  * Then deletes itself.
  */
 void MakeProject::on_ok_button_clicked() {
-    Project *proj = file_handler->create_project(name, project_path.toStdString());
-    mainwindow->add_project_to_tree(proj);
-    mainwindow->set_status_bar("Project " + name.toStdString() + " created.");
-    delete this;
+    if(this->name.isEmpty())
+        mainwindow->set_status_bar("Needs a name");
+    else if(this->project_path.isEmpty())
+        mainwindow->set_status_bar("Needs a path for the project");
+    else if(this->video_path.isEmpty())
+        mainwindow->set_status_bar("Needs a path for the videos");
+   else {
+        Project *proj = file_handler->create_project(name, project_path.toStdString());
+        mainwindow->add_project_to_tree(proj);
+        mainwindow->set_status_bar("Project " + name.toStdString() + " created.");
+        delete this;
+    }
 }
 
 /**
@@ -73,24 +83,6 @@ void MakeProject::on_ok_button_clicked() {
  */
 void MakeProject::on_cancel_button_clicked() {
     delete this;
-}
-
-/**
- * @brief MakeProject::on_project_path_input_textChanged
- * @param arg1 the text of the input box
- * Sets project_path to what is inside the input box.
- */
-void MakeProject::on_project_path_input_textChanged(const QString &arg1) {
-    this->project_path = arg1;
-}
-
-/**
- * @brief MakeProject::on_video_path_input_textChanged
- * @param arg1 the text of the input box
- * Sets video_path to what is inside the input box.
- */
-void MakeProject::on_video_path_input_textChanged(const QString &arg1) {
-    this->video_path = arg1;
 }
 
 /**
