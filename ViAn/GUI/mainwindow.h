@@ -23,6 +23,7 @@
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
+#include "makeproject.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
@@ -38,6 +39,7 @@ class MainWindow : public QMainWindow
 
 public:
     void set_status_bar(string status, int timer = 750);
+    void add_project_to_tree(Project* proj);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
@@ -167,7 +169,6 @@ private:
     FileHandler *fileHandler;
 
     void setup_video_player(video_player *mplayer);
-    void add_project_to_tree(Project* proj);
 
     void add_video_to_tree(string file_path, ID id);
 

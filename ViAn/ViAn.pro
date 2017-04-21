@@ -15,7 +15,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    GUI/makeproject.cpp
 
 #
 # TEST
@@ -25,7 +26,8 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
+    Test/test_mainwindow.h \
+    GUI/makeproject.h
 
 
 #
@@ -57,7 +59,8 @@ HEADERS  += GUI/mainwindow.h \
 
 
 FORMS    += GUI/mainwindow.ui \
-   GUI/inputwindow.ui
+   GUI/inputwindow.ui \
+    GUI/makeproject.ui
 
 RESOURCES += resources.qrc
 #

@@ -355,10 +355,9 @@ void MainWindow::on_bookmark_button_clicked() {
  * @brief MainWindow::on_actionAddProject_triggered
  */
 void MainWindow::on_actionAddProject_triggered() {
-    ACTION action = ADD_PROJECT;
-    input_window = new inputwindow(this, action, "Project name:");
-    input_window->show();
-    set_status_bar("Adding project, need name");
+    MakeProject *make_project = new MakeProject(this, this->fileHandler, this->fileHandler->get_work_space().absolutePath().toStdString());
+    make_project->show();
+    set_status_bar("Adding project");
 }
 
 /**
