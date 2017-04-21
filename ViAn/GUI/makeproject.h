@@ -28,11 +28,11 @@ private slots:
 
     void on_cancel_button_clicked();
 
-    void on_video_path_input_editingFinished();
+    void on_project_path_input_textChanged(const QString &arg1);
 
-    void on_project_path_input_editingFinished();
+    void on_video_path_input_textChanged(const QString &arg1);
 
-    void on_name_input_editingFinished();
+    void on_name_input_textChanged(const QString &arg1);
 
 private:
     QString project_path;
