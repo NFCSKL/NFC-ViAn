@@ -34,8 +34,8 @@ void FileHandler::save(){
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
-    this->save_name = dir.absoluteFilePath("state").toStdString();
-    load_saveable(this->save_name, JSON);
+    this->save_name = dir.absoluteFilePath("state.json").toStdString();
+    load_saveable(this, this->save_name, JSON);
 }
 
 
@@ -69,7 +69,8 @@ void FileHandler::read(const QJsonObject &json){
     QJsonArray json_projs = json["open"].toArray();
     for(int i = 0; i != json_projs.size(); i++){
         QJsonObject json_path = json_projs[i].toObject();
-        load_project(json_path["path"].toString().toStdString());
+        std::string path = json_path["path"].toString().toStdString();
+        open_project(load_project(path)->id);
     }
 }
 
@@ -206,7 +207,9 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-     Project* proj = (Project*) load_saveable(full_project_path, JSON); // Decide format internally, here for flexibility
+     Project* proj = new Project();
+     load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
+     proj->saved = true;
      proj->id = add_project(proj);
      proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
      proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
@@ -220,12 +223,12 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Saveable *FileHandler::load_saveable(std::string full_path, FileHandler::SAVE_FORMAT save_form){
+Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
-    if (!load_file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open load file.");
+    if (!load_file.open(QIODevice::ReadOnly)) {        
+        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
         return nullptr;
     }
     QByteArray save_data = load_file.readAll();
@@ -233,12 +236,8 @@ Saveable *FileHandler::load_saveable(std::string full_path, FileHandler::SAVE_FO
     QJsonDocument load_doc(save_form == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
-
-    Project* proj = new Project();
-    proj->saved = true;
-
-    proj->read(load_doc.object());
-    return proj;
+    saveable->read(load_doc.object());
+    return saveable;
 }
 
 /**

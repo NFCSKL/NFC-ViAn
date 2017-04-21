@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ID id = *it;
         Project* proj = fileHandler->get_project(id);
         add_project_to_tree(proj);
+        std::cout << proj->name <<std::endl;
     }
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
