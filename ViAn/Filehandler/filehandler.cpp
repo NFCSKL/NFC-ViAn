@@ -22,7 +22,7 @@ FileHandler::FileHandler() {
 }
 
 FileHandler::~FileHandler(){
-
+    save();
 }
 void FileHandler::save(){
     QDir dir;
@@ -110,6 +110,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
+    open_project(proj->id);
     return proj;
 }
 
@@ -250,6 +251,7 @@ bool FileHandler::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
     this->proj_map_lock.lock();    
     if(this->projects.erase(proj_id)){
+        close_project(temp->id);
         temp->delete_artifacts();
         QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
         file.remove();
@@ -259,7 +261,7 @@ bool FileHandler::delete_project(ID proj_id){
         this->proj_map_lock.unlock();
         return true;
     }
-    this->proj_map_lock.unlock();
+    this->proj_map_lock.unlock();    
     return false;
 }
 
