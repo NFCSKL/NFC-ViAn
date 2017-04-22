@@ -21,9 +21,18 @@ FileHandler::FileHandler() {
     load();
 }
 
+/**
+ * @brief FileHandler::~FileHandler
+ * Save filehandler state when destroyed.
+ */
 FileHandler::~FileHandler(){
     save();
 }
+
+/**
+ * @brief FileHandler::save
+ * Save filehandler.
+ */
 void FileHandler::save(){
     QDir dir;
     dir.cd(".");
@@ -31,6 +40,10 @@ void FileHandler::save(){
     save_saveable(this,add_dir(dir), JSON);
 }
 
+/**
+ * @brief FileHandler::load
+ * Load filehandler.
+ */
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
@@ -38,11 +51,20 @@ void FileHandler::load(){
     load_saveable(this, this->save_name, JSON);
 }
 
-
+/**
+ * @brief FileHandler::open_project
+ * @param id
+ * Open project by id.
+ */
 void FileHandler::open_project(ID id){
     this->open_projects.push_back(id);
 }
 
+/**
+ * @brief FileHandler::close_project
+ * @param id
+ * Close project by id.
+ */
 void FileHandler::close_project(ID id){
     open_projects.erase(std::remove(open_projects.begin(), open_projects.end(), id), open_projects.end());
 }
@@ -65,6 +87,11 @@ QDir FileHandler::get_work_space(){
     return this->get_dir(this->work_space);
 }
 
+/**
+ * @brief FileHandler::read
+ * @param json
+ * Reads filehandler from a json object.
+ */
 void FileHandler::read(const QJsonObject &json){
     QJsonArray json_projs = json["open"].toArray();
     for(int i = 0; i != json_projs.size(); i++){
@@ -73,7 +100,11 @@ void FileHandler::read(const QJsonObject &json){
         open_project(load_project(path)->id);
     }
 }
-
+/**
+ * @brief FileHandler::write
+ * @param json
+ * Writes filehandler to a json object
+ */
 void FileHandler::write(QJsonObject &json){
     QJsonArray json_projs;
     for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
@@ -110,7 +141,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
-    open_project(proj->id);
+    open_project(proj->id);                     // Open project
     return proj;
 }
 
