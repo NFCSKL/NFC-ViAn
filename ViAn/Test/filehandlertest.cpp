@@ -53,10 +53,6 @@ void FileHandlerTest::project_save_load_test(){
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));
     QVERIFY(file_handler->proj_equals(*proj3,*l_proj3));
 
-    file_handler->open_project(proj1->id);
-    file_handler->open_project(proj2->id);
-    file_handler->open_project(proj3->id);
-
     QVERIFY(file_handler->delete_project(proj1->id));
     QVERIFY(file_handler->delete_project(proj2->id));
     QVERIFY(file_handler->delete_project(proj3->id));
