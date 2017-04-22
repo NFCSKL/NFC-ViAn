@@ -73,6 +73,10 @@ MainWindow::~MainWindow() {
     delete ui;
     delete bookmark_view;
 }
+/**
+ * @brief MainWindow::setup_filehandler
+ * Sets up filehandler and loads projects.
+ */
 void MainWindow::setup_filehandler(){
     fileHandler = new FileHandler();
     for(auto it = fileHandler->open_projects.begin(); it != fileHandler->open_projects.end(); it++){
