@@ -88,14 +88,15 @@ private:
     ID add_file(QString file);
     void add_file(ID id , QString file);
 
-    // Project methods
+    // Saveable methods
+    Saveable* load_saveable(Saveable *saveable, std::string full_path, SAVE_FORMAT save_form);
+    bool save_saveable(Saveable* saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
+    // Project methods
     ID add_project(Project* proj);
     void add_project(ID id, Project *proj);
-    Saveable* load_saveable(Saveable *saveable, std::string full_path, SAVE_FORMAT save_form);
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(Project* proj);
-    bool save_saveable(Saveable* saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
     // Directory methods
     ID add_dir(QDir dir);
