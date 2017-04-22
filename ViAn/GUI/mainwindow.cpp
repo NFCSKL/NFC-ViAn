@@ -32,14 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup a Bookmark View in the right sidebar in the GUI.
     bookmark_view = new BookmarkView(ui->document_list);
 
-    fileHandler = new FileHandler();
+    setup_filehandler();
 
-    for(auto it = fileHandler->open_projects.begin(); it != fileHandler->open_projects.end(); it++){
-        ID id = *it;
-        Project* proj = fileHandler->get_project(id);
-        add_project_to_tree(proj);
-        std::cout << proj->name <<std::endl;
-    }
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
     ui->video_frame->setScaledContents(false);
@@ -78,6 +72,15 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
+}
+void MainWindow::setup_filehandler(){
+    fileHandler = new FileHandler();
+    for(auto it = fileHandler->open_projects.begin(); it != fileHandler->open_projects.end(); it++){
+        ID id = *it;
+        Project* proj = fileHandler->get_project(id);
+        add_project_to_tree(proj);
+        std::cout << proj->name <<std::endl;
+    }
 }
 
 /**
@@ -998,3 +1001,4 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
         set_status_bar("Choose an area to exclude from the analysis.");
     }
 }
+

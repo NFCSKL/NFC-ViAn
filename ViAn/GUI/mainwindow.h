@@ -165,7 +165,7 @@ private:
             );
 
     FileHandler *fileHandler;
-
+    void setup_filehandler();
     void setup_video_player(video_player *mplayer);
     void add_project_to_tree(Project* proj);
 
