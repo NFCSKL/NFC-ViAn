@@ -31,8 +31,7 @@ Video* VideoProject::get_video(){
  * @return bookmarks
  * Return all bookmarks.
  */
-std::vector<Bookmark *> VideoProject::get_bookmarks()
-{
+std::vector<Bookmark *> VideoProject::get_bookmarks(){
     return this->bookmarks;
 }
 

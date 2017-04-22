@@ -350,18 +350,15 @@ void MainWindow::on_bookmark_button_clicked() {
         Project* proj = fileHandler->get_project(my_project->id);
         QDir dir = fileHandler->get_dir(proj->bookmark_dir);
         // Export the current frame in the bookmarks-folder.
-        // The names of the stored files will have increasing numbers.
-
-
         // Get bookmark description
         QString bookmark_text("");
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
+        // The names of the stored files will have increasing numbers.
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        int frame = mvideo_player->get_current_frame_num();
         std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
-
+        int frame = mvideo_player->get_current_frame_num();
         Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
@@ -755,8 +752,10 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
  */
 void MainWindow::on_actionChoose_Workspace_triggered() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->fileHandler->get_work_space().absolutePath().toStdString().c_str());
-    this->fileHandler->set_work_space(dir.toStdString() + "/");
-    set_status_bar("New wokspace set to " + this->fileHandler->work_space);
+    if (!dir.isEmpty()) {
+        this->fileHandler->set_work_space(dir.toStdString() + "/");
+        set_status_bar("New wokspace set to " + this->fileHandler->work_space);
+    }
 }
 
 /**

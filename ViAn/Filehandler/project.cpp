@@ -75,8 +75,7 @@ ID Project::add_video_project(VideoProject* vid_proj){
  * @brief Project::delete_artifacts
  * Delete all projects files.
  */
-void Project::delete_artifacts()
-{
+void Project::delete_artifacts(){
     for(auto it = videos.begin(); it != videos.end(); it++){
         VideoProject* vp = it->second;
         vp->delete_artifacts();

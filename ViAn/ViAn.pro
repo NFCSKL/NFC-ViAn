@@ -16,9 +16,6 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    Filehandler/videoproject.cpp \
-    Filehandler/bookmark.cpp \
-    Filehandler/saveable.cpp
 
 #
 # TEST
@@ -28,10 +25,7 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h \
-    Filehandler/videoproject.h \
-    Filehandler/bookmark.h \
-    Filehandler/saveable.h
+    Test/test_mainwindow.h
 
 
 #
@@ -116,12 +110,19 @@ unix {
 #
 SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
-    Filehandler/video.cpp
+    Filehandler/video.cpp \
+    Filehandler/videoproject.cpp \
+    Filehandler/bookmark.cpp \
+    Filehandler/saveable.cpp
+
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
-    Filehandler/video.h
+    Filehandler/video.h \
+    Filehandler/videoproject.h \
+    Filehandler/bookmark.h  \
+    Filehandler/saveable.h
 
 win32{
 

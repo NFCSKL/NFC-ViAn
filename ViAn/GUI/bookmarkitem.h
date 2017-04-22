@@ -1,7 +1,6 @@
 #ifndef BOOKMARKITEM_H
 #define BOOKMARKITEM_H
-
-#include "../Filehandler/bookmark.h"
+#include "Filehandler/bookmark.h"
 #include <QListWidgetItem>
 
 class BookmarkItem : public QListWidgetItem {
