@@ -56,7 +56,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     else
         root_dir = this->work_space;
 
-
+    proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
@@ -187,6 +187,7 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORM
     proj->read(load_doc.object());
     proj->id = add_project(proj);
     proj->dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")))));
+    proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")) + "/Bookmarks")));
     return proj;
 }
 
@@ -198,18 +199,19 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORM
  */
 bool FileHandler::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
-    this->proj_map_lock.lock();
-    QFile file(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
+    this->proj_map_lock.lock();    
     if(this->projects.erase(proj_id)){
+        temp->delete_artifacts();
+        QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
         file.remove();
+        delete_directory(temp->bookmark_dir);
         delete_directory(temp->dir);
-        delete temp;
+        delete temp;        
         this->proj_map_lock.unlock();
         return true;
     }
     this->proj_map_lock.unlock();
     return false;
-
 }
 
 /**
@@ -232,7 +234,7 @@ ID FileHandler::add_video(Project* proj, std::string file_path){
  */
 void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
     Project* proj = this->get_project(proj_id); // get Project object from id
-    proj->remove_video(vid_id); // Remove ´the video from project
+    proj->remove_video_project(vid_id); // Remove ´the video from project
 }
 
 /**
@@ -429,7 +431,7 @@ void FileHandler::add_dir(ID dir_id, QDir dir){
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
     bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
-               [](const std::pair<ID,Video*> v, const std::pair<ID,Video*> v2){return *(v.second) == *(v2.second);}); // lambda function comparing using video==
+               [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
                                                                                                                       // by dereferencing pointers in vector
     return proj.name == proj2.name &&
            video_equals;

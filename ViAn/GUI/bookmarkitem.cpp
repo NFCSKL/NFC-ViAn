@@ -7,7 +7,8 @@
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
+
+BookmarkItem::BookmarkItem(int frame_nbr, QString file_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
     bookmark = new Bookmark(frame_nbr, file_path, string);
     create_thumbnail(file_path);
 }
@@ -17,9 +18,9 @@ BookmarkItem::BookmarkItem(int frame_nbr, std::string file_path, QString string,
  * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(Bookmark bookmrk, QListWidget* view) : QListWidgetItem(bookmrk.get_description(), view) {
-    bookmark = &bookmrk;
-    create_thumbnail(bookmrk.get_file_path());
+BookmarkItem::BookmarkItem(Bookmark* bookmrk, QListWidget* view) : QListWidgetItem(bookmrk->get_description(), view) {
+    this->bookmark = bookmrk;
+    create_thumbnail(bookmrk->get_file_path());
 }
 
 /**
@@ -27,8 +28,8 @@ BookmarkItem::BookmarkItem(Bookmark bookmrk, QListWidget* view) : QListWidgetIte
  * Creates and adds a thumbnail.
  * @param file_path Path to the stored image.
  */
-void BookmarkItem::create_thumbnail(std::string file_path) {
-    QImage img = QImage(QString::fromStdString(file_path), "TIFF");
+void BookmarkItem::create_thumbnail(QString file_path) {
+    QImage img = QImage(file_path, "TIFF");
     img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
     setData(Qt::DecorationRole, QPixmap::fromImage(img));
 }

@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     original_size = false;
 }
 
+
 /**
  * @brief MainWindow::~MainWindow
  * Destructor
@@ -336,17 +337,22 @@ void MainWindow::on_bookmark_button_clicked() {
         // Get current project.
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        QDir proj_path = fileHandler->get_dir(my_project->id);
         // Add bookmarks-folder to the project-folder.
-        proj_path.mkpath(proj_path.absoluteFilePath("Bookmarks"));
-        proj_path.cd(proj_path.absoluteFilePath("Bookmarks"));
-
+        Project* proj = fileHandler->get_project(my_project->id);
+        QDir dir = fileHandler->get_dir(proj->bookmark_dir);
         // Export the current frame in the bookmarks-folder.
+        // Get bookmark description
+        QString bookmark_text("");
+        bool ok;
+        bookmark_text = bookmark_view->get_input_text(&ok);
+        if(!ok) return;
         // The names of the stored files will have increasing numbers.
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(proj_path.absolutePath().toStdString(), file_name);
-
-        bookmark_view->add_bookmark(mvideo_player->get_current_frame_num(), file_path);
+        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
+        int frame = mvideo_player->get_current_frame_num();
+        Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
+        proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
+        bookmark_view->add_bookmark(bookmark);
         set_status_bar("Saved bookmark.");
     }
 }
@@ -691,6 +697,15 @@ void MainWindow::on_actionLoad_triggered() {
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
         set_status_bar("Project " + loadProj->name + " loaded.");
+        // Add bookmarks
+        for(auto it = loadProj->videos.begin(); it != loadProj->videos.end(); it++){
+            VideoProject* v = it->second;
+            std::vector<Bookmark*> bookmarks = v->get_bookmarks();
+            for(auto it2 = bookmarks.begin(); it2 != bookmarks.end(); it2++){
+                Bookmark* bm = *it2;
+                bookmark_view->add_bookmark(bm);
+            }
+        }
     }
 }
 
@@ -706,7 +721,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
-        Video* v = vid->second;        
+        Video* v = vid->second->get_video();
         add_video_to_tree(v->file_path, v->id);
     }
 }
