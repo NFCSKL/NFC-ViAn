@@ -28,7 +28,7 @@ private slots:
 
     void on_cancel_button_clicked();
 
-    void on_name_input_textChanged(const QString &arg1);
+    void on_name_input_textChanged(const QString &name);
 
 private:
     QString project_path;
@@ -37,6 +37,7 @@ private:
     FileHandler *file_handler;
     MainWindow *mainwindow;
     Ui::MakeProject *ui;
+    void set_status_bar(std::string status, int timer = 750);
 };
 
 #endif // MAKEPROJECT_H

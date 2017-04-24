@@ -64,15 +64,15 @@ void MakeProject::on_video_path_search_button_clicked() {
  */
 void MakeProject::on_ok_button_clicked() {
     if(this->name.isEmpty())
-        mainwindow->set_status_bar("Needs a name");
+        set_status_bar("Needs a name");
     else if(this->project_path.isEmpty())
-        mainwindow->set_status_bar("Needs a path for the project");
+        set_status_bar("Needs a path for the project");
     else if(this->video_path.isEmpty())
-        mainwindow->set_status_bar("Needs a path for the videos");
+        set_status_bar("Needs a path for the videos");
    else {
         Project *proj = file_handler->create_project(name, project_path.toStdString());
         mainwindow->add_project_to_tree(proj);
-        mainwindow->set_status_bar("Project " + name.toStdString() + " created.");
+        set_status_bar("Project " + name.toStdString() + " created.");
         delete this;
     }
 }
@@ -90,6 +90,16 @@ void MakeProject::on_cancel_button_clicked() {
  * @param arg1 the text of the input box
  * Sets name to what is inside the input box.
  */
-void MakeProject::on_name_input_textChanged(const QString &arg1) {
-    this->name = arg1;
+void MakeProject::on_name_input_textChanged(const QString &name) {
+    this->name = name;
+}
+
+/**
+ * @brief MakeProject::set_status_bar
+ * @param status text to show in the statusbar
+ * @param timer time to show it in the bar in ms, 750ms is standard
+ */
+void MakeProject::set_status_bar(std::string status, int timer){
+    ui->statusbar->showMessage(QString::fromStdString(status), timer);
+    mainwindow->set_status_bar(status, timer);
 }
