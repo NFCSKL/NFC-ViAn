@@ -608,6 +608,9 @@
    </property>
   </action>
   <action name="actionRectangle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/box.png</normaloff>:/box.png</iconset>
@@ -620,6 +623,9 @@
    </property>
   </action>
   <action name="actionCircle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/circle.png</normaloff>:/circle.png</iconset>
@@ -632,6 +638,9 @@
    </property>
   </action>
   <action name="actionArrow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/arrow.png</normaloff>:/arrow.png</iconset>
@@ -644,6 +653,9 @@
    </property>
   </action>
   <action name="actionLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/line.png</normaloff>:/line.png</iconset>
@@ -688,6 +700,9 @@
    </property>
   </action>
   <action name="actionPen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/pen.png</normaloff>:/pen.png</iconset>
@@ -751,6 +766,9 @@
    </property>
   </action>
   <action name="actionText">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/text.png</normaloff>:/text.png</iconset>

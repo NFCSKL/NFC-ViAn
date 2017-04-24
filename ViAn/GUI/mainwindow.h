@@ -183,6 +183,8 @@ private:
 
     bool original_size;
 
+    void deselect_overlay_tool();
+
 };
 
 #endif // MAINWINDOW_H
