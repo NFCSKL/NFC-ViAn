@@ -27,6 +27,7 @@ HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
 
+
 #
 # LIBRARY
 #
@@ -40,17 +41,18 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
-    GUI/bookmarkitem.cpp \
-    GUI/bookmark.cpp \
-    GUI/makeproject.cpp
+    GUI/makeproject.cpp \
+    GUI/bookmarkitem.cpp
+
+
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
-    GUI/bookmarkitem.h \
-    GUI/bookmark.h \
     GUI/makeproject.h
+    GUI/bookmarkitem.h
+
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui
 
@@ -107,14 +109,16 @@ unix {
 #
 SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
-    Filehandler/analysis.cpp \
-    Filehandler/video.cpp
+    Filehandler/video.cpp \
+    Filehandler/videoproject.cpp \
+    Filehandler/bookmark.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
-    Filehandler/analysis.h\
-    Filehandler/video.h
+    Filehandler/video.h \
+    Filehandler/videoproject.h \
+    Filehandler/bookmark.h
 
 win32{
 
