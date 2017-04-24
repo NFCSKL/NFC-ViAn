@@ -12,8 +12,9 @@ ReportGenerator::ReportGenerator(std::string& proj_path)
 
     //2.OPEN THE DOCUMENT
     QAxObject* doc = word->querySubObject("Documents");
+    //QAxObject* workbook = doc->querySubObject( "Open(const QString&)", "C:/Users/georg/Documents/Dok3.docx" );
     doc->dynamicCall("Add()");
-    doc->setProperty("Visible",true); // second bool to hide application when opened.
+    word->setProperty("Visible",false); // second bool to hide application when opened.
 
     //3.GET TO THE CONTENTS
     QAxObject* activeDocument=word->querySubObject("ActiveDocument");

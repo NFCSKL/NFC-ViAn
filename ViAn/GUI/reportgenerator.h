@@ -17,7 +17,6 @@ public:
 
 private:
     QString picPath;
-    FileHandler* file_handler;
     std::string proj_path;
     std::string bookmark_path;
     std::vector<std::string> bookmark_names;
