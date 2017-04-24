@@ -3,10 +3,13 @@
 
 
 
-ReportGenerator::ReportGenerator(std::string& proj_path)
+ReportGenerator::ReportGenerator(Project* proj, FileHandler *file_handler)
 {
-    this->proj_path = proj_path;
-    this->bookmark_path = proj_path.append("/bookmarks/");
+    this->proj = proj;
+    this->file_handler = file_handler;
+    //this->bookmark_path = proj_path.append("/bookmarks/");
+    //std::cout << "proj_path: " << proj_path << std::endl;
+   // std::cout << "bookmark_path: " << bookmark_path << std::endl;
     //1. START APPLICATION
     QAxObject*  word = new QAxObject("Word.Application");
 
@@ -32,37 +35,30 @@ ReportGenerator::ReportGenerator(std::string& proj_path)
 
 void ReportGenerator::create_list_of_names()
 {
-    DIR *dir;
-    struct dirent *ent;
-    const char * c = bookmark_path.c_str();
-    if ((dir = opendir (c)) != NULL) {
-      /* print all the files and directories within directory */
-      while ((ent = readdir (dir)) != NULL) {
+    std::map<ID, VideoProject*> videos = proj->videos;
 
-        bookmark_names.push_back(ent->d_name);
-        //std::cout << bookmark_names.size()<< std::endl;
-      }
-      closedir (dir);
-    } else {
-      /* could not open directory */
-      perror ("no files");
+    // get all bookmarks for a project by iterating over each videos bookmarks.
+    for(std::pair<ID, VideoProject*> video : videos) {
+        std::vector<Bookmark *> bookmark_list = video.second->get_bookmarks();
+        for(Bookmark* video_bookmark : bookmark_list) {
+            all_bookmarks.push_back(video_bookmark->get_file_path().toStdString());
+            std::cout << video_bookmark->get_file_path().toStdString() << std::endl;
+        }
     }
 }
-
-
 
 void ReportGenerator::add_pictures(QAxObject* selection)
 {
 
     picPath.clear();
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
-    foreach (std::string name, bookmark_names) {
-        if(name.length() <= 3) continue;
-        picPath.append(QString::fromStdString(bookmark_path)).append(QString::fromStdString(name));
-        std::cout << picPath.toStdString() << std::endl;
+    foreach (std::string bookmark, all_bookmarks) {
+
+       // picPath.append(QString::fromStdString(bookmark_path)).append(QString::fromStdString(name));
+       // std::cout << picPath.toStdString() << std::endl;
         QAxObject* inlineShape = shapes->querySubObject(
                     "AddPicture(const QString&,bool,bool,QVariant)",
-                     picPath, true, true );
+                     QString::fromStdString(bookmark), true, true );
 
         // Center image
         selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
@@ -92,6 +88,8 @@ std::string ReportGenerator::date_time_generator()
 void ReportGenerator::save_report(QAxObject* activeDocument)
 {
     std::string dt = date_time_generator();
+
+    std::string proj_path = file_handler->get_dir(proj->dir).absolutePath().toStdString();
     std::string path = proj_path.append("/report_").append(dt).append(".docx");
 
     activeDocument->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));

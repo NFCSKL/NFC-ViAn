@@ -12,14 +12,17 @@
 class ReportGenerator
 {
 public:
-    ReportGenerator(std::string& bookmark_path);
-
+    ReportGenerator(Project* proj, FileHandler* file_handler);
 
 private:
     QString picPath;
-    std::string proj_path;
-    std::string bookmark_path;
+    Project* proj;
+
     std::vector<std::string> bookmark_names;
+    std::vector<std::string> all_bookmarks;
+
+    FileHandler *file_handler;
+
     void create_list_of_names();
     void add_pictures(QAxObject* selection);
     void save_report(QAxObject* activeDocument);

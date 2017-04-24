@@ -1011,9 +1011,11 @@ void MainWindow::on_actionCreate_report_triggered()
         // Get current project.
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        std::string proj_path = fileHandler->get_dir(my_project->id).absolutePath().toStdString();
+        Project* proj = fileHandler->get_project(my_project->id);
 
+        //std::string proj_path = fileHandler->get_dir(proj->dir).absolutePath().toStdString();
+        //std::cout << proj_path << std::endl;
         //TODO make sure to stop here if there is no bookmarks
-        report = new ReportGenerator(proj_path);
+        report = new ReportGenerator(proj, fileHandler);
     }
 }
