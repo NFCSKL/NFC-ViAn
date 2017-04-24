@@ -462,6 +462,8 @@ void MainWindow::on_actionColour_triggered() {
 void MainWindow::on_actionRectangle_triggered() {
     mvideo_player->set_overlay_tool(RECTANGLE);
     set_status_bar("Tool: rectangle.");
+    deselect_overlay_tool();
+    ui->actionRectangle->setChecked(true);
 }
 
 /**
@@ -471,6 +473,8 @@ void MainWindow::on_actionRectangle_triggered() {
 void MainWindow::on_actionCircle_triggered() {
     mvideo_player->set_overlay_tool(CIRCLE);
     set_status_bar("Tool: circle.");
+    deselect_overlay_tool();
+    ui->actionCircle->setChecked(true);
 }
 
 /**
@@ -480,6 +484,8 @@ void MainWindow::on_actionCircle_triggered() {
 void MainWindow::on_actionLine_triggered() {
     mvideo_player->set_overlay_tool(LINE);
     set_status_bar("Tool: line.");
+    deselect_overlay_tool();
+    ui->actionLine->setChecked(true);
 }
 
 /**
@@ -489,6 +495,8 @@ void MainWindow::on_actionLine_triggered() {
 void MainWindow::on_actionArrow_triggered() {
     mvideo_player->set_overlay_tool(ARROW);
     set_status_bar("Tool: arrow.");
+    deselect_overlay_tool();
+    ui->actionArrow->setChecked(true);
 }
 
 /**
@@ -498,6 +506,8 @@ void MainWindow::on_actionArrow_triggered() {
 void MainWindow::on_actionPen_triggered() {
     mvideo_player->set_overlay_tool(PEN);
     set_status_bar("Tool: pen.");
+    deselect_overlay_tool();
+    ui->actionPen->setChecked(true);
 }
 
 /**
@@ -507,6 +517,21 @@ void MainWindow::on_actionPen_triggered() {
 void MainWindow::on_actionText_triggered() {
     mvideo_player->set_overlay_tool(TEXT);
     set_status_bar("Tool: text.");
+    deselect_overlay_tool();
+    ui->actionText->setChecked(true);
+}
+
+/**
+ * @brief deselct_overlay_tool
+ * Deselects all overlay tools.
+ */
+void MainWindow::deselect_overlay_tool(){
+    ui->actionRectangle->setChecked(false);
+    ui->actionCircle->setChecked(false);
+    ui->actionLine->setChecked(false);
+    ui->actionArrow->setChecked(false);
+    ui->actionPen->setChecked(false);
+    ui->actionText->setChecked(false);
 }
 
 /**
