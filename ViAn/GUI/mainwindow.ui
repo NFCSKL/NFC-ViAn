@@ -584,6 +584,9 @@
    </property>
   </action>
   <action name="actionShow_hide_overlay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/show_hide_overlay.png</normaloff>:/show_hide_overlay.png</iconset>
@@ -792,6 +795,9 @@
    </property>
   </action>
   <action name="actionShow_hide_analysis_area">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Show/hide analysis area</string>
    </property>
