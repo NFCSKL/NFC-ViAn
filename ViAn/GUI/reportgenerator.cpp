@@ -79,7 +79,7 @@ void ReportGenerator::add_pictures(QAxObject* selection)
 }
 
 
-std::__cxx11::string ReportGenerator::date_time_generator()
+std::string ReportGenerator::date_time_generator()
 {
     time_t now = time(0);
     std::string dt = ctime(&now);
