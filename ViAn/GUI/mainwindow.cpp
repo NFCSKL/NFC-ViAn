@@ -8,7 +8,6 @@
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
-#include "inputwindow.h"
 #include "Video/shapes/shape.h"
 
 using namespace std;
@@ -361,45 +360,9 @@ void MainWindow::on_bookmark_button_clicked() {
  * @brief MainWindow::on_actionAddProject_triggered
  */
 void MainWindow::on_actionAddProject_triggered() {
-    ACTION action = ADD_PROJECT;
-    input_window = new inputwindow(this, action, "Project name:");
-    input_window->show();
-    set_status_bar("Adding project, need name");
-}
-
-/**
- * @brief MainWindow::inputSwitchCase
- * @param input the input from the user
- * @param action the action that was triggered earlier
- */
-void MainWindow::input_switch_case(ACTION action, QString qInput) {    
-    MyQTreeWidgetItem *my_project;
-    if(ui->project_tree->selectedItems().size() == 1) {
-        my_project = (MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
-    } else {
-        set_status_bar("Multiple or no things selected.");
-    }
-    switch(action) {
-    case ADD_PROJECT: {
-        Project* proj = fileHandler->create_project(qInput);
-        add_project_to_tree(proj);
-        set_status_bar("Project " + qInput.toStdString() + " created.");
-        delete input_window;
-        break;
-    }
-    case CANCEL:
-        set_status_bar("Cancel");
-        delete input_window;
-        break;
-    case ADD_VIDEO: {
-        ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), qInput.toStdString());
-        add_video_to_tree(qInput.toStdString(), id);
-        set_status_bar("Video " + qInput.toStdString() + " added.");
-        break;
-    }
-    default:
-        break;
-    }
+    MakeProject *make_project = new MakeProject(this, this->fileHandler, this->fileHandler->get_work_space().absolutePath().toStdString());
+    make_project->show();
+    set_status_bar("Adding project");
 }
 
 /**
@@ -654,11 +617,14 @@ void MainWindow::on_actionAddVideo_triggered() {
     QTreeWidgetItem *project;
     if(ui->project_tree->selectedItems().size() == 1) {
         project = ui->project_tree->selectedItems().first();
-        if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
+        MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
+        if (my_project->type == TYPE::PROJECT){
             QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
-                input_switch_case(ACTION::ADD_VIDEO, dir);
+                ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), dir.toStdString());
+                add_video_to_tree(dir.toStdString(), id);
+                set_status_bar("Video " + dir.toStdString() + " added.");
             }
         } else {
             set_status_bar("No project selected.");

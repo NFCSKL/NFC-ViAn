@@ -17,12 +17,12 @@
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
-#include "inputwindow.h"
 #include "bookmarkview.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
+#include "makeproject.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
@@ -38,6 +38,7 @@ class MainWindow : public QMainWindow
 
 public:
     void set_status_bar(string status, int timer = 750);
+    void add_project_to_tree(Project* proj);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
@@ -150,7 +151,6 @@ private slots:
 private:
 
     Ui::MainWindow *ui;
-    inputwindow *input_window;
     video_player* mvideo_player;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
@@ -167,7 +167,6 @@ private:
     FileHandler *fileHandler;
 
     void setup_video_player(video_player *mplayer);
-    void add_project_to_tree(Project* proj);
 
     void add_video_to_tree(string file_path, ID id);
 
