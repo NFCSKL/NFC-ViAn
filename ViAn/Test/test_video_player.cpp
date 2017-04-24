@@ -11,7 +11,7 @@
 test_video_player::test_video_player(QObject *parent) : QObject(parent) {
     QMutex mutex;
     QWaitCondition wait;
-    mvideo = new video_player(&mutex, &wait);
+    mvideo = new video_player(&mutex, &wait, NULL);
 }
 
 /**
@@ -120,7 +120,8 @@ void test_video_player::test_dec_playback_speed(){
 void test_video_player::test_toggle_overlay() {
     QMutex mutex;
     QWaitCondition wait;
-    video_player *v_player = new video_player(&mutex, &wait);
+    QLabel label;
+    video_player *v_player = new video_player(&mutex, &wait, &label);
     v_player->video_overlay->set_showing_overlay(false);
     v_player->toggle_overlay();
     QVERIFY(v_player->is_showing_overlay());
@@ -322,6 +323,33 @@ void test_video_player::test_set_stop_video() {
 }
 
 /**
+ * @brief test_video_player::test_analysis_area_toggle
+ */
+void test_video_player::test_analysis_area_toggle() {
+    bool original_value = mvideo->analysis_area->is_including_area();
+    mvideo->analysis_area->invert_area();
+    QVERIFY(mvideo->analysis_area->is_including_area() != original_value);
+}
+
+/**
+ * @brief test_video_player::test_analysis_area_points
+ */
+void test_video_player::test_analysis_area_points() {
+    std::vector<QPoint> original_points;
+    original_points.push_back(QPoint(0, 10));
+    original_points.push_back(QPoint(210, 150));
+    original_points.push_back(QPoint(255, 255));
+    original_points.push_back(QPoint(1024, 0));
+    for (std::vector<int>::size_type i = 0; i != original_points.size(); i++) {
+        mvideo->analysis_area->add_point(original_points[i]);
+    }
+    std::vector<cv::Point>* points = mvideo->analysis_area->get_polygon();
+    for (std::vector<int>::size_type i = 0; i != points->size(); i++) {
+        QVERIFY((*points)[i].x == original_points[i].x());
+    }
+}
+
+/**
  * @brief test_video_player::test_on_set_playback_frame_pass
  * Test on_set_playback_frame with valid inputs
  */
@@ -413,4 +441,31 @@ void test_video_player::test_convert_frame() {
     mvideo->convert_frame(true);
     QVERIFY(mvideo->img.format() == QImage::Format_Indexed8);
     QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
+}
+
+/**
+ * @brief test_video_player::test_set_zoom_area
+ */
+void test_video_player::test_set_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(0, 0, 10, 10);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 10);
+    QVERIFY(mvideo->zoom_area->get_height() == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().x == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().y == 0);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().width == 10);
+    QVERIFY(mvideo->zoom_area->get_zoom_area().height == 10);
+}
+
+/**
+ * @brief test_reset_zoom_area
+ */
+void test_video_player::test_reset_zoom_area() {
+    mvideo->zoom_area->set_zoom_area(10, 10, 100, 100);
+    mvideo->zoom_area->set_size(128, 128);
+    QVERIFY(mvideo->zoom_area->get_x() == 0);
+    QVERIFY(mvideo->zoom_area->get_y() == 0);
+    QVERIFY(mvideo->zoom_area->get_width() == 128);
+    QVERIFY(mvideo->zoom_area->get_height() == 128);
 }

@@ -11,14 +11,13 @@ QT += axcontainer
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = ViAn
 TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    GUI/reportgenerator.cpp
+SOURCES += main.cpp
+
 
 
 #
@@ -33,12 +32,12 @@ HEADERS += Test/test_video_player.h \
     GUI/reportgenerator.h
 
 
+
 #
 # LIBRARY
 #
 SOURCES += Library/customdialog.cpp
 HEADERS += Library/customdialog.h
-
 
 #
 # GUI
@@ -48,7 +47,9 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/inputwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
-    GUI/bookmark.cpp
+    GUI/bookmarkitem.cpp \
+    GUI/reportgenerator.cpp
+
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -57,7 +58,7 @@ HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
-    GUI/bookmark.h
+    GUI/bookmarkitem.h
 
 
 FORMS    += GUI/mainwindow.ui \
@@ -116,14 +117,16 @@ unix {
 #
 SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
-    Filehandler/analysis.cpp \
-    Filehandler/video.cpp
+    Filehandler/video.cpp \
+    Filehandler/videoproject.cpp \
+    Filehandler/bookmark.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
-    Filehandler/analysis.h\
-    Filehandler/video.h
+    Filehandler/video.h \
+    Filehandler/videoproject.h \
+    Filehandler/bookmark.h
 
 win32{
 

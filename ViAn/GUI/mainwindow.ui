@@ -17,35 +17,44 @@
    <double>1.000000000000000</double>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayoutLeft">
-        <item>
-         <widget class="QTreeWidget" name="ProjectTree">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <column>
-           <property name="text">
-            <string/>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTreeWidget" name="project_tree">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayoutMiddle">
         <property name="sizeConstraint">
          <enum>QLayout::SetNoConstraint</enum>
         </property>
         <item>
          <widget class="QFrame" name="videoFrameContainer">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -54,19 +63,47 @@
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
-            <widget class="QLabel" name="videoFrame">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="scaledContents">
+            <widget class="QScrollArea" name="frame_scroll_area">
+             <property name="widgetResizable">
               <bool>true</bool>
              </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>232</width>
+                <height>282</height>
+               </rect>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="0" column="0">
+                <widget class="QLabel" name="video_frame">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="cursor">
+                  <cursorShape>ArrowCursor</cursorShape>
+                 </property>
+                 <property name="autoFillBackground">
+                  <bool>true</bool>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </widget>
            </item>
           </layout>
@@ -78,7 +115,7 @@
            <enum>QLayout::SetNoConstraint</enum>
           </property>
           <item>
-           <widget class="QPushButton" name="fastBackwardButton">
+           <widget class="QPushButton" name="decrease_speed_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -103,7 +140,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="previousFrameButton">
+           <widget class="QPushButton" name="previous_frame_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -125,7 +162,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="playPauseButton">
+           <widget class="QPushButton" name="play_pause_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -144,7 +181,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="nextFrameButton">
+           <widget class="QPushButton" name="next_frame_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -169,7 +206,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="fastForwardButton">
+           <widget class="QPushButton" name="increase_speed_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -194,7 +231,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="stopButton">
+           <widget class="QPushButton" name="stop_button">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -219,7 +256,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="bookmarkButton">
+           <widget class="QPushButton" name="bookmark_button">
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -265,7 +302,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSlider" name="videoSlider">
+           <widget class="QSlider" name="video_slider">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -296,22 +333,16 @@
          </layout>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayoutRight">
-        <item>
-         <widget class="QListWidget" name="documentList">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+      </widget>
+      <widget class="QListWidget" name="document_list">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -320,8 +351,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>674</width>
-     <height>21</height>
+     <width>616</width>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -372,8 +403,11 @@
     </property>
     <addaction name="actionShow_hide_overlay"/>
     <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="actionInvert_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
+    <addaction name="action_original_size"/>
+    <addaction name="action_fill_screen"/>
     <addaction name="actionRotate_right"/>
     <addaction name="actionRotate_left"/>
    </widget>
@@ -474,6 +508,7 @@
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
    <addaction name="actionShow_hide_analysis_area"/>
+   <addaction name="actionInvert_analysis_area"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -749,6 +784,25 @@
     <string>Contrast/Brightness</string>
    </property>
   </action>
+  <action name="action_original_size">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Original size</string>
+   </property>
+   <property name="toolTip">
+    <string>Original size (on/off)</string>
+   </property>
+  </action>
+  <action name="action_fill_screen">
+   <property name="text">
+    <string>Fill screen</string>
+   </property>
+   <property name="toolTip">
+    <string>Fill screen</string>
+   </property>
+  </action>
   <action name="actionRotate_right">
    <property name="icon">
     <iconset resource="../resources.qrc">
@@ -781,6 +835,14 @@
    </property>
    <property name="toolTip">
     <string>Create a .docx document based on all bookmarks</string>
+   </property>
+  </action>
+  <action name="actionInvert_analysis_area">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Invert analysis area</string>
    </property>
   </action>
  </widget>

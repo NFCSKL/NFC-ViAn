@@ -7,42 +7,12 @@
 #include <fstream>
 #include <sstream>
 #include "filehandler.h"
+#include "videoproject.h"
 #include "video.h"
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDir>
 typedef int ID;
-/**
- * @brief The ProjectStream struct
- * Used for writing projects to and from files.
- * Importand for seperation of different types of data.
- */
-struct ProjectStream{
-    std::stringstream proj_file;
-    std::stringstream videos;
-    std::stringstream analyzes;
-    std::stringstream drawings;
-};
-/**
- * @brief The ProjFiles struct
- * project file container, simplifies code for readability,
- * also easier to pass all files as opposed to every file
- * seperately
- */
-struct ProjFiles{
-   ID dir;
-   ID f_proj;
-   ID f_analysis;
-   ID f_drawings;
-   ID f_videos;
-   ProjFiles(){
-       this->dir = -1;
-       this->f_proj = -1;
-       this->f_analysis = -1;
-       this->f_drawings = -1;
-       this->f_videos = -1;
-   }
-
-   friend ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf);
-   friend ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf);
-};
 
 /**
  * @brief The Project struct
@@ -57,10 +27,14 @@ public:
     Project(std::string dir_path);
     ~Project();
     ID add_video(Video *vid);
-    void remove_video(ID id);
+    ID add_video_project(VideoProject* vid_proj);
+    void add_bookmark(ID id, Bookmark *bookmark);
+    void delete_artifacts();
+    void remove_video_project(ID id);
     // read and write operator for Projects
-    friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
-    friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
+
 
 // TODO
 //    void add_analysis();
@@ -69,8 +43,10 @@ public:
     ID id;
     ID v_id;
     std::string name;
-    ProjFiles* files;
-    std::map<ID,Video*> videos;
+    std::map<ID,VideoProject*> videos;
+    ID dir;
+    ID bookmark_dir;
+    ID dir_videos;
     bool saved;
 };
 
