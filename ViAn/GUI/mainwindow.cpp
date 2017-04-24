@@ -803,14 +803,18 @@ void MainWindow::toggle_toolbar() {
         ui->toolBar_analysis->show();
         ui->toolBar->hide();
         ui->toolBar_overlay->hide();
+        ui->actionShow_hide_overlay->setEnabled(false);
     } else if (mvideo_player->is_showing_overlay()) {
         ui->toolBar_analysis->hide();
         ui->toolBar->hide();
         ui->toolBar_overlay->show();
+        ui->actionShow_hide_analysis_area->setEnabled(false);
     } else {
         ui->toolBar_analysis->hide();
         ui->toolBar->show();
         ui->toolBar_overlay->hide();
+        ui->actionShow_hide_overlay->setEnabled(true);
+        ui->actionShow_hide_analysis_area->setEnabled(true);
     }
 }
 
