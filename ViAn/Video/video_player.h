@@ -13,6 +13,7 @@
 #include <QImageWriter>
 #include <QWaitCondition>
 #include "overlay.h"
+#include "analysisoverlay.h"
 
 #include <chrono>
 
@@ -159,6 +160,7 @@ private:
     int beta = 0;
 
     Overlay* video_overlay = new Overlay();
+    AnalysisOverlay* analysis_overlay = new AnalysisOverlay();
 };
 
 #endif // VIDEO_PLAYER_H

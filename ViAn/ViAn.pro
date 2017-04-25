@@ -16,6 +16,7 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
+    Video/analysisoverlay.cpp
 
 #
 # TEST
@@ -26,6 +27,7 @@ SOURCES += Test/test_video_player.cpp\
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
+    Video/analysisoverlay.h
 
 #
 # LIBRARY
