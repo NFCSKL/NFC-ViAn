@@ -4,13 +4,13 @@
  * @brief BookmarkItem::BookmarkItem
  * @param frame_nbr Frame number associated with the bookmark.
  * @param frame Frame image associated with the bookmark.
- * @param file_path Path to the stored image.
+ * @param file_path Path to the directory for the stored frame.
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
 
-BookmarkItem::BookmarkItem(int frame_nbr, QImage frame, QString file_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
-    bookmark = new Bookmark(frame_nbr, frame, file_path, string);
+BookmarkItem::BookmarkItem(int frame_nbr, QImage frame, QString dir_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
+    bookmark = new Bookmark(frame_nbr, frame, dir_path, string);
     create_thumbnail(frame);
 }
 
