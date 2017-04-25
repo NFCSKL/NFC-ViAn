@@ -4,7 +4,7 @@
  * @brief BookmarkItem::BookmarkItem
  * @param frame_nbr Frame number associated with the bookmark.
  * @param frame Frame image associated with the bookmark.
- * @param file_path Path to the directory for the stored frame.
+ * @param dir_path Path to the directory for the stored frame.
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
