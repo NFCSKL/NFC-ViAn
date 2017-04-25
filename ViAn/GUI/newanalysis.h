@@ -19,12 +19,13 @@ public:
     ~NewAnalysis();
 
 private slots:
-    void on_ok_button_clicked();
+    void on_add_button_clicked();
 
 private:
     Ui::NewAnalysis *ui;
     MainWindow *mainwindow;
     FileHandler *file_handler;
+    void set_status_bar(std::string status, int timer = 750);
 };
 
 #endif // NEWANALYSIS_H

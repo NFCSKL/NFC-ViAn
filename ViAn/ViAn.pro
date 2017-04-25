@@ -27,7 +27,6 @@ HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
 
-
 #
 # LIBRARY
 #
@@ -114,14 +113,17 @@ SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
     Filehandler/video.cpp \
     Filehandler/videoproject.cpp \
-    Filehandler/bookmark.cpp
+    Filehandler/bookmark.cpp \
+    Filehandler/saveable.cpp
+
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
     Filehandler/video.h \
     Filehandler/videoproject.h \
-    Filehandler/bookmark.h
+    Filehandler/bookmark.h  \
+    Filehandler/saveable.h
 
 win32{
 

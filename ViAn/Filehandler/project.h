@@ -6,12 +6,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "filehandler.h"
-#include "videoproject.h"
-#include "video.h"
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDir>
+
+#include "filehandler.h"
+#include "videoproject.h"
+#include "video.h"
+#include "saveable.h"
 typedef int ID;
 
 /**
@@ -20,7 +22,8 @@ typedef int ID;
  * along with parser functionality
  */
 
-struct Project{
+struct Project : Saveable{
+    std::string name;
 public:
     Project();
     Project(ID id, std::string name);
@@ -42,7 +45,6 @@ public:
 public:
     ID id;
     ID v_id;
-    std::string name;
     std::map<ID,VideoProject*> videos;
     ID dir;
     ID bookmark_dir;

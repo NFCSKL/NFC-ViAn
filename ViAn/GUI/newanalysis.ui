@@ -18,7 +18,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QListWidget" name="analysi_list"/>
+       <widget class="QListWidget" name="analysis_list"/>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -26,29 +26,29 @@
          <widget class="QComboBox" name="analysis_choise_list"/>
         </item>
         <item>
+         <widget class="QLineEdit" name="name_input">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QPushButton" name="ok_button">
+           <widget class="QPushButton" name="add_button">
             <property name="text">
-             <string>Ok</string>
+             <string>Add</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="cancel_button">
+           <widget class="QCheckBox" name="use_analysis_area">
             <property name="text">
-             <string>Cancel</string>
+             <string>Use analysis area</string>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>
@@ -62,7 +62,7 @@
      <x>0</x>
      <y>0</y>
      <width>294</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

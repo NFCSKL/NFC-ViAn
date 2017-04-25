@@ -27,7 +27,7 @@
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
-class inputwindow;
+class NewAnalysis;
 
 namespace Ui {
 class MainWindow;
@@ -169,7 +169,8 @@ private:
             );
 
     FileHandler *fileHandler;
-
+    NewAnalysis *new_analysis;
+    void setup_filehandler();
     void setup_video_player(video_player *mplayer);
 
     void add_video_to_tree(string file_path, ID id);

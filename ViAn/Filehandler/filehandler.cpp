@@ -9,7 +9,8 @@ FileHandler::FileHandler() {
     this->project_id = 0; // zero out counter ids
     this->file_id = 0;
     this->dir_id = 0;
-    this->last_error = false;
+    this->last_error = false;    
+    open_projects.clear();
     #ifdef _WIN32
         this->work_space = create_directory("C:/");
     #elif __APPLE__
@@ -17,6 +18,60 @@ FileHandler::FileHandler() {
     #elif __unix__
         this->work_space =  create_directory("~/");
     #endif
+    load();
+}
+
+/**
+ * @brief FileHandler::~FileHandler
+ * Save filehandler state when destroyed.
+ * Deletes projects.
+ */
+FileHandler::~FileHandler(){
+    // Delete projects
+    for(auto it = projects.begin(); it != projects.end(); it++){
+        delete it->second;
+    }
+    save();
+}
+
+/**
+ * @brief FileHandler::save
+ * Save filehandler.
+ */
+void FileHandler::save(){
+    QDir dir;
+    dir.cd(".");
+    this->save_name = dir.absoluteFilePath("state").toStdString();
+    save_saveable(this,add_dir(dir), JSON);
+}
+
+/**
+ * @brief FileHandler::load
+ * Load filehandler.
+ */
+void FileHandler::load(){
+    QDir dir;
+    dir.cd(".");
+    this->save_name = dir.absoluteFilePath("state.json").toStdString();
+    load_saveable(this, this->save_name, JSON);
+}
+
+/**
+ * @brief FileHandler::open_project
+ * @param id
+ * Open project by id.
+ */
+void FileHandler::open_project(ID id){
+    this->open_projects.push_back(id);
+}
+
+/**
+ * @brief FileHandler::close_project
+ * @param id
+ * Close project by id.
+ */
+void FileHandler::close_project(ID id){
+    open_projects.erase(std::remove(open_projects.begin(), open_projects.end(), id), open_projects.end());
 }
 
 /**
@@ -33,9 +88,40 @@ void FileHandler::set_work_space(std::string new_work_space){
  * @brief FileHandler::get_work_space
  * @return default work_space
  */
-QDir FileHandler::get_work_space()
-{
+QDir FileHandler::get_work_space(){
     return this->get_dir(this->work_space);
+}
+
+/**
+ * @brief FileHandler::read
+ * @param json
+ * Reads filehandler from a json object.
+ */
+void FileHandler::read(const QJsonObject &json){
+    QJsonArray json_projs = json["open"].toArray();
+    for(int i = 0; i != json_projs.size(); i++){
+        QJsonObject json_path = json_projs[i].toObject();
+        std::string path = json_path["path"].toString().toStdString();
+        open_project(load_project(path)->id);
+    }
+}
+/**
+ * @brief FileHandler::write
+ * @param json
+ * Writes filehandler to a json object
+ */
+void FileHandler::write(QJsonObject &json){
+    QJsonArray json_projs;
+    for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
+        QJsonObject json_path;
+        ID id = *it;
+        Project* proj = get_project(id);
+        QDir dir = get_dir(proj->dir);
+        QString path = dir.absoluteFilePath((proj->name + ".json").c_str());
+        json_path["path"] = path;
+        json_projs.append(json_path);
+    }
+    json["open"] = json_projs;
 }
 
 /**
@@ -60,6 +146,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
+    open_project(proj->id);                     // Open project
     return proj;
 }
 
@@ -109,7 +196,7 @@ bool FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
-    this->save_project(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
+    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
 }
 
 /**
@@ -118,29 +205,30 @@ void FileHandler::save_project(ID id){
  * Exposed interface, added for simplicity of call when
  * project pointer is still available
  */
-void FileHandler::save_project(Project* proj){
-    this->save_project(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
+void FileHandler::save_project(Project *proj){
+    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
 }
 
 /**
- * @brief FileHandler::save_project
- * @param proj
+ * @brief FileHandler::save_saveable
+ * @param savable
  * @param dir_path
  * @param save_format
  * @return Saves a Json file to provided directory
  */
-bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMAT save_format){
+bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format){
     QDir dir = get_dir(dir_id);
-    std::string file_path = dir.absoluteFilePath(QString::fromStdString(proj->name)).toStdString();
+    std::string file_path = dir.absoluteFilePath(QString::fromStdString(saveable->save_name)).toStdString();
     QFile save_file(save_format == JSON
                     ? QString::fromStdString(file_path + ".json")
-                    : QString::fromStdString(file_path + ".dat"));
+                    : QString::fromStdString(file_path + ".dat"));    
     if(!save_file.open(QIODevice::WriteOnly)){
+        qWarning("Couldn't open save file.");
         return false;
     }
-    QJsonObject json_proj;
-    proj->write(json_proj);
-    QJsonDocument save_doc(json_proj);
+    QJsonObject json_saveable;
+    saveable->write(json_saveable);
+    QJsonDocument save_doc(json_saveable);
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
@@ -156,23 +244,28 @@ bool FileHandler::save_project(Project* proj, ID dir_id, FileHandler::SAVE_FORMA
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-    return load_project(full_project_path, JSON); // Decide format internally, here for flexibility
+     Project* proj = new Project();
+     load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
+     proj->saved = true;
+     proj->id = add_project(proj);
+     proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
+     proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
+     return proj;
 }
 
 /**
- * @brief FileHandler::load_project
- * @param full_project_path
+ * @brief FileHandler::load_savable
+ * @param full savable path
  * @param save_format
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORMAT save_form){
+Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
-
-    if (!load_file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open save file.");
+    if (!load_file.open(QIODevice::ReadOnly)) {        
+        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
         return nullptr;
     }
     QByteArray save_data = load_file.readAll();
@@ -180,15 +273,8 @@ Project* FileHandler::load_project(std::string full_path, FileHandler::SAVE_FORM
     QJsonDocument load_doc(save_form == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
-
-    Project* proj = new Project();
-    proj->saved = true;
-
-    proj->read(load_doc.object());
-    proj->id = add_project(proj);
-    proj->dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")))));
-    proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_path.substr(0, full_path.find_last_of("/")) + "/Bookmarks")));
-    return proj;
+    saveable->read(load_doc.object());
+    return saveable;
 }
 
 /**
@@ -201,6 +287,7 @@ bool FileHandler::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
     this->proj_map_lock.lock();    
     if(this->projects.erase(proj_id)){
+        close_project(temp->id);
         temp->delete_artifacts();
         QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
         file.remove();
@@ -210,7 +297,7 @@ bool FileHandler::delete_project(ID proj_id){
         this->proj_map_lock.unlock();
         return true;
     }
-    this->proj_map_lock.unlock();
+    this->proj_map_lock.unlock();    
     return false;
 }
 

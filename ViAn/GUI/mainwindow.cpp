@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup a Bookmark View in the right sidebar in the GUI.
     bookmark_view = new BookmarkView(ui->document_list);
 
-    fileHandler = new FileHandler();
+    setup_filehandler();
 
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // The video player is not in original size.
     original_size = false;
+
+    this->new_analysis = new NewAnalysis(this, fileHandler);
 }
 
 
@@ -71,6 +73,20 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
+
+    delete new_analysis;
+}
+/**
+ * @brief MainWindow::setup_filehandler
+ * Sets up filehandler and loads projects.
+ */
+void MainWindow::setup_filehandler(){
+    fileHandler = new FileHandler();
+    for(auto it = fileHandler->open_projects.begin(); it != fileHandler->open_projects.end(); it++){
+        ID id = *it;
+        Project* proj = fileHandler->get_project(id);
+        add_project_to_tree(proj);
+    }
 }
 
 /**
@@ -598,6 +614,11 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
             connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
             connect(do_analysis, SIGNAL(triggered()), this, SLOT(on_action_do_analysis_triggered()));
+        } else if(item->type == TYPE::ANALYSIS) {
+            QAction *abort_analysis = new QAction(QIcon(""), tr("&Abort analysis"), this);
+            abort_analysis->setStatusTip(tr("Abort the analysis and remove it"));
+            menu.addAction(abort_analysis);
+            connect(abort_analysis, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
         }
     }
     QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
@@ -692,15 +713,6 @@ void MainWindow::on_actionLoad_triggered() {
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
         set_status_bar("Project " + loadProj->name + " loaded.");
-        // Add bookmarks
-        for(auto it = loadProj->videos.begin(); it != loadProj->videos.end(); it++){
-            VideoProject* v = it->second;
-            std::vector<Bookmark*> bookmarks = v->get_bookmarks();
-            for(auto it2 = bookmarks.begin(); it2 != bookmarks.end(); it2++){
-                Bookmark* bm = *it2;
-                bookmark_view->add_bookmark(bm);
-            }
-        }
     }
 }
 
@@ -716,8 +728,14 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
-        Video* v = vid->second->get_video();
-        add_video_to_tree(v->file_path, v->id);
+        VideoProject* v = vid->second;
+        add_video_to_tree(v->get_video()->file_path, v->get_video()->id);
+        // Add bookmarks
+        std::vector<Bookmark*> bookmarks = v->get_bookmarks();
+        for(auto it2 = bookmarks.begin(); it2 != bookmarks.end(); it2++){
+            Bookmark* bm = *it2;
+            bookmark_view->add_bookmark(bm);
+        }
     }
 }
 
@@ -778,6 +796,8 @@ void MainWindow::on_actionDelete_triggered() {
                 this->fileHandler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
             } else if (my_item->type == TYPE::PROJECT) {
                 this->fileHandler->delete_project(my_item->id);
+            } else if (my_item->type == TYPE::ANALYSIS) {
+                //this->fileHandler->delete_file(my_item->id);
             }
             remove_item_from_tree(my_item);
         }
@@ -1012,7 +1032,6 @@ void MainWindow::on_action_do_analysis_triggered() {
         video = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_video = (MyQTreeWidgetItem*) video;
         if (my_video->type == TYPE::VIDEO){
-            NewAnalysis *new_analysis = new NewAnalysis(this, this->fileHandler);
             new_analysis->show();
         } else {
             set_status_bar("No video selected.");
