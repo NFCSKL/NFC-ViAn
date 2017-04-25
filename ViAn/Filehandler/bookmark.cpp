@@ -46,16 +46,6 @@ QImage Bookmark::get_frame() {
 }
 
 /**
- * @brief Bookmark::get_file_path
- * @return Returns the file path to the stored image associated with the bookmark.
- *     Note that the file path might change when trying to export the bookmark,
- *     if there's already a file with this path.
- */
-QString Bookmark::get_file_path() {
-    return file_path;
-}
-
-/**
  * @brief Bookmark::get_description
  * @return Returns the description associated with the bookmark.
  */
@@ -101,7 +91,6 @@ void Bookmark::export_frame() {
 /**
  * @brief Bookmark::create_file_path
  * Creates the file path to export the bookmark frame to.
- * @param path Path to the directory to store the exported frame in.
  */
 void Bookmark::create_file_path() {
     QString path = QString(dir_path);
@@ -122,4 +111,13 @@ void Bookmark::create_file_path() {
 
     // Update file path variable
     file_path = path;
+}
+
+/**
+ * @brief Bookmark::delete_artifact
+ * Deletes the exported image.
+ */
+void Bookmark::delete_exported_image() {
+    QFile file(file_path);
+    file.remove();
 }

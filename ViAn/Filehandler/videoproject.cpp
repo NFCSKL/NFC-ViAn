@@ -86,8 +86,7 @@ void VideoProject::add_bookmark(Bookmark *bookmark){
 void VideoProject::delete_artifacts(){
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         Bookmark* temp = *it;
-        QFile file (temp->get_file_path());
-        file.remove();
+        temp->delete_exported_image();
     }
 }
 
