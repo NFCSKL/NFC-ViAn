@@ -31,7 +31,7 @@ void NewAnalysis::on_add_button_clicked() {
     if(!ui->name_input->text().isEmpty()) {
         mainwindow->add_analysis_to_tree(ui->name_input->text());
         ui->analysis_list->addItem(ui->name_input->text());
-    } else set_status_bar("No name given.")
+    } else set_status_bar("No name given.");
 }
 
 /**
