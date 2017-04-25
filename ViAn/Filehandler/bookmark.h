@@ -19,19 +19,20 @@ public:
     Bookmark();
     int get_frame_number();
     QImage get_frame();
-    QString get_file_path();
     QString get_description();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void export_frame();
     void create_file_path();
+    void delete_exported_image();
 private:
     QImage frame;           // Frame of the bookmark
     int frame_number;       // Frame at which the bookmark was taken
-    QString dir_path;      // Path to the directory for the bookmarks
-    QString file_path;      // File path to the frame image associated with the bookmark
+    QString dir_path;       // Path to the directory for the bookmarks
     QString description;    // Description for the bookmark, given by user
 
+    // Note that this variable can be altered when the bookmark is exported.
+    QString file_path;      // File path to the frame image associated with the bookmark
 };
 
 #endif // BOOKMARK_H
