@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->video_frame->setScaledContents(false);
 
     ui->project_tree->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
+    connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::right_click_project_tree_menu);
 
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
@@ -566,23 +566,15 @@ void MainWindow::on_actionZoom_out_triggered() {
 }
 
 /**
- * @brief MainWindow::prepare_menu
+ * @brief MainWindow::right_click_project_tree_menu
  * @param pos
  * Creates context menu on right-click in tree view
  */
-void MainWindow::prepare_menu(const QPoint & pos) {
+void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
     QTreeWidget *tree = ui->project_tree;
     MyQTreeWidgetItem *item = (MyQTreeWidgetItem*)tree->itemAt( pos );
     QMenu menu(this);
 
-    QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
-    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
-    create_project->setStatusTip(tr("Create project"));
-    load_project->setStatusTip(tr("Load project"));
-    menu.addAction(create_project);
-    menu.addAction(load_project);
-    connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
-    connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
     if(item != nullptr) {
         if(item->type == TYPE::PROJECT) {
             QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
@@ -596,14 +588,26 @@ void MainWindow::prepare_menu(const QPoint & pos) {
         } else if(item->type == TYPE::VIDEO) {
             QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
             QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
+            QAction *do_analysis = new QAction(QIcon(""), tr("&Do analysis"), this);
             load_video->setStatusTip(tr("Play video"));
             delete_video->setStatusTip(tr("Remove video from project"));
+            do_analysis->setStatusTip(tr("Do a analysis on video"));
             menu.addAction(load_video);
             menu.addAction(delete_video);
+            menu.addAction(do_analysis);
             connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+            connect(do_analysis, SIGNAL(triggered()), this, SLOT(on_action_do_analysis_triggered()));
         }
     }
+    QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+    create_project->setStatusTip(tr("Create project"));
+    load_project->setStatusTip(tr("Load project"));
+    menu.addAction(create_project);
+    menu.addAction(load_project);
+    connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
+    connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
@@ -728,6 +732,15 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
     video_in_tree->set_text_from_filepath(file_path);
     project->addChild(video_in_tree);
     project->setExpanded(true);
+}
+
+void MainWindow::add_analysis_to_tree(QString type) {
+    QTreeWidgetItem *video;
+    video = ui->project_tree->selectedItems().first();
+    MyQTreeWidgetItem *analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type);
+    analysis_in_tree->set_text(type.toStdString());
+    video->addChild(analysis_in_tree);
+    video->setExpanded(true);
 }
 
 /**
@@ -987,5 +1000,24 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
         set_status_bar("Choose an area to run the analysis on.");
     } else {
         set_status_bar("Choose an area to exclude from the analysis.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_do_analysis_triggered
+ */
+void MainWindow::on_action_do_analysis_triggered() {
+    QTreeWidgetItem *video;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        video = ui->project_tree->selectedItems().first();
+        MyQTreeWidgetItem *my_video = (MyQTreeWidgetItem*) video;
+        if (my_video->type == TYPE::VIDEO){
+            NewAnalysis *new_analysis = new NewAnalysis(this, this->fileHandler);
+            new_analysis->show();
+        } else {
+            set_status_bar("No video selected.");
+        }
+    } else {
+        set_status_bar("Multiple or no projects selected.");
     }
 }

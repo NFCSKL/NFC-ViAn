@@ -42,7 +42,8 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
     GUI/makeproject.cpp \
-    GUI/bookmarkitem.cpp
+    GUI/bookmarkitem.cpp \
+    GUI/newanalysis.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -50,11 +51,13 @@ HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
-    GUI/makeproject.h
-    GUI/bookmarkitem.h
+    GUI/makeproject.h \
+    GUI/bookmarkitem.h \
+    GUI/newanalysis.h
 
 FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui
+    GUI/makeproject.ui \
+    GUI/newanalysis.ui
 
 RESOURCES += resources.qrc
 #

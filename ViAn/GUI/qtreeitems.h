@@ -7,7 +7,7 @@
 #include <string>
 #define TEXT_LENGTH 15
 
-enum TYPE {PROJECT, VIDEO};
+enum TYPE {PROJECT, VIDEO, ANALYSIS};
 
 
 class MyQTreeWidgetItem: public QTreeWidgetItem {

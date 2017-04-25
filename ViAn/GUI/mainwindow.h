@@ -23,6 +23,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
+#include "newanalysis.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
@@ -39,6 +40,7 @@ class MainWindow : public QMainWindow
 public:
     void set_status_bar(string status, int timer = 750);
     void add_project_to_tree(Project* proj);
+    void add_analysis_to_tree(QString type);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
@@ -104,7 +106,7 @@ private slots:
 
     void on_actionLine_triggered();
 
-    void prepare_menu(const QPoint & pos);
+    void right_click_project_tree_menu(const QPoint & pos);
 
     void play_video();
 
@@ -147,6 +149,8 @@ private slots:
     void on_action_original_size_triggered();
 
     void on_actionInvert_analysis_area_triggered();
+
+    void on_action_do_analysis_triggered();
 
 private:
 

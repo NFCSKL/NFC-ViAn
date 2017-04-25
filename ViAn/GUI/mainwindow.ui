@@ -383,6 +383,7 @@
     <addaction name="actionExit"/>
     <addaction name="actionChoose_Workspace"/>
     <addaction name="menuDelete"/>
+    <addaction name="action_do_analysis"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -858,6 +859,11 @@
    </property>
    <property name="text">
     <string>Invert analysis area</string>
+   </property>
+  </action>
+  <action name="action_do_analysis">
+   <property name="text">
+    <string>Do analysis</string>
    </property>
   </action>
  </widget>
