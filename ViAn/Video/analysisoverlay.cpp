@@ -4,6 +4,7 @@
  * @brief AnalysisOverlay::AnalysisOverlay
  */
 AnalysisOverlay::AnalysisOverlay() {
+    // Temporary areas to show, since there's no analysis yet.
     add_area(2, cv::Point(50,50), cv::Point(150,150));
     add_area(3, cv::Point(50,50), cv::Point(150,150));
     add_area(4, cv::Point(50,50), cv::Point(150,150));
