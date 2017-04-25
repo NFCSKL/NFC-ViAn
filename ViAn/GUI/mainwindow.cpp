@@ -999,3 +999,15 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
     }
 }
 
+/**
+ * @brief MainWindow::on_actionShow_hide_analysis_overlay_triggered
+ * Toggles the state of showing the analysis overlay.
+ */
+void MainWindow::on_actionShow_hide_analysis_overlay_triggered() {
+    mvideo_player->toggle_analysis_overlay();
+    if (mvideo_player->is_showing_analysis_overlay()) {
+        set_status_bar("Showing analysis overlay: on.");
+    } else {
+        set_status_bar("Showing analysis overlay: off.");
+    }
+}

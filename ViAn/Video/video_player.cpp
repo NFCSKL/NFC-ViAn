@@ -271,6 +271,14 @@ bool video_player::is_showing_overlay() {
 }
 
 /**
+ * @brief video_player::is_showing_analysis_overlay
+ * @return Returns true if the analysis overlay is showing, else false.
+ */
+bool video_player::is_showing_analysis_overlay() {
+    return analysis_overlay->is_showing_overlay();
+}
+
+/**
  * @brief video_player::is_showing_analysis_tool
  * @return Returns true if the analysis area tool is showing, else false.
  */
@@ -538,6 +546,16 @@ void video_player::inc_playback_speed() {
  */
 void video_player::toggle_overlay() {
     video_overlay->toggle_overlay();
+    update_overlay();
+}
+
+/**
+ * @brief video_player::toggle_analysis_overlay
+ * Toggles the showing of the analysis overlay, and if video is paused updates
+ * the frame in the GUI to show with/without the overlay.
+ */
+void video_player::toggle_analysis_overlay() {
+    analysis_overlay->toggle_showing();
     update_overlay();
 }
 
