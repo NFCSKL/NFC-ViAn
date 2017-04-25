@@ -10,8 +10,6 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QImage>
-#include <QImageWriter>
-#include <QWaitCondition>
 #include "overlay.h"
 
 #include <chrono>
@@ -28,7 +26,7 @@ public:
     bool is_stopped();
     bool is_showing_overlay();
     bool is_showing_analysis_tool();
-    std::string export_current_frame(std::string path_to_folder, std::string file_name);
+    QImage get_current_frame_unscaled();
     bool video_open();
 
     int get_num_frames();    
