@@ -14,6 +14,7 @@
 #include "videoproject.h"
 #include "video.h"
 #include "saveable.h"
+#include "analysis.h"
 typedef int ID;
 
 /**
@@ -38,9 +39,9 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-
+    void add_analysis(ID id, Analysis an);
 // TODO
-//    void add_analysis();
+
 //    void add_drawing();      
 public:
     ID id;
