@@ -6,6 +6,7 @@
 ReportGenerator::ReportGenerator(Project* proj, FileHandler *file_handler)
 {
     this->proj = proj;
+
     this->file_handler = file_handler;
     //this->bookmark_path = proj_path.append("/bookmarks/");
     //std::cout << "proj_path: " << proj_path << std::endl;
@@ -44,6 +45,7 @@ void ReportGenerator::create_list_of_names()
             std::string bookmark_path = video_bookmark->get_file_path().toStdString();
             std::string bookmark_description = video_bookmark->get_description().toStdString();
             all_bookmarks.push_back(std::make_pair(bookmark_path, bookmark_description));
+
         }
     }
 }
@@ -53,24 +55,44 @@ void ReportGenerator::add_pictures(QAxObject* selection)
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     for (std::pair<std::string, std::string> bookmark : all_bookmarks) {
 
+        QString pic_path = QString::fromStdString(bookmark.first);
+        pic_path.replace("/", "\\\\");
 
         QAxObject* inlineShape = shapes->querySubObject(
                     "AddPicture(const QString&,bool,bool,QVariant)",
-                     QString::fromStdString(bookmark.first), true, true );
+                     pic_path, false, true);
+
+        std::cout << pic_path.toStdString() << std::endl;
+        // int const original_height = inlineShape->dynamicCall("Height").toInt();
+
+        QImage image = QImage(pic_path);
+        int const original_height = image.height();
+        int const original_width = image.width();
+
+        std::cout << original_height << " and widht : " << original_width << std::endl;
+
+        if(original_height != original_width){
+            inlineShape->dynamicCall( "Height", 126);
+            inlineShape->dynamicCall( "Width", 224);
+            std::cout << "omskalad efter 16:9" << std::endl;
+        }
+
 
         // Center image
         selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
-      //   selection->dynamicCall("TypeText(const QString&)", QString::fromStdString(bookmark.second));
 
+        selection->dynamicCall( "InsertParagraphAfter()" );
+        selection->dynamicCall( "InsertParagraphAfter()" );
+       // selection->dynamicCall("TypeText(const QString&)", QString::fromStdString(bookmark.second));
+
+        selection->dynamicCall("InsertAfter(const QString&)", QString::fromStdString(bookmark.second));
 
         // Add paragraphs between images
-      /*  selection->dynamicCall( "Collapse(int)", 0 );
-        for (int i = 0; i < 5; ++i) {
+        selection->dynamicCall( "Collapse(int)", 0 );
+        for (int i = 0; i < 3; ++i) {
              selection->dynamicCall( "InsertParagraphAfter()" );
         }
         selection->dynamicCall( "Collapse(int)", 0 );
-*/
-
     }
 }
 
