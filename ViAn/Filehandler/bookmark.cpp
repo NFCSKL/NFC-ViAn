@@ -3,13 +3,15 @@
 /**
  * @brief Bookmark::Bookmark
  * @param frame_nbr Frame number associated with the bookmark.
- * @param file_pth Path to the stored image.
+ * @param frme Frame associated with the bookmark.
+ * @param dir_pth Path to the directory to store image in.
  * @param string Text description of the bookmark.
  */
-Bookmark::Bookmark(int frame_nbr, QImage frme, QString file_pth, QString string) {
+Bookmark::Bookmark(int frame_nbr, QImage frme, QString dir_path, QString string) {
     this->frame_number = frame_nbr;
     this->frame = frme;
-    this->file_path = file_pth;
+    // The frae number needs to be set before using create_file_path()
+    this->file_path = create_file_path(dir_path);
     this->description = string;
 }
 /**
@@ -84,4 +86,16 @@ void Bookmark::write(QJsonObject& json){
 void Bookmark::export_frame() {
     QImageWriter writer(file_path, "tiff");
     writer.write(frame);
+}
+
+/**
+ * @brief Bookmark::create_file_path
+ * @param path Path to the directory to store the exported frame in.
+ * @return Returns the path to export the frame to.
+ */
+QString Bookmark::create_file_path(QString dir_path) {
+    dir_path.append("/");
+    dir_path.append(QString::number(frame_number));
+    dir_path.append(".tiff");
+    return dir_path;
 }

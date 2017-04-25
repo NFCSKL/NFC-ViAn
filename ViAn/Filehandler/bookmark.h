@@ -13,7 +13,7 @@
  */
 class Bookmark : Saveable{
 public:
-    Bookmark(int frame_nbr, QImage frme, QString file_pth, QString string);
+    Bookmark(int frame_nbr, QImage frme, QString dir_path, QString string);
     Bookmark();
     int get_frame_number();
     QImage get_frame();
@@ -22,6 +22,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void export_frame();
+    QString create_file_path(QString dir_path);
 private:
     QImage frame;           // Frame of the bookmark
     int frame_number;       // Frame at which the bookmark was taken
