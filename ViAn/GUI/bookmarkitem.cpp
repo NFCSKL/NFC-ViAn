@@ -30,7 +30,6 @@ BookmarkItem::BookmarkItem(Bookmark* bookmrk, QListWidget* view) : QListWidgetIt
  */
 void BookmarkItem::create_thumbnail(QString file_path) {
     QImage img = QImage(file_path, "TIFF");
-
     img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
     setData(Qt::DecorationRole, QPixmap::fromImage(img));
 }
