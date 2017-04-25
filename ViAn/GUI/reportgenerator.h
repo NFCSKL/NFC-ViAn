@@ -19,7 +19,7 @@ private:
     Project* proj;
 
     std::vector<std::string> bookmark_names;
-    std::vector<std::string> all_bookmarks;
+    std::vector<std::pair<std::string, std::string> > all_bookmarks;
 
     FileHandler *file_handler;
 

@@ -41,36 +41,36 @@ void ReportGenerator::create_list_of_names()
     for(std::pair<ID, VideoProject*> video : videos) {
         std::vector<Bookmark *> bookmark_list = video.second->get_bookmarks();
         for(Bookmark* video_bookmark : bookmark_list) {
-            all_bookmarks.push_back(video_bookmark->get_file_path().toStdString());
-            std::cout << video_bookmark->get_file_path().toStdString() << std::endl;
+            std::string bookmark_path = video_bookmark->get_file_path().toStdString();
+            std::string bookmark_description = video_bookmark->get_description().toStdString();
+            all_bookmarks.push_back(std::make_pair(bookmark_path, bookmark_description));
         }
     }
 }
 
 void ReportGenerator::add_pictures(QAxObject* selection)
 {
-
-    picPath.clear();
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
-    foreach (std::string bookmark, all_bookmarks) {
+    for (std::pair<std::string, std::string> bookmark : all_bookmarks) {
 
-       // picPath.append(QString::fromStdString(bookmark_path)).append(QString::fromStdString(name));
-       // std::cout << picPath.toStdString() << std::endl;
+
         QAxObject* inlineShape = shapes->querySubObject(
                     "AddPicture(const QString&,bool,bool,QVariant)",
-                     QString::fromStdString(bookmark), true, true );
+                     QString::fromStdString(bookmark.first), true, true );
 
         // Center image
         selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
+      //   selection->dynamicCall("TypeText(const QString&)", QString::fromStdString(bookmark.second));
+
 
         // Add paragraphs between images
-        selection->dynamicCall( "Collapse(int)", 0 );
+      /*  selection->dynamicCall( "Collapse(int)", 0 );
         for (int i = 0; i < 5; ++i) {
              selection->dynamicCall( "InsertParagraphAfter()" );
         }
         selection->dynamicCall( "Collapse(int)", 0 );
+*/
 
-        picPath.clear();
     }
 }
 
