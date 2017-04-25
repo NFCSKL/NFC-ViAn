@@ -5,14 +5,18 @@
 #include <QString>
 #include <vector>
 #include "saveable.h"
-enum ANALYSIS_TYPE{MOVEMENT_DETECTION = std::string("MOVEMENT_DETECTEN"), FACE_DETECTION = std::string("FACE_DETECTION")};
-struct POI : Saveable{
-    int start_frame;
-    int end_frame;
+enum ANALYSIS_TYPE {MOVEMENT = 0, FACE = 1};
+class POI : Saveable{
+    double frame;
+    std::string file_path;
     std::pair<double, double> upper_left;
-    std::pair down_right;
-    POI(std::pair<double,double> upper_left, std::pair<double,double> upper_left);
+    std::pair<double, double> down_right;
+public:
+    POI();
+    POI(std::pair<double,double> upper_left, std::pair<double,double> down_right);
     POI(std::pair<double,double> upper_left, double height, double width);
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
 };
 
 class Analysis : Saveable{
