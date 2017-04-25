@@ -4,7 +4,7 @@
  * @brief Bookmark::Bookmark
  * @param frame_nbr Frame number associated with the bookmark.
  * @param frame Frame associated with the bookmark.
- * @param dir_pth Path to the directory to store image in.
+ * @param dir_path Path to the directory to store image in.
  * @param string Text description of the bookmark.
  */
 Bookmark::Bookmark(int frame_nbr, QImage frame, QString dir_path, QString string) {
@@ -24,6 +24,7 @@ Bookmark::Bookmark(int frame_nbr, QImage frame, QString dir_path, QString string
 Bookmark::Bookmark() {
     frame_number = 0;
     frame = QImage();
+    dir_path = QString();
     file_path = QString();
     description = QString();
 }
