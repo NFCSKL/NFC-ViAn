@@ -3,7 +3,7 @@
 /**
  * @brief Bookmark::Bookmark
  * @param frame_nbr Frame number associated with the bookmark.
- * @param frme Frame associated with the bookmark.
+ * @param frame Frame associated with the bookmark.
  * @param dir_pth Path to the directory to store image in.
  * @param string Text description of the bookmark.
  */
