@@ -3,12 +3,13 @@
 #include <QJsonObject>
 #include <QString>
 #include <string>
+#include "saveable.h"
 /**
  * @brief The Bookmark class
  * Bookmark class is used for storing bookmarks, i.e. user
  * marked points in a video and an associated frame.
  */
-class Bookmark {
+class Bookmark : Saveable{
 public:
     Bookmark(int frame_nbr, QString file_pth, QString string);
     Bookmark();

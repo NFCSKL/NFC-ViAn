@@ -5,9 +5,9 @@
 #include <sstream>
 #include <QJsonObject>
 #include <QString>
+#include "saveable.h"
 typedef int ID;
-class Video
-{
+class Video : Saveable{
 
 public:
     Video();
