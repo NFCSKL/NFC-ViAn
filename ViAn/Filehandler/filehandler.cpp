@@ -24,8 +24,13 @@ FileHandler::FileHandler() {
 /**
  * @brief FileHandler::~FileHandler
  * Save filehandler state when destroyed.
+ * Deletes projects.
  */
 FileHandler::~FileHandler(){
+    // Delete projects
+    for(auto it = projects.begin(); it != projects.end(); it++){
+        delete it->second;
+    }
     save();
 }
 

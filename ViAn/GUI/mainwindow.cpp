@@ -83,7 +83,6 @@ void MainWindow::setup_filehandler(){
         ID id = *it;
         Project* proj = fileHandler->get_project(id);
         add_project_to_tree(proj);
-        std::cout << proj->name <<std::endl;
     }
 }
 
