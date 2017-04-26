@@ -90,9 +90,11 @@ void Bookmark::export_frame() {
 
 /**
  * @brief Bookmark::create_file_path
- * Creates the file path to export the bookmark frame to.
+ * Creates and updates the file path to export the bookmark frame to.
  */
 void Bookmark::create_file_path() {
+
+    // Append FRAMENR.tiff to the directory path
     QString path = QString(dir_path);
     path.append("/");
     path.append(QString::number(frame_number));
@@ -100,6 +102,7 @@ void Bookmark::create_file_path() {
 
     int counter = 1;
     while (QFile::exists(path)) {
+        // If file exists, try FRAMENR(X).tiff
         path = QString(dir_path);
         path.append("/");
         path.append(QString::number(frame_number));
