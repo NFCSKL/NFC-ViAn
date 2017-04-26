@@ -4,7 +4,7 @@
 #include <QString>
 #include <QImage>
 #include <QImageWriter>
-#include <QFileInfo>
+#include <QFile>
 #include <string>
 #include <iostream>
 #include "saveable.h"
