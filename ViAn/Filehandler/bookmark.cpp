@@ -122,7 +122,7 @@ void Bookmark::create_file_path() {
 
 /**
  * @brief Bookmark::remove_exported_image
- * Removes the exported image, if tthere is one.
+ * Removes the exported image, if there is one.
  */
 void Bookmark::remove_exported_image() {
     // If the file path is empty, then the frame has not been exported so there's nothing to remove.
