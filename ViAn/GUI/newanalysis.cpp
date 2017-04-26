@@ -63,7 +63,7 @@ float NewAnalysis::get_fps() {
     CustomDialog dialog("FPS", this);
     dialog.addLabel("Enter value:");
     dialog.addDblSpinBoxF(fps_text, FPS_MIN, FPS_MAX, &fps, FPS_DECIMALS, FPS_STEP,
-                          "Choose fps value with the input box.");
+                          "Choose FPS value with the input box.");
 
     // Show the dialog (execution will stop here until the dialog is finished)
     dialog.exec();
