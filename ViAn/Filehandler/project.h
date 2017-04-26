@@ -39,7 +39,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-    void add_analysis(ID id, Analysis an);
+    void add_analysis(Analysis an);
 // TODO
 
 //    void add_drawing();      
