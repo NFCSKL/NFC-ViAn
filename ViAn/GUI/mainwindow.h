@@ -7,6 +7,7 @@
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
+#include "Library/customdialog.h"
 #include "Video/video_player.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -16,11 +17,13 @@
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
-#include "inputwindow.h"
+#include "bookmarkview.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
+#include "makeproject.h"
+#define SCROLL_AREA_MARGIN 25
 
 using namespace std;
 class inputwindow;
@@ -35,11 +38,12 @@ class MainWindow : public QMainWindow
 
 public:
     void set_status_bar(string status, int timer = 750);
+    void add_project_to_tree(Project* proj);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
-    bool eventFilter(QObject *obj, QEvent *event); //cannot follow namestandard, generated code
-    const std::string ARROW_STRING = " <--";
+    bool eventFilter(QObject *obj, QEvent *event); //can not follow namestandard, generated code
+    const int SLIDER_UPDATE_TIMER = 200;
 
     // Lock and wait condition to sleep player when video is paused
     QMutex mutex;
@@ -49,42 +53,46 @@ signals:
     void set_play_video();
     void set_pause_video();
     void set_stop_video();
+    void resize_video_frame(int width, int height);
+    void next_video_frame();
+    void prev_video_frame();
+    void set_playback_frame(int frame, bool show_frame = false);
 
 private slots:
 
-    void on_playPauseButton_clicked();
+    void on_play_pause_button_clicked();
 
-    void on_stopButton_clicked();
+    void on_stop_button_clicked();
 
     void on_actionExit_triggered();
 
-    void set_shortcuts();
-
-    void closeEvent (QCloseEvent *event);
+    void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
 
     void update_video(QImage frame);
 
     void set_video_slider_pos(int pos);
 
-    void resizeEvent(QResizeEvent* event);
+    void resizeEvent(QResizeEvent* event); //can not follow namestandard, generated code
 
-    void on_previousFrameButton_clicked();
+    void on_previous_frame_button_clicked();
 
-    void on_nextFrameButton_clicked();
+    void on_next_frame_button_clicked();
 
-    void on_fastBackwardButton_clicked();
+    void on_decrease_speed_button_clicked();
 
-    void on_fastForwardButton_clicked();
+    void on_increase_speed_button_clicked();
 
-    void on_bookmarkButton_clicked();
+    void on_bookmark_button_clicked();
+
+    void on_video_slider_sliderPressed();
+
+    void on_video_slider_sliderReleased();
+
+    void on_video_slider_valueChanged(int new_pos);
 
     void on_actionAddProject_triggered();
-
-    void on_videoSlider_valueChanged(int newPos);
-
-    void on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column);
     
-    void on_actionShow_hide_overlay_triggered();
+    void on_action_show_hide_overlay_triggered();
 
     void on_actionColour_triggered();
 
@@ -118,42 +126,67 @@ private slots:
 
     void on_actionAddVideo_triggered();
 
-    void on_actionDeleteProject_triggered();
+    void on_actionChoose_Workspace_triggered();
 
-signals:
-    void resize_video_frame(int width, int height);
-    void next_video_frame();
-    void prev_video_frame();
+    void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    
+    void on_action_show_hide_analysis_area_triggered();
 
+    void on_actionContrast_Brightness_triggered();
+
+    void on_action_fill_screen_triggered();
+
+    void on_actionRotate_right_triggered();
+
+    void on_actionRotate_left_triggered();
+
+    void on_document_list_itemClicked(QListWidgetItem *item);
+
+    void on_actionDelete_triggered();
+
+    void on_action_original_size_triggered();
+
+    void on_actionInvert_analysis_area_triggered();
+
+    void on_action_close_project_triggered();
+
+    void on_action_show_hide_analysis_overlay_triggered();
 
 private:
 
     Ui::MainWindow *ui;
-    inputwindow *inputWindow;
     video_player* mvideo_player;
-    IconOnButtonHandler *iconOnButtonHandler;
-
+    IconOnButtonHandler *icon_on_button_handler;
+    BookmarkView* bookmark_view;
     QSlider *video_slider;
 
+    bool slider_blocked = false;
+    bool slider_paused_video = false;
+    int prev_slider_pos = 0;
+
+    std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
+                std::chrono::system_clock::now().time_since_epoch()
+            );
+
     FileHandler *fileHandler;
-
+    void setup_filehandler();
     void setup_video_player(video_player *mplayer);
-    void set_selected_project(MyQTreeWidgetItem *newSelectedProject);
-    void set_selected_video(MyQTreeWidgetItem *newSelectedVideo);
-    void set_selected(MyQTreeWidgetItem *&selected, MyQTreeWidgetItem *new_selected);
-    void add_project_to_tree(Project* proj);
-    void add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath);
 
-    void remove_selected_project_from_tree();
-    void remove_video_from_tree(MyQTreeWidgetItem *video);
+    void add_video_to_tree(string file_path, ID id);
+
+    void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
     void toggle_toolbar();
     void enable_video_buttons();
 
-    MyQTreeWidgetItem *selectedProject;
-    MyQTreeWidgetItem *selectedVideo;
+    void on_slider_moving();
+    void on_slider_click(int new_pos, QPoint local_mouse_pos);
+    int slider_pos_under_mouse(QPoint local_mouse_pos);
+    QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
 
+    bool original_size;
 
+    void deselect_overlay_tool();
 
 };
 

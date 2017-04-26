@@ -4,36 +4,20 @@
  */
 Video::Video()
 {
-    this->filepath = "";
+    this->id = -1;
+    this->file_path = "";
 }
+
 /**
  * @brief Video::Video
  * @param id
  * @param filepath
  */
-Video::Video(std::string filepath){
-    this->filepath = filepath;
+Video::Video(std::string file_path){
+    this->file_path = file_path;
+    this->id = -1;
 }
-/**
- * @brief operator >>
- * @param is
- * @param vid
- * @return UNFINISHED
- */
-std::stringstream& operator>>(std::stringstream& is, Video& vid){    
-    is >> vid.filepath;  
-    return is;
-}
-/**
- * @brief operator <<
- * @param os
- * @param vid
- * @return used for writing project to file
- */
-std::stringstream& operator<<(std::stringstream& os, const Video& vid){
-    os << vid.filepath.c_str() << " ";
-    return os;
-}
+
 /**
  * @brief operator ==
  * @param v1
@@ -41,5 +25,23 @@ std::stringstream& operator<<(std::stringstream& os, const Video& vid){
  * @return if videos the same TRUE
  */
 bool operator==(Video v1, Video v2){
-    return v1.filepath == v2.filepath;
+    return v1.file_path == v2.file_path;
+}
+
+/**
+ * @brief Video::read
+ * @param json
+ * Read video parameters from json object.
+ */
+void Video::read(const QJsonObject& json){
+    this->file_path = json["file_path"].toString().toStdString();
+}
+
+/**
+ * @brief Video::write
+ * @param json
+ * Write video parameters to json object.
+ */
+void Video::write(QJsonObject& json){
+    json["file_path"] = QString::fromStdString(this->file_path);
 }

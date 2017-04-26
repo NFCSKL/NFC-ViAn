@@ -2,13 +2,126 @@
 
 /**
  * @brief FileHandler::FileHandler
+ * Initialize filehandler and set
+ * default value for workspace
  */
 FileHandler::FileHandler() {
-    this->m_pid = 0; // zero out counter ids
-    this->m_fid = 0;
-    this->m_did = 0;
-    this->lastError = 0;
+    this->project_id = 0; // zero out counter ids
+    this->file_id = 0;
+    this->dir_id = 0;
+    this->last_error = false;    
+    open_projects.clear();
+    #ifdef _WIN32
+        this->work_space = create_directory("C:/");
+    #elif __APPLE__
+        this->work_space =  create_directory("/Applications/");
+    #elif __unix__
+        this->work_space =  create_directory("~/");
+    #endif
+    load();
+}
 
+/**
+ * @brief FileHandler::~FileHandler
+ * Save filehandler state when destroyed.
+ * Deletes projects.
+ */
+FileHandler::~FileHandler(){
+    // Delete projects
+    for(auto it = projects.begin(); it != projects.end(); it++){
+        delete it->second;
+    }
+    save();
+}
+
+/**
+ * @brief FileHandler::save
+ * Save filehandler.
+ */
+void FileHandler::save(){
+    QDir dir;
+    dir.cd(".");
+    this->save_name = dir.absoluteFilePath("state").toStdString();
+    save_saveable(this,add_dir(dir), JSON);
+}
+
+/**
+ * @brief FileHandler::load
+ * Load filehandler.
+ */
+void FileHandler::load(){
+    QDir dir;
+    dir.cd(".");
+    this->save_name = dir.absoluteFilePath("state.json").toStdString();
+    load_saveable(this, this->save_name, JSON);
+}
+
+/**
+ * @brief FileHandler::open_project
+ * @param id
+ * Open project by id.
+ */
+void FileHandler::open_project(ID id){
+    this->open_projects.push_back(id);
+}
+
+/**
+ * @brief FileHandler::close_project
+ * @param id
+ * Close project by id.
+ */
+void FileHandler::close_project(ID id){
+    open_projects.erase(std::remove(open_projects.begin(), open_projects.end(), id), open_projects.end());
+}
+
+/**
+ * @todo save workspace to file
+ * @brief FileHandler::set_workspace
+ * @param new_work_space
+ * Change default work_space, ie where project files are saved.
+ */
+void FileHandler::set_work_space(std::string new_work_space){
+    this->work_space = create_directory(QString::fromStdString(new_work_space));
+}
+
+/**
+ * @brief FileHandler::get_work_space
+ * @return default work_space
+ */
+QDir FileHandler::get_work_space(){
+    return this->get_dir(this->work_space);
+}
+
+/**
+ * @brief FileHandler::read
+ * @param json
+ * Reads filehandler from a json object.
+ */
+void FileHandler::read(const QJsonObject &json){
+    QJsonArray json_projs = json["open"].toArray();
+    for(int i = 0; i != json_projs.size(); i++){
+        QJsonObject json_path = json_projs[i].toObject();
+        std::string path = json_path["path"].toString().toStdString();
+        open_project(load_project(path)->id);
+    }
+}
+/**
+ * @brief FileHandler::write
+ * @param json
+ * Writes filehandler to a json object
+ */
+void FileHandler::write(QJsonObject &json){
+    QJsonArray json_projs;
+    for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
+        QJsonObject json_path;
+        ID id = *it;
+        Project* proj = get_project(id);
+        QDir dir = get_dir(proj->dir);
+        QString path = dir.absoluteFilePath((proj->name + ".json").c_str());
+        json_path["path"] = path;
+        json_projs.append(json_path);
+    }
+    json["open"] = json_projs;
 }
 
 /**
@@ -17,219 +130,221 @@ FileHandler::FileHandler() {
  * @param std::string name
  * @return Project* created project
  */
-Project* FileHandler::create_project(std::string projName){
-    Project* proj =  new Project(this->m_pid, projName);
-    this->m_projects.insert(std::make_pair(proj->m_id, proj));
-    save_project(proj);
-    this->m_pid++;
+Project* FileHandler::create_project(QString proj_name, std::string dir_path){
+    Project* proj =  new Project(this->project_id, proj_name.toStdString());   
+    ID root_dir;
+    if(dir_path != "")                          //Directory name provided
+        root_dir = create_directory(QString::fromStdString(dir_path));
+    else if(dir_path == "" && proj->dir == -1)  // No directory name provided, project has no directory.
+        root_dir = this->work_space;                 // Default save location to workspace
+    else if(dir_path == "" && proj->dir != -1)  // No Directory provided and project previosuly saved
+        root_dir = proj->dir;                        // Use present save location
+    else
+        root_dir = this->work_space;
+
+    proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
+    proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
+    add_project(proj);                          // Add project to file sytstem
+    save_project(proj);                         // Save project file
+    open_project(proj->id);                     // Open project
     return proj;
 }
 
 /**
  * @brief FileHandler::create_directory
- * @param dirpath
- * @return unique directory ID
+ * @param dir_path
+ * @return id
+ * Creates a directory and all directories needed for that directory, ie
+ * "C:/THIS/IS/A/PATH/" will create THIS, IS, A and PATH directories if these do not exist.
  */
-ID FileHandler::create_directory(std::string dirpath){
-    this->lastError = make_dir(dirpath); //varying implementation, OS dependant
-    ID id = this->add_dir(dirpath);
+ID FileHandler::create_directory(QString dir_path){
+    QDir dir (QDir::root());
+    last_error = !dir.mkpath(dir_path);
+    if(last_error){
+        qWarning("Could not create directory %s",dir_path.toStdString().c_str());
+    }
+
+    dir.setPath(dir_path);
+    ID id = this->add_dir(dir);
     return id;
 }
 
 /**
  * @brief FileHandler::delete_directory
  * @param id
- * @return errorcode, if deletion was done code is 0;
- * otherwise see OS relevant directoryfile.
+ * @return bool, success.
+ * Deletes a given directory
  */
-FH_ERROR FileHandler::delete_directory(ID id){
-    FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
-    return err;
+bool FileHandler::delete_directory(ID id){
+    QDir temp = this->get_dir(id);
+    this->dir_map_lock.lock(); // Order important, locked in getter
+    if(temp.rmdir(temp.absolutePath())){
+        this->dir_map.erase(id);
+        this->dir_map_lock.unlock();
+        return true;
+    }
+    this->dir_map_lock.unlock();
+    return false;
+
 }
 
 /**
  * @brief FileHandler::save_project
  * @param id
+ * Save projects, exposed interface.
+ * Here for simplicity of call as well as hiding save format.
  */
 void FileHandler::save_project(ID id){
-    save_project(get_project(id));
+    Project* proj = get_project(id);
+    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
 }
 
 /**
- * @todo unfinished, needs full project structure
- * and program to file parser to finish
  * @brief FileHandler::save_project
- * @param Project* name
- * Creates project and associated files.
- * @return void
+ * @param proj
+ * Exposed interface, added for simplicity of call when
+ * project pointer is still available
  */
-void FileHandler::save_project(Project* proj){
-    std::string projFile = proj->m_name + std::string(".txt"); //filename
-    if(!proj->saved){
-        ID dirID = create_directory(std::string(WORKSPACE) + "/"+ proj->m_name);//project directory
-
-        proj->files->dir = dirID;
-
-        proj->files->f_proj = create_file(projFile, dirID); //create project file
-
-        std::string vidFile = proj->m_name + "_videos.txt";
-        proj->files->f_videos = create_file(vidFile, dirID); //create video file
-
-
-        std::string analysisFile = proj->m_name + "_analyses.txt";
-        proj->files->f_analysis = create_file(analysisFile, dirID); //create analysis file
-
-
-        std::string drawingFile = proj->m_name + "_drawings.txt";
-        proj->files->f_drawings =create_file(drawingFile, dirID); //create drawings file
-    }
-    update_proj_files(proj);
-
+void FileHandler::save_project(Project *proj){
+    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
 }
 
 /**
- * @todo unfinished, will be released with parser
- * however, is needed for creating
- * @brief FileHandler::save_project
- * @param Project* name
- * Creates project and associated files.
- * @return void
+ * @brief FileHandler::save_saveable
+ * @param savable
+ * @param dir_path
+ * @param save_format
+ * @return Saves a Json file to provided directory
  */
-void FileHandler::update_proj_files(Project* proj){
-    ProjectStream ps;
-    ps << *proj;
-    write_file(proj->files->f_proj, ps.projFile.str(), WRITE_OPTION::OVERWRITE);
-    write_file(proj->files->f_videos, ps.videos.str(), WRITE_OPTION::OVERWRITE);
-    write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
-    write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
-}
-void FileHandler::load_proj_files(std::string str){
-    ID id;
-    std::string filepath;
-    std::stringstream sstr;
-    sstr << str;    
-    //read files until empty
-    while(sstr >> id >> filepath){
-        add_file(id, filepath);
+bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format){
+    QDir dir = get_dir(dir_id);
+    std::string file_path = dir.absoluteFilePath(QString::fromStdString(saveable->save_name)).toStdString();
+    QFile save_file(save_format == JSON
+                    ? QString::fromStdString(file_path + ".json")
+                    : QString::fromStdString(file_path + ".dat"));    
+    if(!save_file.open(QIODevice::WriteOnly)){
+        qWarning("Couldn't open save file.");
+        return false;
     }
+    QJsonObject json_saveable;
+    saveable->write(json_saveable);
+    QJsonDocument save_doc(json_saveable);
+    save_file.write(save_format == JSON
+            ? save_doc.toJson()
+            : save_doc.toBinaryData());
+    return true;
 }
 
 /**
  * @brief FileHandler::load_project
- * @param dirpath
- * @return
+ * @param full_project_path
+ * @return loaded Project
+ * Public load function
+ * Used for simplicity of call and
+ * for hiding save format.
  */
-Project* FileHandler::load_project(std::string fullProjectPath){
-    std::string dirpath = fullProjectPath.substr(0, fullProjectPath.find_last_of("/"));
-    std::string proj_name = fullProjectPath.substr(fullProjectPath.find_last_of("/")+1, fullProjectPath.length());
-    proj_name = proj_name.substr(0, proj_name.find(".txt"));
-    return load_project(proj_name, dirpath);
+Project* FileHandler::load_project(std::string full_project_path){
+     Project* proj = new Project();
+     load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
+     proj->saved = true;
+     proj->id = add_project(proj);
+     proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
+     proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
+     return proj;
 }
 
 /**
- * @todo load analyses (in project <</>> operators)
- * @todo load drawings (in project <</>> operators)
- * @brief FileHandler::load_project
- * @param projname
- * @param dirpath
- * @return project
+ * @brief FileHandler::load_savable
+ * @param full savable path
+ * @param save_format
+ * @return loaded Project
+ * Loads project from json file and returns it
  */
-Project* FileHandler::load_project(std::string projname, std::string dirpath){
-    Project* proj = new Project();
-    proj->m_id = this->m_pid;
-    proj->files->dir = add_dir(dirpath);
+Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){
+    QFile load_file(save_form == JSON
+        ? QString::fromStdString(full_path)
+        : QString::fromStdString(full_path));
+    if (!load_file.open(QIODevice::ReadOnly)) {        
+        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
+        return nullptr;
+    }
+    QByteArray save_data = load_file.readAll();
 
-    add_project(std::make_pair(this->m_pid++, proj));
-    ProjectStream projStream;
-
-    proj->saved = true;
-//    Read project file
-    std::string projFilePath = dirpath + "/" + projname + ".txt";
-    proj->files->f_proj = load_project_file(projFilePath, projStream.projFile);
-
-//    Read video file
-    std::string videoFilePath = dirpath + "/" + projname + "_videos.txt";
-    proj->files->f_videos = load_project_file(videoFilePath, projStream.videos);
-//    Read Analyzes
-    std::string analysesFilePath = dirpath + "/" + projname + "_analyses.txt";
-    proj->files->f_analysis = load_project_file(analysesFilePath, projStream.videos);
-//    Read Drawings
-    std::string drawingsFilePath = dirpath + "/" + projname + "_drawings.txt";
-    proj->files->f_drawings = load_project_file(drawingsFilePath, projStream.drawings);
-//    Read project from projstream
-    projStream >> *proj;
-    return proj;
-}
-
-/**
- * @brief FileHandler::load_project_file
- * help function for load_project
- * @param filePath
- * @param projFileStream
- * @return ID
- */
-ID FileHandler::load_project_file(std::string filePath, std::stringstream& projFileStream){
-    std::string buf;
-    ID projFileID = add_file(filePath);
-    read_file(projFileID, buf);
-    projFileStream << buf; // Read project name
-    return projFileID;
+    QJsonDocument load_doc(save_form == JSON
+        ? QJsonDocument::fromJson(save_data)
+        : QJsonDocument::fromBinaryData(save_data));
+    saveable->read(load_doc.object());
+    return saveable;
 }
 
 /**
  * @brief FileHandler::delete_project
- * Deletes project, its associated files and contents.
- * OBS! This operation is as of now irreversible
- * @param Project*
- * @return FH_ERROR errorcode
+ * @param proj_id
+ * @return Deletes project entirely
+ * Deletes project and frees allocated memory.
  */
-FH_ERROR FileHandler::delete_project(Project* proj){
-    ProjFiles* pf = proj->files;
-    delete_file(pf->f_proj);
-    delete_file(pf->f_videos);
-    delete_file(pf->f_analysis);
-    delete_file(pf->f_drawings);
-    return delete_directory(proj->files->dir);
-
+bool FileHandler::delete_project(ID proj_id){
+    Project* temp = get_project(proj_id);
+    this->proj_map_lock.lock();    
+    if(this->projects.erase(proj_id)){
+        close_project(temp->id);
+        temp->delete_artifacts();
+        QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
+        file.remove();
+        delete_directory(temp->bookmark_dir);
+        delete_directory(temp->dir);
+        delete temp;        
+        this->proj_map_lock.unlock();
+        return true;
+    }
+    this->proj_map_lock.unlock();    
+    return false;
 }
+
 /**
  * @todo make threadsafe
  * @brief FileHandler::add_video
- * @param Project*,string filepath
- *
- * string
- * Add a video filepath to a given project.
+ * @param Project*,string file_path
+ * Add a video file_path to a given project.
  * Creates Video object which is accessed further by returned id.
  */
-void FileHandler::add_video(Project* proj, std::string filePath){
-    Video* v = new Video(filePath);
-    proj->add_video(v);
-    this->add_file(filePath);
+ID FileHandler::add_video(Project* proj, std::string file_path){
+    Video* v = new Video(file_path);
+    return proj->add_video(v); // video id set in proj->add_video
 }
 
- /**
-  * @brief FileHandler::create_file
-  * create a file by given name in already excisting
-  * application tracked directory
-  * @param std::string file name, ID directory id
-  */
+/**
+ * @brief FileHandler::remove_video_from_project
+ * @param proj_id
+ * @param vid_id
+ * Removes video from project according to given ids.
+ */
+void FileHandler::remove_video_from_project(ID proj_id, ID vid_id){
+    Project* proj = this->get_project(proj_id); // get Project object from id
+    proj->remove_video_project(vid_id); // Remove ´the video from project
+}
 
-ID FileHandler::create_file(std::string filename, ID dirID){
-    std::ofstream f;
-    std::string filePath = this->get_dir(dirID)+"/"+filename;
-    f.open(filePath.c_str());
-    return this->add_file(filePath);
+/**
+ * @brief FileHandler::create_file
+ * @param std::string file name, ID directory id
+ * create a file by given name in already existing
+ * application tracked directory.
+ * Note that the file is not actually created
+ * in the file system until the file is written to.
+ */
+ID FileHandler::create_file(QString file_name, QDir dir){
+    return this->add_file(dir.absoluteFilePath(file_name)); // File created
   }
 
 /**
- * @todo make threadsafe
  * @brief FileHandler::delete_file
  * delete application tracked file
  * @param ID file id
  */
- FH_ERROR FileHandler::delete_file(ID id){
-    std::string file = this->get_file(id);
-    return std::remove(file.c_str());
+ bool FileHandler::delete_file(ID id){
+    QFile file(this->get_file(id));
+    file.remove();
+    return this->file_map.erase(id);
  }
 
  /**
@@ -238,52 +353,61 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   *  Write given text to an application tracked file
   * @param ID file id, std::string text
   * @return void
+  * Write given text with OPTION opt, supported OPTIONs are append and overwrite.
   */
- void FileHandler::write_file(ID id, std::string text, WRITE_OPTION opt){
-    std::string fileName = this->get_file(id);
-    std::ofstream f;
+ void FileHandler::write_file(ID id, QString text, WRITE_OPTION opt){
+    QFile file;
+    file.setFileName(this->get_file(id));
+
     switch(opt){
-    case WRITE_OPTION::OVERWRITE:
-        f.open(fileName.c_str(), std::ios::in | std::ios::out);
+    case OVERWRITE:
+        if(!file.open(QIODevice::ReadWrite | QIODevice::QIODevice::Truncate |QIODevice::Text))return; // Empty file
         break;
-    case WRITE_OPTION::APPEND:
-        f.open(fileName.c_str(), std::ios::in | std::ios::out | std::ios::ate);
+    case APPEND:
+        if(!file.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Append)) return; // File can not be written
         break;
     default:
-        return; // no open file
+        if(!file.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) return; // File can not be written
         break;
     }
-    if(f.is_open()) f << text.c_str() << std::endl;
+    QTextStream out(&file);
+    out << text;
+    file.close();
  }
 
  /**
   * @brief FileHandler::read_file
-  *  Read given lenght of lines to buffer from application
-  *  tracked file. OBS! If number of lines exceeds =>
-  *  reads to end of file (EOF)
-  *  @param ID file id, std::string text
-  *  @return voi
+  * @param ID file id, std::string text
+  * @return void
+  * Read given length of lines to buffer from application
+  * tracked file. OBS! If number of lines exceeds lines in file,
+  * reads to end of file (EOF)
   */
- void FileHandler::read_file(ID id,  std::string& buf, int linesToRead){
-     std::ifstream f(this->get_file(id));
-     std::string temp;
-     if(f.is_open()){
-         while(linesToRead-- && std::getline(f, temp)){
-            buf += temp;
-         }
-     }
+ void FileHandler::read_file(ID id,  QString& buf, int lines_to_read){
+    QFile file (this->get_file(id));
+    if(!file.open(QIODevice::ReadWrite | QIODevice::Text)){
+        qWarning("File %s could not be read", file.fileName().toStdString().c_str());
+        return; // File can not be read
+    }
+    QTextStream in(&file);
+    QString line;
+    while(lines_to_read-- && !in.atEnd()){
+        line = in.readLine();
+        buf.append(line);
+    };
+    file.close();
  }
 
  /**
   * @brief FileHandler::get_project
-  * Getter
   * @param ID project id
   * @return Project*
+  * Gets project by ID, locks in doing so.
   */
- Project* FileHandler::get_project(ID pid){
-    this->projMapLock.lock();
-    Project* p = this->m_projects.at(pid);
-    this->projMapLock.unlock();
+ Project* FileHandler::get_project(ID id){
+    this->proj_map_lock.lock();
+    Project* p = this->projects.at(id);
+    this->proj_map_lock.unlock();
     return p;
  }
 
@@ -291,12 +415,13 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   * @brief FileHandler::get_file
   * Getter
   * @param ID project file id
-  * @return std::string filepath
+  * @return std::string file_path
+  * Get file by ID, locks in doing so.
   */
- std::string FileHandler::get_file(ID id){
-    this->fileMapLock.lock();
-    std::string file = this->m_fileMap.at(id);
-    this->fileMapLock.unlock();
+ QString FileHandler::get_file(ID id){
+    this->file_map_lock.lock();
+    QString file = this->file_map.at(id);
+    this->file_map_lock.unlock();
     return file;
  }
 
@@ -304,60 +429,85 @@ ID FileHandler::create_file(std::string filename, ID dirID){
   * @brief FileHandler::get_dir
   * @param ID directory id
   * @return directory path
+  * Gets directory by id, locks in doing so.
   */
- std::string FileHandler::get_dir(ID id){
-    this->dirMapLock.lock();
-    std::string dir = this->m_dirMap.at(id);
-    this->dirMapLock.unlock();
+ QDir FileHandler::get_dir(ID id){
+    this->dir_map_lock.lock();
+    QDir dir = this->dir_map.at(id);
+    this->dir_map_lock.unlock();
     return dir;
  }
 
  /**
-  * @brief FileHandler::add_projectr
-  * @param std::pari<<ID, Project*> pair
-  * @return void
+  * @brief FileHandler::add_project
+  * @param proj
+  * Adds project to map.
   */
- void FileHandler::add_project(std::pair<ID,Project*> pair){
-    this->projMapLock.lock();
-    this->m_projects.insert(pair);
-    this->projMapLock.unlock();
+ ID FileHandler::add_project(Project* proj){
+     add_project(this->project_id, proj);
+     return this->project_id++;
+ }
+
+ /**
+  * @brief FileHandler::add_project
+  * @param std::pair<<ID, Project*> pair
+  * @return void
+  * Adds project to projects, locks in doing so.
+  */
+ void FileHandler::add_project(ID id, Project* proj){
+    std::pair<ID,Project*> pair = std::make_pair(id,proj);
+    this->proj_map_lock.lock();
+    this->projects.insert(pair);
+    this->proj_map_lock.unlock();
 
  }
 
  /**
   * @brief FileHandler::add_file
-  * @param std::string filepath
+  * @param std::string file_path
   * @return unique file identifier
+  * Adds file to filesystem.
   */
-ID FileHandler::add_file(std::string filepath){
-    add_file(this->m_fid, filepath);
-    return this->m_fid++;
+ID FileHandler::add_file(QString file){
+    add_file(this->file_id, file);
+    return this->file_id++;
  }
 
 /**
  * @brief FileHandler::add_file
  * @param id
- * @param filepath
+ * @param file_path
+ * Adds file to file_map, locks in doing so.
  */
-void FileHandler::add_file(ID id ,std::string filepath){
-    std::pair<ID,std::string> pair = std::make_pair(id, filepath);
-    this->fileMapLock.lock();
-    this->m_fileMap.insert(pair);
-    this->fileMapLock.unlock();
+void FileHandler::add_file(ID id ,QString file){
+    std::pair<ID,QString> pair = std::make_pair(id, file);
+    this->file_map_lock.lock();
+    this->file_map.insert(pair);
+    this->file_map_lock.unlock();
 }
 
  /**
   * @brief FileHandler::add_dir
-  * @param std::string dirpath
+  * @param std::string dir_path
   * @return unique directory identifier
+  * Adds directory to directories, locks in doing so.
   */
-ID FileHandler::add_dir(std::string dirpath){
-    std::pair<ID,std::string> pair = std::make_pair(this->m_did, dirpath);
-    this->dirMapLock.lock();
-    this->m_dirMap.insert(pair);
-    this->dirMapLock.unlock();
-    return this->m_did++;
+ID FileHandler::add_dir(QDir dir){
+    add_dir(this->dir_id, dir);
+    return this->dir_id++;
  }
+
+/**
+ * @brief FileHandler::add_dir
+ * @param dir
+ * Inserts directory by id in directories.
+ */
+void FileHandler::add_dir(ID dir_id, QDir dir){
+    std::pair<ID,QDir> pair = std::make_pair(dir_id, dir);
+    this->dir_map_lock.lock();
+    this->dir_map.insert(pair);
+    this->dir_map_lock.unlock();
+}
 
 /**
  * @brief FileHandler::proj_equals
@@ -366,45 +516,10 @@ ID FileHandler::add_dir(std::string dirpath){
  * @return true if project contents are the same
  */
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
-    bool videoEquals =  std::equal(proj.m_videos.begin(), proj.m_videos.end(),
-               proj2.m_videos.begin(),
-               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
-                                                                        // by dereferencing pointers in vector
-    return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
-           proj.m_name == proj2.m_name &&
-           videoEquals;
-}
-
-/**
- * @brief FileHandler::projfiles_equal
- * @param pf
- * @param pf2
- * @return true if files are the same paths
- */
-bool FileHandler::projfiles_equal(ProjFiles& pf, ProjFiles& pf2){
-    return dirs_equal(pf.dir, pf2.dir) &&
-        this->files_equal(pf.f_proj, pf2.f_proj) &&
-        this->files_equal(pf.f_analysis, pf2.f_analysis)&&
-        this->files_equal(pf.f_drawings, pf2.f_drawings) &&
-        this->files_equal(pf.f_videos, pf2.f_videos);
-}
-
-/**
- * @brief FileHandler::files_equal
- * @param id
- * @param id2
- * @return
- */
-bool FileHandler::files_equal(ID id, ID id2){
-    return this->get_file(id) == this->get_file(id2);
-}
-
-/**
- * @brief FileHandler::dirs_equal
- * @param id
- * @param id2
- * @return true if dirs are same path
- */
-bool FileHandler::dirs_equal(ID id, ID id2){
-    return this->get_dir(id) == this->get_dir(id2);
+    bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
+               proj2.videos.begin(),
+               [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
+                                                                                                                      // by dereferencing pointers in vector
+    return proj.name == proj2.name &&
+           video_equals;
 }
