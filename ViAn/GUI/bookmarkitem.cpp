@@ -27,7 +27,7 @@ BookmarkItem::BookmarkItem(Bookmark* bookmrk, QListWidget* view) : QListWidgetIt
 /**
  * @brief BookmarkItem::create_thumbnail
  * Creates and adds a thumbnail.
- * @param file_path Path to the stored image.
+ * @param frame The image for the thumbnail.
  */
 void BookmarkItem::create_thumbnail(QImage &frame) {
     frame = frame.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
