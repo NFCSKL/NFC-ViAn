@@ -615,6 +615,10 @@ void MainWindow::prepare_menu(const QPoint & pos) {
             connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
         }
+        QAction *close_project = new QAction(QIcon(""), tr("&Close project"), this);
+        close_project->setStatusTip(tr("Close project"));
+        menu.addAction(close_project);
+        connect(close_project, SIGNAL(triggered()), this, SLOT(on_action_close_project_triggered()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
@@ -776,6 +780,7 @@ void MainWindow::on_actionDelete_triggered() {
                 this->fileHandler->delete_project(my_item->id);
             }
             remove_item_from_tree(my_item);
+            set_status_bar("Remove item");
         }
     } else {
         set_status_bar("Multiple or no videos selected.");
@@ -787,7 +792,6 @@ void MainWindow::on_actionDelete_triggered() {
  * @param my_item item to be removed from tree
  */
 void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
-    set_status_bar("Remove item");
     delete my_item;
 }
 
@@ -996,6 +1000,24 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
         set_status_bar("Choose an area to run the analysis on.");
     } else {
         set_status_bar("Choose an area to exclude from the analysis.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_close_project_triggered
+ * Remove project from the tree without deleting.
+ */
+void MainWindow::on_action_close_project_triggered() {
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        item = ui->project_tree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
+        set_status_bar("Closed " + my_project->name.toStdString());
+        fileHandler->close_project(my_project->id);
+        remove_item_from_tree(my_project);
+    } else {
+        set_status_bar("Multiple or nothing selected.");
     }
 }
 

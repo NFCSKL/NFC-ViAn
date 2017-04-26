@@ -369,20 +369,13 @@
      <addaction name="actionAddProject"/>
      <addaction name="actionAddVideo"/>
     </widget>
-    <widget class="QMenu" name="menuDelete">
-     <property name="title">
-      <string>Delete</string>
-     </property>
-     <addaction name="actionDeleteAnalys"/>
-     <addaction name="actionDeleteDrawing"/>
-    </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
+    <addaction name="action_close_project"/>
     <addaction name="actionDelete"/>
-    <addaction name="actionExit"/>
     <addaction name="actionChoose_Workspace"/>
-    <addaction name="menuDelete"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -860,6 +853,11 @@
    </property>
    <property name="text">
     <string>Invert analysis area</string>
+   </property>
+  </action>
+  <action name="action_close_project">
+   <property name="text">
+    <string>Close project</string>
    </property>
   </action>
   <action name="action_show_hide_analysis_overlay">
