@@ -406,11 +406,11 @@ void MainWindow::on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int co
     }
 }
 
- /** @brief MainWindow::on_actionShow_hide_overlay_triggered
+ /** @brief MainWindow::on_action_show_hide_overlay_triggered
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
-void MainWindow::on_actionShow_hide_overlay_triggered() {
+void MainWindow::on_action_show_hide_overlay_triggered() {
     mvideo_player->toggle_overlay();
     toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
@@ -620,6 +620,10 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
             menu.addAction(abort_analysis);
             connect(abort_analysis, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
         }
+        QAction *close_project = new QAction(QIcon(""), tr("&Close project"), this);
+        close_project->setStatusTip(tr("Close project"));
+        menu.addAction(close_project);
+        connect(close_project, SIGNAL(triggered()), this, SLOT(on_action_close_project_triggered()));
     }
     QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
     QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
@@ -800,6 +804,7 @@ void MainWindow::on_actionDelete_triggered() {
                 //this->fileHandler->delete_file(my_item->id);
             }
             remove_item_from_tree(my_item);
+            set_status_bar("Remove item");
         }
     } else {
         set_status_bar("Multiple or no videos selected.");
@@ -811,7 +816,6 @@ void MainWindow::on_actionDelete_triggered() {
  * @param my_item item to be removed from tree
  */
 void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
-    set_status_bar("Remove item");
     delete my_item;
 }
 
@@ -827,18 +831,18 @@ void MainWindow::toggle_toolbar() {
         ui->toolBar_analysis->show();
         ui->toolBar->hide();
         ui->toolBar_overlay->hide();
-        ui->actionShow_hide_overlay->setEnabled(false);
+        ui->action_show_hide_overlay->setEnabled(false);
     } else if (mvideo_player->is_showing_overlay()) {
         ui->toolBar_analysis->hide();
         ui->toolBar->hide();
         ui->toolBar_overlay->show();
-        ui->actionShow_hide_analysis_area->setEnabled(false);
+        ui->action_show_hide_analysis_area->setEnabled(false);
     } else {
         ui->toolBar_analysis->hide();
         ui->toolBar->show();
         ui->toolBar_overlay->hide();
-        ui->actionShow_hide_overlay->setEnabled(true);
-        ui->actionShow_hide_analysis_area->setEnabled(true);
+        ui->action_show_hide_overlay->setEnabled(true);
+        ui->action_show_hide_analysis_area->setEnabled(true);
     }
 }
 
@@ -881,10 +885,10 @@ void MainWindow::on_video_slider_sliderPressed() {
     }
 }
 
-/** @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+/** @brief MainWindow::on_action_show_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
  */
-void MainWindow::on_actionShow_hide_analysis_area_triggered() {
+void MainWindow::on_action_show_hide_analysis_area_triggered() {
     mvideo_player->toggle_analysis_area();
     toggle_toolbar();
     if (mvideo_player->is_showing_analysis_tool()) {
@@ -1039,5 +1043,35 @@ void MainWindow::on_action_do_analysis_triggered() {
         }
     } else {
         set_status_bar("Multiple or no projects selected.");
+    }
+}
+/**
+ * @brief MainWindow::on_action_close_project_triggered
+ * Remove project from the tree without deleting.
+ */
+void MainWindow::on_action_close_project_triggered() {
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        item = ui->project_tree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
+        set_status_bar("Closed " + my_project->name.toStdString());
+        fileHandler->close_project(my_project->id);
+        remove_item_from_tree(my_project);
+    } else {
+        set_status_bar("Multiple or nothing selected.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_show_hide_analysis_overlay_triggered
+ * Toggles the state of showing the analysis overlay.
+ */
+void MainWindow::on_action_show_hide_analysis_overlay_triggered() {
+    mvideo_player->toggle_analysis_overlay();
+    if (mvideo_player->is_showing_analysis_overlay()) {
+        set_status_bar("Showing analysis overlay: on.");
+    } else {
+        set_status_bar("Showing analysis overlay: off.");
     }
 }
