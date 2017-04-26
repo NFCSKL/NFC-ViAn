@@ -60,21 +60,26 @@ QString Bookmark::get_description() {
  */
 void Bookmark::read(const QJsonObject& json){
     this->frame_number = json["frame"].toInt();
+    this->dir_path = json["dir"].toString();
     this->file_path = json["path"].toString();
     this->description = json["note"].toString();
+    std::cout << "Load file: " <<file_path.toStdString()<< "\n";
     frame.load(file_path);
 }
 
 /**
  * @brief Bookmark::write
  * @param json
- * Writes a bookmark to a Json object.
+ * Writes a bookmark to a Json object, and exports the frame.
  */
 void Bookmark::write(QJsonObject& json){
+    // Exports the frame and updates file_path.
+    export_frame();
+
     json["frame"] = this->frame_number;
+    json["dir"] = this->dir_path;
     json["path"] = this->file_path;
     json["note"] = this->description;
-    export_frame();
 }
 
 /**
@@ -84,6 +89,7 @@ void Bookmark::write(QJsonObject& json){
 void Bookmark::export_frame() {
     // Update file path in case there's already a file with this file name
     create_file_path();
+    std::cout << "Write file: " <<file_path.toStdString()<< "\n";
     QImageWriter writer(file_path, "tiff");
     writer.write(frame);
 }
@@ -117,10 +123,14 @@ void Bookmark::create_file_path() {
 }
 
 /**
- * @brief Bookmark::delete_artifact
- * Deletes the exported image.
+ * @brief Bookmark::remove_exported_image
+ * Removes the exported image, if tthere is one.
  */
-void Bookmark::delete_exported_image() {
-    QFile file(file_path);
-    file.remove();
+void Bookmark::remove_exported_image() {
+    std::cout << "Remove file: " <<file_path.toStdString()<< "\n";
+    // If the file path is empty, then the frame has not been exported so there's nothing to remove.
+    if (!file_path.isEmpty()) {
+        QFile file(file_path);
+        file.remove();
+    }
 }

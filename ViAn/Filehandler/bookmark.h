@@ -24,7 +24,7 @@ public:
     void write(QJsonObject& json);
     void export_frame();
     void create_file_path();
-    void delete_exported_image();
+    void remove_exported_image();
 private:
     QImage frame;           // Frame of the bookmark
     int frame_number;       // Frame at which the bookmark was taken

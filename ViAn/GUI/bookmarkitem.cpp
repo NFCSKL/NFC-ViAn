@@ -8,7 +8,6 @@
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
-
 BookmarkItem::BookmarkItem(int frame_nbr, QImage frame, QString dir_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
     bookmark = new Bookmark(frame_nbr, frame, dir_path, string);
     create_thumbnail(frame);
