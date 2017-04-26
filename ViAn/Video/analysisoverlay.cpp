@@ -19,8 +19,9 @@ AnalysisOverlay::AnalysisOverlay() {
 /**
  * @brief AnalysisOverlay::draw_overlay
  * Draws an overlay with the detected areas, on top of the specified frame.
- * @param img Frame to draw on
+ * @param frame Frame to draw on.
  * @param frame_nr Number of the frame currently shown in the video.
+ * @return Returns the frame with the overlay.
  */
 cv::Mat AnalysisOverlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (showing_overlay) {
