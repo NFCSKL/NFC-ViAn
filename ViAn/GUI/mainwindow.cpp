@@ -1009,11 +1009,9 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
  */
 void MainWindow::on_action_close_project_triggered() {
     QTreeWidgetItem *item;
-    MyQTreeWidgetItem *my_item;
     MyQTreeWidgetItem *my_project;
     if(ui->project_tree->selectedItems().size() == 1) {
         item = ui->project_tree->selectedItems().first();
-        my_item = (MyQTreeWidgetItem*)item;
         my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
         set_status_bar("Closed " + my_project->name.toStdString());
         fileHandler->close_project(my_project->id);
