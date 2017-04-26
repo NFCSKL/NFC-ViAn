@@ -13,6 +13,7 @@
 #include <QImageWriter>
 #include <QWaitCondition>
 #include "overlay.h"
+#include "analysisoverlay.h"
 
 #include <chrono>
 
@@ -27,6 +28,7 @@ public:
     bool is_paused();
     bool is_stopped();
     bool is_showing_overlay();
+    bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
     std::string export_current_frame(std::string path_to_folder, std::string file_name);
     bool video_open();
@@ -49,6 +51,7 @@ public:
     double get_contrast();
     int get_brightness();
     void toggle_overlay();
+    void toggle_analysis_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
     void undo_overlay();
@@ -159,6 +162,7 @@ private:
     int beta = 0;
 
     Overlay* video_overlay = new Overlay();
+    AnalysisOverlay* analysis_overlay = new AnalysisOverlay();
 };
 
 #endif // VIDEO_PLAYER_H

@@ -92,7 +92,7 @@ private slots:
 
     void on_actionAddProject_triggered();
     
-    void on_actionShow_hide_overlay_triggered();
+    void on_action_show_hide_overlay_triggered();
 
     void on_actionColour_triggered();
 
@@ -130,7 +130,7 @@ private slots:
 
     void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);
     
-    void on_actionShow_hide_analysis_area_triggered();
+    void on_action_show_hide_analysis_area_triggered();
 
     void on_actionContrast_Brightness_triggered();
 
@@ -147,6 +147,8 @@ private slots:
     void on_action_original_size_triggered();
 
     void on_actionInvert_analysis_area_triggered();
+
+    void on_action_show_hide_analysis_overlay_triggered();
 
 private:
 

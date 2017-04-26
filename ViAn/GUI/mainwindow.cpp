@@ -402,11 +402,11 @@ void MainWindow::on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int co
     }
 }
 
- /** @brief MainWindow::on_actionShow_hide_overlay_triggered
+ /** @brief MainWindow::on_action_show_hide_overlay_triggered
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
-void MainWindow::on_actionShow_hide_overlay_triggered() {
+void MainWindow::on_action_show_hide_overlay_triggered() {
     mvideo_player->toggle_overlay();
     toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
@@ -803,18 +803,18 @@ void MainWindow::toggle_toolbar() {
         ui->toolBar_analysis->show();
         ui->toolBar->hide();
         ui->toolBar_overlay->hide();
-        ui->actionShow_hide_overlay->setEnabled(false);
+        ui->action_show_hide_overlay->setEnabled(false);
     } else if (mvideo_player->is_showing_overlay()) {
         ui->toolBar_analysis->hide();
         ui->toolBar->hide();
         ui->toolBar_overlay->show();
-        ui->actionShow_hide_analysis_area->setEnabled(false);
+        ui->action_show_hide_analysis_area->setEnabled(false);
     } else {
         ui->toolBar_analysis->hide();
         ui->toolBar->show();
         ui->toolBar_overlay->hide();
-        ui->actionShow_hide_overlay->setEnabled(true);
-        ui->actionShow_hide_analysis_area->setEnabled(true);
+        ui->action_show_hide_overlay->setEnabled(true);
+        ui->action_show_hide_analysis_area->setEnabled(true);
     }
 }
 
@@ -857,10 +857,10 @@ void MainWindow::on_video_slider_sliderPressed() {
     }
 }
 
-/** @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+/** @brief MainWindow::on_action_show_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
  */
-void MainWindow::on_actionShow_hide_analysis_area_triggered() {
+void MainWindow::on_action_show_hide_analysis_area_triggered() {
     mvideo_player->toggle_analysis_area();
     toggle_toolbar();
     if (mvideo_player->is_showing_analysis_tool()) {
@@ -999,3 +999,15 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
     }
 }
 
+/**
+ * @brief MainWindow::on_action_show_hide_analysis_overlay_triggered
+ * Toggles the state of showing the analysis overlay.
+ */
+void MainWindow::on_action_show_hide_analysis_overlay_triggered() {
+    mvideo_player->toggle_analysis_overlay();
+    if (mvideo_player->is_showing_analysis_overlay()) {
+        set_status_bar("Showing analysis overlay: on.");
+    } else {
+        set_status_bar("Showing analysis overlay: off.");
+    }
+}

@@ -153,6 +153,7 @@ void video_player::convert_frame(bool scale) {
 cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = src.clone();
+    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
@@ -267,6 +268,14 @@ bool video_player::is_stopped() {
  */
 bool video_player::is_showing_overlay() {
     return video_overlay->is_showing_overlay();
+}
+
+/**
+ * @brief video_player::is_showing_analysis_overlay
+ * @return Returns true if the analysis overlay is showing, else false.
+ */
+bool video_player::is_showing_analysis_overlay() {
+    return analysis_overlay->is_showing_overlay();
 }
 
 /**
@@ -537,6 +546,16 @@ void video_player::inc_playback_speed() {
  */
 void video_player::toggle_overlay() {
     video_overlay->toggle_overlay();
+    update_overlay();
+}
+
+/**
+ * @brief video_player::toggle_analysis_overlay
+ * Toggles the showing of the analysis overlay, and if video is paused updates
+ * the frame in the GUI to show with/without the overlay.
+ */
+void video_player::toggle_analysis_overlay() {
+    analysis_overlay->toggle_showing();
     update_overlay();
 }
 
