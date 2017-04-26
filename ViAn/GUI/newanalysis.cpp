@@ -43,33 +43,3 @@ void NewAnalysis::set_status_bar(std::string status, int timer){
     ui->statusbar->showMessage(QString::fromStdString(status), timer);
     mainwindow->set_status_bar(status, timer);
 }
-
-/**
- * @brief NewAnalysis::get_fps
- * Requests the user to enter FPS.
- * @return Returns the FPS, or -1 if cancelled.
- */
-float NewAnalysis::get_fps() {
-    float fps = FPS_DEFAULT;
-
-    // Create the text shown in the dialog
-    QString fps_text = QString("FPS [");
-    fps_text.append(QString::number(FPS_MIN));
-    fps_text.append(" - ");
-    fps_text.append(QString::number(FPS_MAX));
-    fps_text.append("]: ");
-
-    // Create the dialog
-    CustomDialog dialog("FPS", this);
-    dialog.addLabel("Enter value:");
-    dialog.addDblSpinBoxF(fps_text, FPS_MIN, FPS_MAX, &fps, FPS_DECIMALS, FPS_STEP,
-                          "Choose FPS value with the input box.");
-
-    // Show the dialog (execution will stop here until the dialog is finished)
-    dialog.exec();
-
-    if (dialog.wasCancelled()) {
-        return -1;
-    }
-    return fps;
-}

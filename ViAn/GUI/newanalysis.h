@@ -27,12 +27,6 @@ private:
     MainWindow *mainwindow;
     FileHandler *file_handler;
     void set_status_bar(std::string status, int timer = 750);
-    float get_fps();
-
-    // Constants for the FPS dialog. Defines the limits, number
-    // of decimals, default value, and step for the input box.
-    float FPS_MIN = 1, FPS_MAX = 25, FPS_STEP = 0.1, FPS_DEFAULT = 1;
-    int FPS_DECIMALS = 1;
 };
 
 #endif // NEWANALYSIS_H
