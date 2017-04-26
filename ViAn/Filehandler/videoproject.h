@@ -17,14 +17,14 @@
 class VideoProject{
     std::vector<Bookmark*> bookmarks;
     Video* video = nullptr;
-
+    ID vid_id;
 
 
 public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void add_bookmark(Bookmark* bookmark);
-    void add_analysis(ID id, Analysis analysis);
+    ID add_analysis(Analysis analysis);
     void delete_artifacts();    
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
