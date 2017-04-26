@@ -11,10 +11,10 @@ Bookmark::Bookmark(int frame_nbr, QImage frame, QString dir_path, QString string
     this->frame_number = frame_nbr;
     this->frame = frame;
     this->dir_path = dir_path;
-    // this->file_path is set using create_file_path()
-    // The frame number and dir path needs to be set before calling create_file_path()
-    create_file_path();
     this->description = string;
+
+    // There's no file path yet, since the frame has not been exported
+    this->file_path = QString();
 }
 
 /**
