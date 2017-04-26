@@ -52,7 +52,7 @@ void NewAnalysis::set_status_bar(std::string status, int timer){
 float NewAnalysis::get_fps() {
     float fps = FPS_DEFAULT;
 
-    // Create the texts shown in the dialog
+    // Create the text shown in the dialog
     QString fps_text = QString("FPS [");
     fps_text.append(QString::number(FPS_MIN));
     fps_text.append(" - ");
