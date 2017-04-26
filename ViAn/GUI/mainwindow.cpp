@@ -1032,7 +1032,8 @@ void MainWindow::on_action_do_analysis_triggered() {
         video = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_video = (MyQTreeWidgetItem*) video;
         if (my_video->type == TYPE::VIDEO){
-            new_analysis->show();
+            if(new_analysis->isHidden()) new_analysis->show();
+            else new_analysis->activateWindow();
         } else {
             set_status_bar("No video selected.");
         }
