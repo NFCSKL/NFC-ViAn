@@ -9,12 +9,12 @@ enum ANALYSIS_TYPE {MOVEMENT = 0, FACE = 1};
 class POI : Saveable{
     double frame;
     std::string file_path;
-    std::pair<double, double> upper_left;
-    std::pair<double, double> down_right;
+    std::pair<int, int> upper_left;
+    std::pair<int, int> down_right;
 public:
     POI();
-    POI(std::pair<double,double> upper_left, std::pair<double,double> down_right);
-    POI(std::pair<double,double> upper_left, double height, double width);
+    POI(std::pair<int,int> upper_left, std::pair<int,int> down_right);
+    POI(std::pair<int,int> upper_left, int height, int width);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 };
