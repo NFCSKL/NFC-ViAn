@@ -7,7 +7,7 @@
 #include "saveable.h"
 enum ANALYSIS_TYPE {MOVEMENT = 0, FACE = 1};
 class POI : Saveable{
-    double frame;
+    int frame;
     std::string file_path;
     std::pair<int, int> upper_left;
     std::pair<int, int> down_right;
