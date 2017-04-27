@@ -19,6 +19,7 @@ public:
     Bookmark();
     int get_frame_number();
     QImage get_frame();
+    QString get_file_path();
     QString get_description();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
