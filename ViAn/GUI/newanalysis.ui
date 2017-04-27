@@ -26,6 +26,13 @@
          <widget class="QComboBox" name="analysis_choise_list"/>
         </item>
         <item>
+         <widget class="QLabel" name="current_video_lable">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLineEdit" name="name_input">
           <property name="text">
            <string>Name</string>

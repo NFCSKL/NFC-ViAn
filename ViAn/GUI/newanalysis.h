@@ -17,6 +17,7 @@ class NewAnalysis : public QMainWindow
 
 public:
     explicit NewAnalysis(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent = 0);
+    void set_current_video(MyQTreeWidgetItem *current_video);
     ~NewAnalysis();
 
 private slots:
@@ -27,6 +28,7 @@ private:
     MainWindow *mainwindow;
     FileHandler *file_handler;
     void set_status_bar(std::string status, int timer = 750);
+    MyQTreeWidgetItem *current_video;
 };
 
 #endif // NEWANALYSIS_H

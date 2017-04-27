@@ -24,6 +24,7 @@
 #include <QWaitCondition>
 #include "makeproject.h"
 #include "newanalysis.h"
+#include <QQueue>
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
@@ -40,7 +41,7 @@ class MainWindow : public QMainWindow
 public:
     void set_status_bar(string status, int timer = 750);
     void add_project_to_tree(Project* proj);
-    void add_analysis_to_tree(QString type);
+    void add_analysis_to_tree(QString type, MyQTreeWidgetItem *video_in_tree);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
@@ -196,6 +197,9 @@ private:
     bool original_size;
 
     void deselect_overlay_tool();
+
+    MyQTreeWidgetItem *current_analysis;
+    QQueue<MyQTreeWidgetItem> *analysis_queue;
 
 };
 

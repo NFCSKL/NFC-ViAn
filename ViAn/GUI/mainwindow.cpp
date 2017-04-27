@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
     original_size = false;
 
     this->new_analysis = new NewAnalysis(this, fileHandler);
+    this->current_analysis = nullptr;
+    this->analysis_queue = new QQueue<MyQTreeWidgetItem>;
 }
 
 
@@ -751,6 +753,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
 /**
  * @brief MainWindow::add_video_to_tree
  * @param file_path of the video
+ * @todo add all analysis from video to tree
  */
 void MainWindow::add_video_to_tree(std::string file_path, ID id) {
     QTreeWidgetItem *project;
@@ -761,13 +764,11 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
     project->setExpanded(true);
 }
 
-void MainWindow::add_analysis_to_tree(QString type) {
-    QTreeWidgetItem *video;
-    video = ui->project_tree->selectedItems().first();
+void MainWindow::add_analysis_to_tree(QString type, MyQTreeWidgetItem *video_in_tree) {
     MyQTreeWidgetItem *analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type);
     analysis_in_tree->set_text(type.toStdString());
-    video->addChild(analysis_in_tree);
-    video->setExpanded(true);
+    video_in_tree->addChild(analysis_in_tree);
+    video_in_tree->setExpanded(true);
 }
 
 /**
@@ -1045,6 +1046,7 @@ void MainWindow::on_action_do_analysis_triggered() {
         video = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_video = (MyQTreeWidgetItem*) video;
         if (my_video->type == TYPE::VIDEO){
+            new_analysis->set_current_video(my_video);
             if(new_analysis->isHidden()) new_analysis->show();
             else new_analysis->activateWindow();
         } else {
