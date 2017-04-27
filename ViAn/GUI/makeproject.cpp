@@ -70,7 +70,7 @@ void MakeProject::on_ok_button_clicked() {
     else if(this->video_path.isEmpty())
         set_status_bar("Needs a path for the videos");
    else {
-        Project *proj = file_handler->create_project(name, project_path.toStdString());
+        Project *proj = file_handler->create_project(name, project_path.toStdString(), video_path.toStdString());
         mainwindow->add_project_to_tree(proj);
         set_status_bar("Project " + name.toStdString() + " created.");
         delete this;

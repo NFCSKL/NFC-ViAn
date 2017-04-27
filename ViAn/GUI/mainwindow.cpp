@@ -113,6 +113,11 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    //Will be added when functionality is in place
+    /*QObject::connect(this, SIGNAL(next_video_POI()),
+                     mplayer, SLOT(next_POI()));
+    QObject::connect(this, SIGNAL(prev_video_POI()),
+                     mplayer, SLOT(previous_POI()));*/
 }
 
 /**
@@ -355,20 +360,17 @@ void MainWindow::on_bookmark_button_clicked() {
         // Add bookmarks-folder to the project-folder.
         Project* proj = fileHandler->get_project(my_project->id);
         QDir dir = fileHandler->get_dir(proj->bookmark_dir);
-        // Export the current frame in the bookmarks-folder.
         // Get bookmark description
         QString bookmark_text("");
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
-        // The names of the stored files will have increasing numbers.
-        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
-        int frame = mvideo_player->get_current_frame_num();
-        Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
+        int frame_number = mvideo_player->get_current_frame_num();
+        QImage frame = mvideo_player->get_current_frame_unscaled();
+        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
-        set_status_bar("Saved bookmark.");
+        set_status_bar("Bookmark created.");
     }
 }
 
@@ -648,12 +650,15 @@ void MainWindow::on_actionAddVideo_triggered() {
         project = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
         if (my_project->type == TYPE::PROJECT){
-            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
+            Project *proj = this->fileHandler->get_project(my_project->id);
+            std::string video_dir_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
+            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_dir_path.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
-            if(!dir.isEmpty()) { // Check if you have selected something.
-                ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), dir.toStdString());
-                add_video_to_tree(dir.toStdString(), id);
-                set_status_bar("Video " + dir.toStdString() + " added.");
+            if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
+                std::string video_file_path = q_video_file_path.toStdString();
+                ID id = fileHandler->add_video(proj, video_file_path);
+                add_video_to_tree(video_file_path, id);
+                set_status_bar("Video " + video_file_path + " added.");
             }
         } else {
             set_status_bar("No project selected.");
@@ -858,6 +863,10 @@ void MainWindow::enable_video_buttons() {
     ui->increase_speed_button->setEnabled(true);
     ui->previous_frame_button->setEnabled(true);
     ui->stop_button->setEnabled(true);
+    ui->bookmark_button->setEnabled(true);
+    ui->previous_POI_button->setEnabled(true);
+    ui->next_POI_button->setEnabled(true);
+    ui->video_slider->setEnabled(true);
 }
 
 /**
@@ -1073,5 +1082,33 @@ void MainWindow::on_action_show_hide_analysis_overlay_triggered() {
         set_status_bar("Showing analysis overlay: on.");
     } else {
         set_status_bar("Showing analysis overlay: off.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_previous_POI_button_clicked
+ * Jump back to the previous POI.
+ */
+void MainWindow::on_previous_POI_button_clicked() {
+    if (mvideo_player->is_paused()) {
+        set_status_bar("Went back to the previous POI");
+        //will be added when functionality is in place
+        //emit previous_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
+    }
+}
+
+/**
+ * @brief MainWindow::on_next_POI_button_clicked
+ * Jump forward to the next POI.
+ */
+void MainWindow::on_next_POI_button_clicked() {
+    if (mvideo_player->is_paused()) {
+        set_status_bar("Went forward to the next POI");
+        //will be added when functionality is in place
+        //emit next_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
     }
 }
