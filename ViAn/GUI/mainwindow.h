@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void set_status_bar(string status, int timer = 750);
+    void set_status_bar(string status, int timer = 5000);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString qInput);
@@ -159,7 +159,6 @@ private:
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
-    ReportGenerator *report;
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;

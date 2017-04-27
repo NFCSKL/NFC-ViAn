@@ -12,22 +12,24 @@
 class ReportGenerator
 {
 public:
-    ReportGenerator(Project* proj, FileHandler* file_handler);
-
+    explicit ReportGenerator(Project* proj, FileHandler* file_handler);
+    ~ReportGenerator();
 private:
-    QString picPath;
-    Project* proj;
 
-    std::vector<std::string> bookmark_names;
+    Project* proj;
+    QAxObject* word;
+    FileHandler *file_handler;
     std::vector<std::pair<std::string, std::string> > all_bookmarks;
 
-    FileHandler *file_handler;
+    const double IMAGE_WIDTH_REFERENCE = 272.0;
 
     void create_list_of_names();
-    void add_pictures(QAxObject* selection);
+    void add_bookmarks(QAxObject* selection);
     void save_report(QAxObject* activeDocument);
     void close_report(QAxObject* doc, QAxObject*  word);
+    void resize_picture(QString pic_path, QAxObject* inlineShape);
     std::string date_time_generator();
+    void add_paragraph(QAxObject* selection);
 };
 #endif // REPORTGENERERATOR_H
 

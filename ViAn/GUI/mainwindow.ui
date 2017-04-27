@@ -73,7 +73,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>232</width>
-                <height>282</height>
+                <height>281</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -351,8 +351,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>616</width>
-     <height>19</height>
+     <width>674</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -835,6 +835,9 @@
    </property>
    <property name="toolTip">
     <string>Create a .docx document based on all bookmarks</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+R</string>
    </property>
   </action>
   <action name="actionInvert_analysis_area">

@@ -64,7 +64,7 @@ MainWindow::~MainWindow() {
 
     delete icon_on_button_handler;
     delete fileHandler;
-    delete report;
+
 
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
@@ -1012,10 +1012,8 @@ void MainWindow::on_actionCreate_report_triggered()
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
         Project* proj = fileHandler->get_project(my_project->id);
-
-        //std::string proj_path = fileHandler->get_dir(proj->dir).absolutePath().toStdString();
-        //std::cout << proj_path << std::endl;
-        //TODO make sure to stop here if there is no bookmarks
-        report = new ReportGenerator(proj, fileHandler);
+        ReportGenerator(proj, fileHandler);
+    }else {
+        set_status_bar("Select a project to create a report for");
     }
 }
