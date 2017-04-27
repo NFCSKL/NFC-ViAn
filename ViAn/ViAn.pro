@@ -16,7 +16,6 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    GUI/analysiswindow.cpp
 
 #
 # TEST
@@ -27,7 +26,6 @@ SOURCES += Test/test_video_player.cpp\
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    GUI/analysiswindow.h
 
 #
 # LIBRARY
@@ -44,8 +42,8 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp
-
+    GUI/fpsdialog.cpp \
+    GUI/analysiswindow.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
@@ -54,7 +52,8 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkview.h \
     GUI/makeproject.h \
     GUI/bookmarkitem.h \
-    GUI/fpsdialog.h
+    GUI/fpsdialog.h \
+    GUI/analysiswindow.h \
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui \
