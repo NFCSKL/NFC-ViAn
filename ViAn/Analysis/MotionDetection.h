@@ -26,12 +26,15 @@ private:
 
 
     void setup_analysis() override;
-    void do_analysis() override;
+    std::vector<OOI> analyse_frame() override;
     void merge_bounding_rects(std::vector<cv::Rect> &rects);
 
     unsigned int dilation_degree = 16;
     unsigned int smallest_object_size = 500;
 protected:
+
+signals:
+    void save_analysis(Analysis analysis);
 
 };
 

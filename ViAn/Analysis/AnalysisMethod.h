@@ -8,35 +8,38 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
+#include "Filehandler/analysis.h"
 
 
 class AnalysisMethod : public QThread {
+    Q_OBJECT
 public:
     //Analysis();
     bool load_video();
+    void abort_analysis();
+    void pause_analysis();
 
-private:
     virtual void setup_analysis() = 0;
-    virtual void do_analysis() = 0;
+    virtual std::vector<OOI> analyse_frame() = 0;
+    Analysis run_analysis();
     void set_exclude_area(std::vector<cv::Point> points);
     bool sample_current_frame();
 
-protected:
+private:
+    int prev_detection_frame = -1;
+    bool detecting = false;
     bool paused = false;            // Control states
     bool aborted = false;
+    Analysis m_analysis;
+
+protected:
+    int num_frames = -1;
     unsigned int sample_freq = 5;
     unsigned int current_frame = 0; // The current frame number
     cv::VideoCapture capture;       // Video source
     cv::Mat frame, exclude_frame;                  // The frame fetched last
-    void run() override;
 
-signals:
-    void send_detection();          // Used to send the interval of detection
 
-private slots:
-    void on_start();                // Start or resume the analysis
-    void on_pause();                // Pause the analysis
-    void on_abort();                // Abort the analysis
 };
 
 #endif // ANALYSISMETHOD_H

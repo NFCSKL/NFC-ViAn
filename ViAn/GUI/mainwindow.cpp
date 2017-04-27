@@ -10,6 +10,8 @@
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
 #include "Analysis/MotionDetection.h"
+#include "Analysis/AnalysisMethod.h"
+#include "Analysis/analysiscontroller.h"
 
 using namespace std;
 using namespace cv;
@@ -48,8 +50,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // TODO The following code is just here to test.
     // Remove when a proper implementation exists.
     //MotionDetection *md = new MotionDetection("seq_01.mp4");
-    MotionDetection *md = new MotionDetection("eng.mov");
-    md->start();
+    AnalysisController *ac = new AnalysisController("Pumparna.avi",MOTION);
+    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
+                     this, SLOT(save_analysis_to_file(Analysis)));
+    ac->start();
 
     // Initially hide overlay and analysis toolbar
     ui->toolBar_overlay->hide();
@@ -79,6 +83,7 @@ MainWindow::~MainWindow() {
     delete ui;
     delete bookmark_view;
 }
+
 /**
  * @brief MainWindow::setup_filehandler
  * Sets up filehandler and loads projects.
@@ -116,6 +121,19 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+}
+
+/**
+ * @brief MainWindow::save_analysis_to_file
+ * @param analysis
+ * Slot for saving analysis to file.
+ */
+void MainWindow::save_analysis_to_file(Analysis analysis) {
+    int i = 0;
+    for (POI poi : analysis.POIs) {
+        cout << "POI " << ++i << endl;
+        cout << "Start frame: " << poi.start_frame << ", End frame: " << poi.end_frame << endl << endl;
+    }
 }
 
 /**

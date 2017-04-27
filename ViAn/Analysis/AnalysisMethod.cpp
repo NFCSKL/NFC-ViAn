@@ -1,35 +1,6 @@
 #include "AnalysisMethod.h"
 #include <qdebug.h>
-
 #include "opencv2/highgui/highgui.hpp"
-
-/**
- * @brief Analysis::run
- * TODO add comment
- */
-void AnalysisMethod::run() {
-    std::vector<cv::Point> points;
-    set_exclude_area(points);
-    std::cout << "Analysis thread started" << std::endl;
-    setup_analysis();
-    if (capture.isOpened()) {
-        while(!aborted && capture.read(frame)) {
-            // do frame analysis
-            if (true || sample_current_frame()) {
-                do_analysis();
-                cv::waitKey(5);
-            }
-
-            if (paused) {
-                // do pause stuff
-                paused = false;
-            }
-            current_frame++;
-        }
-    }
-    capture.release();
-    std::cout << "Exiting analysis thread " << std::endl;
-}
 
 void AnalysisMethod::set_exclude_area(std::vector<cv::Point> points) {
     cv::Mat img(int(capture.get(cv::CAP_PROP_FRAME_HEIGHT)),int(capture.get(cv::CAP_PROP_FRAME_WIDTH)),CV_8UC1,cv::Scalar(255));
@@ -47,30 +18,48 @@ bool AnalysisMethod::sample_current_frame() {
     return current_frame % sample_freq == 0;
 }
 
-/**
- * @brief Analysis::on_start
- * Flips the paused bool to false.
- * Starts or resumes the analysis
- */
-void AnalysisMethod::on_start() {
-    paused = false;
+Analysis AnalysisMethod::run_analysis() {
+    if (capture.isOpened()) {
+        num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
+        POI* m_POI = new POI();
+        while(!aborted && capture.read(frame)) {
+            // do frame analysis
+            if (true || sample_current_frame()) {
+                std::vector<OOI> detections = analyse_frame();
+
+                if (detections.empty() && detecting) {
+                    qDebug() << "Stopping detection";
+                    m_POI->set_end_frame(current_frame - 1);
+                    m_analysis.add_POI(*m_POI);
+                    m_POI = new POI();
+                    detecting = false;
+                } else if (!detections.empty()) {
+                    qDebug() << "Detecting";
+                    detecting = true;
+                    m_POI->add_detections(current_frame, detections);
+                }
+
+                if (current_frame == num_frames && detecting) {
+                    m_POI->set_end_frame(current_frame);
+                }
+            }
+
+            if (paused) {
+                // do pause stuff
+                paused = false;
+            }
+            current_frame++;
+        }
+    }
+    capture.release();
+    return m_analysis;
 }
 
-/**
- * @brief Analysis::on_pause
- * Flips the paused bool to true.
- * Pauses the analysis
- */
-void AnalysisMethod::on_pause() {
-    paused = true;
-}
-
-/**
- * @brief Analysis::on_abort
- * Flips the aborted bool to true.
- * Aborts the analysis
- */
-void AnalysisMethod::on_abort() {
+void AnalysisMethod::abort_analysis() {
     aborted = true;
     paused = false;
+}
+
+void AnalysisMethod::pause_analysis() {
+    paused = true;
 }

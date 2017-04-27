@@ -152,6 +152,8 @@ private slots:
 
     void on_action_show_hide_analysis_overlay_triggered();
 
+    void save_analysis_to_file(Analysis analysis);
+
 private:
 
     Ui::MainWindow *ui;

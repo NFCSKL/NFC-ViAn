@@ -4,8 +4,8 @@
 
 
 
-MotionDetection::MotionDetection(std::string source_file){
-    capture.open("Pumparna.avi");
+MotionDetection::MotionDetection(std::string source_file) {
+    capture.open(source_file);
     if (!capture.isOpened()) {
         // TODO Take care of this
         std::cout << "Failed to load " << source_file << std::endl;
@@ -17,12 +17,8 @@ MotionDetection::MotionDetection(std::string source_file){
  * Initial setup of the analysis
  */
 void MotionDetection::setup_analysis(){
-
-    capture.set(CV_CAP_PROP_POS_FRAMES, 250);
-    cv::namedWindow("First frame");
-    cv::namedWindow("Current frame");
-    cv::namedWindow("Threshold");
-
+    capture.set(CV_CAP_PROP_POS_FRAMES,4300);
+    current_frame = 4300;
     pMOG2 = cv::createBackgroundSubtractorMOG2(500,50,false);
 }
 
@@ -31,13 +27,18 @@ void MotionDetection::setup_analysis(){
  * Motion detection specific code
  * This function is called from the interface thread loop
  */
-void MotionDetection::do_analysis(){
+std::vector<OOI> MotionDetection::analyse_frame(){
+    qDebug() << "Frame " << current_frame << " of " << num_frames;
+    qDebug() << current_frame*100/(num_frames-1) << "%";
+    std::vector<OOI> OOIs;
     std::vector<std::vector<cv::Point> > contours;
     // Grayscale and blur
 
     shown_frame = frame.clone();
+
     cv::GaussianBlur(frame, frame, blur_size, 0);
     pMOG2->apply(frame, fgMaskMOG2,-1);
+
     pMOG2->getBackgroundImage(background);
 
 
@@ -45,7 +46,6 @@ void MotionDetection::do_analysis(){
     //cv::GaussianBlur(fgMaskMOG2, fgMaskMOG2, blur_size, 0);
     cv::threshold(fgMaskMOG2, fgMaskMOG2, 25, 255, cv::THRESH_BINARY);
     cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
-
 
     if (!diff_prev.empty() && current_frame % sample_freq == 0) {
         cv::Mat gray_frame = shown_frame.clone();
@@ -55,7 +55,6 @@ void MotionDetection::do_analysis(){
         cv::threshold(diff_frame, diff_frame, 25, 255, cv::THRESH_BINARY);
         cv::dilate(diff_frame, diff_frame, kernel_ero);
         cv::bitwise_and(diff_frame, fgMaskMOG2, result);
-        cv::imshow("Current frame",diff_frame);
     } else if (!diff_prev.empty() && !diff_frame.empty()) {
         cv::bitwise_and(diff_frame, fgMaskMOG2, result);
     } else {
@@ -69,25 +68,25 @@ void MotionDetection::do_analysis(){
     prev_frame = shown_frame.clone();
     cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
 
-    cv::imshow("Threshold", result);
     cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-
     cv::Scalar color(0,0,255);
     std::vector<cv::Rect> rects;
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > smallest_object_size) {
             cv::Rect rect = cv::boundingRect(contour);
             rects.push_back(rect);
+            OOIs.push_back(OOI(rect));
         }
     }
+    qDebug() << "Test";
     if (!rects.empty()) {
-        merge_bounding_rects(rects);
+        /*merge_bounding_rects(rects);
         for(cv::Rect rect : rects) {
             cv::rectangle(shown_frame, rect, color, 2);
-        }
+        }*/
     }
-    cv::imshow("First frame", exclude_frame);
-
+    qDebug() << "Finished analysing frame";
+    return OOIs;
 }
 
 void MotionDetection::merge_bounding_rects(std::vector<cv::Rect> &rects) {
