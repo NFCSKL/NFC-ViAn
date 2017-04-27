@@ -632,12 +632,15 @@ void MainWindow::on_actionAddVideo_triggered() {
         project = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
         if (my_project->type == TYPE::PROJECT){
-            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
+            Project *proj = this->fileHandler->get_project(my_project->id);
+            std::string video_dir_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
+            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_dir_path.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
-            if(!dir.isEmpty()) { // Check if you have selected something.
-                ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), dir.toStdString());
-                add_video_to_tree(dir.toStdString(), id);
-                set_status_bar("Video " + dir.toStdString() + " added.");
+            if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
+                std::string video_file_path = q_video_file_path.toStdString();
+                ID id = fileHandler->add_video(proj, video_file_path);
+                add_video_to_tree(video_file_path, id);
+                set_status_bar("Video " + video_file_path + " added.");
             }
         } else {
             set_status_bar("No project selected.");
