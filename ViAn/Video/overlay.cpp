@@ -1,6 +1,4 @@
 #include "overlay.h"
-#include <iostream>
-#include <QInputDialog>
 
 /**
  * @brief Overlay::Overlay
@@ -58,7 +56,7 @@ void Overlay::set_showing_overlay(bool value) {
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
 
-    // If the text option is choosen, a string and size will be entered by the user.
+    // If the text option is chosen, a string and size will be entered by the user.
     if (s == TEXT) {
         std::string input_string = current_string.toStdString();
         float input_font_scale = current_font_scale;
@@ -91,23 +89,54 @@ void Overlay::set_colour(QColor col) {
 
 /**
  * @brief Overlay::get_colour
- * @return The currenty choosen colour.
+ * @return The currenty chosen colour.
  */
 QColor Overlay::get_colour() {
     return current_colour;
 }
 
 /**
- * @brief Overlay::get_shape
- * @return The currently choosen shape
+ * @brief Overlay::get_tool
+ * @return The currently chosen tool
  */
-SHAPES Overlay::get_shape() {
+SHAPES Overlay::get_tool() {
     return current_shape;
 }
 
 /**
+ * @brief Overlay::get_empty_shape
+ * @param shape_type
+ * @return Returns a new shape of the given type.
+ */
+Shape* Overlay::get_empty_shape(SHAPES shape_type) {
+    switch (shape_type) {
+        case RECTANGLE:
+            return new Rectangle();
+            break;
+        case CIRCLE:
+            return new Circle();
+            break;
+        case LINE:
+            return new Line();
+            break;
+        case ARROW:
+            return new Arrow();
+            break;
+        case PEN:
+            return new Pen();
+            break;
+        case TEXT:
+            return new Text();
+            break;
+        default:
+            return nullptr;
+            break;
+    }
+}
+
+/**
  * @brief Overlay::mouse_pressed
- * Creates a drawing shape with the prechoosen colour
+ * Creates a drawing shape with the prechosen colour
  * and shape, if the overlay is visible.
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
@@ -195,3 +224,52 @@ void Overlay::clear(int frame_nr) {
         overlays[frame_nr].clear();
     }
 }
+
+/**
+ * @brief Overlay::read
+ * @param json
+ * Reads the overlay from a Json object.
+ */
+void Overlay::read(const QJsonObject& json) {
+    QJsonArray json_overlays = json["overlays"].toArray();
+    for(int i = 0; i != json_overlays.size(); i++) {
+        // For each overlay, get the associated frame number
+        // and all drawings.
+        QJsonObject json_overlay = json_overlays[i].toObject();
+        int frame_nr = json_overlay["frame"].toInt();
+        QJsonArray json_drawings = json_overlay["drawings"].toArray();
+        for(int i = 0; i != json_drawings.size(); i++) {
+            // For each drawing, get the shape type and read
+            // a shape of that type.
+            QJsonObject json_shape = json_drawings[i].toObject();
+            int shape_i = json_shape["shape"].toInt();
+            SHAPES shape_t = static_cast<SHAPES>(shape_i);
+            Shape* shape = get_empty_shape(shape_t);
+            shape->read(json_shape);
+            overlays[frame_nr].append(shape);
+        }
+    }
+}
+
+/**
+ * @brief Overlay::write
+ * @param json
+ * Writes the overlay to a Json object.
+ */
+void Overlay::write(QJsonObject& json) {
+    QJsonArray json_overlays;
+    for (auto const& map_entry : overlays) {
+        QJsonObject json_overlay;
+        QJsonArray json_drawings;
+        foreach (Shape* s, map_entry.second) { // Second member is the value, i.e. the drawings.
+            QJsonObject json_shape;
+            s->write(json_shape);
+            json_drawings.append(json_shape);
+        }
+        json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
+        json_overlay["drawings"] = json_drawings;
+        json_overlays.append(json_overlay);
+    }
+    json["overlays"] = json_overlays;
+}
+
