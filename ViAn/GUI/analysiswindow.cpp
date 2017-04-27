@@ -1,5 +1,6 @@
 #include "analysiswindow.h"
 #include "ui_analysiswindow.h"
+#include <iostream>
 
 
 AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent) :
@@ -30,7 +31,8 @@ AnalysisWindow::~AnalysisWindow() {
 void AnalysisWindow::on_add_button_clicked() {
     if(!ui->name_input->text().isEmpty()) {
         mainwindow->add_analysis_to_tree(ui->name_input->text(), current_video);
-        ui->analysis_list->addItem(ui->name_input->text());
+        QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
+        ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");
 }
 
@@ -46,6 +48,10 @@ void AnalysisWindow::set_status_bar(std::string status, int timer){
 
 void AnalysisWindow::set_current_video(MyQTreeWidgetItem *current_video) {
     this->current_video = current_video;
-    QString text = "Add analysis to video: " + current_video->name;
-    ui->current_video_lable->setText(text);
+    std::string text = "Add analysis to video: " + current_video->get_name();
+    ui->current_video_lable->setText(QString::fromStdString(text));
+}
+
+void AnalysisWindow::remove_analysis_from_list(ID id) {
+    delete ui->analysis_list->takeItem(id);
 }

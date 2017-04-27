@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->analysis_window = new AnalysisWindow(this, fileHandler);
     this->current_analysis = nullptr;
-    this->analysis_queue = new QQueue<MyQTreeWidgetItem>;
+    this->analysis_queue = new QQueue<MyQTreeWidgetItem*>();
 }
 
 
@@ -763,9 +763,35 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
     project->addChild(video_in_tree);
     project->setExpanded(true);
 }
-
+/**
+ * @brief MainWindow::add_analysis_to_tree
+ * @param type
+ * @param video_in_tree
+ * @todo param analysis from filehandler = nullptr
+ */
 void MainWindow::add_analysis_to_tree(QString type, MyQTreeWidgetItem *video_in_tree) {
-    MyQTreeWidgetItem *analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type);
+    MyQTreeWidgetItem *analysis_in_tree;
+    /*if(analysis == nullptr) {
+        type = analysis.get_name();
+        analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, analysis.get_id());
+    } else {*/
+
+        if(current_analysis == nullptr) {
+            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, -1);//id == -1 => current_analysis
+            current_analysis = analysis_in_tree;
+        } else {
+            int id = analysis_queue->size() + 2;
+            id = -id;
+            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, id);//id < -1 => analysis in queue
+            analysis_queue->enqueue(analysis_in_tree);
+        }
+    //}
+    QQueue<MyQTreeWidgetItem*> *q = new QQueue<MyQTreeWidgetItem*>();
+    while (!analysis_queue->isEmpty()){
+        MyQTreeWidgetItem *i = analysis_queue->dequeue();
+        q->enqueue(i);
+    }
+    while(!q->isEmpty()) analysis_queue->enqueue(q->dequeue());
     analysis_in_tree->set_text(type.toStdString());
     video_in_tree->addChild(analysis_in_tree);
     video_in_tree->setExpanded(true);
@@ -808,6 +834,10 @@ void MainWindow::on_actionDelete_triggered() {
                 this->fileHandler->delete_project(my_item->id);
             } else if (my_item->type == TYPE::ANALYSIS) {
                 //this->fileHandler->delete_file(my_item->id);
+                if(my_item->id < -1) //id < -1 means it is not a finished analysis
+                    remove_analysis_from_queue(my_item);
+                else if(my_item->id == -1)//id = -1 means it is the current_analysis
+                    abort_current_analysis();
             }
             remove_item_from_tree(my_item);
             set_status_bar("Remove item");
@@ -823,6 +853,36 @@ void MainWindow::on_actionDelete_triggered() {
  */
 void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
     delete my_item;
+}
+
+/**
+ * @brief MainWindow::remove_analysis_from_queue
+ * @param my_item to be removed
+ * Removes the item from the queue.
+ */
+void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
+    QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
+    while (!analysis_queue->isEmpty()){
+        MyQTreeWidgetItem *i = analysis_queue->dequeue();
+        i->id++;
+        if(!(my_item == i)) tmp_queue->enqueue(i);
+        else analysis_window->remove_analysis_from_list(-(i->id));
+    }
+    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue());
+    delete tmp_queue;
+}
+
+/**
+ * @brief MainWindow::abort_current_analysis
+ * @todo emit abort()
+ */
+void MainWindow::abort_current_analysis() {
+    if(analysis_queue->isEmpty()) current_analysis = nullptr;
+    else{
+        current_analysis = analysis_queue->dequeue();
+        current_analysis->id = -1;
+    }
+    analysis_window->remove_analysis_from_list(0); // remove the first in the list
 }
 
 /**

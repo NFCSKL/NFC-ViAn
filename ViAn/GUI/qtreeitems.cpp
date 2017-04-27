@@ -56,3 +56,18 @@ std::string MyQTreeWidgetItem::get_name() {
     return text;
 }
 
+/**
+ * @brief operator ==
+ * @param item1
+ * @param item2
+ * @return if the same true
+ */
+bool MyQTreeWidgetItem::operator==(MyQTreeWidgetItem* item){
+
+    bool name = this->name == item->name;
+    bool id = this->id == item->id;
+    bool type = this->type == item->type;
+    bool parent = this->parent() == item->parent();
+    return name && id && type && parent && ((QTreeWidgetItem*)this == (QTreeWidgetItem*)item);
+}
+

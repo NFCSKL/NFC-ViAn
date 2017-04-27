@@ -199,8 +199,9 @@ private:
     void deselect_overlay_tool();
 
     MyQTreeWidgetItem *current_analysis;
-    QQueue<MyQTreeWidgetItem> *analysis_queue;
-
+    QQueue<MyQTreeWidgetItem*> *analysis_queue;
+    void remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
+    void abort_current_analysis();
 };
 
 #endif // MAINWINDOW_H
