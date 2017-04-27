@@ -5,6 +5,7 @@
 
 
 MotionDetection::MotionDetection(std::string source_file) {
+    m_analysis.type = MOTION_DETECTION;
     capture.open(source_file);
     if (!capture.isOpened()) {
         // TODO Take care of this
@@ -17,8 +18,6 @@ MotionDetection::MotionDetection(std::string source_file) {
  * Initial setup of the analysis
  */
 void MotionDetection::setup_analysis(){
-    capture.set(CV_CAP_PROP_POS_FRAMES,4300);
-    current_frame = 4300;
     pMOG2 = cv::createBackgroundSubtractorMOG2(500,50,false);
 }
 
@@ -28,8 +27,6 @@ void MotionDetection::setup_analysis(){
  * This function is called from the interface thread loop
  */
 std::vector<OOI> MotionDetection::analyse_frame(){
-    qDebug() << "Frame " << current_frame << " of " << num_frames;
-    qDebug() << current_frame*100/(num_frames-1) << "%";
     std::vector<OOI> OOIs;
     std::vector<std::vector<cv::Point> > contours;
     // Grayscale and blur
@@ -78,14 +75,14 @@ std::vector<OOI> MotionDetection::analyse_frame(){
             OOIs.push_back(OOI(rect));
         }
     }
-    qDebug() << "Test";
+
     if (!rects.empty()) {
         /*merge_bounding_rects(rects);
         for(cv::Rect rect : rects) {
             cv::rectangle(shown_frame, rect, color, 2);
         }*/
     }
-    qDebug() << "Finished analysing frame";
+
     return OOIs;
 }
 

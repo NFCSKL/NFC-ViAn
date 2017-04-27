@@ -2,6 +2,7 @@
 #define MOTIONDETECTION_H
 
 #include "AnalysisMethod.h"
+#include "analysiscontroller.h"
 #include <string>
 
 /**
@@ -31,6 +32,7 @@ private:
 
     unsigned int dilation_degree = 16;
     unsigned int smallest_object_size = 500;
+
 protected:
 
 signals:

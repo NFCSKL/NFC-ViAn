@@ -23,6 +23,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
+#include "Analysis/analysiscontroller.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
@@ -57,6 +58,7 @@ signals:
     void next_video_frame();
     void prev_video_frame();
     void set_playback_frame(int frame, bool show_frame = false);
+    void abort_analysis();
 
 private slots:
 
@@ -154,10 +156,13 @@ private slots:
 
     void save_analysis_to_file(Analysis analysis);
 
+    void show_analysis_progress(int progress);
+
 private:
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
+    AnalysisController* m_acontroller;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
@@ -173,6 +178,7 @@ private:
     FileHandler *fileHandler;
     void setup_filehandler();
     void setup_video_player(video_player *mplayer);
+    void setup_analysis(AnalysisController *ac);
 
     void add_video_to_tree(string file_path, ID id);
 

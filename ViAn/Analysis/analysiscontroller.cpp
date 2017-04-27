@@ -11,13 +11,15 @@
 
 AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type, QObject* parent) : QThread(parent) {
     switch (type) {
-    case MOTION:
+    case MOTION_DETECTION:
         method = new MotionDetection(file_path);
         break;
     default:
         method = new MotionDetection(file_path);
         break;
     }
+    QObject::connect(method, SIGNAL(send_progress(int)),
+                     this, SLOT(on_progress_update(int)));
 }
 
 /**
@@ -26,11 +28,9 @@ AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type
  */
 void AnalysisController::run() {
     std::vector<cv::Point> points;
-    std::cout << "Analysis thread started" << std::endl;
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
     emit save_analysis(analysis);
-    std::cout << "Exiting analysis thread " << std::endl;
 }
 
 /**
@@ -57,4 +57,13 @@ void AnalysisController::on_pause() {
  */
 void AnalysisController::on_abort() {
     method->abort_analysis();
+}
+
+/**
+ * @brief AnalysisController::on_progress_update
+ * Sends the progress of the current analysis to the gui
+ * @param progress
+ */
+void AnalysisController::on_progress_update(int progress) {
+    emit show_analysis_progress(progress);
 }

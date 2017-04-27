@@ -14,11 +14,13 @@ private:
     AnalysisMethod* method;
 signals:
     void save_analysis(Analysis analysis);
+    void show_analysis_progress(int progress);
 
 private slots:
     void on_start();                // Start or resume the analysis
     void on_pause();                // Pause the analysis
     void on_abort();                // Abort the analysis
+    void on_progress_update(int progress);
 };
 
 #endif // ANALYSISCONTROLLER_H

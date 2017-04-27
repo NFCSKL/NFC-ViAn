@@ -24,13 +24,13 @@ public:
     Analysis run_analysis();
     void set_exclude_area(std::vector<cv::Point> points);
     bool sample_current_frame();
+    int get_progress();
 
 private:
     int prev_detection_frame = -1;
     bool detecting = false;
     bool paused = false;            // Control states
     bool aborted = false;
-    Analysis m_analysis;
 
 protected:
     int num_frames = -1;
@@ -38,6 +38,10 @@ protected:
     unsigned int current_frame = 0; // The current frame number
     cv::VideoCapture capture;       // Video source
     cv::Mat frame, exclude_frame;                  // The frame fetched last
+    Analysis m_analysis;
+
+signals:
+    void send_progress(int progress);
 
 
 };

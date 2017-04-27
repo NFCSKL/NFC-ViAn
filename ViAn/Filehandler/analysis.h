@@ -9,7 +9,7 @@
 #include "saveable.h"
 #include "opencv2/core/core.hpp"
 
-enum ANALYSIS_TYPE {MOTION = 0, FACE = 1};
+enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
 class OOI : Saveable{
     int frame;
     std::string file_path;

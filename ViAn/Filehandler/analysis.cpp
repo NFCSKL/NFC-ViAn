@@ -19,18 +19,18 @@ void POI::read(const QJsonObject& json) {
 void POI::write(QJsonObject& json) {
     json["start"] = start_frame;
     json["end"] = end_frame;
-    QJsonArray json_OOIs;
+
     for(const auto& ooi_pair : OOIs){
         QJsonArray json_frame_OOIs;
-        int frame = ooi_pair.first();
+        int frame = ooi_pair.first;
         std::vector<OOI> oois = ooi_pair.second;
         for (OOI o : oois) {
-
+            QJsonObject json_ooi;
+            o.write(json_ooi);
+            json_frame_OOIs.append(json_ooi);
         }
-        p.write(json_POI);
-        json_POIs.append(json_POI);
+        json[QString::number(frame)] = json_frame_OOIs;
     }
-    json["POI:s"] = json_POIs;
 }
 
 OOI::OOI(){}
@@ -51,23 +51,19 @@ OOI::OOI(cv::Rect rect) {
 }
 
 void OOI::read(const QJsonObject &json){
-    this->frame = json["frame"].toDouble();
-
     this->upper_left.first = json["UL_X"].toDouble();
     this->upper_left.second = json["UL_Y"].toDouble();
 
-    this->lower_right.first = json["DR_X"].toDouble();
-    this->lower_right.second = json["DR_Y"].toDouble();
+    this->lower_right.first = json["LR_X"].toDouble();
+    this->lower_right.second = json["LR_Y"].toDouble();
 }
 
 void OOI::write(QJsonObject &json){
-    json["frame"] = this->frame;
-
     json["UL_X"] = this->upper_left.first;
     json["UL_Y"] = this->upper_left.second;
 
-    json["DR_X"] = this->lower_right.first;
-    json["DR_Y"] = this->lower_right.second;
+    json["LR_X"] = this->lower_right.first;
+    json["LR_Y"] = this->lower_right.second;
 }
 
 Analysis::Analysis() {
@@ -97,7 +93,7 @@ void Analysis::read(const QJsonObject &json){
 }
 
 void Analysis::write(QJsonObject &json){
-    json["analysis"] = this->type;
+    json["type"] = this->type;
     QJsonArray json_POIs;
     for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
         QJsonObject json_POI;

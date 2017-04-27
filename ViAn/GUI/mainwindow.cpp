@@ -16,9 +16,9 @@
 using namespace std;
 using namespace cv;
 
+
 /**
  * @brief MainWindow::MainWindow
- * Constructor
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) :
@@ -50,10 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // TODO The following code is just here to test.
     // Remove when a proper implementation exists.
     //MotionDetection *md = new MotionDetection("seq_01.mp4");
-    AnalysisController *ac = new AnalysisController("Pumparna.avi",MOTION);
-    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
-                     this, SLOT(save_analysis_to_file(Analysis)));
-    ac->start();
+    m_acontroller = new AnalysisController("Pumparna.avi",MOTION_DETECTION);
+    setup_analysis(m_acontroller);
+    m_acontroller->start();
 
     // Initially hide overlay and analysis toolbar
     ui->toolBar_overlay->hide();
@@ -82,6 +81,20 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
+}
+
+/**
+ * @brief MainWindow::setup_analysis
+ * Creates the necessary connections to the analysis thread.
+ * @param ac AnalysisController for the current analysis
+ */
+void MainWindow::setup_analysis(AnalysisController* ac){
+    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
+                     this, SLOT(save_analysis_to_file(Analysis)));
+    QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
+                     this, SLOT(show_analysis_progress(int)));
+    QObject::connect(this, SIGNAL(abort_analysis()),
+                     ac, SLOT(on_abort()));
 }
 
 /**
@@ -129,11 +142,17 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    int i = 0;
-    for (POI poi : analysis.POIs) {
-        cout << "POI " << ++i << endl;
-        cout << "Start frame: " << poi.start_frame << ", End frame: " << poi.end_frame << endl << endl;
-    }
+    //TODO Add code.
+}
+
+/**
+ * @brief MainWindow::on_analysis_update
+ * @param progress current analysis progress in percent
+ */
+void MainWindow::show_analysis_progress(int progress){
+    // Progress for the current analysis
+    // Add to gui from here
+    cout << "ANALYSIS DÖÖÖÖNE" << endl;
 }
 
 /**
