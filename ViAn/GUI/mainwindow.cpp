@@ -8,7 +8,6 @@
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
-#include "inputwindow.h"
 #include "Video/shapes/shape.h"
 
 
@@ -33,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup a Bookmark View in the right sidebar in the GUI.
     bookmark_view = new BookmarkView(ui->document_list);
 
-    fileHandler = new FileHandler();
+    setup_filehandler();
 
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
@@ -76,6 +75,18 @@ MainWindow::~MainWindow() {
     delete ui;
     delete bookmark_view;
 }
+/**
+ * @brief MainWindow::setup_filehandler
+ * Sets up filehandler and loads projects.
+ */
+void MainWindow::setup_filehandler(){
+    fileHandler = new FileHandler();
+    for(auto it = fileHandler->open_projects.begin(); it != fileHandler->open_projects.end(); it++){
+        ID id = *it;
+        Project* proj = fileHandler->get_project(id);
+        add_project_to_tree(proj);
+    }
+}
 
 /**
  * @brief MainWindow::setup_video_player
@@ -101,6 +112,11 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    //Will be added when functionality is in place
+    /*QObject::connect(this, SIGNAL(next_video_POI()),
+                     mplayer, SLOT(next_POI()));
+    QObject::connect(this, SIGNAL(prev_video_POI()),
+                     mplayer, SLOT(previous_POI()));*/
 }
 
 /**
@@ -343,20 +359,17 @@ void MainWindow::on_bookmark_button_clicked() {
         // Add bookmarks-folder to the project-folder.
         Project* proj = fileHandler->get_project(my_project->id);
         QDir dir = fileHandler->get_dir(proj->bookmark_dir);
-        // Export the current frame in the bookmarks-folder.
         // Get bookmark description
         QString bookmark_text("");
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
-        // The names of the stored files will have increasing numbers.
-        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
-        int frame = mvideo_player->get_current_frame_num();
-        Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
+        int frame_number = mvideo_player->get_current_frame_num();
+        QImage frame = mvideo_player->get_current_frame_unscaled();
+        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
-        set_status_bar("Saved bookmark.");
+        set_status_bar("Bookmark created.");
     }
 }
 
@@ -364,45 +377,9 @@ void MainWindow::on_bookmark_button_clicked() {
  * @brief MainWindow::on_actionAddProject_triggered
  */
 void MainWindow::on_actionAddProject_triggered() {
-    ACTION action = ADD_PROJECT;
-    input_window = new inputwindow(this, action, "Project name:");
-    input_window->show();
-    set_status_bar("Adding project, need name");
-}
-
-/**
- * @brief MainWindow::inputSwitchCase
- * @param input the input from the user
- * @param action the action that was triggered earlier
- */
-void MainWindow::input_switch_case(ACTION action, QString qInput) {    
-    MyQTreeWidgetItem *my_project;
-    if(ui->project_tree->selectedItems().size() == 1) {
-        my_project = (MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
-    } else {
-        set_status_bar("Multiple or no things selected.");
-    }
-    switch(action) {
-    case ADD_PROJECT: {
-        Project* proj = fileHandler->create_project(qInput);
-        add_project_to_tree(proj);
-        set_status_bar("Project " + qInput.toStdString() + " created.");
-        delete input_window;
-        break;
-    }
-    case CANCEL:
-        set_status_bar("Cancel");
-        delete input_window;
-        break;
-    case ADD_VIDEO: {
-        ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), qInput.toStdString());
-        add_video_to_tree(qInput.toStdString(), id);
-        set_status_bar("Video " + qInput.toStdString() + " added.");
-        break;
-    }
-    default:
-        break;
-    }
+    MakeProject *make_project = new MakeProject(this, this->fileHandler, this->fileHandler->get_work_space().absolutePath().toStdString());
+    make_project->show();
+    set_status_bar("Adding project");
 }
 
 /**
@@ -430,11 +407,11 @@ void MainWindow::on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int co
     }
 }
 
- /** @brief MainWindow::on_actionShow_hide_overlay_triggered
+ /** @brief MainWindow::on_action_show_hide_overlay_triggered
  * Toggles the showing/hiding of the overlay.
  * Invoked by menu item.
  */
-void MainWindow::on_actionShow_hide_overlay_triggered() {
+void MainWindow::on_action_show_hide_overlay_triggered() {
     mvideo_player->toggle_overlay();
     toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
@@ -465,6 +442,8 @@ void MainWindow::on_actionColour_triggered() {
 void MainWindow::on_actionRectangle_triggered() {
     mvideo_player->set_overlay_tool(RECTANGLE);
     set_status_bar("Tool: rectangle.");
+    deselect_overlay_tool();
+    ui->actionRectangle->setChecked(true);
 }
 
 /**
@@ -474,6 +453,8 @@ void MainWindow::on_actionRectangle_triggered() {
 void MainWindow::on_actionCircle_triggered() {
     mvideo_player->set_overlay_tool(CIRCLE);
     set_status_bar("Tool: circle.");
+    deselect_overlay_tool();
+    ui->actionCircle->setChecked(true);
 }
 
 /**
@@ -483,6 +464,8 @@ void MainWindow::on_actionCircle_triggered() {
 void MainWindow::on_actionLine_triggered() {
     mvideo_player->set_overlay_tool(LINE);
     set_status_bar("Tool: line.");
+    deselect_overlay_tool();
+    ui->actionLine->setChecked(true);
 }
 
 /**
@@ -492,6 +475,8 @@ void MainWindow::on_actionLine_triggered() {
 void MainWindow::on_actionArrow_triggered() {
     mvideo_player->set_overlay_tool(ARROW);
     set_status_bar("Tool: arrow.");
+    deselect_overlay_tool();
+    ui->actionArrow->setChecked(true);
 }
 
 /**
@@ -501,6 +486,8 @@ void MainWindow::on_actionArrow_triggered() {
 void MainWindow::on_actionPen_triggered() {
     mvideo_player->set_overlay_tool(PEN);
     set_status_bar("Tool: pen.");
+    deselect_overlay_tool();
+    ui->actionPen->setChecked(true);
 }
 
 /**
@@ -510,6 +497,21 @@ void MainWindow::on_actionPen_triggered() {
 void MainWindow::on_actionText_triggered() {
     mvideo_player->set_overlay_tool(TEXT);
     set_status_bar("Tool: text.");
+    deselect_overlay_tool();
+    ui->actionText->setChecked(true);
+}
+
+/**
+ * @brief deselct_overlay_tool
+ * Deselects all overlay tools.
+ */
+void MainWindow::deselect_overlay_tool(){
+    ui->actionRectangle->setChecked(false);
+    ui->actionCircle->setChecked(false);
+    ui->actionLine->setChecked(false);
+    ui->actionArrow->setChecked(false);
+    ui->actionPen->setChecked(false);
+    ui->actionText->setChecked(false);
 }
 
 /**
@@ -618,6 +620,10 @@ void MainWindow::prepare_menu(const QPoint & pos) {
             connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
         }
+        QAction *close_project = new QAction(QIcon(""), tr("&Close project"), this);
+        close_project->setStatusTip(tr("Close project"));
+        menu.addAction(close_project);
+        connect(close_project, SIGNAL(triggered()), this, SLOT(on_action_close_project_triggered()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
@@ -632,11 +638,17 @@ void MainWindow::on_actionAddVideo_triggered() {
     QTreeWidgetItem *project;
     if(ui->project_tree->selectedItems().size() == 1) {
         project = ui->project_tree->selectedItems().first();
-        if (((MyQTreeWidgetItem*)project)->type == TYPE::PROJECT){
-            QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
+        MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
+        if (my_project->type == TYPE::PROJECT){
+            Project *proj = this->fileHandler->get_project(my_project->id);
+            std::string video_dir_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
+            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_dir_path.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
-            if(!dir.isEmpty()) { // Check if you have selected something.
-                input_switch_case(ACTION::ADD_VIDEO, dir);
+            if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
+                std::string video_file_path = q_video_file_path.toStdString();
+                ID id = fileHandler->add_video(proj, video_file_path);
+                add_video_to_tree(video_file_path, id);
+                set_status_bar("Video " + video_file_path + " added.");
             }
         } else {
             set_status_bar("No project selected.");
@@ -700,15 +712,6 @@ void MainWindow::on_actionLoad_triggered() {
         Project* loadProj= this->fileHandler->load_project(dir.toStdString());
         add_project_to_tree(loadProj);
         set_status_bar("Project " + loadProj->name + " loaded.");
-        // Add bookmarks
-        for(auto it = loadProj->videos.begin(); it != loadProj->videos.end(); it++){
-            VideoProject* v = it->second;
-            std::vector<Bookmark*> bookmarks = v->get_bookmarks();
-            for(auto it2 = bookmarks.begin(); it2 != bookmarks.end(); it2++){
-                Bookmark* bm = *it2;
-                bookmark_view->add_bookmark(bm);
-            }
-        }
     }
 }
 
@@ -724,8 +727,14 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
-        Video* v = vid->second->get_video();
-        add_video_to_tree(v->file_path, v->id);
+        VideoProject* v = vid->second;
+        add_video_to_tree(v->get_video()->file_path, v->get_video()->id);
+        // Add bookmarks
+        std::vector<Bookmark*> bookmarks = v->get_bookmarks();
+        for(auto it2 = bookmarks.begin(); it2 != bookmarks.end(); it2++){
+            Bookmark* bm = *it2;
+            bookmark_view->add_bookmark(bm);
+        }
     }
 }
 
@@ -779,6 +788,7 @@ void MainWindow::on_actionDelete_triggered() {
                 this->fileHandler->delete_project(my_item->id);
             }
             remove_item_from_tree(my_item);
+            set_status_bar("Remove item");
         }
     } else {
         set_status_bar("Multiple or no videos selected.");
@@ -790,7 +800,6 @@ void MainWindow::on_actionDelete_triggered() {
  * @param my_item item to be removed from tree
  */
 void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
-    set_status_bar("Remove item");
     delete my_item;
 }
 
@@ -806,14 +815,18 @@ void MainWindow::toggle_toolbar() {
         ui->toolBar_analysis->show();
         ui->toolBar->hide();
         ui->toolBar_overlay->hide();
+        ui->action_show_hide_overlay->setEnabled(false);
     } else if (mvideo_player->is_showing_overlay()) {
         ui->toolBar_analysis->hide();
         ui->toolBar->hide();
         ui->toolBar_overlay->show();
+        ui->action_show_hide_analysis_area->setEnabled(false);
     } else {
         ui->toolBar_analysis->hide();
         ui->toolBar->show();
         ui->toolBar_overlay->hide();
+        ui->action_show_hide_overlay->setEnabled(true);
+        ui->action_show_hide_analysis_area->setEnabled(true);
     }
 }
 
@@ -829,6 +842,10 @@ void MainWindow::enable_video_buttons() {
     ui->increase_speed_button->setEnabled(true);
     ui->previous_frame_button->setEnabled(true);
     ui->stop_button->setEnabled(true);
+    ui->bookmark_button->setEnabled(true);
+    ui->previous_POI_button->setEnabled(true);
+    ui->next_POI_button->setEnabled(true);
+    ui->video_slider->setEnabled(true);
 }
 
 /**
@@ -856,10 +873,10 @@ void MainWindow::on_video_slider_sliderPressed() {
     }
 }
 
-/** @brief MainWindow::on_actionShow_hide_analysis_area_triggered
+/** @brief MainWindow::on_action_show_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
  */
-void MainWindow::on_actionShow_hide_analysis_area_triggered() {
+void MainWindow::on_action_show_hide_analysis_area_triggered() {
     mvideo_player->toggle_analysis_area();
     toggle_toolbar();
     if (mvideo_player->is_showing_analysis_tool()) {
@@ -1017,3 +1034,62 @@ void MainWindow::on_actionCreate_report_triggered()
         set_status_bar("Select a project to create a report for");
     }
 }
+
+/** @brief MainWindow::on_action_close_project_triggered
+ *  Remove project from the tree without deleting.
+ */
+void MainWindow::on_action_close_project_triggered() {
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        item = ui->project_tree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
+        set_status_bar("Closed " + my_project->name.toStdString());
+        fileHandler->close_project(my_project->id);
+        remove_item_from_tree(my_project);
+    } else {
+        set_status_bar("Multiple or nothing selected.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_show_hide_analysis_overlay_triggered
+ * Toggles the state of showing the analysis overlay.
+ */
+void MainWindow::on_action_show_hide_analysis_overlay_triggered() {
+    mvideo_player->toggle_analysis_overlay();
+    if (mvideo_player->is_showing_analysis_overlay()) {
+        set_status_bar("Showing analysis overlay: on.");
+    } else {
+        set_status_bar("Showing analysis overlay: off.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_previous_POI_button_clicked
+ * Jump back to the previous POI.
+ */
+void MainWindow::on_previous_POI_button_clicked() {
+    if (mvideo_player->is_paused()) {
+        set_status_bar("Went back to the previous POI");
+        //will be added when functionality is in place
+        //emit previous_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
+    }
+}
+
+/**
+ * @brief MainWindow::on_next_POI_button_clicked
+ * Jump forward to the next POI.
+ */
+void MainWindow::on_next_POI_button_clicked() {
+    if (mvideo_player->is_paused()) {
+        set_status_bar("Went forward to the next POI");
+        //will be added when functionality is in place
+        //emit next_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
+    }
+}
+

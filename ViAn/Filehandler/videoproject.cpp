@@ -59,6 +59,8 @@ void VideoProject::read(const QJsonObject& json){
 void VideoProject::write(QJsonObject& json){
     this->video->write(json);
     QJsonArray json_bookmarks;
+    // Needs to delete bookmarks before exporting the new ones.
+    delete_artifacts();
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         QJsonObject json_bookmark;
         Bookmark* temp = *it;
@@ -84,8 +86,7 @@ void VideoProject::add_bookmark(Bookmark *bookmark){
 void VideoProject::delete_artifacts(){
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         Bookmark* temp = *it;
-        QFile file (temp->get_file_path());
-        file.remove();
+        temp->remove_exported_image();
     }
 }
 

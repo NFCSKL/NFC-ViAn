@@ -2,10 +2,16 @@
 
 /**
  * @brief Arrow::Arrow
+ */
+Arrow::Arrow() : Shape(SHAPES::ARROW) {
+}
+
+/**
+ * @brief Arrow::Arrow
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Arrow::Arrow(QColor col, QPoint pos) : Shape(col, pos) {
+Arrow::Arrow(QColor col, QPoint pos) : Shape(SHAPES::ARROW, col, pos) {
 }
 
 /**
@@ -26,4 +32,22 @@ cv::Mat Arrow::draw(cv::Mat &frame) {
  * @param pos
  */
 void Arrow::handle_new_pos(QPoint pos) {
+}
+
+/**
+ * @brief Arrow::write
+ * @param json
+ * Writes to a Json object.
+ */
+void Arrow::write(QJsonObject& json) {
+    write_shape(json);
+}
+
+/**
+ * @brief Arrow::read
+ * @param json
+ * Reads from a Json object.
+ */
+void Arrow::read(const QJsonObject& json) {
+    read_shape(json);
 }

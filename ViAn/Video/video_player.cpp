@@ -153,6 +153,7 @@ void video_player::convert_frame(bool scale) {
 cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = src.clone();
+    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
@@ -267,6 +268,14 @@ bool video_player::is_stopped() {
  */
 bool video_player::is_showing_overlay() {
     return video_overlay->is_showing_overlay();
+}
+
+/**
+ * @brief video_player::is_showing_analysis_overlay
+ * @return Returns true if the analysis overlay is showing, else false.
+ */
+bool video_player::is_showing_analysis_overlay() {
+    return analysis_overlay->is_showing_overlay();
 }
 
 /**
@@ -541,6 +550,16 @@ void video_player::toggle_overlay() {
 }
 
 /**
+ * @brief video_player::toggle_analysis_overlay
+ * Toggles the showing of the analysis overlay, and if video is paused updates
+ * the frame in the GUI to show with/without the overlay.
+ */
+void video_player::toggle_analysis_overlay() {
+    analysis_overlay->toggle_showing();
+    update_overlay();
+}
+
+/**
  * @brief video_player::set_overlay_tool
  * Sets the overlay tool's shape.
  * @param shape
@@ -627,6 +646,7 @@ void video_player::zoom_in() {
     if (capture.isOpened()) {
         choosing_zoom_area = true;
         zoom_area->reset_pos();
+        QApplication::setOverrideCursor(Qt::CrossCursor); // Set zoom cursor.
     }
 }
 
@@ -712,6 +732,7 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
             choosing_zoom_area = false;
+            QApplication::setOverrideCursor(Qt::ArrowCursor); // Restore cursor.
         } else if (choosing_analysis_area) {
             analysis_area->add_point(pos);
         } else if (is_paused()) {
@@ -797,26 +818,13 @@ void video_player::scale_position(QPoint &pos) {
 }
 
 /**
- * @brief video_player::export_current_frame
- * Stores the current frame in the specified folder.
- * The stored frame will have the sam resolution as the video.
- * @param path_to_folder Path to the folder to store the file in.
- * @return The path to the stored image.
+ * @brief video_player::get_current_frame_unscaled
+ * Creates, converts, processes the current frame and returns it.
  */
-std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
+QImage video_player::get_current_frame_unscaled() {
     convert_frame(false);
 
-    QString path = QString::fromStdString(path_to_folder);
-
-    // Add "/file_name.tiff" to the path.
-    path.append("/");
-    path.append(QString::fromStdString(file_name));
-    path.append(".tiff");
-
-    QImageWriter writer(path, "tiff");
-    writer.write(img);
-
-    return path.toStdString();
+    return img;
 }
 
 /**

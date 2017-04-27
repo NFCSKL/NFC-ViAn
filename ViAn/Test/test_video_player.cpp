@@ -127,6 +127,12 @@ void test_video_player::test_toggle_overlay() {
     QVERIFY(v_player->is_showing_overlay());
     v_player->toggle_overlay();
     QVERIFY(!v_player->is_showing_overlay());
+
+    bool original_value = v_player->analysis_overlay->is_showing_overlay();
+    v_player->toggle_analysis_overlay();
+    QVERIFY(v_player->is_showing_analysis_overlay() != original_value);
+    v_player->toggle_analysis_overlay();
+    QVERIFY(v_player->is_showing_analysis_overlay() == original_value);
 }
 
 /**
@@ -134,7 +140,7 @@ void test_video_player::test_toggle_overlay() {
  */
 void test_video_player::test_set_overlay_tool() {
     mvideo->set_overlay_tool(RECTANGLE);
-    QVERIFY(mvideo->video_overlay->get_shape() == RECTANGLE);
+    QVERIFY(mvideo->video_overlay->get_tool() == RECTANGLE);
 }
 
 /**

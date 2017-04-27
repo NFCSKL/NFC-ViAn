@@ -72,7 +72,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>232</width>
+                <width>304</width>
                 <height>281</height>
                </rect>
               </property>
@@ -136,6 +136,28 @@
             </property>
             <property name="text">
              <string>&lt;&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="previous_POI_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>()&lt;-</string>
             </property>
            </widget>
           </item>
@@ -206,6 +228,28 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="next_POI_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>-&gt;()</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="increase_speed_button">
             <property name="enabled">
              <bool>false</bool>
@@ -257,6 +301,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="bookmark_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
@@ -303,6 +350,9 @@
           </item>
           <item>
            <widget class="QSlider" name="video_slider">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -369,21 +419,14 @@
      <addaction name="actionAddProject"/>
      <addaction name="actionAddVideo"/>
     </widget>
-    <widget class="QMenu" name="menuDelete">
-     <property name="title">
-      <string>Delete</string>
-     </property>
-     <addaction name="actionDeleteAnalys"/>
-     <addaction name="actionDeleteDrawing"/>
-    </widget>
     <addaction name="menuAdd"/>
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
     <addaction name="actionCreate_report"/>
+    <addaction name="action_close_project"/>
     <addaction name="actionDelete"/>
-    <addaction name="actionExit"/>
     <addaction name="actionChoose_Workspace"/>
-    <addaction name="menuDelete"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -401,8 +444,9 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionShow_hide_overlay"/>
-    <addaction name="actionShow_hide_analysis_area"/>
+    <addaction name="action_show_hide_overlay"/>
+    <addaction name="action_show_hide_analysis_overlay"/>
+    <addaction name="action_show_hide_analysis_area"/>
     <addaction name="actionInvert_analysis_area"/>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
@@ -465,8 +509,9 @@
    <addaction name="actionZoom_out"/>
    <addaction name="actionRotate_right"/>
    <addaction name="actionRotate_left"/>
-   <addaction name="actionShow_hide_overlay"/>
-   <addaction name="actionShow_hide_analysis_area"/>
+   <addaction name="action_show_hide_overlay"/>
+   <addaction name="action_show_hide_analysis_area"/>
+   <addaction name="action_show_hide_analysis_overlay"/>
   </widget>
   <widget class="QToolBar" name="toolBar_overlay">
    <property name="enabled">
@@ -490,7 +535,7 @@
    <addaction name="actionPen"/>
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
-   <addaction name="actionShow_hide_overlay"/>
+   <addaction name="action_show_hide_overlay"/>
    <addaction name="separator"/>
    <addaction name="actionZoom_in"/>
    <addaction name="actionZoom_out"/>
@@ -507,7 +552,7 @@
    </attribute>
    <addaction name="actionUndo"/>
    <addaction name="actionClear"/>
-   <addaction name="actionShow_hide_analysis_area"/>
+   <addaction name="action_show_hide_analysis_area"/>
    <addaction name="actionInvert_analysis_area"/>
   </widget>
   <action name="actionSave">
@@ -584,7 +629,10 @@
     <string>Open manual</string>
    </property>
   </action>
-  <action name="actionShow_hide_overlay">
+  <action name="action_show_hide_overlay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/show_hide_overlay.png</normaloff>:/show_hide_overlay.png</iconset>
@@ -609,6 +657,9 @@
    </property>
   </action>
   <action name="actionRectangle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/box.png</normaloff>:/box.png</iconset>
@@ -621,6 +672,9 @@
    </property>
   </action>
   <action name="actionCircle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/circle.png</normaloff>:/circle.png</iconset>
@@ -633,6 +687,9 @@
    </property>
   </action>
   <action name="actionArrow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/arrow.png</normaloff>:/arrow.png</iconset>
@@ -645,6 +702,9 @@
    </property>
   </action>
   <action name="actionLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/line.png</normaloff>:/line.png</iconset>
@@ -689,6 +749,9 @@
    </property>
   </action>
   <action name="actionPen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/pen.png</normaloff>:/pen.png</iconset>
@@ -752,6 +815,9 @@
    </property>
   </action>
   <action name="actionText">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/text.png</normaloff>:/text.png</iconset>
@@ -774,7 +840,10 @@
     <string>Choose Workspace</string>
    </property>
   </action>
-  <action name="actionShow_hide_analysis_area">
+  <action name="action_show_hide_analysis_area">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Show/hide analysis area</string>
    </property>
@@ -846,6 +915,22 @@
    </property>
    <property name="text">
     <string>Invert analysis area</string>
+   </property>
+  </action>
+  <action name="action_close_project">
+   <property name="text">
+    <string>Close project</string>
+   </property>
+  </action>
+  <action name="action_show_hide_analysis_overlay">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show/hide analysis overlay</string>
    </property>
   </action>
  </widget>
