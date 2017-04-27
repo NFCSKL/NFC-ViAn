@@ -351,20 +351,17 @@ void MainWindow::on_bookmark_button_clicked() {
         // Add bookmarks-folder to the project-folder.
         Project* proj = fileHandler->get_project(my_project->id);
         QDir dir = fileHandler->get_dir(proj->bookmark_dir);
-        // Export the current frame in the bookmarks-folder.
         // Get bookmark description
         QString bookmark_text("");
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
-        // The names of the stored files will have increasing numbers.
-        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
-        int frame = mvideo_player->get_current_frame_num();
-        Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
+        int frame_number = mvideo_player->get_current_frame_num();
+        QImage frame = mvideo_player->get_current_frame_unscaled();
+        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
-        set_status_bar("Saved bookmark.");
+        set_status_bar("Bookmark created.");
     }
 }
 
@@ -834,6 +831,7 @@ void MainWindow::enable_video_buttons() {
     ui->increase_speed_button->setEnabled(true);
     ui->previous_frame_button->setEnabled(true);
     ui->stop_button->setEnabled(true);
+    ui->bookmark_button->setEnabled(true);
 }
 
 /**

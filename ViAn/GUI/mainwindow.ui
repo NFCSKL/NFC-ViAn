@@ -257,6 +257,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="bookmark_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>30</width>
