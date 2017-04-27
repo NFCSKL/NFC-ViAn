@@ -40,8 +40,9 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
+    GUI/bookmarkitem.cpp \
     GUI/makeproject.cpp \
-    GUI/bookmarkitem.cpp
+    GUI/fpsdialog.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -49,8 +50,9 @@ HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/bookmarkview.h \
-    GUI/makeproject.h
-    GUI/bookmarkitem.h
+    GUI/bookmarkitem.h \
+    GUI/makeproject.h \
+    GUI/fpsdialog.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui

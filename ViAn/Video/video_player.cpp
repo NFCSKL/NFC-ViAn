@@ -818,26 +818,13 @@ void video_player::scale_position(QPoint &pos) {
 }
 
 /**
- * @brief video_player::export_current_frame
- * Stores the current frame in the specified folder.
- * The stored frame will have the sam resolution as the video.
- * @param path_to_folder Path to the folder to store the file in.
- * @return The path to the stored image.
+ * @brief video_player::get_current_frame_unscaled
+ * Creates, converts, processes the current frame and returns it.
  */
-std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
+QImage video_player::get_current_frame_unscaled() {
     convert_frame(false);
 
-    QString path = QString::fromStdString(path_to_folder);
-
-    // Add "/file_name.tiff" to the path.
-    path.append("/");
-    path.append(QString::fromStdString(file_name));
-    path.append(".tiff");
-
-    QImageWriter writer(path, "tiff");
-    writer.write(img);
-
-    return path.toStdString();
+    return img;
 }
 
 /**
