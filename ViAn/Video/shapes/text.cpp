@@ -2,12 +2,20 @@
 
 /**
  * @brief Text::Text
+ */
+Text::Text() : Shape(SHAPES::TEXT) {
+    string = QString();
+    font_scale = 0;
+}
+
+/**
+ * @brief Text::Text
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  * @param strng String to be displayed
  * @param fnt_scl Font scale of the string
  */
-Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(col, pos) {
+Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES::TEXT, col, pos) {
     string = strng;
     font_scale = fnt_scl;
 }
@@ -31,4 +39,26 @@ cv::Mat Text::draw(cv::Mat &frame) {
  * @param pos
  */
 void Text::handle_new_pos(QPoint pos) {
+}
+
+/**
+ * @brief Text::write
+ * @param json
+ * Writes to a Json object.
+ */
+void Text::write(QJsonObject& json) {
+    write_shape(json);
+    json["text"] = string;
+    json["font"] = font_scale;
+}
+
+/**
+ * @brief Text::read
+ * @param json
+ * Reads from a Json object.
+ */
+void Text::read(const QJsonObject& json) {
+    read_shape(json);
+    this->string = json["text"].toString();
+    this->font_scale = json["font"].toDouble();
 }

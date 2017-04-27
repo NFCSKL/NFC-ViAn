@@ -1,11 +1,14 @@
 #include "circle.h"
 
+Circle::Circle() : Shape(SHAPES::CIRCLE) {
+}
+
 /**
  * @brief Circle::Circle
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Circle::Circle(QColor col, QPoint pos) : Shape(col, pos) {
+Circle::Circle(QColor col, QPoint pos) : Shape(SHAPES::CIRCLE, col, pos) {
 }
 
 /**
@@ -30,4 +33,22 @@ cv::Mat Circle::draw(cv::Mat &frame) {
  * @param pos
  */
 void Circle::handle_new_pos(QPoint pos) {
+}
+
+/**
+ * @brief Circle::write
+ * @param json
+ * Writes to a Json object.
+ */
+void Circle::write(QJsonObject& json) {
+    write_shape(json);
+}
+
+/**
+ * @brief Circle::read
+ * @param json
+ * Reads from a Json object.
+ */
+void Circle::read(const QJsonObject& json) {
+    read_shape(json);
 }

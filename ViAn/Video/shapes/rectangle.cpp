@@ -2,10 +2,16 @@
 
 /**
  * @brief Rectangle::Rectangle
+ */
+Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
+}
+
+/**
+ * @brief Rectangle::Rectangle
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Rectangle::Rectangle(QColor col, QPoint pos) : Shape(col, pos) {
+Rectangle::Rectangle(QColor col, QPoint pos) : Shape(SHAPES::RECTANGLE, col, pos) {
 }
 
 /**
@@ -27,4 +33,22 @@ cv::Mat Rectangle::draw(cv::Mat &frame) {
  * @param pos
  */
 void Rectangle::handle_new_pos(QPoint pos) {
+}
+
+/**
+ * @brief Rectangle::write
+ * @param json
+ * Writes to a Json object.
+ */
+void Rectangle::write(QJsonObject& json) {
+    write_shape(json);
+}
+
+/**
+ * @brief Rectangle::read
+ * @param json
+ * Reads from a Json object.
+ */
+void Rectangle::read(const QJsonObject& json) {
+    read_shape(json);
 }
