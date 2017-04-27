@@ -46,6 +46,15 @@ QImage Bookmark::get_frame() {
 }
 
 /**
+ * @brief Bookmark::get_file_path
+ * @return Returns the file_path of the exported bookmark.
+ *         If bookmark is not exported yet, an empty string is returned
+ */
+QString Bookmark::get_file_path() {
+    return file_path;
+}
+
+/**
  * @brief Bookmark::get_description
  * @return Returns the description associated with the bookmark.
  */
