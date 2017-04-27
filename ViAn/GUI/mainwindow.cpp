@@ -109,6 +109,11 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    //Will be added when functionality is in place
+    /*QObject::connect(this, SIGNAL(next_video_POI()),
+                     mplayer, SLOT(next_POI()));
+    QObject::connect(this, SIGNAL(prev_video_POI()),
+                     mplayer, SLOT(previous_POI()));*/
 }
 
 /**
@@ -834,6 +839,10 @@ void MainWindow::enable_video_buttons() {
     ui->increase_speed_button->setEnabled(true);
     ui->previous_frame_button->setEnabled(true);
     ui->stop_button->setEnabled(true);
+    ui->bookmark_button->setEnabled(true);
+    ui->previous_POI_button->setEnabled(true);
+    ui->next_POI_button->setEnabled(true);
+    ui->video_slider->setEnabled(true);
 }
 
 /**
@@ -1031,5 +1040,33 @@ void MainWindow::on_action_show_hide_analysis_overlay_triggered() {
         set_status_bar("Showing analysis overlay: on.");
     } else {
         set_status_bar("Showing analysis overlay: off.");
+    }
+}
+
+/**
+ * @brief MainWindow::on_previous_POI_button_clicked
+ * Jump back to the previous POI.
+ */
+void MainWindow::on_previous_POI_button_clicked() {
+    if (mvideo_player->is_paused()) {
+        set_status_bar("Went back to the previous POI");
+        //will be added when functionality is in place
+        //emit previous_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
+    }
+}
+
+/**
+ * @brief MainWindow::on_next_POI_button_clicked
+ * Jump forward to the next POI.
+ */
+void MainWindow::on_next_POI_button_clicked() {
+    if (mvideo_player->is_paused()) {
+        set_status_bar("Went forward to the next POI");
+        //will be added when functionality is in place
+        //emit next_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
     }
 }

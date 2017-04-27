@@ -152,6 +152,10 @@ private slots:
 
     void on_action_show_hide_analysis_overlay_triggered();
 
+    void on_previous_POI_button_clicked();
+
+    void on_next_POI_button_clicked();
+
 private:
 
     Ui::MainWindow *ui;
