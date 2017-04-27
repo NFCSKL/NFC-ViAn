@@ -42,7 +42,6 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/makeproject.cpp \
-    GUI/bookmarkitem.cpp \
     GUI/newanalysis.cpp \
     GUI/fpsdialog.cpp
 
