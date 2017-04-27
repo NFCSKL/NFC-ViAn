@@ -15,7 +15,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    GUI/analysiswindow.cpp
 
 #
 # TEST
@@ -25,7 +26,8 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
+    Test/test_mainwindow.h \
+    GUI/analysiswindow.h
 
 #
 # LIBRARY
@@ -42,7 +44,6 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/makeproject.cpp \
-    GUI/newanalysis.cpp \
     GUI/fpsdialog.cpp
 
 
@@ -53,12 +54,11 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkview.h \
     GUI/makeproject.h \
     GUI/bookmarkitem.h \
-    GUI/newanalysis.h \
     GUI/fpsdialog.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui \
-    GUI/newanalysis.ui
+    GUI/analysiswindow.ui
 
 RESOURCES += resources.qrc
 #

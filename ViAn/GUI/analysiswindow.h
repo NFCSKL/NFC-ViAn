@@ -1,5 +1,5 @@
-#ifndef NEWANALYSIS_H
-#define NEWANALYSIS_H
+#ifndef ANALYSISWINDOW_H
+#define ANALYSISWINDOW_H
 
 #include <QMainWindow>
 #include "Library/customdialog.h"
@@ -8,27 +8,27 @@
 
 class MainWindow;
 namespace Ui {
-class NewAnalysis;
+class AnalysisWindow;
 }
 
-class NewAnalysis : public QMainWindow
+class AnalysisWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit NewAnalysis(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent = 0);
+    explicit AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent = 0);
     void set_current_video(MyQTreeWidgetItem *current_video);
-    ~NewAnalysis();
+    ~AnalysisWindow();
 
 private slots:
     void on_add_button_clicked();
 
 private:
-    Ui::NewAnalysis *ui;
+    Ui::AnalysisWindow *ui;
     MainWindow *mainwindow;
     FileHandler *file_handler;
     void set_status_bar(std::string status, int timer = 750);
     MyQTreeWidgetItem *current_video;
 };
 
-#endif // NEWANALYSIS_H
+#endif // ANALYSISWINDOW_H

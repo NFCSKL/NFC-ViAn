@@ -23,12 +23,12 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
-#include "newanalysis.h"
+#include "analysiswindow.h"
 #include <QQueue>
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
-class NewAnalysis;
+class AnalysisWindow;
 
 namespace Ui {
 class MainWindow;
@@ -178,7 +178,7 @@ private:
             );
 
     FileHandler *fileHandler;
-    NewAnalysis *new_analysis;
+    AnalysisWindow *analysis_window;
     void setup_filehandler();
     void setup_video_player(video_player *mplayer);
 

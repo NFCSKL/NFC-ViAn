@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // The video player is not in original size.
     original_size = false;
 
-    this->new_analysis = new NewAnalysis(this, fileHandler);
+    this->analysis_window = new AnalysisWindow(this, fileHandler);
     this->current_analysis = nullptr;
     this->analysis_queue = new QQueue<MyQTreeWidgetItem>;
 }
@@ -76,7 +76,7 @@ MainWindow::~MainWindow() {
     delete ui;
     delete bookmark_view;
 
-    delete new_analysis;
+    delete analysis_window;
 }
 /**
  * @brief MainWindow::setup_filehandler
@@ -1046,9 +1046,9 @@ void MainWindow::on_action_do_analysis_triggered() {
         video = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_video = (MyQTreeWidgetItem*) video;
         if (my_video->type == TYPE::VIDEO){
-            new_analysis->set_current_video(my_video);
-            if(new_analysis->isHidden()) new_analysis->show();
-            else new_analysis->activateWindow();
+            analysis_window->set_current_video(my_video);
+            if(analysis_window->isHidden()) analysis_window->show();
+            else analysis_window->activateWindow();
         } else {
             set_status_bar("No video selected.");
         }
