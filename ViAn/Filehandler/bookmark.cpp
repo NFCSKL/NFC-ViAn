@@ -7,12 +7,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(Video* v, int frame_nbr, QImage frame, QString dir_path, QString text) {
+Bookmark::Bookmark(int frame_nbr, QImage frame, QString dir_path, QString text) {
     this->frame_number = frame_nbr;
     this->frame = frame;
     this->dir_path = dir_path;
     this->description = text;
-    this->parent = v;
     // There's no file path yet, since the frame has not been exported
     this->file_path = QString();
 }
@@ -110,7 +109,7 @@ void Bookmark::create_file_path() {
     // Append FRAMENR.tiff to the directory path
     QString path = QString(dir_path);
     path.append("/");
-    path.append(QString::number(this->video->save_name));
+    path.append(QString::number(frame_number));
     path.append(".tiff");
 
     // Update file path variable
@@ -127,8 +126,4 @@ void Bookmark::remove_exported_image() {
         QFile file(file_path);
         file.remove();
     }
-}
-
-Video *Bookmark::getVideo() const{
-    return video;
 }

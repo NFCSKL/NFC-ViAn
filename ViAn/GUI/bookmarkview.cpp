@@ -8,7 +8,7 @@
  * @param parent Parent item of the BookmarkView.
  */
 BookmarkView::BookmarkView(QListWidget* parent) {
-    view = parent;    
+    view = parent;
 }
 
 /**
@@ -24,11 +24,10 @@ int BookmarkView::get_num_bookmarks() {
  * Adds a bookmark to the bookmark view.
  * @param bookmark Bookmark to add.
  */
-int BookmarkView::add_bookmark(Bookmark* bookmark) {
+int BookmarkView::add_bookmark(ID video_id, ID bookmark_id, Bookmark* bookmark) {
     BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
     view->addItem(bookmark_item);
-    this->boomark_items.insert(id_bookmark);
-    return this->id_bookmark++;
+    this->bookmark_items[video_id][bookmark_id] = bookmark_item;
 }
 
 /**
@@ -37,10 +36,11 @@ int BookmarkView::add_bookmark(Bookmark* bookmark) {
  * @return void
  * Erases bookmarkitem from bookmarkview.
  */
-void BookmarkView::remove_bookmark(ID id){
-    BookmarkItem* bookmark_item = this->boomark_items.at(id);
+void BookmarkView::remove_bookmark(ID video_id, ID bookmark_id){
+    BookmarkItem* bookmark_item = this->bookmark_items.at(video_id).at(bookmark_id);
     view->removeItemWidget(bookmark_item);
-    this->boomark_items.erase(id);
+    this->bookmark_items.at(video_id).erase(bookmark_id);
+    delete bookmark_item;
 }
 
 /**

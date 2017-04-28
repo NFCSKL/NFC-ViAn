@@ -5,18 +5,27 @@
  * @param string, the name of the widget
  * @param id
  */
-MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString string, int id) {
+MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString name, ID id) {
     QTreeWidgetItem();
     this->id = id;
     this->type = type;
-    this->name = string;
+    this->name = name;
+}
+
+/**
+ * @brief QTreeVideoItem::QTreeVideoItem
+ * @param type
+ * @param string
+ * @param id
+ */
+QTreeVideoItem::QTreeVideoItem(TYPE type, QString name, ID id) : MyQTreeWidgetItem(type,name,id){
+    this->bookmarks.clear();
 }
 
 /**
  * @brief MyQTreeWidgetItem::~MyQTreeWidgetItem
  */
 MyQTreeWidgetItem::~MyQTreeWidgetItem() {
-
 }
 
 /**
@@ -55,4 +64,6 @@ std::string MyQTreeWidgetItem::get_name() {
     std::string text (txet.rbegin(), txet.rend());
     return text;
 }
+
+
 

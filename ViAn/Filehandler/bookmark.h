@@ -16,7 +16,7 @@
  */
 class Bookmark : Saveable{    
 public:
-    Bookmark(Video* v, int frame_nbr, QImage frame, QString dir_path, QString string);
+    Bookmark(int frame_nbr, QImage frame, QString dir_path, QString string);
     Bookmark();
     int get_frame_number();    
     QImage get_frame();
@@ -27,7 +27,6 @@ public:
     void export_frame();
     void create_file_path();
     void remove_exported_image();
-    Video *getVideo() const;
 
 private:
     QImage frame;           // Frame of the bookmark
@@ -36,7 +35,6 @@ private:
     QString description;    // Description for the bookmark, given by user
     // Note that this variable can be altered when the bookmark is exported.
     QString file_path;      // File path to the frame image associated with the bookmark
-    Video* video;
 };
 
 #endif // BOOKMARK_H

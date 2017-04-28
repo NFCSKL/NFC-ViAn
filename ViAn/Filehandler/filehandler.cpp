@@ -248,7 +248,6 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
 Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project();
      load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
-     proj->saved = true;
      proj->id = add_project(proj);
      proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
      proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
