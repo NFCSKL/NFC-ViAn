@@ -52,6 +52,8 @@ public:
     QMutex mutex;
     QWaitCondition paused_wait;
 
+    friend class test_mainwindow;
+
 signals:
     void set_play_video();
     void set_pause_video();

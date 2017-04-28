@@ -890,6 +890,15 @@ void MainWindow::abort_current_analysis() {
         current_analysis->id = -1;
     }
     analysis_window->remove_analysis_from_list(0); // remove the first in the list
+    QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
+
+    while (!analysis_queue->isEmpty()){
+            MyQTreeWidgetItem *i = analysis_queue->dequeue();
+            i->id++; // Moves the items up in the queue.
+            tmp_queue->enqueue(i);
+        }
+        while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
+        delete tmp_queue;
 }
 
 /**
