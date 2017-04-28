@@ -9,7 +9,36 @@
 #include "Filehandler/analysis.h"
 #include "Analysis/MotionDetection.h"
 
+/**
+ * @brief AnalysisController::AnalysisController
+ * @param file_path path to the video file to be analysed
+ * @param type      analysis type
+ * @param parent
+ */
 AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type, QObject* parent) : QThread(parent) {
+    setup_analysis(file_path, type);
+}
+
+/**
+ * @brief AnalysisController::AnalysisController
+ * @param file_path                     path to the video file to be analysed
+ * @param type                          analysis type
+ * @param inclusion_exclusion_points    Points for the inclusion/exclusion polygon
+ * @param exclude_poly                  Bool to determine whether to exclude or include the polygon
+ * @param parent
+ */
+AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent) : QThread(parent) {
+    setup_analysis(file_path, type);
+    method->set_include_exclude_area(inclusion_exclusion_points, exclude_poly);
+}
+
+/**
+ * @brief AnalysisController::setup_analysis
+ * Sets up the analysis method and connects needed signals and slots.
+ * @param file_path     path to the video file to be analysed
+ * @param type          analysis type
+ */
+void AnalysisController::setup_analysis(std::string file_path, ANALYSIS_TYPE type) {
     switch (type) {
     case MOTION_DETECTION:
         method = new MotionDetection(file_path);
@@ -24,10 +53,9 @@ AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type
 
 /**
  * @brief Analysis::run
- * TODO add comment
+ * Starts the analysis loop.
  */
 void AnalysisController::run() {
-    std::vector<cv::Point> points;
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
     emit save_analysis(analysis);
@@ -39,6 +67,7 @@ void AnalysisController::run() {
  * Starts or resumes the analysis
  */
 void AnalysisController::on_start() {
+    // TODO add code for resuming from paused state.
 }
 
 /**

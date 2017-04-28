@@ -59,6 +59,7 @@ signals:
     void prev_video_frame();
     void set_playback_frame(int frame, bool show_frame = false);
     void abort_analysis();
+    void set_analysis_results(Analysis analysis);
 
 private slots:
 

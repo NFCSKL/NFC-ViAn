@@ -49,9 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // TODO The following code is just here to test.
     // Remove when a proper implementation exists.
-    //MotionDetection *md = new MotionDetection("seq_01.mp4");
     m_acontroller = new AnalysisController("Pumparna.avi",MOTION_DETECTION);
-    setup_analysis(m_acontroller);
     m_acontroller->start();
 
     // Initially hide overlay and analysis toolbar
@@ -134,6 +132,8 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    QObject::connect(this, SIGNAL(set_analysis_results(Analysis)),
+                     mplayer, SLOT(on_set_analysis_results(Analysis)));
 }
 
 /**
@@ -152,7 +152,6 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
 void MainWindow::show_analysis_progress(int progress){
     // Progress for the current analysis
     // Add to gui from here
-    cout << "ANALYSIS DÖÖÖÖNE" << endl;
 }
 
 /**

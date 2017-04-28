@@ -155,6 +155,7 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     cv::Mat processed_frame = src.clone();
     processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
+
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
     }
@@ -186,7 +187,6 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
 
     return processed_frame;
 }
-
 
 
 /**
@@ -892,4 +892,13 @@ int video_player::get_video_width() {
  */
 int video_player::get_video_height() {
     return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+}
+
+/**
+ * @brief video_player::on_set_analysis_results
+ * Sets analysis results to be used to draw results on video.
+ * @param analysis results
+ */
+void video_player::on_set_analysis_results(Analysis analysis) {
+    m_analysis = analysis;
 }

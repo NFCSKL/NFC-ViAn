@@ -1,16 +1,13 @@
 #include "MotionDetection.h"
-#include <qdebug.h>
 #include <vector>
 
-
-
+/**
+ * @brief MotionDetection::MotionDetection
+ * @param source_file
+ */
 MotionDetection::MotionDetection(std::string source_file) {
     m_analysis.type = MOTION_DETECTION;
     capture.open(source_file);
-    if (!capture.isOpened()) {
-        // TODO Take care of this
-        std::cout << "Failed to load " << source_file << std::endl;
-    }
 }
 
 /**
@@ -29,18 +26,14 @@ void MotionDetection::setup_analysis(){
 std::vector<OOI> MotionDetection::analyse_frame(){
     std::vector<OOI> OOIs;
     std::vector<std::vector<cv::Point> > contours;
-    // Grayscale and blur
 
     shown_frame = frame.clone();
 
     cv::GaussianBlur(frame, frame, blur_size, 0);
     pMOG2->apply(frame, fgMaskMOG2,-1);
-
     pMOG2->getBackgroundImage(background);
 
-
     cv::Mat kernel_ero = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilation_degree,dilation_degree));
-    //cv::GaussianBlur(fgMaskMOG2, fgMaskMOG2, blur_size, 0);
     cv::threshold(fgMaskMOG2, fgMaskMOG2, 25, 255, cv::THRESH_BINARY);
     cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
 
@@ -65,6 +58,11 @@ std::vector<OOI> MotionDetection::analyse_frame(){
     prev_frame = shown_frame.clone();
     cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
 
+    //This code excludes the area of the frame that has been given by exclude_frame.
+    if (do_exclusion) {
+        cv::bitwise_and(result, exclude_frame, result);
+    }
+
     cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     cv::Scalar color(0,0,255);
     std::vector<cv::Rect> rects;
@@ -76,36 +74,5 @@ std::vector<OOI> MotionDetection::analyse_frame(){
         }
     }
 
-    if (!rects.empty()) {
-        /*merge_bounding_rects(rects);
-        for(cv::Rect rect : rects) {
-            cv::rectangle(shown_frame, rect, color, 2);
-        }*/
-    }
-
     return OOIs;
-}
-
-void MotionDetection::merge_bounding_rects(std::vector<cv::Rect> &rects) {
-    std::vector<cv::Rect> result;
-    std::vector<int> removed_rects;
-
-    while (rects.size() > 1) {
-        cv::Rect rect1 = rects.back();
-        rects.pop_back();
-        for(int i = 0; i < rects.size(); ++i) {
-            cv::Rect rect2 = rects[i];
-            if ((rect1 & rect2).area() > 0) {
-                rect1 = (rect1 | rect2);
-                removed_rects.push_back(i);
-            }
-        }
-        std::reverse(removed_rects.begin(),removed_rects.end());
-        for(int i : removed_rects) {
-            rects.erase(rects.begin() + i);
-        }
-        result.push_back(rect1);
-    }
-    result.push_back(rects.front());
-    rects = result;
 }

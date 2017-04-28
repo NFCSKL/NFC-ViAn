@@ -1,23 +1,41 @@
 #include "AnalysisMethod.h"
 #include <qdebug.h>
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/videoio/videoio.hpp"
 
 /**
- * @brief AnalysisMethod::set_exclude_area
+ * @brief AnalysisMethod::set_include_exclude_area
  * Sets an exlusion frame that will be used to exclude detections in a specific area of each frame.
  * @param points for the polygon that defines the exclusion area.
  */
-void AnalysisMethod::set_exclude_area(std::vector<cv::Point> points) {
-    cv::Mat img(int(capture.get(cv::CAP_PROP_FRAME_HEIGHT)),int(capture.get(cv::CAP_PROP_FRAME_WIDTH)),CV_8UC1,cv::Scalar(255));
-    exclude_frame = img;
-    //cv::floodFill(exclude_frame,cv::Point(0,0),Scalar())
+void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon) {
+    if (!capture.isOpened())
+        return;
 
+    do_exclusion = true;
+    cv::Scalar poly_scalar = cv::Scalar(255);
+    cv::Scalar background_scalar = cv::Scalar(0);
+
+    if (exclude_polygon) {
+        poly_scalar = cv::Scalar(0);
+        background_scalar = cv::Scalar(255);
+    }
+
+    cv::Mat img(int(capture.get(cv::CAP_PROP_FRAME_HEIGHT)),int(capture.get(cv::CAP_PROP_FRAME_WIDTH)),CV_8UC1,background_scalar);
+    cv::Point* rook_points[1];
+    rook_points[0] = &points[0];
+    const cv::Point* ppt[1] = {rook_points[0]};
+    int npt[1] = {points.size()};
+    cv::fillPoly(img, ppt, npt, 1, poly_scalar);
+    exclude_frame = img;
 }
+
+
 
 /**
  * @brief AnalysisMethod::sample_current_frame
+ * Checks if the current frame is to be analysed.
  * @return true if the current frame should be analysed.
- * TODO
  */
 bool AnalysisMethod::sample_current_frame() {
     return current_frame % sample_freq == 0;
@@ -29,37 +47,40 @@ bool AnalysisMethod::sample_current_frame() {
  * @return all detections from the performed analysis.
  */
 Analysis AnalysisMethod::run_analysis() {
-    if (capture.isOpened()) {
-        num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
-        POI* m_POI = new POI();
-        while(!aborted && capture.read(frame)) {
-            // do frame analysis
-            if (true || sample_current_frame()) {
-                std::vector<OOI> detections = analyse_frame();
-
-                if (detections.empty() && detecting) {
-                    m_POI->set_end_frame(current_frame - 1);
-                    m_analysis.add_POI(*m_POI);
-                    m_POI = new POI();
-                    detecting = false;
-                } else if (!detections.empty()) {
-                    detecting = true;
-                    m_POI->add_detections(current_frame, detections);
-                }
-
-                if (current_frame == num_frames && detecting) {
-                    m_POI->set_end_frame(current_frame);
-                }
-            }
-
-            if (paused) {
-                // do pause stuff
-                paused = false;
-            }
-            emit send_progress(get_progress());
-            current_frame++;
-        }
+    if (!capture.isOpened()) {
+        return m_analysis;
     }
+
+    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
+    POI* m_POI = new POI();
+    while(!aborted && capture.read(frame)) {
+        // do frame analysis
+        if (sample_current_frame()) {
+            std::vector<OOI> detections = analyse_frame();
+
+            if (detections.empty() && detecting) {
+                m_POI->set_end_frame(current_frame - 1);
+                m_analysis.add_POI(*m_POI);
+                m_POI = new POI();
+                detecting = false;
+            } else if (!detections.empty()) {
+                detecting = true;
+                m_POI->add_detections(current_frame, detections);
+            }
+
+            if (current_frame == num_frames && detecting) {
+                m_POI->set_end_frame(current_frame);
+            }
+        }
+
+        if (paused) {
+            // TODO do pause stuff
+            paused = false;
+        }
+        emit send_progress(get_progress());
+        ++current_frame;
+    }
+
     capture.release();
     return m_analysis;
 }
