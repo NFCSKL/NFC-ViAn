@@ -723,7 +723,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->project_tree->addTopLevelItem(project_in_tree);
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
-    for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
+    for(auto vid = proj->get_videos().begin(); vid != proj->get_videos().end(); ++vid){
         VideoProject* v = vid->second;
         add_video_to_tree(v->get_video()->file_path, v->get_video()->id);
         // Add bookmarks
