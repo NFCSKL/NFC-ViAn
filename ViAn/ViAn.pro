@@ -15,8 +15,7 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    Analysis/AnalysisController.cpp
+SOURCES += main.cpp
 
 #
 # TEST
@@ -26,8 +25,7 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h \
-    Analysis/AnalysisController.h
+    Test/test_mainwindow.h
 
 
 #
@@ -157,7 +155,9 @@ unix {
 # ANALYSIS
 #
 SOURCES += Analysis/AnalysisMethod.cpp\
-    Analysis/MotionDetection.cpp
+    Analysis/MotionDetection.cpp \
+    Analysis/AnalysisController.cpp
 
 HEADERS +=Analysis/AnalysisMethod.h\
-    Analysis/MotionDetection.h
+    Analysis/MotionDetection.h \
+    Analysis/AnalysisController.h
