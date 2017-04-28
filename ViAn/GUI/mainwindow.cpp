@@ -864,11 +864,18 @@ void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
     QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
     while (!analysis_queue->isEmpty()){
         MyQTreeWidgetItem *i = analysis_queue->dequeue();
-        i->id++;
-        if(!(my_item == i)) tmp_queue->enqueue(i);
-        else analysis_window->remove_analysis_from_list(-(i->id));
+        if((my_item == i)) {
+            analysis_window->remove_analysis_from_list(-(++i->id));
+            break;
+        } else tmp_queue->enqueue(i);
+
+    } while (!analysis_queue->isEmpty()){
+        MyQTreeWidgetItem *i = analysis_queue->dequeue();
+        i->id++; // Moves the items after the searshed item up in the queue.
+        tmp_queue->enqueue(i);
     }
-    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue());
+
+    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
     delete tmp_queue;
 }
 
