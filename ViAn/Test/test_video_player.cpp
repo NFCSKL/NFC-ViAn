@@ -140,7 +140,7 @@ void test_video_player::test_toggle_overlay() {
  */
 void test_video_player::test_set_overlay_tool() {
     mvideo->set_overlay_tool(RECTANGLE);
-    QVERIFY(mvideo->video_overlay->get_shape() == RECTANGLE);
+    QVERIFY(mvideo->video_overlay->get_tool() == RECTANGLE);
 }
 
 /**

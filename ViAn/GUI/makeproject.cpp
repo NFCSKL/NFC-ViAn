@@ -70,7 +70,7 @@ void MakeProject::on_ok_button_clicked() {
     else if(this->video_path.isEmpty())
         set_status_bar("Needs a path for the videos");
    else {
-        Project *proj = file_handler->create_project(name, project_path.toStdString());
+        Project *proj = file_handler->create_project(name, project_path.toStdString(), video_path.toStdString());
         mainwindow->add_project_to_tree(proj);
         set_status_bar("Project " + name.toStdString() + " created.");
         delete this;
@@ -100,6 +100,6 @@ void MakeProject::on_name_input_textChanged(const QString &name) {
  * @param timer time to show it in the bar in ms, 750ms is standard
  */
 void MakeProject::set_status_bar(std::string status, int timer){
-    ui->statusbar->showMessage(QString::fromStdString(status), timer);
+    ui->status_bar->showMessage(QString::fromStdString(status), timer);
     mainwindow->set_status_bar(status, timer);
 }

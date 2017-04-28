@@ -130,8 +130,8 @@ void FileHandler::write(QJsonObject &json){
  * @param std::string name
  * @return Project* created project
  */
-Project* FileHandler::create_project(QString proj_name, std::string dir_path){
-    Project* proj =  new Project(this->project_id, proj_name.toStdString());
+Project* FileHandler::create_project(QString proj_name, std::string dir_path, std::string vid_path){
+    Project* proj =  new Project(this->project_id, proj_name.toStdString());   
     ID root_dir;
     if(dir_path != "")                          //Directory name provided
         root_dir = create_directory(QString::fromStdString(dir_path));
@@ -140,10 +140,12 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     else if(dir_path == "" && proj->dir != -1)  // No Directory provided and project previosuly saved
         root_dir = proj->dir;                        // Use present save location
     else
-        root_dir = this->work_space;
-
+        root_dir = this->work_space;    
     proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
+    if(vid_path != "")
+        proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
+
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
     open_project(proj->id);                     // Open project
@@ -196,7 +198,7 @@ bool FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
-    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
+    save_project(proj); // get project and save it
 }
 
 /**
@@ -207,6 +209,7 @@ void FileHandler::save_project(ID id){
  */
 void FileHandler::save_project(Project *proj){
     this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
+    proj->save_project();
 }
 
 /**
@@ -245,11 +248,12 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  */
 Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project();
-     load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
-     proj->saved = true;
+     load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility     
      proj->id = add_project(proj);
      proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
      proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
+     proj->dir_videos = this->work_space;
+     proj->save_project();
      return proj;
 }
 
@@ -516,8 +520,8 @@ void FileHandler::add_dir(ID dir_id, QDir dir){
  * @return true if project contents are the same
  */
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
-    bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
-               proj2.videos.begin(),
+    bool video_equals =  std::equal(proj.get_videos().begin(), proj.get_videos().end(),
+               proj2.get_videos().begin(),
                [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
                                                                                                                       // by dereferencing pointers in vector
     return proj.name == proj2.name &&

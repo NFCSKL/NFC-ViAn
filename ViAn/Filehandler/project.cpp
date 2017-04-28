@@ -49,7 +49,7 @@ void Project::remove_video_project(ID id){
     VideoProject* temp = this->videos.at(id);
     delete temp;
     videos.erase(id);
-
+    this->saved =false;
 }
 
 /**
@@ -59,6 +59,7 @@ void Project::remove_video_project(ID id){
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
     this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
+    this->saved =false;
     return this->v_id++;
 }
 
@@ -69,6 +70,7 @@ ID Project::add_video(Video* vid){
 ID Project::add_video_project(VideoProject* vid_proj){
     vid_proj->get_video()->id = this->v_id;
     this->videos.insert(std::make_pair(this->v_id, vid_proj));
+    this->saved = false;
     return this->v_id++;
 }
 /**
@@ -128,5 +130,30 @@ void Project::add_analysis(Analysis an){
 void Project::add_bookmark(ID id, Bookmark *bookmark){
     VideoProject* v = this->videos.at(id);
     v->add_bookmark(bookmark);
+    this->saved =false;
+}
+
+/**
+ * @brief Project::is_saved
+ * @return true if saved
+ */
+bool Project::is_saved(){
+    return this->saved;
+}
+
+/**
+ * @brief Project::save_project
+ * @return sets saved =true
+ */
+void Project::save_project(){
+    this->saved = true;
+}
+
+/**
+ * @brief Project::get_videos
+ * @return videos&
+ */
+std::map<ID, VideoProject *> &Project::get_videos(){
+    return this->videos;
 }
 

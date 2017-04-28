@@ -23,8 +23,19 @@ typedef int ID;
  * along with parser functionality
  */
 
-struct Project : Saveable{
+class Project : public Saveable{
+
+    bool saved;
+    std::map<ID,VideoProject*> videos;
+public:
     std::string name;
+    ID id;
+    ID v_id;
+    ID dir;
+    ID bookmark_dir;
+    ID dir_videos;
+
+
 public:
     Project();
     Project(ID id, std::string name);
@@ -38,19 +49,15 @@ public:
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-
     void add_analysis(Analysis an);
+    bool is_saved();
+    void save_project();
+    std::map<ID, VideoProject *>& get_videos();
+    bool proj_equals(Project& other);
 // TODO
 
 //    void add_drawing();      
-public:
-    ID id;
-    ID v_id;
-    std::map<ID,VideoProject*> videos;
-    ID dir;
-    ID bookmark_dir;
-    ID dir_videos;
-    bool saved;
+
 };
 
 

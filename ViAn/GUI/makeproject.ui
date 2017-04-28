@@ -52,7 +52,7 @@
           <item>
            <widget class="QPushButton" name="project_path_search_button">
             <property name="text">
-             <string>Search</string>
+             <string>Browse</string>
             </property>
            </widget>
           </item>
@@ -77,7 +77,7 @@
           <item>
            <widget class="QPushButton" name="video_path_search_button">
             <property name="text">
-             <string>Search</string>
+             <string>Browse</string>
             </property>
            </widget>
           </item>
@@ -107,7 +107,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="status_bar"/>
  </widget>
  <resources/>
  <connections/>
