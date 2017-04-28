@@ -515,7 +515,7 @@ void FileHandler::add_dir(ID dir_id, QDir dir){
 /**
  * @brief FileHandler::proj_equals
  * @param proj
- * @param proj2
+    * @param proj2
  * @return true if project contents are the same
  */
 bool FileHandler::proj_equals(Project& proj, Project& proj2){

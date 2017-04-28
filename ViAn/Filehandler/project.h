@@ -49,7 +49,7 @@ public:
     ID dir;
     ID bookmark_dir;
     ID dir_videos;
-    bool saved;
+    bool changes_made;
 };
 
 

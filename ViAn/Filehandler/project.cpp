@@ -14,7 +14,7 @@ Project::Project(ID id, std::string name)
     this->bookmark_dir = -1;
     this->v_id = 0;
     this->videos.clear();
-    this->saved = false;
+    this->changes_made = false;
 }
 /**
  * @brief Project::Project
@@ -121,8 +121,9 @@ void Project::write(QJsonObject& json){
  * @param bookmark
  * Add new bookmark to Videoproj corresponding to id.
  */
-void Project::add_bookmark(ID id, Bookmark *bookmark){
+ID Project::add_bookmark(Bookmark *bookmark){
     VideoProject* v = this->videos.at(id);
     v->add_bookmark(bookmark);
+    return this->id_bookmark;
 }
 
