@@ -14,11 +14,11 @@
  * Bookmark class is used for storing bookmarks, i.e. user
  * marked points in a video and an associated frame.
  */
-class Bookmark : Saveable{    
+class Bookmark : Saveable{
 public:
     Bookmark(int frame_nbr, QImage frame, QString dir_path, QString string);
     Bookmark();
-    int get_frame_number();    
+    int get_frame_number();
     QImage get_frame();
     QString get_file_path();
     QString get_description();
