@@ -347,7 +347,6 @@ void MainWindow::on_action_exit_triggered() {
  * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmark_button_clicked() {
-
     // Add bookmarks-folder to the project-folder.
     Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
     QDir dir = file_handler->get_dir(proj->bookmark_dir);
