@@ -15,7 +15,8 @@ FileHandlerTest::FileHandlerTest(QObject *parent) : QObject(parent){
  */
 void FileHandlerTest::project_test_init()
 {
-    this->proj = file_handler->create_project("TEST_PROJ");
+    std::string dir_path = file_handler->get_work_space().absolutePath().toStdString();
+    this->proj = file_handler->create_project("TEST_PROJ", dir_path, dir_path);
 }
 
 /**
@@ -24,9 +25,10 @@ void FileHandlerTest::project_test_init()
  */
 void FileHandlerTest::project_create_delete_test()
 {
-    Project* proj1 = file_handler->create_project("TEST_PROJ1");
-    Project* proj2 = file_handler->create_project("TEST_PROJ2");
-    Project* proj3 = file_handler->create_project("TEST_PROJ3");
+    std::string dir_path = file_handler->get_work_space().absolutePath().toStdString();
+    Project* proj1 = file_handler->create_project("TEST_PROJ1", dir_path, dir_path);
+    Project* proj2 = file_handler->create_project("TEST_PROJ2", dir_path, dir_path);
+    Project* proj3 = file_handler->create_project("TEST_PROJ3", dir_path, dir_path);
     QVERIFY(file_handler->delete_project(proj1->id));
     QVERIFY(file_handler->delete_project(proj2->id));
     QVERIFY(file_handler->delete_project(proj3->id));
@@ -37,9 +39,10 @@ void FileHandlerTest::project_create_delete_test()
  * Tests saving and loading projects.
  */
 void FileHandlerTest::project_save_load_test(){
-    Project* proj1 = file_handler->create_project("TEST_PROJ1");
-    Project* proj2 = file_handler->create_project("TEST_PROJ2");
-    Project* proj3 = file_handler->create_project("TEST_PROJ3");
+    std::string dir_path = file_handler->get_work_space().absolutePath().toStdString();
+    Project* proj1 = file_handler->create_project("TEST_PROJ1", dir_path, dir_path);
+    Project* proj2 = file_handler->create_project("TEST_PROJ2", dir_path, dir_path);
+    Project* proj3 = file_handler->create_project("TEST_PROJ3", dir_path, dir_path);
 
     file_handler->save_project(proj1->id);
     file_handler->save_project(proj2->id);
@@ -64,9 +67,10 @@ void FileHandlerTest::project_save_load_test(){
  * tests if information is saved and loaded correctly.
  */
 void FileHandlerTest::project_add_remove_items_test(){
-    Project* proj1 = file_handler->create_project("TEST_PROJ1");
-    Project* proj2 = file_handler->create_project("TEST_PROJ2");
-    Project* proj3 = file_handler->create_project("TEST_PROJ3");
+    std::string dir_path = file_handler->get_work_space().absolutePath().toStdString();
+    Project* proj1 = file_handler->create_project("TEST_PROJ1", dir_path, dir_path);
+    Project* proj2 = file_handler->create_project("TEST_PROJ2", dir_path, dir_path);
+    Project* proj3 = file_handler->create_project("TEST_PROJ3", dir_path, dir_path);
 
     file_handler->add_video(proj1, "TEST_VID1");
     file_handler->add_video(proj2, "TEST_VID2");

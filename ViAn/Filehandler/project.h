@@ -15,15 +15,15 @@
 #include "video.h"
 #include "saveable.h"
 typedef int ID;
+class FileHandler;
 
 /**
- * @brief The Project struct
- * incomplete struct, will be added on
+ * @brief The Project class
+ * incomplete class, will be added on
  * along with parser functionality
  */
-
 class Project : public Saveable{
-
+    FileHandler* file_handler;
     bool saved;
     std::map<ID,VideoProject*> videos;
 public:
@@ -31,14 +31,13 @@ public:
     ID id;
     ID v_id;
     ID dir;
-    ID bookmark_dir;
+    ID dir_bookmarks;
     ID dir_videos;
 
 
 public:
-    Project();
-    Project(ID id, std::string name);
-    Project(std::string dir_path);
+    Project(FileHandler* file_handler);
+    Project(FileHandler* file_handler, ID id, std::string name);
     ~Project();
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
@@ -55,7 +54,6 @@ public:
 // TODO
 //    void add_analysis();
 //    void add_drawing();      
-
 };
 
 
