@@ -34,13 +34,13 @@ void POI::set_end_frame(int frame_num) {
 void POI::read(const QJsonObject& json) {
     // TODO
     this->start_frame = json["start"].toInt();
-    this->end_frame = json["end"].toInt();
-    for(int i = start_frame; i != end_frame; i++){
-        QJsonArray json_frame_OOIs = json[QString::number(i)];
+    this->end_frame = json["end"].toInt();    
+    for(int i = start_frame; i != end_frame; i++){        
+        QJsonArray json_frame_OOIs = json[QString::number(i)].toArray();
         std::vector<OOI> oois;
-        for(int j  = 0; j = json_frame_OOIs.size(); j++){
+        for(int j  = 0; j = json_frame_OOIs.size(); j++){            
             OOI ooi;
-            ooi.read(json_frame_OOIs[j]);
+            ooi.read(json_frame_OOIs[j].toObject());
             oois.push_back(ooi);
         }
         this->OOIs.insert(std::make_pair(i, oois));
@@ -183,7 +183,7 @@ void Analysis::read(const QJsonObject &json){
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
         POI poi;
-        POI.read(json_poi);
+        poi.read(json_poi);
         this->add_POI(poi);
     }
 }
