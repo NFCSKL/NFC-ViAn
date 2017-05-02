@@ -2,7 +2,7 @@
 
 /**
  * @brief ReportGenerator::ReportGenerator
- * The constructor will do 5 steps to create a word document, load it with bookmarks and save it.
+ * The constructor will assign parameters to the class members.
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
@@ -11,32 +11,6 @@ ReportGenerator::ReportGenerator(Project* proj, FileHandler *file_handler)
     this->proj = proj;
     this->file_handler = file_handler;
 
-    //1. START APPLICATION
-    word = new QAxObject("Word.Application");
-
-    //2.OPEN THE DOCUMENT
-    QAxObject* doc = word->querySubObject("Documents");
-    doc->dynamicCall("Add()");
-    word->setProperty("Visible",false); // second bool to hide application when opened.
-
-    //3.GET TO THE CONTENTS
-    QAxObject* activeDocument=word->querySubObject("ActiveDocument");
-    QAxObject* activeWindow = activeDocument->querySubObject( "ActiveWindow" );
-    QAxObject* selection = activeWindow->querySubObject( "Selection" );
-
-    // Save all for project bookmarks in a list.
-    create_list_of_names();
-
-    // Make sure there is bookmarks to put in report.
-    if(!all_bookmarks.empty()){
-        //4. ADD IMAGES FROM BOOKMARK FOLDER
-        add_bookmarks(selection);
-
-        //5. SAVE AND CLOSE FILE
-        save_report(activeDocument);
-    }
-
-    close_report(doc, word);
 }
 /**
  * @brief ReportGenerator::~ReportGenerator
@@ -48,6 +22,46 @@ ReportGenerator::~ReportGenerator()
 }
 
 /**
+ * @brief ReportGenerator::create_report
+ * This method will do 5 steps to create a word document, load it with bookmarks and save it.
+ */
+void ReportGenerator::create_report() {
+    //1. START APPLICATION
+    word = new QAxObject("Word.Application");
+    if(!word->isNull()){
+        //2.OPEN THE DOCUMENT
+        QAxObject* doc = word->querySubObject("Documents");
+        doc->dynamicCall("Add()");
+        word->setProperty("Visible",false); // second bool to hide application when opened.
+
+        //3.GET TO THE CONTENTS
+        QAxObject* activeDocument=word->querySubObject("ActiveDocument");
+        QAxObject* activeWindow = activeDocument->querySubObject( "ActiveWindow" );
+        QAxObject* selection = activeWindow->querySubObject( "Selection" );
+
+        // Save all for project bookmarks in a list.
+        create_list_of_names();
+
+        // Make sure there is bookmarks to put in report.
+        if(!all_bookmarks.empty()){
+            //4. ADD IMAGES FROM BOOKMARK FOLDER
+            add_bookmarks(selection);
+
+            //5. SAVE AND CLOSE FILE
+            save_report(activeDocument);
+        }
+        close_report(doc, word);
+    }else{
+        qWarning("could not find Word instance");
+    }
+
+}
+
+
+
+
+
+/**
  * @brief ReportGenerator::create_list_of_names
  * This method will take all bookmarks for all videos in a
  * project and put their path and description in a list.
@@ -57,7 +71,7 @@ ReportGenerator::~ReportGenerator()
  */
 void ReportGenerator::create_list_of_names()
 {
-    std::map<ID, VideoProject*> videos = proj->videos;
+    std::map<ID, VideoProject*> videos = proj->get_videos();
 
     // get all bookmarks for a project by iterating over each videos bookmarks.
     for(std::pair<ID, VideoProject*> video : videos) {

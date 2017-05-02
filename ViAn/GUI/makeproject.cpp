@@ -100,6 +100,6 @@ void MakeProject::on_name_input_textChanged(const QString &name) {
  * @param timer time to show it in the bar in ms, 750ms is standard
  */
 void MakeProject::set_status_bar(std::string status, int timer){
-    ui->statusbar->showMessage(QString::fromStdString(status), timer);
+    ui->status_bar->showMessage(QString::fromStdString(status), timer);
     mainwindow->set_status_bar(status, timer);
 }

@@ -16,7 +16,7 @@
   <property name="windowOpacity">
    <double>1.000000000000000</double>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="QWidget" name="central_widget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QSplitter" name="splitter">
@@ -43,12 +43,12 @@
        </column>
       </widget>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayoutMiddle">
+       <layout class="QVBoxLayout" name="vertical_layout_middle">
         <property name="sizeConstraint">
          <enum>QLayout::SetNoConstraint</enum>
         </property>
         <item>
-         <widget class="QFrame" name="videoFrameContainer">
+         <widget class="QFrame" name="video_frame_container">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -67,7 +67,7 @@
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="scrollAreaWidgetContents">
+             <widget class="QWidget" name="scroll_area_widget_contents">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -110,7 +110,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutMiddle">
+         <layout class="QHBoxLayout" name="horizontal_layout_middle">
           <property name="sizeConstraint">
            <enum>QLayout::SetNoConstraint</enum>
           </property>
@@ -157,7 +157,7 @@
              </size>
             </property>
             <property name="text">
-             <string>()&lt;-</string>
+             <string>|&lt;&lt;</string>
             </property>
            </widget>
           </item>
@@ -245,7 +245,7 @@
              </size>
             </property>
             <property name="text">
-             <string>-&gt;()</string>
+             <string>&gt;&gt;|</string>
             </property>
            </widget>
           </item>
@@ -325,7 +325,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="horizontal_spacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -340,9 +340,9 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="sliderLayout">
+         <layout class="QHBoxLayout" name="slider_layout">
           <item>
-           <widget class="QLabel" name="currentTimeLabel">
+           <widget class="QLabel" name="current_time_label">
             <property name="text">
              <string/>
             </property>
@@ -374,7 +374,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="totalTimeLabel">
+           <widget class="QLabel" name="total_time_label">
             <property name="text">
              <string/>
             </property>
@@ -396,7 +396,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -408,82 +408,82 @@
    <property name="mouseTracking">
     <bool>true</bool>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuAdd">
+    <widget class="QMenu" name="menu_add">
      <property name="title">
       <string>Add</string>
      </property>
-     <addaction name="actionAddProject"/>
-     <addaction name="actionAddVideo"/>
+     <addaction name="action_add_project"/>
+     <addaction name="action_add_video"/>
     </widget>
-    <addaction name="menuAdd"/>
-    <addaction name="actionLoad"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionCreate_report"/>
+    <addaction name="menu_add"/>
+    <addaction name="action_load"/>
+    <addaction name="action_save"/>
+    <addaction name="action_create_report"/>
     <addaction name="action_close_project"/>
-    <addaction name="actionDelete"/>
-    <addaction name="actionChoose_Workspace"/>
-    <addaction name="actionExit"/>
+    <addaction name="action_delete"/>
+    <addaction name="action_choose_workspace"/>
+    <addaction name="action_exit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menu_edit">
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionOptions"/>
+    <addaction name="action_options"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+   <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionOpen_manual"/>
+    <addaction name="action_open_manual"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menu_view">
     <property name="title">
      <string>View</string>
     </property>
     <addaction name="action_show_hide_overlay"/>
     <addaction name="action_show_hide_analysis_overlay"/>
     <addaction name="action_show_hide_analysis_area"/>
-    <addaction name="actionInvert_analysis_area"/>
-    <addaction name="actionZoom_in"/>
-    <addaction name="actionZoom_out"/>
+    <addaction name="action_invert_analysis_area"/>
+    <addaction name="action_zoom_in"/>
+    <addaction name="action_zoom_out"/>
     <addaction name="action_original_size"/>
     <addaction name="action_fill_screen"/>
-    <addaction name="actionRotate_right"/>
-    <addaction name="actionRotate_left"/>
+    <addaction name="action_rotate_right"/>
+    <addaction name="action_rotate_left"/>
    </widget>
-   <widget class="QMenu" name="menuTools">
+   <widget class="QMenu" name="menu_tools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <widget class="QMenu" name="menuShape">
+    <widget class="QMenu" name="menu_shape">
      <property name="title">
       <string>Shape</string>
      </property>
-     <addaction name="actionRectangle"/>
-     <addaction name="actionCircle"/>
-     <addaction name="actionLine"/>
-     <addaction name="actionArrow"/>
-     <addaction name="actionPen"/>
-     <addaction name="actionText"/>
+     <addaction name="action_rectangle"/>
+     <addaction name="action_circle"/>
+     <addaction name="action_line"/>
+     <addaction name="action_arrow"/>
+     <addaction name="action_pen"/>
+     <addaction name="action_text"/>
     </widget>
-    <addaction name="actionColour"/>
-    <addaction name="menuShape"/>
-    <addaction name="actionUndo"/>
-    <addaction name="actionClear"/>
-    <addaction name="actionContrast_Brightness"/>
+    <addaction name="action_colour"/>
+    <addaction name="menu_shape"/>
+    <addaction name="action_undo"/>
+    <addaction name="action_clear"/>
+    <addaction name="action_contrast_brightness"/>
    </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuView"/>
-   <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menu_file"/>
+   <addaction name="menu_edit"/>
+   <addaction name="menu_view"/>
+   <addaction name="menu_tools"/>
+   <addaction name="menu_help"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QStatusBar" name="status_bar"/>
+  <widget class="QToolBar" name="toolbar">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -502,18 +502,18 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSave"/>
-   <addaction name="actionLoad"/>
-   <addaction name="actionAddVideo"/>
-   <addaction name="actionZoom_in"/>
-   <addaction name="actionZoom_out"/>
-   <addaction name="actionRotate_right"/>
-   <addaction name="actionRotate_left"/>
+   <addaction name="action_save"/>
+   <addaction name="action_load"/>
+   <addaction name="action_add_video"/>
+   <addaction name="action_zoom_in"/>
+   <addaction name="action_zoom_out"/>
+   <addaction name="action_rotate_right"/>
+   <addaction name="action_rotate_left"/>
    <addaction name="action_show_hide_overlay"/>
    <addaction name="action_show_hide_analysis_area"/>
    <addaction name="action_show_hide_analysis_overlay"/>
   </widget>
-  <widget class="QToolBar" name="toolBar_overlay">
+  <widget class="QToolBar" name="toolbar_overlay">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -526,21 +526,21 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionColour"/>
-   <addaction name="actionRectangle"/>
-   <addaction name="actionCircle"/>
-   <addaction name="actionArrow"/>
-   <addaction name="actionLine"/>
-   <addaction name="actionText"/>
-   <addaction name="actionPen"/>
-   <addaction name="actionUndo"/>
-   <addaction name="actionClear"/>
+   <addaction name="action_colour"/>
+   <addaction name="action_rectangle"/>
+   <addaction name="action_circle"/>
+   <addaction name="action_arrow"/>
+   <addaction name="action_line"/>
+   <addaction name="action_text"/>
+   <addaction name="action_pen"/>
+   <addaction name="action_undo"/>
+   <addaction name="action_clear"/>
    <addaction name="action_show_hide_overlay"/>
    <addaction name="separator"/>
-   <addaction name="actionZoom_in"/>
-   <addaction name="actionZoom_out"/>
+   <addaction name="action_zoom_in"/>
+   <addaction name="action_zoom_out"/>
   </widget>
-  <widget class="QToolBar" name="toolBar_analysis">
+  <widget class="QToolBar" name="toolbar_analysis">
    <property name="windowTitle">
     <string>toolBar_2</string>
    </property>
@@ -550,12 +550,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionUndo"/>
-   <addaction name="actionClear"/>
+   <addaction name="action_undo"/>
+   <addaction name="action_clear"/>
    <addaction name="action_show_hide_analysis_area"/>
-   <addaction name="actionInvert_analysis_area"/>
+   <addaction name="action_invert_analysis_area"/>
   </widget>
-  <action name="actionSave">
+  <action name="action_save">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/save_project.png</normaloff>:/save_project.png</iconset>
@@ -573,7 +573,7 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionLoad">
+  <action name="action_load">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/load_project.png</normaloff>:/load_project.png</iconset>
@@ -585,18 +585,18 @@
     <string>Ctrl+L</string>
    </property>
   </action>
-  <action name="actionAddProject">
+  <action name="action_add_project">
    <property name="text">
     <string>Project</string>
    </property>
    <property name="toolTip">
-    <string>AddProject</string>
+    <string>Add project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+P</string>
    </property>
   </action>
-  <action name="actionAddVideo">
+  <action name="action_add_video">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/add_video.png</normaloff>:/add_video.png</iconset>
@@ -605,18 +605,18 @@
     <string>Video</string>
    </property>
    <property name="toolTip">
-    <string>AddVideo</string>
+    <string>Add video</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+V</string>
    </property>
   </action>
-  <action name="actionOptions">
+  <action name="action_options">
    <property name="text">
     <string>Options</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="action_exit">
    <property name="text">
     <string>Exit</string>
    </property>
@@ -624,7 +624,7 @@
     <string>Ctrl+E</string>
    </property>
   </action>
-  <action name="actionOpen_manual">
+  <action name="action_open_manual">
    <property name="text">
     <string>Open manual</string>
    </property>
@@ -644,7 +644,7 @@
     <string>Show/hide overlay</string>
    </property>
   </action>
-  <action name="actionColour">
+  <action name="action_colour">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/colour.png</normaloff>:/colour.png</iconset>
@@ -656,8 +656,11 @@
     <string>Shift+C</string>
    </property>
   </action>
-  <action name="actionRectangle">
+  <action name="action_rectangle">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>true</bool>
    </property>
    <property name="icon">
@@ -671,7 +674,7 @@
     <string>Alt+R</string>
    </property>
   </action>
-  <action name="actionCircle">
+  <action name="action_circle">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -686,7 +689,7 @@
     <string>Alt+C</string>
    </property>
   </action>
-  <action name="actionArrow">
+  <action name="action_arrow">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -701,7 +704,7 @@
     <string>Alt+A</string>
    </property>
   </action>
-  <action name="actionLine">
+  <action name="action_line">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -716,39 +719,23 @@
     <string>Alt+L</string>
    </property>
   </action>
-  <action name="actionDeleteProject">
-   <property name="text">
-    <string>Project</string>
-   </property>
-   <property name="toolTip">
-    <string>DeleteProject</string>
-   </property>
-  </action>
-  <action name="actionDeleteVideo">
-   <property name="text">
-    <string>Video</string>
-   </property>
-   <property name="toolTip">
-    <string>DeleteVideo</string>
-   </property>
-  </action>
-  <action name="actionDeleteAnalys">
+  <action name="action_delete_analys">
    <property name="text">
     <string>Analys</string>
    </property>
    <property name="toolTip">
-    <string>DeleteAnalys</string>
+    <string>Delete analys</string>
    </property>
   </action>
-  <action name="actionDeleteDrawing">
+  <action name="action_delete_drawing">
    <property name="text">
     <string>Drawing</string>
    </property>
    <property name="toolTip">
-    <string>DeleteDrawing</string>
+    <string>Delete drawing</string>
    </property>
   </action>
-  <action name="actionPen">
+  <action name="action_pen">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -763,7 +750,7 @@
     <string>Alt+P</string>
    </property>
   </action>
-  <action name="actionClear">
+  <action name="action_clear">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
@@ -772,7 +759,7 @@
     <string>Clear</string>
    </property>
   </action>
-  <action name="actionUndo">
+  <action name="action_undo">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/undo.png</normaloff>:/undo.png</iconset>
@@ -784,7 +771,7 @@
     <string>Ctrl+Z</string>
    </property>
   </action>
-  <action name="actionZoom_in">
+  <action name="action_zoom_in">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/zoom_in.png</normaloff>:/zoom_in.png</iconset>
@@ -796,7 +783,7 @@
     <string>+</string>
    </property>
   </action>
-  <action name="actionZoom_out">
+  <action name="action_zoom_out">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/zoom_out.png</normaloff>:/zoom_out.png</iconset>
@@ -814,7 +801,7 @@
     <string>-</string>
    </property>
   </action>
-  <action name="actionText">
+  <action name="action_text">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -835,9 +822,9 @@
     <string>Alt+T</string>
    </property>
   </action>
-  <action name="actionChoose_Workspace">
+  <action name="action_choose_workspace">
    <property name="text">
-    <string>Choose Workspace</string>
+    <string>Choose workspace</string>
    </property>
   </action>
   <action name="action_show_hide_analysis_area">
@@ -848,7 +835,7 @@
     <string>Show/hide analysis area</string>
    </property>
   </action>
-  <action name="actionContrast_Brightness">
+  <action name="action_contrast_brightness">
    <property name="text">
     <string>Contrast/Brightness</string>
    </property>
@@ -872,7 +859,7 @@
     <string>Fill screen</string>
    </property>
   </action>
-  <action name="actionRotate_right">
+  <action name="action_rotate_right">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/rotate_right.png</normaloff>:/rotate_right.png</iconset>
@@ -881,7 +868,7 @@
     <string>Rotate right</string>
    </property>
   </action>
-  <action name="actionRotate_left">
+  <action name="action_rotate_left">
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/rotate_left.png</normaloff>:/rotate_left.png</iconset>
@@ -890,7 +877,7 @@
     <string>Rotate left</string>
    </property>
   </action>
-  <action name="actionDelete">
+  <action name="action_delete">
    <property name="text">
     <string>Delete selected</string>
    </property>
@@ -898,7 +885,7 @@
     <string>Del</string>
    </property>
   </action>
-  <action name="actionCreate_report">
+  <action name="action_create_report">
    <property name="text">
     <string>Create report</string>
    </property>
@@ -909,7 +896,7 @@
     <string>Ctrl+Shift+R</string>
    </property>
   </action>
-  <action name="actionInvert_analysis_area">
+  <action name="action_invert_analysis_area">
    <property name="checkable">
     <bool>true</bool>
    </property>
