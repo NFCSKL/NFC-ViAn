@@ -33,7 +33,7 @@ private:
 
 protected:
     int num_frames = -1;
-    unsigned int sample_freq = 1;
+    unsigned int sample_freq = 5;
     unsigned int current_frame = 0; // The current frame number
 
     cv::VideoCapture capture;       // Video source

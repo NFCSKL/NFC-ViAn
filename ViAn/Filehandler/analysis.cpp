@@ -32,7 +32,6 @@ void POI::set_end_frame(int frame_num) {
  * @param json
  */
 void POI::read(const QJsonObject& json) {
-    // TODO
     this->start_frame = json["start"].toInt();
     this->end_frame = json["end"].toInt();    
     for(int i = start_frame; i != end_frame; i++){        
