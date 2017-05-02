@@ -127,13 +127,14 @@ void Project::write(QJsonObject& json){
 
 /**
  * @brief Project::add_bookmark
+ * @param v_id the id of the video
  * @param bookmark
  * Add new bookmark to Videoproj corresponding to id.
  */
-void Project::add_bookmark(ID id, Bookmark *bookmark){
-    VideoProject* v = this->videos.at(id);
-    v->add_bookmark(bookmark);
+ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
+    VideoProject* v = this->videos.at(v_id);
     this->changes_made = true;
+    return v->add_bookmark(bookmark);
 }
 
 /**

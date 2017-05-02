@@ -349,7 +349,7 @@ void MainWindow::on_action_exit_triggered() {
 void MainWindow::on_bookmark_button_clicked() {
     // Add bookmarks-folder to the project-folder.
     Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
-    QDir dir = file_handler->get_dir(proj->bookmark_dir);
+    QDir dir = file_handler->get_dir(proj->dir_bookmarks);
     // Get bookmark description
     QString bookmark_text("");
     bool ok;
@@ -638,7 +638,7 @@ void MainWindow::on_action_add_video_triggered() {
             if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
                 std::string video_file_path = q_video_file_path.toStdString();
                 ID id = file_handler->add_video(proj, video_file_path);
-                add_video_to_tree(proj->videos.at(id));
+                add_video_to_tree(proj->get_videos().at(id));
                 set_status_bar("Video " + video_file_path + " added.");
             }
         } else {
@@ -716,7 +716,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
     ui->project_tree->addTopLevelItem(project_in_tree);
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
-    for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
+    for(auto vid = proj->get_videos().begin(); vid != proj->get_videos().end(); ++vid){
         VideoProject* video = vid->second;
         add_video_to_tree(video);
     }
