@@ -95,6 +95,9 @@ void test_report_generator::test_create_list_of_names() {
     report_generator2->create_list_of_names();
     QCOMPARE(report_generator2->all_bookmarks.size(), unsigned(0));
 
+    file_handler->delete_project(proj1->id);
+    file_handler->delete_project(proj2->id);
+
    // delete file_handler;
     delete report_generator1;
     delete report_generator2;
