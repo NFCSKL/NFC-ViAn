@@ -29,7 +29,7 @@ enum WRITE_OPTION{APPEND, OVERWRITE};
 
 typedef int ID;       // ID, defined for code readability.
 
-struct Project; // fix for include issue
+class Project; // fix for include issue
 
 class FileHandler : Saveable{
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
@@ -52,7 +52,7 @@ public:
     //  Project* open_project(ID id); // To be added
     //  Project* close_project(ID id);
     Project* get_project(ID id);
-    Project* create_project(QString proj_name, std::string dir_path="", std::string vid_path="");
+    Project* create_project(QString proj_name, std::string dir_path, std::string vid_path);
     bool delete_project(ID proj_id);
     Project* load_project(std::string full_project_path);
     void save_project(ID id);
