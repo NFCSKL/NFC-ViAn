@@ -111,18 +111,18 @@ void Bookmark::create_file_path() {
     path.append("/");
     path.append(QString::number(frame_number));
     path.append(".tiff");
--  
+     
     int counter = 1;		
- -  while (QFile::exists(path)) {		
- -      // If file exists, try FRAMENR(X).tiff		
- -      path = QString(dir_path);		
- -      path.append("/");		
- -      path.append(QString::number(frame_number));		
- -      path.append("(");		
- -      path.append(QString::number(counter));		
- -      path.append(").tiff");		
- -      counter++;		
- -  }
+    while (QFile::exists(path)) {		
+        // If file exists, try FRAMENR(X).tiff		
+        path = QString(dir_path);		
+        path.append("/");		
+        path.append(QString::number(frame_number));		
+        path.append("(");		
+        path.append(QString::number(counter));		
+        path.append(").tiff");		
+        counter++;		
+    }
     // Update file path variable
     file_path = path;
 }
