@@ -5,15 +5,15 @@
  * @param parent
  */
 test_report_generator::test_report_generator(QObject *parent) : QObject(parent) {
-    file_handler = new FileHandler();
+    this->file_handler = new FileHandler();
 }
 
 /**
  * @brief test_report_generator::test_init
+ * This will initalize everything that is needed for testing the report generator.
  */
 void test_report_generator::test_init()
 {
-
     this->proj1 = file_handler->create_project("TEST_PROJ1");
     this->proj2 = file_handler->create_project("TEST_PROJ2");
 
@@ -43,7 +43,10 @@ void test_report_generator::test_init()
 }
 
 
-
+/**
+ * @brief test_report_generator::test_create_and_save_report
+ * This test will test that reports are created,saved and stored in the project folder.
+ */
 void test_report_generator::test_create_and_save_report() {
     //TEST for project 1
     report_generator1->create_report();
@@ -80,6 +83,8 @@ void test_report_generator::test_create_and_save_report() {
 
 /**
  * @brief test_report_generator::test_create_list_of_names
+ * This test will test that the create list of names method will actually
+ * fill in the right amount of objects in the lists based on bookmarks.
  */
 void test_report_generator::test_create_list_of_names() {
     report_generator1->all_bookmarks.clear();
