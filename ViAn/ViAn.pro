@@ -126,7 +126,7 @@ HEADERS  += Filehandler/filehandler.h \
     Filehandler/videoproject.h \
     Filehandler/bookmark.h  \
     Filehandler/saveable.h \
-    Fildehandler/analysis.h
+    Filehandler/analysis.h
 
 win32{
 

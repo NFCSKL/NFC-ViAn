@@ -33,6 +33,18 @@ void POI::set_end_frame(int frame_num) {
  */
 void POI::read(const QJsonObject& json) {
     // TODO
+    this->start_frame = json["start"].toInt();
+    this->end_frame = json["end"].toInt();
+    for(int i = start_frame; i != end_frame; i++){
+        QJsonArray json_frame_OOIs = json[QString::number(i)];
+        std::vector<OOI> oois;
+        for(int j  = 0; j = json_frame_OOIs.size(); j++){
+            OOI ooi;
+            ooi.read(json_frame_OOIs[j]);
+            oois.push_back(ooi);
+        }
+        this->OOIs.insert(std::make_pair(i, oois));
+    }
 }
 
 /**
@@ -167,12 +179,12 @@ void Analysis::add_POI(POI poi){
  */
 void Analysis::read(const QJsonObject &json){
     this->type = (ANALYSIS_TYPE)json["analysis"].toInt();
-    QJsonArray json_POIs = json["POI:s"].toArray();
-    for (int i = 0; i < json_POIs.size(); ++i) {
-        QJsonObject json_POI = json_POIs[i].toObject();
-        POI POI;
-        POI.read(json_POI);
-        this->add_POI(POI);
+    QJsonArray json_pois = json["POI:s"].toArray();
+    for (int i = 0; i < json_pois.size(); ++i) {
+        QJsonObject json_poi = json_pois[i].toObject();
+        POI poi;
+        POI.read(json_poi);
+        this->add_POI(poi);
     }
 }
 
