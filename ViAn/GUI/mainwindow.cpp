@@ -49,8 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // TODO The following code is just here to test.
     // Remove when a proper implementation exists.
-    m_acontroller = new AnalysisController("eng4k.mov",MOTION_DETECTION);
-    m_acontroller->start();
+    //m_acontroller = new AnalysisController("eng4k.mov",MOTION_DETECTION);
+    //m_acontroller->start();
 
     // Initially hide overlay and analysis toolbar
     ui->toolbar_overlay->hide();
