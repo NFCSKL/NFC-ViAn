@@ -223,6 +223,37 @@ void MainWindow::on_previous_frame_button_clicked() {
  */
 void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
+    set_total_time();
+    set_current_time();
+}
+
+/**
+ * @brief MainWindow::set_total_time
+ * Sets the total video time in the total_time_label
+ */
+void MainWindow::set_total_time() {
+    qint64 duration = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
+    QTime total((duration/3600)%60, (duration/60)%60, duration%60);
+    QString format = "mm:ss";
+    if (duration > 3600)
+        format = "hh:mm:ss";
+    QString total_time_string = total.toString(format);
+    ui->total_time_label->setText(total_time_string);
+}
+
+/**
+ * @brief MainWindow::set_current_time
+ * Sets the current video time in the current_time_label
+ */
+void MainWindow::set_current_time() {
+    qint64 duration = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
+    qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
+    QTime current((current_time/3600)%60, (current_time/60)%60, current_time%60);
+    QString format = "mm:ss";
+    if (duration > 3600)
+        format = "hh:mm:ss";
+    QString current_time_string = current.toString(format);
+    ui->current_time_label->setText(current_time_string);
 }
 
 /**
