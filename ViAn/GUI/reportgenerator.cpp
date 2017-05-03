@@ -9,8 +9,8 @@
 ReportGenerator::ReportGenerator(Project* proj, FileHandler *file_handler) {
     this->proj = proj;
     this->file_handler = file_handler;
-
 }
+
 /**
  * @brief ReportGenerator::~ReportGenerator
  * destructor to remove allocated memory.
@@ -33,9 +33,9 @@ void ReportGenerator::create_report() {
         word->setProperty("Visible",false); // second bool to hide application when opened.
 
         //3.GET TO THE CONTENTS
-        QAxObject* active_Document=word->querySubObject("ActiveDocument");
-        QAxObject* active_Window = active_Document->querySubObject( "ActiveWindow" );
-        QAxObject* selection = active_Window->querySubObject( "Selection" );
+        QAxObject* active_document = word->querySubObject("ActiveDocument");
+        QAxObject* active_window = active_document->querySubObject( "ActiveWindow" );
+        QAxObject* selection = active_window->querySubObject( "Selection" );
 
         // Save all for project bookmarks in a list.
         create_list_of_names();
@@ -46,18 +46,13 @@ void ReportGenerator::create_report() {
             add_bookmarks(selection);
 
             //5. SAVE AND CLOSE FILE
-            save_report(active_Document);
+            save_report(active_document);
         }
         close_report(doc, word);
     }else{
         qWarning("could not find Word instance");
     }
-
 }
-
-
-
-
 
 /**
  * @brief ReportGenerator::create_list_of_names
@@ -87,25 +82,25 @@ void ReportGenerator::create_list_of_names() {
  * that is based on the constant IMAGE_WIDTH_REFERENCE. All images will keep
  * its aspect ratio.
  * @param pic_path, path to the bookmark that is to be resized.
- * @param inlineShape, A word specific object that is a shape where its
+ * @param inline_shape, A word specific object that is a shape where its
  * layout is "inline" with the rest of the document.
  */
-void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_Shape) {
+void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) {
     QImage image = QImage(pic_path);
     int const original_height = image.height();
     int const original_width = image.width();
 
     //Scale all images to have same width but keep aspect ratio
     double multiply_factor = IMAGE_WIDTH_REFERENCE/original_width;
-    inline_Shape->dynamicCall( "Height", (multiply_factor*original_height));
-    inline_Shape->dynamicCall( "Width", IMAGE_WIDTH_REFERENCE);
+    inline_shape->dynamicCall( "Height", (multiply_factor*original_height));
+    inline_shape->dynamicCall( "Width", IMAGE_WIDTH_REFERENCE);
 }
 
 /**
  * @brief ReportGenerator::add_paragraph
  * This adds paragraphs (spaces) between the bookmarks in the
  * document to make it more readable. To increase or decrease the number
- * of paragraphs change the number of times the loop is ran.
+ * of paragraphs change the number of times the loop is executed.
  * @param selection, the selector in the active document.
  */
 void ReportGenerator::add_paragraph(QAxObject* selection) {
@@ -130,11 +125,11 @@ void ReportGenerator::add_bookmarks(QAxObject* selection) {
         //application when spaces are involved
         pic_path.replace("/", "\\\\");
 
-        QAxObject* inlineShape = shapes->querySubObject(
+        QAxObject* inline_shape = shapes->querySubObject(
                     "AddPicture(const QString&,bool,bool,QVariant)",
                      pic_path, false, true);
 
-        resize_picture(pic_path, inlineShape);
+        resize_picture(pic_path, inline_shape);
 
         // Center image
         selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
@@ -168,14 +163,15 @@ std::string ReportGenerator::date_time_generator() {
  * @brief ReportGenerator::save_report
  * This method will save the word document in the project folder.
  * The name will be based on the project and current date and time.
- * @param activeDocument, the document that is selected
+ *
+ * @param active_document, the document that is selected
  */
-void ReportGenerator::save_report(QAxObject* active_Document) {
+void ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
     std::string proj_path = file_handler->get_dir(proj->dir).absolutePath().toStdString();
     std::string path = proj_path.append("/").append(proj->name).append("_").append(dt).append(".docx");
 
-    active_Document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
+    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
 }
 
 /**
@@ -189,6 +185,3 @@ void ReportGenerator::close_report(QAxObject* doc, QAxObject*  word) {
     doc->dynamicCall("Close()");
     word->dynamicCall("Quit()");
 }
-
-
-

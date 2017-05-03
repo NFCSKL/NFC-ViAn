@@ -6,7 +6,7 @@
 #include <ActiveQt/QAxWidget>
 #include <QString>
 #include "Filehandler/filehandler.h"
-#include  "dirent.h"
+#include "dirent.h"
 #include <ctime>
 
 class ReportGenerator {
@@ -27,9 +27,9 @@ private:
 
     void create_list_of_names();
     void add_bookmarks(QAxObject* selection);
-    void save_report(QAxObject* activeDocument);
+    void save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
-    void resize_picture(QString pic_path, QAxObject* inlineShape);
+    void resize_picture(QString pic_path, QAxObject* inline_shape);
     std::string date_time_generator();
     void add_paragraph(QAxObject* selection);
 };

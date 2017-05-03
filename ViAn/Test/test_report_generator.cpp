@@ -18,12 +18,12 @@ void test_report_generator::test_init()
     this->proj1 = file_handler->create_project("TEST_PROJ1", dir_path, dir_path);
     this->proj2 = file_handler->create_project("TEST_PROJ2", dir_path, dir_path);
 
-    std::string video1_path = "C:/Users/georg/Desktop/Pumparna.avi";
-    std::string video2_path = "C:/Users/georg/Desktop/England4k.mov";
+    std::string video1_path = "Pumparna.avi";
+    std::string video2_path = "England4k.mov";
     QString dir_path1 = "C:/TEST_PROJ1/Bookmarks";
     QString dir_path2 = "C:/TEST_PROJ2/Bookmarks";
-    QString bookmark1_path = "C:/Users/georg/Desktop/england_bild.jpg";
-    QString bookmark11_path = "C:/Users/georg/Desktop/pumparna_bild.jpg";
+    QString bookmark1_path = "england_bild.jpg";
+    QString bookmark11_path = "pumparna_bild.jpg";
     QImage image1 = QImage(bookmark1_path);
     QImage image2 = QImage(bookmark11_path);
     Bookmark* bookmark1 = new Bookmark(1,image1, dir_path1, QString::fromStdString("test1"));
