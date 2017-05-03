@@ -134,7 +134,7 @@ private:
     double speed_multiplier = DEFAULT_SPEED_MULT;
 
     bool video_stopped = false;
-    bool video_paused;
+    bool video_paused = false;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
     bool slider_moving = false;

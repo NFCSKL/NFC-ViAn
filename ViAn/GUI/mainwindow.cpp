@@ -903,19 +903,6 @@ void MainWindow::on_video_slider_sliderPressed() {
     }
 }
 
-/** @brief MainWindow::on_action_show_hide_analysis_area_triggered
- * Toggles the choosing of an analysis area.
- */
-void MainWindow::on_action_show_hide_analysis_area_triggered() {
-    mvideo_player->toggle_analysis_area();
-    toggle_toolbar();
-    if (mvideo_player->is_showing_analysis_tool()) {
-        set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
-    } else {
-        set_status_bar("Hiding analysis area tool.");
-    }
-}
-
 /**
  * @brief MainWindow::on_video_slider_sliderReleased
  * Set video playback pos to slider pos and unblock slider update
@@ -928,6 +915,20 @@ void MainWindow::on_video_slider_sliderReleased() {
     if (slider_paused_video) {
         paused_wait.wakeOne();
         slider_paused_video = false;
+    } //else if ()
+        //    mvideo_player->start();
+}
+
+/** @brief MainWindow::on_action_show_hide_analysis_area_triggered
+ * Toggles the choosing of an analysis area.
+ */
+void MainWindow::on_action_show_hide_analysis_area_triggered() {
+    mvideo_player->toggle_analysis_area();
+    toggle_toolbar();
+    if (mvideo_player->is_showing_analysis_tool()) {
+        set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
+    } else {
+        set_status_bar("Hiding analysis area tool.");
     }
 }
 
@@ -1095,10 +1096,15 @@ void MainWindow::on_previous_POI_button_clicked() {
  * Jump forward to the next POI.
  */
 void MainWindow::on_next_POI_button_clicked() {
-    if (mvideo_player->is_paused()) {
+    /*if (mvideo_player->is_paused()) {
         set_status_bar("Went forward to the next POI");
         //will be added when functionality is in place
         //emit next_video_POI();
+    } else {
+        set_status_bar("Needs to be paused");
+    }*/
+    if (mvideo_player->is_stopped()) {
+        set_status_bar("Video is stopped");
     } else {
         set_status_bar("Needs to be paused");
     }
