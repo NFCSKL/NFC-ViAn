@@ -36,11 +36,11 @@ Project::Project(FileHandler* file_handler){
  * Clears contents of video map
  */
 Project::~Project(){
-    for (auto vidIt = this->videos.begin(); vidIt != this->videos.end(); ++vidIt) {
-        delete vidIt->second;
+    for (auto vid_it = this->videos.begin(); vid_it != this->videos.end(); ++vid_it) {
+        delete vid_it->second;
     }
-    for (auto rIt = this->reports.begin(); rIt != this->reports.end(); ++rIt) {
-        delete *rIt;
+    for (auto rep_it = this->reports.begin(); rep_it != this->reports.end(); ++rep_it) {
+        delete *rep_it;
     }
 }
 
@@ -207,6 +207,3 @@ void Project::save_project(){
 std::map<ID, VideoProject* > &Project::get_videos(){
     return this->videos;
 }
-
-
-
