@@ -166,6 +166,7 @@ std::string ReportGenerator::date_time_generator() {
  * This method will save the word document in the project folder.
  * The name will be based on the project and current date and time.
  * @param activeDocument, the document that is selected
+ * @return string, file_path to which document was saved.
  */
 QString ReportGenerator::save_report(QAxObject* active_Document) {
     std::string dt = date_time_generator();
