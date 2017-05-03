@@ -27,7 +27,7 @@ private:
 
     void create_list_of_names();
     void add_bookmarks(QAxObject* selection);
-    void save_report(QAxObject* activeDocument);
+    QString save_report(QAxObject* activeDocument);
     void close_report(QAxObject* doc, QAxObject*  word);
     void resize_picture(QString pic_path, QAxObject* inlineShape);
     std::string date_time_generator();

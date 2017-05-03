@@ -39,6 +39,9 @@ Project::~Project(){
     for (auto vidIt = this->videos.begin(); vidIt != this->videos.end(); ++vidIt) {
         delete vidIt->second;
     }
+    for (auto rIt = this->reports.begin(); rIt != this->reports.end(); ++rIt) {
+        delete *rIt;
+    }
 }
 
 /**
@@ -59,9 +62,18 @@ void Project::remove_video_project(ID id){
  */
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
-    this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
+    VideoProject* vp = new VideoProject(vid);
+    this->videos.insert(std::make_pair(this->v_id, vp));
     this->saved =false;
     return this->v_id++;
+}
+
+/**
+ * @brief Project::add_report
+ * @param file_path
+ */
+void Project::add_report(std::string file_path){
+    this->reports.push_back(new Report(file_path));
 }
 
 /**
@@ -82,6 +94,11 @@ void Project::delete_artifacts(){
     for(auto it = videos.begin(); it != videos.end(); it++){
         VideoProject* vp = it->second;
         vp->delete_artifacts();
+    }
+    for(auto it = reports.begin(); it != reports.end(); it++){
+        Report* temp = *it;
+        QFile file (QString::fromStdString(temp->file_path));
+        file.remove();
     }
 }
 
@@ -156,7 +173,9 @@ void Project::save_project(){
  * @brief Project::get_videos
  * @return videos&
  */
-std::map<ID, VideoProject *> &Project::get_videos(){
+std::map<ID, VideoProject* > &Project::get_videos(){
     return this->videos;
 }
+
+
 

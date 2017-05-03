@@ -16,7 +16,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    Filehandler/report.cpp
 
 
 
@@ -30,7 +31,8 @@ SOURCES += Test/test_video_player.cpp\
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    Test/test_report_generator.h
+    Test/test_report_generator.h \
+    Filehandler/report.h
 
 #
 # LIBRARY

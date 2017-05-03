@@ -26,6 +26,7 @@ class Project : public Saveable{
     FileHandler* file_handler;
     bool saved;
     std::map<ID,VideoProject*> videos;
+    std::vector<Report*> reports;
 public:
     std::string name;
     ID id;
@@ -41,6 +42,7 @@ public:
     ~Project();
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
+    void add_report(std::string file_path);
     void add_bookmark(ID id, Bookmark *bookmark);
     void delete_artifacts();
     void remove_video_project(ID id);

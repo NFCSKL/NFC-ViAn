@@ -46,7 +46,8 @@ void ReportGenerator::create_report() {
             add_bookmarks(selection);
 
             //5. SAVE AND CLOSE FILE
-            save_report(active_Document);
+            QString file_path = save_report(active_Document);
+            this->proj->add_report(file_path.toStdString());
         }
         close_report(doc, word);
     }else{
@@ -54,10 +55,6 @@ void ReportGenerator::create_report() {
     }
 
 }
-
-
-
-
 
 /**
  * @brief ReportGenerator::create_list_of_names
@@ -170,12 +167,12 @@ std::string ReportGenerator::date_time_generator() {
  * The name will be based on the project and current date and time.
  * @param activeDocument, the document that is selected
  */
-void ReportGenerator::save_report(QAxObject* active_Document) {
+QString ReportGenerator::save_report(QAxObject* active_Document) {
     std::string dt = date_time_generator();
     std::string proj_path = file_handler->get_dir(proj->dir).absolutePath().toStdString();
     std::string path = proj_path.append("/").append(proj->name).append("_").append(dt).append(".docx");
-
     active_Document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
+    return QString::fromStdString(path);
 }
 
 /**
