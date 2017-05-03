@@ -91,10 +91,12 @@ ID Project::add_video_project(VideoProject* vid_proj){
  * Delete all projects files.
  */
 void Project::delete_artifacts(){
+    // Delete files in all videoprojects
     for(auto it = videos.begin(); it != videos.end(); it++){
         VideoProject* vp = it->second;
         vp->delete_artifacts();
     }
+    // Delete all reports.
     for(auto it = reports.begin(); it != reports.end(); it++){
         Report* temp = *it;
         QFile file (QString::fromStdString(temp->file_path));
