@@ -35,14 +35,15 @@ public:
     ID dir_bookmarks;
     ID dir_videos;
 
-
 public:
     Project(FileHandler* file_handler);
     Project(FileHandler* file_handler, ID id, std::string name);
     ~Project();
+    void add_report(Report* report);
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
     void add_report(std::string file_path);
+
     void add_bookmark(ID id, Bookmark *bookmark);
     void delete_artifacts();
     void remove_video_project(ID id);

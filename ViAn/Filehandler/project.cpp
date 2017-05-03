@@ -74,6 +74,16 @@ ID Project::add_video(Video* vid){
  */
 void Project::add_report(std::string file_path){
     this->reports.push_back(new Report(file_path));
+    this->saved = false;
+}
+
+/**
+ * @brief Project::add_report
+ * @param file_path
+ * Required for load, object locally allocated
+ */
+void Project::add_report(Report* report){
+    this->reports.push_back(report);
 }
 
 /**
@@ -99,7 +109,7 @@ void Project::delete_artifacts(){
     // Delete all reports.
     for(auto it = reports.begin(); it != reports.end(); it++){
         Report* temp = *it;
-        QFile file (QString::fromStdString(temp->file_path));
+        QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
     }
 }
@@ -115,12 +125,21 @@ void Project::read(const QJsonObject& json){
     this->dir_bookmarks = file_handler->create_directory(json["bookmark_dir"].toString());
     this->dir_videos = file_handler->create_directory(json["video_dir"].toString());
     this->save_name = this->name;
+    // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
         QJsonObject json_vid_proj = json_vid_projs[i].toObject();
         VideoProject* v = new VideoProject();
         v->read(json_vid_proj);
         this->add_video_project(v);
+    }    
+    // Read reports from json
+    QJsonArray json_reports = json["reports"].toArray();
+    for (int i = 0; i < json_reports.size(); ++i) {
+        QJsonObject json_report = json_reports[i].toObject();
+        Report* report = new Report();
+        report->read(json_report);
+        this->add_report(report);
     }
 }
 
@@ -130,11 +149,12 @@ void Project::read(const QJsonObject& json){
  * Write project parameters to json object.
  */
 void Project::write(QJsonObject& json){
-    QJsonArray json_proj;
     json["name"] = QString::fromStdString(this->name);
     json["root_dir"] =  file_handler->get_dir(this->dir).absolutePath();
     json["bookmark_dir"] = file_handler->get_dir(this->dir_bookmarks).absolutePath();
     json["video_dir"] = file_handler->get_dir(this->dir_videos).absolutePath();
+    QJsonArray json_proj;
+    // Write Videos to json
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){
         QJsonObject json_vid_proj;
         VideoProject* v = it->second;
@@ -142,6 +162,15 @@ void Project::write(QJsonObject& json){
         json_proj.append(json_vid_proj);
     }
     json["videos"] = json_proj;
+    // Write reports to json
+    QJsonArray json_reports;
+    for(auto it = this->reports.begin(); it != this->reports.end(); it++){
+        QJsonObject json_report;
+        Report* report = *it;
+        report->write(json_report);
+        json_reports.append(json_report);
+    }
+    json["reports"] = json_reports;
 }
 
 /**
