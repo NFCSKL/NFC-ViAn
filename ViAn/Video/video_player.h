@@ -31,6 +31,7 @@ public:
     QImage get_current_frame_unscaled();
     bool video_open();
 
+    double get_frame_rate();
     int get_num_frames();    
     int get_current_frame_num();
     void set_frame_width(int new_value);

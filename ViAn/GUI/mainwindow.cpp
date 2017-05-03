@@ -5,6 +5,7 @@
 #include <sstream>
 #include <QCloseEvent>
 #include <QColorDialog>
+#include <QTime>
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
