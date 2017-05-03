@@ -4,16 +4,6 @@
  * @brief AnalysisOverlay::AnalysisOverlay
  */
 AnalysisOverlay::AnalysisOverlay() {
-    // Temporary areas to show, since there's no analysis yet.
-    add_area(2, cv::Point(50,50), cv::Point(150,150));
-    add_area(3, cv::Point(50,50), cv::Point(150,150));
-    add_area(4, cv::Point(50,50), cv::Point(150,150));
-    add_area(5, cv::Point(50,50), cv::Point(150,150));
-    add_area(6, cv::Point(50,50), cv::Point(150,150));
-    add_area(7, cv::Point(50,50), cv::Point(150,150));
-    add_area(8, cv::Point(50,50), cv::Point(150,150));
-    add_area(9, cv::Point(50,50), cv::Point(150,150));
-    add_area(10, cv::Point(150,150), cv::Point(250,170));
 }
 
 /**
@@ -25,9 +15,8 @@ AnalysisOverlay::AnalysisOverlay() {
  */
 cv::Mat AnalysisOverlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (showing_overlay) {
-        for (std::pair<cv::Point, cv::Point> area : detections[frame_nr]) {
-            cv::Rect rect(area.first, area.second);
-            cv::rectangle(frame, rect, cv::Scalar(255, 0, 0), 5);
+        for (cv::Rect area : detections[frame_nr]) {
+            cv::rectangle(frame, area, COLOUR, THICKNESS);
         }
     }
     return frame;
@@ -36,12 +25,10 @@ cv::Mat AnalysisOverlay::draw_overlay(cv::Mat &frame, int frame_nr) {
 /**
  * @brief AnalysisOverlay::add_area
  * @param frame_nr Frame associated with the area.
- * @param start Start point.
- * @param end End point.
+ * @param rect The detected area.
  */
-void AnalysisOverlay::add_area(int frame_nr, cv::Point start, cv::Point end) {
-    std::pair <cv::Point, cv::Point> pair(start, end);
-    detections[frame_nr].push_back(pair);
+void AnalysisOverlay::add_area(int frame_nr, cv::Rect rect) {
+    detections[frame_nr].push_back(rect);
 }
 
 /**
