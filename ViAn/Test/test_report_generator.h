@@ -6,8 +6,7 @@
 #include <QTest>
 #include <QObject>
 
-class test_report_generator : public QObject
-{
+class test_report_generator : public QObject {
     Q_OBJECT
 public:
     explicit test_report_generator(QObject *parent = 0);

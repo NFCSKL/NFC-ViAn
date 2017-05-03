@@ -9,8 +9,8 @@
 #include  "dirent.h"
 #include <ctime>
 
-class ReportGenerator
-{
+class ReportGenerator {
+
 public:
     friend class test_report_generator;
     explicit ReportGenerator(Project* proj, FileHandler* file_handler);

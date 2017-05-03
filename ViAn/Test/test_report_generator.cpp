@@ -5,7 +5,7 @@
  * @param parent
  */
 test_report_generator::test_report_generator(QObject *parent) : QObject(parent) {
-    this->file_handler = new FileHandler();
+    file_handler = new FileHandler();
 }
 
 /**
@@ -14,8 +14,9 @@ test_report_generator::test_report_generator(QObject *parent) : QObject(parent) 
  */
 void test_report_generator::test_init()
 {
-    this->proj1 = file_handler->create_project("TEST_PROJ1");
-    this->proj2 = file_handler->create_project("TEST_PROJ2");
+    std::string dir_path = file_handler->get_work_space().absolutePath().toStdString();
+    this->proj1 = file_handler->create_project("TEST_PROJ1", dir_path, dir_path);
+    this->proj2 = file_handler->create_project("TEST_PROJ2", dir_path, dir_path);
 
     std::string video1_path = "C:/Users/georg/Desktop/Pumparna.avi";
     std::string video2_path = "C:/Users/georg/Desktop/England4k.mov";

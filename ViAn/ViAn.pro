@@ -16,8 +16,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    Test/test_report_generator.cpp
+SOURCES += main.cpp
+
 
 
 #
@@ -25,11 +25,11 @@ SOURCES += main.cpp \
 #
 SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp\
+    Test/test_report_generator.cpp \
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    GUI/reportgenerator.h \
     Test/test_report_generator.h
 
 #
@@ -56,6 +56,7 @@ HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/action.h \
     GUI/qtreeitems.h \
+    GUI/reportgenerator.h \
     GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/makeproject.h \

@@ -1022,8 +1022,7 @@ void MainWindow::on_action_invert_analysis_area_triggered() {
  * Invoked when the Create report button is clicked.
  * This will create a new document in Word.
  */
-void MainWindow::on_action_create_report_triggered()
-{
+void MainWindow::on_action_create_report_triggered() {
     QTreeWidgetItem *item;
     MyQTreeWidgetItem *my_project;
     if(ui->project_tree->selectedItems().size() == 1) {
