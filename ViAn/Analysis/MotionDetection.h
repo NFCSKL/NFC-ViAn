@@ -2,7 +2,7 @@
 #define MOTIONDETECTION_H
 
 #include "AnalysisMethod.h"
-#include "analysiscontroller.h"
+#include "AnalysisController.h"
 #include <string>
 
 /**

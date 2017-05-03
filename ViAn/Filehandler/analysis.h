@@ -24,6 +24,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     cv::Rect get_rect();
+    void scale_coordinates(float scale_ratio);
 };
 
 class POI : Saveable{

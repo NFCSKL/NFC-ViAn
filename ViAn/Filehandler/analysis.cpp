@@ -141,6 +141,18 @@ cv::Rect OOI::get_rect() {
 }
 
 /**
+ * @brief OOI::scale_coordinates
+ * Scales the coordinates in the OOI according to the scale ratio parameter.
+ * @param scale_ratio
+ */
+void OOI::scale_coordinates(float scale_ratio) {
+    this->upper_left.first *= scale_ratio;
+    this->upper_left.second *= scale_ratio;
+    this->lower_right.first *= scale_ratio;
+    this->lower_right.second *= scale_ratio;
+}
+
+/**
  * @brief Analysis::Analysis
  */
 Analysis::Analysis() {

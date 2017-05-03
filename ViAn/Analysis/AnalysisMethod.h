@@ -22,8 +22,8 @@ public:
     bool sample_current_frame();
     bool load_video();
 
-    int get_progress();
     Analysis run_analysis();
+    int get_progress();
 
 private:
     int prev_detection_frame = -1;
@@ -32,17 +32,27 @@ private:
     bool aborted = false;
 
 protected:
+    const int FULL_HD_WIDTH = 1920;
+    const int FULL_HD_HEIGHT = 1080;
+
     int num_frames = -1;
     unsigned int sample_freq = 5;
     unsigned int current_frame = 0; // The current frame number
+    int scaled_width = -1;
+    int scaled_height = -1;
+    float scaling_ratio = 1.0;
 
     cv::VideoCapture capture;       // Video source
     cv::Mat frame, exclude_frame;   // The frame fetched last
     Analysis m_analysis;
 
     bool do_exclusion = false;
+    bool scaling_needed = false;
     bool m_exclude_polygon;
     std::vector<cv::Point> include_exclude_poly;
+
+    void calculate_scaling_factor();
+    void scale_frame();
 
 signals:
     void send_progress(int progress);
