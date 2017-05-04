@@ -181,11 +181,9 @@ void MainWindow::on_increase_speed_button_clicked(){
  */
 void MainWindow::on_stop_button_clicked() {
     set_status_bar("Stopped");
-    if (!mvideo_player->is_paused()) {
+    if (mvideo_player->is_playing()) {
         icon_on_button_handler->set_icon("play", ui->play_pause_button);
-    } else if (mvideo_player->is_stopped()){
-        return;
-    } else {
+    } else if (mvideo_player->is_paused()){
         paused_wait.wakeOne();
     }
     emit set_stop_video();
@@ -293,7 +291,7 @@ void MainWindow::on_slider_moving(){
     );
     std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
     if (time_since_last_slider_frame_update.count() >= SLIDER_UPDATE_TIMER) {
-        QPoint local_mouse_pos = ui->video_slider->mapFromGlobal(QCursor::pos());
+        QPoint local_mouse_pos = video_slider->mapFromGlobal(QCursor::pos());
         emit set_playback_frame(slider_pos_under_mouse(local_mouse_pos));
         slider_timer = current_time;
     }
@@ -309,7 +307,7 @@ void MainWindow::on_slider_moving(){
 void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
     int slider_pos = slider_pos_under_mouse(local_mouse_pos);
     if (slider_pos != new_pos) {
-        ui->video_slider->setValue(slider_pos);
+        video_slider->setValue(slider_pos);
         emit set_playback_frame(slider_pos, true);
     }
 }
@@ -322,9 +320,9 @@ void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
  * @return The current position of the mouse pointer on the slider
  */
 int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
-    float pos_ratio = local_mouse_pos.x() / (float )ui->video_slider->size().width();
-    int slider_range = ui->video_slider->maximum() - ui->video_slider->minimum();
-    return ui->video_slider->minimum() + slider_range * pos_ratio;
+    float pos_ratio = local_mouse_pos.x() / (float )video_slider->size().width();
+    int slider_range = video_slider->maximum() - video_slider->minimum();
+    return video_slider->minimum() + slider_range * pos_ratio;
 }
 
 /**
@@ -335,15 +333,13 @@ int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
  */
 
 void MainWindow::on_video_slider_valueChanged(int new_pos) {
-    slider_blocked = true;
     Qt::MouseButtons btns = QApplication::mouseButtons();
-    QPoint local_mouse_pos = ui->video_slider->mapFromGlobal(QCursor::pos());
+    QPoint local_mouse_pos = video_slider->mapFromGlobal(QCursor::pos());
     bool click_on_slider = (btns & Qt::LeftButton) &&
                          (local_mouse_pos.x() >= 0 && local_mouse_pos.y() >= 0 &&
-                          local_mouse_pos.x() < ui->video_slider->size().width() &&
-                          local_mouse_pos.y() < ui->video_slider->size().height());
+                          local_mouse_pos.x() < video_slider->size().width() &&
+                          local_mouse_pos.y() < video_slider->size().height());
     if (click_on_slider) on_slider_click(new_pos, local_mouse_pos);
-    slider_blocked = false;
 }
 
 /**
@@ -897,7 +893,7 @@ QTreeWidgetItem *MainWindow::get_project_from_object(QTreeWidgetItem* item) {
  */
 void MainWindow::on_video_slider_sliderPressed() {
     slider_blocked = true;
-    if (!mvideo_player->is_paused()) {
+    if (mvideo_player->is_playing()) {
         slider_paused_video = true;
         emit set_pause_video();
     }
@@ -915,8 +911,7 @@ void MainWindow::on_video_slider_sliderReleased() {
     if (slider_paused_video) {
         paused_wait.wakeOne();
         slider_paused_video = false;
-    } //else if ()
-        //    mvideo_player->start();
+    }
 }
 
 /** @brief MainWindow::on_action_show_hide_analysis_area_triggered
@@ -1096,15 +1091,10 @@ void MainWindow::on_previous_POI_button_clicked() {
  * Jump forward to the next POI.
  */
 void MainWindow::on_next_POI_button_clicked() {
-    /*if (mvideo_player->is_paused()) {
+    if (mvideo_player->is_paused()) {
         set_status_bar("Went forward to the next POI");
         //will be added when functionality is in place
         //emit next_video_POI();
-    } else {
-        set_status_bar("Needs to be paused");
-    }*/
-    if (mvideo_player->is_stopped()) {
-        set_status_bar("Video is stopped");
     } else {
         set_status_bar("Needs to be paused");
     }

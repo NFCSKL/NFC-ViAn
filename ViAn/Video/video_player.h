@@ -25,6 +25,7 @@ public:
     bool load_video(string filename);
     bool is_paused();
     bool is_stopped();
+    bool is_playing();
     bool is_showing_overlay();
     bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
