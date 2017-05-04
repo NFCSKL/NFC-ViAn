@@ -6,7 +6,7 @@
 #include <ActiveQt/QAxWidget>
 #include <QString>
 #include "Filehandler/filehandler.h"
-#include  "dirent.h"
+#include "dirent.h"
 #include <ctime>
 
 class ReportGenerator {

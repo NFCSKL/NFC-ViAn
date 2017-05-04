@@ -52,7 +52,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // The video player is not in original size.
     original_size = false;
-
 }
 
 
@@ -64,7 +63,6 @@ MainWindow::~MainWindow() {
 
     delete icon_on_button_handler;
     delete file_handler;
-
 
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
@@ -1018,7 +1016,7 @@ void MainWindow::on_action_invert_analysis_area_triggered() {
 }
 
 /**
- * @brief MainWindow::on_actionCreate_report_triggered
+ * @brief MainWindow::on_action_create_report_triggered
  * Invoked when the Create report button is clicked.
  * This will create a new document in Word.
  */
@@ -1033,11 +1031,11 @@ void MainWindow::on_action_create_report_triggered() {
         if(proj->is_saved()){
             ReportGenerator report_generator = ReportGenerator(proj, file_handler);
             report_generator.create_report();
-        }else{
+        } else {
           QMessageBox::question(this, "Project Modified", tr("Please save project before you can export a report.\n"),
                                 QMessageBox::Ok | QMessageBox::Ok);
         }
-    }else {
+    } else {
         set_status_bar("Select a project to create a report for");
     }
 }
@@ -1099,4 +1097,3 @@ void MainWindow::on_next_POI_button_clicked() {
         set_status_bar("Needs to be paused");
     }
 }
-

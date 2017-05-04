@@ -6,7 +6,7 @@
 
 QT       += core gui
 QT       += testlib
-QT += axcontainer
+QT       += axcontainer
 
 CONFIG += c++11
 
