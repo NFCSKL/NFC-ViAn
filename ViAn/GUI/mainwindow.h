@@ -178,6 +178,9 @@ private:
 
     void add_video_to_tree(VideoProject *video);
 
+
+    void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
+    void remove_bookmark_of_video(QTreeVideoItem* video_item);
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
     void toggle_toolbar();

@@ -50,7 +50,7 @@ void Project::remove_video_project(ID id){
     VideoProject* temp = this->videos.at(id);
     delete temp;
     videos.erase(id);
-    this->changes_made =true;
+    this->changes_made = true;
 }
 
 /**
@@ -60,7 +60,7 @@ void Project::remove_video_project(ID id){
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
     this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
-    this->changes_made =true;
+    this->changes_made = true;
     return this->v_id++;
 }
 

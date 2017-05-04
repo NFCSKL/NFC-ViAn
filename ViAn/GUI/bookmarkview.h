@@ -7,7 +7,7 @@
 class BookmarkView {
 public:
     BookmarkView(QListWidget* parent);    
-    int add_bookmark(ID video_id, ID bookmark_id, Bookmark *bookmark);
+    void add_bookmark(ID video_id, ID bookmark_id, Bookmark *bookmark);
     void remove_bookmark(ID video_id, ID bookmark_id);
     int get_num_bookmarks();
     QString get_input_text(bool* ok);

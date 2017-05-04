@@ -2,7 +2,7 @@
 /**
  * @brief MyQTreeWidgetItem::MyQTreeWidgetItem
  * @param type of the widget
- * @param string, the name of the widget
+ * @param name of the widget
  * @param id
  */
 MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString name, ID id) {
@@ -14,8 +14,8 @@ MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString name, ID id) {
 
 /**
  * @brief QTreeVideoItem::QTreeVideoItem
- * @param type
- * @param string
+ * @param type of the widget
+ * @param name of the widget
  * @param id
  */
 QTreeVideoItem::QTreeVideoItem(TYPE type, QString name, ID id) : MyQTreeWidgetItem(type,name,id){
@@ -64,6 +64,3 @@ std::string MyQTreeWidgetItem::get_name() {
     std::string text (txet.rbegin(), txet.rend());
     return text;
 }
-
-
-

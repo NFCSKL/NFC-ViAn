@@ -13,7 +13,7 @@ enum TYPE {PROJECT, VIDEO};
 
 class MyQTreeWidgetItem: public QTreeWidgetItem {
 public:
-    MyQTreeWidgetItem(TYPE type, QString name = "", ID id = 0);
+    MyQTreeWidgetItem(TYPE type, QString name = "", ID id = -1);
     ~MyQTreeWidgetItem();
     ID id;
     TYPE type;

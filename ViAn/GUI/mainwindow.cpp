@@ -775,17 +775,10 @@ void MainWindow::on_action_delete_triggered() {
             if (my_item->type == TYPE::VIDEO) {
                 my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
                 QTreeVideoItem* video_item = (QTreeVideoItem*)my_item;
-                for(auto it = video_item->bookmarks.begin(); it != video_item->bookmarks.end(); it++){
-                    bookmark_view->remove_bookmark(video_item->id, *it);
-                }
-                this->file_handler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
+                remove_bookmark_of_video(video_item);
+            this->file_handler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
             } else if (my_item->type == TYPE::PROJECT) {
-                for(int i = 0; i < my_item->childCount(); i++) {
-                    QTreeVideoItem* v = (QTreeVideoItem*)my_item->child(i);
-                    for(auto it = v->bookmarks.begin(); it != v->bookmarks.end(); it++){
-                        bookmark_view->remove_bookmark(v->id, *it);
-                    }
-                }
+                remove_bookmarks_of_project(my_item);
                 this->file_handler->delete_project(my_item->id);
             }
             remove_item_from_tree(my_item);
@@ -793,6 +786,29 @@ void MainWindow::on_action_delete_triggered() {
         }
     } else {
         set_status_bar("Multiple or no videos selected.");
+    }
+}
+
+/**
+ * @brief MainWindow::remove_bookmarks_of_project
+ * removes the bookmarks in the bookmark_view
+ * @param project_item to remove bookmarks from
+ */
+void MainWindow::remove_bookmarks_of_project(MyQTreeWidgetItem* project_item) {
+    for(int i = 0; i < project_item->childCount(); i++) {
+        QTreeVideoItem* video_item = (QTreeVideoItem*)project_item->child(i);
+        remove_bookmark_of_video(video_item);
+    }
+}
+
+/**
+ * @brief MainWindow::remove_bookmark_of_video
+ * removes the bookmarks in the bookmark_view
+ * @param video_item to remove bookmarks from
+ */
+void MainWindow::remove_bookmark_of_video(QTreeVideoItem* video_item) {
+    for(auto it = video_item->bookmarks.begin(); it != video_item->bookmarks.end(); it++){
+        bookmark_view->remove_bookmark(video_item->id, *it);
     }
 }
 
@@ -1028,6 +1044,7 @@ void MainWindow::on_action_close_project_triggered() {
         my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
         set_status_bar("Closed " + my_project->name.toStdString());
         file_handler->close_project(my_project->id);
+        remove_bookmarks_of_project(my_project);
         remove_item_from_tree(my_project);
     } else {
         set_status_bar("Multiple or nothing selected.");
