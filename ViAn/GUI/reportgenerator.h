@@ -27,9 +27,9 @@ private:
 
     void create_list_of_names();
     void add_bookmarks(QAxObject* selection);
-    QString save_report(QAxObject* activeDocument);
+    QString save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
-    void resize_picture(QString pic_path, QAxObject* inlineShape);
+    void resize_picture(QString pic_path, QAxObject* inline_shape);
     std::string date_time_generator();
     void add_paragraph(QAxObject* selection);
 };
