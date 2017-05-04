@@ -7,12 +7,16 @@ class AnalysisOverlay {
 public:
     AnalysisOverlay();
     cv::Mat draw_overlay(cv::Mat &frame, int frame_nr);
-    void add_area(int frame_nr, cv::Point start, cv::Point end);
+    void add_area(int frame_nr, cv::Rect rect);
     bool is_showing_overlay();
     void toggle_showing();
 private:
-    // Map of vectors with start and end coordinates (as a pair of points)
-    std::map<int, std::vector< std::pair<cv::Point, cv::Point> > > detections;
+    // Colour and thickness for the graphical representation of the detected areas.
+    const cv::Scalar COLOUR = cv::Scalar(255, 0, 0);
+    const int THICKNESS = 5;
+
+    // The detected areas mapped to the frame they're on.
+    std::map<int, std::vector<cv::Rect>> detections;
 
     bool showing_overlay = true;
 };

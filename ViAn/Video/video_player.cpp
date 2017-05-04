@@ -287,6 +287,14 @@ bool video_player::is_showing_analysis_tool() {
 }
 
 /**
+ * @brief video_player::get_frame_rate
+ * @return the frame rate
+ */
+double video_player::get_frame_rate() {
+    return frame_rate;
+}
+
+/**
  * @brief video_player::get_num_frames
  * @return number of frames in video file
  */
