@@ -222,41 +222,39 @@ void MainWindow::on_previous_frame_button_clicked() {
 /**
  * @brief MainWindow::update_video
  * Sets the video_frame pixmap to the current frame from video
+ * and updates labels showing current and total time of video
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
-    set_total_time();
-    set_current_time();
-}
-
-/**
- * @brief MainWindow::set_total_time
- * Sets the total video time in the total_time_label
- */
-void MainWindow::set_total_time() {
-    qint64 duration = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
-    QTime total((duration/3600)%60, (duration/60)%60, duration%60);
-    QString format = "mm:ss";
-    if (duration > 3600)
-        format = "hh:mm:ss";
-    QString total_time_string = total.toString(format);
-    ui->total_time_label->setText(total_time_string);
-}
-
-/**
- * @brief MainWindow::set_current_time
- * Sets the current video time in the current_time_label
- */
-void MainWindow::set_current_time() {
-    qint64 duration = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
     qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
-    QTime current((current_time/3600)%60, (current_time/60)%60, current_time%60);
+    set_time_to_label(ui->current_time_label, current_time);
+}
+
+/**
+ * @brief MainWindow::set_slider_labels
+ * Sets the slider labels showing current and total time
+ */
+void MainWindow::set_slider_labels() {
+    qint64 total_time = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
+    qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
+    set_time_to_label(ui->current_time_label, current_time);
+    set_time_to_label(ui->total_time_label, total_time);
+}
+
+/**
+ * @brief MainWindow::set_time_to_label
+ * Takes an variable of seconds and prints it to the label
+ * in a readable format
+ * @param label the label to be updated
+ * @param time time in seconds, will be printed in the label
+ */
+void MainWindow::set_time_to_label(QLabel *label, qint64 time) {
+    QTime q_time((time/3600)%60, (time/60)%60, time%60);
     QString format = "mm:ss";
-    if (duration > 3600)
+    if (time > 3600)
         format = "hh:mm:ss";
-    QString current_time_string = current.toString(format);
-    ui->current_time_label->setText(current_time_string);
+    label->setText(q_time.toString(format));
 }
 
 /**
@@ -704,6 +702,7 @@ void MainWindow::play_video() {
     enable_video_buttons();
     icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
+    set_slider_labels();
 }
 
 /**
