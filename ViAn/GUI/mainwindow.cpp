@@ -157,12 +157,13 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
  * @param progress current analysis progress in percent
  */
 void MainWindow::show_analysis_progress(int progress){
-    std::cout << progress << std::endl;
-    QString text = "(";
-    text.append(progress);
-    text.append("%) ");
-    text.append(current_analysis->name);
-    current_analysis->setText(0, text);
+    if(!(current_analysis == nullptr)) {
+        QString text = "(";
+        text.append(QString::number(progress));
+        text.append("%) ");
+        text.append(current_analysis->name);
+        current_analysis->setText(0, text);
+    }
 }
 
 /**
@@ -856,6 +857,7 @@ void MainWindow::add_analysis_to_tree(ANALYSIS_TYPE type, QString name, MyQTreeW
             current_analysis = analysis_in_tree;
             m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),type);
             m_acontroller->start();
+            setup_analysis(m_acontroller);
         } else {
             int id = analysis_queue->size() + 2;
             id = -id;
@@ -914,7 +916,7 @@ void MainWindow::on_action_delete_triggered() {
                 //this->fileHandler->delete_file(my_item->id);
                 if(my_item->id < -1) //id < -1 means it is not a finished analysis
                     remove_analysis_from_queue(my_item);
-                else if(my_item->id == -1)//id = -1 means it is the current_analysis
+                else if(my_item == current_analysis)//id = -1 means it is the current_analysis
                     abort_current_analysis();
             }
             remove_item_from_tree(my_item);
@@ -962,21 +964,27 @@ void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
  * @todo emit abort()
  */
 void MainWindow::abort_current_analysis() {
+    emit abort_analysis();
     if(analysis_queue->isEmpty()) current_analysis = nullptr;
     else{
         current_analysis = analysis_queue->dequeue();
         current_analysis->id = -1;
+        ANALYSIS_TYPE type = analysis_queue_type_map[current_analysis];
+        m_acontroller = new AnalysisController(((MyQTreeWidgetItem*)current_analysis->parent())->name.toStdString(),type);
+        m_acontroller->start();
+        setup_analysis(m_acontroller);
+        analysis_queue_type_map.erase(analysis_queue_type_map.find(current_analysis));
     }
     analysis_window->remove_analysis_from_list(0); // remove the first in the list
     QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
 
     while (!analysis_queue->isEmpty()){
-            MyQTreeWidgetItem *i = analysis_queue->dequeue();
-            i->id++; // Moves the items up in the queue.
-            tmp_queue->enqueue(i);
-        }
-        while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
-        delete tmp_queue;
+        MyQTreeWidgetItem *i = analysis_queue->dequeue();
+        i->id++; // Moves the items up in the queue.
+        tmp_queue->enqueue(i);
+    }
+    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
+    delete tmp_queue;
 }
 
 /**

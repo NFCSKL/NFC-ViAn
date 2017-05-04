@@ -20,7 +20,7 @@ void test_mainwindow::test_set_status_bar() {
 void test_mainwindow::test_analysis_queue() {
     MyQTreeWidgetItem *project_in_tree = new MyQTreeWidgetItem(TYPE::PROJECT, "TEST_PROJ", 0);
     mainwindow->ui->project_tree->addTopLevelItem(project_in_tree);
-    MyQTreeWidgetItem *video_in_tree = new MyQTreeWidgetItem(TYPE::VIDEO, "TEST_VIDEO", 1);
+    MyQTreeWidgetItem *video_in_tree = new MyQTreeWidgetItem(TYPE::VIDEO, "seq_01.mp4", 1);
     project_in_tree->addChild(video_in_tree);
     std::string TEST_1 = "TEST_ANALYSIS_1";
     std::string TEST_2 = "TEST_ANALYSIS_2";
