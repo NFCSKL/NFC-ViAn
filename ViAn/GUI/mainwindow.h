@@ -36,7 +36,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    friend class OverlayTester;
+    friend class OverlayIntegrationTest;
 
 public:
     void set_status_bar(string status, int timer = 750);

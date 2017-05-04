@@ -4,12 +4,12 @@
 #include "GUI/mainwindow.h"
 #include "Video/video_player.h"
 
-class OverlayTester {
+class OverlayIntegrationTest {
 public:
-    OverlayTester();
+    OverlayIntegrationTest();
     void exec();
-    void draw_pen();
 private:
+    void draw_pen();
     MainWindow* main = new MainWindow();
     video_player* mvideo;
 };

@@ -2,7 +2,7 @@
 #include "Test/test_video_player.h"
 #include "Test/filehandlertest.h"
 #include "Test/test_mainwindow.h"
-#include "Test/overlaytester.h"
+#include "Test/overlayintegrationtest.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
 /**
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         QTest::qExec(window_test);
     }
     if (integration_testing) {
-        OverlayTester* ot = new OverlayTester();
+        OverlayIntegrationTest* ot = new OverlayIntegrationTest();
         ot->exec();
     }
     return a.exec();
