@@ -263,6 +263,15 @@ bool video_player::is_stopped() {
 }
 
 /**
+ * @brief video_player::is_playing
+ * Returns a boolean value representing whether the currently played video is playing.
+ * @return
+ */
+bool video_player::is_playing(){
+    return !(video_stopped || video_paused);
+}
+
+/**
  * @brief video_player::is_showing_overlay
  * @return Returns true if the overlay tool is showing, else false.
  */
