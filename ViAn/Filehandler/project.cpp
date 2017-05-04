@@ -79,7 +79,7 @@ void Project::add_report(std::string file_path){
 
 /**
  * @brief Project::add_report
- * @param file_path
+ * @param report
  * Required for load, object locally allocated
  */
 void Project::add_report(Report* report){
