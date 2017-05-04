@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    //w.show();
+    w.show();
 
     bool testing = true;
     bool integration_testing = true;
@@ -35,5 +35,5 @@ int main(int argc, char *argv[])
         OverlayTester* ot = new OverlayTester();
         ot->exec();
     }
-    return 0;//a.exec();
+    return a.exec();
 }

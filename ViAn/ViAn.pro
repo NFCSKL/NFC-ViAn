@@ -15,15 +15,15 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    Test/overlaytester.cpp
+SOURCES += main.cpp
 
 #
 # TEST
 #
 SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp
+    Test/test_mainwindow.cpp \
+    Test/overlaytester.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
