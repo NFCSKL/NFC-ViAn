@@ -8,6 +8,7 @@
 #include <QFile>
 #include "bookmark.h"
 #include "video.h"
+#include "report.h"
 enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
 /**
  * @brief The VideoProject class

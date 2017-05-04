@@ -5,11 +5,13 @@
 #include <sstream>
 #include <QCloseEvent>
 #include <QColorDialog>
+#include <QMessageBox>
 #include <QTime>
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
+
 
 using namespace std;
 using namespace cv;
@@ -1065,8 +1067,32 @@ void MainWindow::on_action_invert_analysis_area_triggered() {
 }
 
 /**
- * @brief MainWindow::on_action_close_project_triggered
- * Remove project from the tree without deleting.
+ * @brief MainWindow::on_action_create_report_triggered
+ * Invoked when the Create report button is clicked.
+ * This will create a new document in Word.
+ */
+void MainWindow::on_action_create_report_triggered() {
+    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_project;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        // Get current project.
+        item = ui->project_tree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
+        Project* proj = file_handler->get_project(my_project->id);
+        if(proj->is_saved()){
+            ReportGenerator report_generator = ReportGenerator(proj, file_handler);
+            report_generator.create_report();
+        } else {
+          QMessageBox::question(this, "Project Modified", tr("Please save project before you can export a report.\n"),
+                                QMessageBox::Ok | QMessageBox::Ok);
+        }
+    } else {
+        set_status_bar("Select a project to create a report for");
+    }
+}
+
+/** @brief MainWindow::on_action_close_project_triggered
+ *  Remove project from the tree without deleting.
  */
 void MainWindow::on_action_close_project_triggered() {
     QTreeWidgetItem *item;
