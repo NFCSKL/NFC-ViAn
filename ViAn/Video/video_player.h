@@ -19,6 +19,9 @@ using namespace std;
 
 class video_player : public QThread {
     Q_OBJECT
+
+    friend class OverlayTester;
+
 public:
     video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent = 0);
     ~video_player();

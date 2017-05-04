@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     //w.show();
 
     bool testing = true;
+    bool integration_testing = true;
     if (testing) {
         //For testing video player.
         test_video_player* video_test = new test_video_player();
@@ -29,10 +30,10 @@ int main(int argc, char *argv[])
         //For testing the mainwindow
         test_mainwindow* window_test = new test_mainwindow(&w);
         QTest::qExec(window_test);
-
-        // Integration testing
+    }
+    if (integration_testing) {
         OverlayTester* ot = new OverlayTester();
         ot->exec();
     }
-    return a.exec();
+    return 0;//a.exec();
 }
