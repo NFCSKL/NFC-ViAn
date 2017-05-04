@@ -24,7 +24,7 @@ class FileHandler;
  */
 class Project : public Saveable{
     FileHandler* file_handler;
-    bool saved;
+    bool changes_made;
     std::map<ID,VideoProject*> videos;
     std::vector<Report*> reports;
 public:
@@ -42,9 +42,10 @@ public:
     void add_report(Report* report);
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
+    ID add_bookmark(ID v_id, Bookmark *bookmark);
+
     void add_report(std::string file_path);
 
-    void add_bookmark(ID id, Bookmark *bookmark);
     void delete_artifacts();
     void remove_video_project(ID id);
     // read and write operator for Projects

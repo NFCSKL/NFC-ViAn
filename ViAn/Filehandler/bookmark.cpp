@@ -12,7 +12,6 @@ Bookmark::Bookmark(int frame_nbr, QImage frame, QString dir_path, QString text) 
     this->frame = frame;
     this->dir_path = dir_path;
     this->description = text;
-
     // There's no file path yet, since the frame has not been exported
     this->file_path = QString();
 }
@@ -112,19 +111,18 @@ void Bookmark::create_file_path() {
     path.append("/");
     path.append(QString::number(frame_number));
     path.append(".tiff");
-
-    int counter = 1;
-    while (QFile::exists(path)) {
-        // If file exists, try FRAMENR(X).tiff
-        path = QString(dir_path);
-        path.append("/");
-        path.append(QString::number(frame_number));
-        path.append("(");
-        path.append(QString::number(counter));
-        path.append(").tiff");
-        counter++;
+         
+    int counter = 1;		
+    while (QFile::exists(path)) {		
+        // If file exists, try FRAMENR(X).tiff		
+        path = QString(dir_path);		
+        path.append("/");		
+        path.append(QString::number(frame_number));		
+        path.append("(");		
+        path.append(QString::number(counter));		
+        path.append(").tiff");		
+        counter++;		
     }
-
     // Update file path variable
     file_path = path;
 }

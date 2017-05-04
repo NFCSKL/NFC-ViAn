@@ -167,6 +167,8 @@ private:
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
+    QTreeVideoItem *playing_video;
+
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
@@ -178,8 +180,11 @@ private:
     FileHandler *file_handler;
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
+    void add_video_to_tree(VideoProject *video);
 
-    void add_video_to_tree(string file_path, ID id);
+    void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
+    void remove_bookmark_of_video(QTreeVideoItem* video_item);
+
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
     void set_total_time();
