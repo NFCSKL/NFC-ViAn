@@ -30,7 +30,7 @@ private:
 
 class QTreeVideoItem :public MyQTreeWidgetItem{
 public:
-    explicit QTreeVideoItem(TYPE type, QString name = "", ID id = 0);
+    explicit QTreeVideoItem(TYPE type, QString name = "", ID id = -1);
     std::vector<ID> bookmarks;
     BookmarkView *bookmark_view;
 };
