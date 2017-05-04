@@ -39,6 +39,7 @@ public:
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
+    std::string get_file_name();
 
     void inc_playback_speed();
     void dec_playback_speed();
@@ -133,6 +134,7 @@ private:
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
+    std::string file_path;
 
     bool video_stopped = false;
     bool video_paused = false;

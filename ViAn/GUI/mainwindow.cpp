@@ -387,7 +387,8 @@ void MainWindow::on_bookmark_button_clicked() {
     if(!ok) return;
     int frame_number = mvideo_player->get_current_frame_num();
     QImage frame = mvideo_player->get_current_frame_unscaled();
-    Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(), bookmark_text);
+    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
+    Bookmark* bookmark = new Bookmark(frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
     ID id = proj->add_bookmark(playing_video->id, bookmark);
     bookmark_view->add_bookmark(playing_video->id, id, bookmark);
     playing_video->bookmarks.push_back(id);
