@@ -115,7 +115,7 @@ void FileHandler::write(QJsonObject &json){
     for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
         QJsonObject json_path;
         ID id = *it;
-        Project* proj = get_project(id);
+        Project* proj = get_project(id);        
         QDir dir = get_dir(proj->dir);
         QString path = dir.absoluteFilePath((proj->name + ".json").c_str());
         json_path["path"] = path;

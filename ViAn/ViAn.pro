@@ -117,7 +117,8 @@ SOURCES += Filehandler/filehandler.cpp \
     Filehandler/video.cpp \
     Filehandler/videoproject.cpp \
     Filehandler/bookmark.cpp \
-    Filehandler/saveable.cpp
+    Filehandler/saveable.cpp \
+    Filehandler/analysis.cpp
 
 
 HEADERS  += Filehandler/filehandler.h \
@@ -126,7 +127,8 @@ HEADERS  += Filehandler/filehandler.h \
     Filehandler/video.h \
     Filehandler/videoproject.h \
     Filehandler/bookmark.h  \
-    Filehandler/saveable.h
+    Filehandler/saveable.h \
+    Filehandler/analysis.h
 
 win32{
 
@@ -151,3 +153,14 @@ unix {
 #
 # END: FILEHANDLER
 #
+
+#
+# ANALYSIS
+#
+SOURCES += Analysis/AnalysisMethod.cpp\
+    Analysis/MotionDetection.cpp \
+    Analysis/AnalysisController.cpp
+
+HEADERS +=Analysis/AnalysisMethod.h\
+    Analysis/MotionDetection.h \
+    Analysis/AnalysisController.h

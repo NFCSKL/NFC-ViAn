@@ -10,13 +10,16 @@
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
+#include "Analysis/MotionDetection.h"
+#include "Analysis/AnalysisMethod.h"
+#include "Analysis/analysiscontroller.h"
 
 using namespace std;
 using namespace cv;
 
+
 /**
  * @brief MainWindow::MainWindow
- * Constructor
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) :
@@ -79,6 +82,21 @@ MainWindow::~MainWindow() {
 
     delete analysis_window;
 }
+
+/**
+ * @brief MainWindow::setup_analysis
+ * Creates the necessary connections to the analysis thread.
+ * @param ac AnalysisController for the current analysis
+ */
+void MainWindow::setup_analysis(AnalysisController* ac){
+    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
+                     this, SLOT(save_analysis_to_file(Analysis)));
+    QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
+                     this, SLOT(show_analysis_progress(int)));
+    QObject::connect(this, SIGNAL(abort_analysis()),
+                     ac, SLOT(on_abort()));
+}
+
 /**
  * @brief MainWindow::setup_filehandler
  * Sets up filehandler and loads projects.
@@ -116,11 +134,35 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    QObject::connect(this, SIGNAL(set_analysis_results(Analysis)),
+                     mplayer, SLOT(on_set_analysis_results(Analysis)));
     //Will be added when functionality is in place
     /*QObject::connect(this, SIGNAL(next_video_POI()),
                      mplayer, SLOT(next_POI()));
     QObject::connect(this, SIGNAL(prev_video_POI()),
                      mplayer, SLOT(previous_POI()));*/
+}
+
+/**
+ * @brief MainWindow::save_analysis_to_file
+ * @param analysis
+ * Slot for saving analysis to file.
+ */
+void MainWindow::save_analysis_to_file(Analysis analysis) {
+    //TODO Add code.
+}
+
+/**
+ * @brief MainWindow::on_analysis_update
+ * @param progress current analysis progress in percent
+ */
+void MainWindow::show_analysis_progress(int progress){
+    std::cout << progress << std::endl;
+    QString text = "(";
+    text.append(progress);
+    text.append("%) ");
+    text.append(current_analysis->name);
+    current_analysis->setText(0, text);
 }
 
 /**
@@ -668,8 +710,8 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
     load_project->setStatusTip(tr("Load project"));
     menu.addAction(create_project);
     menu.addAction(load_project);
-    connect(create_project, SIGNAL(triggered()), this, SLOT(on_actionAddProject_triggered()));
-    connect(load_project, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
+    connect(create_project, SIGNAL(triggered()), this, SLOT(on_action_add_project_triggered()));
+    connect(load_project, SIGNAL(triggered()), this, SLOT(on_action_load_triggered()));
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
@@ -802,7 +844,7 @@ void MainWindow::add_video_to_tree(std::string file_path, ID id) {
  * @param video_in_tree
  * @todo param analysis from filehandler = nullptr
  */
-void MainWindow::add_analysis_to_tree(QString type, MyQTreeWidgetItem *video_in_tree) {
+void MainWindow::add_analysis_to_tree(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree) {
     MyQTreeWidgetItem *analysis_in_tree;
     /*if(analysis == nullptr) {
         type = analysis.get_name();
@@ -810,22 +852,25 @@ void MainWindow::add_analysis_to_tree(QString type, MyQTreeWidgetItem *video_in_
     } else {*/
 
         if(current_analysis == nullptr) {
-            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, -1);//id == -1 => current_analysis
+            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name, -1);//id == -1 => current_analysis
             current_analysis = analysis_in_tree;
+            m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),type);
+            m_acontroller->start();
         } else {
             int id = analysis_queue->size() + 2;
             id = -id;
-            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, id);//id < -1 => analysis in queue
+            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name, id);//id < -1 => analysis in queue
             analysis_queue->enqueue(analysis_in_tree);
+            analysis_queue_type_map[analysis_in_tree] = type;
         }
     //}
-    QQueue<MyQTreeWidgetItem*> *q = new QQueue<MyQTreeWidgetItem*>();
+    /*QQueue<MyQTreeWidgetItem*> *q = new QQueue<MyQTreeWidgetItem*>();
     while (!analysis_queue->isEmpty()){
         MyQTreeWidgetItem *i = analysis_queue->dequeue();
         q->enqueue(i);
     }
-    while(!q->isEmpty()) analysis_queue->enqueue(q->dequeue());
-    analysis_in_tree->set_text(type.toStdString());
+    while(!q->isEmpty()) analysis_queue->enqueue(q->dequeue());*/
+    analysis_in_tree->set_text(name.toStdString());
     video_in_tree->addChild(analysis_in_tree);
     video_in_tree->setExpanded(true);
 }

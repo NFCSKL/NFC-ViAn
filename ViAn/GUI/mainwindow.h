@@ -25,6 +25,7 @@
 #include "makeproject.h"
 #include "analysiswindow.h"
 #include <QQueue>
+#include "Analysis/analysiscontroller.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;
@@ -41,7 +42,7 @@ class MainWindow : public QMainWindow
 public:
     void set_status_bar(string status, int timer = 750);
     void add_project_to_tree(Project* proj);
-    void add_analysis_to_tree(QString type, MyQTreeWidgetItem *video_in_tree);
+    void add_analysis_to_tree(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString q_input);
@@ -62,6 +63,8 @@ signals:
     void next_video_frame();
     void prev_video_frame();
     void set_playback_frame(int frame, bool show_frame = false);
+    void abort_analysis();
+    void set_analysis_results(Analysis analysis);
 
 private slots:
 
@@ -159,6 +162,10 @@ private slots:
 
     void on_action_show_hide_analysis_overlay_triggered();
 
+    void save_analysis_to_file(Analysis analysis);
+
+    void show_analysis_progress(int progress);
+
     void on_previous_POI_button_clicked();
 
     void on_next_POI_button_clicked();
@@ -167,6 +174,7 @@ private:
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
+    AnalysisController* m_acontroller;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
@@ -185,6 +193,7 @@ private:
     FileHandler *file_handler;
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
+    void setup_analysis(AnalysisController *ac);
 
     void add_video_to_tree(string file_path, ID id);
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
@@ -206,6 +215,7 @@ private:
 
     MyQTreeWidgetItem *current_analysis;
     QQueue<MyQTreeWidgetItem*> *analysis_queue;
+    std::map<MyQTreeWidgetItem*, ANALYSIS_TYPE> analysis_queue_type_map;
     void remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
     void abort_current_analysis();
 };

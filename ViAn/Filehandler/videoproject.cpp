@@ -68,6 +68,14 @@ void VideoProject::write(QJsonObject& json){
         json_bookmarks.append(json_bookmark);
     }
     json["bookmarks"] = json_bookmarks;
+    QJsonArray json_analyses;
+    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+        QJsonObject json_analysis;
+        Analysis an = it2->second;
+        an.write(json_analysis);
+        json_analyses.append(json_analysis);
+    }
+
 }
 
 /**
@@ -77,6 +85,11 @@ void VideoProject::write(QJsonObject& json){
  */
 void VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.push_back(bookmark);
+}
+
+ID VideoProject::add_analysis(Analysis analysis){
+    this->analyses.insert(std::make_pair(this->vid_id, analysis));
+    return this->vid_id++;
 }
 
 /**

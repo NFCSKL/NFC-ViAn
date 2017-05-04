@@ -14,6 +14,7 @@
 #include "videoproject.h"
 #include "video.h"
 #include "saveable.h"
+#include "analysis.h"
 typedef int ID;
 class FileHandler;
 
@@ -47,12 +48,13 @@ public:
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
+    void add_analysis(Analysis an);
     bool is_saved();
     void save_project();
     std::map<ID, VideoProject *>& get_videos();
     bool proj_equals(Project& other);
 // TODO
-//    void add_analysis();
+
 //    void add_drawing();      
 };
 

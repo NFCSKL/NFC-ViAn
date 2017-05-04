@@ -9,11 +9,9 @@ AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler
     ui->setupUi(this);
     this->mainwindow = mainwindow;
     this->file_handler = file_handler;
-    ui->analysis_choise_list->addItem("Movement");
-    ui->analysis_choise_list->addItem("Face detection");
-    /*for(auto analys = video->analysis.begin(); analys != video->analysis.end(); ++analys) {
-        ui->analysi_list->addItem(analys.second());
-    }*/
+    for(auto it = ANALYSIS_NAMES.begin(); it!=ANALYSIS_NAMES.end(); it++) {
+        ui->analysis_choise_list->addItem(QString::fromStdString(*it));
+    }
 }
 
 /**
@@ -30,7 +28,7 @@ AnalysisWindow::~AnalysisWindow() {
  */
 void AnalysisWindow::on_add_button_clicked() {
     if(!ui->name_input->text().isEmpty()) {
-        mainwindow->add_analysis_to_tree(ui->name_input->text(), current_video);
+        mainwindow->add_analysis_to_tree(ANALYSIS_TYPE::MOTION_DETECTION, ui->name_input->text(), current_video);
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");
