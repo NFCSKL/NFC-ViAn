@@ -2,6 +2,7 @@
 #include "Test/test_video_player.h"
 #include "Test/filehandlertest.h"
 #include "Test/test_mainwindow.h"
+#include "Test/overlaytester.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
 /**
@@ -15,7 +16,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    w.show();
+    //w.show();
 
     bool testing = true;
     if (testing) {
@@ -28,6 +29,10 @@ int main(int argc, char *argv[])
         //For testing the mainwindow
         test_mainwindow* window_test = new test_mainwindow(&w);
         QTest::qExec(window_test);
+
+        // Integration testing
+        OverlayTester* ot = new OverlayTester();
+        ot->exec();
     }
     return a.exec();
 }
