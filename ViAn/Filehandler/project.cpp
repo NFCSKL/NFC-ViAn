@@ -73,7 +73,7 @@ ID Project::add_video(Video* vid){
  */
 void Project::add_report(std::string file_path){
     this->reports.push_back(new Report(file_path));
-    this->saved = false;
+    this->changes_made = true;
 }
 
 /**
