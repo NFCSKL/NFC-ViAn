@@ -11,7 +11,6 @@ public:
 private:
     void draw_pen();
     MainWindow* main = new MainWindow();
-    video_player* mvideo;
 };
 
 #endif // OVERLAYTESTER_H

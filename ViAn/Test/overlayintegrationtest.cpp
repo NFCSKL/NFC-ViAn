@@ -4,10 +4,6 @@
  * @brief OverlayTester::OverlayTester
  */
 OverlayIntegrationTest::OverlayIntegrationTest() {
-    QMutex mutex;
-    QWaitCondition wait;
-    QLabel label;
-    mvideo = new video_player(&mutex, &wait, &label, NULL);
 }
 
 /**
