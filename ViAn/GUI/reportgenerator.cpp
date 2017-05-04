@@ -68,8 +68,9 @@ void ReportGenerator::create_list_of_names() {
 
     // get all bookmarks for a project by iterating over each videos bookmarks.
     for(std::pair<ID, VideoProject*> video : videos) {
-        std::vector<Bookmark *> bookmark_list = video.second->get_bookmarks();
-        for(Bookmark* video_bookmark : bookmark_list) {
+        std::map<ID, Bookmark *> bookmark_list = video.second->get_bookmarks();
+        for(std::pair<ID,Bookmark*> vid_bm_pair : bookmark_list) {
+            Bookmark* video_bookmark = vid_bm_pair.second;
             std::string bookmark_path = video_bookmark->get_file_path().toStdString();
             std::string bookmark_description = video_bookmark->get_description().toStdString();
             all_bookmarks.push_back(std::make_pair(bookmark_path, bookmark_description));
