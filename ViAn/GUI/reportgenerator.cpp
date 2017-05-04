@@ -33,8 +33,8 @@ void ReportGenerator::create_report() {
         word->setProperty("Visible",false); // second bool to hide application when opened.
 
         //3.GET TO THE CONTENTS
-        QAxObject* active_Document=word->querySubObject("ActiveDocument");
-        QAxObject* active_Window = active_Document->querySubObject( "ActiveWindow" );
+        QAxObject* active_document=word->querySubObject("ActiveDocument");
+        QAxObject* active_Window = active_document->querySubObject( "ActiveWindow" );
         QAxObject* selection = active_Window->querySubObject( "Selection" );
 
         // Save all for project bookmarks in a list.
@@ -46,7 +46,7 @@ void ReportGenerator::create_report() {
             add_bookmarks(selection);
 
             //5. SAVE AND CLOSE FILE
-            QString file_path = save_report(active_Document);
+            QString file_path = save_report(active_document);
             this->proj->add_report(file_path.toStdString());
         }
         close_report(doc, word);
@@ -168,11 +168,11 @@ std::string ReportGenerator::date_time_generator() {
  * @param activeDocument, the document that is selected
  * @return string, file_path to which document was saved.
  */
-QString ReportGenerator::save_report(QAxObject* active_Document) {
+QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
     std::string proj_path = file_handler->get_dir(proj->dir).absolutePath().toStdString();
     std::string path = proj_path.append("/").append(proj->name).append("_").append(dt).append(".docx");
-    active_Document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
+    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
     return QString::fromStdString(path);
 }
 
