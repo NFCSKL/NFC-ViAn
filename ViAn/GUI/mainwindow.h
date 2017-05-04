@@ -18,12 +18,14 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "bookmarkview.h"
+#include "reportgenerator.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
 #define SCROLL_AREA_MARGIN 25
+
 
 using namespace std;
 class inputwindow;
@@ -37,7 +39,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void set_status_bar(string status, int timer = 750);
+    void set_status_bar(string status, int timer = 5000);
     void add_project_to_tree(Project* proj);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -144,6 +146,8 @@ private slots:
 
     void on_action_delete_triggered();
 
+    void on_action_create_report_triggered();
+
     void on_action_original_size_triggered();
 
     void on_action_invert_analysis_area_triggered();
@@ -163,7 +167,6 @@ private:
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
-
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
