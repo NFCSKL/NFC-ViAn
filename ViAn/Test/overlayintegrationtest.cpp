@@ -1,13 +1,14 @@
 #include "overlayintegrationtest.h"
 
 /**
- * @brief OverlayTester::OverlayTester
+ * @brief OverlayIntegrationTest::OverlayIntegrationTest
  */
 OverlayIntegrationTest::OverlayIntegrationTest() {
 }
 
 /**
- * @brief OverlayTester::exec
+ * @brief OverlayIntegrationTest::exec
+ * Runs the test.
  */
 void OverlayIntegrationTest::exec() {
 
@@ -61,7 +62,7 @@ void OverlayIntegrationTest::exec() {
 }
 
 /**
- * @brief OverlayTester::draw_pen
+ * @brief OverlayIntegrationTest::draw_pen
  * Simulates mouse events for dragging the mouse around.
  */
 void OverlayIntegrationTest::draw_pen() {
