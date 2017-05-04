@@ -111,8 +111,7 @@ void Bookmark::create_file_path() {
     path.append("/");
     path.append(QString::number(frame_number));
     path.append(".tiff");
-     
-    
+         
     int counter = 1;		
     while (QFile::exists(path)) {		
         // If file exists, try FRAMENR(X).tiff		
