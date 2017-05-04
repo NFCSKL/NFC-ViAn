@@ -183,8 +183,10 @@ void MainWindow::on_stop_button_clicked() {
     set_status_bar("Stopped");
     if (mvideo_player->is_playing()) {
         icon_on_button_handler->set_icon("play", ui->play_pause_button);
-    } else if (mvideo_player->is_paused()){
+    } else if (mvideo_player->is_paused()) {
         paused_wait.wakeOne();
+    } else if (mvideo_player->is_stopped()) {
+        return;
     }
     emit set_stop_video();
 }
