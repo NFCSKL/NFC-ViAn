@@ -19,6 +19,7 @@ public:
     explicit AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent = 0);
     void set_current_video(MyQTreeWidgetItem *current_video);
     void remove_analysis_from_list(ID id);
+    void set_progress_bar(int progress);
     ~AnalysisWindow();
 
 private slots:

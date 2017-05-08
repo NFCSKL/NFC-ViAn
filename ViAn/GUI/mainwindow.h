@@ -214,10 +214,12 @@ private:
     void deselect_overlay_tool();
 
     MyQTreeWidgetItem *current_analysis;
+    int current_analysis_progress;
     QQueue<MyQTreeWidgetItem*> *analysis_queue;
     std::map<MyQTreeWidgetItem*, ANALYSIS_TYPE> analysis_queue_type_map;
     void remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
     void abort_current_analysis();
+    void start_next_analysis();
 };
 
 #endif // MAINWINDOW_H

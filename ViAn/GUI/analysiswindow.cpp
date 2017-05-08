@@ -28,7 +28,8 @@ AnalysisWindow::~AnalysisWindow() {
  */
 void AnalysisWindow::on_add_button_clicked() {
     if(!ui->name_input->text().isEmpty()) {
-        mainwindow->add_analysis_to_tree(ANALYSIS_TYPE::MOTION_DETECTION, ui->name_input->text(), current_video);
+        ANALYSIS_TYPE type = ANALYSIS_NAMES_TYPE_MAP.at(ui->analysis_choise_list->currentText().toStdString());
+        mainwindow->add_analysis_to_tree(type, ui->name_input->text(), current_video);
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");
@@ -52,4 +53,8 @@ void AnalysisWindow::set_current_video(MyQTreeWidgetItem *current_video) {
 
 void AnalysisWindow::remove_analysis_from_list(ID id) {
     delete ui->analysis_list->takeItem(id);
+}
+
+void AnalysisWindow::set_progress_bar(int progress) {
+    ui->progress_bar->setValue(progress);
 }
