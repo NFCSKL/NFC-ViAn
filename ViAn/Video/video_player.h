@@ -26,6 +26,7 @@ public:
     bool load_video(string filename);
     bool is_paused();
     bool is_stopped();
+    bool is_playing();
     bool is_showing_overlay();
     bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
@@ -39,6 +40,7 @@ public:
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
+    std::string get_file_name();
 
     void inc_playback_speed();
     void dec_playback_speed();
@@ -134,9 +136,10 @@ private:
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
+    std::string file_path;
 
     bool video_stopped = false;
-    bool video_paused;
+    bool video_paused = false;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
     bool slider_moving = false;

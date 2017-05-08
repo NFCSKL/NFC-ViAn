@@ -9,28 +9,31 @@
 #include "bookmark.h"
 #include "video.h"
 #include "analysis.h"
+#include "report.h"
+
 /**
  * @brief The VideoProject class
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
 class VideoProject{
-    std::vector<Bookmark*> bookmarks;
+    std::map<ID,Bookmark*> bookmarks;
     Video* video = nullptr;
-    ID vid_id;
+    ID id_bookmark = 0;
+    ID id_analysis = 0;
 
 
 public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    void add_bookmark(Bookmark* bookmark);
     ID add_analysis(Analysis analysis);
+    ID add_bookmark(Bookmark* bookmark);
     void delete_artifacts();    
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
-    std::vector<Bookmark*> get_bookmarks();
     std::map<ID,Analysis> analyses;
+    std::map<ID,Bookmark*> get_bookmarks();
 
 };
 

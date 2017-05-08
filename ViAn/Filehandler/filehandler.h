@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QJsonDocument>
+
 // ViAn files
 #include "project.h"
 #include "saveable.h"
@@ -35,7 +36,7 @@ class FileHandler : Saveable{
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
 
 public:
-
+    friend class test_report_generator;
     FileHandler();
     ~FileHandler();
     //  Workspace methods

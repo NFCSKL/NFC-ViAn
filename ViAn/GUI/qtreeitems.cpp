@@ -2,21 +2,30 @@
 /**
  * @brief MyQTreeWidgetItem::MyQTreeWidgetItem
  * @param type of the widget
- * @param string, the name of the widget
+ * @param name of the widget
  * @param id
  */
-MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString string, int id) {
+MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString name, ID id) {
     QTreeWidgetItem();
     this->id = id;
     this->type = type;
-    this->name = string;
+    this->name = name;
+}
+
+/**
+ * @brief QTreeVideoItem::QTreeVideoItem
+ * @param type of the widget
+ * @param name of the widget
+ * @param id
+ */
+QTreeVideoItem::QTreeVideoItem(TYPE type, QString name, ID id) : MyQTreeWidgetItem(type,name,id){
+    this->bookmarks.clear();
 }
 
 /**
  * @brief MyQTreeWidgetItem::~MyQTreeWidgetItem
  */
 MyQTreeWidgetItem::~MyQTreeWidgetItem() {
-
 }
 
 /**
@@ -70,4 +79,3 @@ bool MyQTreeWidgetItem::operator==(MyQTreeWidgetItem* item){
     bool parent = this->parent() == item->parent();
     return name && id && type && parent && ((QTreeWidgetItem*)this == (QTreeWidgetItem*)item);
 }
-

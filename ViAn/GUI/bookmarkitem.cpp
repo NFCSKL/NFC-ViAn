@@ -2,26 +2,20 @@
 
 /**
  * @brief BookmarkItem::BookmarkItem
- * @param frame_nbr Frame number associated with the bookmark.
- * @param frame Frame image associated with the bookmark.
- * @param dir_path Path to the directory for the stored frame.
- * @param string Text description of the bookmark.
+ * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(int frame_nbr, QImage frame, QString dir_path, QString string, QListWidget* view) : QListWidgetItem(string, view) {
-    bookmark = new Bookmark(frame_nbr, frame, dir_path, string);
+BookmarkItem::BookmarkItem(Bookmark* bookmark, QListWidget* view) : QListWidgetItem(bookmark->get_description(), view) {
+    this->bookmark = bookmark;
+    QImage frame = bookmark->get_frame();
     create_thumbnail(frame);
 }
 
 /**
- * @brief BookmarkItem::BookmarkItem
- * @param bookmrk Bookmark containing relevant.
- * @param view Parent widget of the bookmark.
+ * @brief BookmarkItem::~BookmarkItem
+ * Destructor, no memory allocated.
  */
-BookmarkItem::BookmarkItem(Bookmark* bookmrk, QListWidget* view) : QListWidgetItem(bookmrk->get_description(), view) {
-    this->bookmark = bookmrk;
-    QImage frame = bookmrk->get_frame();
-    create_thumbnail(frame);
+BookmarkItem::~BookmarkItem() {
 }
 
 /**

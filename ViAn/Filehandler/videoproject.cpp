@@ -31,7 +31,7 @@ Video* VideoProject::get_video(){
  * @return bookmarks
  * Return all bookmarks.
  */
-std::vector<Bookmark *> VideoProject::get_bookmarks(){
+std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
     return this->bookmarks;
 }
 
@@ -44,10 +44,10 @@ void VideoProject::read(const QJsonObject& json){
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     for(int i = 0; i != json_bookmarks.size(); i++){
-        Bookmark* new_bookmark = new Bookmark();
         QJsonObject json_bookmark = json_bookmarks[i].toObject();
+        Bookmark* new_bookmark = new Bookmark();
         new_bookmark->read(json_bookmark);
-        this->bookmarks.push_back(new_bookmark);
+        add_bookmark(new_bookmark);
     }
 }
 
@@ -63,7 +63,7 @@ void VideoProject::write(QJsonObject& json){
     delete_artifacts();
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         QJsonObject json_bookmark;
-        Bookmark* temp = *it;
+        Bookmark* temp = it->second;
         temp->write(json_bookmark);
         json_bookmarks.append(json_bookmark);
     }
@@ -83,13 +83,19 @@ void VideoProject::write(QJsonObject& json){
  * @param bookmark
  * Add new bookmark.
  */
-void VideoProject::add_bookmark(Bookmark *bookmark){
-    this->bookmarks.push_back(bookmark);
+ID VideoProject::add_bookmark(Bookmark *bookmark){
+    this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
+    return id_bookmark++;
 }
 
+/**
+ * @brief VideoProject::add_analysis
+ * @param analysis to be added
+ * @return id of the analysis
+ */
 ID VideoProject::add_analysis(Analysis analysis){
-    this->analyses.insert(std::make_pair(this->vid_id, analysis));
-    return this->vid_id++;
+    this->analyses.insert(std::make_pair(this->id_analysis, analysis));
+    return this->id_analysis++;
 }
 
 /**
@@ -98,7 +104,7 @@ ID VideoProject::add_analysis(Analysis analysis){
  */
 void VideoProject::delete_artifacts(){
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
-        Bookmark* temp = *it;
+        Bookmark* temp = it->second;
         temp->remove_exported_image();
     }
 }

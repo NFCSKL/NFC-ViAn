@@ -5,16 +5,19 @@
 #include <QObject>
 #include <QWidget>
 #include <string>
+#include <vector>
+#include "bookmarkview.h"
 #define TEXT_LENGTH 15
 
 enum TYPE {PROJECT, VIDEO, ANALYSIS};
 
+typedef int ID;
 
 class MyQTreeWidgetItem: public QTreeWidgetItem {
 public:
-    explicit MyQTreeWidgetItem(TYPE type, QString name = "", int id = 0);
+    MyQTreeWidgetItem(TYPE type, QString name = "", ID id = -1);
     ~MyQTreeWidgetItem();
-    int id;
+    ID id;
     TYPE type;
     QString name;
     void set_text(std::string text);
@@ -26,6 +29,13 @@ private slots:
 private:
 
 
+};
+
+class QTreeVideoItem :public MyQTreeWidgetItem{
+public:
+    explicit QTreeVideoItem(TYPE type, QString name = "", ID id = -1);
+    std::vector<ID> bookmarks;
+    BookmarkView *bookmark_view;
 };
 
 #endif // QTREEITEMS_H
