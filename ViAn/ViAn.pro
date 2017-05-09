@@ -23,13 +23,15 @@ SOURCES += main.cpp
 #
 SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp\
+    Test/test_mainwindow.cpp \
     Test/test_report_generator.cpp \
-    Test/test_mainwindow.cpp
-
+    Test/overlayintegrationtest.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
-    Test/test_report_generator.h
+    Test/test_report_generator.h \
+    Test/overlayintegrationtest.h
+
 #
 # LIBRARY
 #
