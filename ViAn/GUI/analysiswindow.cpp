@@ -2,7 +2,12 @@
 #include "ui_analysiswindow.h"
 #include <iostream>
 
-
+/**
+ * @brief AnalysisWindow::AnalysisWindow
+ * @param mainwindow
+ * @param file_handler
+ * @param parent
+ */
 AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::AnalysisWindow) {
@@ -10,7 +15,7 @@ AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler
     this->mainwindow = mainwindow;
     this->file_handler = file_handler;
     for(auto it = ANALYSIS_NAMES.begin(); it!=ANALYSIS_NAMES.end(); it++) {
-        ui->analysis_choise_list->addItem(QString::fromStdString(*it));
+        ui->analysis_choise_list->addItem(QString::fromStdString(*it)); //ads all the types of analyses to the rolldown list.
     }
 }
 
@@ -29,7 +34,7 @@ AnalysisWindow::~AnalysisWindow() {
 void AnalysisWindow::on_add_button_clicked() {
     if(!ui->name_input->text().isEmpty()) {
         ANALYSIS_TYPE type = ANALYSIS_NAMES_TYPE_MAP.at(ui->analysis_choise_list->currentText().toStdString());
-        mainwindow->add_analysis_to_tree(type, ui->name_input->text(), current_video);
+        mainwindow->add_analysis_to_queue(type, ui->name_input->text(), current_video, ui->use_analysis_area);
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");
@@ -45,16 +50,28 @@ void AnalysisWindow::set_status_bar(std::string status, int timer){
     mainwindow->set_status_bar(status, timer);
 }
 
+/**
+ * @brief AnalysisWindow::set_current_video
+ * @param current_video video to do analysis on
+ */
 void AnalysisWindow::set_current_video(MyQTreeWidgetItem *current_video) {
     this->current_video = current_video;
     std::string text = "Add analysis to video: " + current_video->get_name();
     ui->current_video_lable->setText(QString::fromStdString(text));
 }
 
+/**
+ * @brief AnalysisWindow::remove_analysis_from_list
+ * @param id position in the list
+ */
 void AnalysisWindow::remove_analysis_from_list(ID id) {
     delete ui->analysis_list->takeItem(id);
 }
 
+/**
+ * @brief AnalysisWindow::set_progress_bar
+ * @param progress percentage
+ */
 void AnalysisWindow::set_progress_bar(int progress) {
     ui->progress_bar->setValue(progress);
 }

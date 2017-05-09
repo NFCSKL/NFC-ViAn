@@ -44,7 +44,8 @@ class MainWindow : public QMainWindow
 public:
     void set_status_bar(string status, int timer = 5000);
     void add_project_to_tree(Project* proj);
-    void add_analysis_to_tree(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree);
+    void add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree);
+    void add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString q_input);

@@ -151,7 +151,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    //file_handler->save_analysis(analysis);
+    emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
@@ -850,28 +850,11 @@ void MainWindow::add_video_to_tree(VideoProject* video) {
  * @param video_in_tree
  * @todo param analysis from filehandler = nullptr
  */
-void MainWindow::add_analysis_to_tree(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree) {
-    MyQTreeWidgetItem *analysis_in_tree;
+void MainWindow::add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree) {
     /*if(analysis == nullptr) {
         type = analysis.get_name();
         analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, analysis.get_id());
     } else {*/
-
-        if(current_analysis == nullptr) {
-            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name, -1);//id == -1 => current_analysis
-            current_analysis = analysis_in_tree;
-            m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),type);
-            m_acontroller->start();
-            setup_analysis(m_acontroller);
-            current_analysis_progress = 0;
-            analysis_window->set_progress_bar(0);
-        } else {
-            int id = analysis_queue->size() + 2;
-            id = -id;
-            analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name, id);//id < -1 => analysis in queue
-            analysis_queue->enqueue(analysis_in_tree);
-            analysis_queue_type_map[analysis_in_tree] = type;
-        }
     //}
     /*QQueue<MyQTreeWidgetItem*> *q = new QQueue<MyQTreeWidgetItem*>();
     while (!analysis_queue->isEmpty()){
@@ -882,6 +865,39 @@ void MainWindow::add_analysis_to_tree(ANALYSIS_TYPE type, QString name, MyQTreeW
     analysis_in_tree->set_text(name.toStdString());
     video_in_tree->addChild(analysis_in_tree);
     video_in_tree->setExpanded(true);
+}
+
+/**
+ * @brief MainWindow::add_analysis_to_queue
+ * @param type
+ * @param name
+ * @param video_in_tree
+ */
+void MainWindow::add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area){
+    MyQTreeWidgetItem *analysis_in_tree;
+    analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name, -1);
+    if(current_analysis == nullptr) {
+        if(use_analysis_area)
+        m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),
+                                               type, mvideo_player->get_analysis_area_polygon(),
+                                               ui->action_invert_analysis_area->isChecked());
+        else m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),type);
+        m_acontroller->start();
+        setup_analysis(m_acontroller);
+        current_analysis = analysis_in_tree;
+        current_analysis_progress = 0;
+    } else {
+        analysis_queue->enqueue(analysis_in_tree);
+        AnalysisController analysis_controller;
+        if(use_analysis_area)
+        analysis_controller = new AnalysisController(video_in_tree->name.toStdString(),
+                                               type, mvideo_player->get_analysis_area_polygon(),
+                                               ui->action_invert_analysis_area->isChecked());
+        else analysis_controller = new AnalysisController(video_in_tree->name.toStdString(),type);
+        analysis_queue->append(analysis_in_tree);
+        analysis_queue_type_map[analysis_in_tree] = analysis_controller;
+    }
+    add_analysis_to_tree(analysis_in_tree, video_in_tree);
 }
 
 /**
