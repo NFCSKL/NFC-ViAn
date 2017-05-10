@@ -123,13 +123,11 @@ void AnalysisMethod::calculate_scaling_factor() {
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
     float height_ratio = float(FULL_HD_HEIGHT)/float(video_height);
     float width_ratio = float(FULL_HD_WIDTH)/float(video_width);
-     std::cout << "Original width: " << video_width << ", Original height: " << video_height << std::endl;
     if (height_ratio >= 1 && width_ratio >= 1) return;
 
     scaling_needed = true;
     //This statement ensures that the original aspect ratio of the video is kept when scaling
     if (width_ratio >= height_ratio) {
-        std::cout << "Height bigger" << std::endl;
         scaling_ratio = height_ratio;
         scaled_width = int(video_width * scaling_ratio);
         scaled_height = FULL_HD_HEIGHT;
@@ -138,7 +136,6 @@ void AnalysisMethod::calculate_scaling_factor() {
         scaled_width = FULL_HD_WIDTH;
         scaled_height = int(video_height * scaling_ratio);
     }
-    std::cout << "Width: " << scaled_width << ", Height: " << scaled_height << ", Scaling ratio: " << scaling_ratio << std::endl;
 }
 
 void AnalysisMethod::scale_frame() {

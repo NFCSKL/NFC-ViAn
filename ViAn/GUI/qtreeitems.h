@@ -20,7 +20,7 @@ public:
     ID id;
     TYPE type;
     QString name;
-    void set_text(std::string text);
+    void set_text(QString text);
     void set_text_from_filepath(std::string filepath);
     std::string get_name();
     bool operator==(MyQTreeWidgetItem* item);

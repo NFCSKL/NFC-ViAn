@@ -34,7 +34,7 @@ AnalysisWindow::~AnalysisWindow() {
 void AnalysisWindow::on_add_button_clicked() {
     if(!ui->name_input->text().isEmpty()) {
         ANALYSIS_TYPE type = ANALYSIS_NAMES_TYPE_MAP.at(ui->analysis_choise_list->currentText().toStdString());
-        mainwindow->add_analysis_to_queue(type, ui->name_input->text(), current_video, ui->use_analysis_area);
+        mainwindow->add_analysis_to_queue(type, ui->name_input->text(), current_video, ui->use_analysis_area->isChecked());
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");

@@ -59,7 +59,6 @@ bool video_player::load_video(string filename) {
         start();
         return true;
     } else {
-        cout << "Could not load file \"" << filename << "\"" << endl;
         return false;
     }
 }
@@ -915,15 +914,17 @@ int video_player::get_video_height() {
  * @param analysis results
  */
 void video_player::on_set_analysis_results(Analysis analysis) {
-    std::cout << "Num frames: " << get_num_frames()<<std::endl;
     for (int frame_num = 0; frame_num < get_num_frames(); ++frame_num) {
         for (cv::Rect rect : analysis.get_detections_on_frame(frame_num)) {
             analysis_overlay->add_area(frame_num,rect);
         }
-        std::cout << "Amount of detections: " << analysis.get_detections_on_frame(frame_num).size() << std::endl;
     }
 }
 
+/**
+ * @brief video_player::get_analysis_area_polygon
+ * @return analysis area polygon
+ */
 std::vector<cv::Point>* video_player::get_analysis_area_polygon() {
     return analysis_area->get_polygon();
 }

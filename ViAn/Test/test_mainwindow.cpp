@@ -25,9 +25,9 @@ void test_mainwindow::test_analysis_queue() {
     std::string TEST_1 = "TEST_ANALYSIS_1";
     std::string TEST_2 = "TEST_ANALYSIS_2";
     std::string TEST_3 = "TEST_ANALYSIS_3";
-    mainwindow->add_analysis_to_tree(ANALYSIS_TYPE::MOTION_DETECTION, QString::fromStdString(TEST_1), video_in_tree);
-    mainwindow->add_analysis_to_tree(ANALYSIS_TYPE::MOTION_DETECTION, QString::fromStdString(TEST_2), video_in_tree);
-    mainwindow->add_analysis_to_tree(ANALYSIS_TYPE::MOTION_DETECTION, QString::fromStdString(TEST_3), video_in_tree);
+    mainwindow->add_analysis_to_queue(ANALYSIS_TYPE::MOTION_DETECTION, QString::fromStdString(TEST_1), video_in_tree, false);
+    mainwindow->add_analysis_to_queue(ANALYSIS_TYPE::MOTION_DETECTION, QString::fromStdString(TEST_2), video_in_tree, false);
+    mainwindow->add_analysis_to_queue(ANALYSIS_TYPE::MOTION_DETECTION, QString::fromStdString(TEST_3), video_in_tree, false);
     QCOMPARE(mainwindow->current_analysis->id, -1);
     QCOMPARE(mainwindow->current_analysis->name.toStdString(), TEST_1);
     MyQTreeWidgetItem *TEST_ANALYSIS_2 = mainwindow->analysis_queue->dequeue();

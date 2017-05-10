@@ -32,13 +32,12 @@ MyQTreeWidgetItem::~MyQTreeWidgetItem() {
  * @brief MyQTreeWidgetItem::set_text
  * @param text shown in the tree
  */
-void MyQTreeWidgetItem::set_text(std::string text) {
-    QString qText = QString::fromStdString(text);
-    if (qText.length() >= TEXT_LENGTH) {
-        qText.chop(qText.length()-TEXT_LENGTH-2);
-        qText.append("...");
+void MyQTreeWidgetItem::set_text(QString text) {
+    if (text.length() >= TEXT_LENGTH) {
+        text.chop(text.length()-TEXT_LENGTH-2);
+        text.append("...");
     }
-    setText(0, qText);
+    setText(0, text);
 }
 
 /**
@@ -50,7 +49,7 @@ void MyQTreeWidgetItem::set_text_from_filepath(std::string filepath) {
     std::string reverse (filepath.rbegin(), filepath.rend());
     std::string txet = reverse.substr(0, reverse.find("/")); // txet = text in reverse
     std::string text (txet.rbegin(), txet.rend());
-    set_text(text);
+    set_text(QString::fromStdString(text));
 }
 
 /**

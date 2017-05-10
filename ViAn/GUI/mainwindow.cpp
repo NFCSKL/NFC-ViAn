@@ -151,15 +151,14 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    emit set_analysis_results(analysis);
+    //emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
         current_analysis->setText(0, text);
-
     }
     start_next_analysis();
-    analysis_window->remove_analysis_from_list(0); // remove the first in the list
+    analysis_window->remove_analysis_from_list(0); //remove the first in the list
 }
 
 /**
@@ -418,10 +417,11 @@ void MainWindow::closeEvent (QCloseEvent *event) {
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::No);
 
-    if (res_btn != QMessageBox::Yes) {
-        event->ignore();
-    } else {
+    if (res_btn == QMessageBox::Yes) {
         event->accept();
+        analysis_window->close();
+    } else {
+       event->ignore();
     }
 }
 
@@ -862,7 +862,7 @@ void MainWindow::add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTr
         q->enqueue(i);
     }
     while(!q->isEmpty()) analysis_queue->enqueue(q->dequeue());*/
-    analysis_in_tree->set_text(name.toStdString());
+    analysis_in_tree->set_text(analysis_in_tree->name);
     video_in_tree->addChild(analysis_in_tree);
     video_in_tree->setExpanded(true);
 }
@@ -875,27 +875,26 @@ void MainWindow::add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTr
  */
 void MainWindow::add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area){
     MyQTreeWidgetItem *analysis_in_tree;
-    analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name, -1);
+    analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name);
     if(current_analysis == nullptr) {
         if(use_analysis_area)
         m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),
-                                               type, mvideo_player->get_analysis_area_polygon(),
+                                               type, *mvideo_player->get_analysis_area_polygon(),
                                                ui->action_invert_analysis_area->isChecked());
-        else m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),type);
+        else m_acontroller = new AnalysisController(video_in_tree->name.toStdString(), type);
         m_acontroller->start();
         setup_analysis(m_acontroller);
         current_analysis = analysis_in_tree;
         current_analysis_progress = 0;
     } else {
-        analysis_queue->enqueue(analysis_in_tree);
-        AnalysisController analysis_controller;
+        AnalysisController *analysis_controller;
         if(use_analysis_area)
         analysis_controller = new AnalysisController(video_in_tree->name.toStdString(),
-                                               type, mvideo_player->get_analysis_area_polygon(),
+                                               type, *mvideo_player->get_analysis_area_polygon(),
                                                ui->action_invert_analysis_area->isChecked());
-        else analysis_controller = new AnalysisController(video_in_tree->name.toStdString(),type);
-        analysis_queue->append(analysis_in_tree);
-        analysis_queue_type_map[analysis_in_tree] = analysis_controller;
+        else analysis_controller = new AnalysisController(video_in_tree->name.toStdString(), type);
+        analysis_queue->enqueue(analysis_in_tree);
+        analysis_queue_map[analysis_in_tree] = analysis_controller;
     }
     add_analysis_to_tree(analysis_in_tree, video_in_tree);
 }
@@ -933,16 +932,18 @@ void MainWindow::on_action_delete_triggered() {
             if (my_item->type == TYPE::VIDEO) {
                 my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
                 QTreeVideoItem* video_item = (QTreeVideoItem*)my_item;
-                remove_bookmark_of_video(video_item);
-            this->file_handler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
+                remove_analysis_of_video(my_item);
+                remove_bookmarks_of_video(video_item);
+                this->file_handler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
             } else if (my_item->type == TYPE::PROJECT) {
+                remove_analysis_of_project(my_item);
                 remove_bookmarks_of_project(my_item);
                 this->file_handler->delete_project(my_item->id);
             } else if (my_item->type == TYPE::ANALYSIS) {
                 //this->fileHandler->delete_file(my_item->id);
-                if(my_item->id < -1) //id < -1 means it is not a finished analysis
+                if(analysis_queue->contains(my_item))
                     remove_analysis_from_queue(my_item);
-                else if(my_item == current_analysis)//id = -1 means it is the current_analysis
+                else if(my_item == current_analysis)
                     abort_current_analysis();
             }
             remove_item_from_tree(my_item);
@@ -961,7 +962,7 @@ void MainWindow::on_action_delete_triggered() {
 void MainWindow::remove_bookmarks_of_project(MyQTreeWidgetItem* project_item) {
     for(int i = 0; i < project_item->childCount(); i++) {
         QTreeVideoItem* video_item = (QTreeVideoItem*)project_item->child(i);
-        remove_bookmark_of_video(video_item);
+        remove_bookmarks_of_video(video_item);
     }
 }
 
@@ -970,9 +971,48 @@ void MainWindow::remove_bookmarks_of_project(MyQTreeWidgetItem* project_item) {
  * removes the bookmarks in the bookmark_view
  * @param video_item to remove bookmarks from
  */
-void MainWindow::remove_bookmark_of_video(QTreeVideoItem* video_item) {
+void MainWindow::remove_bookmarks_of_video(QTreeVideoItem* video_item) {
     for(auto it = video_item->bookmarks.begin(); it != video_item->bookmarks.end(); it++){
         bookmark_view->remove_bookmark(video_item->id, *it);
+    }
+}
+
+void MainWindow::remove_analysis_of_project(MyQTreeWidgetItem* project_item) {
+    for(int i = 0; i < project_item->childCount(); i++) {
+        QTreeWidgetItem* video_item = project_item->child(i);
+        remove_analysis_of_video(video_item);
+    }
+}
+
+void MainWindow::remove_analysis_of_video(QTreeWidgetItem* video_item) {
+    QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
+    while (!analysis_queue->isEmpty()){
+        MyQTreeWidgetItem *i = analysis_queue->dequeue();
+        std::cout << i->name.toStdString() << std::endl;
+        tmp_queue->enqueue(i);
+    }
+    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue());
+
+    int id_count = 1; // Used to keep track of where in the queue it is
+    while (!analysis_queue->isEmpty()){
+        MyQTreeWidgetItem *i = analysis_queue->dequeue();
+        std::cout << "video: " << i->name.toStdString() << std::endl;
+        std::cout << id_count << std::endl;
+        if(i->parent() == video_item) {
+            std::cout << "in video" << std::endl;
+            delete analysis_queue_map[i];
+            analysis_queue_map.erase(analysis_queue_map.find(i));
+            analysis_window->remove_analysis_from_list(id_count);
+        } else {
+            std::cout << "not in video" << std::endl;
+            id_count++;
+            tmp_queue->enqueue(i);
+        }
+    }
+    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
+    delete tmp_queue;
+    if(current_analysis->parent() == video_item){
+        abort_current_analysis();
     }
 }
 
@@ -991,17 +1031,13 @@ void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
  */
 void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
     QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
+    int id_count = 1; // Used to keep track of where in the queue it is
     while (!analysis_queue->isEmpty()){
         MyQTreeWidgetItem *i = analysis_queue->dequeue();
         if((my_item == i)) {
-            analysis_window->remove_analysis_from_list(-(++i->id));
-            break;
+            analysis_window->remove_analysis_from_list(id_count);
         } else tmp_queue->enqueue(i);
-
-    } while (!analysis_queue->isEmpty()){
-        MyQTreeWidgetItem *i = analysis_queue->dequeue();
-        i->id++; // Moves the items after the searshed item up in the queue.
-        tmp_queue->enqueue(i);
+        id_count++;
     }
 
     while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
@@ -1026,23 +1062,12 @@ void MainWindow::start_next_analysis() {
     if(analysis_queue->isEmpty()) current_analysis = nullptr;
     else{
         current_analysis = analysis_queue->dequeue();
-        current_analysis->id = -1;
-        ANALYSIS_TYPE type = analysis_queue_type_map[current_analysis];
-        m_acontroller = new AnalysisController(((MyQTreeWidgetItem*)current_analysis->parent())->name.toStdString(),type);
+        m_acontroller = analysis_queue_map[current_analysis];
         m_acontroller->start();
         setup_analysis(m_acontroller);
         current_analysis_progress = 0;
-        analysis_queue_type_map.erase(analysis_queue_type_map.find(current_analysis));
+        analysis_queue_map.erase(analysis_queue_map.find(current_analysis));
     }
-    QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
-
-    while (!analysis_queue->isEmpty()){
-        MyQTreeWidgetItem *i = analysis_queue->dequeue();
-        i->id++; // Moves the items up in the queue.
-        tmp_queue->enqueue(i);
-    }
-    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
-    delete tmp_queue;
     analysis_window->set_progress_bar(0);
 }
 

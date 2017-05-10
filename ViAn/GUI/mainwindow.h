@@ -205,7 +205,9 @@ private:
     void add_video_to_tree(VideoProject *video);
 
     void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
-    void remove_bookmark_of_video(QTreeVideoItem* video_item);
+    void remove_bookmarks_of_video(QTreeVideoItem* video_item);
+    void remove_analysis_of_project(MyQTreeWidgetItem* project_item);
+    void remove_analysis_of_video(QTreeWidgetItem* video_item);
 
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
@@ -227,7 +229,7 @@ private:
     MyQTreeWidgetItem *current_analysis;
     int current_analysis_progress;
     QQueue<MyQTreeWidgetItem*> *analysis_queue;
-    std::map<MyQTreeWidgetItem*, ANALYSIS_TYPE> analysis_queue_type_map;
+    std::map<MyQTreeWidgetItem*, AnalysisController*> analysis_queue_map;
     void remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
     void abort_current_analysis();
     void start_next_analysis();
