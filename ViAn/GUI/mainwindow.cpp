@@ -1340,6 +1340,7 @@ void MainWindow::on_action_close_project_triggered() {
         set_status_bar("Closed " + my_project->name.toStdString());
         file_handler->close_project(my_project->id);
         remove_bookmarks_of_project(my_project);
+        remove_analysis_of_project(my_project);
         remove_item_from_tree(my_project);
     } else {
         set_status_bar("Multiple or nothing selected.");
