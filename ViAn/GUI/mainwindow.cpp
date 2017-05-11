@@ -1011,7 +1011,7 @@ void MainWindow::remove_analysis_of_video(QTreeWidgetItem* video_item) {
     }
     while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
     delete tmp_queue;
-    if(current_analysis->parent() == video_item){
+    if(current_analysis != nullptr && current_analysis->parent() == video_item){
         abort_current_analysis();
     }
 }
@@ -1050,8 +1050,7 @@ void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
  */
 void MainWindow::abort_current_analysis() {
     emit abort_analysis();
-    start_next_analysis();
-    analysis_window->remove_analysis_from_list(0); // remove the first in the list
+    current_analysis = nullptr;
 }
 
 /**
