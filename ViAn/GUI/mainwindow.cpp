@@ -156,6 +156,13 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         QString text = "(done)";
         text.append(current_analysis->name);
         current_analysis->setText(0, text);
+        // Save analysis
+        ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
+        ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
+        std::cout << p_id  <<std::endl;
+        std::cout << v_id  <<std::endl;
+        file_handler->get_project(p_id)->add_analysis(v_id, analysis);
+        file_handler->save_project(p_id);
     }
     start_next_analysis();
     analysis_window->remove_analysis_from_list(0); //remove the first in the list
@@ -1050,8 +1057,7 @@ void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
  */
 void MainWindow::abort_current_analysis() {
     emit abort_analysis();
-    start_next_analysis();
-    analysis_window->remove_analysis_from_list(0); // remove the first in the list
+    current_analysis = nullptr;
 }
 
 /**

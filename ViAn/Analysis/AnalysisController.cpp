@@ -60,6 +60,7 @@ void AnalysisController::run() {
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
     emit save_analysis(analysis);
+    delete method;
 }
 
 /**

@@ -9,7 +9,7 @@ class AnalysisController : public QThread {
     Q_OBJECT
 public:
     AnalysisController(std::string file_path, ANALYSIS_TYPE type, QObject* parent = 0);
-    AnalysisController(std::string file_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent = 0);
+    AnalysisController(std::string file_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent = 0);    
     void run() override;
 private:
     void setup_analysis(std::string file_path, ANALYSIS_TYPE type);
