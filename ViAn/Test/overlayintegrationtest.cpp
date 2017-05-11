@@ -13,6 +13,7 @@ OverlayIntegrationTest::OverlayIntegrationTest() {
 void OverlayIntegrationTest::exec() {
 
     // Setup video player
+    main->mvideo_player->video_overlay = new Overlay();
     main->mvideo_player->capture.open("seq_01.mp4");
     main->mvideo_player->frame_rate = main->mvideo_player->capture.get(CV_CAP_PROP_FPS);
     main->mvideo_player->num_frames = main->mvideo_player->capture.get(cv::CAP_PROP_FRAME_COUNT);
@@ -55,7 +56,7 @@ void OverlayIntegrationTest::exec() {
     // Export a bookmark
     int frame_number = main->mvideo_player->get_current_frame_num();
     QImage frame = main->mvideo_player->get_current_frame_unscaled();
-    Bookmark* bookmark = new Bookmark(frame_number, frame, "integration_test1", "Bookmark Text");
+    Bookmark* bookmark = new Bookmark(frame_number, frame, "test1.mp4", "integration_test1", "Bookmark Text");
     bookmark->export_frame();
 
     std::cout << "Overlay integration test finished.\n";

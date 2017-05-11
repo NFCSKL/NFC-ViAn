@@ -12,6 +12,7 @@ test_video_player::test_video_player(QObject *parent) : QObject(parent) {
     QMutex mutex;
     QWaitCondition wait;
     mvideo = new video_player(&mutex, &wait, NULL);
+    mvideo->video_overlay = new Overlay();
 }
 
 /**

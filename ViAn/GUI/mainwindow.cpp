@@ -697,12 +697,22 @@ void MainWindow::play_video() {
         mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
         setup_video_player(mvideo_player);
     }
-    mvideo_player->load_video(my_video->name.toStdString());
+
+    // Get the VideoProject containing info abuot the video to load.
+    MyQTreeWidgetItem *proj_item = (MyQTreeWidgetItem*)get_project_from_object(my_video);
+    Project* proj = file_handler->get_project(proj_item->id);
+    VideoProject* video_proj = proj->get_video(my_video->id);
+
+    mvideo_player->load_video(my_video->name.toStdString(), video_proj->get_overlay());
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->video_frame->width(),ui->video_frame->height());
     enable_video_buttons();
     icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
+
+    // Updates the overlay to the state choosen in the GUI.
+    mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
+
     set_slider_labels();
 }
 
