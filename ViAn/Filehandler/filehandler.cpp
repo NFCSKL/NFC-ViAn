@@ -42,7 +42,7 @@ void FileHandler::save(){
     QDir dir;
     dir.cd(".");
     this->save_name = dir.absoluteFilePath("state").toStdString();
-    save_saveable(this,add_dir(dir), JSON);
+    save_saveable(this,add_dir(dir), BINARY);
 }
 
 /**
@@ -53,7 +53,7 @@ void FileHandler::load(){
     QDir dir;
     dir.cd(".");
     this->save_name = dir.absoluteFilePath("state.dat").toStdString();
-    load_saveable(this, this->save_name, JSON);
+    load_saveable(this, this->save_name, BINARY);
 }
 
 /**
