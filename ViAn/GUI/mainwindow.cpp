@@ -806,7 +806,7 @@ void MainWindow::on_action_save_triggered() {
  * @brief MainWindow::on_action_load_triggered
  */
 void MainWindow::on_action_load_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->file_handler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->file_handler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json;*.dat"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* load_proj= this->file_handler->load_project(dir.toStdString());
         add_project_to_tree(load_proj);
