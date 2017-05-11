@@ -207,3 +207,12 @@ void Project::save_project(){
 std::map<ID, VideoProject* > &Project::get_videos(){
     return this->videos;
 }
+
+/**
+ * @brief Project::get_video
+ * @param id
+ * @return Returns the video with the specified id.
+ */
+VideoProject* Project::get_video(ID id) {
+    return this->videos[id];
+}

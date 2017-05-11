@@ -6,6 +6,7 @@
 #include <map>
 #include <QJsonArray>
 #include <QFile>
+#include "Video/overlay.h"
 #include "bookmark.h"
 #include "video.h"
 #include "report.h"
@@ -17,6 +18,7 @@ enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
  */
 class VideoProject{
     std::map<ID,Bookmark*> bookmarks;
+    Overlay* overlay = new Overlay();
     Video* video = nullptr;
     ID id_bookmark = 0;
 
@@ -29,6 +31,7 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
+    Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
 
 };

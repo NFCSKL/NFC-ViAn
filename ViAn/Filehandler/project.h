@@ -54,6 +54,7 @@ public:
     bool is_saved();
     void save_project();
     std::map<ID, VideoProject *>& get_videos();
+    VideoProject* get_video(ID id);
     bool proj_equals(Project& other);
 // TODO
 //    void add_analysis();

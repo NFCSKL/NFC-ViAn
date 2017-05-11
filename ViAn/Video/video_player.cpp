@@ -42,9 +42,11 @@ video_player::~video_player() {
  * @brief video_player::load_video
  * This method loads a video from file.
  * @param filename
+ * @param o Overlay associated to the video
  * @return whether video is loaded
  */
-bool video_player::load_video(string filename) {
+bool video_player::load_video(string filename, Overlay* o) {
+    video_overlay = o;
     if (capture.isOpened())
         capture.release();
 
@@ -147,7 +149,7 @@ void video_player::convert_frame(bool scale) {
 /**
  * @brief video_player::process_frame
  * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
- * @param frame Frame to draw on.
+ * @param src Frame to draw on.
  * @param scale Bool indicating if the frame should be scaled or not.
  * @return Returns the processed frame.
  */
@@ -206,9 +208,9 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
 }
 
 /**
- * @brief video_overlay::zoom_frame
+ * @brief video_player::zoom_frame
  * Zooms in the frame, with the choosen zoom level.
- * @param frame Frame to zoom in on on.
+ * @param src Frame to zoom in on on.
  * @return Returns the zoomed frame.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &src) {
@@ -223,7 +225,7 @@ cv::Mat video_player::zoom_frame(cv::Mat &src) {
 /**
  * @brief video_player::contrast_frame
  * Adds contrast and brightness to the frame.
- * @param frame Frame to manipulate.
+ * @param src Frame to manipulate.
  * @return Returns the manipulated frame.
  */
 cv::Mat video_player::contrast_frame(cv::Mat &src) {
@@ -270,6 +272,15 @@ bool video_player::is_stopped() {
  */
 bool video_player::is_playing(){
     return !(video_stopped || video_paused);
+}
+
+/**
+ * @brief video_player::set_showing_overlay
+ * @param value
+ * Sets the showing/not showing state.
+ */
+void video_player::set_showing_overlay(bool value) {
+    video_overlay->set_showing_overlay(value);
 }
 
 /**
