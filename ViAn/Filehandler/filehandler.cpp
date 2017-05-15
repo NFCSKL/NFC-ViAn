@@ -42,7 +42,7 @@ void FileHandler::save(){
     QDir dir;
     dir.cd(".");
     this->save_name = dir.absoluteFilePath("state").toStdString();
-    save_saveable(this,add_dir(dir), BINARY);
+    save_saveable(this,add_dir(dir), this->save_format);
 }
 
 /**
@@ -52,8 +52,9 @@ void FileHandler::save(){
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
-    this->save_name = dir.absoluteFilePath("state.dat").toStdString();
-    load_saveable(this, this->save_name, BINARY);
+    if(this->save_format == BINARY)this->save_name = dir.absoluteFilePath("state.dat").toStdString();
+    else this->save_name = dir.absoluteFilePath("state.json").toStdString();
+    load_saveable(this, this->save_name, this->save_format);
 }
 
 /**
@@ -200,7 +201,7 @@ void FileHandler::save_project(ID id){
  * project pointer is still available
  */
 void FileHandler::save_project(Project *proj){
-    this->save_saveable(proj, proj->dir, BINARY);
+    this->save_saveable(proj, proj->dir, this->save_format);
     proj->save_project();
 }
 
@@ -241,7 +242,7 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  */
 Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project(this);
-     load_saveable(proj, full_project_path, BINARY); // Decide format internally, here for flexibility
+     load_saveable(proj, full_project_path, this->save_format); // Decide format internally, here for flexibility
      proj->save_project();
      proj->id = add_project(proj);
      return proj;

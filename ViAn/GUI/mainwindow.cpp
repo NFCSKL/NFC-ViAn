@@ -159,8 +159,6 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         // Save analysis
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
-        std::cout << p_id  <<std::endl;
-        std::cout << v_id  <<std::endl;
         file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }

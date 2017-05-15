@@ -196,7 +196,7 @@ ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
  * @return
  */
 ID Project::add_analysis(ID v_id, Analysis analysis){
-    return this->videos.at(id)->add_analysis(analysis);
+    return this->videos.at(v_id)->add_analysis(analysis);
 }
 
 /**
