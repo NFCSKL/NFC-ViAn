@@ -286,8 +286,9 @@ bool FileHandler::delete_project(ID proj_id){
     if(this->projects.erase(proj_id)){
         close_project(temp->id);
         temp->delete_artifacts();
-        if(this->save_format == BINARY ) QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".dat")));
-        else QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
+        QFile file;
+        if(this->save_format == BINARY )  file.setFileName(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".dat")));
+        else file.setFileName((get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json"))));
 
         file.remove();
         delete_directory(temp->dir_bookmarks);
