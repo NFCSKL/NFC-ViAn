@@ -37,7 +37,7 @@ void POI::read(const QJsonObject& json) {
     for(int i = start_frame; i != end_frame; i++){        
         QJsonArray json_frame_OOIs = json[QString::number(i)].toArray();
         std::vector<OOI> oois;
-        for(int j  = 0; j = json_frame_OOIs.size(); j++){            
+        for(int j = 0; j != json_frame_OOIs.size(); j++){
             OOI ooi;
             ooi.read(json_frame_OOIs[j].toObject());
             oois.push_back(ooi);
@@ -54,7 +54,6 @@ void POI::read(const QJsonObject& json) {
 void POI::write(QJsonObject& json) {
     json["start"] = start_frame;
     json["end"] = end_frame;
-
     for(const auto& ooi_pair : OOIs){
         QJsonArray json_frame_OOIs;
         int frame = ooi_pair.first;

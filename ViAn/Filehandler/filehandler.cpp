@@ -42,7 +42,7 @@ void FileHandler::save(){
     QDir dir;
     dir.cd(".");
     this->save_name = dir.absoluteFilePath("state").toStdString();
-    save_saveable(this,add_dir(dir), JSON);
+    save_saveable(this,add_dir(dir), this->save_format);
 }
 
 /**
@@ -52,8 +52,9 @@ void FileHandler::save(){
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
-    this->save_name = dir.absoluteFilePath("state.json").toStdString();
-    load_saveable(this, this->save_name, JSON);
+    if(this->save_format == BINARY )this->save_name = dir.absoluteFilePath("state.dat").toStdString();
+    else this->save_name = dir.absoluteFilePath("state.json").toStdString();
+    load_saveable(this, this->save_name, this->save_format);
 }
 
 /**
@@ -117,7 +118,10 @@ void FileHandler::write(QJsonObject &json){
         ID id = *it;
         Project* proj = get_project(id);        
         QDir dir = get_dir(proj->dir);
-        QString path = dir.absoluteFilePath((proj->name + ".json").c_str());
+        QString path;
+        if(this->save_format == BINARY ) path = dir.absoluteFilePath((proj->name + ".dat").c_str());
+        else path = dir.absoluteFilePath((proj->name + ".json").c_str());
+
         json_path["path"] = path;
         json_projs.append(json_path);
     }
@@ -200,7 +204,7 @@ void FileHandler::save_project(ID id){
  * project pointer is still available
  */
 void FileHandler::save_project(Project *proj){
-    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
+    this->save_saveable(proj, proj->dir, this->save_format);
     proj->save_project();
 }
 
@@ -217,7 +221,7 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
 
     QFile save_file(save_format == JSON
                     ? QString::fromStdString(file_path + ".json")
-                    : QString::fromStdString(file_path + ".dat"));    
+                    : QString::fromStdString(file_path + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){
         qWarning("Couldn't open save file.");
         return false;
@@ -241,7 +245,7 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  */
 Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project(this);
-     load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
+     load_saveable(proj, full_project_path, this->save_format); // Decide format internally, here for flexibility
      proj->save_project();
      proj->id = add_project(proj);
      return proj;
@@ -282,7 +286,10 @@ bool FileHandler::delete_project(ID proj_id){
     if(this->projects.erase(proj_id)){
         close_project(temp->id);
         temp->delete_artifacts();
-        QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
+        QFile file;
+        if(this->save_format == BINARY )  file.setFileName(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".dat")));
+        else file.setFileName((get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json"))));
+
         file.remove();
         delete_directory(temp->dir_bookmarks);
         delete_directory(temp->dir);

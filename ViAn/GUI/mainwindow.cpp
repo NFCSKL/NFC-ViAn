@@ -151,11 +151,16 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    //emit set_analysis_results(analysis);
+    emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
         current_analysis->setText(0, text);
+        // Save analysis
+        ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
+        ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
+        file_handler->get_project(p_id)->add_analysis(v_id, analysis);
+        file_handler->save_project(p_id);
     }
     start_next_analysis();
     analysis_window->remove_analysis_from_list(0); //remove the first in the list
@@ -811,7 +816,7 @@ void MainWindow::on_action_save_triggered() {
  * @brief MainWindow::on_action_load_triggered
  */
 void MainWindow::on_action_load_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->file_handler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->file_handler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json;*.dat"));
     if(!dir.isEmpty()) { // Check if you have selected something.
         Project* load_proj= this->file_handler->load_project(dir.toStdString());
         add_project_to_tree(load_proj);
@@ -1023,7 +1028,7 @@ void MainWindow::remove_analysis_of_video(QTreeWidgetItem* video_item) {
     }
     while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue()); // Puts everything back in the queue.
     delete tmp_queue;
-    if(current_analysis->parent() == video_item){
+    if(current_analysis != nullptr && current_analysis->parent() == video_item){
         abort_current_analysis();
     }
 }
@@ -1062,8 +1067,7 @@ void MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
  */
 void MainWindow::abort_current_analysis() {
     emit abort_analysis();
-    start_next_analysis();
-    analysis_window->remove_analysis_from_list(0); // remove the first in the list
+    current_analysis = nullptr;
 }
 
 /**

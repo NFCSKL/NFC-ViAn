@@ -52,6 +52,7 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
 void VideoProject::read(const QJsonObject& json){
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
+    // Read bookmarks from json
     for(int i = 0; i != json_bookmarks.size(); i++){
         QJsonObject json_bookmark = json_bookmarks[i].toObject();
         Bookmark* new_bookmark = new Bookmark();
@@ -60,6 +61,14 @@ void VideoProject::read(const QJsonObject& json){
     }
     QJsonObject json_overlay = json["overlay"].toObject();
     this->overlay->read(json_overlay);
+    QJsonArray json_analyses = json["analyses"].toArray();
+    // Read analyses from json
+    for (int j = 0; j < json_analyses.size(); ++j) {
+        QJsonObject json_analysis = json_analyses[j].toObject();
+        Analysis analysis;
+        analysis.read(json_analysis);
+        add_analysis(analysis);
+    }
 }
 
 /**
@@ -79,6 +88,7 @@ void VideoProject::write(QJsonObject& json){
         json_bookmarks.append(json_bookmark);
     }
     json["bookmarks"] = json_bookmarks;
+    // Write analyses to json
     QJsonArray json_analyses;
     for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
         QJsonObject json_analysis;
@@ -86,6 +96,7 @@ void VideoProject::write(QJsonObject& json){
         an.write(json_analysis);
         json_analyses.append(json_analysis);
     }
+    json["analyses"] = json_analyses;
 
     QJsonObject json_overlay;
     this->overlay->write(json_overlay);
