@@ -199,8 +199,9 @@ void MainWindow::on_stop_button_clicked() {
  */
 void MainWindow::on_next_frame_button_clicked() {
     if (mvideo_player->is_paused()) {
-        set_status_bar("Went forward a frame");
         emit next_video_frame();
+        int frame = mvideo_player->get_current_frame_num();
+        set_status_bar("Went forward a frame to number " + std::to_string(frame));
     } else {
         set_status_bar("Needs to be paused");
     }
@@ -213,7 +214,8 @@ void MainWindow::on_next_frame_button_clicked() {
 void MainWindow::on_previous_frame_button_clicked() {
     if (mvideo_player->is_paused()) {
         emit prev_video_frame();
-        set_status_bar("Went back a frame");
+        int frame = mvideo_player->get_current_frame_num();
+        set_status_bar("Went back a frame to number " + std::to_string(frame));
     } else {
         set_status_bar("Video needs to be paused");
     }
