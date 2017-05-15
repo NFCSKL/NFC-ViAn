@@ -34,7 +34,7 @@ class Project; // fix for include issue
 
 class FileHandler : Saveable{
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
-    const SAVE_FORMAT save_format = JSON;
+    const SAVE_FORMAT save_format = BINARY;
 public:
     friend class test_report_generator;
     FileHandler();

@@ -151,7 +151,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    //emit set_analysis_results(analysis);
+    emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
