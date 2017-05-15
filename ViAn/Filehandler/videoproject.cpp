@@ -27,6 +27,15 @@ Video* VideoProject::get_video(){
 }
 
 /**
+ * @brief VideoProject::get_overlay
+ * @return
+ * Returns the overlay.
+ */
+Overlay* VideoProject::get_overlay() {
+    return overlay;
+}
+
+/**
  * @brief VideoProject::get_bookmarks
  * @return bookmarks
  * Return all bookmarks.
@@ -49,6 +58,8 @@ void VideoProject::read(const QJsonObject& json){
         new_bookmark->read(json_bookmark);
         add_bookmark(new_bookmark);
     }
+    QJsonObject json_overlay = json["overlay"].toObject();
+    this->overlay->read(json_overlay);
 }
 
 /**
@@ -76,6 +87,9 @@ void VideoProject::write(QJsonObject& json){
         json_analyses.append(json_analysis);
     }
 
+    QJsonObject json_overlay;
+    this->overlay->write(json_overlay);
+    json["overlay"] = json_overlay;
 }
 
 /**

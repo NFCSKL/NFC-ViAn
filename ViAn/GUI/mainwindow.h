@@ -41,6 +41,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    friend class OverlayIntegrationTest;
+
 public:
     void set_status_bar(string status, int timer = 5000);
     void add_project_to_tree(Project* proj);

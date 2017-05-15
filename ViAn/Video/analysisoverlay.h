@@ -13,7 +13,7 @@ public:
 private:
     // Colour and thickness for the graphical representation of the detected areas.
     const cv::Scalar COLOUR = cv::Scalar(255, 0, 0);
-    const int THICKNESS = 5;
+    const int THICKNESS = 3;
 
     // The detected areas mapped to the frame they're on.
     std::map<int, std::vector<cv::Rect>> detections;

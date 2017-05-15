@@ -3,6 +3,7 @@
 #include "Test/filehandlertest.h"
 #include "Test/test_mainwindow.h"
 #include "Test/test_report_generator.h"
+#include "Test/overlayintegrationtest.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
 /**
@@ -20,6 +21,8 @@ int main(int argc, char *argv[])
     w.show();
 
     bool testing = false;
+    bool integration_testing = false;
+
     if (testing) {
         //For testing video player.
         test_video_player* video_test = new test_video_player();
@@ -33,6 +36,10 @@ int main(int argc, char *argv[])
         //For testing the report_generator(THIS TEST WILL CREATE FILES)
         test_report_generator* report_test = new test_report_generator();
         QTest::qExec(report_test);
+    }
+    if (integration_testing) {
+        OverlayIntegrationTest* ot = new OverlayIntegrationTest();
+        ot->exec();
     }
     return a.exec();
 }
