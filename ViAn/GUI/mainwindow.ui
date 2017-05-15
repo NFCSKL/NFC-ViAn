@@ -73,7 +73,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>304</width>
-                <height>281</height>
+                <height>284</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -381,6 +381,13 @@
           </item>
           <item>
            <widget class="QLabel" name="total_time_label">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="speed_label">
             <property name="text">
              <string/>
             </property>
