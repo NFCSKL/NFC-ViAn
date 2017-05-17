@@ -110,6 +110,8 @@ private slots:
 
     void prepare_menu(const QPoint & pos);
 
+    void prepare_bookmark_menu(const QPoint & pos);
+
     void play_video();
 
     void on_action_save_triggered();
@@ -161,6 +163,8 @@ private slots:
     void on_previous_POI_button_clicked();
 
     void on_next_POI_button_clicked();
+
+    void on_action_change_bookmark_triggered();
 
 private:
 

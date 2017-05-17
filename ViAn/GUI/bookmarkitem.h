@@ -9,6 +9,7 @@ public:
     ~BookmarkItem();
     Bookmark* get_bookmark();
     int get_frame_number();
+    void update_description(QString text);
 private:
     void create_thumbnail(QImage &frame);
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;

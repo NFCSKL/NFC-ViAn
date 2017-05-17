@@ -65,6 +65,15 @@ QString Bookmark::get_description() {
 }
 
 /**
+ * @brief Bookmark::set_description
+ * Sets the text description of the bookmark to the specified string.
+ * @param text
+ */
+void Bookmark::set_description(QString text) {
+    this->description = text;
+}
+
+/**
  * @brief Bookmark::read
  * @param json
  * Reads a bookmark from a Json object.

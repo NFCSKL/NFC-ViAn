@@ -22,6 +22,7 @@ public:
     QImage get_frame();
     QString get_file_path();
     QString get_description();
+    void set_description(QString text);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void export_frame();
