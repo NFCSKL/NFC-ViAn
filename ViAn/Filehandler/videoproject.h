@@ -9,8 +9,9 @@
 #include "Video/overlay.h"
 #include "bookmark.h"
 #include "video.h"
+#include "analysis.h"
 #include "report.h"
-enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
+
 /**
  * @brief The VideoProject class
  * Class for storing video and all its belonging components
@@ -18,14 +19,16 @@ enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
  */
 class VideoProject{
     std::map<ID,Bookmark*> bookmarks;
+    std::map<ID,Analysis> analyses;
     Overlay* overlay = new Overlay();
     Video* video = nullptr;
+    ID vid_id;
     ID id_bookmark = 0;
-
 
 public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
+    ID add_analysis(Analysis analysis);
     ID add_bookmark(Bookmark* bookmark);
     void delete_artifacts();    
     VideoProject(Video* v); //Needs to have a video
@@ -33,7 +36,7 @@ public:
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
-
+    std::map<ID,Analysis> get_analyses();
 };
 
 

@@ -123,12 +123,12 @@ void test_video_player::test_toggle_overlay() {
     QWaitCondition wait;
     QLabel label;
     video_player *v_player = new video_player(&mutex, &wait, &label);
+    v_player->video_overlay = new Overlay();
     v_player->video_overlay->set_showing_overlay(false);
     v_player->toggle_overlay();
     QVERIFY(v_player->is_showing_overlay());
     v_player->toggle_overlay();
     QVERIFY(!v_player->is_showing_overlay());
-
     bool original_value = v_player->analysis_overlay->is_showing_overlay();
     v_player->toggle_analysis_overlay();
     QVERIFY(v_player->is_showing_analysis_overlay() != original_value);
@@ -435,7 +435,7 @@ void test_video_player::test_convert_frame() {
 
     //Testing with color frame
     mvideo->capture.read(mvideo->frame);
-    mvideo->convert_frame(true);
+    mvideo->convert_frame(false);
     QVERIFY(mvideo->img.format() == QImage::Format_RGB888);
     QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
 
@@ -445,7 +445,7 @@ void test_video_player::test_convert_frame() {
     cv::cvtColor(mvideo->frame, grayMat, cv::COLOR_BGR2GRAY);
     grayMat.copyTo(mvideo->frame);
     grayMat.release();
-    mvideo->convert_frame(true);
+    mvideo->convert_frame(false);
     QVERIFY(mvideo->img.format() == QImage::Format_Indexed8);
     QVERIFY(mvideo->img.width() == mvideo->frame.cols && mvideo->img.height() == mvideo->frame.rows);
 }

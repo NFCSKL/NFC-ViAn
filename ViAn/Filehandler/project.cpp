@@ -172,6 +172,10 @@ void Project::write(QJsonObject& json){
     json["reports"] = json_reports;
 }
 
+void Project::add_analysis(Analysis an){
+    this->videos.at(id)->add_analysis(an);
+}
+
 /**
  * @brief Project::add_bookmark
  * @param v_id the id of the video

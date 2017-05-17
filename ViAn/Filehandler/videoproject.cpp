@@ -45,6 +45,15 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
 }
 
 /**
+ * @brief VideoProject::get_analyses
+ * @return analyses
+ * return all analyses.
+ */
+std::map<ID,Analysis> VideoProject::get_analyses() {
+    return analyses;
+}
+
+/**
  * @brief Video::read
  * @param json
  * Read videoproject parameters from json object.
@@ -79,6 +88,16 @@ void VideoProject::write(QJsonObject& json){
         json_bookmarks.append(json_bookmark);
     }
     json["bookmarks"] = json_bookmarks;
+
+    QJsonArray json_analyses;
+    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+        QJsonObject json_analysis;
+        Analysis an = it2->second;
+        an.write(json_analysis);
+        json_analyses.append(json_analysis);
+    }
+    json["analyses"] = json_analyses;
+
     QJsonObject json_overlay;
     this->overlay->write(json_overlay);
     json["overlay"] = json_overlay;
@@ -92,6 +111,16 @@ void VideoProject::write(QJsonObject& json){
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
     return id_bookmark++;
+}
+/**
+ * @brief VideoProject::add_analysis
+ * @param analysis
+ * @return ID for analysis
+ * Adds analysis to video project.
+ */
+ID VideoProject::add_analysis(Analysis analysis){
+    this->analyses.insert(std::make_pair(this->vid_id, analysis));
+    return this->vid_id++;
 }
 
 /**

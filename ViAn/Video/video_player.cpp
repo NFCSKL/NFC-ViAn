@@ -158,6 +158,7 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     cv::Mat processed_frame = src.clone();
     processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
+
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
     }
@@ -189,7 +190,6 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
 
     return processed_frame;
 }
-
 
 
 /**
@@ -918,4 +918,19 @@ int video_player::get_video_width() {
  */
 int video_player::get_video_height() {
     return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+}
+
+/**
+ * @brief video_player::on_set_analysis_results
+ * Sets analysis results to be used to draw results on video.
+ * @param analysis results
+ */
+void video_player::on_set_analysis_results(Analysis analysis) {
+    std::cout << "Num frames: " << get_num_frames()<<std::endl;
+    for (int frame_num = 0; frame_num < get_num_frames(); ++frame_num) {
+        for (cv::Rect rect : analysis.get_detections_on_frame(frame_num)) {
+            analysis_overlay->add_area(frame_num,rect);
+        }
+        std::cout << "Amount of detections: " << analysis.get_detections_on_frame(frame_num).size() << std::endl;
+    }
 }

@@ -1,4 +1,4 @@
-#ifndef VIDEO_PLAYER_H
+﻿#ifndef VIDEO_PLAYER_H
 #define VIDEO_PLAYER_H
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -12,6 +12,7 @@
 #include <QImage>
 #include "overlay.h"
 #include "analysisoverlay.h"
+#include "Filehandler/analysis.h"
 
 #include <chrono>
 
@@ -96,6 +97,7 @@ private slots:
     void next_frame();
     void previous_frame();
     void on_set_playback_frame(int frame_num);
+    void on_set_analysis_results(Analysis analysis);
 
 public slots:
     void on_play_video();
@@ -153,6 +155,7 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
+    Analysis m_analysis;
 
     // Constants for the directions of the rotation.
     int const ROTATE_90 = 0, ROTATE_180 = 1, ROTATE_270 = 2, ROTATE_NONE = 3;

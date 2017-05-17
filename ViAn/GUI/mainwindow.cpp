@@ -11,14 +11,16 @@
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
+#include "Analysis/MotionDetection.h"
+#include "Analysis/AnalysisMethod.h"
 
 
 using namespace std;
 using namespace cv;
 
+
 /**
  * @brief MainWindow::MainWindow
- * Constructor
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) :
@@ -49,6 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
     setup_video_player(mvideo_player);
+    //mvideo_player->load_video("enghd.mp4");
+    // TODO The following code is just here to test.
+    // Remove when a proper implementation exists.
+
 
     // Initially hide overlay and analysis toolbar
     ui->toolbar_overlay->hide();
@@ -78,6 +84,21 @@ MainWindow::~MainWindow() {
     delete ui;
     delete bookmark_view;
 }
+
+/**
+ * @brief MainWindow::setup_analysis
+ * Creates the necessary connections to the analysis thread.
+ * @param ac AnalysisController for the current analysis
+ */
+void MainWindow::setup_analysis(AnalysisController* ac){
+    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
+                     this, SLOT(save_analysis_to_file(Analysis)));
+    QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
+                     this, SLOT(show_analysis_progress(int)));
+    QObject::connect(this, SIGNAL(abort_analysis()),
+                     ac, SLOT(on_abort()));
+}
+
 /**
  * @brief MainWindow::setup_filehandler
  * Sets up filehandler and loads projects.
@@ -115,11 +136,34 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    QObject::connect(this, SIGNAL(set_analysis_results(Analysis)),
+                     mplayer, SLOT(on_set_analysis_results(Analysis)));
     //Will be added when functionality is in place
     /*QObject::connect(this, SIGNAL(next_video_POI()),
                      mplayer, SLOT(next_POI()));
     QObject::connect(this, SIGNAL(prev_video_POI()),
                      mplayer, SLOT(previous_POI()));*/
+}
+
+/**
+ * @brief MainWindow::save_analysis_to_file
+ * @param analysis
+ * Slot for saving analysis to file.
+ */
+void MainWindow::save_analysis_to_file(Analysis analysis) {
+    //TODO Add code.
+    std::cout << "Analysis done" << std::endl;
+    emit set_analysis_results(analysis);
+}
+
+/**
+ * @brief MainWindow::on_analysis_update
+ * @param progress current analysis progress in percent
+ */
+void MainWindow::show_analysis_progress(int progress){
+    // Progress for the current analysis
+    // Add to gui from here
+    std::cout << "Progress: " << progress << std::endl;
 }
 
 /**

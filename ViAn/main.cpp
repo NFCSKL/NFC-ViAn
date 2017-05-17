@@ -17,9 +17,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    qRegisterMetaType<Analysis>();
     w.show();
 
-    bool testing = false;
+    bool testing = true;
     bool integration_testing = false;
     if (testing) {
         //For testing video player.
