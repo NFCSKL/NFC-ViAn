@@ -92,7 +92,7 @@ void AnalysisController::on_abort() {
 
 /**
  * @brief AnalysisController::on_progress_update
- * Sends the progress of the current analysis to the gui
+ * Sends the progress of the current analysis in percent to the gui
  * @param progress
  */
 void AnalysisController::on_progress_update(int progress) {

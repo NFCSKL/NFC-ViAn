@@ -129,7 +129,6 @@ SOURCES += Filehandler/filehandler.cpp \
     Filehandler/analysis.cpp \
     Filehandler/report.cpp
 
-
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
@@ -144,7 +143,6 @@ win32{
 
     SOURCES += Filehandler/stringhelper.cpp\
       Filehandler/win32dir.cpp
-
 
     HEADERS += Filehandler/stringhelper.h
 }

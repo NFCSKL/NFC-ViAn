@@ -45,6 +45,25 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
 }
 
 /**
+ * @brief VideoProject::get_analysis
+ * @param id of the analysis
+ * @return the analysis
+ */
+Analysis VideoProject::get_analysis(ID id)
+{
+    return analyses[id];
+}
+
+/**
+ * @brief VideoProject::get_analyses
+ * @return analyses
+ * return all analyses.
+ */
+std::map<ID,Analysis> VideoProject::get_analyses() {
+    return analyses;
+}
+
+/**
  * @brief Video::read
  * @param json
  * Read videoproject parameters from json object.
@@ -117,6 +136,7 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * @brief VideoProject::add_analysis
  * @param analysis to be added
  * @return id of the analysis
+ * Adds analysis to video project.
  */
 ID VideoProject::add_analysis(Analysis analysis){
     this->analyses.insert(std::make_pair(this->id_analysis, analysis));

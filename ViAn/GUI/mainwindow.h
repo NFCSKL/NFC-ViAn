@@ -26,7 +26,7 @@
 #include "makeproject.h"
 #include "analysiswindow.h"
 #include <QQueue>
-#include "Analysis/analysiscontroller.h"
+#include "Analysis/AnalysisController.h"
 #define SCROLL_AREA_MARGIN 25
 
 
@@ -119,6 +119,8 @@ private slots:
 
     void right_click_project_tree_menu(const QPoint & pos);
 
+    void prepare_bookmark_menu(const QPoint & pos);
+
     void play_video();
 
     void on_action_save_triggered();
@@ -180,6 +182,8 @@ private slots:
     void action_clear_analysis_overlay_triggered();
 
     void action_set_analysis_area_to_video_triggered();
+
+    void on_action_change_bookmark_triggered();
 
 private:
 

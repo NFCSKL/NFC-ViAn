@@ -19,11 +19,12 @@
  */
 class VideoProject{
     std::map<ID,Bookmark*> bookmarks;
+    std::map<ID,Analysis> analyses;
     Overlay* overlay = new Overlay();
     Video* video = nullptr;
+    ID vid_id;
     ID id_bookmark = 0;
     ID id_analysis = 0;
-
 
 public:
     void read(const QJsonObject& json);
@@ -34,10 +35,10 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
-    std::map<ID,Analysis> analyses;
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
-
+    std::map<ID,Analysis> get_analyses();
+    Analysis get_analysis(ID id);
 };
 
 

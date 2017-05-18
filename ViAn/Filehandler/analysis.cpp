@@ -54,6 +54,7 @@ void POI::read(const QJsonObject& json) {
 void POI::write(QJsonObject& json) {
     json["start"] = start_frame;
     json["end"] = end_frame;
+
     for(const auto& ooi_pair : OOIs){
         QJsonArray json_frame_OOIs;
         int frame = ooi_pair.first;

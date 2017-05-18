@@ -123,12 +123,12 @@ void test_video_player::test_toggle_overlay() {
     QWaitCondition wait;
     QLabel label;
     video_player *v_player = new video_player(&mutex, &wait, &label);
+    v_player->video_overlay = new Overlay();
     v_player->video_overlay->set_showing_overlay(false);
     v_player->toggle_overlay();
     QVERIFY(v_player->is_showing_overlay());
     v_player->toggle_overlay();
     QVERIFY(!v_player->is_showing_overlay());
-
     bool original_value = v_player->analysis_overlay->is_showing_overlay();
     v_player->toggle_analysis_overlay();
     QVERIFY(v_player->is_showing_analysis_overlay() != original_value);

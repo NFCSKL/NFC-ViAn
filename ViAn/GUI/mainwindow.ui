@@ -415,7 +415,7 @@
      <x>0</x>
      <y>0</y>
      <width>674</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="mouseTracking">
@@ -937,6 +937,14 @@
    </property>
    <property name="text">
     <string>Show/hide analysis overlay</string>
+   </property>
+  </action>
+  <action name="action_change_bookmark">
+   <property name="text">
+    <string>Change bookmark</string>
+   </property>
+   <property name="toolTip">
+    <string>Change bookmark description</string>
    </property>
   </action>
  </widget>

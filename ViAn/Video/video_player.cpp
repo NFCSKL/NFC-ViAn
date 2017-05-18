@@ -947,3 +947,4 @@ void video_player::clear_analysis_overlay(){
     delete analysis_overlay;
     analysis_overlay = new AnalysisOverlay();
 }
+

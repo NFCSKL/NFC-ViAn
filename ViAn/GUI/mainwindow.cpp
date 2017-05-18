@@ -13,8 +13,6 @@
 #include "Video/shapes/shape.h"
 #include "Analysis/MotionDetection.h"
 #include "Analysis/AnalysisMethod.h"
-#include "Analysis/analysiscontroller.h"
-
 
 using namespace std;
 using namespace cv;
@@ -46,9 +44,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->project_tree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::right_click_project_tree_menu);
 
+    ui->document_list->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->document_list, &QListWidget::customContextMenuRequested, this, &MainWindow::prepare_bookmark_menu);
+
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
     setup_video_player(mvideo_player);
+    //mvideo_player->load_video("enghd.mp4");
+    // TODO The following code is just here to test.
+    // Remove when a proper implementation exists.
+
 
     // Initially hide overlay and analysis toolbar
     ui->toolbar_overlay->hide();
@@ -151,7 +156,6 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    //emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
@@ -159,7 +163,9 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         // Save analysis
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
-        file_handler->get_project(p_id)->add_analysis(v_id, analysis);
+        std::cout << v_id << std::endl;
+        std::cout << p_id << std::endl;
+        current_analysis->id = file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }
     start_next_analysis();
@@ -756,6 +762,25 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
 
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
+}
+
+/**
+ * @brief MainWindow::prepare_bookmark_menu
+ * @param pos
+ * Creates context menu on right-click in bookmark view
+ */
+void MainWindow::prepare_bookmark_menu(const QPoint & pos) {
+    QListWidget *list = ui->document_list;
+    BookmarkItem *item = (BookmarkItem*)list->itemAt( pos );
+    QMenu menu(this);
+
+    if(item != nullptr) {
+        QAction *change_bookmark = new QAction(QIcon(""), tr("&Change bookmark"), this);
+        change_bookmark->setStatusTip(tr("Change bookmark"));
+        menu.addAction(change_bookmark);
+        connect(change_bookmark, SIGNAL(triggered()), this, SLOT(on_action_change_bookmark_triggered()));
+    }
+    menu.exec( list->mapToGlobal(pos) );
 }
 
 /**
@@ -1454,9 +1479,23 @@ void MainWindow::action_set_analysis_area_to_video_triggered()
             QTreeVideoItem *video_in_tree = (QTreeVideoItem*)analysis_in_tree->parent();
             if(video_in_tree == playing_video) {
                 ID p_id = ((MyQTreeWidgetItem*)video_in_tree->parent())->id;
-                Analysis analysis = file_handler->get_project(p_id)->get_video(video_in_tree->id)->analyses[analysis_in_tree->id];
+                Analysis analysis = file_handler->get_project(p_id)->get_video(video_in_tree->id)->get_analysis(analysis_in_tree->id);
                 emit set_analysis_results(analysis);
             }
         }
     }
+}
+
+/*
+ * @brief MainWindow::on_action_change_bookmark_triggered
+ * Lets the user change the bookmark description.
+ */
+void MainWindow::on_action_change_bookmark_triggered() {
+    BookmarkItem *item = (BookmarkItem*) ui->document_list->selectedItems().first();
+    QString bookmark_text("");
+    bool ok;
+    bookmark_text = bookmark_view->get_input_text(&ok);
+    if(!ok) return;
+    item->update_description(bookmark_text);
+    set_status_bar("Updated bookmark");
 }

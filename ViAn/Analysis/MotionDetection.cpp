@@ -15,47 +15,51 @@ MotionDetection::MotionDetection(std::string source_file) {
  * Initial setup of the analysis
  */
 void MotionDetection::setup_analysis(){
-    pMOG2 = cv::createBackgroundSubtractorMOG2(500,50,false);
+    background_subtractor = cv::createBackgroundSubtractorMOG2(BACKGROUND_HISTORY,MOG2_THRESHOLD,DETECT_SHADOWS);
+    dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(DILATION_DEGREE,DILATION_DEGREE));
 }
 
 /**
  * @brief MotionDetection::do_analysis
- * Motion detection specific code
- * This function is called from the interface thread loop
+ * This method detects motion in a frame, partly by comparing it to the previous frame
+ * and partly by using a background subtraction algorithm that detects things that are
+ * not part of the background. Rectangles that mark the detected areas are saved for use
+ * during video playback.
  */
 std::vector<OOI> MotionDetection::analyse_frame(){
     std::vector<OOI> OOIs;
     std::vector<std::vector<cv::Point> > contours;
 
-    shown_frame = frame.clone();
+    // Updates background model
+    blurred_frame = frame.clone();
+    cv::GaussianBlur(blurred_frame, blurred_frame, BLUR_SIZE, 0);
+    background_subtractor->apply(blurred_frame, foreground_mask,-1);
 
-    cv::GaussianBlur(frame, frame, blur_size, 0);
-    pMOG2->apply(frame, fgMaskMOG2,-1);
-    pMOG2->getBackgroundImage(background);
+    cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
+    cv::dilate(foreground_mask, foreground_mask, dilation_kernel);
 
-    cv::Mat kernel_ero = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilation_degree,dilation_degree));
-    cv::threshold(fgMaskMOG2, fgMaskMOG2, 25, 255, cv::THRESH_BINARY);
-    cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
 
-    if (!diff_prev.empty() && current_frame % sample_freq == 0) {
-        cv::Mat gray_frame = shown_frame.clone();
+    /* Creates an additional foreground mask and uses
+     * that combined with the MOG2 foreground mask to
+     * assert motion.
+     */
+    if (!prev_frame.empty()) {
+        cv::Mat gray_frame = frame.clone();
         cv::cvtColor(gray_frame, gray_frame, CV_RGB2GRAY);
-        cv::absdiff(diff_prev,gray_frame,diff_frame);
-        cv::GaussianBlur(diff_frame, diff_frame, blur_size, 0);
-        cv::threshold(diff_frame, diff_frame, 25, 255, cv::THRESH_BINARY);
-        cv::dilate(diff_frame, diff_frame, kernel_ero);
-        cv::bitwise_and(diff_frame, fgMaskMOG2, result);
-    } else if (!diff_prev.empty() && !diff_frame.empty()) {
-        cv::bitwise_and(diff_frame, fgMaskMOG2, result);
+        // Get differences between current and previous frame
+        cv::absdiff(prev_frame,gray_frame,diff_frame);
+        // Filters out everything but the detections
+        cv::GaussianBlur(diff_frame, diff_frame, BLUR_SIZE, 0);
+        cv::threshold(diff_frame, diff_frame, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
+        cv::dilate(diff_frame, diff_frame, dilation_kernel);
+        // ANDs the foreground masks
+        cv::bitwise_and(diff_frame, foreground_mask, result);
     } else {
-        result = fgMaskMOG2.clone();
+        // diff_prev is empty for the first analysed frame.
+        result = foreground_mask.clone();
     }
 
-    if (current_frame % sample_freq == 0) {
-        diff_prev = shown_frame.clone();
-        cv::cvtColor(diff_prev, diff_prev, CV_RGB2GRAY);
-    }
-    prev_frame = shown_frame.clone();
+    prev_frame = frame.clone();
     cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
 
     //This code excludes the area of the frame that has been given by exclude_frame.
@@ -63,13 +67,11 @@ std::vector<OOI> MotionDetection::analyse_frame(){
         cv::bitwise_and(result, exclude_frame, result);
     }
 
+    // Creates OOIs from the detected countours.
     cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-    cv::Scalar color(0,0,255);
-    std::vector<cv::Rect> rects;
     for (std::vector<cv::Point> contour : contours) {
-        if (cv::contourArea(contour) > smallest_object_size) {
+        if (cv::contourArea(contour) > SMALLEST_OBJECT_SIZE) {
             cv::Rect rect = cv::boundingRect(contour);
-            rects.push_back(rect);
             OOIs.push_back(OOI(rect));
         }
     }
