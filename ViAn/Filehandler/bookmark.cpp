@@ -2,13 +2,15 @@
 
 /**
  * @brief Bookmark::Bookmark
+ * @param time The time in the video associated with the bookmark (in millisecs).
  * @param frame_nbr Frame number associated with the bookmark.
  * @param frame Frame associated with the bookmark.
  * @param video_file_name Name of the video associated with the bookmark.
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString text) {
+Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString text) {
+    this->time = time;
     this->frame_number = frame_nbr;
     this->frame = frame;
     this->video_file_name = video_file_name;
@@ -29,6 +31,14 @@ Bookmark::Bookmark() {
     dir_path = QString();
     file_path = QString();
     description = QString();
+}
+
+/**
+ * @brief Bookmark::get_time
+ * @return Returns the time in the video where the bookmark points to (in millisecs).
+ */
+int Bookmark::get_time() {
+    return time;
 }
 
 /**

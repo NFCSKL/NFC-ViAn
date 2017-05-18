@@ -433,6 +433,13 @@ void MainWindow::on_action_exit_triggered() {
  * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmark_button_clicked() {
+    // Get the info from the video object.
+    // This should be done first to ensure we get the
+    // frame at the time the user clicked the button.
+    int time = mvideo_player->get_current_time();
+    int frame_number = mvideo_player->get_current_frame_num();
+    QImage frame = mvideo_player->get_current_frame_unscaled();
+    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
     // Add bookmarks-folder to the project-folder.
     Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
     QDir dir = file_handler->get_dir(proj->dir_bookmarks);
@@ -441,10 +448,7 @@ void MainWindow::on_bookmark_button_clicked() {
     bool ok;
     bookmark_text = bookmark_view->get_input_text(&ok);
     if(!ok) return;
-    int frame_number = mvideo_player->get_current_frame_num();
-    QImage frame = mvideo_player->get_current_frame_unscaled();
-    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
-    Bookmark* bookmark = new Bookmark(frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
+    Bookmark* bookmark = new Bookmark(time, frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
     ID id = proj->add_bookmark(playing_video->id, bookmark);
     bookmark_view->add_bookmark(playing_video->id, id, bookmark);
     playing_video->bookmarks.push_back(id);

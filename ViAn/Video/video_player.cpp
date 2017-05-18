@@ -333,6 +333,14 @@ int video_player::get_current_frame_num() {
 }
 
 /**
+ * @brief video_player::get_current_time
+ * @return Returns the current time in the clip in milliseconds.
+ */
+int video_player::get_current_time() {
+    return capture.get(CV_CAP_PROP_POS_MSEC);
+}
+
+/**
  * @brief video_player::get_file_name
  * @return Returns the file name of the video that has
  *         been loaded into the video player.
