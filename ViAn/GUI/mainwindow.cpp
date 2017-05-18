@@ -151,7 +151,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
-    emit set_analysis_results(analysis);
+    //emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
@@ -691,46 +691,69 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
 
     if(item != nullptr) {
         if(item->type == TYPE::PROJECT) {
-            QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
-            QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+            //Rightclick on project to add video to it
+            QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this); 
             add_video->setStatusTip(tr("Add video"));
-            delete_project->setStatusTip(tr("Delete project"));
             menu.addAction(add_video);
-            menu.addAction(delete_project);
             connect(add_video, SIGNAL(triggered()), this, SLOT(on_action_add_video_triggered()));
+            //Rightclick on project to delete it
+            QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+            delete_project->setStatusTip(tr("Delete project"));
+            menu.addAction(delete_project);
             connect(delete_project, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
+
         } else if(item->type == TYPE::VIDEO) {
+            //Rightclick on video to play it
             QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
-            QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
-            QAction *do_analysis = new QAction(QIcon(""), tr("&Do analysis"), this);
             load_video->setStatusTip(tr("Play video"));
-            delete_video->setStatusTip(tr("Remove video from project"));
-            do_analysis->setStatusTip(tr("Do a analysis on video"));
             menu.addAction(load_video);
-            menu.addAction(delete_video);
-            menu.addAction(do_analysis);
             connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
+            //Rightclick on video to remove it
+            QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
+            delete_video->setStatusTip(tr("Remove video from project"));
+            menu.addAction(delete_video);
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
+            //Rightclick on video to performe analysis on it
+            QAction *do_analysis = new QAction(QIcon(""), tr("&Perform analysis"), this);
+            do_analysis->setStatusTip(tr("Perform a analysis on video"));
+            menu.addAction(do_analysis);
             connect(do_analysis, SIGNAL(triggered()), this, SLOT(on_action_do_analysis_triggered()));
+            //Rightclick on video to clear all analysis areas
+            QAction *clear_analysis_overlay = new QAction(QIcon(""), tr("&Clear analysis overlay"), this);
+            clear_analysis_overlay->setStatusTip(tr("Clear the video from all analysis areas"));
+            menu.addAction(clear_analysis_overlay);
+            connect(clear_analysis_overlay, SIGNAL(triggered()), this, SLOT(action_clear_analysis_overlay_triggered()));
         } else if(item->type == TYPE::ANALYSIS) {
+            //Rightclick on analysis to abort it
             QAction *abort_analysis = new QAction(QIcon(""), tr("&Abort analysis"), this);
             abort_analysis->setStatusTip(tr("Abort the analysis and remove it"));
             menu.addAction(abort_analysis);
             connect(abort_analysis, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
+            //Rightclick on analysis to set analysis area to video
+            QAction *set_analysis_area_to_video = new QAction(QIcon(""), tr("&Set analysis area"), this);
+            set_analysis_area_to_video->setStatusTip(tr("Set this analysis area on the video"));
+            menu.addAction(set_analysis_area_to_video);
+            connect(set_analysis_area_to_video, SIGNAL(triggered()), this, SLOT(action_set_analysis_area_to_video_triggered()));
+
         }
+        //Rightclick to close project
         QAction *close_project = new QAction(QIcon(""), tr("&Close project"), this);
         close_project->setStatusTip(tr("Close project"));
         menu.addAction(close_project);
         connect(close_project, SIGNAL(triggered()), this, SLOT(on_action_close_project_triggered()));
+
     }
+    //Rightclick anywhere to create project
     QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
-    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
     create_project->setStatusTip(tr("Create project"));
-    load_project->setStatusTip(tr("Load project"));
     menu.addAction(create_project);
-    menu.addAction(load_project);
     connect(create_project, SIGNAL(triggered()), this, SLOT(on_action_add_project_triggered()));
+    //Rightclick anywhere to load project
+    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+    load_project->setStatusTip(tr("Load project"));
+    menu.addAction(load_project);
     connect(load_project, SIGNAL(triggered()), this, SLOT(on_action_load_triggered()));
+
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
@@ -1409,5 +1432,31 @@ void MainWindow::on_next_POI_button_clicked() {
         //emit next_video_POI();
     } else {
         set_status_bar("Needs to be paused");
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_clear_analysis_overlay_triggered
+ */
+void MainWindow::action_clear_analysis_overlay_triggered() {
+    mvideo_player->clear_analysis_overlay();
+}
+
+/**
+ * @brief MainWindow::on_action_set_analysis_area_to_video_triggered
+ */
+void MainWindow::action_set_analysis_area_to_video_triggered()
+{
+    MyQTreeWidgetItem *analysis_in_tree;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        analysis_in_tree =(MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
+        if (analysis_in_tree->type == TYPE::ANALYSIS) {
+            QTreeVideoItem *video_in_tree = (QTreeVideoItem*)analysis_in_tree->parent();
+            if(video_in_tree == playing_video) {
+                ID p_id = ((MyQTreeWidgetItem*)video_in_tree->parent())->id;
+                Analysis analysis = file_handler->get_project(p_id)->get_video(video_in_tree->id)->analyses[analysis_in_tree->id];
+                emit set_analysis_results(analysis);
+            }
+        }
     }
 }

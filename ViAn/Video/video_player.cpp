@@ -939,3 +939,11 @@ void video_player::on_set_analysis_results(Analysis analysis) {
 std::vector<cv::Point>* video_player::get_analysis_area_polygon() {
     return analysis_area->get_polygon();
 }
+
+/**
+ * @brief video_player::clear_analysis_overlay
+ */
+void video_player::clear_analysis_overlay(){
+    delete analysis_overlay;
+    analysis_overlay = new AnalysisOverlay();
+}

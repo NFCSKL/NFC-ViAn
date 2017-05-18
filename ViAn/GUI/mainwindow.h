@@ -177,6 +177,10 @@ private slots:
 
     void on_next_POI_button_clicked();
 
+    void action_clear_analysis_overlay_triggered();
+
+    void action_set_analysis_area_to_video_triggered();
+
 private:
 
     Ui::MainWindow *ui;

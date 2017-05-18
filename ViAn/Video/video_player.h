@@ -75,6 +75,7 @@ public:
     int get_video_width();
     int get_video_height();
     std::vector<cv::Point>* get_analysis_area_polygon();
+    void clear_analysis_overlay();
 
     friend class test_video_player;
 
