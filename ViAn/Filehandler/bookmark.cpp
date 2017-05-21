@@ -89,6 +89,7 @@ void Bookmark::set_description(QString text) {
  * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
+    this->time = json["time"].toInt();
     this->frame_number = json["frame"].toInt();
     this->video_file_name = json["video_name"].toString();
     this->dir_path = json["dir"].toString();
@@ -106,6 +107,7 @@ void Bookmark::write(QJsonObject& json){
     // Exports the frame and updates file_path.
     export_frame();
 
+    json["time"] = this->time;
     json["frame"] = this->frame_number;
     json["video_name"] = this->video_file_name;
     json["dir"] = this->dir_path;
