@@ -25,8 +25,8 @@ void test_report_generator::test_init()
     QString bookmark11_path = "pumparna_bild.jpg";
     QImage image1 = QImage(bookmark1_path);
     QImage image2 = QImage(bookmark11_path);
-    Bookmark* bookmark1 = new Bookmark(1,image1, QString::fromStdString(video1_path), dir_path1, QString::fromStdString("test1"));
-    Bookmark* bookmark2 = new Bookmark(2,image2, QString::fromStdString(video2_path), dir_path1, QString::fromStdString("test11"));
+    Bookmark* bookmark1 = new Bookmark(1,1,image1, QString::fromStdString(video1_path), dir_path1, QString::fromStdString("test1"));
+    Bookmark* bookmark2 = new Bookmark(1,2,image2, QString::fromStdString(video2_path), dir_path1, QString::fromStdString("test11"));
 
 
     file_handler->add_video(proj1, video1_path);
