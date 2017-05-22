@@ -447,7 +447,7 @@ void MainWindow::on_bookmark_button_clicked() {
     // Get bookmark description
     QString bookmark_text("");
     bool ok;
-    bookmark_text = bookmark_view->get_input_text(&ok);
+    bookmark_text = bookmark_view->get_input_text("", &ok);
     if(!ok) return;
     Bookmark* bookmark = new Bookmark(time, frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
     ID id = proj->add_bookmark(playing_video->id, bookmark);
@@ -1251,9 +1251,9 @@ void MainWindow::on_next_POI_button_clicked() {
  */
 void MainWindow::on_action_change_bookmark_triggered() {
     BookmarkItem *item = (BookmarkItem*) ui->document_list->selectedItems().first();
-    QString bookmark_text("");
+    QString current_text = item->get_bookmark()->get_description();
     bool ok;
-    bookmark_text = bookmark_view->get_input_text(&ok);
+    QString bookmark_text = bookmark_view->get_input_text(current_text.toStdString(), &ok);
     if(!ok) return;
     item->update_description(bookmark_text);
     set_status_bar("Updated bookmark");
