@@ -773,6 +773,8 @@ void MainWindow::play_video() {
 
     if (mvideo_player->isRunning()) {
         emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player->wait();
+        delete mvideo_player;
         mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
         setup_video_player(mvideo_player);
     }

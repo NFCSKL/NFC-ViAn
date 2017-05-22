@@ -32,7 +32,6 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* l
  * @brief video_player::~video_player
  */
 video_player::~video_player() {
-    delete video_overlay;
     delete zoom_area;
     delete analysis_area;
     capture.release();
