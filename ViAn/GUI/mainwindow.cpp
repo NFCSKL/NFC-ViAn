@@ -212,7 +212,7 @@ void MainWindow::on_increase_speed_button_clicked(){
         ui->increase_speed_button->setEnabled(false);
     }
     set_status_bar("Playback speed increased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText(speed + "x");
+    ui->speed_label->setText("Play speed: " + speed + "x");
 }
 
 /**
@@ -228,7 +228,7 @@ void MainWindow::on_decrease_speed_button_clicked(){
         ui->decrease_speed_button->setEnabled(false);
     }
     set_status_bar("Playback speed decreased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText(speed + "x");
+    ui->speed_label->setText("Play speed: " + speed + "x");
 }
 
 /**
@@ -285,6 +285,7 @@ void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
     qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
     set_time_to_label(ui->current_time_label, current_time);
+    ui->frame_line_edit->setText(QString::number(mvideo_player->get_current_frame_num()));
 }
 
 /**
@@ -795,7 +796,8 @@ void MainWindow::play_video() {
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
     set_slider_labels();
-    ui->speed_label->setText("1x");
+    ui->speed_label->setText("Play speed: 1x");
+
 }
 
 /**
@@ -987,6 +989,9 @@ void MainWindow::enable_video_buttons() {
     ui->previous_POI_button->setEnabled(true);
     ui->next_POI_button->setEnabled(true);
     ui->video_slider->setEnabled(true);
+    ui->frame_line_edit->setEnabled(true);
+    ui->jump_button->setEnabled(true);
+    ui->frame_label->setEnabled(true);
 }
 
 /**
@@ -1252,4 +1257,30 @@ void MainWindow::on_action_change_bookmark_triggered() {
     if(!ok) return;
     item->update_description(bookmark_text);
     set_status_bar("Updated bookmark");
+}
+
+/**
+ * @brief MainWindow::on_jump_button_clicked
+ * When clicking the button, jump to frame number
+ * specified in the frame_line_edit
+ */
+void MainWindow::on_jump_button_clicked() {
+    string text = ui->frame_line_edit->text().toStdString();
+    char* p;
+    long converted = strtol(text.c_str(), &p, 10);
+    if (*p != 0){
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is not a number!");
+        messageBox.setFixedSize(500,200);
+    } else if (converted+1 > mvideo_player->get_num_frames()) {
+        QString num_frames = QString::number(mvideo_player->get_num_frames());
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is too large! " + num_frames + " is max frame number.");
+        messageBox.setFixedSize(500,200);
+    } else if (converted+1 < 0) {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is negative!");
+    } else {
+        emit set_playback_frame(converted+1, true);
+    }
 }
