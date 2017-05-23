@@ -29,6 +29,7 @@ AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type
  */
 AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent) : QThread(parent) {
     setup_analysis(file_path, type);
+    if(!inclusion_exclusion_points.empty())
     method->set_include_exclude_area(inclusion_exclusion_points, exclude_poly);
 }
 
@@ -56,7 +57,6 @@ void AnalysisController::setup_analysis(std::string file_path, ANALYSIS_TYPE typ
  * Starts the analysis loop.
  */
 void AnalysisController::run() {
-    std::cout << "Starting controller" << std::endl;
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
     emit save_analysis(analysis);

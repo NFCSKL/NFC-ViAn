@@ -16,7 +16,7 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
 
 #
 # TEST
@@ -48,8 +48,8 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp
-
+    GUI/fpsdialog.cpp \
+    GUI/analysiswindow.cpp \
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -58,12 +58,14 @@ HEADERS  += GUI/mainwindow.h \
     GUI/qtreeitems.h \
     GUI/reportgenerator.h \
     GUI/bookmarkview.h \
-    GUI/bookmarkitem.h \
     GUI/makeproject.h \
-    GUI/fpsdialog.h
+    GUI/bookmarkitem.h \
+    GUI/fpsdialog.h \
+    GUI/analysiswindow.h \
 
 FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui
+    GUI/makeproject.ui \
+    GUI/analysiswindow.ui
 
 RESOURCES += resources.qrc
 #

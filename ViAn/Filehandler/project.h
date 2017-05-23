@@ -44,7 +44,7 @@ public:
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
     ID add_bookmark(ID v_id, Bookmark *bookmark);
-
+    ID add_analysis(ID v_id, Analysis analysis);
     void add_report(std::string file_path);
 
     void delete_artifacts();

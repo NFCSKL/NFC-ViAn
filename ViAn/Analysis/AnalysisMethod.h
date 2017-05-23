@@ -38,6 +38,7 @@ protected:
     int num_frames = -1;
     unsigned int sample_freq = 5;
     int current_frame_index = 0;    // The current frame number
+
     int scaled_width = -1;
     int scaled_height = -1;
     float scaling_ratio = 1.0;

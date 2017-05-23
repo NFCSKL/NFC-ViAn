@@ -10,6 +10,10 @@
 #include "opencv2/core/core.hpp"
 
 enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
+const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial detection"};
+const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
+                                                                     std::make_pair("Facial detection",FACIAL_DETECTION)};
+
 class OOI : Saveable{
     int frame;
     std::string file_path;

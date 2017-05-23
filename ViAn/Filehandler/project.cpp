@@ -170,11 +170,19 @@ void Project::write(QJsonObject& json){
         json_reports.append(json_report);
     }
     json["reports"] = json_reports;
+
 }
 
-void Project::add_analysis(Analysis an){
-    this->videos.at(id)->add_analysis(an);
+/**
+ * @brief Project::add_analysis
+ * @param v_id id of video to add analysis to
+ * @param analysis
+ */
+ID Project::add_analysis(ID v_id, Analysis analysis){
+    this->changes_made = true;
+    return this->videos.at(id)->add_analysis(analysis);
 }
+
 
 /**
  * @brief Project::add_bookmark

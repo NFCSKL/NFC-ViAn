@@ -24,6 +24,7 @@ class VideoProject{
     Video* video = nullptr;
     ID vid_id;
     ID id_bookmark = 0;
+    ID id_analysis = 0;
 
 public:
     void read(const QJsonObject& json);
@@ -37,6 +38,7 @@ public:
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,Analysis> get_analyses();
+    Analysis get_analysis(ID id);
 };
 
 
