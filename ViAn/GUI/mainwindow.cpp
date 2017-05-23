@@ -163,8 +163,7 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         // Save analysis
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
-        std::cout << v_id << std::endl;
-        std::cout << p_id << std::endl;
+        analysis.name = current_analysis->name;
         current_analysis->id = file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }
@@ -916,25 +915,22 @@ void MainWindow::add_video_to_tree(VideoProject* video) {
         ID id = it2->first;
         bookmark_view->add_bookmark(video_in_tree->id, id,bm);
     }
+    // Add Analyses
+    std::map<ID,Analysis> analyses = video->get_analyses();
+    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+        Analysis an = it2->second;
+        ID id = it2->first;
+        MyQTreeWidgetItem* analysis_in_tree = new MyQTreeWidgetItem(ANALYSIS, an.name, id);
+        add_analysis_to_tree(analysis_in_tree, video_in_tree);
+    }
 }
+
 /**
  * @brief MainWindow::add_analysis_to_tree
- * @param type
- * @param video_in_tree
- * @todo param analysis from filehandler = nullptr
+ * @param analysis_in_tree to add
+ * @param video_in_tree adding to
  */
 void MainWindow::add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree) {
-    /*if(analysis == nullptr) {
-        type = analysis.get_name();
-        analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, type, analysis.get_id());
-    } else {*/
-    //}
-    /*QQueue<MyQTreeWidgetItem*> *q = new QQueue<MyQTreeWidgetItem*>();
-    while (!analysis_queue->isEmpty()){
-        MyQTreeWidgetItem *i = analysis_queue->dequeue();
-        q->enqueue(i);
-    }
-    while(!q->isEmpty()) analysis_queue->enqueue(q->dequeue());*/
     analysis_in_tree->set_text(analysis_in_tree->name);
     video_in_tree->addChild(analysis_in_tree);
     video_in_tree->setExpanded(true);
@@ -958,7 +954,7 @@ void MainWindow::add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTree
         m_acontroller->start();
         setup_analysis(m_acontroller);
         current_analysis = analysis_in_tree;
-        current_analysis_progress = 0;
+        current_analysis_progress = -1;
     } else {
         AnalysisController *analysis_controller;
         if(use_analysis_area)
@@ -1137,7 +1133,7 @@ void MainWindow::start_next_analysis() {
         m_acontroller = analysis_queue_map[current_analysis];
         m_acontroller->start();
         setup_analysis(m_acontroller);
-        current_analysis_progress = 0;
+        current_analysis_progress = -1;
         analysis_queue_map.erase(analysis_queue_map.find(current_analysis));
     }
     analysis_window->set_progress_bar(0);

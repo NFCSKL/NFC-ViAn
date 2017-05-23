@@ -169,6 +169,15 @@ Analysis::Analysis(const Analysis &obj) {
 }
 
 /**
+ * @brief Analysis::set_name
+ * @param name
+ */
+void Analysis::set_name(QString name)
+{
+    this->name = name;
+}
+
+/**
  * @brief Analysis::~Analysis
  */
 Analysis::~Analysis() {
@@ -190,6 +199,7 @@ void Analysis::add_POI(POI poi){
  */
 void Analysis::read(const QJsonObject &json){
     this->type = (ANALYSIS_TYPE)json["analysis"].toInt();
+    this->name = (QString)json["name"].toString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
@@ -206,6 +216,7 @@ void Analysis::read(const QJsonObject &json){
  */
 void Analysis::write(QJsonObject &json){
     json["type"] = this->type;
+    json["name"] = this->name;
     QJsonArray json_POIs;
     for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
         QJsonObject json_POI;
