@@ -180,7 +180,7 @@ void Project::write(QJsonObject& json){
  */
 ID Project::add_analysis(ID v_id, Analysis analysis){
     this->changes_made = true;
-    return this->videos.at(id)->add_analysis(analysis);
+    return this->videos.at(v_id)->add_analysis(analysis);
 }
 
 /**
