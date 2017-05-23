@@ -96,7 +96,7 @@ MainWindow::~MainWindow() {
  * @param ac AnalysisController for the current analysis
  */
 void MainWindow::setup_analysis(AnalysisController* ac){
-    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
+    QObject::connect(ac, SIGNAL(analysis_done(Analysis)),
                      this, SLOT(analysis_finished(Analysis)));
     QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
                      this, SLOT(show_analysis_progress(int)));
