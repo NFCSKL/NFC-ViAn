@@ -10,7 +10,7 @@ public:
     void add_bookmark(ID video_id, ID bookmark_id, Bookmark *bookmark);
     void remove_bookmark(ID video_id, ID bookmark_id);
     int get_num_bookmarks();
-    QString get_input_text(bool* ok);
+    QString get_input_text(std::string bookmark_text, bool* ok);
 private:
 
     std::map<ID, std::map<ID, BookmarkItem*>> bookmark_items;

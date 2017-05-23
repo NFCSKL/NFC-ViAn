@@ -9,10 +9,10 @@ Project::Project(FileHandler* file_handler, ID id, std::string name){
     this->name = name;
     this->save_name = name;
     this->id = id;
+    this->v_id = 0;
     this->dir = -1;
     this->dir_videos = -1;
-    this->dir_bookmarks = -1;
-    this->v_id = 0;
+    this->dir_bookmarks = -1;    
     this->videos.clear();
     this->changes_made = true;
 }
@@ -23,8 +23,8 @@ Project::Project(FileHandler* file_handler){
     this->file_handler = file_handler;
     this->name = "";
     this->save_name = "";
-    this->id = -1;
-    this->id = 0;
+    this->id = -1;   
+    this->v_id = 0;
     this->dir = -1;
     this->dir_bookmarks = -1;
     this->dir_videos = -1;
@@ -61,8 +61,9 @@ void Project::remove_video_project(ID id){
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video(Video* vid){
-    vid->id = this->v_id;
-    this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
+    VideoProject* vid_proj = new VideoProject(vid);
+    vid_proj->id  = this->v_id;
+    this->videos.insert(std::make_pair(this->v_id, vid_proj));
     this->changes_made = true;
     return this->v_id++;
 }
@@ -90,7 +91,7 @@ void Project::add_report(Report* report){
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video_project(VideoProject* vid_proj){
-    vid_proj->get_video()->id = this->v_id;
+    vid_proj->id = this->v_id;
     this->videos.insert(std::make_pair(this->v_id, vid_proj));
     this->changes_made = true;
     return this->v_id++;

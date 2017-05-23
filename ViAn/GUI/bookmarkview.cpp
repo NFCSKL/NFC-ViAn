@@ -47,13 +47,12 @@ void BookmarkView::remove_bookmark(ID video_id, ID bookmark_id){
 
 /**
  * @brief BookmarkView::get_input_text
+ * @param bookmark_text Text shown in the text edit when opening the dialog.
  * @param ok Parameter set to false if the user cancels.
  * @return Returns a description for the bookmark,
  *         obtained from the user.
  */
-QString BookmarkView::get_input_text(bool* ok) {
-    std::string bookmark_text = "";
-
+QString BookmarkView::get_input_text(std::string bookmark_text, bool* ok) {
     // Create the dialog
     CustomDialog dialog("Bookmark description", NULL);
     dialog.addLabel("Write a description of the bookmark:");

@@ -54,9 +54,10 @@ void OverlayIntegrationTest::exec() {
     main->on_action_rotate_right_triggered();
 
     // Export a bookmark
+    int time = main->mvideo_player->get_current_time();
     int frame_number = main->mvideo_player->get_current_frame_num();
     QImage frame = main->mvideo_player->get_current_frame_unscaled();
-    Bookmark* bookmark = new Bookmark(frame_number, frame, "test1.mp4", "integration_test1", "Bookmark Text");
+    Bookmark* bookmark = new Bookmark(time, frame_number, frame, "test1.mp4", "integration_test1", "Bookmark Text");
     bookmark->export_frame();
 
     std::cout << "Overlay integration test finished.\n";

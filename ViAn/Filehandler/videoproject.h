@@ -22,11 +22,11 @@ class VideoProject{
     std::map<ID,Analysis> analyses;
     Overlay* overlay = new Overlay();
     Video* video = nullptr;
-    ID vid_id;
     ID id_bookmark = 0;
     ID id_analysis = 0;
 
 public:
+    ID id;
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     ID add_analysis(Analysis analysis);
