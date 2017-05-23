@@ -6,7 +6,8 @@
  * Set video.
  */
 VideoProject::VideoProject(Video* v){
-    this->video = v;
+    this->video = v;    
+    this->id = -1;
 }
 
 /**
@@ -15,6 +16,7 @@ VideoProject::VideoProject(Video* v){
  */
 VideoProject::VideoProject(){
     this->video = new Video();
+    this->id = -1;
 }
 
 /**
@@ -49,8 +51,7 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-Analysis VideoProject::get_analysis(ID id)
-{
+Analysis VideoProject::get_analysis(ID id){
     return analyses[id];
 }
 

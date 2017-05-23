@@ -2,9 +2,7 @@
 /**
  * @brief Video::Video
  */
-Video::Video()
-{
-    this->id = -1;
+Video::Video(){
     this->file_path = "";
 }
 
@@ -15,7 +13,6 @@ Video::Video()
  */
 Video::Video(std::string file_path){
     this->file_path = file_path;
-    this->id = -1;
 }
 
 /**

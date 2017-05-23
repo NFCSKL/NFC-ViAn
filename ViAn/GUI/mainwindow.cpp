@@ -156,6 +156,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
+    emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
@@ -163,8 +164,8 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         // Save analysis
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
-        std::cout << v_id << std::endl;
         std::cout << p_id << std::endl;
+        std::cout << v_id << std::endl;
         current_analysis->id = file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }
@@ -913,7 +914,8 @@ void MainWindow::add_project_to_tree(Project* proj) {
 void MainWindow::add_video_to_tree(VideoProject* video) {
     QTreeWidgetItem *project;
     project = ui->project_tree->selectedItems().first();
-    QTreeVideoItem *video_in_tree = new QTreeVideoItem(TYPE::VIDEO, QString::fromStdString(video->get_video()->file_path), video->get_video()->id);
+    QTreeVideoItem *video_in_tree = new QTreeVideoItem(TYPE::VIDEO, QString::fromStdString(video->get_video()->file_path), video->id);
+    std::cout << video->id << std::endl;
     video_in_tree->set_text_from_filepath(video->get_video()->file_path);
     project->addChild(video_in_tree);
     project->setExpanded(true);
