@@ -189,7 +189,7 @@ void Analysis::add_POI(POI poi){
  * @param json
  */
 void Analysis::read(const QJsonObject &json){
-    this->type = (ANALYSIS_TYPE)json["analysis"].toInt();
+    this->type = (ANALYSIS_TYPE)json["type"].toInt();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
