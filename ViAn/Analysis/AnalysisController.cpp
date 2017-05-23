@@ -59,7 +59,7 @@ void AnalysisController::setup_analysis(std::string file_path, ANALYSIS_TYPE typ
 void AnalysisController::run() {
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
-    emit save_analysis(analysis);
+    emit analysis_done(analysis);
     delete method;
 }
 

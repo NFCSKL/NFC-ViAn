@@ -166,14 +166,14 @@ Analysis::Analysis() {
 Analysis::Analysis(const Analysis &obj) {
     POIs = obj.POIs;
     type = obj.type;
+    name = obj.name;
 }
 
 /**
  * @brief Analysis::set_name
  * @param name
  */
-void Analysis::set_name(QString name)
-{
+void Analysis::set_name(QString name){
     this->name = name;
 }
 
@@ -192,7 +192,6 @@ void Analysis::add_POI(POI poi){
     this->POIs.push_back(poi);
 }
 
-#include <iostream>
 /**
  * @brief Analysis::read
  * Reads analysis from json format.
@@ -200,8 +199,7 @@ void Analysis::add_POI(POI poi){
  */
 void Analysis::read(const QJsonObject &json){
     this->type = (ANALYSIS_TYPE)json["type"].toInt();
-    this->name = (QString)json["name"].toString();
-    std::cout << this->name.toStdString() << std::endl;
+    this->name = json["name"].toString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
@@ -219,7 +217,6 @@ void Analysis::read(const QJsonObject &json){
 void Analysis::write(QJsonObject &json){
     json["type"] = this->type;
     json["name"] = this->name;
-    std::cout << this->name.toStdString() << std::endl;
     QJsonArray json_POIs;
     for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
         QJsonObject json_POI;

@@ -97,7 +97,7 @@ MainWindow::~MainWindow() {
  */
 void MainWindow::setup_analysis(AnalysisController* ac){
     QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
-                     this, SLOT(save_analysis_to_file(Analysis)));
+                     this, SLOT(analysis_finished(Analysis)));
     QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
                      this, SLOT(show_analysis_progress(int)));
     QObject::connect(this, SIGNAL(abort_analysis()),
@@ -155,7 +155,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * @param analysis
  * Slot for saving analysis to file.
  */
-void MainWindow::save_analysis_to_file(Analysis analysis) {
+void MainWindow::analysis_finished(Analysis analysis) {
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
@@ -164,6 +164,8 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
         analysis.name = current_analysis->name;
+        std::cout << analysis.name.toStdString() << std::endl;
+        std::cout << current_analysis->name.toStdString() << std::endl;
         current_analysis->id = file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }
@@ -1054,6 +1056,11 @@ void MainWindow::remove_bookmarks_of_video(QTreeVideoItem* video_item) {
     }
 }
 
+/**
+ * @brief MainWindow::remove_analysis_of_project
+ * removes the analyses from the queue
+ * @param project_item
+ */
 void MainWindow::remove_analysis_of_project(MyQTreeWidgetItem* project_item) {
     for(int i = 0; i < project_item->childCount(); i++) {
         QTreeWidgetItem* video_item = project_item->child(i);
@@ -1061,27 +1068,22 @@ void MainWindow::remove_analysis_of_project(MyQTreeWidgetItem* project_item) {
     }
 }
 
+/**
+ * @brief MainWindow::remove_analysis_of_video
+ * removes the analyses from the queue
+ * @param video_item
+ */
 void MainWindow::remove_analysis_of_video(QTreeWidgetItem* video_item) {
     QQueue<MyQTreeWidgetItem*> *tmp_queue = new QQueue<MyQTreeWidgetItem*>();
-    while (!analysis_queue->isEmpty()){
-        MyQTreeWidgetItem *i = analysis_queue->dequeue();
-        std::cout << i->name.toStdString() << std::endl;
-        tmp_queue->enqueue(i);
-    }
-    while(!tmp_queue->isEmpty()) analysis_queue->enqueue(tmp_queue->dequeue());
 
     int id_count = 1; // Used to keep track of where in the queue it is
     while (!analysis_queue->isEmpty()){
         MyQTreeWidgetItem *i = analysis_queue->dequeue();
-        std::cout << "video: " << i->name.toStdString() << std::endl;
-        std::cout << id_count << std::endl;
         if(i->parent() == video_item) {
-            std::cout << "in video" << std::endl;
             delete analysis_queue_map[i];
             analysis_queue_map.erase(analysis_queue_map.find(i));
             analysis_window->remove_analysis_from_list(id_count);
         } else {
-            std::cout << "not in video" << std::endl;
             id_count++;
             tmp_queue->enqueue(i);
         }

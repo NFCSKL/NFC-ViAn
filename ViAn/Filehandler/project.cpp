@@ -23,7 +23,7 @@ Project::Project(FileHandler* file_handler){
     this->file_handler = file_handler;
     this->name = "";
     this->save_name = "";
-    this->id = -1;   
+    this->id = -1;
     this->v_id = 0;
     this->dir = -1;
     this->dir_bookmarks = -1;
@@ -171,7 +171,6 @@ void Project::write(QJsonObject& json){
         json_reports.append(json_report);
     }
     json["reports"] = json_reports;
-
 }
 
 /**
@@ -183,7 +182,6 @@ ID Project::add_analysis(ID v_id, Analysis analysis){
     this->changes_made = true;
     return this->videos.at(id)->add_analysis(analysis);
 }
-
 
 /**
  * @brief Project::add_bookmark

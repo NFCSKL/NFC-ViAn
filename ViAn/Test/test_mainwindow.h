@@ -13,7 +13,6 @@ public:
     explicit test_mainwindow(MainWindow *mainwindow, QObject *parent = 0);
 private slots:
     void test_set_status_bar();
-    void test_analysis_queue();
 private:
     MainWindow *mainwindow;
 };

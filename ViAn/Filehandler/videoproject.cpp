@@ -139,7 +139,7 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * @return id of the analysis
  * Adds analysis to video project.
  */
-ID VideoProject::add_analysis(Analysis analysis){
+ID VideoProject::add_analysis(Analysis& analysis){
     this->analyses.insert(std::make_pair(this->id_analysis, analysis));
     return this->id_analysis++;
 }

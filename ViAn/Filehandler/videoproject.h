@@ -29,7 +29,7 @@ public:
     ID id;
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    ID add_analysis(Analysis analysis);
+    ID add_analysis(Analysis &analysis);
     ID add_bookmark(Bookmark* bookmark);
     void delete_artifacts();    
     VideoProject(Video* v); //Needs to have a video

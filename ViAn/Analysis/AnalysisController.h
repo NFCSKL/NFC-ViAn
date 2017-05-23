@@ -15,7 +15,7 @@ private:
     void setup_analysis(std::string file_path, ANALYSIS_TYPE type);
     AnalysisMethod* method;
 signals:
-    void save_analysis(Analysis analysis);
+    void analysis_done(Analysis analysis);
     void show_analysis_progress(int progress);
 
 private slots:
