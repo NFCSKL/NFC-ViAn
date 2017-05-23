@@ -40,7 +40,6 @@ FileHandler::~FileHandler(){
  */
 void FileHandler::save(){
     QDir dir;
-    dir.cd(".");
     this->save_name = dir.absoluteFilePath("state").toStdString();
     save_saveable(this,add_dir(dir), this->save_format);
 }

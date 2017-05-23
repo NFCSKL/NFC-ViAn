@@ -32,7 +32,6 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* l
  * @brief video_player::~video_player
  */
 video_player::~video_player() {
-    delete video_overlay;
     delete zoom_area;
     delete analysis_area;
     capture.release();
@@ -329,6 +328,14 @@ int video_player::get_num_frames() {
 int video_player::get_current_frame_num() {
     // capture.get() gives the number of the frame to be read, hence the compensation of -1.
     return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
+}
+
+/**
+ * @brief video_player::get_current_time
+ * @return Returns the current time in the clip in milliseconds.
+ */
+int video_player::get_current_time() {
+    return capture.get(CV_CAP_PROP_POS_MSEC);
 }
 
 /**

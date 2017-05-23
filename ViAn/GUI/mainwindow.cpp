@@ -156,6 +156,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
+    emit set_analysis_results(analysis);
     if(current_analysis != nullptr) {
         QString text = "(done)";
         text.append(current_analysis->name);
@@ -163,8 +164,8 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
         // Save analysis
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
-        std::cout << v_id << std::endl;
         std::cout << p_id << std::endl;
+        std::cout << v_id << std::endl;
         current_analysis->id = file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }
@@ -236,7 +237,7 @@ void MainWindow::on_increase_speed_button_clicked(){
         ui->increase_speed_button->setEnabled(false);
     }
     set_status_bar("Playback speed increased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText(speed + "x");
+    ui->speed_label->setText("Play speed: " + speed + "x");
 }
 
 /**
@@ -252,7 +253,7 @@ void MainWindow::on_decrease_speed_button_clicked(){
         ui->decrease_speed_button->setEnabled(false);
     }
     set_status_bar("Playback speed decreased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText(speed + "x");
+    ui->speed_label->setText("Play speed: " + speed + "x");
 }
 
 /**
@@ -309,6 +310,7 @@ void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
     qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
     set_time_to_label(ui->current_time_label, current_time);
+    ui->frame_line_edit->setText(QString::number(mvideo_player->get_current_frame_num()));
 }
 
 /**
@@ -458,18 +460,22 @@ void MainWindow::on_action_exit_triggered() {
  * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmark_button_clicked() {
+    // Get the info from the video object.
+    // This should be done first to ensure we get the
+    // frame at the time the user clicked the button.
+    int time = mvideo_player->get_current_time();
+    int frame_number = mvideo_player->get_current_frame_num();
+    QImage frame = mvideo_player->get_current_frame_unscaled();
+    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
     // Add bookmarks-folder to the project-folder.
     Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
     QDir dir = file_handler->get_dir(proj->dir_bookmarks);
     // Get bookmark description
     QString bookmark_text("");
     bool ok;
-    bookmark_text = bookmark_view->get_input_text(&ok);
+    bookmark_text = bookmark_view->get_input_text("", &ok);
     if(!ok) return;
-    int frame_number = mvideo_player->get_current_frame_num();
-    QImage frame = mvideo_player->get_current_frame_unscaled();
-    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
-    Bookmark* bookmark = new Bookmark(frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
+    Bookmark* bookmark = new Bookmark(time, frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
     ID id = proj->add_bookmark(playing_video->id, bookmark);
     bookmark_view->add_bookmark(playing_video->id, id, bookmark);
     playing_video->bookmarks.push_back(id);
@@ -826,6 +832,8 @@ void MainWindow::play_video() {
 
     if (mvideo_player->isRunning()) {
         emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player->wait();
+        delete mvideo_player;
         mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
         setup_video_player(mvideo_player);
     }
@@ -846,7 +854,8 @@ void MainWindow::play_video() {
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
     set_slider_labels();
-    ui->speed_label->setText("1x");
+    ui->speed_label->setText("Play speed: 1x");
+
 }
 
 /**
@@ -905,7 +914,8 @@ void MainWindow::add_project_to_tree(Project* proj) {
 void MainWindow::add_video_to_tree(VideoProject* video) {
     QTreeWidgetItem *project;
     project = ui->project_tree->selectedItems().first();
-    QTreeVideoItem *video_in_tree = new QTreeVideoItem(TYPE::VIDEO, QString::fromStdString(video->get_video()->file_path), video->get_video()->id);
+    QTreeVideoItem *video_in_tree = new QTreeVideoItem(TYPE::VIDEO, QString::fromStdString(video->get_video()->file_path), video->id);
+    std::cout << video->id << std::endl;
     video_in_tree->set_text_from_filepath(video->get_video()->file_path);
     project->addChild(video_in_tree);
     project->setExpanded(true);
@@ -1186,6 +1196,9 @@ void MainWindow::enable_video_buttons() {
     ui->previous_POI_button->setEnabled(true);
     ui->next_POI_button->setEnabled(true);
     ui->video_slider->setEnabled(true);
+    ui->frame_line_edit->setEnabled(true);
+    ui->jump_button->setEnabled(true);
+    ui->frame_label->setEnabled(true);
 }
 
 /**
@@ -1492,10 +1505,36 @@ void MainWindow::action_set_analysis_area_to_video_triggered()
  */
 void MainWindow::on_action_change_bookmark_triggered() {
     BookmarkItem *item = (BookmarkItem*) ui->document_list->selectedItems().first();
-    QString bookmark_text("");
+    QString current_text = item->get_bookmark()->get_description();
     bool ok;
-    bookmark_text = bookmark_view->get_input_text(&ok);
+    QString bookmark_text = bookmark_view->get_input_text(current_text.toStdString(), &ok);
     if(!ok) return;
     item->update_description(bookmark_text);
     set_status_bar("Updated bookmark");
+}
+
+/**
+ * @brief MainWindow::on_jump_button_clicked
+ * When clicking the button, jump to frame number
+ * specified in the frame_line_edit
+ */
+void MainWindow::on_jump_button_clicked() {
+    string text = ui->frame_line_edit->text().toStdString();
+    char* p;
+    long converted = strtol(text.c_str(), &p, 10);
+    if (*p != 0){
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is not a number!");
+        messageBox.setFixedSize(500,200);
+    } else if (converted+1 > mvideo_player->get_num_frames()) {
+        QString num_frames = QString::number(mvideo_player->get_num_frames());
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is too large! " + num_frames + " is max frame number.");
+        messageBox.setFixedSize(500,200);
+    } else if (converted+1 < 0) {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is negative!");
+    } else {
+        emit set_playback_frame(converted+1, true);
+    }
 }

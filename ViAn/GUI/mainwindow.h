@@ -185,6 +185,8 @@ private slots:
 
     void on_action_change_bookmark_triggered();
 
+    void on_jump_button_clicked();
+
 private:
 
     Ui::MainWindow *ui;

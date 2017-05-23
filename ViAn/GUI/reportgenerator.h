@@ -16,13 +16,12 @@ public:
     explicit ReportGenerator(Project* proj, FileHandler* file_handler);
     ~ReportGenerator();
     void create_report();
-private:
 
+private:
     Project* proj;
     QAxObject* word;
     FileHandler *file_handler;
-    std::vector<std::pair<std::string, std::string> > all_bookmarks;
-
+    std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 272.0;
 
     void create_list_of_names();
@@ -32,6 +31,7 @@ private:
     void resize_picture(QString pic_path, QAxObject* inline_shape);
     std::string date_time_generator();
     void add_paragraph(QAxObject* selection);
+    QString calculate_time(int ms);
 };
 #endif // REPORTGENERERATOR_H
 

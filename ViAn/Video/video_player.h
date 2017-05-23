@@ -40,6 +40,7 @@ public:
     double get_frame_rate();
     int get_num_frames();    
     int get_current_frame_num();
+    int get_current_time();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
