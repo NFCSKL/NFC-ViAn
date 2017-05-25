@@ -242,7 +242,8 @@ private:
     int current_analysis_progress;
     QQueue<MyQTreeWidgetItem*> *analysis_queue;
     std::map<MyQTreeWidgetItem*, AnalysisController*> analysis_queue_map;
-    void remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
+    bool remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
+    void remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree);
     void abort_current_analysis();
     void start_next_analysis();
 };

@@ -51,8 +51,16 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-Analysis VideoProject::get_analysis(ID id){
+Analysis VideoProject::get_analysis(ID id) {
     return analyses[id];
+}
+
+/**
+ * @brief VideoProject::remove_analysis
+ * @param id of the analysis
+ */
+void VideoProject::remove_analysis(ID id) {
+    analyses.erase(id);
 }
 
 /**

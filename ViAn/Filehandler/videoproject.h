@@ -31,7 +31,7 @@ public:
     void write(QJsonObject& json);
     ID add_analysis(Analysis &analysis);
     ID add_bookmark(Bookmark* bookmark);
-    void delete_artifacts();    
+    void delete_artifacts();
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
@@ -39,6 +39,7 @@ public:
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,Analysis> get_analyses();
     Analysis get_analysis(ID id);
+    void remove_analysis(ID id);
 };
 
 
