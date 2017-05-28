@@ -156,9 +156,7 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * Slot for saving analysis to file.
  */
 void MainWindow::analysis_finished(Analysis analysis) {
-    std::cout << "analysis_finished" << std::endl;
     if(current_analysis != nullptr) {
-        std::cout << "true" << std::endl;
         QString text = "(done)";
         text.append(current_analysis->name);
         current_analysis->setText(0, text);
@@ -169,9 +167,8 @@ void MainWindow::analysis_finished(Analysis analysis) {
         current_analysis->id = file_handler->get_project(p_id)->add_analysis(v_id, analysis);
         file_handler->save_project(p_id);
     }
-    std::cout << "true?" << std::endl;
     start_next_analysis();
-    analysis_window->remove_analysis_from_list(0); //remove the first in the list
+    analysis_window->remove_analysis_from_list(0); //remove the first in the listQ
 }
 
 /**
