@@ -1121,7 +1121,7 @@ void MainWindow::on_action_rotate_left_triggered() {
  */
 void MainWindow::on_document_list_itemClicked(QListWidgetItem *item) {
     BookmarkItem* bookmark = (BookmarkItem*) item;
-    emit set_playback_frame(bookmark->get_frame_number());
+    emit set_playback_frame(bookmark->get_frame_number()+1);
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
 }
 
