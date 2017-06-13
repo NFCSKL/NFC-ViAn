@@ -10,11 +10,12 @@
 #include <QJsonArray>
 #include <QDir>
 
-#include "filehandler.h"
+#include "Filehandler/filehandler.h"
 #include "videoproject.h"
 #include "video.h"
-#include "saveable.h"
-#include "analysis.h"
+#include "Filehandler/saveable.h"
+#include "Filehandler/Analysis/analysis.h"
+
 typedef int ID;
 class FileHandler;
 
@@ -31,7 +32,7 @@ class Project : public Saveable{
 public:
     std::string name;
     ID id;
-    ID v_id;
+    ID video_counter;
     ID dir;
     ID dir_bookmarks;
     ID dir_videos;
@@ -43,8 +44,8 @@ public:
     void add_report(Report* report);
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
-    ID add_bookmark(ID v_id, Bookmark *bookmark);
-
+    ID add_bookmark(ID video_counter, Bookmark *bookmark);
+    ID add_analysis(ID video_counter, Analysis analysis);
     void add_report(std::string file_path);
 
     void delete_artifacts();

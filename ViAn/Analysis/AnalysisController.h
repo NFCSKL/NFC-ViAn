@@ -2,7 +2,7 @@
 #define ANALYSISCONTROLLER_H
 
 #include <QThread>
-#include "Filehandler/analysis.h"
+#include "Filehandler/Analysis/analysis.h"
 #include "Analysis/AnalysisMethod.h"
 
 class AnalysisController : public QThread {
@@ -15,7 +15,7 @@ private:
     void setup_analysis(std::string file_path, ANALYSIS_TYPE type);
     AnalysisMethod* method;
 signals:
-    void save_analysis(Analysis analysis);
+    void analysis_done(Analysis analysis);
     void show_analysis_progress(int progress);
 
 private slots:

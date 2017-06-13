@@ -1,6 +1,7 @@
 #include "project.h"
 /**
  * @brief Project::Project
+ * @param file_handler
  * @param id
  * @param name
  */
@@ -9,12 +10,14 @@ Project::Project(FileHandler* file_handler, ID id, std::string name){
     this->name = name;
     this->save_name = name;
     this->id = id;
+    this->video_counter = 0;
+    this->videos.clear();
+    this->changes_made = true;
+
+    // Setting ids to default values, -1 indicating invalid value.
     this->dir = -1;
     this->dir_videos = -1;
     this->dir_bookmarks = -1;
-    this->v_id = 0;
-    this->videos.clear();
-    this->changes_made = true;
 }
 /**
  * @brief Project::Project
@@ -23,12 +26,14 @@ Project::Project(FileHandler* file_handler){
     this->file_handler = file_handler;
     this->name = "";
     this->save_name = "";
+    this->videos.clear();
+    this->video_counter = 0;
+    // Setting ids to default values, -1 indicating invalid value.
     this->id = -1;
-    this->id = 0;
     this->dir = -1;
     this->dir_bookmarks = -1;
     this->dir_videos = -1;
-    this->videos.clear();
+
 }
 
 /**
@@ -61,10 +66,11 @@ void Project::remove_video_project(ID id){
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video(Video* vid){
-    vid->id = this->v_id;
-    this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
+    VideoProject* vid_proj = new VideoProject(vid);
+    vid_proj->id  = this->video_counter;
+    this->videos.insert(std::make_pair(this->video_counter, vid_proj));
     this->changes_made = true;
-    return this->v_id++;
+    return this->video_counter++;
 }
 
 /**
@@ -90,10 +96,10 @@ void Project::add_report(Report* report){
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video_project(VideoProject* vid_proj){
-    vid_proj->get_video()->id = this->v_id;
-    this->videos.insert(std::make_pair(this->v_id, vid_proj));
+    vid_proj->id = this->video_counter;
+    this->videos.insert(std::make_pair(this->video_counter, vid_proj));
     this->changes_made = true;
-    return this->v_id++;
+    return this->video_counter++;
 }
 /**
  * @brief Project::delete_artifacts
@@ -172,8 +178,14 @@ void Project::write(QJsonObject& json){
     json["reports"] = json_reports;
 }
 
-void Project::add_analysis(Analysis an){
-    this->videos.at(id)->add_analysis(an);
+/**
+ * @brief Project::add_analysis
+ * @param v_id id of video to add analysis to
+ * @param analysis
+ */
+ID Project::add_analysis(ID v_id, Analysis analysis){
+    this->changes_made = true;
+    return this->videos.at(v_id)->add_analysis(analysis);
 }
 
 /**

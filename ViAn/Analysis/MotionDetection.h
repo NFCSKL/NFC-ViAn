@@ -30,6 +30,7 @@ private:
     const int MOG2_THRESHOLD = 50;
     const bool DETECT_SHADOWS = false;
 
+
 signals:
     void save_analysis(Analysis analysis);
 };

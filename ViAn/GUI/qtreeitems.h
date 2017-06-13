@@ -8,8 +8,10 @@
 #include <vector>
 #include "bookmarkview.h"
 #define TEXT_LENGTH 15
+
+enum TYPE {PROJECT, VIDEO, ANALYSIS};
+
 typedef int ID;
-enum TYPE {PROJECT, VIDEO};
 
 class MyQTreeWidgetItem: public QTreeWidgetItem {
 public:
@@ -18,9 +20,10 @@ public:
     ID id;
     TYPE type;
     QString name;
-    void set_text(std::string text);
+    void set_text(QString text);
     void set_text_from_filepath(std::string filepath);
     std::string get_name();
+    bool operator==(MyQTreeWidgetItem* item);
 private slots:
 
 private:

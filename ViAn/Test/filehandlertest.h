@@ -1,7 +1,7 @@
 #ifndef FILEHANDLERTEST_H
 #define FILEHANDLERTEST_H
 #include "Filehandler/filehandler.h"
-#include "Filehandler/project.h"
+#include "Filehandler/Project/project.h"
 #include <QTest>
 #include <QObject>
 

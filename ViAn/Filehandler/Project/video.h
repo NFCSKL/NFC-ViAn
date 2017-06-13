@@ -5,13 +5,12 @@
 #include <sstream>
 #include <QJsonObject>
 #include <QString>
-#include "saveable.h"
+#include "Filehandler/saveable.h"
 typedef int ID;
 class Video : Saveable{
 
 public:
     Video();
-    ID id;
     Video(std::string file_path);
     std::string file_path;
     void read(const QJsonObject& json);

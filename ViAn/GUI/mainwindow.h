@@ -24,12 +24,14 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
+#include "analysiswindow.h"
+#include <QQueue>
 #include "Analysis/AnalysisController.h"
 #define SCROLL_AREA_MARGIN 25
 
 
 using namespace std;
-class inputwindow;
+class AnalysisWindow;
 
 namespace Ui {
 class MainWindow;
@@ -44,6 +46,8 @@ class MainWindow : public QMainWindow
 public:
     void set_status_bar(string status, int timer = 5000);
     void add_project_to_tree(Project* proj);
+    void add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree);
+    void add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString q_input);
@@ -53,6 +57,8 @@ public:
     // Lock and wait condition to sleep player when video is paused
     QMutex mutex;
     QWaitCondition paused_wait;
+
+    friend class test_mainwindow;
 
 signals:
     void set_play_video();
@@ -111,7 +117,7 @@ private slots:
 
     void on_action_line_triggered();
 
-    void prepare_menu(const QPoint & pos);
+    void right_click_project_tree_menu(const QPoint & pos);
 
     void prepare_bookmark_menu(const QPoint & pos);
 
@@ -159,17 +165,23 @@ private slots:
 
     void on_action_invert_analysis_area_triggered();
 
+    void on_action_perform_analysis_triggered();
+
     void on_action_close_project_triggered();
 
     void on_action_show_hide_analysis_overlay_triggered();
 
-    void save_analysis_to_file(Analysis analysis);
+    void analysis_finished(Analysis analysis);
 
     void show_analysis_progress(int progress);
 
     void on_previous_POI_button_clicked();
 
     void on_next_POI_button_clicked();
+
+    void on_action_clear_analysis_overlay_triggered();
+
+    void on_action_set_analysis_area_to_video_triggered();
 
     void on_action_change_bookmark_triggered();
 
@@ -193,14 +205,21 @@ private:
                 std::chrono::system_clock::now().time_since_epoch()
             );
 
+
+    AnalysisWindow *analysis_window;
+
     FileHandler *file_handler;
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
+
     void setup_analysis(AnalysisController *ac);
+
     void add_video_to_tree(VideoProject *video);
 
     void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
-    void remove_bookmark_of_video(QTreeVideoItem* video_item);
+    void remove_bookmarks_of_video(QTreeVideoItem* video_item);
+    void remove_analysis_of_project(MyQTreeWidgetItem* project_item);
+    void remove_analysis_of_video(QTreeWidgetItem* video_item);
 
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
 
@@ -219,6 +238,14 @@ private:
 
     void deselect_overlay_tool();
 
+    MyQTreeWidgetItem *current_analysis;
+    int current_analysis_progress;
+    QQueue<MyQTreeWidgetItem*> *analysis_queue;
+    std::map<MyQTreeWidgetItem*, AnalysisController*> analysis_queue_map;
+    bool remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
+    void remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree);
+    void abort_current_analysis();
+    void start_next_analysis();
 };
 
 #endif // MAINWINDOW_H

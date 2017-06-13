@@ -1,4 +1,5 @@
 #include "test_mainwindow.h"
+#include <string.h>
 /**
  * @brief test_mainwindow::test_mainwindow
  * @param mainwindow the window to be tested

@@ -1,7 +1,7 @@
 #ifndef TEST_REPORT_GENERATOR_H
 #define TEST_REPORT_GENERATOR_H
 #include <Filehandler/filehandler.h>
-#include <Filehandler/project.h>
+#include <Filehandler/Project/project.h>
 #include <GUI/reportgenerator.h>
 #include <QTest>
 #include <QObject>
