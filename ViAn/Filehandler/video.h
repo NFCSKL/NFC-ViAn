@@ -11,7 +11,6 @@ class Video : Saveable{
 
 public:
     Video();
-    ID id;
     Video(std::string file_path);
     std::string file_path;
     void read(const QJsonObject& json);

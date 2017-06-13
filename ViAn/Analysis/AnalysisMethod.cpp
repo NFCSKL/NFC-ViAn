@@ -110,6 +110,7 @@ Analysis AnalysisMethod::run_analysis() {
  */
 int AnalysisMethod::get_progress() {
     return current_frame_index*100/num_frames;
+
 }
 
 /**

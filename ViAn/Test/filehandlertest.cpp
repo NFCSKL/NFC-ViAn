@@ -48,9 +48,9 @@ void FileHandlerTest::project_save_load_test(){
     file_handler->save_project(proj2->id);
     file_handler->save_project(proj3->id);
 
-    Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.json").toStdString());
-    Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.json").toStdString());
-    Project* l_proj3 = file_handler->load_project(file_handler->get_dir(proj3->dir).absoluteFilePath("TEST_PROJ3.json").toStdString());
+    Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.dat").toStdString());
+    Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.dat").toStdString());
+    Project* l_proj3 = file_handler->load_project(file_handler->get_dir(proj3->dir).absoluteFilePath("TEST_PROJ3.dat").toStdString());
 
     QVERIFY(file_handler->proj_equals(*proj1,*l_proj1));
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));
@@ -81,9 +81,9 @@ void FileHandlerTest::project_add_remove_items_test(){
     file_handler->save_project(proj3->id);
 
 
-    Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.json").toStdString());
-    Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.json").toStdString());
-    Project* l_proj3 = file_handler->load_project(file_handler->get_dir(proj3->dir).absoluteFilePath("TEST_PROJ3.json").toStdString());
+    Project* l_proj1 = file_handler->load_project(file_handler->get_dir(proj1->dir).absoluteFilePath("TEST_PROJ1.dat").toStdString());
+    Project* l_proj2 = file_handler->load_project(file_handler->get_dir(proj2->dir).absoluteFilePath("TEST_PROJ2.dat").toStdString());
+    Project* l_proj3 = file_handler->load_project(file_handler->get_dir(proj3->dir).absoluteFilePath("TEST_PROJ3.dat").toStdString());
 
     QVERIFY(file_handler->proj_equals(*proj1,*l_proj1));
     QVERIFY(file_handler->proj_equals(*proj2,*l_proj2));

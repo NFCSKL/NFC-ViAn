@@ -516,6 +516,7 @@
     <addaction name="action_close_project"/>
     <addaction name="action_delete"/>
     <addaction name="action_choose_workspace"/>
+    <addaction name="action_do_analysis"/>
     <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_edit">
@@ -992,6 +993,11 @@
    </property>
    <property name="text">
     <string>Invert analysis area</string>
+   </property>
+  </action>
+  <action name="action_do_analysis">
+   <property name="text">
+    <string>Do analysis</string>
    </property>
   </action>
   <action name="action_close_project">

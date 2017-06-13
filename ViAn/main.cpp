@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 
     bool testing = false;
     bool integration_testing = false;
+
     if (testing) {
         //For testing video player.
         test_video_player* video_test = new test_video_player();

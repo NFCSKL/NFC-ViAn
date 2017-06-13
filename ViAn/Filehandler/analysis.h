@@ -10,6 +10,10 @@
 #include "opencv2/core/core.hpp"
 
 enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
+const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial detection"};
+const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
+                                                                     std::make_pair("Facial detection",FACIAL_DETECTION)};
+
 class OOI : Saveable{
     int frame;
     std::string file_path;
@@ -46,7 +50,8 @@ public:
     Analysis();
     ~Analysis();
     Analysis(const Analysis &obj);
-
+    QString name;
+    void set_name(QString name);
     void add_POI(POI POI);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);

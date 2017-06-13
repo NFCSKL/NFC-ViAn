@@ -1,5 +1,4 @@
 #include "analysis.h"
-#include <iostream>
 
 /**
  * @brief POI::POI
@@ -38,7 +37,7 @@ void POI::read(const QJsonObject& json) {
     for(int i = start_frame; i != end_frame; i++){        
         QJsonArray json_frame_OOIs = json[QString::number(i)].toArray();
         std::vector<OOI> oois;
-        for(int j  = 0; j != json_frame_OOIs.size(); j++){
+        for(int j = 0; j != json_frame_OOIs.size(); j++){
             OOI ooi;
             ooi.read(json_frame_OOIs[j].toObject());
             oois.push_back(ooi);
@@ -167,6 +166,15 @@ Analysis::Analysis() {
 Analysis::Analysis(const Analysis &obj) {
     POIs = obj.POIs;
     type = obj.type;
+    name = obj.name;
+}
+
+/**
+ * @brief Analysis::set_name
+ * @param name
+ */
+void Analysis::set_name(QString name){
+    this->name = name;
 }
 
 /**
@@ -190,7 +198,8 @@ void Analysis::add_POI(POI poi){
  * @param json
  */
 void Analysis::read(const QJsonObject &json){
-    this->type = (ANALYSIS_TYPE)json["analysis"].toInt();
+    this->type = (ANALYSIS_TYPE)json["type"].toInt();
+    this->name = json["name"].toString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
@@ -207,6 +216,7 @@ void Analysis::read(const QJsonObject &json){
  */
 void Analysis::write(QJsonObject &json){
     json["type"] = this->type;
+    json["name"] = this->name;
     QJsonArray json_POIs;
     for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
         QJsonObject json_POI;
@@ -225,15 +235,12 @@ void Analysis::write(QJsonObject &json){
  */
 std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
     std::vector<cv::Rect> rects;
-    std::cout << "Num POIs: " << POIs.size() << std::endl;
     for (POI p : POIs) {
-        std::cout << "POI start frame: "<<p.start_frame << ", End frame: "<<p.end_frame << std::endl;
         if (frame_num >= p.start_frame && frame_num <= p.end_frame) {
             std::vector<OOI> oois = p.OOIs[frame_num];
             for (OOI o : oois) {
                 rects.push_back(o.get_rect());
             }
-            std::cout << "Adding rects " << rects.size() << std::endl;
             break;
         }
     }
