@@ -23,7 +23,7 @@
 #include <QJsonDocument>
 
 // ViAn files
-#include "project.h"
+#include "Filehandler/Project/project.h"
 #include "saveable.h"
 
 enum WRITE_OPTION{APPEND, OVERWRITE};

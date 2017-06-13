@@ -7,7 +7,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
-#include "Filehandler/analysis.h"
+#include "Filehandler/Analysis/analysis.h"
 
 class AnalysisMethod : public QThread {
     Q_OBJECT
