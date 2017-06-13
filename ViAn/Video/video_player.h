@@ -12,7 +12,7 @@
 #include <QImage>
 #include "overlay.h"
 #include "analysisoverlay.h"
-#include "Filehandler/Analysis//analysis.h"
+#include "Project/Analysis/analysis.h"
 
 #include <chrono>
 

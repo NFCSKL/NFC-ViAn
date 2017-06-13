@@ -1,11 +1,10 @@
 #ifndef TEST_REPORT_GENERATOR_H
 #define TEST_REPORT_GENERATOR_H
-#include <Filehandler/filehandler.h>
-#include <Filehandler/Project/project.h>
-#include <GUI/reportgenerator.h>
 #include <QTest>
 #include <QObject>
-
+#include "Filehandler/filehandler.h"
+#include "Project/project.h"
+#include "GUI/reportgenerator.h"
 class test_report_generator : public QObject {
     Q_OBJECT
 public:

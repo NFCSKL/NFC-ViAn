@@ -6,7 +6,7 @@
 #include "opencv2/video/video.hpp"
 #include "opencv2/videoio/videoio.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#include "Filehandler/Analysis/analysis.h"
+#include "Project/Analysis/analysis.h"
 #include "Analysis/MotionDetection.h"
 
 /**

@@ -1,10 +1,5 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
-// OS specific
-#ifdef _WIN32
-    #include <windows.h>
-    #include "stringhelper.h"
-#endif
 // I/O
 #include <string>
 #include <iostream>
@@ -23,7 +18,7 @@
 #include <QJsonDocument>
 
 // ViAn files
-#include "Filehandler/Project/project.h"
+#include "Project/project.h"
 #include "saveable.h"
 
 enum WRITE_OPTION{APPEND, OVERWRITE};
@@ -97,6 +92,7 @@ private:
     // Project methods
     ID add_project(Project* proj);
     void add_project(ID id, Project *proj);
+
     Project* load_project(std::string proj_name, std::string dir_path);
     void save_project(Project* proj);
 

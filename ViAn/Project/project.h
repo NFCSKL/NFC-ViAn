@@ -14,7 +14,7 @@
 #include "videoproject.h"
 #include "video.h"
 #include "Filehandler/saveable.h"
-#include "Filehandler/Analysis/analysis.h"
+#include "Project/Analysis/analysis.h"
 
 typedef int ID;
 class FileHandler;

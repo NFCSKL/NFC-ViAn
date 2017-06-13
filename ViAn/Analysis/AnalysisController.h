@@ -2,7 +2,7 @@
 #define ANALYSISCONTROLLER_H
 
 #include <QThread>
-#include "Filehandler/Analysis/analysis.h"
+#include "Project/Analysis/analysis.h"
 #include "Analysis/AnalysisMethod.h"
 
 class AnalysisController : public QThread {

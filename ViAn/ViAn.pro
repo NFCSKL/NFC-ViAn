@@ -123,50 +123,43 @@ unix {
 # START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/Project/project.cpp \
-    Filehandler/Project/video.cpp \
-    Filehandler/Project/videoproject.cpp \
-    Filehandler/Project/bookmark.cpp \
     Filehandler/saveable.cpp \
-    Filehandler/Analysis/analysis.cpp \
-    Filehandler/report.cpp \
-    Filehandler/Analysis/ooi.cpp \
-    Filehandler/Analysis/poi.cpp
+
+
 
 HEADERS  += Filehandler/filehandler.h \
-    Filehandler/Project/project.h \
-    Filehandler/dir.h \
-    Filehandler/Project/video.h \
-    Filehandler/Project/videoproject.h \
-    Filehandler/Project/bookmark.h  \
     Filehandler/saveable.h \
-    Filehandler/Analysis/analysis.h \
-    Filehandler/report.h    \
-    Filehandler/Analysis/ooi.h \
-    Filehandler/Analysis/poi.h
 
-win32{
 
-    SOURCES += Filehandler/stringhelper.cpp\
-      Filehandler/win32dir.cpp
-
-    HEADERS += Filehandler/stringhelper.h
-}
-
-macx {
-    SOURCES += Filehandler/macdir.cpp
-}
-
-linux {
-    #SOURCES += Filehandler/linuxdir.cpp
-}
-unix {
-    SOURCES += Filehandler/linuxdir.cpp
-}
 
 #
 # END: FILEHANDLER
 #
+
+#
+# Project
+#
+SOURCES += Project/report.cpp \
+    Project/project.cpp \
+    Project/video.cpp \
+    Project/videoproject.cpp \
+    Project/bookmark.cpp \
+    Project/Analysis/analysis.cpp \
+    Project/Analysis/ooi.cpp \
+    Project/Analysis/poi.cpp
+
+
+HEADERS += Project/project.h \
+    Project/video.h \
+    Project/videoproject.h \
+    Project/bookmark.h  \
+    Project/report.h \
+    Project/Analysis/analysis.h \
+    Project/Analysis/ooi.h \
+    Project/Analysis/poi.h
+
+
+
 
 #
 # ANALYSIS
