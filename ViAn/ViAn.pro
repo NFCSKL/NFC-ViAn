@@ -16,7 +16,8 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    projectmanager.cpp
 
 
 #
@@ -32,6 +33,7 @@ HEADERS += Test/test_video_player.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
     Test/overlayintegrationtest.h \
+    projectmanager.h
 
 #
 # LIBRARY
