@@ -165,7 +165,7 @@ private slots:
 
     void on_action_invert_analysis_area_triggered();
 
-    void on_action_do_analysis_triggered();
+    void on_action_perform_analysis_triggered();
 
     void on_action_close_project_triggered();
 
@@ -179,9 +179,9 @@ private slots:
 
     void on_next_POI_button_clicked();
 
-    void action_clear_analysis_overlay_triggered();
+    void on_action_clear_analysis_overlay_triggered();
 
-    void action_set_analysis_area_to_video_triggered();
+    void on_action_set_analysis_area_to_video_triggered();
 
     void on_action_change_bookmark_triggered();
 

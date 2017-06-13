@@ -68,7 +68,7 @@ std::string MyQTreeWidgetItem::get_name() {
  * @brief operator ==
  * @param item1
  * @param item2
- * @return if the same true
+ * If items are identical in member values and have the same parent, true else false.
  */
 bool MyQTreeWidgetItem::operator==(MyQTreeWidgetItem* item){
 

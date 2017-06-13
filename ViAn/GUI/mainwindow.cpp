@@ -723,16 +723,16 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
             delete_video->setStatusTip(tr("Remove video from project"));
             menu.addAction(delete_video);
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
-            //Rightclick on video to performe analysis on it
+            //Rightclick on video to perform analysis on it
             QAction *do_analysis = new QAction(QIcon(""), tr("&Perform analysis"), this);
-            do_analysis->setStatusTip(tr("Perform a analysis on video"));
+            do_analysis->setStatusTip(tr("Perform an analysis on video"));
             menu.addAction(do_analysis);
-            connect(do_analysis, SIGNAL(triggered()), this, SLOT(on_action_do_analysis_triggered()));
+            connect(do_analysis, SIGNAL(triggered()), this, SLOT(on_action_perform_analysis_triggered()));
             //Rightclick on video to clear all analysis areas
             QAction *clear_analysis_overlay = new QAction(QIcon(""), tr("&Clear analysis overlay"), this);
             clear_analysis_overlay->setStatusTip(tr("Clear the video from all analysis areas"));
             menu.addAction(clear_analysis_overlay);
-            connect(clear_analysis_overlay, SIGNAL(triggered()), this, SLOT(action_clear_analysis_overlay_triggered()));
+            connect(clear_analysis_overlay, SIGNAL(triggered()), this, SLOT(on_action_clear_analysis_overlay_triggered()));
         } else if(item->type == TYPE::ANALYSIS) {
             //Rightclick on analysis to abort it
             QAction *abort_analysis = new QAction(QIcon(""), tr("&Abort analysis"), this);
@@ -743,7 +743,7 @@ void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
             QAction *set_analysis_area_to_video = new QAction(QIcon(""), tr("&Set analysis area"), this);
             set_analysis_area_to_video->setStatusTip(tr("Set this analysis area on the video"));
             menu.addAction(set_analysis_area_to_video);
-            connect(set_analysis_area_to_video, SIGNAL(triggered()), this, SLOT(action_set_analysis_area_to_video_triggered()));
+            connect(set_analysis_area_to_video, SIGNAL(triggered()), this, SLOT(on_action_set_analysis_area_to_video_triggered()));
 
         }
         //Rightclick to close project
@@ -907,7 +907,6 @@ void MainWindow::add_project_to_tree(Project* proj) {
 /**
  * @brief MainWindow::add_video_to_tree
  * @param file_path of the video
- * @todo add all analysis from video to tree
  */
 void MainWindow::add_video_to_tree(VideoProject* video) {
     QTreeWidgetItem *project;
@@ -926,9 +925,9 @@ void MainWindow::add_video_to_tree(VideoProject* video) {
     // Add Analyses
     std::map<ID,Analysis> analyses = video->get_analyses();
     for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
-        Analysis an = it2->second;
+        Analysis analysis = it2->second;
         ID id = it2->first;
-        MyQTreeWidgetItem* analysis_in_tree = new MyQTreeWidgetItem(ANALYSIS, an.name, id);
+        MyQTreeWidgetItem* analysis_in_tree = new MyQTreeWidgetItem(ANALYSIS, analysis.name, id);
         add_analysis_to_tree(analysis_in_tree, video_in_tree);
     }
 }
@@ -1115,7 +1114,7 @@ bool MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
         analysis_queue->removeAt(index);
         delete analysis_queue_map[my_item];
         analysis_queue_map.erase(my_item);
-        analysis_window->remove_analysis_from_list(index+1); // +1 becouse of current_analysis has index 0 in analysis_window
+        analysis_window->remove_analysis_from_list(index+1); // + 1 because of current_analysis has index 0 in analysis_window
         return true;
     } else return false;
 }
@@ -1364,7 +1363,7 @@ void MainWindow::on_action_invert_analysis_area_triggered() {
 /**
  * @brief MainWindow::on_action_do_analysis_triggered
  */
-void MainWindow::on_action_do_analysis_triggered() {
+void MainWindow::on_action_perform_analysis_triggered() {
     QTreeWidgetItem *video;
     if(ui->project_tree->selectedItems().size() == 1) {
         video = ui->project_tree->selectedItems().first();
@@ -1469,14 +1468,14 @@ void MainWindow::on_next_POI_button_clicked() {
 /**
  * @brief MainWindow::on_action_clear_analysis_overlay_triggered
  */
-void MainWindow::action_clear_analysis_overlay_triggered() {
+void MainWindow::on_action_clear_analysis_overlay_triggered() {
     mvideo_player->clear_analysis_overlay();
 }
 
 /**
  * @brief MainWindow::on_action_set_analysis_area_to_video_triggered
  */
-void MainWindow::action_set_analysis_area_to_video_triggered()
+void MainWindow::on_action_set_analysis_area_to_video_triggered()
 {
     MyQTreeWidgetItem *analysis_in_tree;
     if(ui->project_tree->selectedItems().size() == 1) {
