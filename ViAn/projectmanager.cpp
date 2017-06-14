@@ -5,7 +5,7 @@ ProjectManager::ProjectManager()
 
 }
 /**
- * @brief FileHandler::add_project
+ * @brief ProjectManager::add_project
  * @param proj
  * Adds project to map.
  */
@@ -15,7 +15,7 @@ ID ProjectManager::add_project(Project* proj){
 }
 
 /**
- * @brief FileHandler::add_project
+ * @brief ProjectManager::add_project
  * @param std::pair<<ID, Project*> pair
  * @return void
  * Adds project to projects, locks in doing so.
@@ -29,7 +29,7 @@ void ProjectManager::add_project(ID id, Project* proj){
 }
 
 /**
- * @brief FileHandler::get_project
+ * @brief ProjectManager::get_project
  * @param ID project id
  * @return Project*
  * Gets project by ID, locks in doing so.
@@ -42,7 +42,30 @@ Project* ProjectManager::get_project(ID id){
 }
 
 /**
- * @brief FileHandler::delete_project
+ * @brief FileHandler::create_project
+ * creates project and associated files.
+ * @param std::string name
+ * @return Project* created project
+ */
+Project* ProjectManager::create_project(const std::string& proj_name,
+                                        const std::string& dir_path,
+                                        const std::string& vid_path)
+{
+    Project* proj =  new Project(this, this->project_id, proj_name);
+    proj->dir = dir_path + proj_name;
+    proj->dir_bookmarks = dir_path + "/Bookmarks";
+    if(vid_path != "")
+        proj->dir_videos = dir_path + vid_path;
+    else
+        proj->dir_videos = dir_path;
+    add_project(proj);                          // Add project to file sytstem
+    save_project(proj);                         // Save project file
+    open_project(proj->id);                     // Open project
+    return proj;
+}
+
+/**
+ * @brief ProjectManager::delete_project
  * @param proj_id
  * @return Deletes project entirely
  * Deletes project and frees allocated memory.
@@ -70,7 +93,7 @@ bool ProjectManager::delete_project(ID proj_id){
 
 /**
  * @todo make threadsafe
- * @brief FileHandler::add_video
+ * @brief ProjectManager::add_video
  * @param Project*,string file_path
  * Add a video file_path to a given project.
  * Creates Video object which is accessed further by returned id.
@@ -81,7 +104,7 @@ ID ProjectManager::add_video(Project* proj, std::string file_path){
 }
 
 /**
- * @brief FileHandler::remove_video_from_project
+ * @brief ProjectManager::remove_video_from_project
  * @param proj_id
  * @param vid_id
  * Removes video from project according to given ids.
@@ -92,7 +115,7 @@ void ProjectManager::remove_video_from_project(ID proj_id, ID vid_id){
 }
 
 /**
- * @brief FileHandler::load_project
+ * @brief ProjectManager::load_project
  * @param full_project_path
  * @return loaded Project
  * Public load function
@@ -109,7 +132,7 @@ Project* ProjectManager::load_project(std::string full_project_path){
 }
 
 /**
- * @brief FileHandler::save_project
+ * @brief ProjectManager::save_project
  * @param id
  * Save projects, exposed interface.
  * Here for simplicity of call as well as hiding save format.
@@ -120,18 +143,18 @@ void ProjectManager::save_project(ID id){
 }
 
 /**
- * @brief FileHandler::save_project
+ * @brief ProjectManager::save_project
  * @param proj
  * Exposed interface, added for simplicity of call when
  * project pointer is still available
  */
 void ProjectManager::save_project(Project *proj){
-    proj->save_saveable(proj, proj->dir, proj->save_format);
+    proj->save_saveable(proj->dir, proj->save_format);
     proj->save_project();
 }
 
 /**
- * @brief FileHandler::open_project
+ * @brief ProjectManager::open_project
  * @param id
  * Open project by id.
  */
@@ -140,7 +163,7 @@ void ProjectManager::open_project(ID id){
 }
 
 /**
- * @brief FileHandler::close_project
+ * @brief ProjectManager::close_project
  * @param id
  * Close project by id.
  */
@@ -149,7 +172,7 @@ void ProjectManager::close_project(ID id){
 }
 
 /**
- * @brief FileHandler::proj_equals
+ * @brief ProjectManager::proj_equals
  * @param proj
  * @param proj2
  * @return true if project contents are the same

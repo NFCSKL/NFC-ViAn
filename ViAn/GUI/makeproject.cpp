@@ -10,7 +10,7 @@
  * @param workspace, the standard
  * @param parent
  */
-MakeProject::MakeProject(MainWindow *mainwindow, FileHandler *file_handler, std::string workspace, QWidget *parent) :
+MakeProject::MakeProject(MainWindow *mainwindow, ProjectManager *project_manager, std::string workspace, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MakeProject) {
     ui->setupUi(this);
@@ -18,7 +18,7 @@ MakeProject::MakeProject(MainWindow *mainwindow, FileHandler *file_handler, std:
     ui->project_path_input->setText(this->project_path); //sets the text in the input box
     this->video_path = QString::fromStdString(workspace);
     ui->video_path_input->setText(this->video_path); //sets the text in the input box
-    this->file_handler = file_handler;
+    this->project_manager = project_manager;
     this->mainwindow = mainwindow;
     QShortcut *ok_shortcut = new QShortcut(QKeySequence(tr("Return")), this);
     QObject::connect(ok_shortcut, SIGNAL(activated()), this, SLOT(on_ok_button_clicked()));
@@ -70,7 +70,9 @@ void MakeProject::on_ok_button_clicked() {
     else if(this->video_path.isEmpty())
         set_status_bar("Needs a path for the videos");
    else {
-        Project *proj = file_handler->create_project(name, project_path.toStdString(), video_path.toStdString());
+        Project *proj = project_manager->create_project(name.toStdString(),
+                                                        project_path.toStdString(),
+                                                        video_path.toStdString());
         mainwindow->add_project_to_tree(proj);
         set_status_bar("Project " + name.toStdString() + " created.");
         delete this;

@@ -3,9 +3,8 @@
 
 #include <QMainWindow>
 #include <QString>
-#include "Filehandler/filehandler.h"
 #include "mainwindow.h"
-
+#include "projectmanager.h"
 class MainWindow;
 namespace Ui {
 class MakeProject;
@@ -16,7 +15,7 @@ class MakeProject : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MakeProject(MainWindow *mainwindow, FileHandler *file_handler, std::string worksace, QWidget *parent = 0);
+    explicit MakeProject(MainWindow *mainwindow, ProjectManager *project_manager, std::string worksace, QWidget *parent = 0);
     ~MakeProject();
 
 private slots:
@@ -34,7 +33,7 @@ private:
     QString project_path;
     QString video_path;
     QString name;
-    FileHandler *file_handler;
+    ProjectManager *project_manager;
     MainWindow *mainwindow;
     Ui::MakeProject *ui;
     void set_status_bar(std::string status, int timer = 750);

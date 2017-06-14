@@ -6,11 +6,9 @@
  * default value for workspace
  */
 FileHandler::FileHandler() {
-    this->project_id = 0; // zero out counter ids
     this->file_id = 0;
     this->dir_id = 0;
-    this->last_error = false;    
-    open_projects.clear();
+    this->last_error = false;     
     #ifdef _WIN32
         this->work_space = create_directory("C:/");
     #elif __APPLE__
@@ -80,12 +78,12 @@ QDir FileHandler::get_work_space(){
  * Reads filehandler from a json object.
  */
 void FileHandler::read(const QJsonObject &json){
-    QJsonArray json_projs = json["open"].toArray();
-    for(int i = 0; i != json_projs.size(); i++){
-        QJsonObject json_path = json_projs[i].toObject();
-        std::string path = json_path["path"].toString().toStdString();
-        open_project(load_project(path)->id);
-    }
+//    QJsonArray json_projs = json["open"].toArray();
+//    for(int i = 0; i != json_projs.size(); i++){
+//        QJsonObject json_path = json_projs[i].toObject();
+//        std::string path = json_path["path"].toString().toStdString();
+//        open_project(load_project(path)->id);
+//    }
 }
 /**
  * @brief FileHandler::write
@@ -93,41 +91,22 @@ void FileHandler::read(const QJsonObject &json){
  * Writes filehandler to a json object
  */
 void FileHandler::write(QJsonObject &json){
-    QJsonArray json_projs;
-    for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
-        QJsonObject json_path;
-        ID id = *it;
-        Project* proj = get_project(id);
-        QDir dir = get_dir(proj->dir);
-        QString path;
-        if(this->save_format == BINARY ) path = dir.absoluteFilePath((proj->name + ".dat").c_str());
-        else path = dir.absoluteFilePath((proj->name + ".json").c_str());
+//    QJsonArray json_projs;
+//    for (auto it = open_projects.begin();  it != open_projects.end(); it++) {
+//        QJsonObject json_path;
+//        ID id = *it;
+//        Project* proj = get_project(id);
+//        QDir dir = get_dir(proj->dir);
+//        QString path;
+//        if(this->save_format == BINARY ) path = dir.absoluteFilePath((proj->name + ".dat").c_str());
+//        else path = dir.absoluteFilePath((proj->name + ".json").c_str());
 
-        json_path["path"] = path;
-        json_projs.append(json_path);
-    }
-    json["open"] = json_projs;
+//        json_path["path"] = path;
+//        json_projs.append(json_path);
+//    }
+//    json["open"] = json_projs;
 }
 
-/**
- * @brief FileHandler::create_project
- * creates project and associated files.
- * @param std::string name
- * @return Project* created project
- */
-Project* FileHandler::create_project(QString proj_name, std::string dir_path, std::string vid_path){
-    Project* proj =  new Project(this, this->project_id, proj_name.toStdString());
-    ID root_dir;
-    root_dir = create_directory(QString::fromStdString(dir_path));
-    proj->dir_bookmarks = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
-    proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
-    if(vid_path != "")
-        proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
-    add_project(proj);                          // Add project to file sytstem
-    save_project(proj);                         // Save project file
-    open_project(proj->id);                     // Open project
-    return proj;
-}
 
 /**
  * @brief FileHandler::create_directory
@@ -166,59 +145,6 @@ bool FileHandler::delete_directory(ID id){
     return false;
 
 }
-
-/**
- * @brief FileHandler::save_saveable
- * @param savable
- * @param dir_path
- * @param save_format
- * @return Saves a Json file to provided directory
- */
-bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format){
-    QDir dir = get_dir(dir_id);
-    std::string file_path = dir.absoluteFilePath(QString::fromStdString(saveable->save_name)).toStdString();
-
-    QFile save_file(save_format == JSON
-                    ? QString::fromStdString(file_path + ".json")
-                    : QString::fromStdString(file_path + ".dat"));
-    if(!save_file.open(QIODevice::WriteOnly)){
-        qWarning("Couldn't open save file.");
-        return false;
-    }
-    QJsonObject json_saveable;
-    saveable->write(json_saveable);
-    QJsonDocument save_doc(json_saveable);
-    save_file.write(save_format == JSON
-            ? save_doc.toJson()
-            : save_doc.toBinaryData());
-    return true;
-}
-
-
-
-/**
- * @brief FileHandler::load_savable
- * @param full savable path
- * @param save_format
- * @return loaded Project
- * Loads project from json file and returns it
- */
-Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){
-    QFile load_file(save_form == JSON
-        ? QString::fromStdString(full_path)
-        : QString::fromStdString(full_path));
-    if (!load_file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
-        return nullptr;
-    }
-    QByteArray save_data = load_file.readAll();
-    QJsonDocument load_doc(save_form == JSON
-        ? QJsonDocument::fromJson(save_data)
-        : QJsonDocument::fromBinaryData(save_data));
-    saveable->read(load_doc.object());
-    return saveable;
-}
-
 
 /**
  * @brief FileHandler::create_file

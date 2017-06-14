@@ -5,24 +5,23 @@
 #include "Project/project.h"
 #include "Filehandler/saveable.h"
 
-
-class ProjectManager        
+class Project;
+class ProjectManager
 {
-    std::vector<ID> open_projects;
     std::mutex proj_map_lock;   // lock for handling project write/read
     std::map<ID,Project*> projects;
     ID project_id;              //counter for project ids
-
     bool proj_equals(Project& proj, Project& proj2);
     friend bool operator==(Project& proj, Project& proj2);
-
+public:
+    std::vector<ID> open_projects;
 public:
     ProjectManager();
     //  Project methods
     //  Project* open_project(ID id); // To be added
     //  Project* close_project(ID id);
     Project* get_project(ID id);
-    Project* create_project(QString proj_name, std::string dir_path, std::string vid_path);
+    Project* create_project(const string &proj_name, const string &dir_path, const std::string& vid_path);
     bool delete_project(ID proj_id);
     Project* load_project(std::string full_project_path);
     void save_project(ID id);

@@ -1,6 +1,13 @@
 #ifndef SAVABLE_H
 #define SAVABLE_H
 #include <QJsonObject>
+
+// QT
+#include <QJsonObject>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QJsonDocument>
 /**
  * @brief The Saveable class
  * The saveable class is an abstract class
@@ -11,17 +18,16 @@ typedef int ID;
 class Saveable
 {
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
-
+    static const SAVE_FORMAT DEFAULT_SAVE_FORMAT = BINARY;
 public:
-    const SAVE_FORMAT save_format = BINARY;
     std::string save_name;
     Saveable();
 
     void save();
     void load();
     // Saveable methods
-    Saveable* load_saveable(Saveable *saveable, std::string full_path, SAVE_FORMAT save_form);
-    bool save_saveable(Saveable* saveable, ID dir_id, SAVE_FORMAT save_format);
+    bool load_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
+    bool save_saveable(const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
     virtual ~Saveable();
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;

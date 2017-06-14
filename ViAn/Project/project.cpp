@@ -5,8 +5,8 @@
  * @param id
  * @param name
  */
-Project::Project(FileHandler* file_handler, ID id, std::string name){
-    this->file_handler = file_handler;
+Project::Project(ProjectManager *projet_manager, ID id, std::string name){
+    this->project_manager = projet_manager;
     this->name = name;
     this->save_name = name;
     this->id = id;
@@ -22,8 +22,8 @@ Project::Project(FileHandler* file_handler, ID id, std::string name){
 /**
  * @brief Project::Project
  */
-Project::Project(FileHandler* file_handler){
-    this->file_handler = file_handler;
+Project::Project(ProjectManager *projet_manager){
+    this->project_manager = projet_manager;
     this->name = "";
     this->save_name = "";
     this->videos.clear();
@@ -126,9 +126,9 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     this->name = json["name"].toString().toStdString();
-    this->dir = file_handler->create_directory(json["root_dir"].toString());
-    this->dir_bookmarks = file_handler->create_directory(json["bookmark_dir"].toString());
-    this->dir_videos = file_handler->create_directory(json["video_dir"].toString());
+    this->dir = json["root_dir"].toString().toStdString();
+    this->dir_bookmarks = json["bookmark_dir"].toString().toStdString();
+    this->dir_videos = json["video_dir"].toString().toStdString();
     this->save_name = this->name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
@@ -155,9 +155,9 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(this->name);
-    json["root_dir"] =  file_handler->get_dir(this->dir).absolutePath();
-    json["bookmark_dir"] = file_handler->get_dir(this->dir_bookmarks).absolutePath();
-    json["video_dir"] = file_handler->get_dir(this->dir_videos).absolutePath();
+    json["root_dir"] =  QString::fromStdString(this->dir);
+    json["bookmark_dir"] = QString::fromStdString(this->dir_bookmarks);
+    json["video_dir"] = QString::fromStdString(this->dir_videos);
     QJsonArray json_proj;
     // Write Videos to json
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){
@@ -213,6 +213,7 @@ bool Project::is_saved(){
  * @return sets saved =true
  */
 void Project::save_project(){
+    save_saveable(dir);
     this->changes_made = false;
 }
 
