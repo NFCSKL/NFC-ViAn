@@ -117,6 +117,12 @@ void Project::delete_artifacts(){
         QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
     }
+    // Delete directories
+    QDir directory;
+    QString q_dir = QString::fromStdString(this->dir);
+    QString q_dir_bookmarks = QString::fromStdString(this->dir_bookmarks);
+    directory.rmdir(qdir);
+    directory.rmdir(q_dir_bookmarks);
 }
 
 /**
@@ -213,9 +219,13 @@ bool Project::is_saved(){
  * @return sets saved =true
  */
 void Project::save_project(){
-    save_saveable(dir);
+    QDir directory;
+    directory.mkpath(QString::fromStdString(this->dir));
+    directory.mkpath(QString::fromStdString(this->dir_bookmarks));
+    save_saveable(this->name, this->dir);
     this->changes_made = false;
 }
+
 
 /**
  * @brief Project::get_videos

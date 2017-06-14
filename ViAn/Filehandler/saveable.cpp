@@ -1,4 +1,6 @@
 #include "saveable.h"
+
+const Saveable::SAVE_FORMAT Saveable::DEFAULT_SAVE_FORMAT;
 /**
  * @brief Saveable::~Saveable
  * virtual constructor
@@ -21,10 +23,13 @@ Saveable::~Saveable(){
  * @param save_format
  * @return Saves a Json file to provided directory
  */
-bool Saveable::save_saveable(const std::string& dir_path, const SAVE_FORMAT& save_format){
+bool Saveable::save_saveable(const std::string& file_name,
+                             const std::string& dir_path, const SAVE_FORMAT& save_format){
+    QDir dir;
+    dir.mkpath(QString::fromStdString(dir_path));
     QFile save_file(save_format == JSON
-                    ? QString::fromStdString(dir_path + ".json")
-                    : QString::fromStdString(dir_path + ".dat"));
+                    ? QString::fromStdString(dir_path + "/" + file_name +".json")
+                    : QString::fromStdString(dir_path + "/" + file_name + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){
         qWarning("Couldn't open save file.");
         return false;

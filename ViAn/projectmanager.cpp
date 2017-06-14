@@ -52,14 +52,11 @@ Project* ProjectManager::create_project(const std::string& proj_name,
                                         const std::string& vid_path)
 {
     Project* proj =  new Project(this, this->project_id, proj_name);
-    proj->dir = dir_path + proj_name;
-    proj->dir_bookmarks = dir_path + "/Bookmarks";
-    if(vid_path != "")
-        proj->dir_videos = dir_path + vid_path;
-    else
-        proj->dir_videos = dir_path;
+    proj->dir = dir_path +"/"+ proj_name;
+    proj->dir_bookmarks = proj->dir + "/Bookmarks";
+    proj->dir_videos = vid_path;
     add_project(proj);                          // Add project to file sytstem
-    save_project(proj);                         // Save project file
+    proj->save_project();                         // Save project file
     open_project(proj->id);                     // Open project
     return proj;
 }
@@ -83,6 +80,7 @@ bool ProjectManager::delete_project(ID proj_id){
 //        file.remove();
 //        delete_directory(temp->dir_bookmarks);
 //        delete_directory(temp->dir);
+        temp->delete_artifacts();
         delete temp;
         this->proj_map_lock.unlock();
         return true;
@@ -123,12 +121,12 @@ void ProjectManager::remove_video_from_project(ID proj_id, ID vid_id){
  * for hiding save format.
  */
 Project* ProjectManager::load_project(std::string full_project_path){
-// maybe handle this in project class? overriding savveable?
-//     Project* proj = new Project(this);
-//     load_saveable(proj, full_project_path, this->save_format); // Decide format internally, here for flexibility
-//     proj->save_project();
-//     proj->id = add_project(proj);
-//     return proj;
+//   maybe handle this in project class? overriding savveable?
+     Project* proj = new Project(this);
+     proj->load_saveable(full_project_path); // Decide format internally, here for flexibility
+     proj->save_project();
+     proj->id = add_project(proj);
+     return proj;
 }
 
 /**
@@ -148,8 +146,7 @@ void ProjectManager::save_project(ID id){
  * Exposed interface, added for simplicity of call when
  * project pointer is still available
  */
-void ProjectManager::save_project(Project *proj){
-    proj->save_saveable(proj->dir, proj->save_format);
+void ProjectManager::save_project(Project *proj){    
     proj->save_project();
 }
 

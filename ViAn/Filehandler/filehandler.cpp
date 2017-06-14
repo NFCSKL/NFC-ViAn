@@ -25,11 +25,11 @@ FileHandler::FileHandler() {
  * Deletes projects.
  */
 FileHandler::~FileHandler(){
-    // Delete projects
-    for(auto it = projects.begin(); it != projects.end(); it++){
-        delete it->second;
-    }
-    save();
+//    // Delete projects
+//    for(auto it = projects.begin(); it != projects.end(); it++){
+//        delete it->second;
+//    }
+//    save();
 }
 
 /**
@@ -38,8 +38,7 @@ FileHandler::~FileHandler(){
  */
 void FileHandler::save(){
     QDir dir;
-    this->save_name = dir.absoluteFilePath("state").toStdString();
-    save_saveable(this,add_dir(dir), this->save_format);
+    this->save_saveable(std::string("state"), dir.absolutePath().toStdString());
 }
 
 /**
@@ -49,9 +48,7 @@ void FileHandler::save(){
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
-    if(this->save_format == BINARY )this->save_name = dir.absoluteFilePath("state.dat").toStdString();
-    else this->save_name = dir.absoluteFilePath("state.json").toStdString();
-    load_saveable(this, this->save_name, this->save_format);
+    load_saveable(this->save_name);
 }
 
 /**

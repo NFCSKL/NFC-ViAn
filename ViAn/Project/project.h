@@ -56,6 +56,7 @@ public:
     void add_analysis(Analysis an);
     bool is_saved();
     void save_project();
+    void load_project();
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID id);
     bool proj_equals(Project& other);

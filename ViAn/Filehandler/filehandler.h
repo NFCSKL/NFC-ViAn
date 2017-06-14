@@ -27,9 +27,7 @@ typedef int ID;       // ID, defined for code readability.
 
 class Project; // fix for include issue
 
-class FileHandler : Saveable{
-    enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
-    const SAVE_FORMAT save_format = BINARY;
+class FileHandler : public Saveable{
 public:
     friend class test_report_generator;
     FileHandler();
@@ -69,10 +67,6 @@ private:
     // File methods
     ID add_file(QString file);
     void add_file(ID id , QString file);
-
-    // Saveable methods
-    Saveable* load_saveable(Saveable *saveable, std::string full_path, SAVE_FORMAT save_form);
-    bool save_saveable(Saveable* saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format);
 
     // Directory methods
     ID add_dir(QDir dir);
