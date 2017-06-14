@@ -9,8 +9,8 @@
 #include "Video/overlay.h"
 #include "bookmark.h"
 #include "video.h"
-#include "Filehandler/Analysis/analysis.h"
-#include "Filehandler/report.h"
+#include "Project/Analysis/analysis.h"
+#include "Project/report.h"
 
 /**
  * @brief The VideoProject class

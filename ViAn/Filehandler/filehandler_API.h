@@ -1,4 +1,0 @@
-#ifndef FILEHANDLER_API_H
-#define FILEHANDLER_API_H
-
-#endif // FILEHANDLER_API_H
