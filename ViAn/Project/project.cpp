@@ -8,7 +8,7 @@
 Project::Project(ProjectManager *projet_manager, ID id, std::string name){
     this->project_manager = projet_manager;
     this->name = name;
-    this->save_name = name;
+    this->m_full_path = name;
     this->id = id;
     this->video_counter = 0;
     this->videos.clear();
@@ -25,7 +25,7 @@ Project::Project(ProjectManager *projet_manager, ID id, std::string name){
 Project::Project(ProjectManager *projet_manager){
     this->project_manager = projet_manager;
     this->name = "";
-    this->save_name = "";
+    this->m_full_path = "";
     this->videos.clear();
     this->video_counter = 0;
     // Setting ids to default values, -1 indicating invalid value.
@@ -118,11 +118,12 @@ void Project::delete_artifacts(){
         file.remove();
     }
     // Delete directories
+    delete_saveable();
     QDir directory;
     QString q_dir = QString::fromStdString(this->dir);
     QString q_dir_bookmarks = QString::fromStdString(this->dir_bookmarks);
-    directory.rmdir(q_dir);
     directory.rmdir(q_dir_bookmarks);
+    directory.rmdir(q_dir);
 }
 
 /**
@@ -135,7 +136,7 @@ void Project::read(const QJsonObject& json){
     this->dir = json["root_dir"].toString().toStdString();
     this->dir_bookmarks = json["bookmark_dir"].toString().toStdString();
     this->dir_videos = json["video_dir"].toString().toStdString();
-    this->save_name = this->name;
+    this->m_full_path = this->name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {

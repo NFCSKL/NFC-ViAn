@@ -25,11 +25,6 @@ FileHandler::FileHandler() {
  * Deletes projects.
  */
 FileHandler::~FileHandler(){
-//    // Delete projects
-//    for(auto it = projects.begin(); it != projects.end(); it++){
-//        delete it->second;
-//    }
-//    save();
 }
 
 /**
@@ -48,7 +43,7 @@ void FileHandler::save(){
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
-    load_saveable(this->save_name);
+    load_saveable(this->m_full_path);
 }
 
 /**

@@ -40,7 +40,17 @@ bool Saveable::save_saveable(const std::string& file_name,
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
+    m_full_path = save_file.fileName().toStdString();
     return true;
+}
+/**
+ * @brief Saveable::delete_saveable
+ * @return
+ */
+bool Saveable::delete_saveable()
+{
+    QFile file(QString::fromStdString(m_full_path));
+    file.remove();
 }
 
 /**
@@ -63,5 +73,6 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
     this->read(load_doc.object());
+    m_full_path = load_file.fileName().toStdString();
     return true;
 }

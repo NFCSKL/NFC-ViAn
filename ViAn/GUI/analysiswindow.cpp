@@ -8,12 +8,12 @@
  * @param file_handler
  * @param parent
  */
-AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, ProjectManager *file_handler, QWidget *parent) :
+AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, ProjectManager *project_manager, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::AnalysisWindow) {
     ui->setupUi(this);
     this->mainwindow = mainwindow;
-    this->project_manager = file_handler;
+    this->project_manager = project_manager;
     for(auto it = ANALYSIS_NAMES.begin(); it!=ANALYSIS_NAMES.end(); it++) {
         ui->analysis_choise_list->addItem(QString::fromStdString(*it)); //ads all the types of analyses to the rolldown list.
     }
