@@ -25,6 +25,12 @@
 #include <QWaitCondition>
 #include "makeproject.h"
 #include "Analysis/AnalysisController.h"
+
+#include <QHBoxLayout>
+#include <QDockWidget>
+#include "videowidget.h"
+#include "projectwidget.h"
+#include "bookmarkwidget.h"
 #define SCROLL_AREA_MARGIN 25
 
 
@@ -54,6 +60,8 @@ public:
     QMutex mutex;
     QWaitCondition paused_wait;
 
+
+
 signals:
     void set_play_video();
     void set_pause_video();
@@ -66,116 +74,60 @@ signals:
     void set_analysis_results(Analysis analysis);
 
 private slots:
-
-    void on_play_pause_button_clicked();
-
-    void on_stop_button_clicked();
-
     void on_action_exit_triggered();
-
     void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
-
     void update_video(QImage frame);
-
     void set_video_slider_pos(int pos);
-
     void resizeEvent(QResizeEvent* event); //can not follow namestandard, generated code
-
-    void on_previous_frame_button_clicked();
-
-    void on_next_frame_button_clicked();
-
-    void on_decrease_speed_button_clicked();
-
-    void on_increase_speed_button_clicked();
-
     void on_bookmark_button_clicked();
-
     void on_video_slider_sliderPressed();
-
     void on_video_slider_sliderReleased();
-
     void on_video_slider_valueChanged(int new_pos);
-
     void on_action_add_project_triggered();
-    
     void on_action_show_hide_overlay_triggered();
-
     void on_action_colour_triggered();
-
     void on_action_rectangle_triggered();
-
     void on_action_circle_triggered();
-
     void on_action_arrow_triggered();
-
     void on_action_line_triggered();
-
     void prepare_menu(const QPoint & pos);
-
     void prepare_bookmark_menu(const QPoint & pos);
-
     void play_video();
-
     void on_action_save_triggered();
-
     void on_action_pen_triggered();
-
     void on_action_text_triggered();
-
     void on_action_undo_triggered();
-
     void on_action_clear_triggered();
-
     void on_action_zoom_in_triggered();
-
     void on_action_zoom_out_triggered();
-
     void on_action_load_triggered();
-
     void on_action_add_video_triggered();
-
     void on_action_choose_workspace_triggered();
-
     void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);//can not follow namestandard, generated code
-    
     void on_action_show_hide_analysis_area_triggered();
-
     void on_action_contrast_brightness_triggered();
-
     void on_action_fill_screen_triggered();
-
     void on_action_rotate_right_triggered();
-
     void on_action_rotate_left_triggered();
-
     void on_document_list_itemClicked(QListWidgetItem *item);//can not follow namestandard, generated code
-
     void on_action_delete_triggered();
-
     void on_action_create_report_triggered();
-
     void on_action_original_size_triggered();
-
     void on_action_invert_analysis_area_triggered();
-
     void on_action_close_project_triggered();
-
     void on_action_show_hide_analysis_overlay_triggered();
-
     void save_analysis_to_file(Analysis analysis);
-
     void show_analysis_progress(int progress);
-
     void on_previous_POI_button_clicked();
-
     void on_next_POI_button_clicked();
-
     void on_action_change_bookmark_triggered();
-
     void on_jump_button_clicked();
 
 private:
+
+    VideoWidget* video_wgt;
+    ProjectWidget* project_wgt;
+    BookmarkWidget* bookmark_wgt;
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;

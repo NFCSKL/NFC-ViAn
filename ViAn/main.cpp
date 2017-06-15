@@ -6,6 +6,8 @@
 #include "Test/overlayintegrationtest.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
+
+Q_DECLARE_METATYPE(cv::Mat);
 /**
  * @brief qMain
  * Constructor
@@ -18,10 +20,14 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     qRegisterMetaType<Analysis>();
+
+
+
     w.show();
 
     bool testing = false;
     bool integration_testing = false;
+    /**
     if (testing) {
         //For testing video player.
         test_video_player* video_test = new test_video_player();
@@ -37,8 +43,11 @@ int main(int argc, char *argv[])
         QTest::qExec(report_test);
     }
     if (integration_testing) {
+        /**
         OverlayIntegrationTest* ot = new OverlayIntegrationTest();
         ot->exec();
+        '/
     }
+    **/
     return a.exec();
 }

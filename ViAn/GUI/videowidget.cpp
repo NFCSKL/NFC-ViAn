@@ -1,0 +1,269 @@
+#include "videowidget.h"
+
+#include <QTime>
+#include <QDebug>
+#include <QShortcut>
+
+#include "Video/video_player.h"
+
+VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QScrollArea) {
+    // Init video player
+    m_video_player = new video_player(&mutex, &paused_wait);
+
+    //Setup playback area
+    vertical_layout = new QVBoxLayout;
+    frame_wgt = new FrameWidget();
+    frame_wgt->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+    scroll_area->setBackgroundRole(QPalette::Dark);
+    scroll_area->setWidget(frame_wgt);
+    scroll_area->setVisible(true);
+    scroll_area->setFrameStyle(0);
+    vertical_layout->addWidget(scroll_area);
+    // End playback setup
+
+    init_control_buttons();
+    init_playback_slider();
+    setLayout(vertical_layout);
+
+    qRegisterMetaType<cv::Mat>("cv::Mat");
+    connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)));
+    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
+    connect(this, &VideoWidget::set_pause_video, m_video_player, &video_player::on_pause_video);
+    connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
+    QObject::connect(this, SIGNAL(next_video_frame()),
+                     m_video_player, SLOT(next_frame()));
+    QObject::connect(this, SIGNAL(prev_video_frame()),
+                     m_video_player, SLOT(previous_frame()));
+
+    m_video_player->load_video("D:\\Testdata\\Pumparna.avi", nullptr);
+    m_video_player->start();
+}
+
+/**
+ * @brief Adds all the video control buttons to the video widget
+ */
+void VideoWidget::init_control_buttons() {
+    QHBoxLayout* controll_row = new QHBoxLayout;
+    controll_row->setAlignment(Qt::AlignLeft);
+
+    std::vector<QPushButton*> btns;
+
+    play_btn = new QPushButton("Play", this);
+    QPushButton* stop_btn = new QPushButton("Stop", this);
+    QPushButton* next_frame_btn = new QPushButton(">", this);
+    QPushButton* prev_frame_btn = new QPushButton("<", this);
+    QPushButton* next_poi_btn = new QPushButton(">>|", this);
+    QPushButton* prev_poi_btn = new QPushButton("|<<", this);
+
+    play_btn->setToolTip(tr("Play video"));
+    stop_btn->setToolTip(tr("Stop video"));
+    next_frame_btn->setToolTip(tr("Next frame"));
+    prev_frame_btn->setToolTip(tr("Previous video"));
+    next_poi_btn->setToolTip(tr("Next POI"));
+    prev_poi_btn->setToolTip(tr("Previous POI"));
+
+
+    // Push order is important
+    btns.push_back(prev_poi_btn);
+    btns.push_back(prev_frame_btn);
+    btns.push_back(play_btn);
+    btns.push_back(next_frame_btn);
+    btns.push_back(next_poi_btn);
+    btns.push_back(stop_btn);
+
+    for (QPushButton* btn : btns) {
+        btn->setFixedSize(BTN_SIZE);
+        controll_row->addWidget(btn);
+    }
+
+    // Create and add speed adjustment slider
+    speed_slider = new QSlider(Qt::Horizontal);
+    speed_slider->setRange(-4,4);
+    speed_slider->setMaximumWidth(90);
+    speed_slider->setTickPosition(QSlider::TicksBelow);
+    speed_slider->setToolTip(tr("Adjust playback speed"));
+    controll_row->addWidget(speed_slider);
+
+    vertical_layout->addLayout(controll_row);
+
+    QShortcut* play_sc = new QShortcut(Qt::Key_Space, this);
+    QShortcut* stop_sc = new QShortcut(Qt::Key_X, this);
+    QShortcut* next_frame_sc = new QShortcut(Qt::Key_Right, this);
+    QShortcut* prev_frame_sc = new QShortcut(Qt::Key_Left, this);
+    //QShortcut* next_poi_sc = new QShortcut(Qt::Key_Space, this);
+    //QShortcut* prev_poi_sc = new QShortcut(Qt::Key_Space, this);
+
+    // Connect buttons, slider and actions
+    connect(play_btn, &QPushButton::clicked, this, &VideoWidget::play_clicked);
+    connect(play_sc, &QShortcut::activated, this, &VideoWidget::play_clicked);
+
+    connect(stop_btn, &QPushButton::clicked, this, &VideoWidget::stop_clicked);
+    connect(stop_sc, &QShortcut::activated, this, &VideoWidget::stop_clicked);
+
+    connect(next_frame_btn, &QPushButton::clicked, this, &VideoWidget::next_frame_clicked);
+    connect(next_frame_sc, &QShortcut::activated, this, &VideoWidget::next_frame_clicked);
+
+    connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
+    connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
+
+    //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
+
+    //
+}
+
+/**
+ * @brief Adds the video slider and playback timestamps
+ */
+void VideoWidget::init_playback_slider() {
+    QHBoxLayout* progress_area = new QHBoxLayout();
+    current_time = new QLabel("--:--");
+    total_time = new QLabel("--:--");
+    playback_slider = new QSlider(Qt::Horizontal);
+    progress_area->addWidget(current_time);
+    progress_area->addWidget(playback_slider);
+    progress_area->addWidget(total_time);
+    vertical_layout->addLayout(progress_area);
+
+    // Signal/slot connect
+    connect(m_video_player, SIGNAL(frame_count(int)), this, SLOT(set_slider_max(int)));
+    connect(m_video_player, SIGNAL(total_time(int)), this, SLOT(set_total_time(int)));
+    connect(m_video_player, SIGNAL(update_current_frame(int)), this, SLOT(on_new_frame(int)));
+    connect(this, SIGNAL(set_playback_frame(int, bool)), m_video_player, SLOT(on_set_playback_frame(int)));
+    connect(playback_slider, &QSlider::sliderPressed, this, on_playback_slider_pressed);
+    connect(playback_slider, &QSlider::sliderReleased, this, on_playback_slider_released);
+    connect(playback_slider, &QSlider::valueChanged, this, on_playback_slider_value_changed);
+    connect(playback_slider, &QSlider::sliderMoved, this, on_playback_slider_moved);
+}
+
+/**
+ * @brief converts the time in ms to a formatted string
+ * @param time in ms
+ * @return correctly formatted QString
+ */
+QString VideoWidget::convert_time(int time) {
+    QTime q_time((time/3600)%60, (time/60)%60, time%60);
+    QString format = "mm:ss";
+    if (time > 3600)
+        format = "hh:mm:ss";
+    return q_time.toString(format);
+}
+
+/**
+ * @brief sets the current playback time to label
+ * @param current playback time in ms
+ */
+void VideoWidget::set_current_time(int time) {
+    current_time->setText(convert_time(time));
+}
+
+/**
+ * @brief sets the total playback time to label
+ * @param total time in ms
+ */
+void VideoWidget::set_total_time(int time) {
+    total_time->setText(convert_time(time));
+}
+
+/**
+ * @brief play/pause button click event
+ */
+void VideoWidget::play_clicked() {
+    if (m_video_player->is_paused()) {
+        // TODO set icon
+        paused_wait.wakeOne();
+        play_btn->setText("Play");
+        // TODO status bar
+    } else if (m_video_player->is_stopped()) {
+        play_btn->setText("Play");
+        m_video_player->start();
+    } else {
+        // Video is playing
+        // TODO Icon
+        emit set_pause_video();
+        play_btn->setText("Pause");
+        // status bar
+    }
+}
+
+/**
+ * @brief stop button click event
+ */
+void VideoWidget::stop_clicked() {
+    //set_status_bar("Stopped");
+    if (m_video_player->is_playing()) {
+        //icon_on_button_handler->set_icon("play", ui->play_pause_button);
+    } else if (m_video_player->is_paused()) {
+        paused_wait.wakeOne();
+    } else if (m_video_player->is_stopped()) {
+        return;
+    }
+    emit set_stop_video();
+}
+
+/**
+ * @brief next frame button click event
+ */
+void VideoWidget::next_frame_clicked() {
+    if (m_video_player->is_paused()) {
+        emit next_video_frame();
+        int frame = m_video_player->get_current_frame_num();
+        //set_status_bar("Went forward a frame to number " + std::to_string(frame));
+    } else {
+        //set_status_bar("Needs to be paused");
+    }
+}
+
+/**
+ * @brief previous frame button click event
+ */
+void VideoWidget::prev_frame_clicked() {
+    if (m_video_player->is_paused()) {
+        emit prev_video_frame();
+        int frame = m_video_player->get_current_frame_num();
+        //set_status_bar("Went back a frame to number " + std::to_string(frame));
+    } else {
+        //set_status_bar("Video needs to be paused");
+    }
+}
+
+/**
+ * @brief sets the max value of the playback slider
+ * @param value
+ */
+void VideoWidget::set_slider_max(int value) {
+    playback_slider->setMaximum(value);
+}
+
+/**
+ * @brief reacts to a new frame number. Updates the playback slider and current time label
+ * @param frame_num
+ */
+void VideoWidget::on_new_frame(int frame_num) {
+    if (!slider_is_blocked)
+        playback_slider->setValue(frame_num);
+    set_current_time(frame_num / m_video_player->get_frame_rate());
+}
+
+void VideoWidget::on_playback_slider_pressed() {
+    slider_is_blocked = true;
+}
+
+void VideoWidget::on_playback_slider_released() {
+    emit set_playback_frame(playback_slider->value(), true);
+    slider_is_blocked = false;
+}
+
+void VideoWidget::on_playback_slider_value_changed() {
+    if (slider_is_blocked) {
+        //qDebug() << "emit slider value";
+        //emit set_playback_frame(slider_pos, true);
+    } else {
+        //qDebug();
+    }
+}
+
+void VideoWidget::on_playback_slider_moved() {
+    qDebug() << "moved";
+}
+

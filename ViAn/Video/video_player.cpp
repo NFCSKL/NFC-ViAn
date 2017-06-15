@@ -19,10 +19,9 @@ using namespace cv;
  * @param label The QLabel where the frame is shown.
  * @param parent
  */
-video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent) : QThread(parent) {
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
     m_mutex = mutex;
     m_paused_wait = paused_wait;
-    video_frame = label;
     QRect rec = QApplication::desktop()->screenGeometry();
     screen_height = rec.height();
     screen_width = rec.width();
@@ -57,6 +56,8 @@ bool video_player::load_video(string filename, Overlay* o) {
         file_path = filename;
         video_paused = false;
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
+        emit frame_count(num_frames);
+        emit total_time(int(num_frames / frame_rate));
         start();
         return true;
     } else {
@@ -79,7 +80,7 @@ void video_player::run()  {
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
-        convert_frame(true);
+        //convert_frame(true);
 
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
         if (delay - conversion_time > 0) {
@@ -113,15 +114,14 @@ void video_player::run()  {
  */
 void video_player::show_frame() {
     emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES));
-    emit processed_image(img);
+    emit processed_image(frame);
 }
 
 /**
- * @brief video_player::convert_frame
+ * @brief video_player::convert_frame TODO SHOULD NOW BE DONE IN FRAMEWIDHGET
  * Converts the current frame to a QImage,
  * including the zoom and overlay.
  * @param scale Bool indicating if the frame should be scaled or not.
- */
 void video_player::convert_frame(bool scale) {
     if (frame.cols == 0 || frame.rows == 0) {
         // Do nothing
@@ -144,6 +144,7 @@ void video_player::convert_frame(bool scale) {
         img.bits(); // enforce deep copy
     }
 }
+*/
 
 /**
  * @brief video_player::process_frame
@@ -451,7 +452,7 @@ void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
-    convert_frame(true);
+    //convert_frame(true);
     show_frame();
 }
 
@@ -462,7 +463,7 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_current_frame_num(frame_nbr)) {
-        convert_frame(true);
+        //convert_frame(true);
         show_frame();
     }
 }
@@ -475,7 +476,7 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
-        convert_frame(true);
+        //convert_frame(true);
         show_frame();
     }
 }
@@ -498,7 +499,7 @@ void video_player::reset_brightness_contrast() {
     alpha = CONTRAST_DEFAULT;
     beta = BRIGHTNESS_DEFAULT;
     if (capture.isOpened()) {
-        convert_frame(true);
+        //convert_frame(true);
         show_frame();
     }
 }
@@ -512,7 +513,7 @@ void video_player::reset_brightness_contrast() {
 void video_player::set_contrast(double contrast) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
     if (capture.isOpened()) {
-        convert_frame(true);
+        //convert_frame(true);
         show_frame();
     }
 }
@@ -526,7 +527,7 @@ void video_player::set_contrast(double contrast) {
 void video_player::set_brightness(int brightness) {
     beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
     if (capture.isOpened()) {
-        convert_frame(true);
+        //convert_frame(true);
         show_frame();
     }
 }
@@ -566,22 +567,17 @@ double video_player::get_speed_multiplier() {
 }
 
 /**
- * @brief video_player::dec_playback_speed
- * Decreases the playback speed by a factor of 2
+ * @brief sets the speed multiplier for playback
+ *        a positive int will increase the speed whilst a negative will decrease it
+ * @param speed_steps
  */
-void video_player::dec_playback_speed() {
-    if (this->speed_multiplier < MAX_SPEED_MULT) {
-        this->set_speed_multiplier(this->get_speed_multiplier()*SPEED_STEP_MULT);
-    }
-}
-
-/**
- * @brief video_player::inc_playback_speed
- * Increases the playback speed by a factor of 2
- */
-void video_player::inc_playback_speed() {
-    if (this->speed_multiplier > MIN_SPEED_MULT) {
-        this->set_speed_multiplier(this->get_speed_multiplier()/SPEED_STEP_MULT);
+void video_player::set_playback_speed(int speed_steps) {
+    if (speed_steps > 0) {
+        set_speed_multiplier(1.0 / (speed_steps * 2));
+    } else if (speed_steps < 0) {
+        set_speed_multiplier(std::abs(speed_steps) * 2);
+    } else {
+        set_speed_multiplier(1);
     }
 }
 
@@ -749,7 +745,7 @@ void video_player::rotate_left() {
  */
 void video_player::video_mouse_pressed(QPoint pos) {
     if (capture.isOpened()) {
-        scale_position(pos);
+        //scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->set_start_pos(pos);
             zoom_area->update_drawing_pos(pos);
@@ -773,7 +769,7 @@ void video_player::video_mouse_pressed(QPoint pos) {
  */
 void video_player::video_mouse_released(QPoint pos) {
     if (capture.isOpened()) {
-        scale_position(pos);
+        //scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
@@ -799,7 +795,7 @@ void video_player::video_mouse_released(QPoint pos) {
  */
 void video_player::video_mouse_moved(QPoint pos) {
     if (capture.isOpened()) {
-        scale_position(pos);
+        //scale_position(pos);
         if (choosing_zoom_area) {
             zoom_area->update_drawing_pos(pos);
         } else if (choosing_analysis_area) {
@@ -817,7 +813,7 @@ void video_player::video_mouse_moved(QPoint pos) {
  * Recalculates the given mouse position from a position in the window
  * the video is shown in to the position on the video frame.
  * @param pos The position to be recalculated.
- */
+
 void video_player::scale_position(QPoint &pos) {
     int video_frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -862,13 +858,15 @@ void video_player::scale_position(QPoint &pos) {
     pos.setX(x_video);
     pos.setY(y_video);
 }
+*/
+
 
 /**
  * @brief video_player::get_current_frame_unscaled
  * Creates, converts, processes the current frame and returns it.
  */
 QImage video_player::get_current_frame_unscaled() {
-    convert_frame(false);
+    //convert_frame(false);
 
     return img;
 }

@@ -16,7 +16,11 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    GUI/videowidget.cpp \
+    GUI/framewidget.cpp \
+    GUI/projectwidget.cpp \
+    GUI/bookmarkwidget.cpp
 
 #
 # TEST
@@ -30,7 +34,11 @@ HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
-    Test/overlayintegrationtest.h
+    Test/overlayintegrationtest.h \
+    GUI/videowidget.h \
+    GUI/framewidget.h \
+    GUI/projectwidget.h \
+    GUI/bookmarkwidget.h
 
 #
 # LIBRARY

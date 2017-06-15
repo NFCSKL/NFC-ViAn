@@ -29,6 +29,31 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     video_slider = ui->video_slider;
 
+    // Layout
+    //HBoxLayout* main_layout = new QHBoxLayout();
+    QDockWidget* docker = new QDockWidget(tr("Projects"), this);
+    docker->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    // Initialize Video Widget
+    video_wgt = new VideoWidget();
+    video_wgt->setMinimumSize(400,400); //TODO fix magic
+    setCentralWidget(video_wgt);
+
+    // Initialize project widget
+    project_wgt = new ProjectWidget();
+    docker->setWidget(project_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, docker);
+    project_wgt->add_project("test_project");
+
+
+    // Initialize bookmark widget
+    docker = new QDockWidget(tr("Bookmarks"), this);
+    bookmark_wgt = new BookmarkWidget();
+    docker->setWidget(bookmark_wgt);
+    addDockWidget(Qt::RightDockWidgetArea, docker);
+    std::vector<std::string> tags = {"one", "two"};
+    bookmark_wgt->add_bookmark("bookmark description", tags);
+
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
@@ -118,8 +143,6 @@ void MainWindow::setup_file_handler(){
  * Connects all signals and slots that are needed between video_player and mainwindow.
  */
 void MainWindow::setup_video_player(video_player *mplayer) {
-    QObject::connect(mplayer, SIGNAL(processed_image(QImage)),
-                     this, SLOT(update_video(QImage)));
     QObject::connect(mplayer, SIGNAL(update_current_frame(int)),
                      this, SLOT(set_video_slider_pos(int)));
     QObject::connect(this, SIGNAL(resize_video_frame(int,int)),
@@ -176,106 +199,6 @@ void MainWindow::set_status_bar(std::string status, int timer){
 }
 
 /**
- * @brief MainWindow::on_play_pause_button_clicked
- * Calls upon video player functions based on current playback status
- * Starts/resumes a stopped/paused video, pauses a playing one
- */
-void MainWindow::on_play_pause_button_clicked() {
-    if (mvideo_player->is_paused()) {
-        // Video thread is paused. Notifying the waitcondition to resume playback
-        icon_on_button_handler->set_icon("pause", ui->play_pause_button);//changes the icon on the play button to a pause-icon
-        paused_wait.wakeOne();
-        set_status_bar("Playing");
-    } else if (mvideo_player->is_stopped()) {
-        // Video thread has finished. Start a new one
-        icon_on_button_handler->set_icon("pause", ui->play_pause_button);
-        mvideo_player->start();
-        set_status_bar("Playing");
-    } else {
-        // Video thread is running. Pause it
-        icon_on_button_handler->set_icon("play", ui->play_pause_button);
-        emit set_pause_video();
-        set_status_bar("Paused");
-    }
-}
-
-/**
- * @brief MainWindow::on_increase_speed_button_clicked
- * Calls upon video player function which in turn increases the playback speed
- */
-void MainWindow::on_increase_speed_button_clicked(){
-    ui->decrease_speed_button->setEnabled(true);
-    mvideo_player->inc_playback_speed();
-    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
-    QString speed = QString::number(curr_speed_factor);
-    if (curr_speed_factor >= mvideo_player->MAX_SPEED_MULT) {
-        ui->increase_speed_button->setEnabled(false);
-    }
-    set_status_bar("Playback speed increased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText("Play speed: " + speed + "x");
-}
-
-/**
- * @brief MainWindow::on_decrease_speed_button_clicked
- * Calls upon a video player function which decreases the playback speed
- */
-void MainWindow::on_decrease_speed_button_clicked(){
-    ui->increase_speed_button->setEnabled(true);
-    mvideo_player->dec_playback_speed();
-    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
-    QString speed = QString::number(curr_speed_factor);
-    if (curr_speed_factor <= mvideo_player->MIN_SPEED_MULT) {
-        ui->decrease_speed_button->setEnabled(false);
-    }
-    set_status_bar("Playback speed decreased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText("Play speed: " + speed + "x");
-}
-
-/**
- * @brief MainWindow::on_stop_button_clicked
- * Calls upon video player function which in turn stops the video
- */
-void MainWindow::on_stop_button_clicked() {
-    set_status_bar("Stopped");
-    if (mvideo_player->is_playing()) {
-        icon_on_button_handler->set_icon("play", ui->play_pause_button);
-    } else if (mvideo_player->is_paused()) {
-        paused_wait.wakeOne();
-    } else if (mvideo_player->is_stopped()) {
-        return;
-    }
-    emit set_stop_video();
-}
-
-/**
- * @brief MainWindow::on_next_frame_button_clicked
- * Calls upon video player function which in turn skips to the next frame
- */
-void MainWindow::on_next_frame_button_clicked() {
-    if (mvideo_player->is_paused()) {
-        emit next_video_frame();
-        int frame = mvideo_player->get_current_frame_num();
-        set_status_bar("Went forward a frame to number " + std::to_string(frame));
-    } else {
-        set_status_bar("Needs to be paused");
-    }
-}
-
-/**
- * @brief MainWindow::on_previous_frame_button_clicked
- * Calls upon video player function which in turn steps back to the previous frame
- */
-void MainWindow::on_previous_frame_button_clicked() {
-    if (mvideo_player->is_paused()) {
-        emit prev_video_frame();
-        int frame = mvideo_player->get_current_frame_num();
-        set_status_bar("Went back a frame to number " + std::to_string(frame));
-    } else {
-        set_status_bar("Video needs to be paused");
-    }
-}
-
-/**
  * @brief MainWindow::update_video
  * Sets the video_frame pixmap to the current frame from video
  * and updates labels showing current and total time of video
@@ -284,34 +207,8 @@ void MainWindow::on_previous_frame_button_clicked() {
 void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
     qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
-    set_time_to_label(ui->current_time_label, current_time);
+    //set_time_to_label(ui->current_time_label, current_time);
     ui->frame_line_edit->setText(QString::number(mvideo_player->get_current_frame_num()));
-}
-
-/**
- * @brief MainWindow::set_slider_labels
- * Sets the slider labels showing current and total time
- */
-void MainWindow::set_slider_labels() {
-    qint64 total_time = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
-    qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
-    set_time_to_label(ui->current_time_label, current_time);
-    set_time_to_label(ui->total_time_label, total_time);
-}
-
-/**
- * @brief MainWindow::set_time_to_label
- * Takes an variable of seconds and prints it to the label
- * in a readable format
- * @param label the label to be updated
- * @param time time in seconds, will be printed in the label
- */
-void MainWindow::set_time_to_label(QLabel *label, qint64 time) {
-    QTime q_time((time/3600)%60, (time/60)%60, time%60);
-    QString format = "mm:ss";
-    if (time > 3600)
-        format = "hh:mm:ss";
-    label->setText(q_time.toString(format));
 }
 
 /**
@@ -795,7 +692,7 @@ void MainWindow::play_video() {
     // Updates the overlay to the state choosen in the GUI.
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
-    set_slider_labels();
+    //set_slider_labels();
     ui->speed_label->setText("Play speed: 1x");
 
 }
