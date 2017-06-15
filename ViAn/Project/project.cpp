@@ -121,7 +121,7 @@ void Project::delete_artifacts(){
     QDir directory;
     QString q_dir = QString::fromStdString(this->dir);
     QString q_dir_bookmarks = QString::fromStdString(this->dir_bookmarks);
-    directory.rmdir(qdir);
+    directory.rmdir(q_dir);
     directory.rmdir(q_dir_bookmarks);
 }
 
