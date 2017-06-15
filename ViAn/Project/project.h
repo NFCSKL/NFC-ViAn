@@ -16,6 +16,7 @@
 #include "Filehandler/saveable.h"
 #include "Project/Analysis/analysis.h"
 #include "projectmanager.h"
+
 typedef int ID;
 class FileHandler;
 class ProjectManager;

@@ -156,7 +156,9 @@ private slots:
 
     void on_action_rotate_left_triggered();
 
-    void on_document_list_itemClicked(QListWidgetItem *item);//can not follow namestandard, generated code
+    void on_document_list_itemClicked(QListWidgetItem *item);
+    
+    void on_document_list_itemDoubleClicked(QListWidgetItem *item);
 
     void on_action_delete_triggered();
 

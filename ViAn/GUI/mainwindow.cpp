@@ -1321,6 +1321,15 @@ void MainWindow::on_action_rotate_left_triggered() {
  * @param item The bookmark that has been clicked.
  */
 void MainWindow::on_document_list_itemClicked(QListWidgetItem *item) {
+
+}
+
+/**
+ * @brief MainWindow::on_document_list_itemDoubleClicked
+ * Invoked when an item in the bookmark view has been clicked.
+ * @param item The bookmark that has been clicked.
+ */
+void MainWindow::on_document_list_itemDoubleClicked(QListWidgetItem *item) {
     BookmarkItem* bookmark = (BookmarkItem*) item;
     emit set_playback_frame(bookmark->get_frame_number()+1);
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
@@ -1493,7 +1502,7 @@ void MainWindow::on_action_set_analysis_area_to_video_triggered()
     }
 }
 
-/*
+/**
  * @brief MainWindow::on_action_change_bookmark_triggered
  * Lets the user change the bookmark description.
  */

@@ -27,6 +27,7 @@ public:
     // Saveable methods
     bool load_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
     bool save_saveable(const std::string &file_name, const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
+
     virtual ~Saveable();
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;
