@@ -34,6 +34,45 @@ MainWindow::MainWindow(QWidget *parent) :
     QDockWidget* docker = new QDockWidget(tr("Projects"), this);
     docker->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
+    //Initialize menu bar
+    QMenu* file_menu = menuBar()->addMenu(tr("File"));
+
+    // File menu actions
+    QAction* new_project_act = new QAction(tr("New project"), this);
+    QAction* load_project_act = new QAction(tr("Load project"), this);
+    QAction* save_project_act = new QAction(tr("Save project"), this);
+    QAction* gen_report_act = new QAction(tr("Generate report"), this);
+    QAction* close_project_act = new QAction(tr("Close project"), this);
+
+    file_menu->addAction(new_project_act);
+    file_menu->addAction(load_project_act);
+    file_menu->addAction(save_project_act);
+    file_menu->addAction(gen_report_act);
+    file_menu->addAction(close_project_act);
+    QAction* quit_act = file_menu->addAction(tr("&Quit"), this, &QWidget::close);
+
+    new_project_act->setShortcuts(QKeySequence::New);
+    load_project_act->setShortcuts(QKeySequence::Open);
+    save_project_act->setShortcuts(QKeySequence::Save);
+    //gen_report_act->setShortcuts(QKeySequence::Save); TODO ADD
+    close_project_act->setShortcuts(QKeySequence::Close);
+    quit_act->setShortcuts(QKeySequence::Quit);
+
+    new_project_act->setStatusTip(tr("Create a new project"));
+    load_project_act->setStatusTip(tr("Load project"));
+    save_project_act->setStatusTip(tr("Save project"));
+    gen_report_act->setStatusTip(tr("Generate report"));
+    close_project_act->setStatusTip(tr("Close Project"));
+    quit_act->setStatusTip(tr("Quit the application"));
+
+    connect(new_project_act, &QAction::triggered, this, &MainWindow::new_project);
+    connect(load_project_act, &QAction::triggered, this, &MainWindow::load_project);
+    connect(save_project_act, &QAction::triggered, this, &MainWindow::save_project);
+    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
+    connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
+    // End file menu actions
+
+
     // Initialize Video Widget
     video_wgt = new VideoWidget();
     video_wgt->setMinimumSize(400,400); //TODO fix magic
@@ -108,6 +147,46 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
+}
+
+/**
+ * @brief MainWindow::on_new_project_act
+ * runs when the new project action is triggered
+ */
+void MainWindow::new_project() {
+
+}
+
+/**
+ * @brief MainWindow::on_load_project_act
+ * runs when the load project action is triggered
+ */
+void MainWindow::load_project() {
+
+}
+
+/**
+ * @brief MainWindow::on_save_project_act
+ * runs when the save project action is triggered
+ */
+void MainWindow::save_project() {
+
+}
+
+/**
+ * @brief MainWindow::on_save_project_act
+ * runs when the generate report action is triggered
+ */
+void MainWindow::gen_report() {
+
+}
+
+/**
+ * @brief MainWindow::on_save_project_act
+ * runs when the close project action is triggered
+ */
+void MainWindow::close_project() {
+
 }
 
 /**

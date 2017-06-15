@@ -74,6 +74,12 @@ signals:
     void set_analysis_results(Analysis analysis);
 
 private slots:
+    void new_project(void);
+    void load_project(void);
+    void save_project(void);
+    void gen_report(void);
+    void close_project(void);
+
     void on_action_exit_triggered();
     void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
     void update_video(QImage frame);
