@@ -72,14 +72,6 @@ bool ProjectManager::delete_project(ID proj_id){
     this->proj_map_lock.lock();
     if(this->projects.erase(proj_id)){
         close_project(temp->id);
-// Logic which remove system files should not be here, should be deleted separately
-//        temp->delete_artifacts();
-//        QFile file;
-//        if(this->save_format == BINARY )  file.setFileName(get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".dat")));
-//        else file.setFileName((get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json"))));
-//        file.remove();
-//        delete_directory(temp->dir_bookmarks);
-//        delete_directory(temp->dir);
         temp->delete_artifacts();
         delete temp;
         this->proj_map_lock.unlock();
