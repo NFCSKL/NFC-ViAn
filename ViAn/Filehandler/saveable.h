@@ -18,10 +18,13 @@ typedef int ID;
 
 class Saveable
 {
+
 public:
+    std::string m_full_path;
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
     static const SAVE_FORMAT DEFAULT_SAVE_FORMAT = JSON;
-    std::string m_full_path;
+
+
 public:
     Saveable();
     virtual ~Saveable();
@@ -36,6 +39,8 @@ public:
     void delete_saveable();
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;
+    std::string full_path() const;
+    void setFull_path(const std::string &full_path);
 };
 
 #endif // SAVABLE_H

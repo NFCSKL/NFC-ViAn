@@ -59,8 +59,10 @@ AnalysisMeta VideoProject::get_analysis(ID id) {
  * @brief VideoProject::remove_analysis
  * @param id of the analysis
  */
-void VideoProject::remove_analysis(ID id) {
+void VideoProject::delete_analysis(ID id) {
+    AnalysisMeta am = analyses.at(id);
     analyses.erase(id);
+    am.delete_saveable();
 }
 
 /**
@@ -159,9 +161,8 @@ void VideoProject::delete_artifacts(){
         Bookmark* temp = it->second;
         temp->remove_exported_image();
     }
-    for(auto it = analyses.begin(); it != analyses.end(); it++){
-        AnalysisMeta temp = it->second;
-        temp.delete_saveable();
+    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+        AnalysisMeta temp2 = it2->second;
+
     }
 }
-

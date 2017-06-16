@@ -39,8 +39,8 @@ public:
     std::string dir_videos = "";
 
 public:
-    Project(ProjectManager* projet_manager);
-    Project(ProjectManager* projet_manager, ID id, std::string name);
+    Project(ProjectManager* project_manager);
+    Project(ProjectManager* project_manager, ID id, std::string name);
     ~Project();
     void add_report(Report* report);
     ID add_video(Video *vid);

@@ -5,8 +5,8 @@
  * @param id
  * @param name
  */
-Project::Project(ProjectManager *projet_manager, ID id, std::string name){
-    this->project_manager = projet_manager;
+Project::Project(ProjectManager *project_manager, ID id, std::string name){
+    this->project_manager = project_manager;
     this->name = name;
     this->m_full_path = name;
     this->id = id;
@@ -17,8 +17,8 @@ Project::Project(ProjectManager *projet_manager, ID id, std::string name){
 /**
  * @brief Project::Project
  */
-Project::Project(ProjectManager *projet_manager){
-    this->project_manager = projet_manager;
+Project::Project(ProjectManager *project_manager){
+    this->project_manager = project_manager;
     this->name = "";
     this->m_full_path = "";
     this->videos.clear();
@@ -127,7 +127,7 @@ void Project::read(const QJsonObject& json){
     this->dir = json["root_dir"].toString().toStdString();
     this->dir_bookmarks = json["bookmark_dir"].toString().toStdString();
     this->dir_videos = json["video_dir"].toString().toStdString();
-    this->m_full_path = this->name;
+    this->m_full_path = this->dir +"/"+ this->name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -156,6 +156,7 @@ void Project::write(QJsonObject& json){
     json["root_dir"] =  QString::fromStdString(this->dir);
     json["bookmark_dir"] = QString::fromStdString(this->dir_bookmarks);
     json["video_dir"] = QString::fromStdString(this->dir_videos);
+    json["full_path"] = QString::fromStdString(m_full_path);
     QJsonArray json_proj;
     // Write Videos to json
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){

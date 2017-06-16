@@ -16,6 +16,7 @@ AnalysisMeta::AnalysisMeta(Analysis &analysis)
         std::pair<int,int> pair = std::make_pair(poi.start_frame, poi.end_frame);
         m_poi_intervals.push_back(pair);
     }
+    std::cout << "in analysis constructor" << m_full_path << std::endl;
 }
 
 /**
@@ -42,8 +43,9 @@ Analysis AnalysisMeta::get_analysis()
  */
 AnalysisMeta::AnalysisMeta(const AnalysisMeta &other)
 {
-    m_poi_intervals = other.m_poi_intervals;
+    m_poi_intervals = other.m_poi_intervals;    
     m_full_path = other.m_full_path;
+    std::cout << "copyconstruct" << m_full_path << std::endl;
 }
 
 /**
@@ -52,7 +54,8 @@ AnalysisMeta::AnalysisMeta(const AnalysisMeta &other)
  */
 void AnalysisMeta::read(const QJsonObject &json)
 {
-    m_full_path = json["file_path"].toString().toStdString();
+    m_full_path = json["asd"].toString().toStdString();
+    std::cout << "read" << m_full_path << std::endl;
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_pair = json_intervals[i].toObject();
@@ -69,7 +72,7 @@ void AnalysisMeta::read(const QJsonObject &json)
  */
 void AnalysisMeta::write(QJsonObject &json)
 {
-    json["file_path"] = QString::fromStdString(m_full_path);
+    json["asd"] = QString::fromStdString(m_full_path);
     QJsonArray intervals;
     for (auto it = m_poi_intervals.begin(); it != m_poi_intervals.end(); ++it) {
         QJsonObject interval;

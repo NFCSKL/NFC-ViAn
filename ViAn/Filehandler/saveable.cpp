@@ -5,6 +5,16 @@ const Saveable::SAVE_FORMAT Saveable::DEFAULT_SAVE_FORMAT;
  * @brief Saveable::~Saveable
  * virtual constructor
  */
+std::string Saveable::full_path() const
+{
+    return m_full_path;
+}
+
+void Saveable::setFull_path(const std::string &full_path)
+{
+    m_full_path = full_path;
+}
+
 Saveable::Saveable(){
 
 }

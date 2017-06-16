@@ -165,6 +165,7 @@ void MainWindow::analysis_finished(AnalysisMeta analysis) {
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
         analysis.m_name = current_analysis->name.toStdString();
+        std::cout << "*** analysis finished***" << analysis.m_name << std::endl;
         current_analysis->id = project_manager->get_project(p_id)->add_analysis(v_id, analysis);
         project_manager->save_project(p_id);
     }
@@ -1015,9 +1016,9 @@ void MainWindow::on_action_delete_triggered() {
                 remove_bookmarks_of_video(video_item);
                 this->project_manager->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
             } else if (my_item->type == TYPE::PROJECT) {
+                this->project_manager->delete_project(my_item->id);
                 remove_analysis_of_project(my_item);
                 remove_bookmarks_of_project(my_item);
-                this->project_manager->delete_project(my_item->id);
             } else if (my_item->type == TYPE::ANALYSIS) {
                 if(analysis_queue->contains(my_item))
                     remove_analysis_from_queue(my_item);
@@ -1095,7 +1096,7 @@ void MainWindow::remove_analysis_of_video(QTreeWidgetItem* video_item) {
 void MainWindow::remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree) {
     ID project_id = ((MyQTreeWidgetItem*) analysis_in_tree->parent()->parent())->id;
     ID video_id = ((MyQTreeWidgetItem*) analysis_in_tree->parent())->id;
-    project_manager->get_project(project_id)->get_video(video_id)->remove_analysis(analysis_in_tree->id);
+    project_manager->get_project(project_id)->get_video(video_id)->delete_analysis(analysis_in_tree->id);
 }
 
 /**

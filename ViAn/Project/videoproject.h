@@ -39,7 +39,7 @@ public:
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,AnalysisMeta> get_analyses();
     AnalysisMeta get_analysis(ID id);
-    void remove_analysis(ID id);
+    void delete_analysis(ID id);
 };
 
 

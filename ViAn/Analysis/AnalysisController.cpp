@@ -18,6 +18,7 @@
  */
 AnalysisController::AnalysisController(std::string save_path, std::string video_path, ANALYSIS_TYPE type, QObject* parent) : QThread(parent) {
     m_save_path = save_path;
+    std::cout << save_path << std::endl;
     m_video_path = video_path;
     setup_analysis(video_path, type);
 }
