@@ -165,7 +165,6 @@ void MainWindow::analysis_finished(AnalysisMeta analysis) {
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
         analysis.m_name = current_analysis->name.toStdString();
-        std::cout << "*** analysis finished***" << analysis.m_name << std::endl;
         current_analysis->id = project_manager->get_project(p_id)->add_analysis(v_id, analysis);
         project_manager->save_project(p_id);
     }
