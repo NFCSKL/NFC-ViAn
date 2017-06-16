@@ -14,7 +14,7 @@
 #include "videoproject.h"
 #include "video.h"
 #include "Filehandler/saveable.h"
-#include "Project/Analysis/analysis.h"
+#include "Project/Analysis/analysismeta.h"
 #include "projectmanager.h"
 
 typedef int ID;
@@ -46,7 +46,7 @@ public:
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
     ID add_bookmark(ID video_counter, Bookmark *bookmark);
-    ID add_analysis(ID video_counter, Analysis analysis);
+    ID add_analysis(ID video_counter, AnalysisMeta analysis);
     void add_report(std::string file_path);
 
     void delete_artifacts();

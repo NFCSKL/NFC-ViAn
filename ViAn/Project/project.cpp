@@ -190,7 +190,7 @@ void Project::write(QJsonObject& json){
  * @param v_id id of video to add analysis to
  * @param analysis
  */
-ID Project::add_analysis(ID v_id, Analysis analysis){
+ID Project::add_analysis(ID v_id, AnalysisMeta analysis){
     this->changes_made = true;
     return this->videos.at(v_id)->add_analysis(analysis);
 }

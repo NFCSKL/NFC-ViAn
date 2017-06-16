@@ -43,6 +43,32 @@ bool Saveable::save_saveable(const std::string& file_name,
     m_full_path = save_file.fileName().toStdString();
     return true;
 }
+
+/**
+ * @brief Saveable::save_saveable
+ * @param full_path
+ * @param save_format
+ * @return
+ */
+bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format)
+{
+    QFile save_file(save_format == JSON
+                    ? QString::fromStdString(full_path + ".json")
+                    : QString::fromStdString(full_path + ".dat"));
+    if(!save_file.open(QIODevice::WriteOnly)){
+        qWarning("Couldn't open save file.");
+        return false;
+    }
+    QJsonObject json_saveable;
+    this->write(json_saveable);
+    QJsonDocument save_doc(json_saveable);
+    save_file.write(save_format == JSON
+            ? save_doc.toJson()
+            : save_doc.toBinaryData());
+    m_full_path = save_file.fileName().toStdString();
+    return true;
+}
+
 /**
  * @brief Saveable::delete_saveable
  * @return

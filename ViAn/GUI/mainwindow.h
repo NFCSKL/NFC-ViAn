@@ -28,6 +28,7 @@
 #include <QQueue>
 #include "projectmanager.h"
 #include "Analysis/AnalysisController.h"
+#include "Project/Analysis/analysismeta.h"
 #define SCROLL_AREA_MARGIN 25
 
 
@@ -45,10 +46,11 @@ class MainWindow : public QMainWindow
     friend class OverlayIntegrationTest;
 
 public:
+    QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
     void set_status_bar(string status, int timer = 5000);
     void add_project_to_tree(Project* proj);
     void add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree);
-    void add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area);
+    void add_analysis_to_queue(QString q_save_path, ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void input_switch_case(ACTION action, QString q_input);
@@ -174,7 +176,7 @@ private slots:
 
     void on_action_show_hide_analysis_overlay_triggered();
 
-    void analysis_finished(Analysis analysis);
+    void analysis_finished(AnalysisMeta analysis);
 
     void show_analysis_progress(int progress);
 
@@ -235,7 +237,7 @@ private:
     void on_slider_moving();
     void on_slider_click(int new_pos, QPoint local_mouse_pos);
     int slider_pos_under_mouse(QPoint local_mouse_pos);
-    QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
+
 
     bool original_size;
 

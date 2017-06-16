@@ -7,6 +7,7 @@
 #include "opencv2/videoio/videoio.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "Project/Analysis/analysis.h"
+#include "Project/Analysis/analysismeta.h"
 #include "Analysis/MotionDetection.h"
 
 /**
@@ -15,8 +16,10 @@
  * @param type      analysis type
  * @param parent
  */
-AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type, QObject* parent) : QThread(parent) {
-    setup_analysis(file_path, type);
+AnalysisController::AnalysisController(std::string save_path, std::string video_path, ANALYSIS_TYPE type, QObject* parent) : QThread(parent) {
+    m_save_path = save_path;
+    m_video_path = video_path;
+    setup_analysis(video_path, type);
 }
 
 /**
@@ -27,8 +30,11 @@ AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type
  * @param exclude_poly                  Bool to determine whether to exclude or include the polygon
  * @param parent
  */
-AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent) : QThread(parent) {
-    setup_analysis(file_path, type);
+AnalysisController::AnalysisController(std::string save_path, std::string video_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent) : QThread(parent) {
+    m_save_path = save_path;
+    m_video_path = video_path;
+
+    setup_analysis(video_path, type);
     if(!inclusion_exclusion_points.empty())
     method->set_include_exclude_area(inclusion_exclusion_points, exclude_poly);
 }
@@ -39,13 +45,13 @@ AnalysisController::AnalysisController(std::string file_path, ANALYSIS_TYPE type
  * @param file_path     path to the video file to be analysed
  * @param type          analysis type
  */
-void AnalysisController::setup_analysis(std::string file_path, ANALYSIS_TYPE type) {
+void AnalysisController::setup_analysis(std::string video_path, ANALYSIS_TYPE type) {
     switch (type) {
     case MOTION_DETECTION:
-        method = new MotionDetection(file_path);
+        method = new MotionDetection(video_path);
         break;
     default:
-        method = new MotionDetection(file_path);
+        method = new MotionDetection(video_path);
         break;
     }
     QObject::connect(method, SIGNAL(send_progress(int)),
@@ -59,7 +65,9 @@ void AnalysisController::setup_analysis(std::string file_path, ANALYSIS_TYPE typ
 void AnalysisController::run() {
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
-    emit analysis_done(analysis);
+    analysis.save_saveable(m_save_path);
+    AnalysisMeta analysis_meta (analysis);
+    emit analysis_done(analysis_meta);
     delete method;
 }
 

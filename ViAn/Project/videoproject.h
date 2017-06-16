@@ -9,7 +9,7 @@
 #include "Video/overlay.h"
 #include "bookmark.h"
 #include "video.h"
-#include "Project/Analysis/analysis.h"
+#include "Project/Analysis/analysismeta.h"
 #include "Project/report.h"
 
 /**
@@ -19,7 +19,7 @@
  */
 class VideoProject{
     std::map<ID,Bookmark*> bookmarks;
-    std::map<ID,Analysis> analyses;
+    std::map<ID,AnalysisMeta> analyses;
     Overlay* overlay = new Overlay();
     Video* video = nullptr;
     ID id_bookmark = 0;
@@ -29,7 +29,7 @@ public:
     ID id;
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    ID add_analysis(Analysis &analysis);
+    ID add_analysis(AnalysisMeta &analysis);
     ID add_bookmark(Bookmark* bookmark);
     void delete_artifacts();
     VideoProject(Video* v); //Needs to have a video
@@ -37,8 +37,8 @@ public:
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
-    std::map<ID,Analysis> get_analyses();
-    Analysis get_analysis(ID id);
+    std::map<ID,AnalysisMeta> get_analyses();
+    AnalysisMeta get_analysis(ID id);
     void remove_analysis(ID id);
 };
 

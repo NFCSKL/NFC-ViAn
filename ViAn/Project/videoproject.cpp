@@ -51,7 +51,7 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-Analysis VideoProject::get_analysis(ID id) {
+AnalysisMeta VideoProject::get_analysis(ID id) {
     return analyses[id];
 }
 
@@ -68,7 +68,7 @@ void VideoProject::remove_analysis(ID id) {
  * @return analyses
  * return all analyses.
  */
-std::map<ID,Analysis> VideoProject::get_analyses() {
+std::map<ID, AnalysisMeta> VideoProject::get_analyses() {
     return analyses;
 }
 
@@ -93,7 +93,7 @@ void VideoProject::read(const QJsonObject& json){
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();
-        Analysis analysis;
+        AnalysisMeta analysis;
         analysis.read(json_analysis);
         add_analysis(analysis);
     }
@@ -120,7 +120,7 @@ void VideoProject::write(QJsonObject& json){
     QJsonArray json_analyses;
     for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
         QJsonObject json_analysis;
-        Analysis an = it2->second;
+        AnalysisMeta an = it2->second;
         an.write(json_analysis);
         json_analyses.append(json_analysis);
     }
@@ -147,7 +147,7 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * @return id of the analysis
  * Adds analysis to video project.
  */
-ID VideoProject::add_analysis(Analysis& analysis){
+ID VideoProject::add_analysis(AnalysisMeta &analysis){
     this->analyses.insert(std::make_pair(this->id_analysis, analysis));
     return this->id_analysis++;
 }

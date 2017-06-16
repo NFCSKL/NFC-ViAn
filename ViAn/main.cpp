@@ -5,6 +5,7 @@
 #include "Test/test_report_generator.h"
 #include "Test/overlayintegrationtest.h"
 #include "GUI/mainwindow.h"
+#include "Project/Analysis/analysismeta.h"
 #include <QApplication>
 /**
  * @brief qMain
@@ -17,7 +18,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    qRegisterMetaType<Analysis>();
+    qRegisterMetaType<AnalysisMeta>();
     w.show();
 
     bool testing = false;

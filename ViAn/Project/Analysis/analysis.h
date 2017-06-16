@@ -16,7 +16,7 @@ enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
 const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial detection"};
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
                                                                      std::make_pair("Facial detection",FACIAL_DETECTION)};
-class Analysis : Saveable {
+class Analysis : public Saveable {
 public:
     ANALYSIS_TYPE type;
     Analysis();
@@ -30,6 +30,5 @@ public:
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     std::vector<POI> POIs;
 };
-Q_DECLARE_METATYPE(Analysis)
 
 #endif // ANALYSIS_H

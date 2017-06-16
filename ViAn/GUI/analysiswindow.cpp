@@ -1,5 +1,6 @@
 #include "analysiswindow.h"
 #include "ui_analysiswindow.h"
+#include "GUI/qtreeitems.h"
 #include <iostream>
 
 /**
@@ -32,9 +33,13 @@ AnalysisWindow::~AnalysisWindow() {
  * Adds the selected analysis type to the analysis list.
  */
 void AnalysisWindow::on_add_button_clicked() {
+    ID proj_id = ((MyQTreeWidgetItem*)mainwindow->get_project_from_object(current_video))->id;
+    Project* proj = project_manager->get_project(proj_id);
+
     if(!ui->name_input->text().isEmpty()) {
+        QString save_path = QString::fromStdString(proj->dir) + "_" + ui->name_input->text();
         ANALYSIS_TYPE type = ANALYSIS_NAMES_TYPE_MAP.at(ui->analysis_choise_list->currentText().toStdString());
-        mainwindow->add_analysis_to_queue(type, ui->name_input->text(), current_video, ui->use_analysis_area->isChecked());
+        mainwindow->add_analysis_to_queue(save_path,type, ui->name_input->text(), current_video, ui->use_analysis_area->isChecked());
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");
