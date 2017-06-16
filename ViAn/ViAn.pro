@@ -18,8 +18,9 @@ TEMPLATE = app
 #
 SOURCES += main.cpp \
     projectmanager.cpp \
-    Project/Analysis/analysismeta.cpp
-
+    Project/Analysis/analysismeta.cpp \
+    GUI/TreeItems/videoitem.cpp \
+    GUI/TreeItems/analysisitem.cpp
 
 #
 # TEST
@@ -35,7 +36,9 @@ HEADERS += Test/test_video_player.h \
     Test/test_report_generator.h \
     Test/overlayintegrationtest.h \
     projectmanager.h \
-    Project/Analysis/analysismeta.h
+    Project/Analysis/analysismeta.h \
+    GUI/TreeItems/videoitem.h \
+    GUI/TreeItems/analysisitem.h
 
 #
 # LIBRARY
@@ -55,6 +58,12 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/makeproject.cpp \
     GUI/fpsdialog.cpp \
     GUI/analysiswindow.cpp \
+    GUI/fpsdialog.cpp   \
+    GUI/videowidget.cpp \
+    GUI/framewidget.cpp \
+    GUI/projectwidget.cpp \
+    GUI/bookmarkwidget.cpp \
+    GUI/createprojectdialog.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -67,6 +76,12 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/analysiswindow.h \
+    GUI/fpsdialog.h \
+    GUI/videowidget.h \
+    GUI/framewidget.h \
+    GUI/projectwidget.h \
+    GUI/bookmarkwidget.h \
+    GUI/createprojectdialog.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui \

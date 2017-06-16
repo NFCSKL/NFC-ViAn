@@ -9,7 +9,7 @@ OverlayIntegrationTest::OverlayIntegrationTest() {
 /**
  * @brief OverlayIntegrationTest::exec
  * Runs the test.
- */
+
 void OverlayIntegrationTest::exec() {
 
     // Setup video player
@@ -62,7 +62,7 @@ void OverlayIntegrationTest::exec() {
 
     std::cout << "Overlay integration test finished.\n";
 }
-
+*/
 /**
  * @brief OverlayIntegrationTest::draw_pen
  * Simulates mouse events for dragging the mouse around.

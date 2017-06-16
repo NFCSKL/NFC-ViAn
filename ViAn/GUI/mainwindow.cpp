@@ -6,6 +6,7 @@
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QMenuBar>
 #include <QTime>
 #include <chrono>
 #include <thread>
@@ -27,15 +28,46 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow){
     ui->setupUi(this);
     video_slider = ui->video_slider;
+    setup_file_handler();
 
+    QMenuBar* menuBar = new QMenuBar();
+    QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
+    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    toggle_project_widget = project_dock->toggleViewAction();
+    toggle_bookmark_widget = bookmark_dock->toggleViewAction();
+
+    // Initialize Video Widget
+    video_wgt = new VideoWidget();
+    video_wgt->setMinimumSize(600,400); //TODO fix magic
+    setCentralWidget(video_wgt);
+
+    // Initialize project widget
+    project_wgt = new ProjectWidget(file_handler);
+    project_dock->setWidget(project_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, project_dock);
+
+
+    // Initialize bookmark widget
+    bookmark_wgt = new BookmarkWidget();
+    bookmark_dock->setWidget(bookmark_wgt);
+    addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
+    std::vector<std::string> tags = {"one", "two"};
+    bookmark_wgt->add_bookmark("bookmark description", tags);
+
+    //Initialize menu bar
+    init_file_menu();
+    init_edit_menu();
+    init_view_menu();
+    init_tools_menu();
+    init_help_menu();
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
 
     // Setup a Bookmark View in the right sidebar in the GUI.
     bookmark_view = new BookmarkView(ui->document_list);
-
-    setup_file_handler();
 
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
@@ -90,6 +122,156 @@ MainWindow::~MainWindow() {
     delete analysis_window;
 }
 
+void MainWindow::init_file_menu() {
+    QMenu* file_menu = menuBar()->addMenu(tr("File"));
+    QAction* new_project_act = new QAction(tr("New project"), this);
+    QAction* open_project_act = new QAction(tr("Open project"), this);
+    QAction* save_project_act = new QAction(tr("Save project"), this);
+    QAction* gen_report_act = new QAction(tr("Generate report"), this);
+    QAction* close_project_act = new QAction(tr("Close project"), this);
+    QAction* remove_project_act = new QAction(tr("Remove project"), this);
+    QAction* add_vid_act = new QAction(tr("Add video"), this);
+
+    file_menu->addAction(new_project_act);
+    QMenu* add_menu = file_menu->addMenu(tr("Add"));
+    add_menu->addAction(add_vid_act);
+    file_menu->addAction(open_project_act);
+    file_menu->addAction(save_project_act);
+    file_menu->addAction(close_project_act);
+    file_menu->addAction(remove_project_act);
+    file_menu->addAction(gen_report_act);
+    file_menu->addSeparator();
+    QAction* quit_act = file_menu->addAction(tr("&Quit"), this, &QWidget::close);
+
+    new_project_act->setShortcuts(QKeySequence::New);
+    open_project_act->setShortcuts(QKeySequence::Open);
+    save_project_act->setShortcuts(QKeySequence::Save);
+    //gen_report_act->setShortcuts(QKeySequence::Save); TODO ADD
+    close_project_act->setShortcuts(QKeySequence::Close);
+    quit_act->setShortcuts(QKeySequence::Quit);
+
+    new_project_act->setStatusTip(tr("Create a new project"));
+    open_project_act->setStatusTip(tr("Load project"));
+    save_project_act->setStatusTip(tr("Save project"));
+    gen_report_act->setStatusTip(tr("Generate report"));
+    close_project_act->setStatusTip(tr("Close project"));
+    remove_project_act->setStatusTip(tr("Remove project"));
+    quit_act->setStatusTip(tr("Quit the application"));
+
+    connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
+    connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    //connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project);
+    connect(save_project_act, &QAction::triggered, this, &MainWindow::save_project);
+    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
+    connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
+}
+
+void MainWindow::init_edit_menu() {
+    QMenu* edit_menu = menuBar()->addMenu(tr("Edit"));
+    QAction* options_act = new QAction(tr("Options"), this);
+    QAction* cont_bri_act = new QAction(tr("Contrast/Brightness"), this);
+    QAction* cw_act = new QAction(tr("Rotate 90 CW"), this);
+    QAction* ccw_act = new QAction(tr("Rotate 90 CCW"), this);
+
+    edit_menu->addAction(cont_bri_act);
+    edit_menu->addAction(cw_act);
+    edit_menu->addAction(ccw_act);
+    edit_menu->addSeparator();
+    edit_menu->addAction(options_act);
+
+    //options_act->setShortcuts(QKeySequence::);
+    options_act->setStatusTip(tr("Program options"));
+    connect(options_act, &QAction::triggered, this, &MainWindow::options);
+}
+
+void MainWindow::init_view_menu() {
+    QMenu* view_menu = menuBar()->addMenu(tr("&View"));
+    QAction* annotation_act = new QAction(tr("Annotations"), this);
+    QAction* detection_act = new QAction(tr("Detections"), this);
+
+    annotation_act->setCheckable(true);
+    detection_act->setCheckable(true);
+
+    view_menu->addAction(toggle_project_widget);
+    view_menu->addAction(toggle_bookmark_widget);
+    view_menu->addSeparator();
+    view_menu->addAction(annotation_act);
+    view_menu->addAction(detection_act);
+}
+
+void MainWindow::init_tools_menu() {
+    QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
+    QAction* color_act = new QAction(tr("Color"), this);
+    QAction* zoom_in_act = new QAction(tr("Zoom in"), this);
+    QAction* zoom_out_act = new QAction(tr("Zoom out"), this);
+    QAction* fit_screen_act = new QAction(tr("Fit to screen"), this);
+    QAction* move_act = new QAction(tr("Panning tool"), this);
+    QAction* rectangle_act = new QAction(tr("Rectangle"), this);
+    QAction* circle_act = new QAction(tr("Circle"), this);
+    QAction* line_act = new QAction(tr("line"), this);
+    QAction* arrow_act = new QAction(tr("Arrow"), this);
+    QAction* pen_act = new QAction(tr("Pen"), this);
+    QAction* text_act = new QAction(tr("Text"), this);
+    QAction* undo_act = new QAction(tr("Undo"), this);
+    QAction* clear_act = new QAction(tr("Clear"), this);
+
+
+    tool_menu->addAction(color_act);
+    QMenu* drawing_tools = tool_menu->addMenu(tr("Shapes"));
+    drawing_tools->addAction(rectangle_act);
+    drawing_tools->addAction(circle_act);
+    drawing_tools->addAction(line_act);
+    drawing_tools->addAction(arrow_act);
+    drawing_tools->addAction(pen_act);
+    drawing_tools->addAction(text_act);
+    tool_menu->addAction(undo_act);
+    tool_menu->addAction(clear_act);
+    tool_menu->addSeparator();
+    tool_menu->addAction(zoom_in_act);
+    tool_menu->addAction(zoom_out_act);
+    tool_menu->addAction(fit_screen_act);
+    tool_menu->addAction(move_act);
+}
+
+void MainWindow::init_help_menu() {
+    QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
+    QAction* help_act = new QAction(tr("Open manual"), this);
+    help_menu->addAction(help_act);
+}
+
+
+/**
+ * @brief MainWindow::save_project_act
+ * runs when the save project action is triggered
+ */
+void MainWindow::save_project() {
+
+}
+
+/**
+ * @brief MainWindow::gen_report
+ * runs when the generate report action is triggered
+ */
+void MainWindow::gen_report() {
+
+}
+
+/**
+ * @brief MainWindow::on_save_project_act
+ * runs when the close project action is triggered
+ */
+void MainWindow::close_project() {
+
+}
+
+/**
+ * @brief MainWindow::on_save_project_act
+ * runs when the options action is triggered
+ */
+void MainWindow::options() {
+    project_wgt->close();
+}
+
 /**
  * @brief MainWindow::setup_analysis
  * Creates the necessary connections to the analysis thread.
@@ -124,8 +306,6 @@ void MainWindow::setup_file_handler(){
  * Connects all signals and slots that are needed between video_player and mainwindow.
  */
 void MainWindow::setup_video_player(video_player *mplayer) {
-    QObject::connect(mplayer, SIGNAL(processed_image(QImage)),
-                     this, SLOT(update_video(QImage)));
     QObject::connect(mplayer, SIGNAL(update_current_frame(int)),
                      this, SLOT(set_video_slider_pos(int)));
     QObject::connect(this, SIGNAL(resize_video_frame(int,int)),
@@ -200,106 +380,6 @@ void MainWindow::set_status_bar(std::string status, int timer){
 }
 
 /**
- * @brief MainWindow::on_play_pause_button_clicked
- * Calls upon video player functions based on current playback status
- * Starts/resumes a stopped/paused video, pauses a playing one
- */
-void MainWindow::on_play_pause_button_clicked() {
-    if (mvideo_player->is_paused()) {
-        // Video thread is paused. Notifying the waitcondition to resume playback
-        icon_on_button_handler->set_icon("pause", ui->play_pause_button);//changes the icon on the play button to a pause-icon
-        paused_wait.wakeOne();
-        set_status_bar("Playing");
-    } else if (mvideo_player->is_stopped()) {
-        // Video thread has finished. Start a new one
-        icon_on_button_handler->set_icon("pause", ui->play_pause_button);
-        mvideo_player->start();
-        set_status_bar("Playing");
-    } else {
-        // Video thread is running. Pause it
-        icon_on_button_handler->set_icon("play", ui->play_pause_button);
-        emit set_pause_video();
-        set_status_bar("Paused");
-    }
-}
-
-/**
- * @brief MainWindow::on_increase_speed_button_clicked
- * Calls upon video player function which in turn increases the playback speed
- */
-void MainWindow::on_increase_speed_button_clicked(){
-    ui->decrease_speed_button->setEnabled(true);
-    mvideo_player->inc_playback_speed();
-    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
-    QString speed = QString::number(curr_speed_factor);
-    if (curr_speed_factor >= mvideo_player->MAX_SPEED_MULT) {
-        ui->increase_speed_button->setEnabled(false);
-    }
-    set_status_bar("Playback speed increased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText("Play speed: " + speed + "x");
-}
-
-/**
- * @brief MainWindow::on_decrease_speed_button_clicked
- * Calls upon a video player function which decreases the playback speed
- */
-void MainWindow::on_decrease_speed_button_clicked(){
-    ui->increase_speed_button->setEnabled(true);
-    mvideo_player->dec_playback_speed();
-    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
-    QString speed = QString::number(curr_speed_factor);
-    if (curr_speed_factor <= mvideo_player->MIN_SPEED_MULT) {
-        ui->decrease_speed_button->setEnabled(false);
-    }
-    set_status_bar("Playback speed decreased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText("Play speed: " + speed + "x");
-}
-
-/**
- * @brief MainWindow::on_stop_button_clicked
- * Calls upon video player function which in turn stops the video
- */
-void MainWindow::on_stop_button_clicked() {
-    set_status_bar("Stopped");
-    if (mvideo_player->is_playing()) {
-        icon_on_button_handler->set_icon("play", ui->play_pause_button);
-    } else if (mvideo_player->is_paused()) {
-        paused_wait.wakeOne();
-    } else if (mvideo_player->is_stopped()) {
-        return;
-    }
-    emit set_stop_video();
-}
-
-/**
- * @brief MainWindow::on_next_frame_button_clicked
- * Calls upon video player function which in turn skips to the next frame
- */
-void MainWindow::on_next_frame_button_clicked() {
-    if (mvideo_player->is_paused()) {
-        emit next_video_frame();
-        int frame = mvideo_player->get_current_frame_num();
-        set_status_bar("Went forward a frame to number " + std::to_string(frame));
-    } else {
-        set_status_bar("Needs to be paused");
-    }
-}
-
-/**
- * @brief MainWindow::on_previous_frame_button_clicked
- * Calls upon video player function which in turn steps back to the previous frame
- */
-void MainWindow::on_previous_frame_button_clicked() {
-    if (mvideo_player->is_paused()) {
-        emit prev_video_frame();
-        int frame = mvideo_player->get_current_frame_num();
-        set_status_bar("Went back a frame to number " + std::to_string(frame));
-    } else {
-        set_status_bar("Video needs to be paused");
-    }
-}
-
-/**
  * @brief MainWindow::update_video
  * Sets the video_frame pixmap to the current frame from video
  * and updates labels showing current and total time of video
@@ -308,34 +388,8 @@ void MainWindow::on_previous_frame_button_clicked() {
 void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
     qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
-    set_time_to_label(ui->current_time_label, current_time);
+    //set_time_to_label(ui->current_time_label, current_time);
     ui->frame_line_edit->setText(QString::number(mvideo_player->get_current_frame_num()));
-}
-
-/**
- * @brief MainWindow::set_slider_labels
- * Sets the slider labels showing current and total time
- */
-void MainWindow::set_slider_labels() {
-    qint64 total_time = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
-    qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
-    set_time_to_label(ui->current_time_label, current_time);
-    set_time_to_label(ui->total_time_label, total_time);
-}
-
-/**
- * @brief MainWindow::set_time_to_label
- * Takes an variable of seconds and prints it to the label
- * in a readable format
- * @param label the label to be updated
- * @param time time in seconds, will be printed in the label
- */
-void MainWindow::set_time_to_label(QLabel *label, qint64 time) {
-    QTime q_time((time/3600)%60, (time/60)%60, time%60);
-    QString format = "mm:ss";
-    if (time > 3600)
-        format = "hh:mm:ss";
-    label->setText(q_time.toString(format));
 }
 
 /**
@@ -481,6 +535,7 @@ void MainWindow::on_bookmark_button_clicked() {
     set_status_bar("Bookmark created.");
 }
 
+<<<<<<< HEAD
 /**
  * @brief MainWindow::on_action_add_project_triggered
  */
@@ -489,6 +544,9 @@ void MainWindow::on_action_add_project_triggered() {
     make_project->show();
     set_status_bar("Adding project");
 }
+=======
+
+>>>>>>> b0b8b2bf32e5cbe7d78a70058a9105975325e602
 
 /**
  * @brief MainWindow::on_project_tree_itemDoubleClicked
@@ -671,24 +729,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
-/**
- * @brief MainWindow::on_action_zoom_in_triggered
- * Sets a state in the video overlay
- * for the user to choose an area.
- */
-void MainWindow::on_action_zoom_in_triggered() {
-    mvideo_player->zoom_in();
-    set_status_bar("Zoom in. Choose your area.");
-}
 
-/**
- * @brief MainWindow::on_action_zoom_out_triggered
- * Reset the zoom level to the full video size.
- */
-void MainWindow::on_action_zoom_out_triggered() {
-    mvideo_player->zoom_out();
-    set_status_bar("Zoom out.");
-}
 
 /**
  * @brief MainWindow::right_click_project_tree_menu
@@ -852,7 +893,7 @@ void MainWindow::play_video() {
     // Updates the overlay to the state choosen in the GUI.
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
-    set_slider_labels();
+    //set_slider_labels();
     ui->speed_label->setText("Play speed: 1x");
 
 }

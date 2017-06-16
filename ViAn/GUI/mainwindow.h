@@ -29,6 +29,12 @@
 #include "projectmanager.h"
 #include "Analysis/AnalysisController.h"
 #include "Project/Analysis/analysismeta.h"
+
+#include <QHBoxLayout>
+#include <QDockWidget>
+#include "videowidget.h"
+#include "projectwidget.h"
+#include "bookmarkwidget.h"
 #define SCROLL_AREA_MARGIN 25
 
 
@@ -61,8 +67,6 @@ public:
     QMutex mutex;
     QWaitCondition paused_wait;
 
-    friend class test_mainwindow;
-
 signals:
     void set_play_video();
     void set_pause_video();
@@ -75,87 +79,42 @@ signals:
     void set_analysis_results(Analysis analysis);
 
 private slots:
-
-    void on_play_pause_button_clicked();
-
-    void on_stop_button_clicked();
+    void save_project(void);
+    void gen_report(void);
+    void close_project(void);
+    void options(void);
 
     void on_action_exit_triggered();
-
     void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
-
     void update_video(QImage frame);
-
     void set_video_slider_pos(int pos);
-
     void resizeEvent(QResizeEvent* event); //can not follow namestandard, generated code
-
-    void on_previous_frame_button_clicked();
-
-    void on_next_frame_button_clicked();
-
-    void on_decrease_speed_button_clicked();
-
-    void on_increase_speed_button_clicked();
-
     void on_bookmark_button_clicked();
-
     void on_video_slider_sliderPressed();
-
     void on_video_slider_sliderReleased();
-
     void on_video_slider_valueChanged(int new_pos);
-
-    void on_action_add_project_triggered();
-    
     void on_action_show_hide_overlay_triggered();
-
     void on_action_colour_triggered();
-
     void on_action_rectangle_triggered();
-
     void on_action_circle_triggered();
-
     void on_action_arrow_triggered();
-
     void on_action_line_triggered();
-
     void right_click_project_tree_menu(const QPoint & pos);
-
     void prepare_bookmark_menu(const QPoint & pos);
-
     void play_video();
-
     void on_action_save_triggered();
-
     void on_action_pen_triggered();
-
     void on_action_text_triggered();
-
     void on_action_undo_triggered();
-
     void on_action_clear_triggered();
-
-    void on_action_zoom_in_triggered();
-
-    void on_action_zoom_out_triggered();
-
     void on_action_load_triggered();
-
     void on_action_add_video_triggered();
-
     void on_action_choose_workspace_triggered();
-
     void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);//can not follow namestandard, generated code
-    
     void on_action_show_hide_analysis_area_triggered();
-
     void on_action_contrast_brightness_triggered();
-
     void on_action_fill_screen_triggered();
-
     void on_action_rotate_right_triggered();
-
     void on_action_rotate_left_triggered();
 
     void on_document_list_itemClicked(QListWidgetItem *item);
@@ -163,36 +122,34 @@ private slots:
     void on_document_list_itemDoubleClicked(QListWidgetItem *item);
 
     void on_action_delete_triggered();
-
     void on_action_create_report_triggered();
-
     void on_action_original_size_triggered();
-
     void on_action_invert_analysis_area_triggered();
+
 
     void on_action_perform_analysis_triggered();
 
     void on_action_close_project_triggered();
-
     void on_action_show_hide_analysis_overlay_triggered();
 
     void analysis_finished(AnalysisMeta analysis);
 
     void show_analysis_progress(int progress);
-
     void on_previous_POI_button_clicked();
-
     void on_next_POI_button_clicked();
-
     void on_action_clear_analysis_overlay_triggered();
 
     void on_action_set_analysis_area_to_video_triggered();
 
-    void on_action_change_bookmark_triggered();
 
+    void on_action_change_bookmark_triggered();
     void on_jump_button_clicked();
 
 private:
+
+    VideoWidget* video_wgt;
+    ProjectWidget* project_wgt;
+    BookmarkWidget* bookmark_wgt;
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
@@ -201,6 +158,8 @@ private:
     BookmarkView* bookmark_view;
     QSlider *video_slider;
     QTreeVideoItem *playing_video;
+    QAction* toggle_project_widget;
+    QAction* toggle_bookmark_widget;
 
     bool slider_blocked = false;
     bool slider_paused_video = false;
@@ -214,6 +173,13 @@ private:
     AnalysisWindow *analysis_window;
     FileHandler* file_handler;
     ProjectManager *project_manager;
+
+    void init_file_menu();
+    void init_edit_menu();
+    void init_view_menu();
+    void init_tools_menu();
+    void init_help_menu();
+
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
 

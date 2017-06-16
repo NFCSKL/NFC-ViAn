@@ -73,7 +73,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>304</width>
-                <height>253</height>
+                <height>271</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -486,6 +486,7 @@
     </item>
    </layout>
   </widget>
+<<<<<<< HEAD
   <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
     <rect>
@@ -573,6 +574,8 @@
    <addaction name="menu_tools"/>
    <addaction name="menu_help"/>
   </widget>
+=======
+>>>>>>> b0b8b2bf32e5cbe7d78a70058a9105975325e602
   <widget class="QStatusBar" name="status_bar"/>
   <widget class="QToolBar" name="toolbar">
    <property name="enabled">

@@ -24,8 +24,8 @@ private slots:
     void test_set_frame_height();
     void test_next_frame();
     void test_previous_frame();
-    void test_inc_playback_speed();
-    void test_dec_playback_speed();
+    //void test_inc_playback_speed();
+    //void test_dec_playback_speed();
     void test_toggle_overlay();
     void test_set_overlay_tool();
     void test_set_overlay_colour();
@@ -40,10 +40,10 @@ private slots:
     void test_set_stop_video();
     void test_analysis_area_toggle();
     void test_analysis_area_points();
-    void test_on_set_playback_frame_pass();
-    void test_on_set_playback_frame_fail();
+    //void test_on_set_playback_frame_pass();
+    //void test_on_set_playback_frame_fail();
     void test_set_current_frame_num();
-    void test_convert_frame();
+    //void test_convert_frame();
     void test_set_zoom_area();
     void test_reset_zoom_area();
 

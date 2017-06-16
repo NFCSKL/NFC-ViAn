@@ -7,6 +7,8 @@
 #include "GUI/mainwindow.h"
 #include "Project/Analysis/analysismeta.h"
 #include <QApplication>
+
+Q_DECLARE_METATYPE(cv::Mat);
 /**
  * @brief qMain
  * Constructor
@@ -18,12 +20,23 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+<<<<<<< HEAD
     qRegisterMetaType<AnalysisMeta>();
+=======
+    qRegisterMetaType<Analysis>();
+
+
+
+>>>>>>> b0b8b2bf32e5cbe7d78a70058a9105975325e602
     w.show();
 
     bool testing = false;
     bool integration_testing = false;
+<<<<<<< HEAD
 
+=======
+    /**
+>>>>>>> b0b8b2bf32e5cbe7d78a70058a9105975325e602
     if (testing) {
 //        //For testing video player.
 //        test_video_player* video_test = new test_video_player();
@@ -39,8 +52,11 @@ int main(int argc, char *argv[])
 //        QTest::qExec(report_test);
     }
     if (integration_testing) {
+        /**
         OverlayIntegrationTest* ot = new OverlayIntegrationTest();
         ot->exec();
+        '/
     }
+    **/
     return a.exec();
 }

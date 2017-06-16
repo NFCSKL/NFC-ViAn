@@ -24,7 +24,7 @@ class video_player : public QThread {
     friend class OverlayIntegrationTest;
 
 public:
-    video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent = 0);
+    video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent = 0);
     ~video_player();
     bool load_video(string filename, Overlay* o);
     bool is_paused();
@@ -92,8 +92,10 @@ public:
 
 
 signals:
-    void processed_image(const QImage &image);
+    void processed_image(const cv::Mat image);
     void update_current_frame(const int frame);
+    void frame_count(int value);
+    void total_time(int time);
 
 private slots:
     void scaling_event(int new_width, int new_height);
@@ -108,6 +110,7 @@ public slots:
     void on_stop_video();
 
 
+    void set_playback_speed(int speed_steps);
 protected:
     void run() override;
     void msleep(int ms);
@@ -125,8 +128,6 @@ private:
     bool limited_frame_dimensions();
     bool set_current_frame_num(int frame_nbr);
 
-    // The QLabel where the video is shown.
-    QLabel* video_frame;
 
     cv::VideoCapture capture;
     cv::Mat frame;
