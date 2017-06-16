@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget(file_handler);
+    project_wgt = new ProjectWidget(project_manager);
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
@@ -534,19 +534,6 @@ void MainWindow::on_bookmark_button_clicked() {
     playing_video->bookmarks.push_back(id);
     set_status_bar("Bookmark created.");
 }
-
-<<<<<<< HEAD
-/**
- * @brief MainWindow::on_action_add_project_triggered
- */
-void MainWindow::on_action_add_project_triggered() {
-    MakeProject *make_project = new MakeProject(this, this->project_manager, this->file_handler->get_work_space().absolutePath().toStdString());
-    make_project->show();
-    set_status_bar("Adding project");
-}
-=======
-
->>>>>>> b0b8b2bf32e5cbe7d78a70058a9105975325e602
 
 /**
  * @brief MainWindow::on_project_tree_itemDoubleClicked

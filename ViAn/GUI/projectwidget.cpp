@@ -5,8 +5,8 @@
 
 #include <QDebug>
 
-ProjectWidget::ProjectWidget(FileHandler* file_handler, QWidget *parent) : QTreeWidget(parent) {
-    m_file_handler = file_handler;
+ProjectWidget::ProjectWidget(ProjectManager* project_manager, QWidget *parent) : QTreeWidget(parent) {
+    m_project_manager = project_manager;
 }
 
 void ProjectWidget::new_project() {
@@ -19,9 +19,9 @@ void ProjectWidget::new_project() {
 }
 
 void ProjectWidget::add_project(QString project_name, QString project_path) {
-    //std::string _tmp_name = project_name.toStdString();
+    std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
-    proj = m_file_handler->create_project(project_name, _tmp_path, _tmp_path);
+    proj = m_project_manager->create_project(_tmp_name, _tmp_path, _tmp_path);
     create_default_tree();
 }
 

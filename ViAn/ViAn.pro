@@ -58,7 +58,6 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/makeproject.cpp \
     GUI/fpsdialog.cpp \
     GUI/analysiswindow.cpp \
-    GUI/fpsdialog.cpp   \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
     GUI/projectwidget.cpp \
@@ -76,7 +75,6 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/analysiswindow.h \
-    GUI/fpsdialog.h \
     GUI/videowidget.h \
     GUI/framewidget.h \
     GUI/projectwidget.h \

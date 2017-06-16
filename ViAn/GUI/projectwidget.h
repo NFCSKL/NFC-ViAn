@@ -8,14 +8,14 @@
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    FileHandler* m_file_handler;
+    ProjectManager* m_project_manager;
     void create_default_tree();
     void tree_add_video();
     void tree_add_video(QString vid_name);
 
     QTreeWidgetItem* videos;
 public:
-    explicit ProjectWidget(FileHandler* file_handler, QWidget *parent = nullptr);
+    explicit ProjectWidget(ProjectManager *project_manager, QWidget *parent = nullptr);
     Project* proj = nullptr;
 
 signals:

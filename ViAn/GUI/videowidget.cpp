@@ -36,7 +36,7 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     QObject::connect(this, SIGNAL(prev_video_frame()),
                      m_video_player, SLOT(previous_frame()));
 
-    m_video_player->load_video("D:\\Testdata\\Pumparna.avi", nullptr);
+    m_video_player->load_video("C:\\Testdata\\Pumparna.avi", nullptr);
     m_video_player->start();
 }
 
