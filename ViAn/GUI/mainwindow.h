@@ -74,11 +74,10 @@ signals:
     void set_analysis_results(Analysis analysis);
 
 private slots:
-    void new_project(void);
-    void load_project(void);
     void save_project(void);
     void gen_report(void);
     void close_project(void);
+    void options(void);
 
     void on_action_exit_triggered();
     void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
@@ -89,7 +88,6 @@ private slots:
     void on_video_slider_sliderPressed();
     void on_video_slider_sliderReleased();
     void on_video_slider_valueChanged(int new_pos);
-    void on_action_add_project_triggered();
     void on_action_show_hide_overlay_triggered();
     void on_action_colour_triggered();
     void on_action_rectangle_triggered();
@@ -104,8 +102,6 @@ private slots:
     void on_action_text_triggered();
     void on_action_undo_triggered();
     void on_action_clear_triggered();
-    void on_action_zoom_in_triggered();
-    void on_action_zoom_out_triggered();
     void on_action_load_triggered();
     void on_action_add_video_triggered();
     void on_action_choose_workspace_triggered();
@@ -142,6 +138,8 @@ private:
     BookmarkView* bookmark_view;
     QSlider *video_slider;
     QTreeVideoItem *playing_video;
+    QAction* toggle_project_widget;
+    QAction* toggle_bookmark_widget;
 
     bool slider_blocked = false;
     bool slider_paused_video = false;
@@ -152,6 +150,11 @@ private:
             );
 
     FileHandler *file_handler;
+    void init_file_menu();
+    void init_edit_menu();
+    void init_view_menu();
+    void init_tools_menu();
+    void init_help_menu();
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
     void setup_analysis(AnalysisController *ac);

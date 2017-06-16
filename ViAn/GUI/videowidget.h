@@ -38,6 +38,8 @@ public slots:
     void stop_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+    void zoom_in_clicked();
+    void zoom_out_clicked();
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
     void on_playback_slider_pressed(void);

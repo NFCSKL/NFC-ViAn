@@ -17,10 +17,8 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    GUI/videowidget.cpp \
-    GUI/framewidget.cpp \
-    GUI/projectwidget.cpp \
-    GUI/bookmarkwidget.cpp
+    GUI/TreeItems/videoitem.cpp \
+    GUI/TreeItems/analysisitem.cpp
 
 #
 # TEST
@@ -35,10 +33,8 @@ HEADERS += Test/test_video_player.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
     Test/overlayintegrationtest.h \
-    GUI/videowidget.h \
-    GUI/framewidget.h \
-    GUI/projectwidget.h \
-    GUI/bookmarkwidget.h
+    GUI/TreeItems/videoitem.h \
+    GUI/TreeItems/analysisitem.h
 
 #
 # LIBRARY
@@ -56,7 +52,12 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp
+    GUI/fpsdialog.cpp   \
+    GUI/videowidget.cpp \
+    GUI/framewidget.cpp \
+    GUI/projectwidget.cpp \
+    GUI/bookmarkwidget.cpp \
+    GUI/createprojectdialog.cpp
 
 
 
@@ -68,7 +69,12 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/makeproject.h \
-    GUI/fpsdialog.h
+    GUI/fpsdialog.h \
+    GUI/videowidget.h \
+    GUI/framewidget.h \
+    GUI/projectwidget.h \
+    GUI/bookmarkwidget.h \
+    GUI/createprojectdialog.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui

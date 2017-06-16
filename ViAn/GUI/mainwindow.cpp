@@ -6,6 +6,7 @@
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QMenuBar>
 #include <QTime>
 #include <chrono>
 #include <thread>
@@ -28,79 +29,46 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow){
     ui->setupUi(this);
     video_slider = ui->video_slider;
+    setup_file_handler();
 
-    // Layout
-    //HBoxLayout* main_layout = new QHBoxLayout();
-    QDockWidget* docker = new QDockWidget(tr("Projects"), this);
-    docker->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-    //Initialize menu bar
-    QMenu* file_menu = menuBar()->addMenu(tr("File"));
-
-    // File menu actions
-    QAction* new_project_act = new QAction(tr("New project"), this);
-    QAction* load_project_act = new QAction(tr("Load project"), this);
-    QAction* save_project_act = new QAction(tr("Save project"), this);
-    QAction* gen_report_act = new QAction(tr("Generate report"), this);
-    QAction* close_project_act = new QAction(tr("Close project"), this);
-
-    file_menu->addAction(new_project_act);
-    file_menu->addAction(load_project_act);
-    file_menu->addAction(save_project_act);
-    file_menu->addAction(gen_report_act);
-    file_menu->addAction(close_project_act);
-    QAction* quit_act = file_menu->addAction(tr("&Quit"), this, &QWidget::close);
-
-    new_project_act->setShortcuts(QKeySequence::New);
-    load_project_act->setShortcuts(QKeySequence::Open);
-    save_project_act->setShortcuts(QKeySequence::Save);
-    //gen_report_act->setShortcuts(QKeySequence::Save); TODO ADD
-    close_project_act->setShortcuts(QKeySequence::Close);
-    quit_act->setShortcuts(QKeySequence::Quit);
-
-    new_project_act->setStatusTip(tr("Create a new project"));
-    load_project_act->setStatusTip(tr("Load project"));
-    save_project_act->setStatusTip(tr("Save project"));
-    gen_report_act->setStatusTip(tr("Generate report"));
-    close_project_act->setStatusTip(tr("Close Project"));
-    quit_act->setStatusTip(tr("Quit the application"));
-
-    connect(new_project_act, &QAction::triggered, this, &MainWindow::new_project);
-    connect(load_project_act, &QAction::triggered, this, &MainWindow::load_project);
-    connect(save_project_act, &QAction::triggered, this, &MainWindow::save_project);
-    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
-    // End file menu actions
-
+    QMenuBar* menuBar = new QMenuBar();
+    QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
+    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    toggle_project_widget = project_dock->toggleViewAction();
+    toggle_bookmark_widget = bookmark_dock->toggleViewAction();
 
     // Initialize Video Widget
     video_wgt = new VideoWidget();
-    video_wgt->setMinimumSize(400,400); //TODO fix magic
+    video_wgt->setMinimumSize(600,400); //TODO fix magic
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget();
-    docker->setWidget(project_wgt);
-    addDockWidget(Qt::LeftDockWidgetArea, docker);
-    project_wgt->add_project("test_project");
+    project_wgt = new ProjectWidget(file_handler);
+    project_dock->setWidget(project_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
 
     // Initialize bookmark widget
-    docker = new QDockWidget(tr("Bookmarks"), this);
     bookmark_wgt = new BookmarkWidget();
-    docker->setWidget(bookmark_wgt);
-    addDockWidget(Qt::RightDockWidgetArea, docker);
+    bookmark_dock->setWidget(bookmark_wgt);
+    addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     std::vector<std::string> tags = {"one", "two"};
     bookmark_wgt->add_bookmark("bookmark description", tags);
 
+    //Initialize menu bar
+    init_file_menu();
+    init_edit_menu();
+    init_view_menu();
+    init_tools_menu();
+    init_help_menu();
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
 
     // Setup a Bookmark View in the right sidebar in the GUI.
     bookmark_view = new BookmarkView(ui->document_list);
-
-    setup_file_handler();
 
     // Add this object as a listener to video_frame.
     ui->video_frame->installEventFilter(this);
@@ -149,24 +117,126 @@ MainWindow::~MainWindow() {
     delete bookmark_view;
 }
 
-/**
- * @brief MainWindow::on_new_project_act
- * runs when the new project action is triggered
- */
-void MainWindow::new_project() {
+void MainWindow::init_file_menu() {
+    QMenu* file_menu = menuBar()->addMenu(tr("File"));
+    QAction* new_project_act = new QAction(tr("New project"), this);
+    QAction* open_project_act = new QAction(tr("Open project"), this);
+    QAction* save_project_act = new QAction(tr("Save project"), this);
+    QAction* gen_report_act = new QAction(tr("Generate report"), this);
+    QAction* close_project_act = new QAction(tr("Close project"), this);
+    QAction* remove_project_act = new QAction(tr("Remove project"), this);
+    QAction* add_vid_act = new QAction(tr("Add video"), this);
 
+    file_menu->addAction(new_project_act);
+    QMenu* add_menu = file_menu->addMenu(tr("Add"));
+    add_menu->addAction(add_vid_act);
+    file_menu->addAction(open_project_act);
+    file_menu->addAction(save_project_act);
+    file_menu->addAction(close_project_act);
+    file_menu->addAction(remove_project_act);
+    file_menu->addAction(gen_report_act);
+    file_menu->addSeparator();
+    QAction* quit_act = file_menu->addAction(tr("&Quit"), this, &QWidget::close);
+
+    new_project_act->setShortcuts(QKeySequence::New);
+    open_project_act->setShortcuts(QKeySequence::Open);
+    save_project_act->setShortcuts(QKeySequence::Save);
+    //gen_report_act->setShortcuts(QKeySequence::Save); TODO ADD
+    close_project_act->setShortcuts(QKeySequence::Close);
+    quit_act->setShortcuts(QKeySequence::Quit);
+
+    new_project_act->setStatusTip(tr("Create a new project"));
+    open_project_act->setStatusTip(tr("Load project"));
+    save_project_act->setStatusTip(tr("Save project"));
+    gen_report_act->setStatusTip(tr("Generate report"));
+    close_project_act->setStatusTip(tr("Close project"));
+    remove_project_act->setStatusTip(tr("Remove project"));
+    quit_act->setStatusTip(tr("Quit the application"));
+
+    connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
+    connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    //connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project);
+    connect(save_project_act, &QAction::triggered, this, &MainWindow::save_project);
+    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
+    connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
 }
 
-/**
- * @brief MainWindow::on_load_project_act
- * runs when the load project action is triggered
- */
-void MainWindow::load_project() {
+void MainWindow::init_edit_menu() {
+    QMenu* edit_menu = menuBar()->addMenu(tr("Edit"));
+    QAction* options_act = new QAction(tr("Options"), this);
+    QAction* cont_bri_act = new QAction(tr("Contrast/Brightness"), this);
+    QAction* cw_act = new QAction(tr("Rotate 90 CW"), this);
+    QAction* ccw_act = new QAction(tr("Rotate 90 CCW"), this);
 
+    edit_menu->addAction(cont_bri_act);
+    edit_menu->addAction(cw_act);
+    edit_menu->addAction(ccw_act);
+    edit_menu->addSeparator();
+    edit_menu->addAction(options_act);
+
+    //options_act->setShortcuts(QKeySequence::);
+    options_act->setStatusTip(tr("Program options"));
+    connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 
+void MainWindow::init_view_menu() {
+    QMenu* view_menu = menuBar()->addMenu(tr("&View"));
+    QAction* annotation_act = new QAction(tr("Annotations"), this);
+    QAction* detection_act = new QAction(tr("Detections"), this);
+
+    annotation_act->setCheckable(true);
+    detection_act->setCheckable(true);
+
+    view_menu->addAction(toggle_project_widget);
+    view_menu->addAction(toggle_bookmark_widget);
+    view_menu->addSeparator();
+    view_menu->addAction(annotation_act);
+    view_menu->addAction(detection_act);
+}
+
+void MainWindow::init_tools_menu() {
+    QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
+    QAction* color_act = new QAction(tr("Color"), this);
+    QAction* zoom_in_act = new QAction(tr("Zoom in"), this);
+    QAction* zoom_out_act = new QAction(tr("Zoom out"), this);
+    QAction* fit_screen_act = new QAction(tr("Fit to screen"), this);
+    QAction* move_act = new QAction(tr("Panning tool"), this);
+    QAction* rectangle_act = new QAction(tr("Rectangle"), this);
+    QAction* circle_act = new QAction(tr("Circle"), this);
+    QAction* line_act = new QAction(tr("line"), this);
+    QAction* arrow_act = new QAction(tr("Arrow"), this);
+    QAction* pen_act = new QAction(tr("Pen"), this);
+    QAction* text_act = new QAction(tr("Text"), this);
+    QAction* undo_act = new QAction(tr("Undo"), this);
+    QAction* clear_act = new QAction(tr("Clear"), this);
+
+
+    tool_menu->addAction(color_act);
+    QMenu* drawing_tools = tool_menu->addMenu(tr("Shapes"));
+    drawing_tools->addAction(rectangle_act);
+    drawing_tools->addAction(circle_act);
+    drawing_tools->addAction(line_act);
+    drawing_tools->addAction(arrow_act);
+    drawing_tools->addAction(pen_act);
+    drawing_tools->addAction(text_act);
+    tool_menu->addAction(undo_act);
+    tool_menu->addAction(clear_act);
+    tool_menu->addSeparator();
+    tool_menu->addAction(zoom_in_act);
+    tool_menu->addAction(zoom_out_act);
+    tool_menu->addAction(fit_screen_act);
+    tool_menu->addAction(move_act);
+}
+
+void MainWindow::init_help_menu() {
+    QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
+    QAction* help_act = new QAction(tr("Open manual"), this);
+    help_menu->addAction(help_act);
+}
+
+
 /**
- * @brief MainWindow::on_save_project_act
+ * @brief MainWindow::save_project_act
  * runs when the save project action is triggered
  */
 void MainWindow::save_project() {
@@ -174,7 +244,7 @@ void MainWindow::save_project() {
 }
 
 /**
- * @brief MainWindow::on_save_project_act
+ * @brief MainWindow::gen_report
  * runs when the generate report action is triggered
  */
 void MainWindow::gen_report() {
@@ -187,6 +257,14 @@ void MainWindow::gen_report() {
  */
 void MainWindow::close_project() {
 
+}
+
+/**
+ * @brief MainWindow::on_save_project_act
+ * runs when the options action is triggered
+ */
+void MainWindow::options() {
+    project_wgt->close();
 }
 
 /**
@@ -432,14 +510,7 @@ void MainWindow::on_bookmark_button_clicked() {
     set_status_bar("Bookmark created.");
 }
 
-/**
- * @brief MainWindow::on_action_add_project_triggered
- */
-void MainWindow::on_action_add_project_triggered() {
-    MakeProject *make_project = new MakeProject(this, this->file_handler, this->file_handler->get_work_space().absolutePath().toStdString());
-    make_project->show();
-    set_status_bar("Adding project");
-}
+
 
 /**
  * @brief MainWindow::on_project_tree_itemDoubleClicked
@@ -622,24 +693,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
-/**
- * @brief MainWindow::on_action_zoom_in_triggered
- * Sets a state in the video overlay
- * for the user to choose an area.
- */
-void MainWindow::on_action_zoom_in_triggered() {
-    mvideo_player->zoom_in();
-    set_status_bar("Zoom in. Choose your area.");
-}
 
-/**
- * @brief MainWindow::on_action_zoom_out_triggered
- * Reset the zoom level to the full video size.
- */
-void MainWindow::on_action_zoom_out_triggered() {
-    mvideo_player->zoom_out();
-    set_status_bar("Zoom out.");
-}
 
 /**
  * @brief MainWindow::prepare_menu

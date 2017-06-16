@@ -44,38 +44,57 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
  * @brief Adds all the video control buttons to the video widget
  */
 void VideoWidget::init_control_buttons() {
-    QHBoxLayout* controll_row = new QHBoxLayout;
+    QHBoxLayout* controll_row = new QHBoxLayout;    // Container for all button areas
+    QHBoxLayout* other_btns = new QHBoxLayout;      // Bookmark, tag
+    QHBoxLayout* video_btns = new QHBoxLayout;      // Play, pause etc
+    QHBoxLayout* analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
+    QHBoxLayout* zoom_btns = new QHBoxLayout;       // Zoom buttons
     controll_row->setAlignment(Qt::AlignLeft);
+    video_btns->setSpacing(5);
+    other_btns->setSpacing(5);
+    analysis_btns->setSpacing(5);
+    zoom_btns->setSpacing(5);
+    controll_row->setSpacing(15);
 
     std::vector<QPushButton*> btns;
 
-    play_btn = new QPushButton("Play", this);
-    QPushButton* stop_btn = new QPushButton("Stop", this);
-    QPushButton* next_frame_btn = new QPushButton(">", this);
-    QPushButton* prev_frame_btn = new QPushButton("<", this);
-    QPushButton* next_poi_btn = new QPushButton(">>|", this);
-    QPushButton* prev_poi_btn = new QPushButton("|<<", this);
+    play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
+    QPushButton* stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
+    QPushButton* next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
+    QPushButton* prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
+    QPushButton* next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next_poi.png"), "", this);
+    QPushButton* prev_poi_btn = new QPushButton(QIcon("../ViAn/Icons/prev_poi.png"), "", this);
+    QPushButton* bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
+    QPushButton* analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
+    QPushButton* tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
+    QPushButton* zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
+    QPushButton* zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
+    QPushButton* fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
+    QPushButton* move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
 
     play_btn->setToolTip(tr("Play video"));
     stop_btn->setToolTip(tr("Stop video"));
     next_frame_btn->setToolTip(tr("Next frame"));
-    prev_frame_btn->setToolTip(tr("Previous video"));
+    prev_frame_btn->setToolTip(tr("Previous frame"));
+    bookmark_btn->setToolTip(tr("Bookmark the current frame"));
+    tag_btn->setToolTip(tr("Tag the current frame"));
     next_poi_btn->setToolTip(tr("Next POI"));
+    analysis_btn->setToolTip(tr("Analysis"));
     prev_poi_btn->setToolTip(tr("Previous POI"));
 
-
-    // Push order is important
-    btns.push_back(prev_poi_btn);
-    btns.push_back(prev_frame_btn);
     btns.push_back(play_btn);
-    btns.push_back(next_frame_btn);
-    btns.push_back(next_poi_btn);
     btns.push_back(stop_btn);
-
-    for (QPushButton* btn : btns) {
-        btn->setFixedSize(BTN_SIZE);
-        controll_row->addWidget(btn);
-    }
+    btns.push_back(next_frame_btn);
+    btns.push_back(prev_frame_btn);
+    btns.push_back(next_poi_btn);
+    btns.push_back(prev_poi_btn);
+    btns.push_back(bookmark_btn);
+    btns.push_back(analysis_btn);
+    btns.push_back(tag_btn);
+    btns.push_back(zoom_in_btn);
+    btns.push_back(zoom_out_btn);
+    btns.push_back(fit_btn);
+    btns.push_back(move_btn);
 
     // Create and add speed adjustment slider
     speed_slider = new QSlider(Qt::Horizontal);
@@ -83,7 +102,32 @@ void VideoWidget::init_control_buttons() {
     speed_slider->setMaximumWidth(90);
     speed_slider->setTickPosition(QSlider::TicksBelow);
     speed_slider->setToolTip(tr("Adjust playback speed"));
-    controll_row->addWidget(speed_slider);
+
+    for (QPushButton* btn : btns) {
+        btn->setFixedSize(BTN_SIZE);
+    }
+
+    video_btns->addWidget(prev_frame_btn);
+    video_btns->addWidget(play_btn);
+    video_btns->addWidget(next_frame_btn);
+    video_btns->addWidget(stop_btn);
+    video_btns->addWidget(speed_slider);
+    controll_row->addLayout(video_btns);
+
+    analysis_btns->addWidget(prev_poi_btn);
+    analysis_btns->addWidget(analysis_btn);
+    analysis_btns->addWidget(next_poi_btn);
+    controll_row->addLayout(analysis_btns);
+
+    other_btns->addWidget(bookmark_btn);
+    other_btns->addWidget(tag_btn);
+    controll_row->addLayout(other_btns);
+
+    zoom_btns->addWidget(zoom_in_btn);
+    zoom_btns->addWidget(zoom_out_btn);
+    zoom_btns->addWidget(fit_btn);
+    zoom_btns->addWidget(move_btn);
+    controll_row->addLayout(zoom_btns);
 
     vertical_layout->addLayout(controll_row);
 
@@ -106,6 +150,12 @@ void VideoWidget::init_control_buttons() {
 
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
+
+    connect(zoom_in_btn, &QPushButton::clicked, this, &VideoWidget::zoom_in_clicked);
+    //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
+
+    connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::zoom_out_clicked);
+    //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
 
@@ -170,18 +220,16 @@ void VideoWidget::set_total_time(int time) {
  */
 void VideoWidget::play_clicked() {
     if (m_video_player->is_paused()) {
-        // TODO set icon
+        play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
         paused_wait.wakeOne();
-        play_btn->setText("Play");
         // TODO status bar
     } else if (m_video_player->is_stopped()) {
-        play_btn->setText("Play");
+         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
         m_video_player->start();
     } else {
         // Video is playing
-        // TODO Icon
+        play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         emit set_pause_video();
-        play_btn->setText("Pause");
         // status bar
     }
 }
@@ -192,7 +240,7 @@ void VideoWidget::play_clicked() {
 void VideoWidget::stop_clicked() {
     //set_status_bar("Stopped");
     if (m_video_player->is_playing()) {
-        //icon_on_button_handler->set_icon("play", ui->play_pause_button);
+         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
     } else if (m_video_player->is_paused()) {
         paused_wait.wakeOne();
     } else if (m_video_player->is_stopped()) {
@@ -225,6 +273,24 @@ void VideoWidget::prev_frame_clicked() {
     } else {
         //set_status_bar("Video needs to be paused");
     }
+}
+
+/**
+ * @brief VideoWidget::zoom_in_clicked
+ * zoom in button clicked.
+ * Sets a state in the video overlay
+ * for the user to choose an area.
+ */
+void VideoWidget::zoom_in_clicked() {
+    m_video_player->zoom_in();
+}
+
+/**
+ * @brief VideoWidget::zoom_out_clicked
+ * zoom out button clicked.
+ */
+void VideoWidget::zoom_out_clicked() {
+    m_video_player->zoom_out();
 }
 
 /**
