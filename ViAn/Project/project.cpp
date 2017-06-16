@@ -13,11 +13,6 @@ Project::Project(ProjectManager *projet_manager, ID id, std::string name){
     this->video_counter = 0;
     this->videos.clear();
     this->changes_made = true;
-
-    // Setting ids to default values, -1 indicating invalid value.
-    this->dir = -1;
-    this->dir_videos = -1;
-    this->dir_bookmarks = -1;
 }
 /**
  * @brief Project::Project
@@ -30,10 +25,6 @@ Project::Project(ProjectManager *projet_manager){
     this->video_counter = 0;
     // Setting ids to default values, -1 indicating invalid value.
     this->id = -1;
-    this->dir = -1;
-    this->dir_bookmarks = -1;
-    this->dir_videos = -1;
-
 }
 
 /**

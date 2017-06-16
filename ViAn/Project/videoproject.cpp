@@ -161,5 +161,9 @@ void VideoProject::delete_artifacts(){
         Bookmark* temp = it->second;
         temp->remove_exported_image();
     }
+    for(auto it = analyses.begin(); it != analyses.end(); it++){
+        AnalysisMeta* temp = it->second;
+        temp->delete_saveable();
+    }
 }
 

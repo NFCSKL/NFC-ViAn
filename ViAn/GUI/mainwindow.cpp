@@ -164,7 +164,7 @@ void MainWindow::analysis_finished(AnalysisMeta analysis) {
         // Save analysis
         ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
         ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
-        analysis.name = current_analysis->name.toStdString();
+        analysis.m_name = current_analysis->name.toStdString();
         current_analysis->id = project_manager->get_project(p_id)->add_analysis(v_id, analysis);
         project_manager->save_project(p_id);
     }
@@ -928,7 +928,7 @@ void MainWindow::add_video_to_tree(VideoProject* video) {
     for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
         AnalysisMeta analysis = it2->second;
         ID id = it2->first;
-        MyQTreeWidgetItem* analysis_in_tree = new MyQTreeWidgetItem(ANALYSIS, QString::fromStdString(analysis.name), id);
+        MyQTreeWidgetItem* analysis_in_tree = new MyQTreeWidgetItem(ANALYSIS, QString::fromStdString(analysis.m_name), id);
         add_analysis_to_tree(analysis_in_tree, video_in_tree);
     }
 }
@@ -952,7 +952,7 @@ void MainWindow::add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTr
  */
 void MainWindow::add_analysis_to_queue(QString q_save_path, ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area){
     MyQTreeWidgetItem *analysis_in_tree;
-    std::string save_path = q_save_path.toStdString() + std::to_string(type);
+    std::string save_path = q_save_path.toStdString();
     analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name);   
     if(current_analysis == nullptr) {
         if(use_analysis_area)

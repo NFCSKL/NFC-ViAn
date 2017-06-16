@@ -8,6 +8,7 @@
  */
 AnalysisMeta::AnalysisMeta(Analysis &analysis)
 {
+    m_name = analysis.name.toStdString();
     m_full_path = analysis.m_full_path;
     std::vector<POI> pois = analysis.POIs;
     for (auto it = pois.begin(); it != pois.end(); ++it) {
@@ -31,15 +32,17 @@ AnalysisMeta::AnalysisMeta()
 Analysis AnalysisMeta::get_analysis()
 {
     Analysis analysis;
-    std::cout << "***"<<m_full_path << "*** " <<std::endl;
     analysis.load_saveable(m_full_path);
     return analysis;
 }
 
+/**
+ * @brief AnalysisMeta::AnalysisMeta
+ * @param other
+ */
 AnalysisMeta::AnalysisMeta(const AnalysisMeta &other)
 {
     m_poi_intervals = other.m_poi_intervals;
-    std::cout << m_full_path << std::endl;
     m_full_path = other.m_full_path;
 }
 

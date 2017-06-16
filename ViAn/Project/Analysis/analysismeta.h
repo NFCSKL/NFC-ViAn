@@ -7,13 +7,14 @@ class AnalysisMeta : public Saveable
 {
     std::vector<std::pair<int,int>> m_poi_intervals;
 public:
-    std::string name;
+    std::string m_name;
     AnalysisMeta(Analysis& analysis);
     AnalysisMeta();
     Analysis get_analysis();
     AnalysisMeta(const AnalysisMeta &other);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
+    virtual void delete_saveable();
 
 
 };

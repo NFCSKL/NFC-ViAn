@@ -73,7 +73,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
  * @brief Saveable::delete_saveable
  * @return
  */
-bool Saveable::delete_saveable()
+void Saveable::delete_saveable()
 {
     QFile file(QString::fromStdString(m_full_path));
     file.remove();
