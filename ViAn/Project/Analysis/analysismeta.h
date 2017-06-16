@@ -14,9 +14,6 @@ public:
     AnalysisMeta(const AnalysisMeta &other);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
-    virtual void delete_saveable();
-
-
 };
 Q_DECLARE_METATYPE(AnalysisMeta)
 #endif // ANALYSISMETA_H
