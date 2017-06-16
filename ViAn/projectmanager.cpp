@@ -52,7 +52,7 @@ Project* ProjectManager::create_project(const std::string& proj_name,
                                         const std::string& vid_path)
 {
     Project* proj =  new Project(this, this->project_id, proj_name);
-    proj->dir = dir_path +"/"+ proj_name;
+    proj->dir = dir_path + "/" + proj_name;
     proj->dir_bookmarks = proj->dir + "/Bookmarks";
     proj->dir_videos = vid_path;
     add_project(proj);                          // Add project to file sytstem

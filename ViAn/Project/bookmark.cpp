@@ -18,6 +18,7 @@ Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_nam
     this->description = text;
     // There's no file path yet, since the frame has not been exported
     this->file_path = QString();
+    export_frame();
 }
 
 /**
@@ -105,8 +106,6 @@ void Bookmark::read(const QJsonObject& json){
  */
 void Bookmark::write(QJsonObject& json){
     // Exports the frame and updates file_path.
-    export_frame();
-
     json["time"] = this->time;
     json["frame"] = this->frame_number;
     json["video_name"] = this->video_file_name;
