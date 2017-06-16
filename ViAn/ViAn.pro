@@ -17,7 +17,8 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    projectmanager.cpp
+    projectmanager.cpp \
+    Project/Analysis/analysismeta.cpp
 
 
 #
@@ -33,7 +34,8 @@ HEADERS += Test/test_video_player.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
     Test/overlayintegrationtest.h \
-    projectmanager.h
+    projectmanager.h \
+    Project/Analysis/analysismeta.h
 
 #
 # LIBRARY
