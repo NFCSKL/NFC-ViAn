@@ -10,11 +10,6 @@ std::string Saveable::full_path() const
     return m_full_path;
 }
 
-void Saveable::setFull_path(const std::string &full_path)
-{
-    m_full_path = full_path;
-}
-
 Saveable::Saveable(){
 
 }
@@ -31,7 +26,7 @@ Saveable::~Saveable(){
  * @param savable
  * @param dir_path
  * @param save_format
- * @return Saves a Json file to provided directory
+ * @return Saves a Json file to provided directory with file_name and save_format
  */
 bool Saveable::save_saveable(const std::string& file_name,
                              const std::string& dir_path, const SAVE_FORMAT& save_format){
@@ -58,11 +53,11 @@ bool Saveable::save_saveable(const std::string& file_name,
  * @brief Saveable::save_saveable
  * @param full_path
  * @param save_format
- * @return
+ * @return true if successfull, false else
  */
 bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format)
 {
-    QFile save_file(save_format == JSON
+    QFile save_file(save_format == JSON     // Decide what format was used
                     ? QString::fromStdString(full_path + ".json")
                     : QString::fromStdString(full_path + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){
@@ -70,12 +65,12 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
         return false;
     }
     QJsonObject json_saveable;
-    this->write(json_saveable);
+    this->write(json_saveable);                        //Write to json
     QJsonDocument save_doc(json_saveable);
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-    m_full_path = save_file.fileName().toStdString();
+    m_full_path = save_file.fileName().toStdString(); // Set path to saved path
     return true;
 }
 
@@ -83,7 +78,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
  * @brief Saveable::delete_saveable
  * @return
  */
-void Saveable::delete_saveable()
+bool Saveable::delete_saveable()
 {
     QFile file(QString::fromStdString(m_full_path));
     file.remove();
@@ -97,18 +92,18 @@ void Saveable::delete_saveable()
  * Loads saveable from binary or json file.
  */
 bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& save_format){
-    QFile load_file(save_format == JSON
+    QFile load_file(save_format == JSON                // Decide what format was used
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
     if (!load_file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
+        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str()); // Could not open file
         return false;
     }
-    QByteArray save_data = load_file.readAll();
+    QByteArray save_data = load_file.readAll();         // Read file
     QJsonDocument load_doc(save_format == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
-    this->read(load_doc.object());
-    m_full_path = load_file.fileName().toStdString();
+    this->read(load_doc.object());                      // Read this object
+    m_full_path = load_file.fileName().toStdString();   // Set path to saved path
     return true;
 }

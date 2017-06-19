@@ -3,16 +3,13 @@
 
 #include <QWidget>
 #include <QTreeWidget>
-#include <Filehandler/filehandler.h>
-
+#include "Project/project.h"
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    ProjectManager* m_project_manager;
-
     QTreeWidgetItem* m_videos;
 public:
-    explicit ProjectWidget(ProjectManager *project_manager, QWidget *parent = nullptr);
+    explicit ProjectWidget(QWidget *parent = nullptr);
     Project* m_proj = nullptr;
 
 signals:

@@ -8,7 +8,7 @@ class AnalysisMeta : public Saveable
     std::vector<std::pair<int,int>> m_poi_intervals;
 public:
     std::string m_name;
-    AnalysisMeta(Analysis& analysis);
+    AnalysisMeta(const Analysis &analysis);
     AnalysisMeta();
     Analysis get_analysis();
     AnalysisMeta(const AnalysisMeta &other);

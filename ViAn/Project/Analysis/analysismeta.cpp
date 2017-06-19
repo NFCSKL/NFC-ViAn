@@ -6,14 +6,16 @@
  * @brief AnalysisMeta::AnalysisMeta
  * @param analysis
  */
-AnalysisMeta::AnalysisMeta(Analysis &analysis)
+AnalysisMeta::AnalysisMeta(const Analysis &analysis)
 {
     m_name = analysis.name.toStdString();
     m_full_path = analysis.m_full_path;
     std::vector<POI> pois = analysis.POIs;
+    std::pair<int,int> pair;
+    POI poi;
     for (auto it = pois.begin(); it != pois.end(); ++it) {
-        POI poi = *it;
-        std::pair<int,int> pair = std::make_pair(poi.start_frame, poi.end_frame);
+        poi = *it;
+        pair = std::make_pair(poi.start_frame, poi.end_frame);
         m_poi_intervals.push_back(pair);
     }
 }

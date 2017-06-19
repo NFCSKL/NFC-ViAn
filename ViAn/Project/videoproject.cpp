@@ -51,7 +51,7 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-AnalysisMeta VideoProject::get_analysis(ID id) {
+AnalysisMeta VideoProject::get_analysis(const int& id) {
     return analyses[id];
 }
 
@@ -59,7 +59,7 @@ AnalysisMeta VideoProject::get_analysis(ID id) {
  * @brief VideoProject::remove_analysis
  * @param id of the analysis
  */
-void VideoProject::delete_analysis(ID id) {
+void VideoProject::delete_analysis(const int& id) {
     AnalysisMeta am = analyses.at(id);
     analyses.erase(id);
     am.delete_saveable();

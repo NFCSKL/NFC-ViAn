@@ -1,221 +1,59 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QHBoxLayout>
+#include <QDockWidget>
 #include <QMainWindow>
 #include <QBasicTimer>
-#include <string>
 #include <QCloseEvent>
+
 #include <QSlider>
 #include <QFileDialog>
+
+#include <string>
+
 #include "Library/customdialog.h"
-#include "Video/video_player.h"
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/videoio/videoio.hpp"
-#include "opencv2/video/video.hpp"
-#include "opencv2/core/core.hpp"
-#include "icononbuttonhandler.h"
-#include "ui_mainwindow.h"
-#include "Filehandler/filehandler.h"
-#include "bookmarkview.h"
 #include "reportgenerator.h"
 #include "action.h"
 #include "qtreeitems.h"
-#include <QMutex>
-#include <QWaitCondition>
-#include "makeproject.h"
-#include "analysiswindow.h"
-#include <QQueue>
-#include "projectmanager.h"
+
 #include "Analysis/AnalysisController.h"
 #include "Project/Analysis/analysismeta.h"
 
-#include <QHBoxLayout>
-#include <QDockWidget>
 #include "videowidget.h"
 #include "projectwidget.h"
 #include "bookmarkwidget.h"
-#define SCROLL_AREA_MARGIN 25
-
 
 using namespace std;
 class AnalysisWindow;
-
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+public:    
 
-    friend class OverlayIntegrationTest;
-
-public:
-    QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
-    void set_status_bar(string status, int timer = 5000);
-    void add_project_to_tree(Project* proj);
-    void add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree);
-    void add_analysis_to_queue(QString q_save_path, ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void input_switch_case(ACTION action, QString q_input);
-    bool eventFilter(QObject *obj, QEvent *event); //can not follow namestandard, generated code
-    const int SLIDER_UPDATE_TIMER = 200;
-
-    // Lock and wait condition to sleep player when video is paused
-    QMutex mutex;
-    QWaitCondition paused_wait;
-
-signals:
-    void set_play_video();
-    void set_pause_video();
-    void set_stop_video();
-    void resize_video_frame(int width, int height);
-    void next_video_frame();
-    void prev_video_frame();
-    void set_playback_frame(int frame, bool show_frame = false);
-    void abort_analysis();
-    void set_analysis_results(Analysis analysis);
-
 private slots:
     void save_project(void);
     void gen_report(void);
     void close_project(void);
     void options(void);
-
-    void on_action_exit_triggered();
-    void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
-    void update_video(QImage frame);
-    void set_video_slider_pos(int pos);
-    void resizeEvent(QResizeEvent* event); //can not follow namestandard, generated code
-    void on_bookmark_button_clicked();
-    void on_video_slider_sliderPressed();
-    void on_video_slider_sliderReleased();
-    void on_video_slider_valueChanged(int new_pos);
-    void on_action_show_hide_overlay_triggered();
-    void on_action_colour_triggered();
-    void on_action_rectangle_triggered();
-    void on_action_circle_triggered();
-    void on_action_arrow_triggered();
-    void on_action_line_triggered();
-    void right_click_project_tree_menu(const QPoint & pos);
-    void prepare_bookmark_menu(const QPoint & pos);
-    void play_video();
-    void on_action_save_triggered();
-    void on_action_pen_triggered();
-    void on_action_text_triggered();
-    void on_action_undo_triggered();
-    void on_action_clear_triggered();
-    void on_action_load_triggered();
-    void on_action_add_video_triggered();
-    void on_action_choose_workspace_triggered();
-    void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);//can not follow namestandard, generated code
-    void on_action_show_hide_analysis_area_triggered();
-    void on_action_contrast_brightness_triggered();
-    void on_action_fill_screen_triggered();
-    void on_action_rotate_right_triggered();
-    void on_action_rotate_left_triggered();
-
-    void on_document_list_itemClicked(QListWidgetItem *item);
-    
-    void on_document_list_itemDoubleClicked(QListWidgetItem *item);
-
-    void on_action_delete_triggered();
-    void on_action_create_report_triggered();
-    void on_action_original_size_triggered();
-    void on_action_invert_analysis_area_triggered();
-
-
-    void on_action_perform_analysis_triggered();
-
-    void on_action_close_project_triggered();
-    void on_action_show_hide_analysis_overlay_triggered();
-
-    void analysis_finished(AnalysisMeta analysis);
-
-    void show_analysis_progress(int progress);
-    void on_previous_POI_button_clicked();
-    void on_next_POI_button_clicked();
-    void on_action_clear_analysis_overlay_triggered();
-
-    void on_action_set_analysis_area_to_video_triggered();
-
-
-    void on_action_change_bookmark_triggered();
-    void on_jump_button_clicked();
-
 private:
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
-    BookmarkWidget* bookmark_wgt;
+    BookmarkWidget* bookmark_wgt;   
 
-    Ui::MainWindow *ui;
-    video_player* mvideo_player;
-    AnalysisController* m_acontroller;
-    IconOnButtonHandler *icon_on_button_handler;
-    BookmarkView* bookmark_view;
-    QSlider *video_slider;
-    QTreeVideoItem *playing_video;
-    QAction* toggle_project_widget;
-    QAction* toggle_bookmark_widget;
-
-    bool slider_blocked = false;
-    bool slider_paused_video = false;
-    int prev_slider_pos = 0;
-
-    std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
-                std::chrono::system_clock::now().time_since_epoch()
-            );
-
+    QAction* toggle_project_wgt;
+    QAction* toggle_bookmark_wgt;
 
     AnalysisWindow *analysis_window;
-    FileHandler* file_handler;
-    ProjectManager *project_manager;
 
     void init_file_menu();
     void init_edit_menu();
     void init_view_menu();
     void init_tools_menu();
     void init_help_menu();
-
-    void setup_file_handler();
-    void setup_video_player(video_player *mplayer);
-
-    void setup_analysis(AnalysisController *ac);
-
-    void add_video_to_tree(VideoProject *video);
-
-    void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
-    void remove_bookmarks_of_video(QTreeVideoItem* video_item);
-    void remove_analysis_of_project(MyQTreeWidgetItem* project_item);
-    void remove_analysis_of_video(QTreeWidgetItem* video_item);
-
-    void remove_item_from_tree(MyQTreeWidgetItem *my_item);
-
-    void set_slider_labels();
-    void set_time_to_label(QLabel *label, qint64 time);
-
-    void enable_video_buttons();
-
-    void on_slider_moving();
-    void on_slider_click(int new_pos, QPoint local_mouse_pos);
-    int slider_pos_under_mouse(QPoint local_mouse_pos);
-
-
-    bool original_size;
-
-    void deselect_overlay_tool();
-
-    MyQTreeWidgetItem *current_analysis;
-    int current_analysis_progress;
-    QQueue<MyQTreeWidgetItem*> *analysis_queue;
-    std::map<MyQTreeWidgetItem*, AnalysisController*> analysis_queue_map;
-    bool remove_analysis_from_queue(MyQTreeWidgetItem *my_item);
-    void remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree);
-    void abort_current_analysis();
-    void start_next_analysis();
 };
 
 #endif // MAINWINDOW_H

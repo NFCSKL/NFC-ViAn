@@ -17,9 +17,9 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    projectmanager.cpp \
     Project/Analysis/analysismeta.cpp \
     GUI/TreeItems/itemtypes.cpp \
+    Project/projecttestsuite.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp
 
@@ -27,18 +27,13 @@ SOURCES += main.cpp \
 # TEST
 #
 SOURCES += Test/test_video_player.cpp\
-    Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp \
-    Test/test_report_generator.cpp \
-    Test/overlayintegrationtest.cpp
+    Test/test_report_generator.cpp
+
 HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h \
-    Test/test_mainwindow.h \
     Test/test_report_generator.h \
-    Test/overlayintegrationtest.h \
-    projectmanager.h \
     Project/Analysis/analysismeta.h \
     GUI/TreeItems/itemtypes.h \
+    Project/projecttestsuite.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h
 
@@ -57,9 +52,7 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
-    GUI/makeproject.cpp \
     GUI/fpsdialog.cpp \
-    GUI/analysiswindow.cpp \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
     GUI/projectwidget.cpp \
@@ -73,19 +66,15 @@ HEADERS  += GUI/mainwindow.h \
     GUI/qtreeitems.h \
     GUI/reportgenerator.h \
     GUI/bookmarkview.h \
-    GUI/makeproject.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
-    GUI/analysiswindow.h \
     GUI/videowidget.h \
     GUI/framewidget.h \
     GUI/projectwidget.h \
     GUI/bookmarkwidget.h \
     GUI/createprojectdialog.h
 
-FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui \
-    GUI/analysiswindow.ui
+FORMS    +=
 
 RESOURCES += resources.qrc
 #
@@ -141,12 +130,12 @@ unix {
 #
 # START: FILEHANDLER
 #
-SOURCES += Filehandler/filehandler.cpp \
+SOURCES += \
     Filehandler/saveable.cpp \
 
 
 
-HEADERS  += Filehandler/filehandler.h \
+HEADERS  += \
     Filehandler/saveable.h \
 
 

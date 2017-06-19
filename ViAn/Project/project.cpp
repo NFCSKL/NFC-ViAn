@@ -1,43 +1,63 @@
 #include "project.h"
 /**
  * @brief Project::Project
+ * Empty private constructor, used for Project::fromFile
+ */
+Project::Project()
+{
+
+}
+
+/**
+ * @brief Project::Project
  * @param file_handler
  * @param id
  * @param name
  */
-Project::Project(ProjectManager *project_manager, ID id, std::string name){
-    this->project_manager = project_manager;
-    this->name = name;
-    this->m_full_path = name;
-    this->id = id;
-    this->video_counter = 0;
-    this->videos.clear();
-    this->changes_made = true;
+Project* Project::fromFile(const std::string &full_path)
+{
+    Project* proj = new Project();
+    proj->load_saveable(full_path);
+    proj->m_changes = false;
+    return proj;
 }
+
 /**
  * @brief Project::Project
+ * @param name     := name of the project
+ * @param dir_path := directory to save project in
+ * @param vid_path := path for videos folder
  */
-Project::Project(ProjectManager *project_manager){
-    this->project_manager = project_manager;
-    this->name = "";
-    this->m_full_path = "";
-    this->videos.clear();
-    this->video_counter = 0;
-    // Setting ids to default values, -1 indicating invalid value.
-    this->id = -1;
+Project::Project(const std::string& name, const std::string& dir_path, const std::string& vid_path){
+    m_name = name;
+    m_full_path = dir_path + name;
+    m_dir_bookmarks = dir_path + "/Boomarks";
+    m_dir_videos = vid_path;
 }
+
 
 /**
  * @brief Project::~Project
  * Clears contents of video map
  */
 Project::~Project(){
-    for (auto vid_it = this->videos.begin(); vid_it != this->videos.end(); ++vid_it) {
+    for (auto vid_it = m_videos.begin(); vid_it != m_videos.end(); ++vid_it) {
         delete vid_it->second;
     }
-    for (auto rep_it = this->reports.begin(); rep_it != this->reports.end(); ++rep_it) {
+    for (auto rep_it = m_reports.begin(); rep_it != m_reports.end(); ++rep_it) {
         delete *rep_it;
     }
+}
+
+/**
+ * @brief Project::add_video
+ * @return Video ID to be used for identifying the video.
+ */
+ID Project::add_video_project(VideoProject *vid_proj){
+    vid_proj->id = m_vid_count;
+    m_videos.insert(std::make_pair(m_vid_count, vid_proj));
+    m_changes = true;
+    return m_vid_count++;
 }
 
 /**
@@ -45,65 +65,49 @@ Project::~Project(){
  * @param id
  * Remove video from videos and delete its contents.
  */
-void Project::remove_video_project(ID id){
-    VideoProject* temp = this->videos.at(id);
+void Project::remove_video_project(const int& id){
+    VideoProject* temp = m_videos.at(id);
     delete temp;
-    videos.erase(id);
-    this->changes_made = true;
+    m_videos.erase(id);
+    m_changes = true;
 }
 
-/**
- * @brief Project::add_video
- * @return Video ID to be used for identifying the video.
- */
-ID Project::add_video(Video* vid){
-    VideoProject* vid_proj = new VideoProject(vid);
-    vid_proj->id  = this->video_counter;
-    this->videos.insert(std::make_pair(this->video_counter, vid_proj));
-    this->changes_made = true;
-    return this->video_counter++;
-}
-
-/**
- * @brief Project::add_report
- * @param file_path
- */
-void Project::add_report(std::string file_path){
-    this->reports.push_back(new Report(file_path));
-    this->changes_made = true;
-}
 
 /**
  * @brief Project::add_report
  * @param report
  * Required for load, object locally allocated
  */
-void Project::add_report(Report* report){
-    this->reports.push_back(report);
+ID Project::add_report(Report *report){
+    m_reports.push_back(report);
+    return m_reports.size();
 }
 
 /**
- * @brief Project::add_video
- * @return Video ID to be used for identifying the video.
+ * @brief Project::remove_report
+ * @param id
  */
-ID Project::add_video_project(VideoProject* vid_proj){
-    vid_proj->id = this->video_counter;
-    this->videos.insert(std::make_pair(this->video_counter, vid_proj));
-    this->changes_made = true;
-    return this->video_counter++;
+void Project::remove_report(const int &id)
+{
+    Report* temp = m_reports.at(id);
+    delete temp;
+    m_videos.erase(id);
+    m_changes = true;
 }
+
+
 /**
  * @brief Project::delete_artifacts
  * Delete all projects files.
  */
 void Project::delete_artifacts(){
     // Delete files in all videoprojects
-    for(auto it = videos.begin(); it != videos.end(); it++){
+    for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         VideoProject* vp = it->second;
         vp->delete_artifacts();
     }
     // Delete all reports.
-    for(auto it = reports.begin(); it != reports.end(); it++){
+    for(auto it = m_reports.begin(); it != m_reports.end(); it++){
         Report* temp = *it;
         QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
@@ -111,8 +115,8 @@ void Project::delete_artifacts(){
     // Delete directories
     delete_saveable();
     QDir directory;
-    QString q_dir = QString::fromStdString(this->dir);
-    QString q_dir_bookmarks = QString::fromStdString(this->dir_bookmarks);
+    QString q_dir = QString::fromStdString(m_dir);
+    QString q_dir_bookmarks = QString::fromStdString(m_dir_bookmarks);
     directory.rmdir(q_dir_bookmarks);
     directory.rmdir(q_dir);
 }
@@ -123,18 +127,18 @@ void Project::delete_artifacts(){
  * Read project parameters from json object.
  */
 void Project::read(const QJsonObject& json){
-    this->name = json["name"].toString().toStdString();
-    this->dir = json["root_dir"].toString().toStdString();
-    this->dir_bookmarks = json["bookmark_dir"].toString().toStdString();
-    this->dir_videos = json["video_dir"].toString().toStdString();
-    this->m_full_path = this->dir +"/"+ this->name;
+    m_name = json["name"].toString().toStdString();
+    m_dir = json["root_dir"].toString().toStdString();
+    m_dir_bookmarks = json["bookmark_dir"].toString().toStdString();
+    m_dir_videos = json["video_dir"].toString().toStdString();
+    m_full_path = m_dir +"/"+ m_name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
         QJsonObject json_vid_proj = json_vid_projs[i].toObject();
         VideoProject* v = new VideoProject();
         v->read(json_vid_proj);
-        this->add_video_project(v);
+        add_video_project(v);
     }    
     // Read reports from json
     QJsonArray json_reports = json["reports"].toArray();
@@ -142,7 +146,7 @@ void Project::read(const QJsonObject& json){
         QJsonObject json_report = json_reports[i].toObject();
         Report* report = new Report();
         report->read(json_report);
-        this->add_report(report);
+        add_report(report);
     }
 }
 
@@ -152,14 +156,14 @@ void Project::read(const QJsonObject& json){
  * Write project parameters to json object.
  */
 void Project::write(QJsonObject& json){
-    json["name"] = QString::fromStdString(this->name);
-    json["root_dir"] =  QString::fromStdString(this->dir);
-    json["bookmark_dir"] = QString::fromStdString(this->dir_bookmarks);
-    json["video_dir"] = QString::fromStdString(this->dir_videos);
+    json["name"] = QString::fromStdString(m_name);
+    json["root_dir"] =  QString::fromStdString(m_dir);
+    json["bookmark_dir"] = QString::fromStdString(m_dir_bookmarks);
+    json["video_dir"] = QString::fromStdString(m_dir_videos);
     json["full_path"] = QString::fromStdString(m_full_path);
     QJsonArray json_proj;
     // Write Videos to json
-    for(auto it = this->videos.begin(); it != this->videos.end(); it++){
+    for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         QJsonObject json_vid_proj;
         VideoProject* v = it->second;
         v->write(json_vid_proj);
@@ -168,7 +172,7 @@ void Project::write(QJsonObject& json){
     json["videos"] = json_proj;
     // Write reports to json
     QJsonArray json_reports;
-    for(auto it = this->reports.begin(); it != this->reports.end(); it++){
+    for(auto it = m_reports.begin(); it != m_reports.end(); it++){
         QJsonObject json_report;
         Report* report = *it;
         report->write(json_report);
@@ -182,9 +186,9 @@ void Project::write(QJsonObject& json){
  * @param v_id id of video to add analysis to
  * @param analysis
  */
-ID Project::add_analysis(ID v_id, AnalysisMeta analysis){
-    this->changes_made = true;
-    return this->videos.at(v_id)->add_analysis(analysis);
+ID Project::add_analysis(const int &vid_id, AnalysisMeta &analysis){
+    m_changes = true;
+    return m_videos.at(vid_id)->add_analysis(analysis);
 }
 
 /**
@@ -193,9 +197,9 @@ ID Project::add_analysis(ID v_id, AnalysisMeta analysis){
  * @param bookmark
  * Add new bookmark to Videoproj corresponding to id.
  */
-ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
-    VideoProject* v = this->videos.at(v_id);
-    this->changes_made = true;
+ID Project::add_bookmark(const int &vid_id, Bookmark *bookmark){
+    VideoProject* v = m_videos.at(vid_id);
+    m_changes = true;
     return v->add_bookmark(bookmark);
 }
 
@@ -203,29 +207,28 @@ ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
  * @brief Project::is_saved
  * @return true if saved
  */
-bool Project::is_saved(){
-    return !this->changes_made;
+bool Project::is_saved() const{
+    return !m_changes;
 }
 
 /**
  * @brief Project::save_project
  * @return sets saved =true
  */
-void Project::save_project(){
+bool Project::save_project(){
+    m_changes = false;
     QDir directory;
-    directory.mkpath(QString::fromStdString(this->dir));
-    directory.mkpath(QString::fromStdString(this->dir_bookmarks));
-    save_saveable(this->name, this->dir);
-    this->changes_made = false;
+    directory.mkpath(QString::fromStdString(m_dir));
+    directory.mkpath(QString::fromStdString(m_dir_bookmarks));
+    return save_saveable(m_name, m_dir);
 }
-
 
 /**
  * @brief Project::get_videos
  * @return videos&
  */
-std::map<ID, VideoProject* > &Project::get_videos(){
-    return this->videos;
+std::map<ID, VideoProject*> &Project::get_videos(){
+    return m_videos;
 }
 
 /**
@@ -234,5 +237,28 @@ std::map<ID, VideoProject* > &Project::get_videos(){
  * @return Returns the video with the specified id.
  */
 VideoProject* Project::get_video(ID id) {
-    return this->videos[id];
+    return m_videos[id];
+}
+
+/**
+ * @brief Project::Project
+ */
+std::string Project::getDir_bookmarks() const
+{
+    return m_dir_bookmarks;
+}
+
+std::string Project::getDir_videos() const
+{
+    return m_dir_videos;
+}
+
+std::string Project::getDir() const
+{
+    return m_dir;
+}
+
+std::string Project::getName() const
+{
+    return m_name;
 }

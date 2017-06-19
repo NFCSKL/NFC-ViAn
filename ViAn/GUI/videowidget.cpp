@@ -17,14 +17,14 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
 
     scroll_area->setBackgroundRole(QPalette::Dark);
     scroll_area->setWidget(frame_wgt);
-    scroll_area->setVisible(true);
     scroll_area->setFrameStyle(0);
     vertical_layout->addWidget(scroll_area);
+
     // End playback setup
 
     init_control_buttons();
     init_playback_slider();
-    setLayout(vertical_layout);
+    setLayout(vertical_layout);   
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
     connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)));
@@ -38,6 +38,8 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
 
     m_video_player->load_video("C:\\Testdata\\Pumparna.avi", nullptr);
     m_video_player->start();
+
+
 }
 
 /**
