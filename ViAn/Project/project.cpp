@@ -47,7 +47,7 @@ Project::~Project(){
         delete vid_it->second;
     }
     for (auto rep_it = m_reports.begin(); rep_it != m_reports.end(); ++rep_it) {
-        delete *rep_it;
+        delete rep_it->second;
     }
 }
 
@@ -56,7 +56,6 @@ Project::~Project(){
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video_project(VideoProject *vid_proj){
-    vid_proj->id = m_vid_count;
     m_videos.insert(std::make_pair(m_vid_count, vid_proj));
     m_changes = true;
     return m_vid_count++;
@@ -81,8 +80,9 @@ void Project::remove_video_project(const int& id){
  * Required for load, object locally allocated
  */
 ID Project::add_report(Report *report){
-    m_reports.push_back(report);
-    return m_reports.size();
+    m_reports.insert(std::make_pair(m_rp_count,report));
+    m_changes = true;
+    return m_rp_count++;
 }
 
 /**
@@ -93,7 +93,7 @@ void Project::remove_report(const int &id)
 {
     Report* temp = m_reports.at(id);
     delete temp;
-    m_videos.erase(id);
+    m_reports.erase(id);
     m_changes = true;
 }
 
@@ -110,7 +110,7 @@ void Project::delete_artifacts(){
     }
     // Delete all reports.
     for(auto it = m_reports.begin(); it != m_reports.end(); it++){
-        Report* temp = *it;
+        Report* temp = (*it).second;
         QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
     }
@@ -176,7 +176,7 @@ void Project::write(QJsonObject& json){
     QJsonArray json_reports;
     for(auto it = m_reports.begin(); it != m_reports.end(); it++){
         QJsonObject json_report;
-        Report* report = *it;
+        Report* report = it->second;
         report->write(json_report);
         json_reports.append(json_report);
     }
