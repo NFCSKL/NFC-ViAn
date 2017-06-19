@@ -46,17 +46,17 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
  * @brief Adds all the video control buttons to the video widget
  */
 void VideoWidget::init_control_buttons() {
-    QHBoxLayout* controll_row = new QHBoxLayout;    // Container for all button areas
-    QHBoxLayout* other_btns = new QHBoxLayout;      // Bookmark, tag
+    QHBoxLayout* control_row = new QHBoxLayout;     // Container for all button areas
     QHBoxLayout* video_btns = new QHBoxLayout;      // Play, pause etc
     QHBoxLayout* analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
+    QHBoxLayout* other_btns = new QHBoxLayout;      // Bookmark, tag
     QHBoxLayout* zoom_btns = new QHBoxLayout;       // Zoom buttons
-    controll_row->setAlignment(Qt::AlignLeft);
+    control_row->setAlignment(Qt::AlignLeft);
     video_btns->setSpacing(5);
-    other_btns->setSpacing(5);
     analysis_btns->setSpacing(5);
+    other_btns->setSpacing(5);
     zoom_btns->setSpacing(5);
-    controll_row->setSpacing(15);
+    control_row->setSpacing(15);
 
     std::vector<QPushButton*> btns;
 
@@ -101,9 +101,27 @@ void VideoWidget::init_control_buttons() {
     // Create and add speed adjustment slider
     speed_slider = new QSlider(Qt::Horizontal);
     speed_slider->setRange(-4,4);
-    speed_slider->setMaximumWidth(90);
+    speed_slider->setMaximumWidth(120);
     speed_slider->setTickPosition(QSlider::TicksBelow);
     speed_slider->setToolTip(tr("Adjust playback speed"));
+    QLabel *label1 = new QLabel("1/16x", this);
+    QLabel *label2 = new QLabel("1⁄4x", this);
+    QLabel *label3 = new QLabel("1x", this);
+    QLabel *label4 = new QLabel("4x", this);
+    QLabel *label5 = new QLabel("16x", this);
+    QFont f("comic sans", 6, QFont::Normal);
+    label1->setFont(f);
+    label2->setFont(f);
+    label3->setFont(f);
+    label4->setFont(f);
+    label5->setFont(f);
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(speed_slider, 0, 0, 1, 5);
+    layout->addWidget(label1, 1, 0, 1, 1);
+    layout->addWidget(label2, 1, 1, 1, 1);
+    layout->addWidget(label3, 1, 2, 1, 1);
+    layout->addWidget(label4, 1, 3, 1, 1);
+    layout->addWidget(label5, 1, 4, 1, 1);
 
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
@@ -113,25 +131,25 @@ void VideoWidget::init_control_buttons() {
     video_btns->addWidget(play_btn);
     video_btns->addWidget(next_frame_btn);
     video_btns->addWidget(stop_btn);
-    video_btns->addWidget(speed_slider);
-    controll_row->addLayout(video_btns);
+    video_btns->addLayout(layout);
+    control_row->addLayout(video_btns);
 
     analysis_btns->addWidget(prev_poi_btn);
     analysis_btns->addWidget(analysis_btn);
     analysis_btns->addWidget(next_poi_btn);
-    controll_row->addLayout(analysis_btns);
+    control_row->addLayout(analysis_btns);
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(tag_btn);
-    controll_row->addLayout(other_btns);
+    control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(zoom_in_btn);
     zoom_btns->addWidget(zoom_out_btn);
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
-    controll_row->addLayout(zoom_btns);
+    control_row->addLayout(zoom_btns);
 
-    vertical_layout->addLayout(controll_row);
+    vertical_layout->addLayout(control_row);
 
     QShortcut* play_sc = new QShortcut(Qt::Key_Space, this);
     QShortcut* stop_sc = new QShortcut(Qt::Key_X, this);

@@ -34,6 +34,8 @@ signals:
     set_playback_frame(int, bool);
 
 public slots:
+    void set_current_time(int time);
+    void set_total_time(int time);
     void play_clicked(void);
     void stop_clicked(void);
     void next_frame_clicked(void);
@@ -48,8 +50,6 @@ public slots:
     void on_playback_slider_moved(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
-    void set_current_time(int time);
-    void set_total_time(int time);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
