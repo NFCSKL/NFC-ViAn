@@ -197,7 +197,6 @@ private:
     void set_slider_labels();
     void set_time_to_label(QLabel *label, qint64 time);
 
-    void toggle_toolbar();
     void enable_video_buttons();
 
     void on_slider_moving();

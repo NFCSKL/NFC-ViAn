@@ -14,6 +14,8 @@
 #include "Video/shapes/shape.h"
 #include "Analysis/MotionDetection.h"
 #include "Analysis/AnalysisMethod.h"
+#include "Toolbars/maintoolbar.h"
+#include "Toolbars/drawingtoolbar.h"
 
 using namespace std;
 using namespace cv;
@@ -62,6 +64,18 @@ MainWindow::MainWindow(QWidget *parent) :
     init_view_menu();
     init_tools_menu();
     init_help_menu();
+
+    // Main toolbar
+    MainToolbar* main_toolbar = new MainToolbar();
+    QAction* toogle_toolbar = main_toolbar->toggleViewAction();
+    addToolBar(main_toolbar);
+    connect(main_toolbar->add_video_act, QAction::triggered, project_wgt, &ProjectWidget::add_video);
+
+    // Draw toolbar
+    DrawingToolbar* draw_toolbar = new DrawingToolbar();
+    QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
+    addToolBar(draw_toolbar);
+    connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
@@ -566,25 +580,10 @@ void MainWindow::on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int co
  */
 void MainWindow::on_action_show_hide_overlay_triggered() {
     mvideo_player->toggle_overlay();
-    toggle_toolbar();
     if (mvideo_player->is_showing_overlay()) {
         set_status_bar("Overlay: On.");
     } else {
         set_status_bar("Overlay: Off.");
-    }
-}
-
-/**
- * @brief MainWindow::on_action_colour_triggered
- * Selects a colour for the overlay drawing tool.
- */
-void MainWindow::on_action_colour_triggered() {
-    QColor col = QColorDialog::getColor();
-    if (col.isValid()) {
-        mvideo_player->set_overlay_colour(col);
-        std::string msg = "Color: ";
-        msg.append(col.name().toStdString());
-        set_status_bar(msg);
     }
 }
 
@@ -1176,32 +1175,6 @@ void MainWindow::start_next_analysis() {
     analysis_window->set_progress_bar(0);
 }
 
-/**
- * @brief MainWindow::toggle_toolbar
- * This method will toggle the toolbar depending on whether the overlay and analysis is showing or not.
- * It is switching between a toolbar that contains items as save/add/load and another that
- * contains drawing tools, and a third containing analysis tools.
- * This is invoked when the overlay and analysis tool is activated and deactivated.
- */
-void MainWindow::toggle_toolbar() {
-    if (mvideo_player->is_showing_analysis_tool()) {
-        ui->toolbar_analysis->show();
-        ui->toolbar->hide();
-        ui->toolbar_overlay->hide();
-        ui->action_show_hide_overlay->setEnabled(false);
-    } else if (mvideo_player->is_showing_overlay()) {
-        ui->toolbar_analysis->hide();
-        ui->toolbar->hide();
-        ui->toolbar_overlay->show();
-        ui->action_show_hide_analysis_area->setEnabled(false);
-    } else {
-        ui->toolbar_analysis->hide();
-        ui->toolbar->show();
-        ui->toolbar_overlay->hide();
-        ui->action_show_hide_overlay->setEnabled(true);
-        ui->action_show_hide_analysis_area->setEnabled(true);
-    }
-}
 
 /**
  * @brief MainWindow::enable_video_buttons
@@ -1269,7 +1242,6 @@ void MainWindow::on_video_slider_sliderReleased() {
  */
 void MainWindow::on_action_show_hide_analysis_area_triggered() {
     mvideo_player->toggle_analysis_area();
-    toggle_toolbar();
     if (mvideo_player->is_showing_analysis_tool()) {
         set_status_bar("Showing analysis area tool. Select your area by clicking on the video.");
     } else {

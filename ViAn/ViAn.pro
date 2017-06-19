@@ -19,7 +19,9 @@ TEMPLATE = app
 SOURCES += main.cpp \
     projectmanager.cpp \
     Project/Analysis/analysismeta.cpp \
-    GUI/TreeItems/itemtypes.cpp
+    GUI/TreeItems/itemtypes.cpp \
+    GUI/Toolbars/maintoolbar.cpp \
+    GUI/Toolbars/drawingtoolbar.cpp
 
 #
 # TEST
@@ -36,7 +38,9 @@ HEADERS += Test/test_video_player.h \
     Test/overlayintegrationtest.h \
     projectmanager.h \
     Project/Analysis/analysismeta.h \
-    GUI/TreeItems/itemtypes.h
+    GUI/TreeItems/itemtypes.h \
+    GUI/Toolbars/maintoolbar.h \
+    GUI/Toolbars/drawingtoolbar.h
 
 #
 # LIBRARY
