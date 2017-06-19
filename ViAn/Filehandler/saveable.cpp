@@ -46,9 +46,9 @@ bool Saveable::save_saveable(const std::string& file_name,
             ? save_doc.toJson()
             : save_doc.toBinaryData());
 
-    m_file_path = (file_name.find(".json") || file_name.find(".dat"))
+    m_full_path = (file_name.find(".json") || file_name.find(".dat"))
             ? dir_path + "/" + file_name
-            : save_file.fileName();
+            : save_file.fileName().toStdString();
 
     return true;
 }
@@ -74,9 +74,9 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-    m_file_path = (full_path.find(".json") || full_path.find(".dat"))
-            ? dir_path + "/" + file_name
-            : save_file.fileName();
+    m_full_path = (full_path.find(".json") || full_path.find(".dat"))
+            ? full_path
+            : save_file.fileName().toStdString();
     return true;
 }
 
