@@ -8,14 +8,18 @@
 #include <QDebug>
 
 CreateProjectDialog::CreateProjectDialog(QWidget *parent) : QDialog(parent) {
-    setSizeGripEnabled(false);
+    setWindowTitle(tr("Create project"));
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
     btn_box = new QDialogButtonBox(Qt::Horizontal);
 
-    path_text->setFixedWidth(200);
+    setTabOrder(name_text, path_text);
+    setTabOrder(path_text, browse_btn);
+
+    browse_btn->setFixedWidth(80);
     browse_btn->setFixedHeight(path_text->height());
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);

@@ -155,7 +155,7 @@ void VideoWidget::init_control_buttons() {
     QShortcut* stop_sc = new QShortcut(Qt::Key_X, this);
     QShortcut* next_frame_sc = new QShortcut(Qt::Key_Right, this);
     QShortcut* prev_frame_sc = new QShortcut(Qt::Key_Left, this);
-    //QShortcut* next_poi_sc = new QShortcut(Qt::Key_Space, this);
+    //QShortcut* next_poi_sc = new QShortcut(QKeySequence(tr("Ctrl+Qt::Key_Right), this);
     //QShortcut* prev_poi_sc = new QShortcut(Qt::Key_Space, this);
 
     // Connect buttons, slider and actions
