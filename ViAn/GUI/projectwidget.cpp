@@ -20,8 +20,9 @@ void ProjectWidget::new_project() {
 
 void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
-    std::string _tmp_path = project_path.toStdString();
-    m_proj = new Project(_tmp_name, _tmp_path, _tmp_path);
+    std::string _tmp_path = project_path.toStdString();    
+    m_proj = new Project(_tmp_name, _tmp_path);
+    m_proj->save_project();
     create_default_tree();
 }
 

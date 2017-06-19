@@ -1,4 +1,5 @@
 #include "project.h"
+#include <QDebug>
 /**
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
@@ -28,11 +29,12 @@ Project* Project::fromFile(const std::string &full_path)
  * @param dir_path := directory to save project in
  * @param vid_path := path for videos folder
  */
-Project::Project(const std::string& name, const std::string& dir_path, const std::string& vid_path){
+Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;
-    m_full_path = dir_path + name;
-    m_dir_bookmarks = dir_path + "/Boomarks";
-    m_dir_videos = vid_path;
+    m_dir = dir_path + "/" + name + "/";
+    m_dir_bookmarks = m_dir + "/Bookmarks/";
+    m_dir_videos = dir_path;
+    m_full_path = m_dir  + name;
 }
 
 
@@ -220,7 +222,7 @@ bool Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    return save_saveable(m_name, m_dir);
+    return save_saveable(m_full_path);
 }
 
 /**

@@ -7,7 +7,7 @@ ProjectTestsuite::ProjectTestsuite(QObject *parent)
 }
 
 void ProjectTestsuite::init_project_test(){
-    m_proj = new Project("TEST_PROJ","C:/", "C:/");
+    m_proj = new Project("TEST_PROJ","C:/");
 }
 
 void ProjectTestsuite::add_remove_vid_proj_test()

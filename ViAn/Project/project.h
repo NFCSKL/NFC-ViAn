@@ -30,7 +30,6 @@ class Project : public Saveable{
     std::string m_dir = "";
     std::string m_dir_bookmarks = "";
     std::string m_dir_videos = "";
-
     Q_DECL_DEPRECATED bool m_changes = true;
     std::map<ID,VideoProject*> m_videos;
     std::vector<Report*> m_reports;
@@ -40,7 +39,7 @@ public:
 
 public:
     static Project* fromFile(const std::string& full_path);
-    Project(const std::string& name, const std::string& dir_path, const std::string& vid_path);
+    Project(const std::string& name, const std::string& dir_path);
     ~Project();
 
     ID add_report(Report* report);

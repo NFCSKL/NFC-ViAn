@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <iostream>
 #include <sstream>
@@ -10,7 +9,6 @@
 #include <QTime>
 #include <chrono>
 #include <thread>
-#include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
 #include "Analysis/MotionDetection.h"
 #include "Analysis/AnalysisMethod.h"
