@@ -47,7 +47,6 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/icononbuttonhandler.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
@@ -61,7 +60,6 @@ SOURCES += GUI/mainwindow.cpp \
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/icononbuttonhandler.h \
     GUI/action.h \
     GUI/qtreeitems.h \
     GUI/reportgenerator.h \
