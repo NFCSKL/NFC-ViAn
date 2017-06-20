@@ -22,6 +22,7 @@ SOURCES += main.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
     GUI/analysisslider.cpp
+    Project/Test/videoprojecttest.cpp
 
 #
 # TEST
@@ -36,6 +37,7 @@ HEADERS += Test/test_video_player.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     GUI/analysisslider.h
+    Project/Test/videoprojecttest.h
 
 #
 # LIBRARY

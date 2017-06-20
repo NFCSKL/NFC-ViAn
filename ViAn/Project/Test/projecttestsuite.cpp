@@ -68,7 +68,8 @@ void ProjectTestsuite::save_load_test(){
 
     QVERIFY(proj->save_project());
 
-    Project* proj2 = Project::fromFile(proj->file_name());
+    Project* proj2 = Project::fromFile(proj->full_path());
+
 
     QCOMPARE(proj->m_name , proj2->m_name);
     QCOMPARE(proj->m_dir , proj2->m_dir);
