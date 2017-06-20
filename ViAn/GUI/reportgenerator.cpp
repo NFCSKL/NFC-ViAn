@@ -133,7 +133,7 @@ QString ReportGenerator::calculate_time(int ms) {
 void ReportGenerator::add_bookmarks(QAxObject* selection) {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     for (Bookmark* bookmark : all_bookmarks) {
-        QString pic_path = bookmark->get_file_path();
+        QString pic_path = QString::fromStdString(bookmark->full_path());
         //Fix to make path work with windows word
         //application when spaces are involved
         pic_path.replace("/", "\\\\");
@@ -150,11 +150,11 @@ void ReportGenerator::add_bookmarks(QAxObject* selection) {
         //adds description beneath image
         QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
         QString time = QString("Time: %1").arg(calculate_time(bookmark->get_time()));
-        QString bm_description = bookmark->get_description();
+        QString bm_description = QString::fromStdString(bookmark->get_description());
         QString description = "";
 
         if (!bm_description.isEmpty()) {
-            description = QString("Description: %1").arg(bookmark->get_description());
+            description = QString("Description: %1").arg(bm_description);
         }
         selection->dynamicCall( "InsertParagraphAfter()" );
         selection->dynamicCall("InsertAfter(const QString&)", time);

@@ -188,7 +188,7 @@ void Project::write(QJsonObject& json){
  * @param v_id id of video to add analysis to
  * @param analysis
  */
-ID Project::add_analysis(const int &vid_id, AnalysisMeta &analysis){
+ID Project::add_analysis(const int &vid_id, AnalysisMeta* analysis){
     m_changes = true;
     return m_videos.at(vid_id)->add_analysis(analysis);
 }

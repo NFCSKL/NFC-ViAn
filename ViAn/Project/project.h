@@ -49,7 +49,7 @@ public:
     void remove_report(const int& id);
 
     Q_DECL_DEPRECATED ID add_bookmark(const int& vid_id,  Bookmark *bookmark);
-    Q_DECL_DEPRECATED ID add_analysis(const int& vid_id,  AnalysisMeta& analysis);
+    Q_DECL_DEPRECATED ID add_analysis(const int& vid_id,  AnalysisMeta* analysis);
 
 
 

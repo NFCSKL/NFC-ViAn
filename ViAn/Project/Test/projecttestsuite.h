@@ -5,9 +5,9 @@
 #include <QObject>
 #include <QTest>
 //vian
-#include "project.h"
-#include "videoproject.h"
-#include "report.h"
+#include "Project/project.h"
+#include "Project/videoproject.h"
+#include "Project/report.h"
 /**
  * @brief The ProjectTestsuite class
  * This class tests the usage of Projects public interface.
