@@ -35,7 +35,7 @@ signals:
     void prev_video_frame(void);
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
-    void new_bookmark(int, cv::Mat);
+    void new_bookmark(VideoProject*, int, cv::Mat);
 public slots:
     void play_clicked(void);
     void stop_clicked(void);

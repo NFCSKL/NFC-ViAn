@@ -3,23 +3,30 @@
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
     QVBoxLayout* layout = new QVBoxLayout();
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
-    bookmark_list = new QListWidget();
-
+    init_bookmark_list();
+    setLayout(layout);
     layout->addWidget(bookmark_list);
     layout->addWidget(generate_btn);
-    setLayout(layout);
 }
 
-void BookmarkWidget::add_bookmark(std::string description, std::vector<std::string> tags) {
-    bookmark_list->addItem(QString::fromStdString(description));
+void BookmarkWidget::add_bookmark(BookmarkItem* bm_item) {
+    bookmark_list->addItem(bm_item);
 }
 
-void BookmarkWidget::create_bookmark(const int frame_nbr, cv::Mat)
+void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr, cv::Mat)
 {
     qDebug() << "create bookmark";
     bool ok;
+    if(!ok) return;
     QString text = get_input_text("", &ok);
-    Bookmark("filepath",text.toStdString(),frame_nbr);
+    add_bookmark(new BookmarkItem(new Bookmark(vid_proj,text.toStdString(),frame_nbr), bookmark_list));
+}
+
+void BookmarkWidget::init_bookmark_list()
+{
+    QVBoxLayout* layout = new QVBoxLayout();
+    bookmark_list = new QListWidget();
+    bookmark_list->setLayout(layout);
 }
 /**
  * @brief BookmarkWidget::get_input_text

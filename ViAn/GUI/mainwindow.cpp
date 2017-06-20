@@ -41,8 +41,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt = new BookmarkWidget();
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     std::vector<std::string> tags = {"one", "two"};
-    bookmark_wgt->add_bookmark("bookmark description", tags);
-    connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
+    connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
     bookmark_dock->setWidget(bookmark_wgt);
 
 

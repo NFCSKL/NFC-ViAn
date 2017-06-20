@@ -217,8 +217,7 @@ void VideoWidget::set_total_time(int time) {
 void VideoWidget::on_bookmark_clicked()
 {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-
-    emit new_bookmark(current_frame, bookmark_frame);
+    emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 
 /**
