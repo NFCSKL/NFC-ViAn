@@ -34,9 +34,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private slots:
+    void open_project(void);
     void save_project(void);
     void gen_report(void);
     void close_project(void);
+    void remove_project(void);
     void options(void);
 private:
 
