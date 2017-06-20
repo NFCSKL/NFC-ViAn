@@ -4,9 +4,11 @@
 #include <QPaintEvent>
 #include <QStylePainter>
 #include <QStyleOptionSlider>
+#include <QDebug>
 
 AnalysisSlider::AnalysisSlider(Qt::Orientation orientation, QWidget * parent) : QSlider(parent) {
     setOrientation(orientation);
+    setPageStep(10);
 }
 
 /**
@@ -28,7 +30,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     if (!rects.empty()) {
         for (auto it = rects.begin(); it != rects.end(); ++it) {
             QRect rect(groove_rect.left() + (*it).first * groove_rect.width(), groove_rect.top(), ((*it).second - (*it).first) * groove_rect.width(), groove_rect.height());
-            painter.fillRect(rect, QBrush(Qt::yellow, Qt::DiagCrossPattern));
+            painter.fillRect(rect, QBrush(Qt::yellow));
         }
     }
     option.subControls = QStyle::SC_SliderHandle;

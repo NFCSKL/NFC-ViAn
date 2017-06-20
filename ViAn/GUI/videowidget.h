@@ -10,6 +10,8 @@
 #include <QWaitCondition>
 #include <QPushButton>
 #include <QSlider>
+#include <QShortcut>
+#include <vector>
 #include "framewidget.h"
 #include "analysisslider.h"
 #include "Video/video_player.h"
@@ -62,12 +64,57 @@ private:
     QLabel* current_time;
     QLabel* total_time;
     FrameWidget* frame_wgt;
+
+    //Buttons
     QPushButton* play_btn;
+    QPushButton* stop_btn;
+    QPushButton* next_frame_btn;
+    QPushButton* prev_frame_btn;
+    QPushButton* next_poi_btn;
+    QPushButton* prev_poi_btn;
+    QPushButton* analysis_btn;
+    QPushButton* bookmark_btn;    
+    QPushButton* tag_btn;
+    QPushButton* zoom_in_btn;
+    QPushButton* zoom_out_btn;
+    QPushButton* fit_btn;
+    QPushButton* move_btn;
+
+    //Layouts
+    QHBoxLayout* control_row;     // Container for all button areas
+    QHBoxLayout* video_btns;      // Play, pause etc
+    QHBoxLayout* analysis_btns;   // Buttons for starting analysis and jumping between pois
+    QHBoxLayout* other_btns;      // Bookmark, tag
+    QHBoxLayout* zoom_btns;       // Zoom buttons
+    QGridLayout* speed_slider_layout;
+
+    //Shortcuts
+    QShortcut* play_sc;
+    QShortcut* stop_sc;
+    QShortcut* next_frame_sc;
+    QShortcut* prev_frame_sc;
+    QShortcut* next_poi_sc;
+    QShortcut* prev_poi_sc;
+    
+    std::vector<QPushButton*> btns;
+
     QString convert_time(int time);
 
     bool slider_is_blocked = false;
 
     void init_control_buttons();
+
+    void init_layouts();
+    void set_btn_icons();
+    void set_btn_tool_tip();
+    void set_btn_size();
+    void set_btn_tab_order();
+    void set_btn_shortcuts();
+
+    void init_speed_slider();
+
+    void add_btns_to_layouts();
+
     void init_playback_slider();
 
 };
