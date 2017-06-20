@@ -109,7 +109,6 @@ public slots:
     void next_frame();
     void previous_frame();
     void set_playback_speed(int speed_steps);
-    void get_first_frame();
 protected:
     void run() override;
     void msleep(int ms);
@@ -145,7 +144,7 @@ private:
     double speed_multiplier = DEFAULT_SPEED_MULT;
     std::string file_path;
 
-    bool video_stopped = false;
+    bool video_stopped = true;
     bool video_paused = false;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;

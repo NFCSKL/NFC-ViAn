@@ -58,6 +58,7 @@ bool video_player::load_video(string filename, Overlay* o) {
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         emit frame_count(num_frames);
         emit total_time(int(num_frames / frame_rate));
+        capture.set(CV_CAP_PROP_POS_FRAMES, 0);
         return true;
     } else {
         return false;
@@ -104,19 +105,8 @@ void video_player::run()  {
     video_stopped = true;
     capture.set(CV_CAP_PROP_POS_FRAMES, 0);
     emit update_current_frame(0);
+    qDebug() << "end of thread loop";
 }
-
-/**
- * @brief video_player::get_first_frame
- * Slot function to retrieve the first frame
- */
-void video_player::get_first_frame() {
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
-    capture.read(frame);
-    processed_image(frame);
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
-}
-
 
 /**
  * @brief show_frame
@@ -439,8 +429,12 @@ void video_player::previous_frame() {
  * Sets the paused and stopped bools to false
  */
 void video_player::on_play_video() {
+    qDebug() << QThread::currentThreadId();
     video_paused = false;
     video_stopped = false;
+    if (!isRunning()) {
+        start();
+    }
 }
 
 /**
@@ -449,6 +443,7 @@ void video_player::on_play_video() {
  * Sets the paused bool to true
  */
 void video_player::on_pause_video() {
+    qDebug() << QThread::currentThreadId();
     video_paused = true;
 }
 

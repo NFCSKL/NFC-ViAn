@@ -1,7 +1,12 @@
 #include "framewidget.h"
-#include <iostream>
+#include <QDebug>
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
+}
+
+void FrameWidget::draw_from_playback(cv::Mat frame) {
+    if (do_update)
+        draw_image(frame);
 }
 
 void FrameWidget::draw_image(cv::Mat image) {
@@ -29,4 +34,14 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
     painter.end();
+}
+
+void FrameWidget::accept_update() {
+    qDebug("accepting");
+    do_update = true;
+}
+
+void FrameWidget::block_update() {
+    qDebug("blocking");
+    do_update = false;
 }

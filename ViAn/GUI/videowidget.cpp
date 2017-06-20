@@ -5,6 +5,11 @@
 #include <QShortcut>
 
 #include "Video/video_player.h"
+#include "Video/videoplayer.h"
+#include <opencv2/videoio.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/video/video.hpp>
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QScrollArea) {
     // Init video player
@@ -27,14 +32,22 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     setLayout(vertical_layout);   
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
-    connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)));
+    connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_from_playback(cv::Mat)));
     connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
+    connect(m_video_player, &video_player::started, frame_wgt, &FrameWidget::accept_update);
+    connect(m_video_player, &QThread::finished, frame_wgt, &FrameWidget::block_update);
+    connect(this, &VideoWidget::set_play_video, m_video_player, &video_player::on_play_video);
     connect(this, &VideoWidget::set_pause_video, m_video_player, &video_player::on_pause_video);
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
     connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
-    connect(this, &VideoWidget::ret_first_frame, m_video_player, &video_player::get_first_frame);
+    connect(this, SIGNAL(first_frame(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)), Qt::QueuedConnection);
 
+
+}
+
+void VideoWidget::test() {
+    std::cout << "finished";
 }
 
 /**
@@ -222,7 +235,7 @@ void VideoWidget::play_clicked() {
         // TODO status bar
     } else if (m_video_player->is_stopped()) {
          play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
-        m_video_player->start();
+         emit set_play_video();
     } else {
         // Video is playing
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
@@ -338,7 +351,6 @@ void VideoWidget::on_playback_slider_moved() {
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     m_vid_proj = vid_proj;
     if (m_video_player->is_paused()) {
-        qDebug() << "wake video player thread";
         // Playback thread sleeping, wake it
         paused_wait.wakeOne();
     }
@@ -346,13 +358,15 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     if (m_video_player->isRunning()) {
         // Playback thread is running, stop will make it finish
         // wait until it does
-        qDebug() << "wait for video player thread";
         emit set_stop_video();
         m_video_player->wait();
-        qDebug() << " waiting done";
     }
-
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
-    emit ret_first_frame();
+    qDebug("here");
+    cv::VideoCapture cap(m_vid_proj->get_video()->file_path);
+    cv::Mat frame;
+    cap.read(frame);
+    emit first_frame(frame);
+    cap.release();
 }
 

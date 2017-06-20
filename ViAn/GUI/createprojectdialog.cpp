@@ -43,12 +43,10 @@ void CreateProjectDialog::browse_btn_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"), path_text->text());
     if(!dir.isEmpty()) {
         path_text->setText(dir);
-        qDebug() << dir;
     }
 }
 
 void CreateProjectDialog::ok_btn_clicked() {
-    qDebug() << "ok";
     emit project_path(name_text->text(), path_text->text());
     close();
 

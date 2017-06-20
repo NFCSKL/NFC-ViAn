@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     GUI/TreeItems/itemtypes.cpp \
     Project/projecttestsuite.cpp \
     GUI/Toolbars/maintoolbar.cpp \
-    GUI/Toolbars/drawingtoolbar.cpp
+    GUI/Toolbars/drawingtoolbar.cpp \
+    Video/videoplayer.cpp
 
 #
 # TEST
@@ -35,7 +36,8 @@ HEADERS += Test/test_video_player.h \
     GUI/TreeItems/itemtypes.h \
     Project/projecttestsuite.h \
     GUI/Toolbars/maintoolbar.h \
-    GUI/Toolbars/drawingtoolbar.h
+    GUI/Toolbars/drawingtoolbar.h \
+    Video/videoplayer.h
 
 #
 # LIBRARY

@@ -105,12 +105,10 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, QString vid_name) {
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, int col) {
     switch(item->type()){
     case VIDEO_ITEM: {
-        qDebug() << "Video Selected";
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         marked_video(vid_item->get_video_project());
         break;
     } case ANALYSIS_ITEM: {
-        qDebug() << "Analysis Selected";
         AnalysisItem* vid_item = dynamic_cast<AnalysisItem*>(item);
         break;
     } case FOLDER_ITEM: {

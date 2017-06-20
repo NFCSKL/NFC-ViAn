@@ -27,12 +27,14 @@ public:
     video_player* m_video_player;
 
 signals:
+    set_play_video();
     set_pause_video();
     set_stop_video();
     next_video_frame();
     prev_video_frame();
     ret_first_frame();
     set_playback_frame(int, bool);
+    void first_frame(cv::Mat frame);
 
 public slots:
     void play_clicked(void);
@@ -52,6 +54,7 @@ public slots:
     void set_current_time(int time);
     void set_total_time(int time);
     void load_marked_video(VideoProject* vid_proj);
+    void test();
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
