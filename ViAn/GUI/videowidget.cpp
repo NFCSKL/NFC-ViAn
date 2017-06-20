@@ -337,7 +337,6 @@ void VideoWidget::on_playback_slider_moved() {
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     m_vid_proj = vid_proj;
-
     if (m_video_player->is_paused()) {
         qDebug() << "wake video player thread";
         // Playback thread sleeping, wake it
@@ -354,7 +353,6 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     }
 
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
-    //m_video_player->start(); // TODO should only display the first frame from the video
     emit ret_first_frame();
 }
 
