@@ -25,11 +25,11 @@ using ID = int;
  */
 class Project : public Saveable{
     friend class ProjectTestsuite;
+    std::string m_file = "";
     std::string m_name = "";
     std::string m_dir = "";
     std::string m_dir_bookmarks = "";
     std::string m_dir_videos = "";
-
     std::map<ID, VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
     int m_vid_count = 0;

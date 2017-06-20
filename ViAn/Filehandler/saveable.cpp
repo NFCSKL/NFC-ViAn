@@ -55,10 +55,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
     save_file.write(save_format == JSON         // Choose written format
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-    m_full_path = (full_path.find(".json") != std::string::npos ||  // Store file name, add file ending if neccesary
-            full_path.find(".dat") != std::string::npos)
-            ? full_path
-            : save_file.fileName().toStdString();
+    m_full_path = save_file.fileName().toStdString();
     return true;
 }
 
@@ -66,6 +63,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
  * @brief Saveable::delete_saveable
  * @return
  * Delete previously set path m_full_path
+ * m_full_path is set by both save_saveable and load saveable
  */
 bool Saveable::delete_saveable()
 {
@@ -95,6 +93,6 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         : QJsonDocument::fromBinaryData(save_data));
 
     this->read(load_doc.object());                      // Read data to be loaded, OBS! Implement this when inheriting
-    m_full_path = full_path;
+    m_full_path = load_file.fileName().toStdString();
     return true;
 }

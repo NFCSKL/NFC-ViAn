@@ -17,7 +17,7 @@
  */
 class Saveable
 {
-protected:
+private:
     std::string m_full_path; // Used to save complete saved path, i.e /Dir/Path/file.ending
 public:
 
