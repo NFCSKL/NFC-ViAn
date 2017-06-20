@@ -29,6 +29,8 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
 
+    Q_DECL_DEPRECATED ID id;
+
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 

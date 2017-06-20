@@ -70,6 +70,7 @@ void ProjectTestsuite::save_load_test(){
 
     Project* proj2 = Project::fromFile(proj->full_path());
 
+
     QCOMPARE(proj->m_name , proj2->m_name);
     QCOMPARE(proj->m_dir , proj2->m_dir);
     QCOMPARE(proj->m_dir_videos , proj2->m_dir_videos);

@@ -8,6 +8,7 @@
 #include "Project/Test/projecttestsuite.h"
 #include "Project/Test/videoprojecttest.h"
 
+
 Q_DECLARE_METATYPE(cv::Mat)
 /**
  * @brief qMain
@@ -24,6 +25,7 @@ int main(int argc, char *argv[])
     bool unit_testing = true;
     if(unit_testing){
         QTest::qExec(new ProjectTestsuite());
+
         QTest::qExec(new VideoProjectTest());
     }
     w.show();
