@@ -37,7 +37,7 @@ public:
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0 ;
 
-    std::string file_name() const;
+    std::string full_path() const;
 };
 
 #endif // SAVABLE_H
