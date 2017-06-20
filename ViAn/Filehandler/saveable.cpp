@@ -100,9 +100,7 @@ bool Saveable::delete_saveable()
  * Loads saveable from binary or json file.
  */
 bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& save_format){
-    QFile load_file(save_format == JSON                // Decide what format was used
-        ? QString::fromStdString(full_path + ".json")
-        : QString::fromStdString(full_path + ".dat"));
+    QFile load_file(QString::fromStdString(full_path));
     if (!load_file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str()); // Could not open file
         return false;
@@ -112,6 +110,6 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
     this->read(load_doc.object());                      // Read this object
-    m_full_path = load_file.fileName().toStdString();   // Set path to saved path
+    m_full_path = full_path;  // Set path to saved path
     return true;
 }
