@@ -32,13 +32,14 @@ class Project : public Saveable{
     std::string m_dir_videos = "";
     Q_DECL_DEPRECATED bool m_changes = true;
     std::map<ID,VideoProject*> m_videos;
-    std::vector<Report*> m_reports;
-    ID m_vid_count = 0;
+    std::map<ID, Report*> m_reports;
+    int m_vid_count = 0;
+    int m_rp_count = 0;
 public:  
     Q_DECL_DEPRECATED int m_id = -1;
 
 public:
-    static Project* fromFile(const std::string& full_path);
+    static Project* fromFile(const std::string& file_name);
     Project(const std::string& name, const std::string& dir_path);
     ~Project();
 
