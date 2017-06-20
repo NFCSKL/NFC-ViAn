@@ -15,7 +15,6 @@
 #include "Library/customdialog.h"
 #include "reportgenerator.h"
 #include "action.h"
-#include "qtreeitems.h"
 
 #include "Analysis/AnalysisController.h"
 #include "Project/Analysis/analysismeta.h"

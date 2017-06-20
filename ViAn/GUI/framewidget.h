@@ -13,6 +13,8 @@ class FrameWidget : public QWidget
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
+    cv::Mat get_mat() const;
+
 signals:
 
 public slots:
@@ -20,7 +22,6 @@ public slots:
 protected:
     QImage _qimage;
     cv::Mat _tmp;
-
     void paintEvent(QPaintEvent *event) override;
 };
 

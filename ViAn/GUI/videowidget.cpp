@@ -157,6 +157,8 @@ void VideoWidget::init_control_buttons() {
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
 
     //
+    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
+
 }
 
 /**
@@ -210,6 +212,13 @@ void VideoWidget::set_current_time(int time) {
  */
 void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
+}
+
+void VideoWidget::on_bookmark_clicked()
+{
+    cv::Mat bookmark_frame = frame_wgt->get_mat();
+
+    emit new_bookmark(current_frame, bookmark_frame);
 }
 
 /**
@@ -305,6 +314,7 @@ void VideoWidget::set_slider_max(int value) {
 void VideoWidget::on_new_frame(int frame_num) {
     if (!slider_is_blocked)
         playback_slider->setValue(frame_num);
+    current_frame = frame_num;
     set_current_time(frame_num / m_video_player->get_frame_rate());
 }
 

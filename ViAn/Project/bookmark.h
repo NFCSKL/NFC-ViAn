@@ -16,8 +16,7 @@
  */
 class Bookmark : public Saveable{
 public:
-    Bookmark(const std::string& file_path, const std::string& text,
-             const int& time, const int& frame_nbr);
+    Bookmark(const std::string& file_path, const std::string& text, const int& frame_nbr);
     Bookmark();
     int get_time();
     int get_frame_number();

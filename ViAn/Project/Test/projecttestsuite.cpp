@@ -22,7 +22,6 @@ void ProjectTestsuite::add_remove_vid_proj_test()
     proj->remove_video_project(idx3);
 
     QCOMPARE(proj->m_videos.size() , unsigned(0));
-
 }
 
 void ProjectTestsuite::add_remove_report_test()

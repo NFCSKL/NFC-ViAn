@@ -21,9 +21,8 @@ BookmarkItem::~BookmarkItem() {
  * Creates and adds a thumbnail.
  * @param frame The image for the thumbnail.
  */
-void BookmarkItem::create_thumbnail(QImage &frame) {
-    frame = frame.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
-    setData(Qt::DecorationRole, QPixmap::fromImage(frame));
+void BookmarkItem::create_thumbnail(QImage &frame) {    
+
 }
 
 /**

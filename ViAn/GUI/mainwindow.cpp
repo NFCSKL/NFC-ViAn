@@ -39,10 +39,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
-    bookmark_dock->setWidget(bookmark_wgt);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     std::vector<std::string> tags = {"one", "two"};
     bookmark_wgt->add_bookmark("bookmark description", tags);
+    connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
+    bookmark_dock->setWidget(bookmark_wgt);
+
 
     //Initialize menu bar
     init_file_menu();

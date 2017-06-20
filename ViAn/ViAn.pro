@@ -49,8 +49,6 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/qtreeitems.cpp \
-    GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/fpsdialog.cpp \
@@ -62,9 +60,7 @@ SOURCES += GUI/mainwindow.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/qtreeitems.h \
     GUI/reportgenerator.h \
-    GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/videowidget.h \

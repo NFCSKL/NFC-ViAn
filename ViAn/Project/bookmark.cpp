@@ -9,8 +9,7 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(const std::string &file_path, const std::string &text, const int &time, const int &frame_nbr) {
-    this->time = time;
+Bookmark::Bookmark(const std::string &file_path, const std::string &text, const int &frame_nbr) {
     this->frame_number = frame_nbr;
     this->description = text;
     // There's no file path yet, since the frame has not been exported

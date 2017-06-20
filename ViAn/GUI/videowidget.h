@@ -17,6 +17,8 @@
 class VideoWidget : public QWidget
 {
     Q_OBJECT
+private:
+    int current_frame;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -27,13 +29,13 @@ public:
     video_player* m_video_player;
 
 signals:
-    set_pause_video();
-    set_stop_video();
-    next_video_frame();
-    prev_video_frame();
-    ret_first_frame();
-    set_playback_frame(int, bool);
-
+    void set_pause_video(void);
+    void set_stop_video(void);
+    void next_video_frame(void);
+    void prev_video_frame(void);
+    void ret_first_frame(void);
+    void set_playback_frame(int, bool);
+    void new_bookmark(int, cv::Mat);
 public slots:
     void play_clicked(void);
     void stop_clicked(void);
@@ -47,6 +49,7 @@ public slots:
     void on_playback_slider_released(void);
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
+    void on_bookmark_clicked(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
     void set_current_time(int time);

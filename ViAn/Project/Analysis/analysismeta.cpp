@@ -8,8 +8,8 @@
  */
 AnalysisMeta::AnalysisMeta(const Analysis &analysis)
 {
-    m_name = analysis.name.toStdString();
-    m_full_path = analysis.full_path();
+    m_name = analysis.name;
+    m_full_path = analysis.m_full_path;
     std::vector<POI> pois = analysis.POIs;
     std::pair<int,int> pair;
     POI poi;
@@ -55,7 +55,6 @@ AnalysisMeta::AnalysisMeta(const AnalysisMeta &other)
  */
 void AnalysisMeta::read(const QJsonObject &json)
 {
-
     m_name = json["name"].toString().toStdString();
     m_full_path = json["full_path"].toString().toStdString();
     QJsonArray json_intervals = json["intervals"].toArray();
