@@ -37,7 +37,8 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
                      m_video_player, SLOT(previous_frame()));
 
     m_video_player->load_video("C:\\Testdata\\Pumparna.avi", nullptr);
-    m_video_player->start();
+    play_clicked();
+    //m_video_player->start();
 
 
 }
@@ -102,25 +103,26 @@ void VideoWidget::init_control_buttons() {
     speed_slider = new QSlider(Qt::Horizontal);
     speed_slider->setRange(-4,4);
     speed_slider->setMaximumWidth(120);
+    speed_slider->setTickInterval(1);
     speed_slider->setTickPosition(QSlider::TicksBelow);
     speed_slider->setToolTip(tr("Adjust playback speed"));
     QLabel *label1 = new QLabel("1/16x", this);
-    QLabel *label2 = new QLabel("1⁄4x", this);
+    //QLabel *label2 = new QLabel("1⁄4x", this);
     QLabel *label3 = new QLabel("1x", this);
-    QLabel *label4 = new QLabel("4x", this);
+    //QLabel *label4 = new QLabel("4x", this);
     QLabel *label5 = new QLabel("16x", this);
     QFont f("comic sans", 6, QFont::Normal);
     label1->setFont(f);
-    label2->setFont(f);
+    //label2->setFont(f);
     label3->setFont(f);
-    label4->setFont(f);
+    //label4->setFont(f);
     label5->setFont(f);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(speed_slider, 0, 0, 1, 5);
     layout->addWidget(label1, 1, 0, 1, 1);
-    layout->addWidget(label2, 1, 1, 1, 1);
+    //layout->addWidget(label2, 1, 1, 1, 1);
     layout->addWidget(label3, 1, 2, 1, 1);
-    layout->addWidget(label4, 1, 3, 1, 1);
+    //layout->addWidget(label4, 1, 3, 1, 1);
     layout->addWidget(label5, 1, 4, 1, 1);
 
     for (QPushButton* btn : btns) {
@@ -189,11 +191,12 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
-    playback_slider = new QSlider(Qt::Horizontal);
+    playback_slider = new AnalysisSlider(Qt::Horizontal);
     progress_area->addWidget(current_time);
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
     vertical_layout->addLayout(progress_area);
+    playback_slider->add_slider_rect(0.3, 0.5);
 
     // Signal/slot connect
     connect(m_video_player, SIGNAL(frame_count(int)), this, SLOT(set_slider_max(int)));

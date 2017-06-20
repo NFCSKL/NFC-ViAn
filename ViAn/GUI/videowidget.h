@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include "framewidget.h"
+#include "analysisslider.h"
 #include "Video/video_player.h"
 
 class VideoWidget : public QWidget
@@ -57,7 +58,7 @@ private:
     QVBoxLayout* vertical_layout;
     QScrollArea* scroll_area;
     QSlider* speed_slider;
-    QSlider* playback_slider;
+    AnalysisSlider* playback_slider;
     QLabel* current_time;
     QLabel* total_time;
     FrameWidget* frame_wgt;
