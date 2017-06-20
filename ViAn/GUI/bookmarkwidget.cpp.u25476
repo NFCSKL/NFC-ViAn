@@ -28,7 +28,6 @@ void BookmarkWidget::init_bookmark_list()
     QVBoxLayout* layout = new QVBoxLayout();
     bookmark_list = new QListWidget();
     bookmark_list->setLayout(layout);
-    // Enable drag and drop
     bookmark_list->setSelectionMode(QAbstractItemView::SingleSelection);
     bookmark_list->setDragDropMode(QAbstractItemView::InternalMove);
     bookmark_list->setDragEnabled(true);
