@@ -12,6 +12,7 @@
 #include <QSlider>
 #include "framewidget.h"
 #include "Video/video_player.h"
+#include "Project/videoproject.h"
 
 class VideoWidget : public QWidget
 {
@@ -30,7 +31,7 @@ signals:
     set_stop_video();
     next_video_frame();
     prev_video_frame();
-
+    ret_first_frame();
     set_playback_frame(int, bool);
 
 public slots:
@@ -50,6 +51,7 @@ public slots:
     //void prev_poi_clicked(void);
     void set_current_time(int time);
     void set_total_time(int time);
+    void load_marked_video(VideoProject* vid_proj);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
@@ -63,6 +65,7 @@ private:
     FrameWidget* frame_wgt;
     QPushButton* play_btn;
     QString convert_time(int time);
+    VideoProject* m_vid_proj;
 
     bool slider_is_blocked = false;
 

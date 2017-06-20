@@ -14,7 +14,7 @@ public:
 
 signals:
     void selected_media();
-    void marked_video();
+    void marked_video(VideoProject* vid_proj);
 public slots:
     void new_project(void);
     void add_project(QString project_name, QString project_path);

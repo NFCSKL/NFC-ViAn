@@ -99,8 +99,6 @@ signals:
 
 private slots:
     void scaling_event(int new_width, int new_height);
-    void next_frame();
-    void previous_frame();
     void on_set_playback_frame(int frame_num);
     void on_set_analysis_results(Analysis analysis);
 
@@ -108,9 +106,10 @@ public slots:
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
-
-
+    void next_frame();
+    void previous_frame();
     void set_playback_speed(int speed_steps);
+    void get_first_frame();
 protected:
     void run() override;
     void msleep(int ms);
