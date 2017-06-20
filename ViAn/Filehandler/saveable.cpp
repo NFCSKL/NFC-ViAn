@@ -43,7 +43,6 @@ bool Saveable::save_saveable(const std::string& file_name,
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-
     m_full_path = (file_name.find(".json") != std::string::npos ||
             file_name.find(".dat") != std::string::npos)
             ? dir_path + "/" + file_name
