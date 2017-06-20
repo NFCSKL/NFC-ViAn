@@ -1,11 +1,9 @@
 #include "saveable.h"
 
 const Saveable::SAVE_FORMAT Saveable::DEFAULT_SAVE_FORMAT;
-/**
- * @brief Saveable::~Saveable
- * virtual constructor
- */
-std::string Saveable::file_name() const
+
+
+std::string Saveable::full_path() const
 {
     return m_full_path;
 }
