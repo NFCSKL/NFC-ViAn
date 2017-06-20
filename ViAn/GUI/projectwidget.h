@@ -14,11 +14,14 @@ public:
 
 signals:
     void selected_media();
+    void marked_video();
 public slots:
     void new_project(void);
     void add_project(QString project_name, QString project_path);
     void add_video();
     void add_analysis();
+    void save_project();
+    void open_project();
 private slots:
     void tree_item_clicked(QTreeWidgetItem *item, int col);
 private:

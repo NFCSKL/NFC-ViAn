@@ -26,7 +26,7 @@ class VideoProject{
     ID id_analysis = 0;
 
 public:
-    ID id;
+    Q_DECL_DEPRECATED ID id;
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 

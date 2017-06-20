@@ -128,8 +128,10 @@ void MainWindow::init_file_menu() {
 
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project);
     connect(save_project_act, &QAction::triggered, this, &MainWindow::save_project);
+
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
     connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
     connect(remove_project_act, &QAction::triggered, this, &MainWindow::remove_project);
