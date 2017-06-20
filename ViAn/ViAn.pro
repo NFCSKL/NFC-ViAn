@@ -20,7 +20,8 @@ SOURCES += main.cpp \
     Project/Analysis/analysismeta.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
-    GUI/Toolbars/drawingtoolbar.cpp
+    GUI/Toolbars/drawingtoolbar.cpp \
+    Project/Test/videoprojecttest.cpp
 
 #
 # TEST
@@ -33,7 +34,8 @@ HEADERS += Test/test_video_player.h \
     Project/Analysis/analysismeta.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
-    GUI/Toolbars/drawingtoolbar.h
+    GUI/Toolbars/drawingtoolbar.h \
+    Project/Test/videoprojecttest.h
 
 #
 # LIBRARY

@@ -17,35 +17,33 @@
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
-class VideoProject{
-    std::map<ID,Bookmark*> bookmarks;
-    std::map<ID,AnalysisMeta> analyses;
-    Overlay* overlay = new Overlay();
+class VideoProject : public Saveable{
+    friend class VideoProjectTest;
+    std::map<ID,Bookmark*> m_bookmarks;
+    std::map<ID,AnalysisMeta*> m_analyses;
+    Overlay* m_overlay = new Overlay();
     Video* video = nullptr;
-    ID id_bookmark = 0;
-    ID id_analysis = 0;
-
+    ID m_bm_cnt = 0;  // Bookmark id counter
+    ID m_ana_cnt = 0; // Analysis id counter
 public:
-    Q_DECL_DEPRECATED ID id;
+    VideoProject(Video* v); //Needs to have a video
+    VideoProject();
+
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-    ID add_analysis(AnalysisMeta &analysis);
+    ID add_analysis(AnalysisMeta* analysis);
     ID add_bookmark(Bookmark* bookmark);
 
     void delete_analysis(const int& id);
     void delete_bookmark(const int& id);
-
     void delete_artifacts();
 
-    VideoProject(Video* v); //Needs to have a video
-    VideoProject();
     Video* get_video();
     Overlay* get_overlay();
-
     std::map<ID,Bookmark*> get_bookmarks();
-    std::map<ID,AnalysisMeta> get_analyses();
-    AnalysisMeta get_analysis(const int &id);
+    std::map<ID,AnalysisMeta*> get_analyses();
+    AnalysisMeta *get_analysis(const int &id);
 };
 
 

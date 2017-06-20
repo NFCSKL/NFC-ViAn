@@ -7,7 +7,6 @@
  */
 VideoProject::VideoProject(Video* v){
     this->video = v;    
-    this->id = -1;
 }
 
 /**
@@ -16,7 +15,6 @@ VideoProject::VideoProject(Video* v){
  */
 VideoProject::VideoProject(){
     this->video = new Video();
-    this->id = -1;
 }
 
 /**
@@ -34,7 +32,7 @@ Video* VideoProject::get_video(){
  * Returns the overlay.
  */
 Overlay* VideoProject::get_overlay() {
-    return overlay;
+    return m_overlay;
 }
 
 /**
@@ -43,7 +41,7 @@ Overlay* VideoProject::get_overlay() {
  * Return all bookmarks.
  */
 std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
-    return this->bookmarks;
+    return this->m_bookmarks;
 }
 
 /**
@@ -51,8 +49,8 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-AnalysisMeta VideoProject::get_analysis(const int& id) {
-    return analyses[id];
+AnalysisMeta* VideoProject::get_analysis(const int& id) {
+    return m_analyses[id];
 }
 
 /**
@@ -60,9 +58,22 @@ AnalysisMeta VideoProject::get_analysis(const int& id) {
  * @param id of the analysis
  */
 void VideoProject::delete_analysis(const int& id) {
-    AnalysisMeta am = analyses.at(id);
-    analyses.erase(id);
-    am.delete_saveable();
+    AnalysisMeta* am = m_analyses.at(id);
+    m_analyses.erase(id);
+    am->delete_saveable();
+    delete am;
+}
+
+/**
+ * @brief VideoProject::delete_bookmark
+ * @param id
+ */
+void VideoProject::delete_bookmark(const int &id)
+{
+    Bookmark* bm = m_bookmarks.at(id);
+    m_bookmarks.erase(id);
+    bm->remove_exported_image();
+    delete bm;
 }
 
 /**
@@ -70,8 +81,8 @@ void VideoProject::delete_analysis(const int& id) {
  * @return analyses
  * return all analyses.
  */
-std::map<ID, AnalysisMeta> VideoProject::get_analyses() {
-    return analyses;
+std::map<ID, AnalysisMeta *> VideoProject::get_analyses() {
+    return m_analyses;
 }
 
 /**
@@ -90,13 +101,13 @@ void VideoProject::read(const QJsonObject& json){
         add_bookmark(new_bookmark);
     }
     QJsonObject json_overlay = json["overlay"].toObject();
-    this->overlay->read(json_overlay);
+    this->m_overlay->read(json_overlay);
     QJsonArray json_analyses = json["analyses"].toArray();
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();
-        AnalysisMeta analysis;
-        analysis.read(json_analysis);
+        AnalysisMeta* analysis = new AnalysisMeta();
+        analysis->read(json_analysis);
         add_analysis(analysis);
     }
 }
@@ -109,7 +120,7 @@ void VideoProject::read(const QJsonObject& json){
 void VideoProject::write(QJsonObject& json){
     this->video->write(json);
     QJsonArray json_bookmarks;
-    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
         QJsonObject json_bookmark;
         Bookmark* temp = it->second;
         temp->write(json_bookmark);
@@ -118,16 +129,16 @@ void VideoProject::write(QJsonObject& json){
     json["bookmarks"] = json_bookmarks;
     // Write analyses to json
     QJsonArray json_analyses;
-    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+    for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
-        AnalysisMeta an = it2->second;
-        an.write(json_analysis);
+        AnalysisMeta* an = it2->second;
+        an->write(json_analysis);
         json_analyses.append(json_analysis);
     }
     json["analyses"] = json_analyses;
 
     QJsonObject json_overlay;
-    this->overlay->write(json_overlay);
+    this->m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
 }
 
@@ -137,8 +148,8 @@ void VideoProject::write(QJsonObject& json){
  * Add new bookmark.
  */
 ID VideoProject::add_bookmark(Bookmark *bookmark){
-    this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
-    return id_bookmark++;
+    this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
+    return m_bm_cnt++;
 }
 
 /**
@@ -147,9 +158,9 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * @return id of the analysis
  * Adds analysis to video project.
  */
-ID VideoProject::add_analysis(AnalysisMeta &analysis){
-    this->analyses.insert(std::make_pair(this->id_analysis, analysis));
-    return this->id_analysis++;
+ID VideoProject::add_analysis(AnalysisMeta* analysis){
+    this->m_analyses.insert(std::make_pair(this->m_ana_cnt, analysis));
+    return this->m_ana_cnt++;
 }
 
 /**
@@ -157,12 +168,13 @@ ID VideoProject::add_analysis(AnalysisMeta &analysis){
  * Delete bookmark files.
  */
 void VideoProject::delete_artifacts(){
-    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
         Bookmark* temp = it->second;
         temp->remove_exported_image();
     }
-    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
-        AnalysisMeta temp2 = it2->second;
+    for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
+        AnalysisMeta* temp = it2->second;
+        temp->delete_saveable();
 
     }
 }

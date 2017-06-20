@@ -107,6 +107,9 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
     this->read(load_doc.object());                      // Read this object
-    m_full_path = full_path;  // Set path to saved path
+    m_full_path = (full_path.find(".json") != std::string::npos ||
+            full_path.find(".dat") != std::string::npos)
+            ? full_path
+            : load_file.fileName().toStdString();;  // Set path to saved path
     return true;
 }

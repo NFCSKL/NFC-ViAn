@@ -9,7 +9,7 @@
 AnalysisMeta::AnalysisMeta(const Analysis &analysis)
 {
     m_name = analysis.name.toStdString();
-    m_full_path = analysis.m_full_path;
+    m_full_path = analysis.full_path();
     std::vector<POI> pois = analysis.POIs;
     std::pair<int,int> pair;
     POI poi;

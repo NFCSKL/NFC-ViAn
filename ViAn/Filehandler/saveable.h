@@ -17,9 +17,10 @@
  */
 class Saveable
 {
-
-public:
+protected:
     std::string m_full_path;
+public:
+
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
     static const SAVE_FORMAT DEFAULT_SAVE_FORMAT = JSON;
 
