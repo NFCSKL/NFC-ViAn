@@ -21,6 +21,7 @@ SOURCES += main.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
+    GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp
 
 #
@@ -35,6 +36,7 @@ HEADERS += Test/test_video_player.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
+    GUI/projectdialog.h \
     Project/Test/videoprojecttest.h
 
 #
@@ -55,8 +57,7 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
     GUI/projectwidget.cpp \
-    GUI/bookmarkwidget.cpp \
-    GUI/createprojectdialog.cpp
+    GUI/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -69,8 +70,7 @@ HEADERS  += GUI/mainwindow.h \
     GUI/videowidget.h \
     GUI/framewidget.h \
     GUI/projectwidget.h \
-    GUI/bookmarkwidget.h \
-    GUI/createprojectdialog.h
+    GUI/bookmarkwidget.h
 
 FORMS    +=
 

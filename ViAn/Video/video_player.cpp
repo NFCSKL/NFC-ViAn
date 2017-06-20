@@ -58,7 +58,6 @@ bool video_player::load_video(string filename, Overlay* o) {
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         emit frame_count(num_frames);
         emit total_time(int(num_frames / frame_rate));
-        start();
         return true;
     } else {
         return false;
@@ -106,6 +105,18 @@ void video_player::run()  {
     capture.set(CV_CAP_PROP_POS_FRAMES, 0);
     emit update_current_frame(0);
 }
+
+/**
+ * @brief video_player::get_first_frame
+ * Slot function to retrieve the first frame
+ */
+void video_player::get_first_frame() {
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    capture.read(frame);
+    processed_image(frame);
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+}
+
 
 /**
  * @brief show_frame
@@ -448,6 +459,7 @@ void video_player::on_pause_video() {
  * Sets playback frame to the start of the video and updates the GUI.
  */
 void video_player::on_stop_video() {
+    qDebug() << "stopping video";
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);

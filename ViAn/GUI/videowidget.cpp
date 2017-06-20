@@ -31,14 +31,9 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
     connect(this, &VideoWidget::set_pause_video, m_video_player, &video_player::on_pause_video);
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
-    QObject::connect(this, SIGNAL(next_video_frame()),
-                     m_video_player, SLOT(next_frame()));
-    QObject::connect(this, SIGNAL(prev_video_frame()),
-                     m_video_player, SLOT(previous_frame()));
-
-    m_video_player->load_video("C:\\Testdata\\Pumparna.avi", nullptr);
-    m_video_player->start();
-
+    connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
+    connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
+    connect(this, &VideoWidget::ret_first_frame, m_video_player, &video_player::get_first_frame);
 
 }
 
@@ -333,5 +328,31 @@ void VideoWidget::on_playback_slider_value_changed() {
 
 void VideoWidget::on_playback_slider_moved() {
     qDebug() << "moved";
+}
+
+/**
+ * @brief VideoWidget::load_marked_video
+ * Slot function for loading a new video
+ * @param vid_proj
+ */
+void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+    m_vid_proj = vid_proj;
+    if (m_video_player->is_paused()) {
+        qDebug() << "wake video player thread";
+        // Playback thread sleeping, wake it
+        paused_wait.wakeOne();
+    }
+
+    if (m_video_player->isRunning()) {
+        // Playback thread is running, stop will make it finish
+        // wait until it does
+        qDebug() << "wait for video player thread";
+        emit set_stop_video();
+        m_video_player->wait();
+        qDebug() << " waiting done";
+    }
+
+    m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
+    emit ret_first_frame();
 }
 

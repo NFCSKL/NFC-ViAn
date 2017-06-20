@@ -1,5 +1,5 @@
 #include "projectwidget.h"
-#include "createprojectdialog.h"
+#include "projectdialog.h"
 #include "TreeItems/itemtypes.h"
 #include <QFileDialog>
 #include <QDebug>
@@ -13,9 +13,9 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
  * @brief ProjectWidget::new_project
  * Creates a create project dialog
  */
-void ProjectWidget::new_project() {
+void ProjectWidget::new_project() const {
     if (m_proj == nullptr) {
-        CreateProjectDialog* proj_dialog = new CreateProjectDialog();
+        ProjectDialog* proj_dialog = new ProjectDialog();
         QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
     } else {
         // TODO project already loadedq
@@ -41,7 +41,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  * Creates and adds the default tree structure
  */
 void ProjectWidget::create_default_tree() {
-    m_videos = new QTreeWidgetItem();
+    m_videos = new FolderItem(FOLDER_ITEM);
     m_videos->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
     m_videos->setText(0, tr("Videos"));
     addTopLevelItem(m_videos);
@@ -89,7 +89,7 @@ void ProjectWidget::tree_add_analysis(){
  * @param vid_proj
  * @param vid_name
  */
-void ProjectWidget::tree_add_video(VideoProject* vid_proj, QString vid_name) {
+void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid = new VideoItem(vid_proj, VIDEO_ITEM);
     vid->setText(0, vid_name);
     m_videos->addChild(vid);
@@ -102,15 +102,21 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, QString vid_name) {
  * @param item
  * @param col
  */
-void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, int col) {
+void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
-    case VIDEO_ITEM:
+    case VIDEO_ITEM: {
         qDebug() << "Video Selected";
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+        marked_video(vid_item->get_video_project());
         break;
-    case ANALYSIS_ITEM:
+    } case ANALYSIS_ITEM: {
         qDebug() << "Analysis Selected";
+        AnalysisItem* vid_item = dynamic_cast<AnalysisItem*>(item);
         break;
-    default:
+    } case FOLDER_ITEM: {
+        qDebug() << "Folder Selected";
+        break;
+    } default:
         qDebug() << "Nothing clicked";
     }
 
@@ -129,14 +135,17 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project() {
-    create_default_tree();
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
-    m_proj = Project::fromFile(project_path.toStdString());
-    for (auto vid_pair : m_proj->get_videos()) {
-        VideoProject* vid_proj = vid_pair.second;
-        QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
-        int index = video_path.lastIndexOf('/') + 1;
-        QString vid_name = video_path.right(video_path.length() - index);
-        tree_add_video(vid_proj, vid_name);
+    if (!project_path.isEmpty()) {
+        clear();
+        create_default_tree();
+        m_proj = Project::fromFile(project_path.toStdString());
+        for (auto vid_pair : m_proj->get_videos()) {
+            VideoProject* vid_proj = vid_pair.second;
+            QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
+            int index = video_path.lastIndexOf('/') + 1;
+            QString vid_name = video_path.right(video_path.length() - index);
+            tree_add_video(vid_proj, vid_name);
+        }
     }
 }
