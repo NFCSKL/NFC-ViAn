@@ -44,17 +44,16 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @param start frame
  * @param end frame
  */
-void AnalysisSlider::add_slider_rect(int start, int end) {
+void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
     double first, second;
-    first = (double)start/maximum();
-    second = (double)end/maximum();
+    first = (double)start_frame/maximum();
+    second = (double)end_frame/maximum();
     std::pair<double, double> pair;
     if (first > second) {
         pair = std::make_pair(second, first);
     } else {
         pair = std::make_pair(first, second);
     }
-
     rects.push_back(pair);
 }
 
