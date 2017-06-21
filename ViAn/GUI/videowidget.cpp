@@ -265,7 +265,6 @@ void VideoWidget::init_playback_slider() {
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
     vertical_layout->addLayout(progress_area);
-    playback_slider->add_slider_rect(0.3, 0.5);
 
     // Signal/slot connect
     connect(m_video_player, SIGNAL(frame_count(int)), this, SLOT(set_slider_max(int)));

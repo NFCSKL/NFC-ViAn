@@ -10,7 +10,7 @@ class AnalysisSlider : public QSlider {
 
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
-    void add_slider_rect(double start, double end);
+    void add_slider_rect(int start, int end);
     void clear_rects();
 
 protected:

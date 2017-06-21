@@ -41,11 +41,20 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @brief AnalysisSlider::add_slider_rect
  * Adds a pair of doubles to a pair vector. This pair represents
  * a certain area of the slider from start to end.
- * @param start in the range 0-1
- * @param end in the range 0-1, should be > than start
+ * @param start frame
+ * @param end frame
  */
-void AnalysisSlider::add_slider_rect(double start, double end) {
-    std::pair<double, double> pair = std::make_pair(start, end);
+void AnalysisSlider::add_slider_rect(int start, int end) {
+    double first, second;
+    first = (double)start/maximum();
+    second = (double)end/maximum();
+    std::pair<double, double> pair;
+    if (first > second) {
+        pair = std::make_pair(second, first);
+    } else {
+        pair = std::make_pair(first, second);
+    }
+
     rects.push_back(pair);
 }
 
