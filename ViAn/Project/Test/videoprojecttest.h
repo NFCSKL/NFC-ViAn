@@ -15,8 +15,7 @@ private slots:
     void read_write_test();
     void delete_analysis();
     void delete_bookmark();
-    void save_load_test();
-    void delete_artifacts_test();
+    void save_load_delete_test();
 };
 
 #endif // VIDEOPROJECTTEST_H

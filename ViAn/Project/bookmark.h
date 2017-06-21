@@ -16,8 +16,7 @@
  */
 class Bookmark : public Saveable{
 public:
-    Bookmark(const std::string& file_path, const std::string& text,
-             const int& time, const int& frame_nbr);
+    Bookmark(const std::string& file_path, const std::string& text, const int& frame_nbr);
     Bookmark();
     int get_time();
     int get_frame_number();
@@ -30,6 +29,7 @@ public:
     Q_DECL_DEPRECATED void remove_exported_image();
 
 private:
+    std::string m_file = "";
     int frame_number = -1;       // Frame at which the bookmark was taken
     int time = -1;               // Time of the bookmark (in millisecs)
     std::string description = "";    // Description for the bookmark, given by user

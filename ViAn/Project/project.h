@@ -25,19 +25,15 @@ using ID = int;
  */
 class Project : public Saveable{
     friend class ProjectTestsuite;
-
+    std::string m_file = "";
     std::string m_name = "";
     std::string m_dir = "";
     std::string m_dir_bookmarks = "";
     std::string m_dir_videos = "";
-    Q_DECL_DEPRECATED bool m_changes = true;
-    std::map<ID,VideoProject*> m_videos;
+    std::map<ID, VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
     int m_vid_count = 0;
     int m_rp_count = 0;
-public:  
-    Q_DECL_DEPRECATED int m_id = -1;
-
 public:
     static Project* fromFile(const std::string& file_name);
     Project(const std::string& name, const std::string& dir_path);
@@ -45,14 +41,11 @@ public:
 
     ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
+    // TODO
+    //ID add_drawing();
+    // void remove_drawing();
     void remove_video_project(const int &id);
     void remove_report(const int& id);
-
-    Q_DECL_DEPRECATED ID add_bookmark(const int& vid_id,  Bookmark *bookmark);
-    Q_DECL_DEPRECATED ID add_analysis(const int& vid_id,  AnalysisMeta* analysis);
-
-
-
 
     // read and write operator for Projects
     void read(const QJsonObject& json);
@@ -62,15 +55,14 @@ public:
     bool is_saved() const;
     bool save_project();
     bool load_project();
+
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID m_id);
-// TODO
-
-//    void add_drawing();      
     std::string getDir_bookmarks() const;
     std::string getDir_videos() const;
     std::string getDir() const;
     std::string getName() const;
+
 private:
     Project();
 };

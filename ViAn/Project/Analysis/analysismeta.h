@@ -6,6 +6,7 @@
 class AnalysisMeta : public Saveable
 {
     std::vector<std::pair<int,int>> m_poi_intervals;
+    std::string file_analysis;
 public:
     std::string m_name;
     AnalysisMeta(const Analysis &analysis);

@@ -9,12 +9,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(const std::string &file_path, const std::string &text, const int &time, const int &frame_nbr) {
-    this->time = time;
+Bookmark::Bookmark(const std::string &file_path, const std::string &text, const int &frame_nbr) {
     this->frame_number = frame_nbr;
     this->description = text;
     // There's no file path yet, since the frame has not been exported
-    m_full_path = file_path;
+    m_file = file_path;
 }
 
 /**
@@ -65,7 +64,7 @@ void Bookmark::set_description(const std::string& text) {
 void Bookmark::read(const QJsonObject& json){
     this->time = json["time"].toInt();
     this->frame_number = json["frame"].toInt();
-    m_full_path= json["path"].toString().toStdString();
+    m_file = json["path"].toString().toStdString();
     this->description = json["description"].toString().toStdString();
 }
 
@@ -78,7 +77,7 @@ void Bookmark::write(QJsonObject& json){
     // Exports the frame and updates file_path.
     json["time"] = this->time;
     json["frame"] = this->frame_number;
-    json["path"] = QString::fromStdString(m_full_path);
+    json["path"] = QString::fromStdString(m_file);
     json["description"] = QString::fromStdString(description);
 }
 

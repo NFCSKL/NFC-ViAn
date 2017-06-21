@@ -30,14 +30,9 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)));
     connect(this, &VideoWidget::set_pause_video, m_video_player, &video_player::on_pause_video);
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
-    QObject::connect(this, SIGNAL(next_video_frame()),
-                     m_video_player, SLOT(next_frame()));
-    QObject::connect(this, SIGNAL(prev_video_frame()),
-                     m_video_player, SLOT(previous_frame()));
-
-    m_video_player->load_video("C:\\Testdata\\Pumparna.avi", nullptr);
-    play_clicked();
-    //m_video_player->start();
+    connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
+    connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
+    connect(this, &VideoWidget::ret_first_frame, m_video_player, &video_player::get_first_frame);
 }
 
 /**
@@ -219,11 +214,14 @@ void VideoWidget::init_control_buttons() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
+    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
+
     connect(zoom_in_btn, &QPushButton::clicked, this, &VideoWidget::zoom_in_clicked);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::zoom_out_clicked);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
+
 
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
 }
@@ -307,6 +305,13 @@ void VideoWidget::set_current_time(int time) {
  */
 void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
+}
+
+void VideoWidget::on_bookmark_clicked()
+{
+    cv::Mat bookmark_frame = frame_wgt->get_mat();
+
+    emit new_bookmark(current_frame, bookmark_frame);
 }
 
 /**
@@ -402,6 +407,7 @@ void VideoWidget::set_slider_max(int value) {
 void VideoWidget::on_new_frame(int frame_num) {
     if (!slider_is_blocked)
         playback_slider->setValue(frame_num);
+    current_frame = frame_num;
     set_current_time(frame_num / m_video_player->get_frame_rate());
 }
 
@@ -425,4 +431,30 @@ void VideoWidget::on_playback_slider_value_changed() {
 
 void VideoWidget::on_playback_slider_moved() {
     qDebug() << "moved";
+}
+
+/**
+ * @brief VideoWidget::load_marked_video
+ * Slot function for loading a new video
+ * @param vid_proj
+ */
+void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+    m_vid_proj = vid_proj;
+    if (m_video_player->is_paused()) {
+        qDebug() << "wake video player thread";
+        // Playback thread sleeping, wake it
+        paused_wait.wakeOne();
+    }
+
+    if (m_video_player->isRunning()) {
+        // Playback thread is running, stop will make it finish
+        // wait until it does
+        qDebug() << "wait for video player thread";
+        emit set_stop_video();
+        m_video_player->wait();
+        qDebug() << " waiting done";
+    }
+
+    m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
+    emit ret_first_frame();
 }

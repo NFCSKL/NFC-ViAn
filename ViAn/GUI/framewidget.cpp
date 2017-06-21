@@ -25,6 +25,12 @@ void FrameWidget::draw_image(cv::Mat image) {
     repaint();
 }
 
+
+cv::Mat FrameWidget::get_mat() const
+{
+    return _tmp.clone();
+}
+
 void FrameWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);

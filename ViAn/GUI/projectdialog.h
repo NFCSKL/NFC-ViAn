@@ -7,14 +7,14 @@
 #include <QDialogButtonBox>
 #include <QString>
 
-class CreateProjectDialog : public QDialog
+class ProjectDialog : public QDialog
 {
     Q_OBJECT
     QLineEdit* path_text;
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
 public:
-    explicit CreateProjectDialog(QWidget *parent = nullptr);
+    explicit ProjectDialog(QWidget *parent = nullptr);
 
 signals:
     void project_path(QString name, QString path);

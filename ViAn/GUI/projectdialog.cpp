@@ -1,4 +1,4 @@
-#include "createprojectdialog.h"
+#include "projectdialog.h"
 #include <QSize>
 #include <QPushButton>
 #include <QBoxLayout>
@@ -7,9 +7,8 @@
 
 #include <QDebug>
 
-CreateProjectDialog::CreateProjectDialog(QWidget *parent) : QDialog(parent) {
-    setWindowTitle(tr("Create project"));
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
+    setSizeGripEnabled(false);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
@@ -36,14 +35,14 @@ CreateProjectDialog::CreateProjectDialog(QWidget *parent) : QDialog(parent) {
     vertical_layout->addWidget(btn_box);
     setLayout(vertical_layout);
 
-    connect(browse_btn, &QPushButton::clicked, this, &CreateProjectDialog::browse_btn_clicked);
-    connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &CreateProjectDialog::ok_btn_clicked);
-    connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &CreateProjectDialog::cancel_btn_clicked);
+    connect(browse_btn, &QPushButton::clicked, this, &ProjectDialog::browse_btn_clicked);
+    connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ProjectDialog::ok_btn_clicked);
+    connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &ProjectDialog::cancel_btn_clicked);
 
     show();
 }
 
-void CreateProjectDialog::browse_btn_clicked() {
+void ProjectDialog::browse_btn_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"), path_text->text());
     if(!dir.isEmpty()) {
         path_text->setText(dir);
@@ -51,14 +50,14 @@ void CreateProjectDialog::browse_btn_clicked() {
     }
 }
 
-void CreateProjectDialog::ok_btn_clicked() {
+void ProjectDialog::ok_btn_clicked() {
     qDebug() << "ok";
     emit project_path(name_text->text(), path_text->text());
     close();
 
 }
 
-void CreateProjectDialog::cancel_btn_clicked() {
+void ProjectDialog::cancel_btn_clicked() {
     close();
 }
 

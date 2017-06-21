@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
-    GUI/analysisslider.cpp
+    GUI/analysisslider.cpp \
+    GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp
 
 #
@@ -36,7 +37,8 @@ HEADERS += Test/test_video_player.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
-    GUI/analysisslider.h
+    GUI/analysisslider.h \
+    GUI/projectdialog.h \
     Project/Test/videoprojecttest.h
 
 #
@@ -49,30 +51,24 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/qtreeitems.cpp \
-    GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/fpsdialog.cpp \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
     GUI/projectwidget.cpp \
-    GUI/bookmarkwidget.cpp \
-    GUI/createprojectdialog.cpp
+    GUI/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/qtreeitems.h \
     GUI/reportgenerator.h \
-    GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/videowidget.h \
     GUI/framewidget.h \
     GUI/projectwidget.h \
-    GUI/bookmarkwidget.h \
-    GUI/createprojectdialog.h
+    GUI/bookmarkwidget.h
 
 FORMS    +=
 

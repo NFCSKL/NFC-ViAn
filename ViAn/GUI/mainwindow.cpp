@@ -39,10 +39,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
-    bookmark_dock->setWidget(bookmark_wgt);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     std::vector<std::string> tags = {"one", "two"};
     bookmark_wgt->add_bookmark("bookmark description", tags);
+    connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
+    bookmark_dock->setWidget(bookmark_wgt);
+
 
     //Initialize menu bar
     init_file_menu();
@@ -62,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
+    
+    connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
 }
 
 
@@ -128,10 +132,8 @@ void MainWindow::init_file_menu() {
 
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
-
-    connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project);
-    connect(save_project_act, &QAction::triggered, this, &MainWindow::save_project);
-
+    connect(open_project_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
+    connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
     connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
     connect(remove_project_act, &QAction::triggered, this, &MainWindow::remove_project);
