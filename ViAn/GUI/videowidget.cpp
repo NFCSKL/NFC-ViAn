@@ -179,10 +179,10 @@ void VideoWidget::init_playback_slider() {
     connect(m_video_player, SIGNAL(total_time(int)), this, SLOT(set_total_time(int)));
     connect(m_video_player, SIGNAL(update_current_frame(int)), this, SLOT(on_new_frame(int)));
     connect(this, SIGNAL(set_playback_frame(int, bool)), m_video_player, SLOT(on_set_playback_frame(int)));
-    connect(playback_slider, &QSlider::sliderPressed, this, on_playback_slider_pressed);
-    connect(playback_slider, &QSlider::sliderReleased, this, on_playback_slider_released);
-    connect(playback_slider, &QSlider::valueChanged, this, on_playback_slider_value_changed);
-    connect(playback_slider, &QSlider::sliderMoved, this, on_playback_slider_moved);
+    connect(playback_slider, &QSlider::sliderPressed, this, &VideoWidget::on_playback_slider_pressed);
+    connect(playback_slider, &QSlider::sliderReleased, this, &VideoWidget::on_playback_slider_released);
+    connect(playback_slider, &QSlider::valueChanged, this, &VideoWidget::on_playback_slider_value_changed);
+    connect(playback_slider, &QSlider::sliderMoved, this, &VideoWidget::on_playback_slider_moved);
 }
 
 /**
