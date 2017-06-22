@@ -12,7 +12,7 @@
 class BookmarkCategory : public QObject, public QListWidgetItem
 {
     Q_OBJECT
-    QVBoxLayout*  folder_layout = nullptr;
+    QVBoxLayout*  layout = nullptr;
     QScrollArea* disputed = nullptr;
     QScrollArea* reference = nullptr;
 public:

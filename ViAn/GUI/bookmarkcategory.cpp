@@ -4,15 +4,15 @@ BookmarkCategory::BookmarkCategory(QListWidget *parent) : QListWidgetItem(parent
 {   
     // Setup layout
     QWidget* folder = new QWidget();
-    folder_layout = new QVBoxLayout();
-    folder_layout->setAlignment(Qt::AlignTop);
-    folder_layout->setMargin(5);
-    folder_layout->setSpacing(5);
+    layout = new QVBoxLayout();
+    layout->setAlignment(Qt::AlignTop);
+    layout->setMargin(5);
+    layout->setSpacing(5);
     folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
     QLineEdit* title = new QLineEdit("mapname");
-    folder_layout->addWidget(title);
-    folder_layout->addLayout(container);
+    layout->addWidget(title);
+    layout->addLayout(container);
 
     // Add disputed and reference list
     disputed = make_scrollable_container();
@@ -21,7 +21,7 @@ BookmarkCategory::BookmarkCategory(QListWidget *parent) : QListWidgetItem(parent
     container->addWidget(disputed);
     container->addWidget(reference);
 
-    folder->setLayout(folder_layout);
+    folder->setLayout(layout);
     parent->setItemWidget(this, folder);
     setSizeHint(folder->sizeHint());
 }
