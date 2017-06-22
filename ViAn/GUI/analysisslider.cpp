@@ -58,9 +58,9 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
 }
 
 /**
- * @brief AnalysisSlider::clear_rects
+ * @brief AnalysisSlider::clear_slider
  * Clear the rects vector.
  */
-void AnalysisSlider::clear_rects() {
+void AnalysisSlider::clear_slider() {
     rects.clear();
 }

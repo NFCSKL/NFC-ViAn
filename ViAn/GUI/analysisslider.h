@@ -11,7 +11,7 @@ class AnalysisSlider : public QSlider {
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
     void add_slider_interval(int start_frame, int end_frame);
-    void clear_rects();
+    void clear_slider();
 
 protected:
     void paintEvent(QPaintEvent *ev);
