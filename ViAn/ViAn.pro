@@ -22,7 +22,9 @@ SOURCES += main.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
     GUI/projectdialog.cpp \
-    Project/Test/videoprojecttest.cpp
+    Project/Test/videoprojecttest.cpp \
+    GUI/bookmarkcategory.cpp \
+    GUI/bookmarkcontainer.cpp
 
 #
 # TEST
@@ -37,7 +39,9 @@ HEADERS += Test/test_video_player.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     GUI/projectdialog.h \
-    Project/Test/videoprojecttest.h
+    Project/Test/videoprojecttest.h \
+    GUI/bookmarkcategory.h \
+    GUI/bookmarkcontainer.h
 
 #
 # LIBRARY

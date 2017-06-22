@@ -6,26 +6,32 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QDebug>
+#include <QScrollArea>
+#include <QDockWidget>
 #include <opencv2/opencv.hpp>
 #include "Project/videoproject.h"
 #include "bookmarkitem.h"
+#include "bookmarkcategory.h"
 class BookmarkWidget : public QWidget
 {
-    const int TEXT_EDIT_MIN_HEIGHT = 64;
-    std::map<std::string, BookmarkItem> m_vid_bm_map;
     Q_OBJECT
+    QListWidget* bm_win;
+    QVBoxLayout* bm_win_layout;
+    QVBoxLayout* layout;
+    QScrollArea* scroll_area;
+    QDockWidget* folder_dock;
+    const int TEXT_EDIT_MIN_HEIGHT = 64;
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
-    void add_bookmark(BookmarkItem* bm_item);
+    static QListWidget *get_drag_drop_list(QWidget *parent);
 
 signals:
 
 public slots:
     void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
 private:
-    QListWidget* bookmark_list;
-    void init_bookmark_list();
-    QString get_input_text(std::string bookmark_text, bool* ok);
+    void add_new_folder();
+    QString get_input_text(std::string text, bool* ok);
 };
 
 #endif // BOOKMARKWIDGET_H

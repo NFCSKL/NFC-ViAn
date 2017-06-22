@@ -6,7 +6,7 @@
 #include <QMainWindow>
 #include <QBasicTimer>
 #include <QCloseEvent>
-
+#include <QWindow>
 #include <QSlider>
 #include <QFileDialog>
 

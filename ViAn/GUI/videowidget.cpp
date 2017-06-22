@@ -41,17 +41,17 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
  * @brief Adds all the video control buttons to the video widget
  */
 void VideoWidget::init_control_buttons() {
-    QHBoxLayout* controll_row = new QHBoxLayout;    // Container for all button areas
+    QHBoxLayout* control_row = new QHBoxLayout;    // Container for all button areas
     QHBoxLayout* other_btns = new QHBoxLayout;      // Bookmark, tag
     QHBoxLayout* video_btns = new QHBoxLayout;      // Play, pause etc
     QHBoxLayout* analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
     QHBoxLayout* zoom_btns = new QHBoxLayout;       // Zoom buttons
-    controll_row->setAlignment(Qt::AlignLeft);
+    control_row->setAlignment(Qt::AlignLeft);
     video_btns->setSpacing(5);
     other_btns->setSpacing(5);
     analysis_btns->setSpacing(5);
     zoom_btns->setSpacing(5);
-    controll_row->setSpacing(15);
+    control_row->setSpacing(15);
 
     std::vector<QPushButton*> btns;
 
@@ -109,24 +109,24 @@ void VideoWidget::init_control_buttons() {
     video_btns->addWidget(next_frame_btn);
     video_btns->addWidget(stop_btn);
     video_btns->addWidget(speed_slider);
-    controll_row->addLayout(video_btns);
+    control_row->addLayout(video_btns);
 
     analysis_btns->addWidget(prev_poi_btn);
     analysis_btns->addWidget(analysis_btn);
     analysis_btns->addWidget(next_poi_btn);
-    controll_row->addLayout(analysis_btns);
+    control_row->addLayout(analysis_btns);
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(tag_btn);
-    controll_row->addLayout(other_btns);
+    control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(zoom_in_btn);
     zoom_btns->addWidget(zoom_out_btn);
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
-    controll_row->addLayout(zoom_btns);
+    control_row->addLayout(zoom_btns);
 
-    vertical_layout->addLayout(controll_row);
+    vertical_layout->addLayout(control_row);
 
     QShortcut* play_sc = new QShortcut(Qt::Key_Space, this);
     QShortcut* stop_sc = new QShortcut(Qt::Key_X, this);
@@ -217,6 +217,7 @@ void VideoWidget::set_total_time(int time) {
 void VideoWidget::on_bookmark_clicked()
 {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
+
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 

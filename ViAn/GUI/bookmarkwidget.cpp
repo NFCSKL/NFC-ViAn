@@ -1,16 +1,39 @@
 #include "bookmarkwidget.h"
 #include "Library/customdialog.h"
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
-    QVBoxLayout* layout = new QVBoxLayout();
+
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
-    init_bookmark_list();
+    QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
+    connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
+    bm_win = get_drag_drop_list(this);
+
+    bm_win_layout = new QVBoxLayout();
+    bm_win_layout->setAlignment(Qt::AlignTop);
+    bm_win_layout->setSpacing(10);
+    bm_win_layout->setMargin(10);
+    scroll_area = new QScrollArea();
+
+    bm_win->setLayout(bm_win_layout);
+    scroll_area->setWidget(bm_win);
+    scroll_area->setFrameStyle(0);
+    scroll_area->setWidgetResizable(true);
+
+    layout = new QVBoxLayout();    
+    layout->setAlignment(Qt::AlignBottom);    
+    layout->addWidget(new_folder_btn);
+    layout->addWidget(scroll_area);
+    layout->addWidget(generate_btn);   
+    layout->setMargin(10);
+    layout->setSpacing(10);
+    setMinimumWidth(bm_win->sizeHint().width()*2); // Should be 2*thumbnail + margin
     setLayout(layout);
-    layout->addWidget(bookmark_list);
-    layout->addWidget(generate_btn);
 }
 
-void BookmarkWidget::add_bookmark(BookmarkItem* bm_item) {
-    bookmark_list->addItem(bm_item);
+void BookmarkWidget::add_new_folder()
+{
+    BookmarkCategory* f2 = new BookmarkCategory(bm_win);
+    bm_win->addItem(f2);
+
 }
 
 void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr, cv::Mat)
@@ -20,20 +43,21 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     QString text = get_input_text("", &ok);    
     if(!ok) return;
     qDebug() << "add bookmark";
-    add_bookmark(new BookmarkItem(new Bookmark(vid_proj,text.toStdString(),frame_nbr), bookmark_list));
+    Bookmark* bookmark = new Bookmark(vid_proj,text.toStdString(), frame_nbr);
+    vid_proj->add_bookmark(bookmark);
+    //add_bookmark(vid_proj, bookmark);
 }
 
-void BookmarkWidget::init_bookmark_list()
+QListWidget* BookmarkWidget::get_drag_drop_list(QWidget* parent)
 {
-    QVBoxLayout* layout = new QVBoxLayout();
-    bookmark_list = new QListWidget();
-    bookmark_list->setLayout(layout);
+    QListWidget* lw = new QListWidget(parent);
     // Enable drag and drop
-    bookmark_list->setSelectionMode(QAbstractItemView::SingleSelection);
-    bookmark_list->setDragDropMode(QAbstractItemView::InternalMove);
-    bookmark_list->setDragEnabled(true);
-    bookmark_list->viewport()->setAcceptDrops(true);
-    bookmark_list->setDropIndicatorShown(true);
+    lw->setSelectionMode(QAbstractItemView::SingleSelection);
+    lw->setDragDropMode(QAbstractItemView::InternalMove);
+    lw->setDragEnabled(true);
+    lw->viewport()->setAcceptDrops(true);
+    lw->setDropIndicatorShown(true);
+    return lw;
 }
 /**
  * @brief BookmarkWidget::get_input_text
@@ -42,11 +66,11 @@ void BookmarkWidget::init_bookmark_list()
  * @return Returns a description for the bookmark,
  *         obtained from the user.
  */
-QString BookmarkWidget::get_input_text(std::string bookmark_text, bool* ok) {
+QString BookmarkWidget::get_input_text(std::string text, bool* ok) {
     // Create the dialog
     CustomDialog dialog("Bookmark description", NULL);
     dialog.addLabel("Write a description of the bookmark:");
-    dialog.addTextEdit(&bookmark_text, false, false, TEXT_EDIT_MIN_HEIGHT,
+    dialog.addTextEdit(&text, false, false, TEXT_EDIT_MIN_HEIGHT,
                           "Write a description of the bookmark. This will be used when creating a report.");
 
     // Show the dialog (execution will stop here until the dialog is finished)
@@ -57,5 +81,5 @@ QString BookmarkWidget::get_input_text(std::string bookmark_text, bool* ok) {
         return "";
     }
     *ok = true;
-    return QString::fromStdString(bookmark_text);
+    return QString::fromStdString(text);
 }

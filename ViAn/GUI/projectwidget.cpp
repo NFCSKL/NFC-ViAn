@@ -80,7 +80,6 @@ void ProjectWidget::add_analysis(){
 void ProjectWidget::tree_add_analysis(){
     AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
     addTopLevelItem(ana);
-    ana->setText(0,"aina");
 }
 
 /**

@@ -5,7 +5,8 @@
  * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(Bookmark* bookmark, QListWidget* view) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), view) {
+BookmarkItem::BookmarkItem(Bookmark* bookmark, QListWidget* view) :
+    QListWidgetItem(QString::fromStdString(bookmark->get_description()),view) {
     this->bookmark = bookmark;
 }
 
