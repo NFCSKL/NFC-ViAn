@@ -36,6 +36,7 @@ signals:
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
     void new_bookmark(int, cv::Mat);
+    void set_status_bar(std::string);
 public slots:
     void play_clicked(void);
     void stop_clicked(void);

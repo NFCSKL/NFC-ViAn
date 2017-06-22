@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QTime>
+#include <QDebug>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
@@ -45,7 +46,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
     bookmark_dock->setWidget(bookmark_wgt);
 
-
     //Initialize menu bar
     init_file_menu();
     init_edit_menu();
@@ -58,6 +58,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, QAction::triggered, project_wgt, &ProjectWidget::add_video);
+
+    //Status Bar
+    status_bar = new StatusBar();
+    setStatusBar(status_bar);
+    connect(this, SIGNAL(set_status_bar(std::string)), status_bar, SLOT(on_set_status_bar(std::string)));
+    connect(video_wgt, SIGNAL(set_status_bar(std::string)), status_bar, SLOT(on_set_status_bar(std::string)));
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
@@ -288,7 +294,7 @@ void MainWindow::init_help_menu() {
  * runs when the open project action is triggered
  */
 void MainWindow::open_project() {
-
+    emit set_status_bar("Opening project.");
 }
 
 /**
@@ -296,7 +302,7 @@ void MainWindow::open_project() {
  * runs when the save project action is triggered
  */
 void MainWindow::save_project() {
-
+    emit set_status_bar("Project saved.");
 }
 
 /**
@@ -304,7 +310,7 @@ void MainWindow::save_project() {
  * runs when the generate report action is triggered
  */
 void MainWindow::gen_report() {
-
+    emit set_status_bar("Generating report. Please wait.");
 }
 
 /**
@@ -312,7 +318,7 @@ void MainWindow::gen_report() {
  * runs when the close project action is triggered
  */
 void MainWindow::close_project() {
-
+    emit set_status_bar("Closed the project.");
 }
 
 /**
@@ -320,7 +326,7 @@ void MainWindow::close_project() {
  * runs when the remove project action is triggered
  */
 void MainWindow::remove_project() {
-
+    emit set_status_bar("Removed the project.");
 }
 
 /**
@@ -328,5 +334,5 @@ void MainWindow::remove_project() {
  *  runs when the options action is triggered
  */
 void MainWindow::options() {
-
+    emit set_status_bar("Opening options.");
 }

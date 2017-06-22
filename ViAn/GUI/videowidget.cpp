@@ -289,6 +289,8 @@ void VideoWidget::prev_frame_clicked() {
  */
 void VideoWidget::zoom_in_clicked() {
     m_video_player->zoom_in();
+    qDebug("Zoom in");
+    emit set_status_bar("Zoom in");
 }
 
 /**
