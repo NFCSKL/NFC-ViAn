@@ -266,38 +266,6 @@ void test_video_player::test_video_open() {
 }
 
 /**
- * @brief test_video_player::test_scaling_event
- * Tests that the aspect ratio is kept when the QLabel signals a scaling event.
- */
-void test_video_player::test_scaling_event() {
-    mvideo->capture.release();
-    mvideo->capture.open("seq_01.mp4");
-    mvideo->scaling_event(640,1080);
-
-    QVERIFY(mvideo->frame_height < 1080);
-
-    mvideo->scaling_event(1920,480);
-    QVERIFY(mvideo->frame_width < 1920);
-}
-
-/**
- * @brief test_video_player::test_scale_frame
- */
-void test_video_player::test_scale_frame() {
-    mvideo->capture.release();
-    mvideo->capture.open("seq_01.mp4");
-    int video_width = mvideo->capture.get(CV_CAP_PROP_FRAME_WIDTH);
-    int video_height = mvideo->capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-
-    mvideo->capture.read(mvideo->frame);
-
-    mvideo->scaling_event(video_width*2,
-                          video_height*2);
-    cv::Mat temp = mvideo->scale_frame(mvideo->frame);
-    QVERIFY(temp.cols == video_width*2 && temp.rows == video_height*2);
-}
-
-/**
  * @brief test_video_player::test_set_play_video
  */
 void test_video_player::test_set_play_video() {
@@ -454,7 +422,7 @@ void test_video_player::test_convert_frame() {
 
 /**
  * @brief test_video_player::test_set_zoom_area
- */
+
 void test_video_player::test_set_zoom_area() {
     mvideo->zoom_area->set_zoom_area(0, 0, 10, 10);
     QVERIFY(mvideo->zoom_area->get_x() == 0);
@@ -466,10 +434,10 @@ void test_video_player::test_set_zoom_area() {
     QVERIFY(mvideo->zoom_area->get_zoom_area().width == 10);
     QVERIFY(mvideo->zoom_area->get_zoom_area().height == 10);
 }
+*/
 
 /**
  * @brief test_reset_zoom_area
- */
 void test_video_player::test_reset_zoom_area() {
     mvideo->zoom_area->set_zoom_area(10, 10, 100, 100);
     mvideo->zoom_area->set_size(128, 128);
@@ -478,3 +446,4 @@ void test_video_player::test_reset_zoom_area() {
     QVERIFY(mvideo->zoom_area->get_width() == 128);
     QVERIFY(mvideo->zoom_area->get_height() == 128);
 }
+*/

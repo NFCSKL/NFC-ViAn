@@ -5,8 +5,18 @@ FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void FrameWidget::draw_from_playback(cv::Mat frame) {
-    if (do_update)
-        draw_image(frame);
+    current_frame = frame;
+    draw_image(frame);
+}
+
+void FrameWidget::toggle_zoom(bool value) {
+    if (value) {
+        tool = ZOOM;
+        setCursor(Qt::CrossCursor);
+    } else {
+        unsetCursor();
+        tool = NONE;
+    }
 }
 
 void FrameWidget::draw_image(cv::Mat image) {
@@ -30,18 +40,90 @@ void FrameWidget::draw_image(cv::Mat image) {
     repaint();
 }
 
+/**
+ * @brief FrameWidget::paintEvent
+ * @param event
+ */
 void FrameWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
+
+    if (draw_zoom_rect) {
+        painter.setPen(QColor(0,255,0));
+        QRectF zoom(zoom_start_pos, zoom_end_pos);
+        painter.drawRect(zoom);
+    }
+
     painter.end();
 }
 
-void FrameWidget::accept_update() {
-    qDebug("accepting");
-    do_update = true;
+/**
+ * @brief FrameWidget::resizeEvent
+ * @param event
+ */
+void FrameWidget::resizeEvent(QResizeEvent *event) {
+    emit current_size(width(), height());
 }
 
-void FrameWidget::block_update() {
-    qDebug("blocking");
-    do_update = false;
+/**
+ * @brief FrameWidget::mousePressEvent
+ * @param event
+ */
+void FrameWidget::mousePressEvent(QMouseEvent *event) {
+    switch (tool) {
+    case ZOOM:
+        zoom_start_pos = event->pos();
+        break;
+    default:
+        prev_pos = event->pos();
+        break;
+    }
 }
+
+/**
+ * @brief FrameWidget::mouseReleaseEvent
+ * @param event
+ */
+void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
+    switch (tool) {
+    case ZOOM: {
+        draw_zoom_rect = false;
+        repaint();
+
+        int width = std::abs(zoom_start_pos.x() - zoom_end_pos.x());
+        int height = std::abs(zoom_start_pos.y() - zoom_end_pos.y());
+        double width_ratio = current_frame.cols / double(width );
+        double height_ratio = current_frame.rows / double(height);
+        emit zoom_factor(std::min(width_ratio, height_ratio));
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief FrameWidget::mouseMoveEvent
+ * @param event
+ */
+void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
+    switch (tool) {
+    case ZOOM:
+        zoom_end_pos = event->pos();
+        draw_zoom_rect = true;
+        repaint();
+        break;
+    default:
+        QPoint _tmp = prev_pos - event->pos();
+        emit moved_xy(_tmp.x(), _tmp.y());
+        prev_pos = event->pos();
+        break;
+    }
+    if (do_zoom) {
+
+    }
+}
+
+
+
+

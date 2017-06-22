@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     Project/projecttestsuite.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
-    Video/videoplayer.cpp
+    Video/videoplayer.cpp \
+    utility.cpp
 
 #
 # TEST
@@ -37,7 +38,8 @@ HEADERS += Test/test_video_player.h \
     Project/projecttestsuite.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
-    Video/videoplayer.h
+    Video/videoplayer.h \
+    utility.h
 
 #
 # LIBRARY

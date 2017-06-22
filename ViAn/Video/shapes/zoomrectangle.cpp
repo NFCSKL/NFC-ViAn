@@ -65,7 +65,8 @@ void ZoomRectangle::reset_pos() {
  */
 void ZoomRectangle::set_start_pos(QPoint pos) {
     // The zoom area has to be inside the video.
-    draw_start = bounded_coords(pos);
+//    draw_start = bounded_coords(pos);
+    draw_start = cv::Point(pos.x(), pos.y());
 }
 
 /**
