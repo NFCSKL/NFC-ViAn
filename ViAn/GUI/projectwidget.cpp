@@ -81,6 +81,7 @@ void ProjectWidget::tree_add_analysis(){
     AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
     addTopLevelItem(ana);
     ana->setText(0,"aina");
+    emit set_status_bar("Analysis added");
 }
 
 /**
@@ -93,6 +94,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     VideoItem* vid = new VideoItem(vid_proj, VIDEO_ITEM);
     vid->setText(0, vid_name);
     m_videos->addChild(vid);
+    emit set_status_bar("Video added");
 }
 
 /**
@@ -105,19 +107,19 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
-        qDebug() << "Video Selected";
+        emit set_status_bar("Video selected");
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         marked_video(vid_item->get_video_project());
         break;
     } case ANALYSIS_ITEM: {
-        qDebug() << "Analysis Selected";
+        emit set_status_bar("Analysis selected");
         AnalysisItem* vid_item = dynamic_cast<AnalysisItem*>(item);
         break;
     } case FOLDER_ITEM: {
-        qDebug() << "Folder Selected";
+        emit set_status_bar("Folder selected");
         break;
     } default:
-        qDebug() << "Nothing clicked";
+        break;
     }
 
 }
@@ -128,6 +130,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
  */
 void ProjectWidget::save_project() {
     m_proj->save_project();
+    emit set_status_bar("Project saved");
 }
 
 /**
@@ -137,6 +140,7 @@ void ProjectWidget::save_project() {
 void ProjectWidget::open_project() {
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
+        emit set_status_bar("Opening project");
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());

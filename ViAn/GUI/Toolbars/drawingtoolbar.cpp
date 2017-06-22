@@ -57,6 +57,7 @@ void DrawingToolbar::create_buttons() {
  */
 void DrawingToolbar::color_tool_clicked() {
     QColor color = QColorDialog::getColor();
+    emit set_status_bar("Choose a color");
     if (color.isValid()) {
         // TODO set overlay color
     }

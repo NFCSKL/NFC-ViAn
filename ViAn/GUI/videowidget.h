@@ -117,10 +117,9 @@ private:
     void set_btn_size();
     void set_btn_tab_order();
     void set_btn_shortcuts();
-
     void init_speed_slider();
-
     void add_btns_to_layouts();
+    void connect_btns();
 
     void init_playback_slider();
 
