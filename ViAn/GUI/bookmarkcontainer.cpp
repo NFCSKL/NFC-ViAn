@@ -1,5 +1,8 @@
 #include "bookmarkcontainer.h"
-
+/**
+ * @brief BookmarkContainer::BookmarkContainer
+ * @param parent
+ */
 BookmarkContainer::BookmarkContainer(QWidget *parent) : QListWidget(parent)
 {
     // Enable drag and drop

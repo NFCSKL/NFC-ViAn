@@ -9,6 +9,11 @@
 #include <QCommonStyle>
 #include "bookmarkwidget.h"
 #include "bookmarkcontainer.h"
+/**
+ * @brief The BookmarkCategory class
+ * This class is inteded to store two scrollable lists
+ * containing bookmars or images.
+ */
 class BookmarkCategory : public QObject, public QListWidgetItem
 {
     Q_OBJECT

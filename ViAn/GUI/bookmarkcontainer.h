@@ -3,6 +3,14 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QLayout>
+
+/**
+ * @brief BookmarkContainer::BookmarkContainer
+ * @param parent
+ * This container should contain bookmarks
+ * and images when fully implemeted.
+ * It should support drag and drop from and to the container.
+ */
 class BookmarkContainer : public QListWidget
 {
     Q_OBJECT
