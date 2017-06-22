@@ -28,57 +28,79 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
     connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)));
-    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
     connect(this, &VideoWidget::set_pause_video, m_video_player, &video_player::on_pause_video);
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
     connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
     connect(this, &VideoWidget::ret_first_frame, m_video_player, &video_player::get_first_frame);
-
 }
 
 /**
- * @brief Adds all the video control buttons to the video widget
+ * @brief VideoWidget::init_btn_layout
+ * Set up the button layouts
  */
-void VideoWidget::init_control_buttons() {
-    QHBoxLayout* controll_row = new QHBoxLayout;    // Container for all button areas
-    QHBoxLayout* other_btns = new QHBoxLayout;      // Bookmark, tag
-    QHBoxLayout* video_btns = new QHBoxLayout;      // Play, pause etc
-    QHBoxLayout* analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
-    QHBoxLayout* zoom_btns = new QHBoxLayout;       // Zoom buttons
-    controll_row->setAlignment(Qt::AlignLeft);
+void VideoWidget::init_layouts() {
+    control_row = new QHBoxLayout;     // Container for all button areas
+    video_btns = new QHBoxLayout;      // Play, pause etc
+    analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
+    other_btns = new QHBoxLayout;      // Bookmark, tag
+    zoom_btns = new QHBoxLayout;       // Zoom buttons
+
+    control_row->setAlignment(Qt::AlignLeft);
     video_btns->setSpacing(5);
-    other_btns->setSpacing(5);
     analysis_btns->setSpacing(5);
+    other_btns->setSpacing(5);
     zoom_btns->setSpacing(5);
-    controll_row->setSpacing(15);
+    control_row->setSpacing(15);
 
-    std::vector<QPushButton*> btns;
+    speed_slider_layout = new QGridLayout;
+}
 
+/**
+ * @brief VideoWidget::set_icons
+ * Set icons on all buttons
+ */
+void VideoWidget::set_btn_icons() {
     play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
-    QPushButton* stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
-    QPushButton* next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
-    QPushButton* prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
-    QPushButton* next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next_poi.png"), "", this);
-    QPushButton* prev_poi_btn = new QPushButton(QIcon("../ViAn/Icons/prev_poi.png"), "", this);
-    QPushButton* bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
-    QPushButton* analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
-    QPushButton* tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
-    QPushButton* zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
-    QPushButton* zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
-    QPushButton* fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
-    QPushButton* move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+    stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
+    next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
+    prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
+    next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next_poi.png"), "", this);
+    prev_poi_btn = new QPushButton(QIcon("../ViAn/Icons/prev_poi.png"), "", this);
+    bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
+    analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
+    tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
+    zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
+    zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
+    fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
+    move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+}
 
+/**
+ * @brief VideoWidget::set_tool_tip
+ * Set tooltip on all buttons
+ */
+void VideoWidget::set_btn_tool_tip() {
     play_btn->setToolTip(tr("Play video"));
     stop_btn->setToolTip(tr("Stop video"));
     next_frame_btn->setToolTip(tr("Next frame"));
     prev_frame_btn->setToolTip(tr("Previous frame"));
+    next_poi_btn->setToolTip(tr("Next POI"));
+    prev_poi_btn->setToolTip(tr("Previous POI"));
+    analysis_btn->setToolTip(tr("Analysis"));
     bookmark_btn->setToolTip(tr("Bookmark the current frame"));
     tag_btn->setToolTip(tr("Tag the current frame"));
-    next_poi_btn->setToolTip(tr("Next POI"));
-    analysis_btn->setToolTip(tr("Analysis"));
-    prev_poi_btn->setToolTip(tr("Previous POI"));
+    zoom_in_btn->setToolTip(tr("Zoom in"));
+    zoom_out_btn->setToolTip(tr("Zoom out"));
+    fit_btn->setToolTip(tr("Scale the video to screen"));
+    move_btn->setToolTip(tr("Panning tool"));
+}
 
+/**
+ * @brief VideoWidget::set_btn_size
+ * Set the size on all buttons
+ */
+void VideoWidget::set_btn_size() {
     btns.push_back(play_btn);
     btns.push_back(stop_btn);
     btns.push_back(next_frame_btn);
@@ -92,48 +114,92 @@ void VideoWidget::init_control_buttons() {
     btns.push_back(zoom_out_btn);
     btns.push_back(fit_btn);
     btns.push_back(move_btn);
-
-    // Create and add speed adjustment slider
-    speed_slider = new QSlider(Qt::Horizontal);
-    speed_slider->setRange(-4,4);
-    speed_slider->setMaximumWidth(90);
-    speed_slider->setTickPosition(QSlider::TicksBelow);
-    speed_slider->setToolTip(tr("Adjust playback speed"));
-
+    
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
     }
+}
 
+/**
+ * @brief VideoWidget::set_tab_order
+ * Set the tab order for the buttons
+ */
+void VideoWidget::set_btn_tab_order() {
+    setTabOrder(prev_frame_btn, play_btn);
+    setTabOrder(play_btn, next_frame_btn);
+    setTabOrder(next_frame_btn, stop_btn);
+    setTabOrder(stop_btn, prev_poi_btn);
+    setTabOrder(prev_poi_btn, analysis_btn);
+    setTabOrder(analysis_btn, next_poi_btn);
+    setTabOrder(next_poi_btn, bookmark_btn);
+    setTabOrder(bookmark_btn, tag_btn);
+    setTabOrder(tag_btn, zoom_in_btn);
+    setTabOrder(zoom_in_btn, zoom_out_btn);
+    setTabOrder(zoom_out_btn, fit_btn);
+    setTabOrder(fit_btn, move_btn);
+}
+
+/**
+ * @brief VideoWidget::set_btn_shortcuts
+ * Set shortcuts to the buttons
+ */
+void VideoWidget::set_btn_shortcuts() {
+    play_sc = new QShortcut(Qt::Key_Space, this);
+    stop_sc = new QShortcut(Qt::Key_X, this);
+    next_frame_sc = new QShortcut(Qt::Key_Right, this);
+    prev_frame_sc = new QShortcut(Qt::Key_Left, this);
+
+    //TODO Add functionality and test
+    //QShortcut* next_poi_sc = new QShortcut(QKeySequence(tr("Ctrl+Qt::Key_Right), this);
+    //QShortcut* prev_poi_sc = new QShortcut(Qt::Key_Space, this);
+}
+
+/**
+ * @brief VideoWidget::add_btns_to_layouts
+ * Add the buttons to the layouts
+ */
+void VideoWidget::add_btns_to_layouts() {
     video_btns->addWidget(prev_frame_btn);
     video_btns->addWidget(play_btn);
     video_btns->addWidget(next_frame_btn);
     video_btns->addWidget(stop_btn);
-    video_btns->addWidget(speed_slider);
-    controll_row->addLayout(video_btns);
+    video_btns->addLayout(speed_slider_layout);
+    control_row->addLayout(video_btns);
 
     analysis_btns->addWidget(prev_poi_btn);
     analysis_btns->addWidget(analysis_btn);
     analysis_btns->addWidget(next_poi_btn);
-    controll_row->addLayout(analysis_btns);
+    control_row->addLayout(analysis_btns);
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(tag_btn);
-    controll_row->addLayout(other_btns);
+    control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(zoom_in_btn);
     zoom_btns->addWidget(zoom_out_btn);
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
-    controll_row->addLayout(zoom_btns);
+    control_row->addLayout(zoom_btns);
 
-    vertical_layout->addLayout(controll_row);
+    vertical_layout->addLayout(control_row);
+}
 
-    QShortcut* play_sc = new QShortcut(Qt::Key_Space, this);
-    QShortcut* stop_sc = new QShortcut(Qt::Key_X, this);
-    QShortcut* next_frame_sc = new QShortcut(Qt::Key_Right, this);
-    QShortcut* prev_frame_sc = new QShortcut(Qt::Key_Left, this);
-    //QShortcut* next_poi_sc = new QShortcut(Qt::Key_Space, this);
-    //QShortcut* prev_poi_sc = new QShortcut(Qt::Key_Space, this);
+/**
+ * @brief Adds all the video control buttons to the video widget
+ */
+void VideoWidget::init_control_buttons() {
+
+    init_layouts();
+
+    set_btn_icons();
+    set_btn_tool_tip();
+    set_btn_size();
+    set_btn_tab_order();
+    set_btn_shortcuts();
+
+    init_speed_slider();
+
+    add_btns_to_layouts();
 
     // Connect buttons, slider and actions
     connect(play_btn, &QPushButton::clicked, this, &VideoWidget::play_clicked);
@@ -148,17 +214,43 @@ void VideoWidget::init_control_buttons() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
+    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
+
     connect(zoom_in_btn, &QPushButton::clicked, this, &VideoWidget::zoom_in_clicked);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::zoom_out_clicked);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
+
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
+}
 
-    //
-    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
+/**
+ * @brief VideoWidget::init_speed_slider
+ * Create and add speed adjustment slider
+ */
+void VideoWidget::init_speed_slider() {
+    speed_slider = new QSlider(Qt::Horizontal);
+    speed_slider->setRange(-4,4);
+    speed_slider->setMaximumWidth(120);
+    speed_slider->setPageStep(1);
+    speed_slider->setTickPosition(QSlider::TicksBelow);
+    speed_slider->setToolTip(tr("Adjust playback speed"));
+    QLabel *label1 = new QLabel("1/16x", this);
+    QLabel *label2 = new QLabel("1x", this);
+    QLabel *label3 = new QLabel("16x", this);
+    QFont f("Helvetica", 6, QFont::Normal);
+    label1->setFont(f);
+    label2->setFont(f);
+    label3->setFont(f);
+    //laout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
+    speed_slider_layout->addWidget(speed_slider, 0, 0, 1, 5);
+    speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
+    speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
+    speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
 
+    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
 }
 
 /**
@@ -168,7 +260,7 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
-    playback_slider = new QSlider(Qt::Horizontal);
+    playback_slider = new AnalysisSlider(Qt::Horizontal);
     progress_area->addWidget(current_time);
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
@@ -365,4 +457,3 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
     emit ret_first_frame();
 }
-
