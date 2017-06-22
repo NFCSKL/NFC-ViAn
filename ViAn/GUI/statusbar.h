@@ -10,7 +10,7 @@ public:
     StatusBar();
 
 public slots:
-    void on_set_status_bar(std::string status, int timer = 2000);
+    void on_set_status_bar(QString status, int timer = 2000);
 };
 
 #endif // STATUSBAR_H

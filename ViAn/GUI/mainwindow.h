@@ -46,7 +46,7 @@ public slots:
     void options(void);
 
 signals:
-    void set_status_bar(std::string);
+    void set_status_bar(QString);
 
 private:
 

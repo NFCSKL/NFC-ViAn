@@ -39,7 +39,7 @@ signals:
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
     void new_bookmark(int, cv::Mat);
-    void set_status_bar(std::string);
+    void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);

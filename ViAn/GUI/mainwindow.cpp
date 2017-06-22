@@ -53,13 +53,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_tools_menu();
     init_help_menu();
 
-    // Status bar
-    status_bar = new StatusBar();
-    setStatusBar(status_bar);
-    connect(this, SIGNAL(set_status_bar(std::string)), status_bar, SLOT(on_set_status_bar(std::string)));
-    connect(video_wgt, SIGNAL(set_status_bar(std::string)), status_bar, SLOT(on_set_status_bar(std::string)));
-    connect(project_wgt, SIGNAL(set_status_bar(std::string)), status_bar, SLOT(on_set_status_bar(std::string)));
-
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
     QAction* toggle_toolbar = main_toolbar->toggleViewAction();
@@ -71,6 +64,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
+
+    // Status bar
+    status_bar = new StatusBar();
+    setStatusBar(status_bar);
+    connect(this, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
 }
