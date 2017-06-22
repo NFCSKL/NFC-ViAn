@@ -6,8 +6,8 @@ BookmarkCategory::BookmarkCategory(QListWidget *parent) : QListWidgetItem(parent
     QWidget* folder = new QWidget();
     folder_layout = new QVBoxLayout();
     folder_layout->setAlignment(Qt::AlignTop);
-    folder_layout->setMargin(0);
-    folder_layout->setSpacing(0);
+    folder_layout->setMargin(5);
+    folder_layout->setSpacing(5);
     folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
     QLineEdit* title = new QLineEdit("mapname");
