@@ -22,6 +22,7 @@ using namespace cv;
 video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
     m_mutex = mutex;
     m_paused_wait = paused_wait;
+    zoomer = new Zoomer();
 }
 
 /**
@@ -54,6 +55,8 @@ bool video_player::load_video(string filename, Overlay* o) {
         capture.set(CV_CAP_PROP_POS_FRAMES, 0);
         video_paused = true;
         video_stopped = false;
+        zoomer->set_frame_size(cv::Size(original_width, original_height));
+        zoomer->reset();
         return true;
     } else {
         return false;
@@ -78,8 +81,11 @@ void video_player::read_capture_data() {
  */
 void video_player::reset() {
     if (capture.isOpened()) capture.release();
+
     choosen_interpol = cv::INTER_NEAREST;
     scale_factor = 1;
+
+    speed_multiplier = DEFAULT_SPEED_MULT;
 }
 
 /**
@@ -121,7 +127,6 @@ void video_player::run()  {
     capture.set(CV_CAP_PROP_POS_FRAMES, 0);
     emit update_current_frame(0);
     video_paused = false;
-    qDebug() << "end of thread loop";
 }
 
 /**
@@ -158,6 +163,7 @@ void video_player::convert_frame(bool scale) {
  */
 void video_player::process_frame(bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
+    manipulated_frame.release();
     manipulated_frame = frame.clone();
 //    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
 //    processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
@@ -167,7 +173,7 @@ void video_player::process_frame(bool scale) {
 //    }
 
 //    processed_frame = contrast_frame(processed_frame);
-    if (scale_factor != 1) scale_mat(scale_factor);
+    if (zoomer->get_scale_factor() != 1) zoomer->scale_frame(manipulated_frame);
 
 //    //Scales the frame if these criteria are met
 //    if (scale && frame_dimensions_limited && !original_dimensions_shown) {
@@ -204,16 +210,48 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
  * @return Returns the zoomed frame.
  */
 void video_player::update_zoom(double zoom_factor) {
-    qDebug() << zoom_factor;
     scale_factor *= zoom_factor;
+    if (scale_factor > 4) scale_factor = 4;
     process_frame(zoom_factor);
     emit processed_image(manipulated_frame);
 }
 
 void video_player::set_zoom(double zoom_factor) {
+    if (zoom_factor > 4) zoom_factor = 4;
     scale_factor = zoom_factor;
     process_frame(zoom_factor);
     emit processed_image(manipulated_frame);
+}
+
+void video_player::zoom_out() {
+    zoomer->set_scale_factor(zoomer->get_scale_factor() * 0.75);
+    process_frame(1);
+    emit processed_image(manipulated_frame);
+}
+
+void video_player::fit_screen() {
+    zoomer->fit_viewport();
+    process_frame(1);
+    emit processed_image(manipulated_frame);
+}
+
+void video_player::on_move_zoom_rect(int x, int y) {
+    zoomer->move_zoom_rect(x, y);
+    if (video_paused) {
+        process_frame(1);
+        emit processed_image(manipulated_frame);
+    }
+}
+
+void video_player::set_zoom_rect(QPoint p1, QPoint p2) {
+    zoomer->set_zoom_rect(p1, p2);
+    process_frame(1);
+    emit processed_image(manipulated_frame);
+
+}
+
+void video_player::set_viewport_size(QSize size) {
+    if (zoomer != nullptr) zoomer->set_viewport_size(size);
 }
 
 void video_player::scale_mat(double scale) {
@@ -224,7 +262,7 @@ void video_player::scale_mat(double scale) {
         interpol_method = cv::INTER_AREA;
     }
     cv::Mat scaled_frame;
-    cv::resize(manipulated_frame, manipulated_frame, cv::Size(), scale, scale, interpol_method);
+    //cv::resize(manipulated_frame(zoom_rect), manipulated_frame, cv::Size(), scale, scale, interpol_method);
 }
 
 /**
@@ -434,7 +472,6 @@ void video_player::previous_frame() {
  * Sets the paused and stopped bools to false
  */
 void video_player::on_play_video() {
-    qDebug() << QThread::currentThreadId();
     video_paused = false;
     video_stopped = false;
     if (!isRunning()) {
@@ -448,7 +485,7 @@ void video_player::on_play_video() {
  * Sets the paused bool to true
  */
 void video_player::on_pause_video() {
-    qDebug() << QThread::currentThreadId();
+    std::cout << "PAUSED" << std::endl;
     video_paused = true;
 }
 
@@ -459,7 +496,6 @@ void video_player::on_pause_video() {
  * Sets playback frame to the start of the video and updates the GUI.
  */
 void video_player::on_stop_video() {
-    qDebug() << "stopping video";
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
@@ -474,7 +510,7 @@ void video_player::on_stop_video() {
  */
 void video_player::update_frame(int frame_nbr) {
     if (set_current_frame_num(frame_nbr)) {
-        //convert_frame(true);
+        process_frame(false);
         show_frame();
     }
 }

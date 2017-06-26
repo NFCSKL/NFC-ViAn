@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QMouseEvent>
+#include <QSize>
 #include "Video/shapes/zoomrectangle.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
@@ -15,6 +16,8 @@ class FrameWidget : public QWidget
 {
     Q_OBJECT
     QPainter*  painter;
+    QSize m_scroll_area_size;
+    cv::Rect original_rect; // Contains the size of the unmodified frame
 
     click_tool tool = NONE;
     cv::Mat current_frame;
@@ -33,10 +36,12 @@ signals:
     void current_size(int width, int height);
     void moved_xy(int x, int y);
     void current_frame_size(QSize size);
+    void zoom_points(QPoint, QPoint);
 public slots:
     void draw_image(cv::Mat image);
     void draw_from_playback(cv::Mat frame);
     void toggle_zoom(bool value);
+    void set_scroll_area_size(QSize size);
 protected:
     QImage _qimage;
     cv::Mat _tmp;

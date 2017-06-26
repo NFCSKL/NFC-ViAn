@@ -23,7 +23,9 @@ SOURCES += main.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
     Video/videoplayer.cpp \
-    utility.cpp
+    utility.cpp \
+    GUI/drawscrollarea.cpp \
+    Video/zoomer.cpp
 
 #
 # TEST
@@ -39,7 +41,9 @@ HEADERS += Test/test_video_player.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     Video/videoplayer.h \
-    utility.h
+    utility.h \
+    GUI/drawscrollarea.h \
+    Video/zoomer.h
 
 #
 # LIBRARY

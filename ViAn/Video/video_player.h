@@ -13,6 +13,7 @@
 #include "overlay.h"
 #include "analysisoverlay.h"
 #include "Project/Analysis/analysis.h"
+#include "zoomer.h"
 
 #include <chrono>
 
@@ -36,6 +37,10 @@ class video_player : public QThread {
     // Interpolation method used when zooming
     int choosen_interpol = cv::INTER_NEAREST;
     double scale_factor = 1;
+    cv::Rect zoom_rect;
+    Zoomer* zoomer = nullptr;
+
+
 
 
     double speed_multiplier = DEFAULT_SPEED_MULT;
@@ -159,6 +164,10 @@ public slots:
 
     void update_zoom(double zoom_factor);
     void set_zoom(double zoom_factor);
+    void set_zoom_rect(QPoint p1, QPoint p2);
+    void set_viewport_size(QSize size);
+    void fit_screen();
+    void on_move_zoom_rect(int x, int y);
 protected:
     void run() override;
     void msleep(int ms);
