@@ -1,5 +1,6 @@
 #include "videowidget.h"
 #include "utility.h"
+#include "drawscrollarea.h"
 
 #include <QTime>
 #include <QDebug>
@@ -13,7 +14,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/video/video.hpp>
 
-VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QScrollArea) {
+VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video player
     m_video_player = new video_player(&mutex, &paused_wait);
 
@@ -41,8 +42,12 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
 
     connect(frame_wgt, SIGNAL(zoom_factor(double)), m_video_player, SLOT(update_zoom(double)));
-
+    connect(frame_wgt, SIGNAL(zoom_points(QPoint, QPoint)), m_video_player, SLOT(set_zoom_rect(QPoint, QPoint)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(update_bar_pos(int,int)));
+    connect(frame_wgt, SIGNAL(moved_xy(int,int)), m_video_player, SLOT(on_move_zoom_rect(int,int)));
+
+    connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
+    connect(scroll_area, SIGNAL(new_size(QSize)), m_video_player, SLOT(set_viewport_size(QSize)));
 
     connect(m_video_player, SIGNAL(capture_frame_size(QSize)), this, SLOT(set_current_frame_size(QSize)));
     connect(this, &VideoWidget::set_play_video, m_video_player, &video_player::on_play_video);
@@ -173,13 +178,13 @@ void VideoWidget::init_control_buttons() {
     connect(zoom_in_sc, &QShortcut::activated, zoom_in_btn, &QPushButton::toggle);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
-    connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::zoom_out_clicked);
+    connect(zoom_out_btn, &QPushButton::clicked, m_video_player, &video_player::zoom_out);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
 
     //
-    connect(fit_btn, &QPushButton::clicked, this, &VideoWidget::fit_clicked);
+    connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
 }
 
 /**

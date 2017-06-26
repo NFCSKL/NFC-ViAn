@@ -13,6 +13,7 @@
 #include "framewidget.h"
 #include "Video/video_player.h"
 #include "Project/videoproject.h"
+#include "drawscrollarea.h"
 
 class VideoWidget : public QWidget
 {
@@ -65,7 +66,7 @@ private:
     const QSize BTN_SIZE = QSize(30, 30);
 
     QVBoxLayout* vertical_layout;
-    QScrollArea* scroll_area;
+    DrawScrollArea* scroll_area;
     QSlider* speed_slider;
     QSlider* playback_slider;
     QLabel* current_time;

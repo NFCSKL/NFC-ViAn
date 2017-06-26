@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize Video Widget
     video_wgt = new VideoWidget();
-    video_wgt->setMinimumSize(600,400); //TODO fix magic
+    video_wgt->setMinimumSize(16 * 40, 9 * 40); //TODO fix magic
     setCentralWidget(video_wgt);
 
     // Initialize project widget
