@@ -149,8 +149,8 @@ void MainWindow::init_file_menu() {
     connect(open_project_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
-    connect(remove_project_act, &QAction::triggered, this, &MainWindow::remove_project);
+    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
+    connect(remove_project_act, &QAction::triggered, project_wgt, &ProjectWidget::remove_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
 
@@ -300,45 +300,11 @@ void MainWindow::init_help_menu() {
 }
 
 /**
- * @brief MainWindow::open_project_act
- * runs when the open project action is triggered
- * TODO Remove?
- */
-void MainWindow::open_project() {
-    emit set_status_bar("Opening project.");
-}
-
-/**
- * @brief MainWindow::save_project_act
- * runs when the save project action is triggered
- * TODO Remove?
- */
-void MainWindow::save_project() {
-    emit set_status_bar("Project saved.");
-}
-
-/**
  * @brief MainWindow::gen_report
  * runs when the generate report action is triggered
  */
 void MainWindow::gen_report() {
     emit set_status_bar("Generating report. Please wait.");
-}
-
-/**
- * @brief MainWindow::on_save_project_act
- * runs when the close project action is triggered
- */
-void MainWindow::close_project() {
-    emit set_status_bar("Closed the project.");
-}
-
-/**
- * @brief MainWindow::remove_project_act
- * runs when the remove project action is triggered
- */
-void MainWindow::remove_project() {
-    emit set_status_bar("Removed the project.");
 }
 
 /**

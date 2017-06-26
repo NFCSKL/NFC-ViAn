@@ -36,11 +36,7 @@ public:
 
     StatusBar* status_bar;
 private slots:
-    void open_project(void);
-    void save_project(void);
     void gen_report(void);
-    void close_project(void);
-    void remove_project(void);
 
 public slots:
     void options(void);

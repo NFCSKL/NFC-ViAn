@@ -23,6 +23,8 @@ public slots:
     void add_analysis();
     void save_project();
     void open_project();
+    void close_project();
+    void remove_project();
 private slots:
     void tree_item_clicked(QTreeWidgetItem *item, const int& col);
 private:

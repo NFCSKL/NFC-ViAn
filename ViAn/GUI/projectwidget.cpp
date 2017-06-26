@@ -108,16 +108,13 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
-        emit set_status_bar("Video selected");
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         marked_video(vid_item->get_video_project());
         break;
     } case ANALYSIS_ITEM: {
-        emit set_status_bar("Analysis selected");
         AnalysisItem* vid_item = dynamic_cast<AnalysisItem*>(item);
         break;
     } case FOLDER_ITEM: {
-        emit set_status_bar("Folder selected");
         break;
     } default:
         break;
@@ -153,4 +150,20 @@ void ProjectWidget::open_project() {
             tree_add_video(vid_proj, vid_name);
         }
     }
+}
+
+/**
+ * @brief ProjectWidget::close_project
+ * TODO Fix
+ */
+void ProjectWidget::close_project() {
+    emit set_status_bar("Closed the project");
+}
+
+/**
+ * @brief ProjectWidget::remove_project
+ * TODO FIX
+ */
+void ProjectWidget::remove_project() {
+    emit set_status_bar("Removed the project");
 }
