@@ -356,7 +356,7 @@ void VideoWidget::next_frame_clicked() {
     if (m_video_player->is_paused()) {
         emit next_video_frame();
         int frame = m_video_player->get_current_frame_num();
-        emit set_status_bar("Went forward a frame to number " + QString(frame));
+        emit set_status_bar("Went forward a frame to number " + QString::number(frame));
     } else {
         emit set_status_bar("Video needs to be paused");
     }
@@ -369,7 +369,7 @@ void VideoWidget::prev_frame_clicked() {
     if (m_video_player->is_paused()) {
         emit prev_video_frame();
         int frame = m_video_player->get_current_frame_num();
-        emit set_status_bar("Went backward a frame to number " + QString(frame));
+        emit set_status_bar("Went backward a frame to number " + QString::number(frame));
     } else {
         emit set_status_bar("Video needs to be paused.");
     }
