@@ -39,6 +39,22 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
  * @brief VideoWidget::init_btn_layout
  * Set up the button layouts
  */
+void VideoWidget::init_control_buttons() {
+    init_layouts();
+    set_btn_icons();
+    set_btn_tool_tip();
+    set_btn_size();
+    set_btn_tab_order();
+    set_btn_shortcuts();
+    init_speed_slider();
+    add_btns_to_layouts();
+    connect_btns();
+}
+
+/**
+ * @brief VideoWidget::init_btn_layout
+ * Set up the button layouts
+ */
 void VideoWidget::init_layouts() {
     control_row = new QHBoxLayout;     // Container for all button areas
     video_btns = new QHBoxLayout;      // Play, pause etc
@@ -155,6 +171,33 @@ void VideoWidget::set_btn_shortcuts() {
 }
 
 /**
+ * @brief VideoWidget::init_speed_slider
+ * Create and add speed adjustment slider
+ */
+void VideoWidget::init_speed_slider() {
+    speed_slider = new QSlider(Qt::Horizontal);
+    speed_slider->setRange(-4,4);
+    speed_slider->setMaximumWidth(120);
+    speed_slider->setPageStep(1);
+    speed_slider->setTickPosition(QSlider::TicksBelow);
+    speed_slider->setToolTip(tr("Adjust playback speed"));
+    QLabel *label1 = new QLabel("1/16x", this);
+    QLabel *label2 = new QLabel("1x", this);
+    QLabel *label3 = new QLabel("16x", this);
+    QFont f("Helvetica", 6, QFont::Normal);
+    label1->setFont(f);
+    label2->setFont(f);
+    label3->setFont(f);
+    //laout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
+    speed_slider_layout->addWidget(speed_slider, 0, 0, 1, 5);
+    speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
+    speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
+    speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
+
+    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
+}
+
+/**
  * @brief VideoWidget::add_btns_to_layouts
  * Add the buttons to the layouts
  */
@@ -185,22 +228,10 @@ void VideoWidget::add_btns_to_layouts() {
 }
 
 /**
- * @brief Adds all the video control buttons to the video widget
+ * @brief VideoWidget::connect_btns
+ * Connect all control buttons with signals and slots
  */
-void VideoWidget::init_control_buttons() {
-
-    init_layouts();
-
-    set_btn_icons();
-    set_btn_tool_tip();
-    set_btn_size();
-    set_btn_tab_order();
-    set_btn_shortcuts();
-
-    init_speed_slider();
-
-    add_btns_to_layouts();
-
+void VideoWidget::connect_btns() {
     // Connect buttons, slider and actions
     connect(play_btn, &QPushButton::clicked, this, &VideoWidget::play_clicked);
     connect(play_sc, &QShortcut::activated, this, &VideoWidget::play_clicked);
@@ -221,36 +252,6 @@ void VideoWidget::init_control_buttons() {
 
     connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::zoom_out_clicked);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
-
-
-    //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
-}
-
-/**
- * @brief VideoWidget::init_speed_slider
- * Create and add speed adjustment slider
- */
-void VideoWidget::init_speed_slider() {
-    speed_slider = new QSlider(Qt::Horizontal);
-    speed_slider->setRange(-4,4);
-    speed_slider->setMaximumWidth(120);
-    speed_slider->setPageStep(1);
-    speed_slider->setTickPosition(QSlider::TicksBelow);
-    speed_slider->setToolTip(tr("Adjust playback speed"));
-    QLabel *label1 = new QLabel("1/16x", this);
-    QLabel *label2 = new QLabel("1x", this);
-    QLabel *label3 = new QLabel("16x", this);
-    QFont f("Helvetica", 6, QFont::Normal);
-    label1->setFont(f);
-    label2->setFont(f);
-    label3->setFont(f);
-    //laout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
-    speed_slider_layout->addWidget(speed_slider, 0, 0, 1, 5);
-    speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
-    speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
-    speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
-
-    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
 }
 
 /**
@@ -320,15 +321,16 @@ void VideoWidget::play_clicked() {
     if (m_video_player->is_paused()) {
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
         paused_wait.wakeOne();
-        // TODO status bar
+        emit set_status_bar("Play");
     } else if (m_video_player->is_stopped()) {
-         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
+        play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
         m_video_player->start();
+        emit set_status_bar("Play");
     } else {
         // Video is playing
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         emit set_pause_video();
-        // status bar
+        emit set_status_bar("Paused");
     }
 }
 
@@ -336,7 +338,7 @@ void VideoWidget::play_clicked() {
  * @brief stop button click event
  */
 void VideoWidget::stop_clicked() {
-    //set_status_bar("Stopped");
+    emit set_status_bar("Stopped");
     if (m_video_player->is_playing()) {
          play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
     } else if (m_video_player->is_paused()) {
@@ -354,9 +356,9 @@ void VideoWidget::next_frame_clicked() {
     if (m_video_player->is_paused()) {
         emit next_video_frame();
         int frame = m_video_player->get_current_frame_num();
-        //set_status_bar("Went forward a frame to number " + std::to_string(frame));
+        emit set_status_bar("Went forward a frame to number " + QString::number(frame));
     } else {
-        //set_status_bar("Needs to be paused");
+        emit set_status_bar("Video needs to be paused");
     }
 }
 
@@ -367,9 +369,9 @@ void VideoWidget::prev_frame_clicked() {
     if (m_video_player->is_paused()) {
         emit prev_video_frame();
         int frame = m_video_player->get_current_frame_num();
-        //set_status_bar("Went back a frame to number " + std::to_string(frame));
+        emit set_status_bar("Went backward a frame to number " + QString::number(frame));
     } else {
-        //set_status_bar("Video needs to be paused");
+        emit set_status_bar("Video needs to be paused.");
     }
 }
 
@@ -381,6 +383,7 @@ void VideoWidget::prev_frame_clicked() {
  */
 void VideoWidget::zoom_in_clicked() {
     m_video_player->zoom_in();
+    emit set_status_bar("Zoom in");
 }
 
 /**
@@ -389,6 +392,7 @@ void VideoWidget::zoom_in_clicked() {
  */
 void VideoWidget::zoom_out_clicked() {
     m_video_player->zoom_out();
+    emit set_status_bar("Zoom out");
 }
 
 /**
@@ -429,7 +433,7 @@ void VideoWidget::on_playback_slider_value_changed() {
 }
 
 void VideoWidget::on_playback_slider_moved() {
-    qDebug() << "moved";
+
 }
 
 /**
@@ -456,4 +460,5 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
 
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
     emit ret_first_frame();
+    emit set_status_bar("Video loaded");
 }

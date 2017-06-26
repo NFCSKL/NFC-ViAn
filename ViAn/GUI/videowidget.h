@@ -39,6 +39,7 @@ signals:
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
     void new_bookmark(int, cv::Mat);
+    void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
@@ -116,10 +117,9 @@ private:
     void set_btn_size();
     void set_btn_tab_order();
     void set_btn_shortcuts();
-
     void init_speed_slider();
-
     void add_btns_to_layouts();
+    void connect_btns();
 
     void init_playback_slider();
 

@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QTime>
+#include <QDebug>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
@@ -27,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
 
-    // Initialize Video Widget
+    // Initialize video widget
     video_wgt = new VideoWidget();
     video_wgt->setMinimumSize(600,400); //TODO fix magic
     setCentralWidget(video_wgt);
@@ -44,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt->add_bookmark("bookmark description", tags);
     connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
     bookmark_dock->setWidget(bookmark_wgt);
-
 
     //Initialize menu bar
     init_file_menu();
@@ -64,6 +64,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
+
+    // Status bar
+    status_bar = new StatusBar();
+    setStatusBar(status_bar);
+    connect(this, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
 }
@@ -83,6 +91,7 @@ MainWindow::~MainWindow() {
 void MainWindow::init_file_menu() {
     QMenu* file_menu = menuBar()->addMenu(tr("&File"));
 
+    // Init actions
     QAction* new_project_act = new QAction(tr("&New project"), this);
     QAction* add_vid_act = new QAction(tr("&Add video"), this);
     QAction* open_project_act = new QAction(tr("&Open project"), this);
@@ -92,15 +101,17 @@ void MainWindow::init_file_menu() {
     QAction* remove_project_act = new QAction(tr("&Remove project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
-    //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));
+    // Set icons
+    //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));     //add if wanted
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
-    //gen_report_act->setIcon(QIcon("../ViAn/Icons/....png"));
-    //close_project_act->setIcon(QIcon("../ViAn/Icons/....png"));
+    //gen_report_act->setIcon(QIcon("../ViAn/Icons/....png"));      //add if wanted
+    //close_project_act->setIcon(QIcon("../ViAn/Icons/....png"));   //add if wanted
     remove_project_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
     quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
 
+    // Add actions to the menu
     file_menu->addAction(new_project_act);
     file_menu->addAction(add_vid_act);
     file_menu->addAction(open_project_act);
@@ -112,31 +123,34 @@ void MainWindow::init_file_menu() {
     file_menu->addSeparator();
     file_menu->addAction(quit_act);
 
-    new_project_act->setShortcuts(QKeySequence::New);
-    add_vid_act->setShortcuts(QKeySequence::SelectAll);
-    open_project_act->setShortcuts(QKeySequence::Open);
-    save_project_act->setShortcuts(QKeySequence::Save);
-    gen_report_act->setShortcuts(QKeySequence::Print);
-    close_project_act->setShortcuts(QKeySequence::Close);
-    remove_project_act->setShortcuts(QKeySequence::Delete);
-    quit_act->setShortcut(QKeySequence(tr("Ctrl+E")));
+    // Set shortcuts
+    new_project_act->setShortcuts(QKeySequence::New);       //Ctrl + N
+    add_vid_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
+    open_project_act->setShortcuts(QKeySequence::Open);     //Ctrl + O
+    save_project_act->setShortcuts(QKeySequence::Save);     //Ctrl + S
+    close_project_act->setShortcuts(QKeySequence::Close);   //Ctrl + F4
+    remove_project_act->setShortcuts(QKeySequence::Delete); //Del
+    gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
+    quit_act->setShortcut(QKeySequence(tr("Ctrl+E")));      //Ctrl + E
 
+    // Set shortcuts
     new_project_act->setStatusTip(tr("Create a new project"));
     add_vid_act->setStatusTip(tr("Add video"));
     open_project_act->setStatusTip(tr("Load project"));
     save_project_act->setStatusTip(tr("Save project"));
-    gen_report_act->setStatusTip(tr("Generate report"));
     close_project_act->setStatusTip(tr("Close project"));
     remove_project_act->setStatusTip(tr("Remove project"));
+    gen_report_act->setStatusTip(tr("Generate report"));
     quit_act->setStatusTip(tr("Quit the application"));
 
+    // Connet with signals and slots
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(open_project_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, this, &MainWindow::close_project);
-    connect(remove_project_act, &QAction::triggered, this, &MainWindow::remove_project);
+    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
+    connect(remove_project_act, &QAction::triggered, project_wgt, &ProjectWidget::remove_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
 
@@ -164,8 +178,8 @@ void MainWindow::init_edit_menu() {
     edit_menu->addAction(options_act);
 
     cont_bri_act->setStatusTip(tr("Contrast and brightness"));
-    cw_act->setStatusTip(tr("Rotate"));
-    ccw_act->setStatusTip(tr("Rotate"));
+    cw_act->setStatusTip(tr("Rotate clockwise"));
+    ccw_act->setStatusTip(tr("Rotate counter clockwise"));
     options_act->setStatusTip(tr("Program options"));
 
     //connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
@@ -193,7 +207,10 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(annotation_act);
     view_menu->addAction(detection_act);
 
-    //Connect
+    toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
+    toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
+    annotation_act->setStatusTip(tr("Toggle annotations on/off"));
+    detection_act->setStatusTip(tr("Toggle detections on/off"));
 }
 
 /**
@@ -219,7 +236,7 @@ void MainWindow::init_tools_menu() {
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
-    //clear_act->setIcon(QIcon("../ViAn/Icons/....png"));
+    clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
     zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
     fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
@@ -233,7 +250,6 @@ void MainWindow::init_tools_menu() {
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
-
     drawing_tools->addAction(rectangle_act);
     drawing_tools->addAction(circle_act);
     drawing_tools->addAction(line_act);
@@ -284,43 +300,11 @@ void MainWindow::init_help_menu() {
 }
 
 /**
- * @brief MainWindow::open_project_act
- * runs when the open project action is triggered
- */
-void MainWindow::open_project() {
-
-}
-
-/**
- * @brief MainWindow::save_project_act
- * runs when the save project action is triggered
- */
-void MainWindow::save_project() {
-
-}
-
-/**
  * @brief MainWindow::gen_report
  * runs when the generate report action is triggered
  */
 void MainWindow::gen_report() {
-
-}
-
-/**
- * @brief MainWindow::on_save_project_act
- * runs when the close project action is triggered
- */
-void MainWindow::close_project() {
-
-}
-
-/**
- * @brief MainWindow::remove_project_act
- * runs when the remove project action is triggered
- */
-void MainWindow::remove_project() {
-
+    emit set_status_bar("Generating report. Please wait.");
 }
 
 /**
@@ -328,5 +312,5 @@ void MainWindow::remove_project() {
  *  runs when the options action is triggered
  */
 void MainWindow::options() {
-
+    emit set_status_bar("Opening options.");
 }

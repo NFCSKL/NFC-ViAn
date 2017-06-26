@@ -8,7 +8,9 @@
 #include <QDebug>
 
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
-    setSizeGripEnabled(false);
+    // remove question mark from the title bar
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);

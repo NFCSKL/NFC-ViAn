@@ -22,6 +22,7 @@
 #include "videowidget.h"
 #include "projectwidget.h"
 #include "bookmarkwidget.h"
+#include "statusbar.h"
 
 using namespace std;
 class AnalysisWindow;
@@ -32,18 +33,22 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    StatusBar* status_bar;
 private slots:
-    void open_project(void);
-    void save_project(void);
     void gen_report(void);
-    void close_project(void);
-    void remove_project(void);
+
+public slots:
     void options(void);
+
+signals:
+    void set_status_bar(QString);
+
 private:
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
-    BookmarkWidget* bookmark_wgt;   
+    BookmarkWidget* bookmark_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
