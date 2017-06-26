@@ -433,7 +433,7 @@ void VideoWidget::on_playback_slider_value_changed() {
 }
 
 void VideoWidget::on_playback_slider_moved() {
-    qDebug() << "moved";
+
 }
 
 /**

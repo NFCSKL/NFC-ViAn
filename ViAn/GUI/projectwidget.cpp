@@ -95,6 +95,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     vid->setText(0, vid_name);
     m_videos->addChild(vid);
     emit set_status_bar("Video added");
+    m_videos->setExpanded(true);
 }
 
 /**
