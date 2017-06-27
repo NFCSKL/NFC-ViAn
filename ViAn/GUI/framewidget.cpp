@@ -44,6 +44,10 @@ void FrameWidget::draw_image(cv::Mat image) {
     repaint();
 }
 
+cv::Mat FrameWidget::get_mat() const {
+    return _tmp.clone();
+}
+
 /**
  * @brief FrameWidget::paintEvent
  * @param event
@@ -130,8 +134,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
 
         emit zoom_points(zoom_start_pos, end);
-//        emit zoom_factor(std::min(width_ratio, height_ratio));
-
         break;
     }
     default:

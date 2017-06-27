@@ -9,17 +9,10 @@ Project::Project()
 
 }
 
-/**
- * @brief Project::Project
- * @param file_handler
- * @param id
- * @param name
- */
 Project* Project::fromFile(const std::string &full_path)
 {
     Project* proj = new Project();
     proj->load_saveable(full_path);
-    proj->m_changes = false;
     return proj;
 }
 
@@ -34,7 +27,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
     m_dir = dir_path + "/" + name + "/";
     m_dir_bookmarks = m_dir + "/Bookmarks/";
     m_dir_videos = dir_path;
-    m_full_path = m_dir  + name;
+    m_file = m_dir  + name;
 }
 
 
@@ -47,7 +40,7 @@ Project::~Project(){
         delete vid_it->second;
     }
     for (auto rep_it = m_reports.begin(); rep_it != m_reports.end(); ++rep_it) {
-        delete *rep_it;
+        delete rep_it->second;
     }
 }
 
@@ -56,9 +49,7 @@ Project::~Project(){
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video_project(VideoProject *vid_proj){
-    vid_proj->id = m_vid_count;
     m_videos.insert(std::make_pair(m_vid_count, vid_proj));
-    m_changes = true;
     return m_vid_count++;
 }
 
@@ -71,7 +62,6 @@ void Project::remove_video_project(const int& id){
     VideoProject* temp = m_videos.at(id);
     delete temp;
     m_videos.erase(id);
-    m_changes = true;
 }
 
 
@@ -81,8 +71,8 @@ void Project::remove_video_project(const int& id){
  * Required for load, object locally allocated
  */
 ID Project::add_report(Report *report){
-    m_reports.push_back(report);
-    return m_reports.size();
+    m_reports.insert(std::make_pair(m_rp_count,report));   
+    return m_rp_count++;
 }
 
 /**
@@ -93,8 +83,7 @@ void Project::remove_report(const int &id)
 {
     Report* temp = m_reports.at(id);
     delete temp;
-    m_videos.erase(id);
-    m_changes = true;
+    m_reports.erase(id);
 }
 
 
@@ -110,7 +99,7 @@ void Project::delete_artifacts(){
     }
     // Delete all reports.
     for(auto it = m_reports.begin(); it != m_reports.end(); it++){
-        Report* temp = *it;
+        Report* temp = (*it).second;
         QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
     }
@@ -133,7 +122,7 @@ void Project::read(const QJsonObject& json){
     m_dir = json["root_dir"].toString().toStdString();
     m_dir_bookmarks = json["bookmark_dir"].toString().toStdString();
     m_dir_videos = json["video_dir"].toString().toStdString();
-    m_full_path = m_dir +"/"+ m_name;
+    m_file = m_dir +"/"+ m_name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -162,7 +151,7 @@ void Project::write(QJsonObject& json){
     json["root_dir"] =  QString::fromStdString(m_dir);
     json["bookmark_dir"] = QString::fromStdString(m_dir_bookmarks);
     json["video_dir"] = QString::fromStdString(m_dir_videos);
-    json["full_path"] = QString::fromStdString(m_full_path);
+    json["full_path"] = QString::fromStdString(m_file);
     QJsonArray json_proj;
     // Write Videos to json
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){
@@ -176,7 +165,7 @@ void Project::write(QJsonObject& json){
     QJsonArray json_reports;
     for(auto it = m_reports.begin(); it != m_reports.end(); it++){
         QJsonObject json_report;
-        Report* report = *it;
+        Report* report = it->second;
         report->write(json_report);
         json_reports.append(json_report);
     }
@@ -184,45 +173,14 @@ void Project::write(QJsonObject& json){
 }
 
 /**
- * @brief Project::add_analysis
- * @param v_id id of video to add analysis to
- * @param analysis
- */
-ID Project::add_analysis(const int &vid_id, AnalysisMeta &analysis){
-    m_changes = true;
-    return m_videos.at(vid_id)->add_analysis(analysis);
-}
-
-/**
- * @brief Project::add_bookmark
- * @param v_id the id of the video
- * @param bookmark
- * Add new bookmark to Videoproj corresponding to id.
- */
-ID Project::add_bookmark(const int &vid_id, Bookmark *bookmark){
-    VideoProject* v = m_videos.at(vid_id);
-    m_changes = true;
-    return v->add_bookmark(bookmark);
-}
-
-/**
- * @brief Project::is_saved
- * @return true if saved
- */
-bool Project::is_saved() const{
-    return !m_changes;
-}
-
-/**
  * @brief Project::save_project
  * @return sets saved =true
  */
 bool Project::save_project(){
-    m_changes = false;
     QDir directory;
     directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    return save_saveable(m_full_path);
+    return save_saveable(m_file);
 }
 
 /**

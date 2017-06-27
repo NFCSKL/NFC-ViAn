@@ -5,6 +5,8 @@
 #include "Test/test_report_generator.h"
 #include "GUI/mainwindow.h"
 #include "Project/Analysis/analysismeta.h"
+#include "Project/Test/projecttestsuite.h"
+#include "Project/Test/videoprojecttest.h"
 
 
 Q_DECLARE_METATYPE(cv::Mat)
@@ -20,7 +22,12 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     qRegisterMetaType<AnalysisMeta>();
+    bool unit_testing = true;
+    if(unit_testing){
+        QTest::qExec(new ProjectTestsuite());
 
+        QTest::qExec(new VideoProjectTest());
+    }
     w.show();
     return a.exec();
 }

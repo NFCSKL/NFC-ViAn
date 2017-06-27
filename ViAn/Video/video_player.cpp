@@ -48,7 +48,6 @@ bool video_player::load_video(string filename, Overlay* o) {
     if (capture.isOpened()) {
         read_capture_data();
         file_path = filename;
-        video_paused = false;
         emit frame_count(num_frames);
         emit total_time(int(num_frames / frame_rate));
         emit capture_frame_size(QSize(original_width, original_height));
@@ -443,7 +442,6 @@ void video_player::on_play_video() {
  * Sets the paused bool to true
  */
 void video_player::on_pause_video() {
-    std::cout << "PAUSED" << std::endl;
     video_paused = true;
 }
 
@@ -457,7 +455,6 @@ void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
     set_current_frame_num(0);
-    //convert_frame(true);
     show_frame();
 }
 

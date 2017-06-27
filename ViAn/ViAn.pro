@@ -19,13 +19,15 @@ TEMPLATE = app
 SOURCES += main.cpp \
     Project/Analysis/analysismeta.cpp \
     GUI/TreeItems/itemtypes.cpp \
-    Project/projecttestsuite.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
-    Video/videoplayer.cpp \
     utility.cpp \
     GUI/drawscrollarea.cpp \
-    Video/zoomer.cpp
+    Video/zoomer.cpp \
+    GUI/analysisslider.cpp \
+    GUI/projectdialog.cpp \
+    Project/Test/videoprojecttest.cpp \
+    GUI/statusbar.cpp
 
 #
 # TEST
@@ -37,13 +39,15 @@ HEADERS += Test/test_video_player.h \
     Test/test_report_generator.h \
     Project/Analysis/analysismeta.h \
     GUI/TreeItems/itemtypes.h \
-    Project/projecttestsuite.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
-    Video/videoplayer.h \
     utility.h \
     GUI/drawscrollarea.h \
-    Video/zoomer.h
+    Video/zoomer.h \
+    GUI/analysisslider.h \
+    GUI/projectdialog.h \
+    Project/Test/videoprojecttest.h \
+    GUI/statusbar.h
 
 #
 # LIBRARY
@@ -55,30 +59,24 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/qtreeitems.cpp \
-    GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/fpsdialog.cpp \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
     GUI/projectwidget.cpp \
-    GUI/bookmarkwidget.cpp \
-    GUI/createprojectdialog.cpp
+    GUI/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/qtreeitems.h \
     GUI/reportgenerator.h \
-    GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/videowidget.h \
     GUI/framewidget.h \
     GUI/projectwidget.h \
-    GUI/bookmarkwidget.h \
-    GUI/createprojectdialog.h
+    GUI/bookmarkwidget.h
 
 FORMS    +=
 
@@ -153,7 +151,8 @@ HEADERS  += \
 #
 # Project
 #
-SOURCES += Project/report.cpp \
+SOURCES += Project/Test/projecttestsuite.cpp \
+    Project/report.cpp \
     Project/project.cpp \
     Project/video.cpp \
     Project/videoproject.cpp \
@@ -163,7 +162,8 @@ SOURCES += Project/report.cpp \
     Project/Analysis/poi.cpp
 
 
-HEADERS += Project/project.h \
+HEADERS +=Project/Test/projecttestsuite.h \
+    Project/project.h \
     Project/video.h \
     Project/videoproject.h \
     Project/bookmark.h  \

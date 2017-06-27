@@ -3,6 +3,11 @@
 /**
  * @brief Analysis::Analysis
  */
+std::string Analysis::getName() const
+{
+    return name;
+}
+
 Analysis::Analysis() {
 }
 
@@ -21,7 +26,7 @@ Analysis::Analysis(const Analysis &obj) {
  * @brief Analysis::set_name
  * @param QString name
  */
-void Analysis::set_name(QString name){
+void Analysis::set_name(const std::string& name){
     this->name = name;
 }
 
@@ -47,7 +52,7 @@ void Analysis::add_POI(POI poi){
  */
 void Analysis::read(const QJsonObject &json){
     this->type = (ANALYSIS_TYPE)json["type"].toInt();
-    this->name = json["name"].toString();
+    this->name = json["name"].toString().toStdString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
@@ -64,7 +69,7 @@ void Analysis::read(const QJsonObject &json){
  */
 void Analysis::write(QJsonObject &json){
     json["type"] = this->type;
-    json["name"] = this->name;
+    json["name"] = QString::fromStdString(this->name);
     QJsonArray json_POIs;
     for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
         QJsonObject json_POI;

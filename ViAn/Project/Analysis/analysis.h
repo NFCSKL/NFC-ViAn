@@ -17,18 +17,23 @@ const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial det
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
                                                                      std::make_pair("Facial detection",FACIAL_DETECTION)};
 class Analysis : public Saveable {
+    friend class AnalysisMeta;
+    std::string name;
+
 public:
     ANALYSIS_TYPE type;
     Analysis();
-    ~Analysis();
     Analysis(const Analysis &obj);
-    QString name;
-    void set_name(QString name);
+    ~Analysis();    
+
     void add_POI(POI POI);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    std::vector<cv::Rect> get_detections_on_frame(int frame_num);
+
     std::vector<POI> POIs;
+    std::vector<cv::Rect> get_detections_on_frame(int frame_num);
+    void set_name(const std::string &name);
+    std::string getName() const;
 };
 
 #endif // ANALYSIS_H

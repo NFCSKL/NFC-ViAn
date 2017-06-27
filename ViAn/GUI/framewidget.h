@@ -28,6 +28,8 @@ class FrameWidget : public QWidget
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
+    cv::Mat get_mat() const;
+
 signals:
     void video_pressed(QPoint pos);
     void video_released(QPoint pos);
