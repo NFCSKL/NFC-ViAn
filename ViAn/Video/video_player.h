@@ -49,6 +49,7 @@ class video_player : public QThread {
     bool slider_moving = false;
     bool choosing_analysis_area = false;
 
+    QMutex frame_lock;
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
 
@@ -95,7 +96,6 @@ public:
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
-    std::string get_file_name();
 
     void inc_playback_speed();
     void dec_playback_speed();
@@ -118,8 +118,7 @@ public:
     bool is_including_area();
     void zoom_in();
     void zoom_out();
-    void rotate_right();
-    void rotate_left();
+
     int get_video_width();
     int get_video_height();
     std::vector<cv::Point>* get_analysis_area_polygon();
@@ -148,22 +147,25 @@ signals:
 private slots:
     void on_set_playback_frame(int frame_num);
     void on_set_analysis_results(Analysis analysis);
-
 public slots:
+    // Playback
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
     void next_frame();
     void previous_frame();
     void set_playback_speed(int speed_steps);
+    // Zoom
     void set_zoom_rect(QPoint p1, QPoint p2);
     void set_viewport_size(QSize size);
     void fit_screen();
     void on_move_zoom_rect(int x, int y);
+    // Rotation
+    void rotate_right();
+    void rotate_left();
 protected:
     void run() override;
     void msleep(int ms);
-
 private:
     void read_capture_data();
     void reset();
@@ -172,7 +174,6 @@ private:
     cv::Mat scale_frame(cv::Mat &src);
     void process_frame(bool scale);
     void update_overlay();
-    void show_frame();
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
     void scale_mat(double scale);

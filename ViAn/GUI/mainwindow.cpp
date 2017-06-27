@@ -183,8 +183,8 @@ void MainWindow::init_edit_menu() {
     options_act->setStatusTip(tr("Program options"));
 
     //connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    //connect(cw_act, &QAction::triggered, this, &MainWindow::options);
-    //connect(ccw_act, &QAction::triggered, this, &MainWindow::options);
+    connect(cw_act, &QAction::triggered, video_wgt->m_video_player, &video_player::rotate_right);
+    connect(ccw_act, &QAction::triggered, video_wgt->m_video_player, &video_player::rotate_left);
     connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 

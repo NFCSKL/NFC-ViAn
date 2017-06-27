@@ -24,12 +24,14 @@ public:
     void set_viewport_size(const QSize size);
     void move_zoom_rect(int x, int y);
     void fit_viewport();
+    void flip();
     void reset();
 
     void scale_frame(cv::Mat& frame) const;
     cv::Rect get_zoom_rect() const;
     double get_scale_factor() const;
 private:
+    void force_bounds();
     void update_scale();
     void update_rect_size();
 };

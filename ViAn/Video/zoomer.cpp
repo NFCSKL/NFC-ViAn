@@ -109,6 +109,21 @@ void Zoomer::fit_viewport() {
                               m_viewport_size.height() / double(m_frame_size.height));
 }
 
+void Zoomer::flip() {
+    // Flips the original frame size
+    set_frame_size(cv::Size(m_frame_size.height, m_frame_size.width));
+
+    // Flips the zoom rect size
+    // Must be within the frame size
+    // TODO correct matrix rotation
+    int _tmp = m_zoom_rect.height;
+    m_zoom_rect.height = std::min(std::abs(m_zoom_rect.width),
+                                  std::abs(m_frame_rect.height - m_zoom_rect.y));
+    m_zoom_rect.width = std::min(std::abs(_tmp),
+                                 std::abs(m_frame_size.width - m_zoom_rect.x));
+    force_bounds();
+}
+
 /**
  * @brief Zoomer::update_scale
  * Updates the zooming factor based on viewport and zoom rectangle sizes
@@ -134,8 +149,11 @@ void Zoomer::update_rect_size() {
     cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - int(width_diff / 2)), std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
     cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)), std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
 
-    m_zoom_rect = cv::Rect(new_tl, new_br);
-    anchor = QPoint(new_tl.x, new_tl.y);
+    cv::Rect _tmp = cv::Rect(new_tl, new_br);
+    if (_tmp.area() > 1) {
+        m_zoom_rect = _tmp;
+        anchor = QPoint(new_tl.x, new_tl.y);
+    }
 }
 
 /**
@@ -173,4 +191,9 @@ cv::Rect Zoomer::get_zoom_rect() const {
  */
 double Zoomer::get_scale_factor() const {
     return m_scale_factor;
+}
+
+void Zoomer::force_bounds() {
+    m_zoom_rect.height = std::min(m_frame_size.height, m_zoom_rect.height);
+    m_zoom_rect.width = std::min(m_frame_size.width, m_zoom_rect.width);
 }

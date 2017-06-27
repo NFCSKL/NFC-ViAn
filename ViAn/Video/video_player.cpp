@@ -82,6 +82,7 @@ void video_player::read_capture_data() {
 void video_player::reset() {
     if (capture.isOpened()) capture.release();
     speed_multiplier = DEFAULT_SPEED_MULT;
+    rotate_direction = ROTATE_NONE;
 }
 
 /**
@@ -103,7 +104,7 @@ void video_player::run()  {
             this->msleep(delay - conversion_time);
         }
 
-        show_frame();
+        //show_frame();
 
         if (set_new_frame) {
             // A new frame has been set outside the loop, change it
@@ -125,16 +126,6 @@ void video_player::run()  {
     capture.set(CV_CAP_PROP_POS_FRAMES, 0);
     capture.read(frame);
     process_frame(true);
-    show_frame();
-}
-
-/**
- * @brief show_frame
- * Calculates and emits the current frame to GUI.
- */
-void video_player::show_frame() {
-    emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES) - 1);
-    emit processed_image(manipulated_frame);
 }
 
 /**
@@ -143,6 +134,7 @@ void video_player::show_frame() {
  */
 void video_player::process_frame(bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
+    QMutexLocker locker(&frame_lock);
     manipulated_frame.release();
     manipulated_frame = frame.clone();
 //    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
@@ -153,18 +145,24 @@ void video_player::process_frame(bool scale) {
 //    }
 
 //    processed_frame = contrast_frame(processed_frame);
-    if (zoomer->get_scale_factor() != 1) zoomer->scale_frame(manipulated_frame);
 
 //    //Scales the frame if these criteria are met
 //    if (scale && frame_dimensions_limited && !original_dimensions_shown) {
 //        processed_frame = scale_frame(processed_frame);
 //    }
 
-//    // Rotates the frame, according to the choosen direction.
-//    // If direction is in the valid range the frame is rotated.
-//    if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
-//        cv::rotate(processed_frame, processed_frame, rotate_direction);
-//    }
+    // Rotates the frame, according to the choosen direction.
+    // If direction is in the valid range the frame is rotated.
+    if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
+        cv::rotate(manipulated_frame, manipulated_frame, rotate_direction);
+    }
+
+    // Scales the frame
+    if (zoomer->get_scale_factor() != 1) zoomer->scale_frame(manipulated_frame);
+
+    // Emit manipulated frame and current frame number
+    emit processed_image(manipulated_frame.clone());
+    emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES) - 1);
 }
 
 /**
@@ -172,9 +170,10 @@ void video_player::process_frame(bool scale) {
  * Slot function for zooming out
  */
 void video_player::zoom_out() {
+    frame_lock.lock();
     zoomer->set_scale_factor(zoomer->get_scale_factor() * ZOOM_OUT_FACTOR);
+    frame_lock.unlock();
     process_frame(1);
-    emit processed_image(manipulated_frame);
 }
 
 /**
@@ -182,9 +181,11 @@ void video_player::zoom_out() {
  * Slot function. Will fit the current video to window size
  */
 void video_player::fit_screen() {
+    frame_lock.lock();
     zoomer->fit_viewport();
+    frame_lock.unlock();
     process_frame(1);
-    emit processed_image(manipulated_frame);
+
 }
 
 /**
@@ -194,11 +195,11 @@ void video_player::fit_screen() {
  * @param y movement on the y-axis
  */
 void video_player::on_move_zoom_rect(int x, int y) {
+    frame_lock.lock();
     zoomer->move_zoom_rect(x, y);
-    if (video_paused) {
-        process_frame(1);
-        emit processed_image(manipulated_frame);
-    }
+    frame_lock.unlock();
+    process_frame(1);
+
 }
 
 /**
@@ -208,10 +209,10 @@ void video_player::on_move_zoom_rect(int x, int y) {
  * @param p2 bottom-right corner of the rectangle
  */
 void video_player::set_zoom_rect(QPoint p1, QPoint p2) {
+    frame_lock.lock();
     zoomer->set_zoom_rect(p1, p2);
+    frame_lock.unlock();
     process_frame(1);
-    emit processed_image(manipulated_frame);
-
 }
 
 /**
@@ -219,7 +220,9 @@ void video_player::set_zoom_rect(QPoint p1, QPoint p2) {
  * @param size
  */
 void video_player::set_viewport_size(QSize size) {
+    frame_lock.lock();
     if (zoomer != nullptr) zoomer->set_viewport_size(size);
+    frame_lock.unlock();
 }
 
 /**
@@ -341,16 +344,6 @@ int video_player::get_current_time() {
 }
 
 /**
- * @brief video_player::get_file_name
- * @return Returns the file name of the video that has
- *         been loaded into the video player.
- */
-std::string video_player::get_file_name() {
-    std::size_t found = file_path.find_last_of("/");
-    return file_path.substr(found+1);
-}
-
-/**
  * @brief video_player::set_current_frame_num
  * Sets the current frame to the specified number, if it's within the video.
  * @param frame_nbr The number to set the currently read frame to (0-based index).
@@ -464,7 +457,6 @@ void video_player::on_stop_video() {
 void video_player::update_frame(int frame_nbr) {
     if (set_current_frame_num(frame_nbr)) {
         process_frame(false);
-        show_frame();
     }
 }
 
@@ -476,8 +468,7 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
-        //convert_frame(true);
-        show_frame();
+        process_frame(1);
     }
 }
 
@@ -499,8 +490,7 @@ void video_player::reset_brightness_contrast() {
     alpha = CONTRAST_DEFAULT;
     beta = BRIGHTNESS_DEFAULT;
     if (capture.isOpened()) {
-        //convert_frame(true);
-        show_frame();
+        process_frame(1);
     }
 }
 
@@ -513,8 +503,7 @@ void video_player::reset_brightness_contrast() {
 void video_player::set_contrast(double contrast) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
     if (capture.isOpened()) {
-        //convert_frame(true);
-        show_frame();
+        process_frame(1);
     }
 }
 
@@ -527,8 +516,7 @@ void video_player::set_contrast(double contrast) {
 void video_player::set_brightness(int brightness) {
     beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
     if (capture.isOpened()) {
-        //convert_frame(true);
-        show_frame();
+        process_frame(1);
     }
 }
 
@@ -683,12 +671,13 @@ bool video_player::is_including_area() {
  * Rotates the video to the right by 90 degrees.
  */
 void video_player::rotate_right() {
-    if (capture.isOpened()) {
-        // Rotaing right means adding 1 and
-        // starting over if larger than maximum,
-        rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
-        update_overlay();
-    }
+    // Rotaing right means adding 1 and
+    // starting over if larger than maximum,
+    frame_lock.lock();
+    rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
+    zoomer->flip();
+    frame_lock.unlock();
+    process_frame(1);
 }
 
 /**
@@ -696,14 +685,15 @@ void video_player::rotate_right() {
  * Rotates the video to the left by 90 degrees.
  */
 void video_player::rotate_left() {
-    if (capture.isOpened()) {
-        // Rotaing left means subtracting 1 and
-        // starting over if larger than maximum.
-        // Modulo handles positive values, so
-        // minus 1 is the same as adding maximum-1.
-        rotate_direction = (rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
-        update_overlay();
-    }
+    // Rotaing left means subtracting 1 and
+    // starting over if larger than maximum.
+    // Modulo handles positive values, so
+    // minus 1 is the same as adding maximum-1.
+    frame_lock.lock();
+    rotate_direction = (rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
+    zoomer->flip();
+    frame_lock.unlock();
+    process_frame(1);
 }
 
 /**
