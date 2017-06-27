@@ -23,6 +23,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
     m_mutex = mutex;
     m_paused_wait = paused_wait;
     zoomer = new Zoomer();
+    manipulator = new FrameManipulator();
 }
 
 /**
@@ -31,6 +32,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
 video_player::~video_player() {
     delete analysis_area;
     delete zoomer;
+    delete manipulator;
     capture.release();
 }
 
@@ -56,7 +58,7 @@ bool video_player::load_video(string filename, Overlay* o) {
         video_paused = true;
         video_stopped = false;
         zoomer->set_frame_size(cv::Size(original_width, original_height));
-        zoomer->reset();
+
         return true;
     } else {
         return false;
@@ -83,6 +85,8 @@ void video_player::reset() {
     if (capture.isOpened()) capture.release();
     speed_multiplier = DEFAULT_SPEED_MULT;
     rotate_direction = ROTATE_NONE;
+    zoomer->reset();
+    manipulator->reset();
 }
 
 /**
@@ -140,17 +144,6 @@ void video_player::process_frame(bool scale) {
 //    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
 //    processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
 
-//    if (choosing_analysis_area) {
-//        processed_frame = analysis_area->draw(processed_frame);
-//    }
-
-//    processed_frame = contrast_frame(processed_frame);
-
-//    //Scales the frame if these criteria are met
-//    if (scale && frame_dimensions_limited && !original_dimensions_shown) {
-//        processed_frame = scale_frame(processed_frame);
-//    }
-
     // Rotates the frame, according to the choosen direction.
     // If direction is in the valid range the frame is rotated.
     if (ROTATE_MIN <= rotate_direction && rotate_direction <= ROTATE_MAX) {
@@ -159,6 +152,9 @@ void video_player::process_frame(bool scale) {
 
     // Scales the frame
     if (zoomer->get_scale_factor() != 1) zoomer->scale_frame(manipulated_frame);
+
+    // Applies brightness and contrast
+    manipulator->apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
     emit processed_image(manipulated_frame.clone());
@@ -231,12 +227,9 @@ void video_player::set_viewport_size(QSize size) {
  * @param src Frame to manipulate.
  * @return Returns the manipulated frame.
  */
-cv::Mat video_player::contrast_frame(cv::Mat &src) {
+void video_player::contrast_frame(void) {
     // Create image for the modified frame.
-    Mat modified_frame;
-    // Do the operation modified_frame = alpha * frame + beta
-    src.convertTo(modified_frame, -1, alpha, beta);
-    return modified_frame;
+
 }
 
 /**
@@ -487,11 +480,10 @@ void video_player::set_slider_frame(int frame_nbr) {
  * Resets contrast and brightness to default values.
  */
 void video_player::reset_brightness_contrast() {
-    alpha = CONTRAST_DEFAULT;
-    beta = BRIGHTNESS_DEFAULT;
-    if (capture.isOpened()) {
-        process_frame(1);
-    }
+    frame_lock.lock();
+    manipulator->reset();
+    frame_lock.unlock();
+    process_frame(1);
 }
 
 /**
@@ -500,40 +492,13 @@ void video_player::reset_brightness_contrast() {
  * @param contrast Contrast parameter in range
  *                 CONTRAST_MIN to CONTRAST_MAX.
  */
-void video_player::set_contrast(double contrast) {
-    alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, contrast));
-    if (capture.isOpened()) {
-        process_frame(1);
-    }
-}
-
-/**
- * @brief video_player::set_brightness
- * Sets the brightness value (beta value).
- * @param brightness Brightness parameter in range
- *                   BRIGHTNESS_MIN to BRIGHTNESS_MAX.
- */
-void video_player::set_brightness(int brightness) {
-    beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, brightness));
-    if (capture.isOpened()) {
-        process_frame(1);
-    }
-}
-
-/**
- * @brief video_player::get_contrast
- * @return Returns contrast parameter in range 0 to 255.
- */
-double video_player::get_contrast() {
-    return alpha;
-}
-
-/**
- * @brief video_player::get_brightness
- * @return Returns brightness parameter in range 0 to 255.
- */
-int video_player::get_brightness() {
-    return beta;
+void video_player::set_bright_cont(int b_value, double c_value) {
+    frame_lock.lock();
+    qDebug() << b_value;
+    manipulator->set_brightness(b_value);
+    manipulator->set_contrast(c_value);
+    frame_lock.unlock();
+    process_frame(1);
 }
 
 /**
