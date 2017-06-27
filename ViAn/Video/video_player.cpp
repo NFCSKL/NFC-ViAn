@@ -30,6 +30,7 @@ video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* 
  */
 video_player::~video_player() {
     delete analysis_area;
+    delete zoomer;
     capture.release();
 }
 
@@ -80,10 +81,6 @@ void video_player::read_capture_data() {
  */
 void video_player::reset() {
     if (capture.isOpened()) capture.release();
-
-    choosen_interpol = cv::INTER_NEAREST;
-    scale_factor = 1;
-
     speed_multiplier = DEFAULT_SPEED_MULT;
 }
 
@@ -123,9 +120,12 @@ void video_player::run()  {
         m_mutex->unlock();
     }
     video_stopped = true;
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
-    emit update_current_frame(0);
     video_paused = false;
+
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    capture.read(frame);
+    process_frame(true);
+    show_frame();
 }
 
 /**
@@ -172,7 +172,7 @@ void video_player::process_frame(bool scale) {
  * Slot function for zooming out
  */
 void video_player::zoom_out() {
-    zoomer->set_scale_factor(zoomer->get_scale_factor() * 0.75);
+    zoomer->set_scale_factor(zoomer->get_scale_factor() * ZOOM_OUT_FACTOR);
     process_frame(1);
     emit processed_image(manipulated_frame);
 }
@@ -454,8 +454,6 @@ void video_player::on_pause_video() {
 void video_player::on_stop_video() {
     video_stopped = true;
     video_paused = false;
-    set_current_frame_num(0);
-    show_frame();
 }
 
 /**

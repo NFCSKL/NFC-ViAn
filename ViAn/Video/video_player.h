@@ -35,13 +35,8 @@ class video_player : public QThread {
     int frame_height;
 
     // Interpolation method used when zooming
-    int choosen_interpol = cv::INTER_NEAREST;
-    double scale_factor = 1;
-    cv::Rect zoom_rect;
+    const double ZOOM_OUT_FACTOR = 0.75; // zoom out 25%
     Zoomer* zoomer = nullptr;
-
-
-
 
     double speed_multiplier = DEFAULT_SPEED_MULT;
 

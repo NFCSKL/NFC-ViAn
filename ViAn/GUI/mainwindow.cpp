@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize video widget
     video_wgt = new VideoWidget();
-    video_wgt->setMinimumSize(16 * 40, 9 * 40); //TODO fix magic
+    video_wgt->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT * SIZE_MULTIPLIER); // width and height sets aspect ratio
     setCentralWidget(video_wgt);
 
     // Initialize project widget

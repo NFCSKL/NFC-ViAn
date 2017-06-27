@@ -354,8 +354,6 @@ void VideoWidget::on_bookmark_clicked()
  * @brief play/pause button click event
  */
 void VideoWidget::play_clicked() {
-    double horizontal_step_size = h_bar->maximum() / 1280;
-    qDebug() << horizontal_step_size;
     if (m_video_player->is_paused()) {
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
         paused_wait.wakeOne();
@@ -491,7 +489,6 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     }
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
     m_video_player->start();
-
 }
 
 void VideoWidget::update_bar_pos(int change_x, int change_y) {

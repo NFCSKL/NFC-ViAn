@@ -158,9 +158,6 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         prev_pos = event->pos();
         break;
     }
-    if (do_zoom) {
-
-    }
 }
 
 
