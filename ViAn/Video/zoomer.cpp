@@ -34,7 +34,6 @@ void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
         anchor = QPoint(m_zoom_rect.tl().x, m_zoom_rect.tl().y);
         update_scale();
         update_rect_size();
-
     }
 }
 
@@ -124,16 +123,16 @@ void Zoomer::update_scale() {
  * Calculates a new size for the zooming rectangle based on the scale factor
  */
 void Zoomer::update_rect_size() {
-    int width = m_viewport_size.width() / m_scale_factor;
-    int height = m_viewport_size.height() / m_scale_factor;
-    int width_diff = width - m_zoom_rect.width;
-    int height_diff = height - m_zoom_rect.height;
+    double width = m_viewport_size.width() / m_scale_factor;
+    double height = m_viewport_size.height() / m_scale_factor;
+    double width_diff = width - m_zoom_rect.width;
+    double height_diff = height - m_zoom_rect.height;
 
 
     // Generate a new top-left and bottom-right corner for the rectangle
     // Makes sure the rectangle will not be bigger then the original frame
-    cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - width_diff / 2), std::max(0, m_zoom_rect.tl().y - height_diff / 2));
-    cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, m_zoom_rect.br().x + width_diff / 2), std::min(m_frame_rect.br().y, m_zoom_rect.br().y + height_diff / 2));
+    cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - int(width_diff / 2)), std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
+    cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)), std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
 
     m_zoom_rect = cv::Rect(new_tl, new_br);
     anchor = QPoint(new_tl.x, new_tl.y);
@@ -149,6 +148,11 @@ void Zoomer::reset() {
     m_zoom_rect = m_frame_rect;
 }
 
+/**
+ * @brief Zoomer::scale_frame
+ * Scales the frame 'frame'
+ * @param frame
+ */
 void Zoomer::scale_frame(cv::Mat &frame) const {
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;

@@ -161,9 +161,6 @@ public slots:
     void next_frame();
     void previous_frame();
     void set_playback_speed(int speed_steps);
-
-    void update_zoom(double zoom_factor);
-    void set_zoom(double zoom_factor);
     void set_zoom_rect(QPoint p1, QPoint p2);
     void set_viewport_size(QSize size);
     void fit_screen();

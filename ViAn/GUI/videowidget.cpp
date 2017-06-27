@@ -29,6 +29,8 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     v_bar = scroll_area->verticalScrollBar();
     h_bar = scroll_area->horizontalScrollBar();
     v_bar->setSingleStep(1);
+    v_bar->hide();
+    h_bar->hide();
     vertical_layout->addWidget(scroll_area);
 
     // End playback setup
@@ -41,7 +43,6 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_from_playback(cv::Mat)));
     connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
 
-    connect(frame_wgt, SIGNAL(zoom_factor(double)), m_video_player, SLOT(update_zoom(double)));
     connect(frame_wgt, SIGNAL(zoom_points(QPoint, QPoint)), m_video_player, SLOT(set_zoom_rect(QPoint, QPoint)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(update_bar_pos(int,int)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), m_video_player, SLOT(on_move_zoom_rect(int,int)));
@@ -55,8 +56,6 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
     connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
-    connect(this, SIGNAL(zoom_out(double)), m_video_player, SLOT(update_zoom(double)));
-    connect(this, SIGNAL(set_zoom(double)), m_video_player, SLOT(set_zoom(double)));
 }
 
 /**
@@ -376,6 +375,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     }
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
     m_video_player->start();
+
 }
 
 void VideoWidget::update_bar_pos(int change_x, int change_y) {

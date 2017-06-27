@@ -100,7 +100,7 @@ void video_player::run()  {
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
-        convert_frame(true);
+        process_frame(true);
 
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
         if (delay - conversion_time > 0) {
@@ -139,27 +139,8 @@ void video_player::show_frame() {
 }
 
 /**
- * @brief video_player::convert_frame TODO SHOULD NOW BE DONE IN FRAMEWIDHGET
- * Converts the current frame to a QImage,
- * including the zoom and overlay.
- * @param scale Bool indicating if the frame should be scaled or not.
- */
-void video_player::convert_frame(bool scale) {
-    if (frame.cols == 0 || frame.rows == 0) {
-        // Do nothing
-        return;
-    }
-
-    // Process frame (draw overlay, zoom, scaling, contrast/brightness, rotation)
-    process_frame(scale);
-}
-
-/**
  * @brief video_player::process_frame
- * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
- * @param src Frame to draw on.
- * @param scale Bool indicating if the frame should be scaled or not.
- * @return Returns the processed frame.
+ * Manipulates the current frame according to the current program settings
  */
 void video_player::process_frame(bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
@@ -187,54 +168,32 @@ void video_player::process_frame(bool scale) {
 //    }
 }
 
-
 /**
- * @brief video_player::scale_frame
- * Scales the video frame to match the resolution of the video window.
- * Before using this method, a check that frame_width and frame_height
- * have reasonable values is needed.
- * @param src
- * @return
+ * @brief video_player::zoom_out
+ * Slot function for zooming out
  */
-cv::Mat video_player::scale_frame(cv::Mat &src) {
-    cv::Size size(frame_width,frame_height);
-    cv::Mat dst(size,src.type());
-    cv::resize(src,dst,size); //resize frame
-    return dst;
-}
-
-/**
- * @brief video_player::zoom_frame
- * Zooms in the frame, with the choosen zoom level.
- * @param src Frame to zoom in on on.
- * @return Returns the zoomed frame.
- */
-void video_player::update_zoom(double zoom_factor) {
-    scale_factor *= zoom_factor;
-    if (scale_factor > 4) scale_factor = 4;
-    process_frame(zoom_factor);
-    emit processed_image(manipulated_frame);
-}
-
-void video_player::set_zoom(double zoom_factor) {
-    if (zoom_factor > 4) zoom_factor = 4;
-    scale_factor = zoom_factor;
-    process_frame(zoom_factor);
-    emit processed_image(manipulated_frame);
-}
-
 void video_player::zoom_out() {
     zoomer->set_scale_factor(zoomer->get_scale_factor() * 0.75);
     process_frame(1);
     emit processed_image(manipulated_frame);
 }
 
+/**
+ * @brief video_player::fit_screen
+ * Slot function. Will fit the current video to window size
+ */
 void video_player::fit_screen() {
     zoomer->fit_viewport();
     process_frame(1);
     emit processed_image(manipulated_frame);
 }
 
+/**
+ * @brief video_player::on_move_zoom_rect
+ * Slot function. Called when the video is moved
+ * @param x movement on the x-axis
+ * @param y movement on the y-axis
+ */
 void video_player::on_move_zoom_rect(int x, int y) {
     zoomer->move_zoom_rect(x, y);
     if (video_paused) {
@@ -243,6 +202,12 @@ void video_player::on_move_zoom_rect(int x, int y) {
     }
 }
 
+/**
+ * @brief video_player::set_zoom_rect
+ * Slot function. Sets the zoom rectangle in the zoomer
+ * @param p1 top-left corner of the rectangle
+ * @param p2 bottom-right corner of the rectangle
+ */
 void video_player::set_zoom_rect(QPoint p1, QPoint p2) {
     zoomer->set_zoom_rect(p1, p2);
     process_frame(1);
@@ -250,19 +215,12 @@ void video_player::set_zoom_rect(QPoint p1, QPoint p2) {
 
 }
 
+/**
+ * @brief video_player::set_viewport_size
+ * @param size
+ */
 void video_player::set_viewport_size(QSize size) {
     if (zoomer != nullptr) zoomer->set_viewport_size(size);
-}
-
-void video_player::scale_mat(double scale) {
-    int interpol_method = 0;
-    if (scale_factor > 1) {
-        interpol_method = choosen_interpol;
-    } else if (scale_factor < 1) {
-        interpol_method = cv::INTER_AREA;
-    }
-    cv::Mat scaled_frame;
-    //cv::resize(manipulated_frame(zoom_rect), manipulated_frame, cv::Size(), scale, scale, interpol_method);
 }
 
 /**
@@ -818,7 +776,7 @@ bool video_player::video_open() {
  * @return original width of the video
  */
 int video_player::get_video_width() {
-    return capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    return original_width;
 }
 
 /**
@@ -826,7 +784,7 @@ int video_player::get_video_width() {
  * @return original height of the video
  */
 int video_player::get_video_height() {
-    return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    return original_height;
 }
 
 /**
