@@ -12,7 +12,6 @@ FrameManipulator::FrameManipulator() {
  */
 void FrameManipulator::set_brightness(int value){
     beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, value));
-    qDebug() << beta;
 }
 
 /**
@@ -33,7 +32,6 @@ void FrameManipulator::set_contrast(double value) {
 void FrameManipulator::apply(cv::Mat &src) {
     // Do the operation modified_frame = alpha * frame + beta
     src.convertTo(src, -1, alpha, beta);
-    std::cout << beta << " " << alpha << std::endl;
 }
 
 /**
