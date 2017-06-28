@@ -16,11 +16,17 @@
 #include "analysisslider.h"
 #include "Video/video_player.h"
 #include "Project/videoproject.h"
+#include "drawscrollarea.h"
+
 
 class VideoWidget : public QWidget
 {
     Q_OBJECT
-private:
+
+    QScrollBar* v_bar;
+    QScrollBar* h_bar;
+    QSize current_frame_size;
+    double h_step_size, v_step_size;
     int current_frame;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
@@ -28,10 +34,13 @@ public:
     // Lock and wait condition to sleep player when video is paused
     QMutex mutex;
     QWaitCondition paused_wait;
-
     video_player* m_video_player;
 
 signals:
+    void first_frame(cv::Mat frame);
+    void zoom_out(double zoom_factor);
+    void set_zoom(double zoom_factor);
+    void set_play_video(void);
     void set_pause_video(void);
     void set_stop_video(void);
     void next_video_frame(void);
@@ -47,7 +56,6 @@ public slots:
     void stop_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
-    void zoom_in_clicked();
     void zoom_out_clicked();
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
@@ -55,16 +63,21 @@ public slots:
     void on_playback_slider_released(void);
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
-    void on_bookmark_clicked(void);
+    void fit_clicked(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
     void load_marked_video(VideoProject* vid_proj);
+    void update_bar_pos(int change_x, int change_y);
+    void set_current_frame_size(QSize size);
+    void on_bookmark_clicked(void);
+    //void next_poi_clicked(void);
+    //void prev_poi_clicked(void);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
     QVBoxLayout* vertical_layout;
-    QScrollArea* scroll_area;
+    DrawScrollArea* scroll_area;
     QSlider* speed_slider;
     AnalysisSlider* playback_slider;
     QLabel* current_time;
@@ -101,6 +114,7 @@ private:
     QShortcut* prev_frame_sc;
     QShortcut* next_poi_sc;
     QShortcut* prev_poi_sc;
+    QShortcut* zoom_in_sc;
     
     std::vector<QPushButton*> btns;
 

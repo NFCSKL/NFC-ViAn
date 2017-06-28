@@ -33,8 +33,6 @@ private slots:
     void test_set_contrast();
     void test_set_brightness();
     void test_video_open();
-    void test_scaling_event();
-    void test_scale_frame();
     void test_set_play_video();
     void test_set_pause_video();
     void test_set_stop_video();
@@ -44,8 +42,8 @@ private slots:
     //void test_on_set_playback_frame_fail();
     void test_set_current_frame_num();
     //void test_convert_frame();
-    void test_set_zoom_area();
-    void test_reset_zoom_area();
+//    void test_set_zoom_area();
+//    void test_reset_zoom_area();
 
 private:
     video_player* mvideo;

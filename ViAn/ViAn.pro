@@ -21,6 +21,9 @@ SOURCES += main.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
+    utility.cpp \
+    GUI/drawscrollarea.cpp \
+    Video/zoomer.cpp \
     GUI/analysisslider.cpp \
     GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
@@ -38,6 +41,9 @@ HEADERS += Test/test_video_player.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
+    utility.h \
+    GUI/drawscrollarea.h \
+    Video/zoomer.h \
     GUI/analysisslider.h \
     GUI/projectdialog.h \
     Project/Test/videoprojecttest.h \

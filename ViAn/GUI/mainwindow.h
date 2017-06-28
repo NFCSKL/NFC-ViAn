@@ -30,7 +30,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:    
-
+    const int SIZE_MULTIPLIER = 40;
+    const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
+    const int VIDEO_WGT_HEIGHT = 9;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 

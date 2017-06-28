@@ -1,12 +1,20 @@
 #include "videowidget.h"
+#include "utility.h"
+#include "drawscrollarea.h"
 
 #include <QTime>
 #include <QDebug>
 #include <QShortcut>
+#include <QScrollBar>
 
 #include "Video/video_player.h"
+#include "Video/videoplayer.h"
+#include <opencv2/videoio.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/video/video.hpp>
 
-VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QScrollArea) {
+VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video player
     m_video_player = new video_player(&mutex, &paused_wait);
 
@@ -18,6 +26,11 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     scroll_area->setBackgroundRole(QPalette::Dark);
     scroll_area->setWidget(frame_wgt);
     scroll_area->setFrameStyle(0);
+    v_bar = scroll_area->verticalScrollBar();
+    h_bar = scroll_area->horizontalScrollBar();
+    v_bar->setSingleStep(1);
+    v_bar->hide();
+    h_bar->hide();
     vertical_layout->addWidget(scroll_area);
 
     // End playback setup
@@ -27,12 +40,23 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QSc
     setLayout(vertical_layout);   
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
-    connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_image(cv::Mat)));
+    connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_from_playback(cv::Mat)));
+    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
+
+    connect(frame_wgt, SIGNAL(zoom_points(QPoint, QPoint)), m_video_player, SLOT(set_zoom_rect(QPoint, QPoint)));
+    connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(update_bar_pos(int,int)));
+    connect(frame_wgt, SIGNAL(moved_xy(int,int)), m_video_player, SLOT(on_move_zoom_rect(int,int)));
+
+    connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
+    connect(scroll_area, SIGNAL(new_size(QSize)), m_video_player, SLOT(set_viewport_size(QSize)));
+
+    connect(m_video_player, SIGNAL(capture_frame_size(QSize)), this, SLOT(set_current_frame_size(QSize)));
+    connect(this, &VideoWidget::set_play_video, m_video_player, &video_player::on_play_video);
+
     connect(this, &VideoWidget::set_pause_video, m_video_player, &video_player::on_pause_video);
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
     connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
-    connect(this, &VideoWidget::ret_first_frame, m_video_player, &video_player::get_first_frame);
 }
 
 /**
@@ -78,6 +102,7 @@ void VideoWidget::init_layouts() {
  */
 void VideoWidget::set_btn_icons() {
     play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
+
     stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
     prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
@@ -90,6 +115,8 @@ void VideoWidget::set_btn_icons() {
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+    zoom_in_btn->setCheckable(true);
+    move_btn->setCheckable(true);
 }
 
 /**
@@ -164,6 +191,7 @@ void VideoWidget::set_btn_shortcuts() {
     stop_sc = new QShortcut(Qt::Key_X, this);
     next_frame_sc = new QShortcut(Qt::Key_Right, this);
     prev_frame_sc = new QShortcut(Qt::Key_Left, this);
+    zoom_in_sc = new QShortcut(Qt::Key_Z, this);
 
     //TODO Add functionality and test
     //QShortcut* next_poi_sc = new QShortcut(QKeySequence(tr("Ctrl+Qt::Key_Right), this);
@@ -245,13 +273,21 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
+
+    connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
+    connect(zoom_in_sc, &QShortcut::activated, zoom_in_btn, &QPushButton::toggle);
+
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
 
-    connect(zoom_in_btn, &QPushButton::clicked, this, &VideoWidget::zoom_in_clicked);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
-    connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::zoom_out_clicked);
+    connect(zoom_out_btn, &QPushButton::clicked, m_video_player, &video_player::zoom_out);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
+
+    //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
+
+    //
+    connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
 }
 
 /**
@@ -324,6 +360,7 @@ void VideoWidget::play_clicked() {
         emit set_status_bar("Play");
     } else if (m_video_player->is_stopped()) {
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
+        emit set_play_video();
         m_video_player->start();
         emit set_status_bar("Play");
     } else {
@@ -376,17 +413,6 @@ void VideoWidget::prev_frame_clicked() {
 }
 
 /**
- * @brief VideoWidget::zoom_in_clicked
- * zoom in button clicked.
- * Sets a state in the video overlay
- * for the user to choose an area.
- */
-void VideoWidget::zoom_in_clicked() {
-    m_video_player->zoom_in();
-    emit set_status_bar("Zoom in");
-}
-
-/**
  * @brief VideoWidget::zoom_out_clicked
  * zoom out button clicked.
  */
@@ -436,6 +462,10 @@ void VideoWidget::on_playback_slider_moved() {
 
 }
 
+void VideoWidget::fit_clicked() {
+    emit set_zoom(Utility::min_size_ratio(scroll_area->size(), current_frame_size));
+}
+
 /**
  * @brief VideoWidget::load_marked_video
  * Slot function for loading a new video
@@ -444,7 +474,9 @@ void VideoWidget::on_playback_slider_moved() {
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     m_vid_proj = vid_proj;
     if (m_video_player->is_paused()) {
-        qDebug() << "wake video player thread";
+        // Playback thread sleeping, wake it
+        emit set_stop_video();
+
         // Playback thread sleeping, wake it
         paused_wait.wakeOne();
     }
@@ -452,13 +484,19 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     if (m_video_player->isRunning()) {
         // Playback thread is running, stop will make it finish
         // wait until it does
-        qDebug() << "wait for video player thread";
         emit set_stop_video();
         m_video_player->wait();
-        qDebug() << " waiting done";
     }
-
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
-    emit ret_first_frame();
-    emit set_status_bar("Video loaded");
+    m_video_player->start();
 }
+
+void VideoWidget::update_bar_pos(int change_x, int change_y) {
+    h_bar->setSliderPosition(h_bar->sliderPosition() + change_x);
+    v_bar->setSliderPosition(v_bar->sliderPosition() + change_y);
+}
+
+void VideoWidget::set_current_frame_size(QSize size) {
+    current_frame_size = size;
+}
+
