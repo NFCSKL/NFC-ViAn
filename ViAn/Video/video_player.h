@@ -153,7 +153,6 @@ public slots:
     void rotate_right();
     void rotate_left();
     // Frame manipulation (brightness, contrast)
-    void reset_brightness_contrast();
     void set_bright_cont(int b_value, double c_value);
 protected:
     void run() override;

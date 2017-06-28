@@ -58,7 +58,6 @@ bool video_player::load_video(string filename, Overlay* o) {
         video_paused = true;
         video_stopped = false;
         zoomer->set_frame_size(cv::Size(original_width, original_height));
-
         return true;
     } else {
         return false;
@@ -107,8 +106,6 @@ void video_player::run()  {
         if (delay - conversion_time > 0) {
             this->msleep(delay - conversion_time);
         }
-
-        //show_frame();
 
         if (set_new_frame) {
             // A new frame has been set outside the loop, change it
@@ -475,17 +472,6 @@ void video_player::set_slider_frame(int frame_nbr) {
     update_frame(frame_nbr);
 }
 
-
-/** @brief video_player::reset_brightness_contrast
- * Resets contrast and brightness to default values.
- */
-void video_player::reset_brightness_contrast() {
-    frame_lock.lock();
-    manipulator->reset();
-    frame_lock.unlock();
-    process_frame(1);
-}
-
 /**
  * @brief video_player::set_contrast
  * Sets the contrast value (alpha value).
@@ -494,7 +480,6 @@ void video_player::reset_brightness_contrast() {
  */
 void video_player::set_bright_cont(int b_value, double c_value) {
     frame_lock.lock();
-    qDebug() << b_value;
     manipulator->set_brightness(b_value);
     manipulator->set_contrast(c_value);
     frame_lock.unlock();
@@ -636,7 +621,7 @@ bool video_player::is_including_area() {
  * Rotates the video to the right by 90 degrees.
  */
 void video_player::rotate_right() {
-    // Rotaing right means adding 1 and
+    // Rotating right means adding 1 and
     // starting over if larger than maximum,
     frame_lock.lock();
     rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
@@ -650,7 +635,7 @@ void video_player::rotate_right() {
  * Rotates the video to the left by 90 degrees.
  */
 void video_player::rotate_left() {
-    // Rotaing left means subtracting 1 and
+    // Rotating left means subtracting 1 and
     // starting over if larger than maximum.
     // Modulo handles positive values, so
     // minus 1 is the same as adding maximum-1.
