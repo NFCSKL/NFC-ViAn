@@ -155,105 +155,105 @@ void test_video_player::test_set_overlay_colour() {
 /**
  * @brief test_video_player::test_reset_brightness_contrast
  */
-void test_video_player::test_reset_brightness_contrast() {
-    mvideo->reset_brightness_contrast();
-    QVERIFY(mvideo->CONTRAST_DEFAULT);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_DEFAULT);
-}
+//void test_video_player::test_reset_brightness_contrast() {
+//    mvideo->reset_brightness_contrast();
+//    QVERIFY(mvideo->CONTRAST_DEFAULT);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_DEFAULT);
+//}
 
 /**
  * @brief test_video_player::test_set_contrast
  */
-void test_video_player::test_set_contrast() {
-    mvideo->set_contrast(mvideo->CONTRAST_MIN - 10);
-    QVERIFY(mvideo->CONTRAST_MIN == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MIN - 0.01);
-    QVERIFY(mvideo->CONTRAST_MIN == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MIN);
-    QVERIFY(mvideo->CONTRAST_MIN == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MIN + 0.1);
-    QVERIFY(mvideo->CONTRAST_MIN + 0.1 == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_DEFAULT);
-    QVERIFY(mvideo->CONTRAST_DEFAULT == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MAX - 0.1);
-    QVERIFY(mvideo->CONTRAST_MAX - 0.1 == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MAX);
-    QVERIFY(mvideo->CONTRAST_MAX == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MAX + 0.01);
-    QVERIFY(mvideo->CONTRAST_MAX == mvideo->get_contrast());
-    mvideo->set_contrast(mvideo->CONTRAST_MAX + 10);
-    QVERIFY(mvideo->CONTRAST_MAX == mvideo->get_contrast());
+//void test_video_player::test_set_contrast() {
+//    mvideo->set_contrast(mvideo->CONTRAST_MIN - 10);
+//    QVERIFY(mvideo->CONTRAST_MIN == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MIN - 0.01);
+//    QVERIFY(mvideo->CONTRAST_MIN == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MIN);
+//    QVERIFY(mvideo->CONTRAST_MIN == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MIN + 0.1);
+//    QVERIFY(mvideo->CONTRAST_MIN + 0.1 == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_DEFAULT);
+//    QVERIFY(mvideo->CONTRAST_DEFAULT == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MAX - 0.1);
+//    QVERIFY(mvideo->CONTRAST_MAX - 0.1 == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MAX);
+//    QVERIFY(mvideo->CONTRAST_MAX == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MAX + 0.01);
+//    QVERIFY(mvideo->CONTRAST_MAX == mvideo->get_contrast());
+//    mvideo->set_contrast(mvideo->CONTRAST_MAX + 10);
+//    QVERIFY(mvideo->CONTRAST_MAX == mvideo->get_contrast());
 
-    // Values should be doubles 0.5 to 5.0
-    mvideo->set_contrast(-10);
-    QVERIFY(0.5 == mvideo->get_contrast());
-    mvideo->set_contrast(0);
-    QVERIFY(0.5 == mvideo->get_contrast());
-    mvideo->set_contrast(0.49);
-    QVERIFY(0.5 == mvideo->get_contrast());
-    mvideo->set_contrast(0.5);
-    QVERIFY(0.5 == mvideo->get_contrast());
-    mvideo->set_contrast(0.51);
-    QVERIFY(0.51 == mvideo->get_contrast());
-    mvideo->set_contrast(1);
-    QVERIFY(1 == mvideo->get_contrast());
-    mvideo->set_contrast(2);
-    QVERIFY(2 == mvideo->get_contrast());
-    mvideo->set_contrast(4.99);
-    QVERIFY(4.99 == mvideo->get_contrast());
-    mvideo->set_contrast(5);
-    QVERIFY(5 == mvideo->get_contrast());
-    mvideo->set_contrast(5.01);
-    QVERIFY(5 == mvideo->get_contrast());
-    mvideo->set_contrast(500);
-    QVERIFY(5 == mvideo->get_contrast());
-}
+//    // Values should be doubles 0.5 to 5.0
+//    mvideo->set_contrast(-10);
+//    QVERIFY(0.5 == mvideo->get_contrast());
+//    mvideo->set_contrast(0);
+//    QVERIFY(0.5 == mvideo->get_contrast());
+//    mvideo->set_contrast(0.49);
+//    QVERIFY(0.5 == mvideo->get_contrast());
+//    mvideo->set_contrast(0.5);
+//    QVERIFY(0.5 == mvideo->get_contrast());
+//    mvideo->set_contrast(0.51);
+//    QVERIFY(0.51 == mvideo->get_contrast());
+//    mvideo->set_contrast(1);
+//    QVERIFY(1 == mvideo->get_contrast());
+//    mvideo->set_contrast(2);
+//    QVERIFY(2 == mvideo->get_contrast());
+//    mvideo->set_contrast(4.99);
+//    QVERIFY(4.99 == mvideo->get_contrast());
+//    mvideo->set_contrast(5);
+//    QVERIFY(5 == mvideo->get_contrast());
+//    mvideo->set_contrast(5.01);
+//    QVERIFY(5 == mvideo->get_contrast());
+//    mvideo->set_contrast(500);
+//    QVERIFY(5 == mvideo->get_contrast());
+//}
 
 /**
  * @brief test_video_player::test_set_brightness
  */
-void test_video_player::test_set_brightness() {
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN - 10);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN - 1);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN + 1);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN + 1);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_DEFAULT);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_DEFAULT);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX - 1);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX - 1);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX + 1);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX);
-    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX + 10);
-    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX);
+//void test_video_player::test_set_brightness() {
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN - 10);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN - 1);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MIN + 1);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MIN + 1);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_DEFAULT);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_DEFAULT);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX - 1);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX - 1);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX + 1);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX);
+//    mvideo->set_brightness(mvideo->BRIGHTNESS_MAX + 10);
+//    QVERIFY(mvideo->get_brightness() == mvideo->BRIGHTNESS_MAX);
 
-    // Values should be integers -100 to 100
-    mvideo->set_brightness(-101);
-    QVERIFY(mvideo->get_brightness() == -100);
-    mvideo->set_brightness(-100);
-    QVERIFY(mvideo->get_brightness() == -100);
-    mvideo->set_brightness(-99);
-    QVERIFY(mvideo->get_brightness() == -99);
-    mvideo->set_brightness(0);
-    QVERIFY(mvideo->get_brightness() == 0);
-    mvideo->set_brightness(1);
-    QVERIFY(mvideo->get_brightness() == 1);
-    mvideo->set_brightness(2);
-    QVERIFY(mvideo->get_brightness() == 2);
-    mvideo->set_brightness(99);
-    QVERIFY(mvideo->get_brightness() == 99);
-    mvideo->set_brightness(100);
-    QVERIFY(mvideo->get_brightness() == 100);
-    mvideo->set_brightness(101);
-    QVERIFY(mvideo->get_brightness() == 100);
-    mvideo->set_brightness(500);
-    QVERIFY(mvideo->get_brightness() == 100);
-}
+//    // Values should be integers -100 to 100
+//    mvideo->set_brightness(-101);
+//    QVERIFY(mvideo->get_brightness() == -100);
+//    mvideo->set_brightness(-100);
+//    QVERIFY(mvideo->get_brightness() == -100);
+//    mvideo->set_brightness(-99);
+//    QVERIFY(mvideo->get_brightness() == -99);
+//    mvideo->set_brightness(0);
+//    QVERIFY(mvideo->get_brightness() == 0);
+//    mvideo->set_brightness(1);
+//    QVERIFY(mvideo->get_brightness() == 1);
+//    mvideo->set_brightness(2);
+//    QVERIFY(mvideo->get_brightness() == 2);
+//    mvideo->set_brightness(99);
+//    QVERIFY(mvideo->get_brightness() == 99);
+//    mvideo->set_brightness(100);
+//    QVERIFY(mvideo->get_brightness() == 100);
+//    mvideo->set_brightness(101);
+//    QVERIFY(mvideo->get_brightness() == 100);
+//    mvideo->set_brightness(500);
+//    QVERIFY(mvideo->get_brightness() == 100);
+//}
 
 /**
  * @brief test_video_player::test_video_open

@@ -15,6 +15,7 @@
 #include "Analysis/AnalysisMethod.h"
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
+#include "manipulatordialog.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -182,9 +183,9 @@ void MainWindow::init_edit_menu() {
     ccw_act->setStatusTip(tr("Rotate counter clockwise"));
     options_act->setStatusTip(tr("Program options"));
 
-    //connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    //connect(cw_act, &QAction::triggered, this, &MainWindow::options);
-    //connect(ccw_act, &QAction::triggered, this, &MainWindow::options);
+    connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
+    connect(cw_act, &QAction::triggered, video_wgt->m_video_player, &video_player::rotate_right);
+    connect(ccw_act, &QAction::triggered, video_wgt->m_video_player, &video_player::rotate_left);
     connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 
@@ -305,6 +306,18 @@ void MainWindow::init_help_menu() {
  */
 void MainWindow::gen_report() {
     emit set_status_bar("Generating report. Please wait.");
+}
+
+/**
+ * @brief MainWindow::cont_bri
+ * Contrast/brightness triggered.
+ * Creates a dialog for choosing contrast and brightness values.
+ */
+void MainWindow::cont_bri() {
+    emit set_status_bar("Opening contrast/brightness settings");
+    ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
+    connect(man_dialog, SIGNAL(values(int,double)), video_wgt->m_video_player, SLOT(set_bright_cont(int,double)));
+    man_dialog->exec();
 }
 
 /**

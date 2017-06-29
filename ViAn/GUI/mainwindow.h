@@ -39,6 +39,7 @@ public:
     StatusBar* status_bar;
 private slots:
     void gen_report(void);
+    void cont_bri(void);
 
 public slots:
     void options(void);

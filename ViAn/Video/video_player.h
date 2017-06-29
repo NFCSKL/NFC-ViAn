@@ -14,6 +14,7 @@
 #include "analysisoverlay.h"
 #include "Project/Analysis/analysis.h"
 #include "zoomer.h"
+#include "framemanipulator.h"
 
 #include <chrono>
 
@@ -34,7 +35,7 @@ class video_player : public QThread {
     int frame_width;
     int frame_height;
 
-    // Interpolation method used when zooming
+    // Zoom
     const double ZOOM_OUT_FACTOR = 0.75; // zoom out 25%
     Zoomer* zoomer = nullptr;
 
@@ -49,6 +50,7 @@ class video_player : public QThread {
     bool slider_moving = false;
     bool choosing_analysis_area = false;
 
+    QMutex frame_lock;
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
 
@@ -63,13 +65,10 @@ class video_player : public QThread {
     int const ROTATE_NUM = 4;
     int rotate_direction = ROTATE_NONE;
 
-    // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
-    double alpha = 1;
-    // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
-    int beta = 0;
-
     Overlay* video_overlay;
     AnalysisOverlay* analysis_overlay = new AnalysisOverlay();
+
+    FrameManipulator* manipulator = nullptr;
 
     friend class OverlayIntegrationTest;
 
@@ -95,18 +94,13 @@ public:
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
-    std::string get_file_name();
 
     void inc_playback_speed();
     void dec_playback_speed();
 
     void set_slider_frame(int frame_nbr);
     
-    void reset_brightness_contrast();
-    void set_contrast(double contrast);
-    void set_brightness(int brightness);
-    double get_contrast();
-    int get_brightness();
+
     void toggle_overlay();
     void toggle_analysis_overlay();
     void set_overlay_tool(SHAPES shape);
@@ -118,8 +112,7 @@ public:
     bool is_including_area();
     void zoom_in();
     void zoom_out();
-    void rotate_right();
-    void rotate_left();
+
     int get_video_width();
     int get_video_height();
     std::vector<cv::Point>* get_analysis_area_polygon();
@@ -132,12 +125,6 @@ public:
     const double DEFAULT_SPEED_MULT = 1;
     const double SPEED_STEP_MULT = 2;
 
-    // Constants for the limits and the precision of contrast and brightness values.
-    const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
-    const int CONTRAST_DECIMALS = 2;
-    const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
-
-
 signals:
     void capture_frame_size(QSize size);
     void processed_image(const cv::Mat image);
@@ -148,36 +135,43 @@ signals:
 private slots:
     void on_set_playback_frame(int frame_num);
     void on_set_analysis_results(Analysis analysis);
-
 public slots:
+    // All slot functions that manipulates a value used by the video thread must be locked
+    // Playback
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
     void next_frame();
     void previous_frame();
     void set_playback_speed(int speed_steps);
+    // Zoom
     void set_zoom_rect(QPoint p1, QPoint p2);
     void set_viewport_size(QSize size);
     void fit_screen();
     void on_move_zoom_rect(int x, int y);
+    // Rotation
+    void rotate_right();
+    void rotate_left();
+    // Frame manipulation (brightness, contrast)
+    void set_bright_cont(int b_value, double c_value);
 protected:
     void run() override;
     void msleep(int ms);
-
 private:
     void read_capture_data();
     void reset();
     void update_frame(int frame_nbr);
-    cv::Mat contrast_frame(cv::Mat &src);
+
     cv::Mat scale_frame(cv::Mat &src);
     void process_frame(bool scale);
     void update_overlay();
-    void show_frame();
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
     void scale_mat(double scale);
     bool limited_frame_dimensions();
     bool set_current_frame_num(int frame_nbr);
+    // Frame manipulation (brightness, contrast)
+    void contrast_frame();
 };
 
 #endif // VIDEO_PLAYER_H

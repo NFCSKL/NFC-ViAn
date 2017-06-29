@@ -27,7 +27,9 @@ SOURCES += main.cpp \
     GUI/analysisslider.cpp \
     GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
-    GUI/statusbar.cpp
+    GUI/statusbar.cpp \
+    Video/rotatablerect.cpp \
+    GUI/manipulatordialog.cpp
 
 #
 # TEST
@@ -47,7 +49,9 @@ HEADERS += Test/test_video_player.h \
     GUI/analysisslider.h \
     GUI/projectdialog.h \
     Project/Test/videoprojecttest.h \
-    GUI/statusbar.h
+    GUI/statusbar.h \
+    Video/rotatablerect.h \
+    GUI/manipulatordialog.h
 
 #
 # LIBRARY
@@ -97,7 +101,8 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
-    Video/shapes/analysarea.cpp
+    Video/shapes/analysarea.cpp \
+    Video/framemanipulator.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/analysisoverlay.h \
@@ -109,7 +114,8 @@ HEADERS += Video/video_player.h \
     Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
-    Video/shapes/analysarea.h
+    Video/shapes/analysarea.h \
+    Video/framemanipulator.h
 
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
