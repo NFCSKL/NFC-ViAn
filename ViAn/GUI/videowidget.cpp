@@ -281,6 +281,7 @@ void VideoWidget::connect_btns() {
 
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
+    connect(frame_wgt, &FrameWidget::trigger_zoom_out, zoom_out_btn, &QPushButton::click);
     connect(zoom_out_btn, &QPushButton::clicked, m_video_player, &video_player::zoom_out);
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 

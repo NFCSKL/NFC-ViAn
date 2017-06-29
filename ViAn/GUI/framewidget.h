@@ -25,6 +25,7 @@ class FrameWidget : public QWidget
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
     bool draw_zoom_rect = false;
     bool do_zoom = false;
+    bool do_zoom_out = false;
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
@@ -39,6 +40,7 @@ signals:
     void moved_xy(int x, int y);
     void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
+    void trigger_zoom_out();
 public slots:
     void draw_image(cv::Mat image);
     void draw_from_playback(cv::Mat frame);
@@ -53,6 +55,13 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+private:
+    void init_panning(QPoint pos);
+    void init_zoom(QPoint pos);
+    void panning(QPoint pos);
+    void zoom(QPoint pos);
+    void end_panning();
+    void end_zoom();
 };
 
 #endif // FRAMEWIDGET_H

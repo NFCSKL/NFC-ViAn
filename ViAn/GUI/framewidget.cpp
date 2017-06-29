@@ -98,10 +98,17 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
     case ZOOM:
-        zoom_start_pos = event->pos();
+        if (event->button() == Qt::RightButton) {
+            init_panning(event->pos());
+        } else if (event->button() == Qt::LeftButton) {
+            if (event->modifiers() == Qt::ControlModifier) {
+                do_zoom_out = true;
+            } else {
+                init_zoom(event->pos());
+            }
+        }
         break;
     default:
-        prev_pos = event->pos();
         break;
     }
 }
@@ -113,27 +120,16 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     switch (tool) {
     case ZOOM: {
-        draw_zoom_rect = false;
-        repaint();
-
-        // Scale factor
-        int width = std::abs(zoom_start_pos.x() - zoom_end_pos.x());
-        int height = std::abs(zoom_start_pos.y() - zoom_end_pos.y());
-        double width_ratio = current_frame.cols / double(width );
-        double height_ratio = current_frame.rows / double(height);
-
-        // ROI rect points
-        int wid = zoom_end_pos.x() - zoom_start_pos.x();
-        int hei = zoom_end_pos.y() - zoom_start_pos.y();
-
-        double wid_ratio = double(wid) / current_frame.cols;
-        double height_mod = std::copysign(current_frame.rows * wid_ratio, hei);
-        QPoint end = QPoint(zoom_end_pos.x(), zoom_start_pos.y() + height_mod);
-
-        cv::Rect zoom_rect(cv::Point(zoom_start_pos.x(), zoom_start_pos.y()), cv::Point(end.x(), end.y()));
-        double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
-
-        emit zoom_points(zoom_start_pos, end);
+        if (event->button() == Qt::RightButton) {
+            end_panning();
+        } else if (event->button() == Qt::LeftButton){
+            if (do_zoom_out) {
+                emit trigger_zoom_out();
+                do_zoom_out = false;
+            } else {
+                end_zoom();
+            }
+        }
         break;
     }
     default:
@@ -148,16 +144,93 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     switch (tool) {
     case ZOOM:
-        zoom_end_pos = event->pos();
-        draw_zoom_rect = true;
-        repaint();
+        if (event->buttons() == Qt::RightButton){
+            panning(event->pos());
+        } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
+            zoom(event->pos());
+        }
         break;
     default:
-        QPoint _tmp = prev_pos - event->pos();
-        emit moved_xy(_tmp.x(), _tmp.y());
-        prev_pos = event->pos();
         break;
     }
+}
+
+/**
+ * @brief FrameWidget::init_panning
+ * Init panning on frame
+ * @param pos
+ */
+void FrameWidget::init_panning(QPoint pos) {
+    prev_pos = pos;
+    setCursor(Qt::ClosedHandCursor);
+}
+
+/**
+ * @brief FrameWidget::init_zoom
+ * Init zoom on frame
+ * @param pos
+ */
+void FrameWidget::init_zoom(QPoint pos) {
+    zoom_start_pos = pos;
+}
+
+/**
+ * @brief FrameWidget::panning
+ * Is panning. Emits the new pos on frame.
+ * @param pos
+ */
+void FrameWidget::panning(QPoint pos) {
+    // Using panning
+    QPoint _tmp = prev_pos - pos;
+    emit moved_xy(_tmp.x(), _tmp.y());
+    prev_pos = pos;
+}
+
+/**
+ * @brief FrameWidget::zoom
+ * Updates and redraws the zooming rect
+ * @param pos
+ */
+void FrameWidget::zoom(QPoint pos) {
+    zoom_end_pos = pos;
+    draw_zoom_rect = true;
+    repaint();
+}
+
+/**
+ * @brief FrameWidget::end_panning
+ * Panning stopped
+ */
+void FrameWidget::end_panning() {
+    setCursor(Qt::CrossCursor);
+}
+
+/**
+ * @brief FrameWidget::end_zoom
+ * Emits the points of the zooming rect
+ */
+void FrameWidget::end_zoom() {
+    draw_zoom_rect = false;
+    repaint();
+
+    // Scale factor
+    int width = std::abs(zoom_start_pos.x() - zoom_end_pos.x());
+    int height = std::abs(zoom_start_pos.y() - zoom_end_pos.y());
+    double width_ratio = current_frame.cols / double(width );
+    double height_ratio = current_frame.rows / double(height);
+
+    // ROI rect points
+    int wid = zoom_end_pos.x() - zoom_start_pos.x();
+    int hei = zoom_end_pos.y() - zoom_start_pos.y();
+
+    double wid_ratio = double(wid) / current_frame.cols;
+    double height_mod = std::copysign(current_frame.rows * wid_ratio, hei);
+    QPoint end = QPoint(zoom_end_pos.x(), zoom_start_pos.y() + height_mod);
+
+    cv::Rect zoom_rect(cv::Point(zoom_start_pos.x(), zoom_start_pos.y()), cv::Point(end.x(), end.y()));
+    double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
+
+    emit zoom_points(zoom_start_pos, end);
 }
 
 
