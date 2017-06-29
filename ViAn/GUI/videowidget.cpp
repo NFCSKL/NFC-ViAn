@@ -396,7 +396,7 @@ void VideoWidget::next_frame_clicked() {
         emit set_status_bar("Already at the end");
     } else {
         emit next_video_frame();
-        emit set_status_bar("Went forward a frame to number " + QString::number(m_video_player->get_current_frame_num() + 1));
+        emit set_status_bar("Went forward a frame to number " + QString::number(step_frame));
     }
 
 }
@@ -405,12 +405,12 @@ void VideoWidget::next_frame_clicked() {
  * @brief previous frame button click event
  */
 void VideoWidget::prev_frame_clicked() {
-    int step_frame = m_video_player->get_current_frame_num() - 1;
+    int step_frame = current_frame - 1;
     if (step_frame < 0) {
         emit set_status_bar("Already at the beginning");
     } else {
         emit prev_video_frame();
-        emit set_status_bar("Went backward a frame to number " + QString::number(m_video_player->get_current_frame_num() - 1));
+        emit set_status_bar("Went backward a frame to number " + QString::number(step_frame));
     }
 }
 
@@ -437,7 +437,7 @@ void VideoWidget::set_slider_max(int value) {
  */
 void VideoWidget::on_new_frame(int frame_num) {
     if (!playback_slider->is_blocked()) {
-        // Block signals to prevent value changed signal to trigger1
+        // Block signals to prevent value_changed signal to trigger
         playback_slider->blockSignals(true);
         playback_slider->setValue(frame_num);
         playback_slider->blockSignals(false);
