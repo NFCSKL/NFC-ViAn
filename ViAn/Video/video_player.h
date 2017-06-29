@@ -24,6 +24,7 @@ class video_player : public QThread {
     Q_OBJECT
     cv::VideoCapture capture;
     cv::Mat frame, manipulated_frame;   // Frame is the original frame read video capture
+    QThread* processing_thread = nullptr;
 
     // Current capture data
     int num_frames;
@@ -133,7 +134,6 @@ signals:
     void total_time(int time);
 
 private slots:
-    void on_set_playback_frame(int frame_num);
     void on_set_analysis_results(Analysis analysis);
 public slots:
     // All slot functions that manipulates a value used by the video thread must be locked
@@ -144,6 +144,7 @@ public slots:
     void next_frame();
     void previous_frame();
     void set_playback_speed(int speed_steps);
+    void set_playback_pos(int pos);
     // Zoom
     void set_zoom_rect(QPoint p1, QPoint p2);
     void set_viewport_size(QSize size);
@@ -160,18 +161,15 @@ protected:
 private:
     void read_capture_data();
     void reset();
-    void update_frame(int frame_nbr);
-
+    void check_last_frame();
     cv::Mat scale_frame(cv::Mat &src);
-    void process_frame(bool scale);
+    void process_frame();
     void update_overlay();
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
     void scale_mat(double scale);
     bool limited_frame_dimensions();
     bool set_current_frame_num(int frame_nbr);
-    // Frame manipulation (brightness, contrast)
-    void contrast_frame();
 };
 
 #endif // VIDEO_PLAYER_H

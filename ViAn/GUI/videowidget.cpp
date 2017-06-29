@@ -307,7 +307,7 @@ void VideoWidget::init_playback_slider() {
     connect(m_video_player, SIGNAL(frame_count(int)), this, SLOT(set_slider_max(int)));
     connect(m_video_player, SIGNAL(total_time(int)), this, SLOT(set_total_time(int)));
     connect(m_video_player, SIGNAL(update_current_frame(int)), this, SLOT(on_new_frame(int)));
-    connect(this, SIGNAL(set_playback_frame(int, bool)), m_video_player, SLOT(on_set_playback_frame(int)));
+    connect(this, SIGNAL(set_playback_frame(int, bool)), m_video_player, SLOT(set_playback_pos(int)));
     connect(playback_slider, &QSlider::sliderPressed, this, &VideoWidget::on_playback_slider_pressed);
     connect(playback_slider, &QSlider::sliderReleased, this, &VideoWidget::on_playback_slider_released);
     connect(playback_slider, &QSlider::valueChanged, this, &VideoWidget::on_playback_slider_value_changed);
@@ -390,25 +390,26 @@ void VideoWidget::stop_clicked() {
  * @brief next frame button click event
  */
 void VideoWidget::next_frame_clicked() {
-    if (m_video_player->is_paused()) {
-        emit next_video_frame();
-        int frame = m_video_player->get_current_frame_num();
-        emit set_status_bar("Went forward a frame to number " + QString::number(frame));
+    int step_frame = current_frame + 1;
+    if (step_frame > m_video_player->get_num_frames() - 1) {
+        emit set_status_bar("Already at the end");
     } else {
-        emit set_status_bar("Video needs to be paused");
+        emit next_video_frame();
+        emit set_status_bar("Went forward a frame to number " + QString::number(step_frame));
     }
+
 }
 
 /**
  * @brief previous frame button click event
  */
 void VideoWidget::prev_frame_clicked() {
-    if (m_video_player->is_paused()) {
-        emit prev_video_frame();
-        int frame = m_video_player->get_current_frame_num();
-        emit set_status_bar("Went backward a frame to number " + QString::number(frame));
+    int step_frame = current_frame - 1;
+    if (step_frame < 0) {
+        emit set_status_bar("Already at the beginning");
     } else {
-        emit set_status_bar("Video needs to be paused.");
+        emit prev_video_frame();
+        emit set_status_bar("Went backward a frame to number " + QString::number(step_frame));
     }
 }
 
@@ -434,32 +435,48 @@ void VideoWidget::set_slider_max(int value) {
  * @param frame_num
  */
 void VideoWidget::on_new_frame(int frame_num) {
-    if (!slider_is_blocked)
+    if (!playback_slider->is_blocked()) {
+        // Block signals to prevent value_changed signal to trigger
+        playback_slider->blockSignals(true);
         playback_slider->setValue(frame_num);
+        playback_slider->blockSignals(false);
+    }
     current_frame = frame_num;
     set_current_time(frame_num / m_video_player->get_frame_rate());
 }
 
 void VideoWidget::on_playback_slider_pressed() {
-    slider_is_blocked = true;
+    timer.start();
+    playback_slider->set_blocked(true);
+    playback_slider->set_was_paused(m_video_player->is_paused());
+    if (!playback_slider->get_was_paused()) emit set_pause_video();
 }
 
 void VideoWidget::on_playback_slider_released() {
+    playback_slider->set_blocked(false);
     emit set_playback_frame(playback_slider->value(), true);
-    slider_is_blocked = false;
+    if (!playback_slider->get_was_paused()) paused_wait.wakeOne();
+
 }
 
 void VideoWidget::on_playback_slider_value_changed() {
-    if (slider_is_blocked) {
-        //qDebug() << "emit slider value";
-        //emit set_playback_frame(slider_pos, true);
-    } else {
-        //qDebug();
+    if (!playback_slider->is_blocked()) {
+        playback_slider->set_blocked(true);
+        // Click occured
+        emit set_playback_frame(playback_slider->value(), true);
+        playback_slider->set_blocked(false);
     }
 }
 
 void VideoWidget::on_playback_slider_moved() {
+    if (std::abs(playback_slider->value() - prev_frame_idx) % 5 == 0) {
+        emit set_playback_frame(playback_slider->value(), true);
+    }
 
+    if (timer.elapsed() > 200) {
+        emit set_playback_frame(playback_slider->value(), true);
+        timer.restart();
+    }
 }
 
 void VideoWidget::fit_clicked() {

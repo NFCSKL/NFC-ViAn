@@ -7,6 +7,8 @@
 #include <QDesktopWidget>
 #include <qpainter.h>
 #include <qdebug.h>
+#include <QTime>
+#include "frameprocessor.h"
 
 
 using namespace std;
@@ -51,10 +53,10 @@ bool video_player::load_video(string filename, Overlay* o) {
     if (capture.isOpened()) {
         read_capture_data();
         file_path = filename;
-        emit frame_count(num_frames);
+        emit frame_count(num_frames - 1);
         emit total_time(int(num_frames / frame_rate));
         emit capture_frame_size(QSize(original_width, original_height));
-        capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+        check_last_frame();
         video_paused = true;
         video_stopped = false;
         zoomer->set_frame_size(cv::Size(original_width, original_height));
@@ -96,21 +98,21 @@ void video_player::reset() {
  */
 void video_player::run()  {
     int delay = (1000/frame_rate);
-    set_current_frame_num(0);
-    while (!video_stopped && capture.read(frame)) {
+    bool is_end = false;
+    while (!video_stopped) {
+        // The video capture object can be modified from outside this thread
+        // Thus the capture.read cannot be part of the loop condition
         const clock_t begin_time = std::clock();
+        frame_lock.lock();
+        is_end = !capture.read(frame);
+        frame_lock.unlock();
+        if (is_end) break;
 
-        process_frame(true);
-
+        // Time the frame processing time and adjust for a smoother playback
+        process_frame();
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
         if (delay - conversion_time > 0) {
             this->msleep(delay - conversion_time);
-        }
-
-        if (set_new_frame) {
-            // A new frame has been set outside the loop, change it
-            capture.set(CV_CAP_PROP_POS_FRAMES, new_frame_num);
-            set_new_frame = false;
         }
 
         // Waits for the video to be resumed
@@ -123,17 +125,15 @@ void video_player::run()  {
     }
     video_stopped = true;
     video_paused = false;
-
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
-    capture.read(frame);
-    process_frame(true);
+    set_playback_pos(0);
+    process_frame();
 }
 
 /**
  * @brief video_player::process_frame
  * Manipulates the current frame according to the current program settings
  */
-void video_player::process_frame(bool scale) {
+void video_player::process_frame() {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     QMutexLocker locker(&frame_lock);
     manipulated_frame.release();
@@ -166,7 +166,7 @@ void video_player::zoom_out() {
     frame_lock.lock();
     zoomer->set_scale_factor(zoomer->get_scale_factor() * ZOOM_OUT_FACTOR);
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 }
 
 /**
@@ -177,7 +177,7 @@ void video_player::fit_screen() {
     frame_lock.lock();
     zoomer->fit_viewport();
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 
 }
 
@@ -191,7 +191,7 @@ void video_player::on_move_zoom_rect(int x, int y) {
     frame_lock.lock();
     zoomer->move_zoom_rect(x, y);
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 
 }
 
@@ -205,7 +205,7 @@ void video_player::set_zoom_rect(QPoint p1, QPoint p2) {
     frame_lock.lock();
     zoomer->set_zoom_rect(p1, p2);
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 }
 
 /**
@@ -219,14 +219,34 @@ void video_player::set_viewport_size(QSize size) {
 }
 
 /**
- * @brief video_player::contrast_frame
- * Adds contrast and brightness to the frame.
- * @param src Frame to manipulate.
- * @return Returns the manipulated frame.
+ * @brief video_player::set_playback_pos
+ * Sets the playback position in frames
+ * @param pos the frame number
  */
-void video_player::contrast_frame(void) {
-    // Create image for the modified frame.
+void video_player::set_playback_pos(int pos) {
+    if (pos < 0 || pos > num_frames - 1) return;
+    if (video_paused) {
+        // The playback is paused and thus the playback thread is sleeping
+        // Force frame processing in another thread to prevent GUI lag
+        // Ignore position update if already processing
+        if (processing_thread != nullptr && processing_thread->isRunning()) return;
 
+        processing_thread = new QThread;
+        FrameProcessor* processor = new FrameProcessor(frame, rotate_direction, pos, manipulator, zoomer, &frame_lock, &capture);
+        processor->moveToThread(processing_thread);
+
+        connect(processing_thread, &QThread::finished, processor, &FrameProcessor::deleteLater);
+        connect(processor, &FrameProcessor::done, processing_thread, &QThread::quit);
+        connect(processing_thread, &QThread::started, processor, &FrameProcessor::process);
+        connect(processor, SIGNAL(done_processing(cv::Mat)), this, SIGNAL(processed_image(cv::Mat)));
+        connect(processor, SIGNAL(frame_num(int)), this, SIGNAL(update_current_frame(int)));
+        processing_thread->start();
+    } else {
+        frame_lock.lock();
+        capture.set(CV_CAP_PROP_POS_FRAMES, pos);   // Set next frame to be read
+        capture.read(frame);                        // Read it
+        frame_lock.unlock();
+    }
 }
 
 /**
@@ -334,27 +354,6 @@ int video_player::get_current_time() {
 }
 
 /**
- * @brief video_player::set_current_frame_num
- * Sets the current frame to the specified number, if it's within the video.
- * @param frame_nbr The number to set the currently read frame to (0-based index).
- * @return Return true if successful, false if the specified number is outside the video.
- */
-bool video_player::set_current_frame_num(int frame_nbr) {
-    if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
-        // capture.set() sets the number of the frame to be read.
-        if (video_paused) {
-            capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
-            capture.read(frame);
-        } else {
-            set_new_frame = true;
-            new_frame_num = frame_nbr;
-        }
-        return true;
-    }
-    return false;
-}
-
-/**
  * @brief video_player::set_frame_width
  * @param new_value
  */
@@ -371,31 +370,11 @@ void video_player::set_frame_height(int new_value) {
 }
 
 /**
- * @brief video_player::on_set_playback_frame
- * Updates the frame directly if the video is paused.
- * Otherwise it saves the frame number which later on
- * updates in the run function
- * @param frame_num
- */
-void video_player::on_set_playback_frame(int frame_num) {
-    if (video_paused) {
-        update_frame(frame_num - 1);
-    } else {
-        if (frame_num >= 0 && frame_num < get_num_frames()) {
-            set_new_frame = true;
-            new_frame_num = frame_num;
-        } else {
-            set_new_frame = false;
-        }
-    }
-}
-
-/**
  * @brief video_player::next_frame
  * Moves the playback one frame forward.
  */
 void video_player::next_frame() {
-    update_frame(get_current_frame_num() + 1);
+    set_playback_pos(get_current_frame_num() + 1);
 }
 
 /**
@@ -403,7 +382,7 @@ void video_player::next_frame() {
  * Moves the playback one frame backward.
  */
 void video_player::previous_frame() {
-    update_frame(get_current_frame_num() - 1);
+    set_playback_pos(get_current_frame_num() - 1);
 }
 
 /**
@@ -440,14 +419,17 @@ void video_player::on_stop_video() {
 }
 
 /**
- * @brief video_player::update_frame
- * @param frame_nbr
- * Updates the current frame if frame_nbr is valid.
+ * @brief video_player::check_last_frame
+ * Checks if the last frame is empty.
  */
-void video_player::update_frame(int frame_nbr) {
-    if (set_current_frame_num(frame_nbr)) {
-        process_frame(false);
+void video_player::check_last_frame() {
+    cv::Mat last;
+    capture.set(CV_CAP_PROP_POS_FRAMES, num_frames - 1);
+    capture.read(last);
+    if (last.empty()) {
+        num_frames -= 1;
     }
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
 }
 
 /**
@@ -458,18 +440,8 @@ void video_player::update_overlay() {
     // If the video is paused we need to update the frame ourself (otherwise done in the video-thread),
     // but only if there is a video loaded.
     if (capture.isOpened() && is_paused()) {
-        process_frame(1);
+        process_frame();
     }
-}
-
-/**
- * @brief video_player::set_slider_frame
- * @param frame_nbr
- * This method is called when the slider is moved and is used to call the private method
- * update_frame with the desired frame number.
- */
-void video_player::set_slider_frame(int frame_nbr) {
-    update_frame(frame_nbr);
 }
 
 /**
@@ -483,7 +455,7 @@ void video_player::set_bright_cont(int b_value, double c_value) {
     manipulator->set_brightness(b_value);
     manipulator->set_contrast(c_value);
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 }
 
 /**
@@ -627,7 +599,7 @@ void video_player::rotate_right() {
     rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
     zoomer->flip();
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 }
 
 /**
@@ -643,7 +615,7 @@ void video_player::rotate_left() {
     rotate_direction = (rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
     zoomer->flip();
     frame_lock.unlock();
-    process_frame(1);
+    process_frame();
 }
 
 /**

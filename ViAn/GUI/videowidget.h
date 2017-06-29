@@ -2,6 +2,7 @@
 #define VIDEOWIDGET_H
 
 #include <QWidget>
+#include <QTime>
 #include <QScrollArea>
 #include <QLabel>
 #include <QSize>
@@ -26,8 +27,10 @@ class VideoWidget : public QWidget
     QScrollBar* v_bar;
     QScrollBar* h_bar;
     QSize current_frame_size;
+    QTime timer;
     double h_step_size, v_step_size;
     int current_frame;
+    int prev_frame_idx;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 

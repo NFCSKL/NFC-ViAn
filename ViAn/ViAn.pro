@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     Project/Test/videoprojecttest.cpp \
     GUI/statusbar.cpp \
     Video/rotatablerect.cpp \
-    GUI/manipulatordialog.cpp
+    GUI/manipulatordialog.cpp \
+    Video/frameprocessor.cpp
 
 #
 # TEST
@@ -51,7 +52,8 @@ HEADERS += Test/test_video_player.h \
     Project/Test/videoprojecttest.h \
     GUI/statusbar.h \
     Video/rotatablerect.h \
-    GUI/manipulatordialog.h
+    GUI/manipulatordialog.h \
+    Video/frameprocessor.h
 
 #
 # LIBRARY
