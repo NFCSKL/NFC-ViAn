@@ -65,25 +65,25 @@ void test_video_player::test_set_frame_height() {
     QVERIFY(mvideo->frame_height == 50);
 }
 
-/**
- * @brief test_video_player::test_next_frame
- */
-void test_video_player::test_next_frame() {
-    mvideo->video_paused = true;
-    mvideo->set_current_frame_num(100);
-    mvideo->next_frame();
-    QVERIFY(mvideo->get_current_frame_num() == 101);
-}
+///**
+// * @brief test_video_player::test_next_frame
+// */
+//void test_video_player::test_next_frame() {
+//    mvideo->video_paused = true;
+//    mvideo->set_current_frame_num(100);
+//    mvideo->next_frame();
+//    QVERIFY(mvideo->get_current_frame_num() == 101);
+//}
 
-/**
- * @brief test_video_player::test_previous_frame
- */
-void test_video_player::test_previous_frame() {
-    mvideo->video_paused = true;
-    mvideo->set_current_frame_num(100);
-    mvideo->previous_frame();
-    QVERIFY(mvideo->get_current_frame_num() == 99);
-}
+///**
+// * @brief test_video_player::test_previous_frame
+// */
+//void test_video_player::test_previous_frame() {
+//    mvideo->video_paused = true;
+//    mvideo->set_current_frame_num(100);
+//    mvideo->previous_frame();
+//    QVERIFY(mvideo->get_current_frame_num() == 99);
+//}
 
 /**
  * @brief test_video_player::test_inc_playback_speed
@@ -359,33 +359,33 @@ void test_video_player::test_on_set_playback_frame_fail() {
 */
 
 
-/**
- * @brief test_video_player::test_set_current_frame_num
- * Testing if setting the current frame to a specific frame in a video works as expected.
- */
-void test_video_player::test_set_current_frame_num() {
-    mvideo->capture.release();
-    mvideo->capture.open("seq_01.mp4");
+///**
+// * @brief test_video_player::test_set_current_frame_num
+// * Testing if setting the current frame to a specific frame in a video works as expected.
+// */
+//void test_video_player::test_set_current_frame_num() {
+//    mvideo->capture.release();
+//    mvideo->capture.open("seq_01.mp4");
 
-    const int LEGAL_FRAME = 100;
-    const int ILLEGAL_FRAME = 999999;
+//    const int LEGAL_FRAME = 100;
+//    const int ILLEGAL_FRAME = 999999;
 
-    //Testing different branches with legal frame number
-    mvideo->frame.release();
-    mvideo->video_paused = true;
-    QVERIFY(mvideo->set_current_frame_num(LEGAL_FRAME));
-    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == LEGAL_FRAME+1);
-    QVERIFY(mvideo->frame.elemSize()*mvideo->frame.cols*mvideo->frame.rows != 0);
+//    //Testing different branches with legal frame number
+//    mvideo->frame.release();
+//    mvideo->video_paused = true;
+//    QVERIFY(mvideo->set_current_frame_num(LEGAL_FRAME));
+//    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == LEGAL_FRAME+1);
+//    QVERIFY(mvideo->frame.elemSize()*mvideo->frame.cols*mvideo->frame.rows != 0);
 
-    mvideo->video_paused = false;
-    mvideo->new_frame_num = -1;
-    mvideo->set_new_frame = false;
-    mvideo->set_current_frame_num(LEGAL_FRAME);
-    QVERIFY(mvideo->new_frame_num == LEGAL_FRAME && mvideo->set_new_frame);
+//    mvideo->video_paused = false;
+//    mvideo->new_frame_num = -1;
+//    mvideo->set_new_frame = false;
+//    mvideo->set_current_frame_num(LEGAL_FRAME);
+//    QVERIFY(mvideo->new_frame_num == LEGAL_FRAME && mvideo->set_new_frame);
 
-    //Testing illegal frame number
-    QVERIFY(!mvideo->set_current_frame_num(ILLEGAL_FRAME));
-}
+//    //Testing illegal frame number
+//    QVERIFY(!mvideo->set_current_frame_num(ILLEGAL_FRAME));
+//}
 
 /**
  * @brief test_video_player::test_convert_frame

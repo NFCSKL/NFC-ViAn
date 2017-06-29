@@ -64,3 +64,19 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
 void AnalysisSlider::clear_slider() {
     rects.clear();
 }
+
+void AnalysisSlider::set_blocked(bool value) {
+    m_blocked = value;
+}
+
+bool AnalysisSlider::is_blocked() {
+    return m_blocked;
+}
+
+bool AnalysisSlider::get_was_paused() {
+    return m_was_paused;
+}
+
+void AnalysisSlider::set_was_paused(bool value) {
+    m_was_paused = value;
+}
