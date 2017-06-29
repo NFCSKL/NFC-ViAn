@@ -20,7 +20,7 @@ void FrameManipulator::set_brightness(int value){
  * @param value
  */
 void FrameManipulator::set_contrast(double value) {
-    alpha = std::min(FrameManipulator::CONTRAST_MAX, std::max(FrameManipulator::CONTRAST_MIN, value));
+    alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, value));
 }
 
 
@@ -39,6 +39,6 @@ void FrameManipulator::apply(cv::Mat &src) {
  * Reset the alpha and beta values to default
  */
 void FrameManipulator::reset() {
-    alpha = FrameManipulator::CONTRAST_DEFAULT;
-    beta = FrameManipulator::BRIGHTNESS_DEFAULT;
+    alpha = CONTRAST_DEFAULT;
+    beta = BRIGHTNESS_DEFAULT;
 }

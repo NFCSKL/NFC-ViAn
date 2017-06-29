@@ -448,7 +448,6 @@ void VideoWidget::on_new_frame(int frame_num) {
 void VideoWidget::on_playback_slider_pressed() {
     timer.start();
     playback_slider->set_blocked(true);
-    std::cout << m_video_player->is_playing() << std::endl;
     playback_slider->set_was_paused(m_video_player->is_paused());
     if (!playback_slider->get_was_paused()) emit set_pause_video();
 }
@@ -471,7 +470,6 @@ void VideoWidget::on_playback_slider_value_changed() {
 
 void VideoWidget::on_playback_slider_moved() {
     if (std::abs(playback_slider->value() - prev_frame_idx) % 5 == 0) {
-        qDebug() << "update";
         emit set_playback_frame(playback_slider->value(), true);
     }
 

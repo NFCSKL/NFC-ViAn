@@ -99,9 +99,6 @@ void video_player::reset() {
 void video_player::run()  {
     int delay = (1000/frame_rate);
     bool is_end = false;
-    unsigned int counter = 0;
-    QTime timer;
-    timer.start();
     while (!video_stopped) {
         // The video capture object can be modified from outside this thread
         // Thus the capture.read cannot be part of the loop condition
@@ -125,10 +122,7 @@ void video_player::run()  {
             video_paused = false;
         }
         m_mutex->unlock();
-
-
     }
-    std::cout << timer.elapsed() << std::endl;
     video_stopped = true;
     video_paused = false;
     set_playback_pos(0);
@@ -599,7 +593,7 @@ bool video_player::is_including_area() {
  * Rotates the video to the right by 90 degrees.
  */
 void video_player::rotate_right() {
-    // Rotaing right means adding 1 and
+    // Rotating right means adding 1 and
     // starting over if larger than maximum,
     frame_lock.lock();
     rotate_direction = (rotate_direction + 1) % ROTATE_NUM;
@@ -613,7 +607,7 @@ void video_player::rotate_right() {
  * Rotates the video to the left by 90 degrees.
  */
 void video_player::rotate_left() {
-    // Rotaing left means subtracting 1 and
+    // Rotating left means subtracting 1 and
     // starting over if larger than maximum.
     // Modulo handles positive values, so
     // minus 1 is the same as adding maximum-1.
