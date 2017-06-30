@@ -10,6 +10,10 @@ MotionDetection::MotionDetection(std::string source_file) {
     capture.open(source_file);
 }
 
+MotionDetection::~MotionDetection() {
+
+}
+
 /**
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis
@@ -54,6 +58,7 @@ std::vector<OOI> MotionDetection::analyse_frame(){
         cv::dilate(diff_frame, diff_frame, dilation_kernel);
         // ANDs the foreground masks
         cv::bitwise_and(diff_frame, foreground_mask, result);
+        gray_frame.release();
     } else {
         // diff_prev is empty for the first analysed frame.
         result = foreground_mask.clone();

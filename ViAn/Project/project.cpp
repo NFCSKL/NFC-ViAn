@@ -8,7 +8,7 @@ Project::Project()
 {
 
 }
-
+//TODO Fix all these function names
 Project* Project::fromFile(const std::string &full_path)
 {
     Project* proj = new Project();

@@ -21,6 +21,7 @@
 
 #include "videowidget.h"
 #include "projectwidget.h"
+#include "analysiswidget.h"
 #include "bookmarkwidget.h"
 #include "statusbar.h"
 
@@ -51,6 +52,7 @@ private:
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
+    AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
 
     QAction* toggle_project_wgt;
@@ -61,6 +63,7 @@ private:
     void init_file_menu();
     void init_edit_menu();
     void init_view_menu();
+    void init_analysis_menu();
     void init_tools_menu();
     void init_help_menu();
 };

@@ -1,5 +1,6 @@
 #include "framewidget.h"
 #include <QDebug>
+#include "Project/Analysis/analysis.h"
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
 }
@@ -21,6 +22,21 @@ void FrameWidget::toggle_zoom(bool value) {
 
 void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
+}
+
+void FrameWidget::set_analysis(Analysis* analysis) {
+    m_analysis = analysis;
+}
+
+void FrameWidget::set_detections_on_frame(int frame_num) {
+    if (m_analysis) {
+        ooi_rects = m_analysis->get_detections_on_frame(frame_num);
+    }
+}
+
+void FrameWidget::set_detections(bool detections) {
+    m_detections = detections;
+    repaint();  //Repaint to update the current frame directly
 }
 
 void FrameWidget::draw_image(cv::Mat image) {
@@ -78,6 +94,16 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         painter.setPen(QColor(0,255,0));
         QRectF zoom(zoom_start_pos, zoom_end_pos);
         painter.drawRect(zoom);
+    }
+    if (m_detections) {
+        for (cv::Rect rect : ooi_rects) {
+            QPoint tl(rect.x, rect.y);
+            QPoint br(rect.x+rect.width, rect.y+rect.height);
+
+            QRectF detect_rect(tl, br);
+            painter.setPen(QColor(0,0,255));
+            painter.drawRect(detect_rect);
+        }
     }
 
     painter.end();

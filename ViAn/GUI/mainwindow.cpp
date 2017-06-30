@@ -39,18 +39,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
+    // Initialize analysis widget
+    analysis_wgt = new AnalysisWidget();
+    connect(video_wgt, SIGNAL(start_analysis(VideoProject*)), project_wgt, SLOT(start_analysis(VideoProject*)));
+    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*)));
+
+
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     std::vector<std::string> tags = {"one", "two"};
     bookmark_wgt->add_bookmark("bookmark description", tags);
-    connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt,SLOT(create_bookmark(int,cv::Mat)));
+    connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(int,cv::Mat)));
     bookmark_dock->setWidget(bookmark_wgt);
 
     //Initialize menu bar
     init_file_menu();
     init_edit_menu();
     init_view_menu();
+    init_analysis_menu();
     init_tools_menu();
     init_help_menu();
 
@@ -73,8 +80,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    
+    connect(analysis_wgt, &AnalysisWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
+    connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
+    connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
+
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
+    connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
+
+    connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
+    connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
+    connect(project_wgt, SIGNAL(enable_poi_btns(bool)), video_wgt, SLOT(enable_poi_btns(bool)));
 }
 
 
@@ -215,8 +230,22 @@ void MainWindow::init_view_menu() {
 }
 
 /**
+ * @brief MainWindow::init_analysis_menu
+ * Set up the analysis menu
+ */
+void MainWindow::init_analysis_menu() {
+    QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
+
+    QAction* analysis_act = new QAction(tr("&Perform_analysis"), this);
+    analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
+    analysis_act->setStatusTip(tr("Perform analysis"));
+    analysis_menu->addAction(analysis_act);
+    connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
+}
+
+/**
  * @brief MainWindow::init_tools_menu
- * Set up the init menu
+ * Set up the tools menu
  */
 void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));

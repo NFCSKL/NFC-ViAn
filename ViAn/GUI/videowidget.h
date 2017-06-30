@@ -38,6 +38,7 @@ public:
     QMutex mutex;
     QWaitCondition paused_wait;
     video_player* m_video_player;
+    FrameWidget* frame_wgt;
 
 signals:
     void first_frame(cv::Mat frame);
@@ -51,6 +52,9 @@ signals:
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
     void new_bookmark(int, cv::Mat);
+    void set_detections_on_frame(int);
+    
+    void start_analysis(VideoProject*);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -59,6 +63,7 @@ public slots:
     void stop_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+    void analysis_btn_clicked(void);
     void zoom_out_clicked();
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
@@ -70,6 +75,7 @@ public slots:
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
     void load_marked_video(VideoProject* vid_proj);
+    void enable_poi_btns(bool);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
@@ -85,7 +91,7 @@ private:
     AnalysisSlider* playback_slider;
     QLabel* current_time;
     QLabel* total_time;
-    FrameWidget* frame_wgt;
+
 
     //Buttons
     QPushButton* play_btn;
@@ -125,6 +131,9 @@ private:
     VideoProject* m_vid_proj;
 
     bool slider_is_blocked = false;
+    bool video_btns_enabled = false;
+
+    void enable_video_btns();
 
     void init_control_buttons();
 

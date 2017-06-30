@@ -15,13 +15,18 @@ public:
 signals:
     void selected_media();
     void marked_video(VideoProject* vid_proj);
+    void marked_analysis(Analysis*);
+    void set_detections(bool);
+    void enable_poi_btns(bool);
     void set_status_bar(QString);
+    void begin_analysis(std::string, std::string, QTreeWidgetItem*);
 
 public slots:
     void new_project(void) const;
     void add_project(const QString project_name, const QString project_path);
     void add_video();
-    void add_analysis();
+    void start_analysis(VideoProject*);
+    void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
     void open_project();
     void close_project();
@@ -32,7 +37,6 @@ private:
     void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
-    void tree_add_analysis();
 
 };
 
