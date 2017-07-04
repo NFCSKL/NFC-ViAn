@@ -21,7 +21,9 @@
 
 #include "videowidget.h"
 #include "projectwidget.h"
+#include "analysiswidget.h"
 #include "bookmarkwidget.h"
+#include "statusbar.h"
 
 using namespace std;
 class AnalysisWindow;
@@ -29,21 +31,29 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:    
-
+    const int SIZE_MULTIPLIER = 40;
+    const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
+    const int VIDEO_WGT_HEIGHT = 9;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    StatusBar* status_bar;
 private slots:
-    void open_project(void);
-    void save_project(void);
     void gen_report(void);
-    void close_project(void);
-    void remove_project(void);
+    void cont_bri(void);
+
+public slots:
     void options(void);
+
+signals:
+    void set_status_bar(QString);
+
 private:
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
-    BookmarkWidget* bookmark_wgt;   
+    AnalysisWidget* analysis_wgt;
+    BookmarkWidget* bookmark_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
@@ -53,6 +63,7 @@ private:
     void init_file_menu();
     void init_edit_menu();
     void init_view_menu();
+    void init_analysis_menu();
     void init_tools_menu();
     void init_help_menu();
 };

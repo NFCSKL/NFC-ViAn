@@ -24,6 +24,7 @@ AnalysisController::AnalysisController(std::string save_path, std::string video_
 
 /**
  * @brief AnalysisController::AnalysisController
+ * @param save_path                     path to the save
  * @param file_path                     path to the video file to be analysed
  * @param type                          analysis type
  * @param inclusion_exclusion_points    Points for the inclusion/exclusion polygon
@@ -37,6 +38,12 @@ AnalysisController::AnalysisController(std::string save_path, std::string video_
     setup_analysis(video_path, type);
     if(!inclusion_exclusion_points.empty())
     method->set_include_exclude_area(inclusion_exclusion_points, exclude_poly);
+}
+
+void AnalysisController::new_analysis(std::string save_path, std::string video_path, ANALYSIS_TYPE type) {
+    m_save_path = save_path;
+    m_video_path = video_path;
+    setup_analysis(video_path, type);
 }
 
 /**
@@ -104,5 +111,5 @@ void AnalysisController::on_abort() {
  * @param progress
  */
 void AnalysisController::on_progress_update(int progress) {
-    emit show_analysis_progress(progress);
+    emit progress_signal(progress);
 }

@@ -8,8 +8,12 @@ enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM};
 
 class AnalysisItem : public QTreeWidgetItem
 {
+    Analysis m_analysis;
+
 public:
     AnalysisItem(int type);
+    void set_analysis(Analysis analysis);
+    Analysis *get_analysis();
 };
 
 class FolderItem : public QTreeWidgetItem

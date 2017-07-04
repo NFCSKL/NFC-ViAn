@@ -13,6 +13,7 @@
 class MotionDetection : public AnalysisMethod {
 public:
     MotionDetection(std::string source_file);
+    ~MotionDetection();
 
 private:
     cv::Mat foreground_mask, background, blurred_frame, diff_frame, result, prev_frame, dilation_kernel;

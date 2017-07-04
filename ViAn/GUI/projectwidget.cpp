@@ -6,7 +6,6 @@
 #include <iostream>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
-    add_analysis();
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
 
@@ -69,20 +68,33 @@ void ProjectWidget::add_video() {
 }
 
 /**
- * @brief ProjectWidget::add_analysis
- * Slot function to add an analysis
+ * @brief ProjectWidget::start_analysis
+ * @param vid_proj
+ * Start analysis on the selected video
  */
-void ProjectWidget::add_analysis(){
-    tree_add_analysis();
+void ProjectWidget::start_analysis(VideoProject* vid_proj) {
+    AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
+    for (int i = 0; i < m_videos->childCount(); i++) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
+        if (vid_item->get_video_project() == vid_proj) {
+            m_videos->child(i)->addChild(ana);
+            ana->setText(0, "Loading");
+            m_videos->child(i)->setExpanded(true);
+            QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
+            emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
+        }
+    }
 }
 
 /**
- * @brief ProjectWidget::tree_add_analysis
- * Adds the analysis to the project tree
+ * @brief ProjectWidget::set_tree_item_name
+ * @param item
+ * @param name
+ * Slot to set the name if an item in the project tree
  */
-void ProjectWidget::tree_add_analysis(){
-    AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
-    addTopLevelItem(ana);
+
+void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
+    item->setText(0, name);
 }
 
 /**
@@ -95,6 +107,8 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     VideoItem* vid = new VideoItem(vid_proj, VIDEO_ITEM);
     vid->setText(0, vid_name);
     m_videos->addChild(vid);
+    emit set_status_bar("Video added");
+    m_videos->setExpanded(true);
 }
 
 /**
@@ -107,19 +121,24 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
-        qDebug() << "Video Selected";
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        marked_video(vid_item->get_video_project());
+        emit marked_video(vid_item->get_video_project());
+        emit set_detections(false);
+        emit enable_poi_btns(false);
         break;
     } case ANALYSIS_ITEM: {
-        qDebug() << "Analysis Selected";
-        AnalysisItem* vid_item = dynamic_cast<AnalysisItem*>(item);
+        tree_item_clicked(item->parent(), 0);
+        AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        emit marked_analysis(ana_item->get_analysis());
+        emit set_detections(true);
+        if (!ana_item->get_analysis()->POIs.empty()) {
+            emit enable_poi_btns(true);
+        }
         break;
     } case FOLDER_ITEM: {
-        qDebug() << "Folder Selected";
         break;
     } default:
-        qDebug() << "Nothing clicked";
+        break;
     }
 
 }
@@ -130,6 +149,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
  */
 void ProjectWidget::save_project() {
     m_proj->save_project();
+    emit set_status_bar("Project saved");
 }
 
 /**
@@ -139,6 +159,7 @@ void ProjectWidget::save_project() {
 void ProjectWidget::open_project() {
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
+        emit set_status_bar("Opening project");
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
@@ -152,4 +173,20 @@ void ProjectWidget::open_project() {
             tree_add_video(vid_proj, vid_name);
         }
     }
+}
+
+/**
+ * @brief ProjectWidget::close_project
+ * TODO Fix
+ */
+void ProjectWidget::close_project() {
+    emit set_status_bar("TODO - Closed the project");
+}
+
+/**
+ * @brief ProjectWidget::remove_project
+ * TODO FIX
+ */
+void ProjectWidget::remove_project() {
+    emit set_status_bar("TODO - Removed the project");
 }

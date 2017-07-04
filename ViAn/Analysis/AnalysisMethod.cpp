@@ -31,7 +31,6 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
 }
 
 
-
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.
@@ -78,13 +77,6 @@ Analysis AnalysisMethod::run_analysis() {
                 }
                 m_POI->add_detections(current_frame_index, detections);
             }
-
-            // Makes sure that a POI that stretches to the end of the
-            // video gets an end frame.
-            if (current_frame_index == (num_frames-1) && detecting) {
-                m_POI->set_end_frame(current_frame_index);
-                m_analysis.add_POI(*m_POI);
-            }
         } else if (!detections.empty()) {
             /* If the current frame is not sampled, the detections from the previously
              * sampled frame should still be valid and should therefore be shown as
@@ -97,8 +89,15 @@ Analysis AnalysisMethod::run_analysis() {
             // TODO do pause stuff
             paused = false;
         }
+
         emit send_progress(get_progress());
         ++current_frame_index;
+    }
+    // Makes sure that a POI that stretches to the end of the
+    // video gets an end frame.
+    if (detecting) {
+        m_POI->set_end_frame(current_frame_index);
+        m_analysis.add_POI(*m_POI);
     }
     capture.release();
     return m_analysis;

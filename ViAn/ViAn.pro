@@ -21,12 +21,21 @@ SOURCES += main.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
+    utility.cpp \
+    GUI/drawscrollarea.cpp \
+    Video/zoomer.cpp \
+    GUI/analysisslider.cpp \
     GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
     GUI/bookmarkcategory.cpp \
     GUI/bookmarkcontainer.cpp \
     imagegenerator.cpp \
-    GUI/bookmarklist.cpp
+    GUI/bookmarklist.cpp \
+    GUI/statusbar.cpp \
+    GUI/analysiswidget.cpp \
+    GUI/manipulatordialog.cpp \
+    Video/frameprocessor.cpp
+
 
 #
 # TEST
@@ -40,12 +49,20 @@ HEADERS += Test/test_video_player.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
+    utility.h \
+    GUI/drawscrollarea.h \
+    Video/zoomer.h \
+    GUI/analysisslider.h \
     GUI/projectdialog.h \
     Project/Test/videoprojecttest.h \
     GUI/bookmarkcategory.h \
     GUI/bookmarkcontainer.h \
     imagegenerator.h \
-    GUI/bookmarklist.h
+    GUI/bookmarklist.h \
+    GUI/statusbar.h \
+    GUI/analysiswidget.h \
+    GUI/manipulatordialog.h \
+    Video/frameprocessor.h
 
 #
 # LIBRARY
@@ -95,7 +112,8 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
-    Video/shapes/analysarea.cpp
+    Video/shapes/analysarea.cpp \
+    Video/framemanipulator.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/analysisoverlay.h \
@@ -107,7 +125,8 @@ HEADERS += Video/video_player.h \
     Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
-    Video/shapes/analysarea.h
+    Video/shapes/analysarea.h \
+    Video/framemanipulator.h
 
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include

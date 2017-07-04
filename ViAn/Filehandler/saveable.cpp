@@ -45,8 +45,8 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
                     ? QString::fromStdString(full_path + ".json")
                     : QString::fromStdString(full_path + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){  // Attempt to open full_path
-        qWarning("Couldn't open save file %s",
-                 save_file.fileName());   // Send warning if unsuccessful
+        qDebug() << "Couldn't open save file"+
+                 save_file.fileName();   // Send warning if unsuccessful
         return false;
     }
     QJsonObject json_saveable;                  // Data to be saved
@@ -69,7 +69,7 @@ bool Saveable::delete_saveable()
 {
     QFile file(QString::fromStdString(m_full_path));
     if(file.exists()) return file.remove();
-    qWarning("No file to delete");
+    qDebug() << "Couldn't delete file: " + QString::fromStdString(m_full_path);
     return false;
 }
 

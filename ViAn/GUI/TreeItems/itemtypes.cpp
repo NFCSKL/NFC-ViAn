@@ -13,6 +13,14 @@ AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 
 }
 
+void AnalysisItem::set_analysis(Analysis analysis) {
+    m_analysis = analysis;
+}
+
+Analysis* AnalysisItem::get_analysis() {
+    return &m_analysis;
+}
+
 FolderItem::FolderItem(int type) : QTreeWidgetItem(type) {
 
 }

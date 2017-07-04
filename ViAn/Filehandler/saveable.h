@@ -8,7 +8,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QJsonDocument>
-
+#include <QDebug>
 /**
  * @brief The Saveable class
  * The saveable class is an abstract class

@@ -8,14 +8,19 @@
 #include <QDebug>
 
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
-    setSizeGripEnabled(false);
+    // remove question mark from the title bar
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
     btn_box = new QDialogButtonBox(Qt::Horizontal);
 
-    path_text->setFixedWidth(200);
+    setTabOrder(name_text, path_text);
+    setTabOrder(path_text, browse_btn);
+
+    browse_btn->setFixedWidth(80);
     browse_btn->setFixedHeight(path_text->height());
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
@@ -43,12 +48,10 @@ void ProjectDialog::browse_btn_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"), path_text->text());
     if(!dir.isEmpty()) {
         path_text->setText(dir);
-        qDebug() << dir;
     }
 }
 
 void ProjectDialog::ok_btn_clicked() {
-    qDebug() << "ok";
     emit project_path(name_text->text(), path_text->text());
     close();
 

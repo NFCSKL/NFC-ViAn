@@ -12,10 +12,10 @@
  */
 class AnalysisMeta : public Saveable
 {
-    std::vector<std::pair<int,int>> m_poi_intervals;
     std::string file_analysis;
 public:
     std::string m_name;
+    std::vector<std::pair<int,int>> m_poi_intervals;
     AnalysisMeta(const Analysis &analysis);
     AnalysisMeta();
     Analysis get_analysis(); // Only use this if all analysisinformation is needed
