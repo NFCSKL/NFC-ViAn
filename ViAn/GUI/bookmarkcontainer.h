@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QLayout>
+#include <QDropEvent>
 
 /**
  * @brief BookmarkContainer::BookmarkContainer
@@ -17,7 +18,9 @@ class BookmarkContainer : public QListWidget
     QVBoxLayout* layout;
 public:
     explicit BookmarkContainer(QWidget* parent = nullptr);
-
+    ~BookmarkContainer();
+protected:
+    void dropEvent(QDropEvent* event);
 };
 
 #endif // BOOKMARKCONTAINER_H

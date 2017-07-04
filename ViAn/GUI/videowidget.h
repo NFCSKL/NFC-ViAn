@@ -18,7 +18,7 @@ class VideoWidget : public QWidget
 {
     Q_OBJECT
 private:
-    int current_frame;
+    int current_frame = 0;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 

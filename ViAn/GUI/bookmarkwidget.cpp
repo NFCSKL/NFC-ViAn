@@ -1,20 +1,21 @@
 #include "bookmarkwidget.h"
 #include "Library/customdialog.h"
+#include <imagegenerator.h>
+#include <QString>
+#include <QMenu>
+
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
 
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
     QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
     connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
-    bm_win = get_drag_drop_list(this);
+    bm_list = new BookmarkList(this);
 
-    bm_win_layout = new QVBoxLayout();
-    bm_win_layout->setAlignment(Qt::AlignTop);
-    bm_win_layout->setSpacing(10);
-    bm_win_layout->setMargin(10);
+    bm_list_layout = new QVBoxLayout();
+
     scroll_area = new QScrollArea();
 
-    bm_win->setLayout(bm_win_layout);
-    scroll_area->setWidget(bm_win);
+    scroll_area->setWidget(bm_list);
     scroll_area->setFrameStyle(0);
     scroll_area->setWidgetResizable(true);
 
@@ -25,40 +26,97 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
     layout->addWidget(generate_btn);   
     layout->setMargin(10);
     layout->setSpacing(10);
-    setMinimumWidth(bm_win->sizeHint().width()*2); // Should be 2*thumbnail + margin
+    setMinimumWidth(bm_list->sizeHint().width()*2); // Should be 2*thumbnail + margin
     setLayout(layout);
+
+    //Context menu for list items
+//    bm_list->setContextMenuPolicy(Qt::CustomContextMenu);
+//    connect(bm_list, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(item_context_menu(QPoint)));
 }
 
-void BookmarkWidget::add_new_folder()
-{
-    BookmarkCategory* f2 = new BookmarkCategory(bm_win);
-    bm_win->addItem(f2);
+void BookmarkWidget::add_new_folder() {
+    BookmarkCategory* f2 = new BookmarkCategory("name", bm_list, CONTAINER);
+    bm_list->addItem(f2);
 
 }
 
-void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr, cv::Mat)
+void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame)
 {
-    qDebug() << "create bookmark";
     bool ok;
     QString text = get_input_text("", &ok);    
     if(!ok) return;
-    qDebug() << "add bookmark";
-    Bookmark* bookmark = new Bookmark(vid_proj,text.toStdString(), frame_nbr);
+    Bookmark* bookmark = new Bookmark(vid_proj, text.toStdString(), frame_nbr);
     vid_proj->add_bookmark(bookmark);
-    //add_bookmark(vid_proj, bookmark);
+
+    std::string file_name = vid_proj->get_video()->file_path;
+    int index = file_name.find_last_of('/') + 1;
+    file_name = file_name.substr(index);
+    file_name += "_" + std::to_string(frame_nbr);
+
+    ImageGenerator im_gen(frame, m_path);
+    std::string thumbnail_path = im_gen.create_thumbnail(file_name);
+    im_gen.create_tiff(file_name);
+
+    BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
+    bm_item->set_thumbnail(thumbnail_path);
+    qDebug() << "Adding item";
+    bm_list->addItem(bm_item);
+
 }
 
-QListWidget* BookmarkWidget::get_drag_drop_list(QWidget* parent)
-{
-    QListWidget* lw = new QListWidget(parent);
-    // Enable drag and drop
-    lw->setSelectionMode(QAbstractItemView::SingleSelection);
-    lw->setDragDropMode(QAbstractItemView::InternalMove);
-    lw->setDragEnabled(true);
-    lw->viewport()->setAcceptDrops(true);
-    lw->setDropIndicatorShown(true);
-    return lw;
+
+void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
+    for (auto bm_map : vid_proj->get_bookmarks()) {
+        Bookmark* bm = bm_map.second;
+        BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
+
+        // Load thumbnail TODO add check for file
+        std::string t_path = m_path + "_thumbnails/" + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
+        bm_item->set_thumbnail(t_path);
+
+        if (bm->get_container_name().empty()) {
+            qDebug() << "Adding to unsorted list";
+            bm_list->addItem(bm_item);
+        } else {
+            // TODO Find container with name and add to it
+            BookmarkCategory* bm_cat = nullptr;
+            for (int i = 0; i < bm_list->count(); i++) {
+                QListWidgetItem* item = bm_list->item(i);
+                if (item->type() == CONTAINER) {
+                    BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
+                    if (_tmp_cat->get_name() == bm->get_container_name()) {
+                            bm_cat = _tmp_cat;
+                            break;
+                        }
+                    }
+                }
+            if (bm_cat == nullptr) {
+                // Container does not exist. Create and add it
+                bm_cat= new BookmarkCategory(bm->get_container_name(), bm_list, CONTAINER);
+//                qDebug() << "Adding bookmark category";
+            }
+
+            switch (bm->get_type()) {
+                case DISPUTED:
+                    // Add bookmark to the left container
+                    bm_cat->add_disp_item(bm_item);
+                    break;
+                case REFERENCE:
+                    // Add bookmark to the right container
+                    bm_cat->add_ref_item(bm_item);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }
+
+
+void BookmarkWidget::set_path(string path) {
+    m_path = path;
+}
+
 /**
  * @brief BookmarkWidget::get_input_text
  * @param bookmark_text Text shown in the text edit when opening the dialog.

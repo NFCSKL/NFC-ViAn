@@ -12,23 +12,31 @@
 #include "Project/videoproject.h"
 #include "bookmarkitem.h"
 #include "bookmarkcategory.h"
+#include "bookmarklist.h"
+
+enum list_types {BOOKMARK, CONTAINER};
+
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT
-    QListWidget* bm_win;
-    QVBoxLayout* bm_win_layout;
+    std::string m_path;
+    BookmarkList* bm_list;
+    QVBoxLayout* bm_list_layout;
     QVBoxLayout* layout;
     QScrollArea* scroll_area;
     QDockWidget* folder_dock;
     const int TEXT_EDIT_MIN_HEIGHT = 64;
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
-    static QListWidget *get_drag_drop_list(QWidget *parent);
 
 signals:
 
 public slots:
     void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
+    void load_bookmarks(VideoProject *vid_proj);
+    void set_path(std::string path);
+private slots:
+//    void item_context_menu(QPoint pos);
 private:
     void add_new_folder();
     QString get_input_text(std::string text, bool* ok);

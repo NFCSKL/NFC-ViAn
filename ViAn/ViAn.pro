@@ -24,7 +24,9 @@ SOURCES += main.cpp \
     GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
     GUI/bookmarkcategory.cpp \
-    GUI/bookmarkcontainer.cpp
+    GUI/bookmarkcontainer.cpp \
+    imagegenerator.cpp \
+    GUI/bookmarklist.cpp
 
 #
 # TEST
@@ -41,7 +43,9 @@ HEADERS += Test/test_video_player.h \
     GUI/projectdialog.h \
     Project/Test/videoprojecttest.h \
     GUI/bookmarkcategory.h \
-    GUI/bookmarkcontainer.h
+    GUI/bookmarkcontainer.h \
+    imagegenerator.h \
+    GUI/bookmarklist.h
 
 #
 # LIBRARY

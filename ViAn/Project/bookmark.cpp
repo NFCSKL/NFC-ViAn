@@ -38,6 +38,20 @@ int Bookmark::get_frame_number() {
     return frame_number;
 }
 
+
+int Bookmark::get_type() {
+    return m_type;
+}
+
+/**
+ * @brief Bookmark::get_container_name
+ * @return
+ */
+std::string Bookmark::get_container_name() {
+    return m_container_name;
+}
+
+
 /**
  * @brief Bookmark::get_description
  * @return Returns the description associated with the bookmark.
@@ -56,6 +70,24 @@ void Bookmark::set_description(const std::string& text) {
 }
 
 /**
+ * @brief Bookmark::set_type
+ * Sets the bookmark type
+ * @param type
+ */
+void Bookmark::set_type(const int type) {
+    m_type = type;
+}
+
+/**
+ * @brief Bookmark::set_container_name
+ * Sets the name of the GUI container that the bookmark is stored in
+ * @param name
+ */
+void Bookmark::set_container_name(const string name) {
+    m_container_name = name;
+}
+
+/**
  * @brief Bookmark::read
  * @param json
  * Reads a bookmark from a Json object.
@@ -65,6 +97,9 @@ void Bookmark::read(const QJsonObject& json){
     this->frame_number = json["frame"].toInt();
     m_file = json["path"].toString().toStdString();
     this->description = json["description"].toString().toStdString();
+    m_type = json["type"].toInt();
+    m_container_name = json["container"].toString().toStdString();
+
 }
 
 /**
@@ -78,6 +113,8 @@ void Bookmark::write(QJsonObject& json){
     json["frame"] = this->frame_number;
     json["path"] = QString::fromStdString(m_file);
     json["description"] = QString::fromStdString(description);
+    json["type"] = m_type;
+    json["container"] = QString::fromStdString(m_container_name);
 }
 
 /**

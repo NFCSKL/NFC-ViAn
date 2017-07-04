@@ -213,8 +213,7 @@ std::string Project::getDir_videos() const
     return m_dir_videos;
 }
 
-std::string Project::getDir() const
-{
+std::string Project::getDir() const {
     return m_dir;
 }
 

@@ -1,39 +1,91 @@
 #include "bookmarkcategory.h"
+#include <QDebug>
 
-BookmarkCategory::BookmarkCategory(QListWidget *parent) : QListWidgetItem(parent)
-{   
+BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int type) : QListWidgetItem(parent, type) {
+    m_name = name;
     // Setup layout
     QWidget* folder = new QWidget();
     layout = new QVBoxLayout();
     layout->setAlignment(Qt::AlignTop);
     layout->setMargin(5);
-    layout->setSpacing(5);
+    layout->setSpacing(0);
     folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
-    QLineEdit* title = new QLineEdit("mapname");
+    QLineEdit* title = new QLineEdit(QString::fromStdString(name));
+    connect(title, SIGNAL(textEdited(QString)), this, SLOT(on_text_edited(QString)));
     layout->addWidget(title);
     layout->addLayout(container);
 
     // Add disputed and reference list
-    disputed = make_scrollable_container();
-    reference = make_scrollable_container();
+    disp_list = new BookmarkList(false, DISPUTED);
+    ref_list = new BookmarkList(false, REFERENCE);
+    disp_list->set_parent_name(m_name);
+    ref_list->set_parent_name(m_name);
+    connect(title, SIGNAL(textEdited(QString)), disp_list, SLOT(on_parent_name_edited(QString)));
+    connect(title, SIGNAL(textEdited(QString)), ref_list, SLOT(on_parent_name_edited(QString)));
+
+    disputed = make_scrollable_container(disp_list);
+    reference = make_scrollable_container(ref_list);
 
     container->addWidget(disputed);
     container->addWidget(reference);
 
     folder->setLayout(layout);
     parent->setItemWidget(this, folder);
+
     setSizeHint(folder->sizeHint());
 }
 
-QScrollArea *BookmarkCategory::make_scrollable_container()
-{
-    BookmarkContainer* container = new BookmarkContainer();
+BookmarkCategory::~BookmarkCategory() {
+    delete layout;
+    delete disputed;
+    delete reference;
+}
+
+std::string BookmarkCategory::get_name() {
+    return m_name;
+}
+
+std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
+    vector<BookmarkItem *> items;
+    for (auto i = 0; i < disp_list->count(); ++i) {
+        items.push_back(dynamic_cast<BookmarkItem*>(disp_list->item(i)));
+    }
+    return items;
+}
+
+std::vector<BookmarkItem *> BookmarkCategory::get_references() {
+    vector<BookmarkItem *> items;
+    for (auto i = 0; i < ref_list->count(); ++i) {
+        qDebug() << i;
+        items.push_back(dynamic_cast<BookmarkItem*>(ref_list->item(i)));
+    }
+    return items;
+}
+
+void BookmarkCategory::add_disp_item(BookmarkItem *bm_item) {
+    disp_list->addItem(bm_item);
+}
+
+void BookmarkCategory::add_ref_item(BookmarkItem *bm_item) {
+    ref_list->addItem(bm_item);
+}
+
+QScrollArea *BookmarkCategory::make_scrollable_container(BookmarkList* container) {
     QScrollArea* scroll_area = new QScrollArea();
     scroll_area->setWidget(container);
     scroll_area->setFrameStyle(0);
     scroll_area->setWidgetResizable(true);
     return scroll_area;
+}
+
+/**
+ * @brief BookmarkCategory::on_text_edited
+ * Updateds name with the text from the editbox
+ * @param name
+ */
+void BookmarkCategory::on_text_edited(QString name){
+    m_name = name.toStdString();
 }
 
 

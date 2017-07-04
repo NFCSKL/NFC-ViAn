@@ -1,12 +1,14 @@
 #include "bookmarkitem.h"
+#include <opencv2/highgui/highgui.hpp>
+#include <QDebug>
 
 /**
  * @brief BookmarkItem::BookmarkItem
  * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(Bookmark* bookmark, QListWidget* view) :
-    QListWidgetItem(QString::fromStdString(bookmark->get_description()),view) {
+BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) :
+    QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
     this->bookmark = bookmark;
 }
 
@@ -22,8 +24,9 @@ BookmarkItem::~BookmarkItem() {
  * Creates and adds a thumbnail.
  * @param frame The image for the thumbnail.
  */
-void BookmarkItem::create_thumbnail(QImage &frame) {    
-
+void BookmarkItem::set_thumbnail(std::string thum_path) {
+    QIcon icon(QString::fromStdString(thum_path));
+    setIcon(icon);
 }
 
 /**

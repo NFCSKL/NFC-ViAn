@@ -15,6 +15,8 @@ public:
 signals:
     void selected_media();
     void marked_video(VideoProject* vid_proj);
+    void proj_path(std::string);
+    void load_bookmarks(VideoProject* vid_proj);
 public slots:
     void new_project(void) const;
     void add_project(const QString project_name, const QString project_path);

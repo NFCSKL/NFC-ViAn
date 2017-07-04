@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
 
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
+    connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
+    connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
     bookmark_dock->setWidget(bookmark_wgt);    
 
     //Initialize menu bar
@@ -54,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
-    QAction* toggle_toolbar = main_toolbar->toggleViewAction();
+    //TODO REMOVE? QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, QAction::triggered, project_wgt, &ProjectWidget::add_video);
 

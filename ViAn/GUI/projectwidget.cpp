@@ -3,6 +3,7 @@
 #include "TreeItems/itemtypes.h"
 #include <QFileDialog>
 #include <QDebug>
+#include <iostream>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     add_analysis();
@@ -34,6 +35,8 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_path = project_path.toStdString();    
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
+    _tmp_path.append(_tmp_name);
+    emit proj_path(m_proj->getDir());
 }
 
 /**
@@ -139,8 +142,10 @@ void ProjectWidget::open_project() {
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
+        emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
             VideoProject* vid_proj = vid_pair.second;
+            emit load_bookmarks(vid_proj);
             QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
             int index = video_path.lastIndexOf('/') + 1;
             QString vid_name = video_path.right(video_path.length() - index);
