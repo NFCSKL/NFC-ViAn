@@ -54,14 +54,16 @@ void ProjectWidget::create_default_tree() {
 void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return; // TODO: HANDLE CASE
 
-    QString video_path = QFileDialog().getOpenFileName(this, tr("Add video"), m_proj->getDir_videos().c_str());
-    int index = video_path.lastIndexOf('/') + 1;
-    QString vid_name = video_path.right(video_path.length() - index);
+    QStringList video_paths = QFileDialog().getOpenFileNames(this, tr("Add video"), m_proj->getDir_videos().c_str());
+    for (auto video_path : video_paths){
+        int index = video_path.lastIndexOf('/') + 1;
+        QString vid_name = video_path.right(video_path.length() - index);
 
-    VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
-    m_proj->add_video_project(vid_proj);
-
-    tree_add_video(vid_proj, vid_name);
+        // TODO Check if file is already added
+        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+        m_proj->add_video_project(vid_proj);
+        tree_add_video(vid_proj, vid_name);
+    }
 }
 
 /**
@@ -103,7 +105,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     VideoItem* vid = new VideoItem(vid_proj, VIDEO_ITEM);
     vid->setText(0, vid_name);
     m_videos->addChild(vid);
-    emit set_status_bar("Video added");
+    emit set_status_bar("Video added: " + vid_name);
     m_videos->setExpanded(true);
 }
 
