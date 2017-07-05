@@ -24,7 +24,7 @@ signals:
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
 
 public slots:
-    void new_project(void) const;
+    void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
