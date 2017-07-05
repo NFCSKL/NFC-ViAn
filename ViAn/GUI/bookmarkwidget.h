@@ -14,8 +14,8 @@
 #include "bookmarkcategory.h"
 #include "bookmarklist.h"
 
+class BookmarkCategory;
 enum list_types {BOOKMARK, CONTAINER};
-
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT
@@ -35,10 +35,12 @@ public slots:
     void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
+    void clear_bookmarks();
 private slots:
 //    void item_context_menu(QPoint pos);
 private:
     void add_new_folder();
+    BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
     QString get_input_text(std::string text, bool* ok);
 };
 

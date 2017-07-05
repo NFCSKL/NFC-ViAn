@@ -39,6 +39,8 @@ private:
     void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
+signals:
+    void project_closed();
 
 };
 

@@ -149,6 +149,7 @@ void VideoProject::write(QJsonObject& json){
  */
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
+    bookmark->set_video_project(this);
     return m_bm_cnt++;
 }
 

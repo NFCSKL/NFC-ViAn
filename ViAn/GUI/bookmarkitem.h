@@ -4,6 +4,7 @@
 #include <QListWidgetItem>
 
 class BookmarkItem : public QListWidgetItem {
+    QString hover_text;
 public:
     BookmarkItem(Bookmark *bookmark, int type = 1);
     ~BookmarkItem();

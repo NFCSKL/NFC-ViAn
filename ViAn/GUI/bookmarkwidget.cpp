@@ -37,7 +37,34 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
 void BookmarkWidget::add_new_folder() {
     BookmarkCategory* f2 = new BookmarkCategory("name", bm_list, CONTAINER);
     bm_list->addItem(f2);
+    connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
 
+}
+
+BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, string> *container) {
+    BookmarkCategory* bm_cat = nullptr;
+    for (int i = 0; i < bm_list->count(); i++) {
+        QListWidgetItem* item = bm_list->item(i);
+        if (item->type() == CONTAINER) {
+            BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
+            if (_tmp_cat->get_name() == container->second) {
+                    bm_cat = _tmp_cat;
+                    break;
+                }
+            }
+        }
+
+    if (bm_cat == nullptr) {
+        // Container does not exist. Create and add it
+        bm_cat= new BookmarkCategory(container->second, bm_list, CONTAINER);
+        connect(bm_cat, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
+    }
+
+    if (container->first == DISPUTED)
+        bm_cat->add_disp_item(bm_item);
+    else
+        bm_cat->add_ref_item(bm_item);
+    return bm_cat;
 }
 
 void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame)
@@ -59,7 +86,6 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
-    qDebug() << "Adding item";
     bm_list->addItem(bm_item);
 
 }
@@ -68,45 +94,19 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
 void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;
-        BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
-
         // Load thumbnail TODO add check for file
         std::string t_path = m_path + "_thumbnails/" + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
-        bm_item->set_thumbnail(t_path);
-
-        if (bm->get_container_name().empty()) {
-            qDebug() << "Adding to unsorted list";
-            bm_list->addItem(bm_item);
-        } else {
-            // TODO Find container with name and add to it
-            BookmarkCategory* bm_cat = nullptr;
-            for (int i = 0; i < bm_list->count(); i++) {
-                QListWidgetItem* item = bm_list->item(i);
-                if (item->type() == CONTAINER) {
-                    BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
-                    if (_tmp_cat->get_name() == bm->get_container_name()) {
-                            bm_cat = _tmp_cat;
-                            break;
-                        }
-                    }
-                }
-            if (bm_cat == nullptr) {
-                // Container does not exist. Create and add it
-                bm_cat= new BookmarkCategory(bm->get_container_name(), bm_list, CONTAINER);
-//                qDebug() << "Adding bookmark category";
-            }
-
-            switch (bm->get_type()) {
-                case DISPUTED:
-                    // Add bookmark to the left container
-                    bm_cat->add_disp_item(bm_item);
-                    break;
-                case REFERENCE:
-                    // Add bookmark to the right container
-                    bm_cat->add_ref_item(bm_item);
-                    break;
-                default:
-                    break;
+        auto containers = bm->get_containers();
+        for (auto it = containers.begin(); it != containers.end(); ++it) {
+            // Add bookmark to all its containers
+            std::pair<int, std::string> _container = *it;
+            BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
+            bm_item->set_thumbnail(t_path);
+            if (_container.second.empty()) {
+                // No container name. Add it to the main list
+                bm_list->addItem(bm_item);
+            } else {
+                add_to_container(bm_item, &_container);
             }
         }
     }
@@ -115,6 +115,10 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
 
 void BookmarkWidget::set_path(string path) {
     m_path = path;
+}
+
+void BookmarkWidget::clear_bookmarks() {
+    bm_list->clear();
 }
 
 /**

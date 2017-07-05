@@ -189,6 +189,7 @@ void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     if (m_proj == nullptr) return;
     emit set_status_bar("Closing project");
+    emit project_closed();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
@@ -215,5 +216,5 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-
+    emit project_closed();
 }

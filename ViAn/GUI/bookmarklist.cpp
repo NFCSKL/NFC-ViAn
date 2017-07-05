@@ -47,16 +47,17 @@ void BookmarkList::set_parent_name(string name) {
  * @param name
  */
 void BookmarkList::on_parent_name_edited(QString name) {
-    m_par_cont_name = name.toStdString();
     if (m_par_cont_name.empty()) return;
     for (size_t i = 0; i < this->count(); ++i) {
+        std::cout<<"ITEM"<<std::endl;
         auto item = this->item(i);
         if (item->type() == 0) {
             // BookmarkItem. Update container name
             auto bm_item = dynamic_cast<BookmarkItem*>(item);
-            bm_item->get_bookmark()->set_container_name(m_par_cont_name);
+            bm_item->get_bookmark()->rename_container(m_par_cont_name, name.toStdString());
         }
     }
+    m_par_cont_name = name.toStdString();
 }
 
 void BookmarkList::item_left_clicked() {
@@ -74,10 +75,22 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
  * Renames the clicked item
  */
 void BookmarkList::rename_item(){
+    bool ok;
+    auto dialog = [&ok](QString existing_text, QString title){
+        QString text = QInputDialog::getMultiLineText(nullptr, title, "something", existing_text);
+        if (text.toStdString().empty()) ok = false;
+        return text;
+    };
+
+    QString new_text;
     switch (clicked_item->type()) {
-    case 0:
+    case 0: {
         // Bookmark
+        auto item = dynamic_cast<BookmarkItem*>(clicked_item);
+        QString _tmp = "Change description";
+        new_text = dialog(item->text(), _tmp);
         break;
+    }
     case 1:
         // Container
         break;
@@ -114,6 +127,7 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     clicked_item = itemAt(event->pos());
     on_double_clicked(clicked_item);
+    setCurrentItem(clicked_item);
     switch (event->button()) {
         case Qt::RightButton:
             // Create context menu
@@ -123,7 +137,6 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
             // Drag and drop event
             item_left_clicked();
             drag_start_pos = event->pos();
-            setCurrentItem(clicked_item);
             break;
         default:
         break;
@@ -191,6 +204,7 @@ void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {
  * It will create a copy of the item and add it to the list.
  * It is up to the source listwidget to remove the original item.
  * @param event
+ * TODO split into functions
  */
 void BookmarkList::dropEvent(QDropEvent *event) {
     // Get subclass type from mimedata
@@ -201,17 +215,20 @@ void BookmarkList::dropEvent(QDropEvent *event) {
     stream >> type;
 
     // Get origin widget of drag item
-    QListWidget* list = dynamic_cast<BookmarkList*>(event->source());
+    BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
     auto item = list->currentItem();
     if (type == 0) {
         // BookmarkItem. Copy and add
         auto cast_item = dynamic_cast<BookmarkItem*>(item);
         QIcon icon = cast_item->icon();
         BookmarkItem* bm_item = new BookmarkItem(cast_item->get_bookmark(), 0);
-        bm_item->get_bookmark()->set_container_name(m_par_cont_name);
-        bm_item->get_bookmark()->set_type(m_container_type);
+        bm_item->get_bookmark()->add_container(m_par_cont_name, m_container_type);
         bm_item->setIcon(icon);
         addItem(bm_item);
+        if (event->proposedAction() == Qt::MoveAction) {
+            qDebug() << QString::fromStdString(list->m_par_cont_name);
+            bm_item->get_bookmark()->remove_container(list->m_par_cont_name, list->m_container_type);
+        }
         event->acceptProposedAction();
     } else if (type == 1 ) {
         // BookmarkCategory

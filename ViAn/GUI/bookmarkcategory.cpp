@@ -23,6 +23,8 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
     ref_list->set_parent_name(m_name);
     connect(title, SIGNAL(textEdited(QString)), disp_list, SLOT(on_parent_name_edited(QString)));
     connect(title, SIGNAL(textEdited(QString)), ref_list, SLOT(on_parent_name_edited(QString)));
+    connect(disp_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(set_bookmark_video(VideoProject*,int)));
+    connect(ref_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(set_bookmark_video(VideoProject*,int)));
 
     disputed = make_scrollable_container(disp_list);
     reference = make_scrollable_container(ref_list);

@@ -37,6 +37,8 @@ private:
     QScrollArea* make_scrollable_container(BookmarkList* cont);
 private slots:
     void on_text_edited(QString name);
+signals:
+    set_bookmark_video(VideoProject* vid_proj, int frame_idx);
 };
 
 #endif // BOOKMARKFOLDER_H

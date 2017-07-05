@@ -7,8 +7,14 @@
  * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) :
-    QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
+BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
+    QString frame = QString::number(bookmark->get_frame_number());
+    QString v_name = QString::fromStdString(bookmark->get_video_project()->get_video()->get_name());
+
+    hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + QString::number(bookmark->get_time()) + "\nDescription: ";
+    QString description = QString::fromStdString(bookmark->get_description());
+    setToolTip(hover_text + description);
+    this->setText(frame + "@" + v_name);
     this->bookmark = bookmark;
 }
 
@@ -53,5 +59,5 @@ int BookmarkItem::get_frame_number() {
  */
 void BookmarkItem::update_description(const QString& text) {
     this->bookmark->set_description(text.toStdString());
-    setText(text);
+    setToolTip(hover_text + text);
 }
