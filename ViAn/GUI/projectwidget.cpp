@@ -155,6 +155,7 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project() {
+    if (m_proj != nullptr) close_project();
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
         emit set_status_bar("Opening project");
@@ -176,7 +177,11 @@ void ProjectWidget::open_project() {
  * TODO Fix
  */
 void ProjectWidget::close_project() {
-    emit set_status_bar("TODO - Closed the project");
+    // TODO Check for unsaved changes before closing
+    emit set_status_bar("Closing project");
+    this->clear();
+    delete m_proj;
+    m_proj = nullptr;
 }
 
 /**
