@@ -12,12 +12,13 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
  * @brief ProjectWidget::new_project
  * Creates a create project dialog
  */
-void ProjectWidget::new_project() const {
+void ProjectWidget::new_project() {
     if (m_proj == nullptr) {
         ProjectDialog* proj_dialog = new ProjectDialog();
         QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
     } else {
-        // TODO project already loadedq
+        close_project();
+        new_project();
     }
 }
 
@@ -178,6 +179,7 @@ void ProjectWidget::open_project() {
  */
 void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
+    if (m_proj == nullptr) return;
     emit set_status_bar("Closing project");
     this->clear();
     delete m_proj;
@@ -189,5 +191,21 @@ void ProjectWidget::close_project() {
  * TODO FIX
  */
 void ProjectWidget::remove_project() {
-    emit set_status_bar("TODO - Removed the project");
+    // TODO Does this delete all images
+    if (m_proj == nullptr) return;
+    QMessageBox msg_box;
+    msg_box.setText("Are you sure you want to remove the project?");
+    msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg_box.setDefaultButton(QMessageBox::No);
+    int reply = msg_box.exec();
+
+    if (reply != QMessageBox::Yes) return;
+    emit set_status_bar("Removing project and associated files");
+    m_proj->delete_artifacts();
+
+    this->clear();
+    delete m_proj;
+    m_proj = nullptr;
+
 }
