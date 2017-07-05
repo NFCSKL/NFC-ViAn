@@ -14,7 +14,7 @@ public:
 
 signals:
     void selected_media();
-    void marked_video(VideoProject* vid_proj);
+    void marked_video(VideoProject* vid_proj, int frame = 0);
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
     void marked_analysis(Analysis*);

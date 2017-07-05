@@ -32,6 +32,7 @@ public:
     int get_time();
     int get_frame_number();
     int get_type();
+    VideoProject* get_video_project();
     std::string get_container_name();
     std::string get_description();
     void set_description(const std::string &text);

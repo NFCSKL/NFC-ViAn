@@ -17,6 +17,7 @@ public:
     static const unsigned int THUMBNAIL_SIZE;
 private:
     void export_image(std::string s_path, int ext, unsigned int size = 0, bool keep_aspect_ratio = true);
+    bool create_directory(std::string path);
 };
 
 

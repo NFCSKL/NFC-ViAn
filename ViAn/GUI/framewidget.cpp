@@ -29,7 +29,7 @@ void FrameWidget::set_analysis(Analysis* analysis) {
 }
 
 void FrameWidget::set_detections_on_frame(int frame_num) {
-    if (m_analysis) {
+    if (m_analysis != nullptr) {
         ooi_rects = m_analysis->get_detections_on_frame(frame_num);
     }
 }

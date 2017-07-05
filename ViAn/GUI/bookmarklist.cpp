@@ -20,6 +20,7 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setDropIndicatorShown(true);
 
     setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
+    connect(this, &BookmarkList::itemDoubleClicked, this, &BookmarkList::on_double_clicked);
     clear();
 }
 
@@ -42,7 +43,7 @@ void BookmarkList::set_parent_name(string name) {
 
 /**
  * @brief BookmarkList::on_parent_name_edited
- * Stores the updated parent container name
+ * Stores the updated parent container name in each bookmark
  * @param name
  */
 void BookmarkList::on_parent_name_edited(QString name) {
@@ -93,6 +94,15 @@ void BookmarkList::remove_item() {
     delete currentItem();
 }
 
+void BookmarkList::on_double_clicked(QListWidgetItem *item) {
+    qDebug() << "DOUBLE CLICKED";
+    if (item->type() != 0) return;
+    auto b_item = dynamic_cast<BookmarkItem*>(item);
+    // Start video at correct frame
+
+    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
+}
+
 /**
  * @brief BookmarkList::mousePressEvent
  * Triggers when the widget is clicked.
@@ -103,6 +113,7 @@ void BookmarkList::remove_item() {
 void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     clicked_item = itemAt(event->pos());
+    on_double_clicked(clicked_item);
     switch (event->button()) {
         case Qt::RightButton:
             // Create context menu

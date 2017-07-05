@@ -10,7 +10,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
     QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
     connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
     bm_list = new BookmarkList(this);
-
+    connect(bm_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
     bm_list_layout = new QVBoxLayout();
 
     scroll_area = new QScrollArea();

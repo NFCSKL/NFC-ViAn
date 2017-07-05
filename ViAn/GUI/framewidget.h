@@ -24,7 +24,7 @@ class FrameWidget : public QWidget
 
     click_tool tool = NONE;
     cv::Mat current_frame;
-    Analysis* m_analysis;
+    Analysis* m_analysis = nullptr;
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
     bool draw_zoom_rect = false;

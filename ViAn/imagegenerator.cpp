@@ -1,5 +1,7 @@
 #include "imagegenerator.h"
 #include <QDebug>
+#include <iostream>
+#include <QDir>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -8,6 +10,7 @@ const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
 ImageGenerator::ImageGenerator(cv::Mat frame, std::string proj_path){
     m_frame = frame.clone();
     m_path = proj_path;
+    std::cout << "PROJECT PATH::" << proj_path << std::endl;
 }
 
 ImageGenerator::~ImageGenerator() {
@@ -15,14 +18,31 @@ ImageGenerator::~ImageGenerator() {
 }
 
 std::string ImageGenerator::create_thumbnail(std::string name) {
-    std::string full_path = m_path + "/_thumbnails/"  + name;
-    export_image(full_path, PNG, ImageGenerator::THUMBNAIL_SIZE);
-    return full_path += ".png";
+    std::string save_path = m_path + "/_thumbnails/";
+    if (!create_directory(save_path)) return "";
+    export_image(save_path + name, PNG, ImageGenerator::THUMBNAIL_SIZE);
+    return save_path + name + ".png";
 }
 
 void ImageGenerator::create_tiff(std::string name) {
-    std::string full_path = m_path + "/Stills/" + name;
-    export_image(full_path, TIFF);
+    std::string save_path = m_path + "/Stills/";
+    if (!create_directory(save_path)) return;
+    export_image(save_path + name, TIFF);
+}
+
+/**
+ * @brief ImageGenerator::create_directory
+ * Creates the full directory path.
+ * @return true if the path exists/has been created
+ */
+bool ImageGenerator::create_directory(std::string path){
+    std::cout << "SAVE PATH::" << path << std::endl;
+    const QString q_path = QString::fromStdString(path);
+    bool success = QDir().exists(q_path);
+    if (!success) {
+        success = QDir().mkpath(q_path);
+    }
+    return success;
 }
 
 void ImageGenerator::export_image(std::string s_path, int ext, const unsigned int size, bool keep_aspect_ratio) {

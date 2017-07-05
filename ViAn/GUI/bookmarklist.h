@@ -34,11 +34,14 @@ private:
 private slots:
     void rename_item();
     void remove_item();
+    void on_double_clicked(QListWidgetItem* item);
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
+signals:
+    set_bookmark_video(VideoProject* vid_proj, int frame_idx);
 };
 
 #endif // BOOKMARKLIST_H

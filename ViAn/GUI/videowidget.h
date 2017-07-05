@@ -73,7 +73,7 @@ public slots:
     void fit_clicked(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
-    void load_marked_video(VideoProject* vid_proj);
+    void load_marked_video(VideoProject* vid_proj, int frame = 0);
     void enable_poi_btns(bool);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);

@@ -43,6 +43,10 @@ int Bookmark::get_type() {
     return m_type;
 }
 
+VideoProject *Bookmark::get_video_project() {
+    return m_vid_proj;
+}
+
 /**
  * @brief Bookmark::get_container_name
  * @return
