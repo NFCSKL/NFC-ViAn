@@ -2,9 +2,11 @@
 #include "projectdialog.h"
 #include "TreeItems/itemtypes.h"
 #include <QFileDialog>
+#include <QHeaderView>
 #include <QDebug>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
+    header()->close();
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
 
