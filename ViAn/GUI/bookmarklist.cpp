@@ -207,6 +207,7 @@ void BookmarkList::mouseMoveEvent(QMouseEvent *event) {
         auto item = takeItem(row(clicked_item));
         delete item;
     }
+    clicked_item = nullptr;
 }
 
 void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {

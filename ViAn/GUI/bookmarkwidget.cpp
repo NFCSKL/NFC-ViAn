@@ -131,6 +131,7 @@ void BookmarkWidget::clear_bookmarks() {
 QString BookmarkWidget::get_input_text(std::string text, bool* ok) {
     // Create the dialog
     CustomDialog dialog("Bookmark description", NULL);
+    dialog.setWindowFlags(windowFlags() & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint);
     dialog.addLabel("Write a description of the bookmark:");
     dialog.addTextEdit(&text, false, false, TEXT_EDIT_MIN_HEIGHT,
                           "Write a description of the bookmark. This will be used when creating a report.");
