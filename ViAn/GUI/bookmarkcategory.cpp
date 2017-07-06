@@ -11,9 +11,9 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
     layout->setSpacing(0);
     folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
-    QLineEdit* title = new QLineEdit(QString::fromStdString(name));
-    connect(title, SIGNAL(textEdited(QString)), this, SLOT(on_text_edited(QString)));
-    layout->addWidget(title);
+    m_title = new QLineEdit(QString::fromStdString(name));
+    connect(m_title, SIGNAL(textChanged(QString)), this, SLOT(on_text_edited(QString)));
+    layout->addWidget(m_title);
     layout->addLayout(container);
 
     // Add disputed and reference list
@@ -21,8 +21,8 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
     ref_list = new BookmarkList(false, REFERENCE);
     disp_list->set_parent_name(m_name);
     ref_list->set_parent_name(m_name);
-    connect(title, SIGNAL(textEdited(QString)), disp_list, SLOT(on_parent_name_edited(QString)));
-    connect(title, SIGNAL(textEdited(QString)), ref_list, SLOT(on_parent_name_edited(QString)));
+    connect(m_title, SIGNAL(textChanged(QString)), disp_list, SLOT(on_parent_name_edited(QString)));
+    connect(m_title, SIGNAL(textChanged(QString)), ref_list, SLOT(on_parent_name_edited(QString)));
     connect(disp_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(set_bookmark_video(VideoProject*,int)));
     connect(ref_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(set_bookmark_video(VideoProject*,int)));
 
@@ -39,7 +39,7 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
 }
 
 BookmarkCategory::~BookmarkCategory() {
-    delete layout;
+//    delete layout;
     delete disputed;
     delete reference;
 }
@@ -59,10 +59,41 @@ std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
 std::vector<BookmarkItem *> BookmarkCategory::get_references() {
     vector<BookmarkItem *> items;
     for (auto i = 0; i < ref_list->count(); ++i) {
-        qDebug() << i;
         items.push_back(dynamic_cast<BookmarkItem*>(ref_list->item(i)));
     }
     return items;
+}
+
+/**
+ * @brief BookmarkCategory::create_menu
+ * Creates and returns a QMenu. The calling function is responsible for deleting it
+ * @return
+ */
+QMenu *BookmarkCategory::create_menu(){
+    QMenu* menu = nullptr;
+}
+
+void BookmarkCategory::update_title(const QString &title){
+    m_title->setText(title);
+}
+
+/**
+ * @brief BookmarkCategory::copy
+ * Returns a new BookmarkCategory containing the same Bookmarks
+ * @return
+ */
+BookmarkCategory *BookmarkCategory::copy(QListWidget* new_parent) {
+    BookmarkCategory* new_bm_cat = new BookmarkCategory(m_name, new_parent, type());
+    // Copy disputed bookmarks
+    vector<BookmarkItem*> items = get_disputed();
+    std::for_each(items.begin(), items.end(),
+                  [new_bm_cat](BookmarkItem* bi){new_bm_cat->add_disp_item(bi->copy());});
+    // Copy reference bookmarks
+    items = get_references();
+    std::for_each(items.begin(), items.end(),
+                  [new_bm_cat](BookmarkItem* bi){new_bm_cat->add_ref_item(bi->copy());});
+    return new_bm_cat;
+
 }
 
 void BookmarkCategory::add_disp_item(BookmarkItem *bm_item) {

@@ -2,6 +2,8 @@
 #define BOOKMARKITEM_H
 #include "Project/bookmark.h"
 #include <QListWidgetItem>
+#include <QMenu>
+#include <QObject>
 
 class BookmarkItem : public QListWidgetItem {
     QString hover_text;
@@ -12,6 +14,7 @@ public:
     int get_frame_number();
     void update_description(const QString &text);
     void set_thumbnail(std::string thum_path);
+    BookmarkItem* copy();
 private:
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
     Bookmark* bookmark;

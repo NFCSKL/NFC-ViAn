@@ -36,6 +36,17 @@ void BookmarkItem::set_thumbnail(std::string thum_path) {
 }
 
 /**
+ * @brief BookmarkItem::copy
+ * Returns a new BookmarkItem with the same bookmark pointer
+ * @return
+ */
+BookmarkItem *BookmarkItem::copy() {
+    BookmarkItem* new_bm_item = new BookmarkItem(bookmark, 0);
+    new_bm_item->setIcon(icon());
+    return new_bm_item;
+}
+
+/**
  * @brief BookmarkItem::get_bookmark
  * @return Returns the bookmark representation.
  */

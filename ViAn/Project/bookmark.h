@@ -41,12 +41,12 @@ public:
     void remove_container(std::string name, int type);
     void rename_container(std::string old_name, std::string new_name);
     void set_video_project(VideoProject* vid_proj);
+    bool remove();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     Q_DECL_DEPRECATED void export_frame();
     Q_DECL_DEPRECATED void create_file_path();
     Q_DECL_DEPRECATED void remove_exported_image();
-
 private:
 
 };

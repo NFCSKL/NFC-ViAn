@@ -98,6 +98,15 @@ void Bookmark::set_video_project(VideoProject *vid_proj){
 }
 
 /**
+ * @brief Bookmark::remove
+ * Returns a bool specifying if the bookmark should be deleted or not
+ * @return
+ */
+bool Bookmark::remove() {
+    return (m_containers.empty());
+}
+
+/**
  * @brief Bookmark::read
  * @param json
  * Reads a bookmark from a Json object.

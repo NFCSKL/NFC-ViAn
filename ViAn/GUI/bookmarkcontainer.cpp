@@ -23,7 +23,6 @@ BookmarkContainer::BookmarkContainer(QWidget *parent) : QListWidget(parent) {
 }
 
 BookmarkContainer::~BookmarkContainer(){
-    qDebug() << "Deleting container";
     delete layout;
 }
 

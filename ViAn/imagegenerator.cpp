@@ -10,7 +10,6 @@ const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
 ImageGenerator::ImageGenerator(cv::Mat frame, std::string proj_path){
     m_frame = frame.clone();
     m_path = proj_path;
-    std::cout << "PROJECT PATH::" << proj_path << std::endl;
 }
 
 ImageGenerator::~ImageGenerator() {
@@ -36,7 +35,6 @@ void ImageGenerator::create_tiff(std::string name) {
  * @return true if the path exists/has been created
  */
 bool ImageGenerator::create_directory(std::string path){
-    std::cout << "SAVE PATH::" << path << std::endl;
     const QString q_path = QString::fromStdString(path);
     bool success = QDir().exists(q_path);
     if (!success) {
@@ -52,7 +50,6 @@ void ImageGenerator::export_image(std::string s_path, int ext, const unsigned in
         double ratio = 1;
         if (keep_aspect_ratio) ratio = m_frame.cols / static_cast<double>(m_frame.rows);
         resize(m_frame, tmp, cv::Size(ratio * size, size));
-        qDebug() << "resized";
     }
 
     // Convert to RGB

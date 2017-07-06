@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QScrollArea>
 #include <QCommonStyle>
+#include <QMenu>
 #include "bookmarkwidget.h"
 #include "bookmarkcontainer.h"
 #include "bookmarklist.h"
@@ -18,6 +19,7 @@
 class BookmarkCategory : public QObject, public QListWidgetItem
 {
     Q_OBJECT
+    QLineEdit* m_title = nullptr;
     QVBoxLayout*  layout = nullptr;
     QScrollArea* disputed = nullptr;
     QScrollArea* reference = nullptr;
@@ -33,6 +35,9 @@ public:
     std::string get_name();
     std::vector<BookmarkItem*> get_disputed();
     std::vector<BookmarkItem*> get_references();
+    QMenu* create_menu();
+    void update_title(const QString &title);
+    BookmarkCategory* copy(QListWidget* new_parent);
 private:
     QScrollArea* make_scrollable_container(BookmarkList* cont);
 private slots:
