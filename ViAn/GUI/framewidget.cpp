@@ -28,9 +28,24 @@ void FrameWidget::set_analysis(Analysis* analysis) {
     m_analysis = analysis;
 }
 
+/**
+ * @brief FrameWidget::clear_analysis
+ * Forgets the current analysis
+ */
+void FrameWidget::clear_analysis() {
+    m_analysis = nullptr;
+    ooi_rects.clear();
+}
+
+/**
+ * @brief FrameWidget::set_detections_on_frame
+ * Updates the oois_rects with all detections to be painted
+ * @param frame_num
+ */
 void FrameWidget::set_detections_on_frame(int frame_num) {
-    if (m_analysis) {
+    if (m_analysis != nullptr) {
         ooi_rects = m_analysis->get_detections_on_frame(frame_num);
+        repaint();
     }
 }
 

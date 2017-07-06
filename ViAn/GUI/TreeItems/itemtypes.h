@@ -12,6 +12,7 @@ class AnalysisItem : public QTreeWidgetItem
 
 public:
     AnalysisItem(int type);
+    ~AnalysisItem();
     void set_analysis(Analysis analysis);
     Analysis *get_analysis();
 };
@@ -29,6 +30,7 @@ class VideoItem : public QTreeWidgetItem
 public:
     VideoItem(VideoProject* video_project, int type);
     VideoProject* get_video_project();
+    ~VideoItem();
 signals:
 
 public slots:

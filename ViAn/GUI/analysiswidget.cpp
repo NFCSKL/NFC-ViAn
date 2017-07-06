@@ -62,6 +62,7 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     emit name_in_tree(current_analysis, "Analysis");
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
     ana_item->set_analysis(analysis.get_analysis());
+
     current_analysis = nullptr;
     duration = 0;
 
