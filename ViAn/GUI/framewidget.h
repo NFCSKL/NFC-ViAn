@@ -53,6 +53,7 @@ public slots:
     void toggle_zoom(bool value);
     void set_scroll_area_size(QSize size);
     void set_analysis(Analysis*);
+    void clear_analysis();
     void set_detections_on_frame(int);
     void set_detections(bool);
 protected:

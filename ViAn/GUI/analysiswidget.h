@@ -36,6 +36,7 @@ signals:
     void remove_analysis_bar(void);
     void show_progress(int);
     void name_in_tree(QTreeWidgetItem*, QString);
+    void add_slider_interval(int, int);
 };
 
 #endif // ANALYSISWIDGET_H

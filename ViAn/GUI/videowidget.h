@@ -31,6 +31,7 @@ private:
     double h_step_size, v_step_size;
     int current_frame = 0;
     int prev_frame_idx;
+    int POI_end;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -39,6 +40,7 @@ public:
     QWaitCondition paused_wait;
     video_player* m_video_player;
     FrameWidget* frame_wgt;
+    AnalysisSlider* playback_slider;
 
 signals:
     void first_frame(cv::Mat frame);
@@ -63,6 +65,9 @@ public slots:
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
     void analysis_btn_clicked(void);
+    void analysis_play_btn_toggled(bool value);
+    void next_poi_btn_clicked(void);
+    void prev_poi_btn_clicked(void);
     void zoom_out_clicked();
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
@@ -87,7 +92,6 @@ private:
     QVBoxLayout* vertical_layout;
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
-    AnalysisSlider* playback_slider;
     QLabel* current_time;
     QLabel* total_time;
 
@@ -100,6 +104,7 @@ private:
     QPushButton* next_poi_btn;
     QPushButton* prev_poi_btn;
     QPushButton* analysis_btn;
+    QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;    
     QPushButton* tag_btn;
     QPushButton* zoom_in_btn;
@@ -131,6 +136,7 @@ private:
 
     bool slider_is_blocked = false;
     bool video_btns_enabled = false;
+    bool analysis_only = false;
 
     void enable_video_btns();
 
