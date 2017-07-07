@@ -6,23 +6,42 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QDebug>
+#include <QScrollArea>
+#include <QDockWidget>
 #include <opencv2/opencv.hpp>
+#include "Project/videoproject.h"
 #include "bookmarkitem.h"
+#include "bookmarkcategory.h"
+#include "bookmarklist.h"
+
+class BookmarkCategory;
+enum list_types {BOOKMARK, CONTAINER};
 class BookmarkWidget : public QWidget
 {
-    const int TEXT_EDIT_MIN_HEIGHT = 64;
     Q_OBJECT
+    std::string m_path;
+    BookmarkList* bm_list;
+    QVBoxLayout* bm_list_layout;
+    QVBoxLayout* layout;
+    QScrollArea* scroll_area;
+    QDockWidget* folder_dock;
+    const int TEXT_EDIT_MIN_HEIGHT = 64;
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
-    void add_bookmark(std::string description, std::vector<std::string> tags);
 
 signals:
-
+    void play_bookmark_video(VideoProject* vid_proj, int frame_idx);
 public slots:
-    void create_bookmark(const int frame_nbr, cv::Mat);
+    void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
+    void load_bookmarks(VideoProject *vid_proj);
+    void set_path(std::string path);
+    void clear_bookmarks();
+private slots:
+//    void item_context_menu(QPoint pos);
 private:
-    QListWidget* bookmark_list;
-    QString get_input_text(std::string bookmark_text, bool* ok);
+    void add_new_folder();
+    BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
+    QString get_input_text(std::string text, bool* ok);
 };
 
 #endif // BOOKMARKWIDGET_H

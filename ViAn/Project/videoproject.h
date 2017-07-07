@@ -17,6 +17,7 @@
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
+class Bookmark;
 class VideoProject : public Saveable{
     friend class VideoProjectTest;
     std::map<ID,Bookmark*> m_bookmarks;

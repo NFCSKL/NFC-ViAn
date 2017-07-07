@@ -23,13 +23,13 @@
 class VideoWidget : public QWidget
 {
     Q_OBJECT
-
+private:
     QScrollBar* v_bar;
     QScrollBar* h_bar;
     QSize current_frame_size;
     QTime timer;
     double h_step_size, v_step_size;
-    int current_frame;
+    int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
 public:
@@ -53,9 +53,8 @@ signals:
     void prev_video_frame(void);
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
-    void new_bookmark(int, cv::Mat);
+    void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
-    
     void start_analysis(VideoProject*);
     void set_status_bar(QString);
 public slots:
@@ -79,7 +78,7 @@ public slots:
     void fit_clicked(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
-    void load_marked_video(VideoProject* vid_proj);
+    void load_marked_video(VideoProject* vid_proj, int frame = 0);
     void enable_poi_btns(bool);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);

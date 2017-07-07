@@ -242,6 +242,7 @@ void VideoWidget::add_btns_to_layouts() {
     video_btns->addWidget(next_frame_btn);
     video_btns->addWidget(stop_btn);
     video_btns->addLayout(speed_slider_layout);
+
     control_row->addLayout(video_btns);
 
     analysis_btns->addWidget(prev_poi_btn);
@@ -364,7 +365,7 @@ void VideoWidget::on_bookmark_clicked()
 {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
 
-    emit new_bookmark(current_frame, bookmark_frame);
+    emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 
 /**
@@ -540,7 +541,7 @@ void VideoWidget::fit_clicked() {
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
     if (m_vid_proj != vid_proj) {
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
@@ -563,6 +564,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
         m_video_player->start();
     }
 
+    emit set_playback_frame(frame, true);
     if (!video_btns_enabled) {
         enable_video_btns();
     }

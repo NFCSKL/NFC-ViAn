@@ -27,10 +27,14 @@ SOURCES += main.cpp \
     GUI/analysisslider.cpp \
     GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
+    GUI/bookmarkcategory.cpp \
+    imagegenerator.cpp \
+    GUI/bookmarklist.cpp \
     GUI/statusbar.cpp \
     GUI/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp
+
 
 #
 # TEST
@@ -50,6 +54,9 @@ HEADERS += Test/test_video_player.h \
     GUI/analysisslider.h \
     GUI/projectdialog.h \
     Project/Test/videoprojecttest.h \
+    GUI/bookmarkcategory.h \
+    imagegenerator.h \
+    GUI/bookmarklist.h \
     GUI/statusbar.h \
     GUI/analysiswidget.h \
     GUI/manipulatordialog.h \

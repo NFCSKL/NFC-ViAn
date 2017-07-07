@@ -8,11 +8,12 @@
 #include "Filehandler/saveable.h"
 typedef int ID;
 class Video : Saveable{
-
+    std::string m_name;
 public:
     Video();
     Video(std::string file_path);
     std::string file_path;
+    std::string get_name();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

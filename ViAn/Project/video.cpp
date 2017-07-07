@@ -13,6 +13,12 @@ Video::Video(){
  */
 Video::Video(std::string file_path){
     this->file_path = file_path;
+    int index = file_path.find_last_of('/') + 1;
+    m_name = file_path.substr(index);
+}
+
+std::string Video::get_name() {
+    return m_name;
 }
 
 /**
@@ -32,6 +38,7 @@ bool operator==(Video v1, Video v2){
  */
 void Video::read(const QJsonObject& json){
     this->file_path = json["file_path"].toString().toStdString();
+    m_name = json["name"].toString().toStdString();
 }
 
 /**
@@ -41,4 +48,6 @@ void Video::read(const QJsonObject& json){
  */
 void Video::write(QJsonObject& json){
     json["file_path"] = QString::fromStdString(this->file_path);
+    json["name"] = QString::fromStdString(m_name);
+
 }

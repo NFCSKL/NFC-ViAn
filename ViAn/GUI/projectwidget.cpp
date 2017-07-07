@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
+#include <iostream>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -36,6 +37,8 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_path = project_path.toStdString();    
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
+    _tmp_path.append(_tmp_name);
+    emit proj_path(m_proj->getDir());
 }
 
 /**
@@ -94,6 +97,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param name
  * Slot to set the name if an item in the project tree
  */
+
 void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
     item->setText(0, name);
 }
@@ -168,8 +172,10 @@ void ProjectWidget::open_project() {
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
+        emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
             VideoProject* vid_proj = vid_pair.second;
+            emit load_bookmarks(vid_proj);
             QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
             int index = video_path.lastIndexOf('/') + 1;
             QString vid_name = video_path.right(video_path.length() - index);
@@ -186,6 +192,7 @@ void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     if (m_proj == nullptr) return;
     emit set_status_bar("Closing project");
+    emit project_closed();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
@@ -212,5 +219,5 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-
+    emit project_closed();
 }

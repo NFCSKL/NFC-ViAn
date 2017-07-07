@@ -14,7 +14,9 @@ public:
 
 signals:
     void selected_media();
-    void marked_video(VideoProject* vid_proj);
+    void marked_video(VideoProject* vid_proj, int frame = 0);
+    void proj_path(std::string);
+    void load_bookmarks(VideoProject* vid_proj);
     void marked_analysis(Analysis*);
     void set_detections(bool);
     void enable_poi_btns(bool);
@@ -38,6 +40,8 @@ private:
     void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
+signals:
+    void project_closed();
 
 };
 
