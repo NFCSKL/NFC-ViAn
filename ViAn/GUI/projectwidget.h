@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QTreeWidget>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 #include "Project/project.h"
 class ProjectWidget : public QTreeWidget
 {
@@ -34,14 +37,21 @@ public slots:
     void open_project();
     void close_project();
     void remove_project();
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 private slots:
     void tree_item_clicked(QTreeWidgetItem *item, const int& col);
 private:
     void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
+    QStringList mimeTypes() const;
+    void file_dropped(QString path);
+    void folder_dropped(QString path);
 signals:
     void project_closed();
+protected:
+
 
 };
 

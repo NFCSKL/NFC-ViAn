@@ -9,6 +9,7 @@
 #include <QWindow>
 #include <QSlider>
 #include <QFileDialog>
+#include <QDragEnterEvent>
 
 #include <string>
 
@@ -66,6 +67,7 @@ private:
     void init_analysis_menu();
     void init_tools_menu();
     void init_help_menu();
+protected:
 };
 
 #endif // MAINWINDOW_H

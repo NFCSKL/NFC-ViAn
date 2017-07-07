@@ -4,10 +4,17 @@
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
+#include <QFileInfo>
+#include <QDirIterator>
 #include <iostream>
+#include <algorithm>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
+//    setSelectionMode(QAbstractItemView::SingleSelection);
+//    setDragDropMode(QAbstractItemView::DragDrop);
+    setAcceptDrops(true);
+//    setDropIndicatorShown(true);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
 
@@ -114,6 +121,60 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->addChild(vid);
     emit set_status_bar("Video added: " + vid_name);
     m_videos->setExpanded(true);
+}
+
+QStringList ProjectWidget::mimeTypes() const {
+    return QStringList() << "application/x-qabstractitemmodeldatalist" << "text/uri-list";
+}
+
+void ProjectWidget::file_dropped(QString path) {
+    qDebug() << path;
+    std::set<std::string> exts {"avi", "mov", "mkv", "mp4"};
+//    qDebug() << path;
+    QFileInfo tmp(path);
+    std::string ext = tmp.suffix().toStdString();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (exts.find(ext) != exts.end()) {
+        // Add file
+        int index = path.lastIndexOf('/') + 1;
+        QString vid_name = path.right(path.length() - index);
+
+        // TODO Check if file is already added
+        VideoProject* vid_proj = new VideoProject(new Video(path.toStdString()));
+        m_proj->add_video_project(vid_proj);
+        tree_add_video(vid_proj, vid_name);
+    }
+
+}
+
+void ProjectWidget::folder_dropped(QString path) {
+    QDirIterator d_iter(path);
+    while (d_iter.hasNext()) {
+        QFileInfo tmp(d_iter.next());
+        if (tmp.isDir() && tmp.absoluteFilePath().length() > path.length())
+            folder_dropped(tmp.absoluteFilePath());
+        else
+            file_dropped(tmp.absoluteFilePath());
+    }
+}
+
+
+void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
+    if (event->mimeData()->hasUrls() && m_proj != nullptr) event->acceptProposedAction();
+}
+
+void ProjectWidget::dropEvent(QDropEvent *event) {
+    for (auto &url : event->mimeData()->urls()) {
+        QString video_path = url.toLocalFile();
+        QFileInfo f_info(video_path);
+
+        if (f_info.isDir()) {
+            folder_dropped(video_path);
+            continue;
+        } else {
+            file_dropped(video_path);
+        }
+    }
 }
 
 /**
