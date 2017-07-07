@@ -128,9 +128,7 @@ QStringList ProjectWidget::mimeTypes() const {
 }
 
 void ProjectWidget::file_dropped(QString path) {
-    qDebug() << path;
     std::set<std::string> exts {"avi", "mov", "mkv", "mp4"};
-//    qDebug() << path;
     QFileInfo tmp(path);
     std::string ext = tmp.suffix().toStdString();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);

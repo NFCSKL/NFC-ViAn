@@ -56,7 +56,7 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
 
     if (bm_cat == nullptr) {
         // Container does not exist. Create and add it
-        bm_cat= new BookmarkCategory(container->second, bm_list, CONTAINER);
+        bm_cat = new BookmarkCategory(container->second, bm_list, CONTAINER);
         connect(bm_cat, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
     }
 
@@ -131,6 +131,7 @@ void BookmarkWidget::clear_bookmarks() {
 QString BookmarkWidget::get_input_text(std::string text, bool* ok) {
     // Create the dialog
     CustomDialog dialog("Bookmark description", NULL);
+    dialog.setWindowFlags(windowFlags() & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint);
     dialog.addLabel("Write a description of the bookmark:");
     dialog.addTextEdit(&text, false, false, TEXT_EDIT_MIN_HEIGHT,
                           "Write a description of the bookmark. This will be used when creating a report.");
