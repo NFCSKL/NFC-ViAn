@@ -132,7 +132,6 @@ void Bookmark::read(const QJsonObject& json){
  * Writes a bookmark to a Json object, and exports the frame.
  */
 void Bookmark::write(QJsonObject& json){
-    qDebug() << "Saving";
     // Exports the frame and updates file_path.
     json["time"] = this->time;
     json["frame"] = this->frame_number;

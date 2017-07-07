@@ -114,7 +114,7 @@ QScrollArea *BookmarkCategory::make_scrollable_container(BookmarkList* container
 
 /**
  * @brief BookmarkCategory::on_text_edited
- * Updateds name with the text from the editbox
+ * Updates name with the text from the editbox
  * @param name
  */
 void BookmarkCategory::on_text_edited(QString name){
