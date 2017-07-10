@@ -4,7 +4,9 @@
 #include <QTime>
 
 FrameProcessor::FrameProcessor(cv::Mat& frame, int rot_dir, int pos, FrameManipulator* f_man, Zoomer* zoomer, QMutex* mutex, cv::VideoCapture* capture) {
+    mutex->lock();
     m_frame = frame.clone();
+    mutex->unlock();
     m_rot_dir = rot_dir;
     m_f_man = f_man;
     m_zoomer = zoomer;
