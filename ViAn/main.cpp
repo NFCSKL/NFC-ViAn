@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     if(unit_testing){
         QTest::qExec(new ProjectTestsuite());
 
-        QTest::qExec(new VideoProjectTest());
+        //QTest::qExec(new VideoProjectTest());
     }
     w.show();
     return a.exec();

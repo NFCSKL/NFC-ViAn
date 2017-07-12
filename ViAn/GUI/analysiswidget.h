@@ -14,7 +14,6 @@ class AnalysisWidget : public QWidget
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
     AnalysisController* an_col;
-    VideoProject* vid_proj;
     std::string dots = "";
     std::clock_t start;
     int duration = 0;

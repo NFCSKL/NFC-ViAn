@@ -67,12 +67,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar->setWindowTitle(tr("Main toolbar"));
     //TODO REMOVE? QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
+    draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
@@ -91,14 +93,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
+    connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
+
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
-    connect(project_wgt, SIGNAL(enable_poi_btns(bool)), video_wgt, SLOT(enable_poi_btns(bool)));
+
+    connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
 
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
+    connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
+
+    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt, SLOT(set_tag(Analysis*)));
+    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
+    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Analysis)), project_wgt, SLOT(add_tag(VideoProject*, Analysis)));
+    connect(video_wgt, SIGNAL(new_frame_tagged(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
 }
 
 
@@ -363,5 +374,5 @@ void MainWindow::cont_bri() {
  *  runs when the options action is triggered
  */
 void MainWindow::options() {
-    emit set_status_bar("Opening options.");
+    emit set_status_bar("Opening options");
 }

@@ -72,6 +72,7 @@ void AnalysisController::setup_analysis(std::string video_path, ANALYSIS_TYPE ty
 void AnalysisController::run() {
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
+    analysis.set_name("Analysis");
     analysis.save_saveable(m_save_path);
     AnalysisMeta analysis_meta (analysis);
     emit analysis_done(analysis_meta);

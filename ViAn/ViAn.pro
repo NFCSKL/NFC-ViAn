@@ -33,7 +33,8 @@ SOURCES += main.cpp \
     GUI/statusbar.cpp \
     GUI/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
-    Video/frameprocessor.cpp
+    Video/frameprocessor.cpp \
+    GUI/tagdialog.cpp
 
 
 #
@@ -60,7 +61,8 @@ HEADERS += Test/test_video_player.h \
     GUI/statusbar.h \
     GUI/analysiswidget.h \
     GUI/manipulatordialog.h \
-    Video/frameprocessor.h
+    Video/frameprocessor.h \
+    GUI/tagdialog.h
 
 #
 # LIBRARY

@@ -1,6 +1,7 @@
 #include "videowidget.h"
 #include "utility.h"
 #include "drawscrollarea.h"
+#include "tagdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -114,6 +115,7 @@ void VideoWidget::set_btn_icons() {
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
+    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
     zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
@@ -156,6 +158,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(bookmark_btn);
     btns.push_back(analysis_btn);
     btns.push_back(tag_btn);
+    btns.push_back(new_tag_btn);
     btns.push_back(zoom_in_btn);
     btns.push_back(zoom_out_btn);
     btns.push_back(fit_btn);
@@ -168,7 +171,7 @@ void VideoWidget::set_btn_size() {
     next_poi_btn->setFixedSize(BTN_SIZE);
     prev_poi_btn->setFixedSize(BTN_SIZE);
     analysis_play_btn->setFixedSize(BTN_SIZE);
-    enable_poi_btns(false);
+    enable_poi_btns(false,false);
 }
 
 /**
@@ -176,6 +179,8 @@ void VideoWidget::set_btn_size() {
  * Set the tab order for the buttons
  */
 void VideoWidget::set_btn_tab_order() {
+    // TODO update
+
     setTabOrder(prev_frame_btn, play_btn);
     setTabOrder(play_btn, next_frame_btn);
     setTabOrder(next_frame_btn, stop_btn);
@@ -200,6 +205,7 @@ void VideoWidget::set_btn_shortcuts() {
     next_frame_sc = new QShortcut(Qt::Key_Right, this);
     prev_frame_sc = new QShortcut(Qt::Key_Left, this);
     zoom_in_sc = new QShortcut(Qt::Key_Z, this);
+    tag_sc = new QShortcut(Qt::Key_T, this);
 
     next_poi_sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right), this);
     prev_poi_sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left), this);
@@ -215,6 +221,7 @@ void VideoWidget::init_speed_slider() {
     speed_slider->setMaximumWidth(120);
     speed_slider->setPageStep(1);
     speed_slider->setTickPosition(QSlider::TicksBelow);
+    speed_slider->setEnabled(false);
     speed_slider->setToolTip(tr("Adjust playback speed"));
     QLabel *label1 = new QLabel("1/16x", this);
     QLabel *label2 = new QLabel("1x", this);
@@ -253,6 +260,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(tag_btn);
+    other_btns->addWidget(new_tag_btn);
     control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(zoom_in_btn);
@@ -283,6 +291,7 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
+
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
 
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
@@ -296,6 +305,11 @@ void VideoWidget::connect_btns() {
 
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
 
+    connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
+    connect(tag_sc, &QShortcut::activated, this, &VideoWidget::tag_frame);
+
+    connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
+
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     connect(frame_wgt, &FrameWidget::trigger_zoom_out, zoom_out_btn, &QPushButton::click);
@@ -304,7 +318,6 @@ void VideoWidget::connect_btns() {
 
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
 
-    //
     connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
 }
 
@@ -315,10 +328,18 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
+    frame_line_edit = new QLineEdit();
+
+    frame_line_edit->setFixedWidth(50);
+
     playback_slider = new AnalysisSlider(Qt::Horizontal);
+
+    frame_line_edit->setEnabled(false);
+    playback_slider->setEnabled(false);
     progress_area->addWidget(current_time);
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
+    progress_area->addWidget(frame_line_edit);
     vertical_layout->addLayout(progress_area);
 
     // Signal/slot connect
@@ -330,6 +351,8 @@ void VideoWidget::init_playback_slider() {
     connect(playback_slider, &QSlider::sliderReleased, this, &VideoWidget::on_playback_slider_released);
     connect(playback_slider, &QSlider::valueChanged, this, &VideoWidget::on_playback_slider_value_changed);
     connect(playback_slider, &QSlider::sliderMoved, this, &VideoWidget::on_playback_slider_moved);
+
+    connect(frame_line_edit, &QLineEdit::editingFinished, this, &VideoWidget::frame_line_edit_finished);
 }
 
 /**
@@ -361,10 +384,8 @@ void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
 }
 
-void VideoWidget::on_bookmark_clicked()
-{
+void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 
@@ -433,24 +454,65 @@ void VideoWidget::prev_frame_clicked() {
 void VideoWidget::analysis_btn_clicked() {
     if (m_vid_proj != nullptr) {
         emit start_analysis(m_vid_proj);
+    } else {
+        emit set_status_bar("No video selected");
     }
+}
+
+void VideoWidget::tag_frame() {
+    if (m_tag != nullptr){
+        if (m_tag->type == TAG) {
+            m_tag->add_frame(current_frame);
+            emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
+            emit new_frame_tagged(m_tag);
+        }
+    } else {
+        emit set_status_bar("Select a tag");
+    }
+}
+
+void VideoWidget::new_tag_clicked() {
+    TagDialog* tag_dialog = new TagDialog();
+    connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
+    tag_dialog->exec();
+}
+
+void VideoWidget::new_tag(QString name) {
+    Analysis tag;       //TODO pointer
+    tag.set_name(name.toStdString());
+    tag.type = TAG;
+    emit add_tag(m_vid_proj, tag);
+}
+
+void VideoWidget::set_tag(Analysis* tag) {
+    m_tag = tag;
+}
+
+void VideoWidget::clear_tag() {
+    m_tag = nullptr;
 }
 
 void VideoWidget::analysis_play_btn_toggled(bool value) {
     analysis_only = value;
-    /*if (!playback_slider->is_in_POI(current_frame)) {
-        next_poi_btn_clicked();
-    }
-    POI_end = playback_slider->get_next_poi_end(current_frame);*/
 }
 
 void VideoWidget::next_poi_btn_clicked() {
     int new_frame = playback_slider->get_next_poi_start(current_frame);
+    if (new_frame == current_frame) {
+        emit set_status_bar("Already at last POI");
+    } else {
+        emit set_status_bar("Jumped to next POI");
+    }
     emit set_playback_frame(new_frame, true);
 }
 
 void VideoWidget::prev_poi_btn_clicked() {
     int new_frame = playback_slider->get_prev_poi_start(current_frame);
+    if (new_frame == current_frame) {
+        emit set_status_bar("Already at first POI");
+    } else {
+        emit set_status_bar("Jumped to previous POI");
+    }
     emit set_playback_frame(new_frame, true);
 }
 
@@ -495,6 +557,7 @@ void VideoWidget::on_new_frame(int frame_num) {
     }
     current_frame = frame_num;
     set_current_time(frame_num / m_video_player->get_frame_rate());
+    frame_line_edit->setText(QString::number(current_frame));
     emit set_detections_on_frame(frame_num);
 }
 
@@ -542,6 +605,9 @@ void VideoWidget::fit_clicked() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
+    if (!video_btns_enabled) {
+        enable_video_btns();
+    }
     if (m_vid_proj != vid_proj) {
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
@@ -563,23 +629,23 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         m_video_player->start();
     }
-
+    if (frame == -1) return;
     emit set_playback_frame(frame, true);
-    if (!video_btns_enabled) {
-        enable_video_btns();
-    }
 }
 
 void VideoWidget::enable_video_btns() {
     for (QPushButton* btn : btns) {
         btn->setEnabled(true);
     }
+    playback_slider->setEnabled(true);
+    frame_line_edit->setEnabled(true);
+    speed_slider->setEnabled(true);
 }
 
-void VideoWidget::enable_poi_btns(bool b) {
+void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
-    analysis_play_btn->setEnabled(b);
+    analysis_play_btn->setEnabled(ana_play_btn);
     if (!b) {
         analysis_play_btn->setChecked(b);
         analysis_only = b;
@@ -593,5 +659,26 @@ void VideoWidget::update_bar_pos(int change_x, int change_y) {
 
 void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
+}
+
+/**
+ * @brief VideoWidget::frame_line_edit_finished
+ * Slot function for when the frame_line_edit is finished edited och enter is pressed
+ * Checks if input is a legal frame and then set that as current frame.
+ */
+void VideoWidget::frame_line_edit_finished() {
+    std::string text = frame_line_edit->text().toStdString();
+    char* p;
+    long converted = strtol(text.c_str(), &p, 10);
+    if (*p != 0){
+        emit set_status_bar("Error! Input is not a number!");
+    } else if (converted > playback_slider->maximum()) {
+        QString num_frames = QString::number(playback_slider->maximum());
+        emit set_status_bar("Error! Input is too large. " + num_frames + " is max frame number.");
+    } else if (converted < 0) {
+        emit set_status_bar("Error! Input is negative!");
+    } else {
+        emit set_playback_frame(converted, true);
+    }
 }
 

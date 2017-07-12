@@ -41,7 +41,8 @@ void ProjectWidget::new_project() {
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
-    std::string _tmp_path = project_path.toStdString();    
+    std::string _tmp_path = project_path.toStdString();
+    parentWidget()->parentWidget()->setWindowTitle(project_name);
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
     _tmp_path.append(_tmp_name);
@@ -54,7 +55,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  */
 void ProjectWidget::create_default_tree() {
     m_videos = new FolderItem(FOLDER_ITEM);
-    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     m_videos->setText(0, tr("Videos"));
     addTopLevelItem(m_videos);
 }
@@ -71,7 +72,6 @@ void ProjectWidget::add_video() {
     for (auto video_path : video_paths){
         int index = video_path.lastIndexOf('/') + 1;
         QString vid_name = video_path.right(video_path.length() - index);
-
         // TODO Check if file is already added
         VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
         m_proj->add_video_project(vid_proj);
@@ -99,6 +99,25 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
 }
 
 /**
+ * @brief ProjectWidget::add_tag
+ * @param vid_proj
+ * @param tag
+ * Adds a tag 'tag' under vid_proj
+ */
+void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis tag) {
+    TagItem* tag_item = new TagItem(tag, TAG_ITEM);
+    vid_proj->add_analysis(tag_item->get_tag());
+    for (int i = 0; i < m_videos->childCount(); i++) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
+        if (vid_item->get_video_project() == vid_proj) {
+            m_videos->child(i)->addChild(tag_item);
+            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->get_name()));
+            m_videos->child(i)->setExpanded(true);
+        }
+    }
+}
+
+/**
  * @brief ProjectWidget::set_tree_item_name
  * @param item
  * @param name
@@ -121,6 +140,21 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->addChild(vid);
     emit set_status_bar("Video added: " + vid_name);
     m_videos->setExpanded(true);
+    for (std::pair<int,Analysis*> ana : vid_proj->get_analyses()){
+        if (ana.second->type == TAG) {
+            TagItem* tag_item = new TagItem(*ana.second, TAG_ITEM);
+            tag_item->setText(0, QString::fromStdString(ana.second->get_name()));
+            vid->addChild(tag_item);
+            vid->setExpanded(true);
+        } else {
+            AnalysisItem* ana_item = new AnalysisItem(ANALYSIS_ITEM);
+            ana_item->set_analysis(*ana.second);
+            ana_item->setText(0, QString::fromStdString(ana.second->get_name()));
+            vid->addChild(ana_item);
+            vid->setExpanded(true);
+        }
+
+    }
 }
 
 QStringList ProjectWidget::mimeTypes() const {
@@ -189,7 +223,8 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_video(vid_item->get_video_project());
         emit set_detections(false);
         emit set_poi_slider(false);
-        emit enable_poi_btns(false);
+        emit set_tag_slider(false);
+        emit enable_poi_btns(false,false);
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent(), 0);
@@ -198,9 +233,15 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_detections(true);
         emit set_poi_slider(true);
         if (!ana_item->get_analysis()->POIs.empty()) {
-            emit enable_poi_btns(true);
+            emit enable_poi_btns(true, true);
         }
-
+        break;
+    } case TAG_ITEM: {
+        tree_item_clicked(item->parent(), 0);
+        TagItem* tag_item = dynamic_cast<TagItem*>(item);
+        emit marked_tag(tag_item->get_tag());
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
         break;
     } case FOLDER_ITEM: {
         break;

@@ -4,7 +4,7 @@
 #include "Project/videoproject.h"
 #include <QTreeWidgetItem>
 
-enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM};
+enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
 
 class AnalysisItem : public QTreeWidgetItem
 {
@@ -17,10 +17,12 @@ public:
     Analysis *get_analysis();
 };
 
-class FolderItem : public QTreeWidgetItem
+class TagItem : public QTreeWidgetItem
 {
+    Analysis m_tag;
 public:
-    FolderItem(int type);
+    TagItem(Analysis tag, int type);
+    Analysis *get_tag();
 };
 
 class VideoItem : public QTreeWidgetItem
@@ -34,5 +36,11 @@ public:
 signals:
 
 public slots:
+};
+
+class FolderItem : public QTreeWidgetItem
+{
+public:
+    FolderItem(int type);
 };
 #endif // ITEMTYPES_H

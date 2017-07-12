@@ -6,16 +6,18 @@
  * @brief AnalysisMeta::AnalysisMeta
  * @param analysis
  */
-AnalysisMeta::AnalysisMeta(const Analysis &analysis)
-{
+AnalysisMeta::AnalysisMeta(const Analysis &analysis) {
     m_name = analysis.name;
     file_analysis = analysis.full_path();
-    std::vector<POI> pois = analysis.POIs;
+    std::set<POI*> pois;
+    for (auto poi : analysis.POIs) {
+        pois.insert(poi);
+    }
     std::pair<int,int> pair;
-    POI poi;
+    POI* poi;
     for (auto it = pois.begin(); it != pois.end(); ++it) {
         poi = *it;
-        pair = std::make_pair(poi.start_frame, poi.end_frame);
+        pair = std::make_pair(poi->start_frame, poi->end_frame);
         m_poi_intervals.push_back(pair);
     }
 }
@@ -23,16 +25,14 @@ AnalysisMeta::AnalysisMeta(const Analysis &analysis)
 /**
  * @brief AnalysisMeta::AnalysisMeta
  */
-AnalysisMeta::AnalysisMeta()
-{
+AnalysisMeta::AnalysisMeta() {
 }
 
 /**
  * @brief AnalysisMeta::get_analysis
  * @return
  */
-Analysis AnalysisMeta::get_analysis()
-{
+Analysis AnalysisMeta::get_analysis() {
     Analysis analysis;
     analysis.load_saveable(file_analysis);
     return analysis;
@@ -42,8 +42,7 @@ Analysis AnalysisMeta::get_analysis()
  * @brief AnalysisMeta::AnalysisMeta
  * @param other
  */
-AnalysisMeta::AnalysisMeta(const AnalysisMeta &other)
-{
+AnalysisMeta::AnalysisMeta(const AnalysisMeta &other) {
     m_name = other.m_name;
     m_poi_intervals = other.m_poi_intervals;    
     file_analysis = other.file_analysis;
@@ -53,8 +52,7 @@ AnalysisMeta::AnalysisMeta(const AnalysisMeta &other)
  * @brief AnalysisMeta::read
  * @param json
  */
-void AnalysisMeta::read(const QJsonObject &json)
-{
+void AnalysisMeta::read(const QJsonObject &json) {
     m_name = json["name"].toString().toStdString();
     file_analysis = json["full_path"].toString().toStdString();
     QJsonArray json_intervals = json["intervals"].toArray();
@@ -71,8 +69,7 @@ void AnalysisMeta::read(const QJsonObject &json)
  * @brief AnalysisMeta::write
  * @param json
  */
-void AnalysisMeta::write(QJsonObject &json)
-{
+void AnalysisMeta::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
     json["full_path"] = QString::fromStdString(file_analysis);
     QJsonArray intervals;

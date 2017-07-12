@@ -39,8 +39,7 @@ bool Saveable::save_saveable(const std::string& file_name,
  * @param save_format
  * @return true if successfull, false else
  */
-bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format)
-{
+bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format) {
     QFile save_file(save_format == JSON           // Decide full_path, directory path + file name + file ending
                     ? QString::fromStdString(full_path + ".json")
                     : QString::fromStdString(full_path + ".dat"));

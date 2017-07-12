@@ -26,6 +26,28 @@ void POI::set_end_frame(int frame_num) {
     end_frame = frame_num;
 }
 
+bool POI::is_in_POI(int frame_num) {
+    return frame_num >= start_frame && frame_num <= end_frame;
+}
+
+/**
+ * @brief POI::at_edge
+ * Checks if frame_num is the next or previous frame of the POI
+ * if it is, add it
+ * @param frame_num
+ * @return
+ */
+bool POI::at_edge(int frame_num) {
+    if (frame_num == start_frame-1) {
+        start_frame = frame_num;
+        return true;
+    } else if (frame_num == end_frame+1) {
+        end_frame = frame_num;
+        return true;
+    }
+    return false;
+}
+
 /**
  * @brief POI::read
  * Reads POI from json format.
