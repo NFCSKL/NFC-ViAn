@@ -39,9 +39,6 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
 }
 
 BookmarkCategory::~BookmarkCategory() {
-//    delete layout;
-    delete disputed;
-    delete reference;
 }
 
 std::string BookmarkCategory::get_name() {

@@ -6,7 +6,7 @@ VideoItem::VideoItem(VideoProject* video_project, int type): QTreeWidgetItem(typ
 }
 
 VideoItem::~VideoItem(){
-    delete m_vid_proj;
+    // VideoProject should be deleted by the Project
 }
 
 VideoProject* VideoItem::get_video_project() {
