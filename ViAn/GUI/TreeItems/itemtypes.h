@@ -6,8 +6,7 @@
 
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
 
-class AnalysisItem : public QTreeWidgetItem
-{
+class AnalysisItem : public QTreeWidgetItem {
     Analysis m_analysis;
 
 public:
@@ -17,16 +16,14 @@ public:
     Analysis *get_analysis();
 };
 
-class TagItem : public QTreeWidgetItem
-{
-    Analysis m_tag;
+class TagItem : public QTreeWidgetItem {
+    Analysis* m_tag;
 public:
-    TagItem(Analysis tag, int type);
+    TagItem(Analysis *tag, int type);
     Analysis *get_tag();
 };
 
-class VideoItem : public QTreeWidgetItem
-{
+class VideoItem : public QTreeWidgetItem {
     VideoProject* m_vid_proj;
 
 public:
@@ -38,8 +35,8 @@ signals:
 public slots:
 };
 
-class FolderItem : public QTreeWidgetItem
-{
+class FolderItem : public QTreeWidgetItem {
+
 public:
     FolderItem(int type);
 };

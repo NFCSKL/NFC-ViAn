@@ -12,7 +12,7 @@
 #include "poi.h"
 #include "ooi.h"
 
-enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1, TAG};
+enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1, TAG = 2};
 
 const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial detection", "Tag"};
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
@@ -35,10 +35,12 @@ public:
     };
 
     void add_POI(POI *POI);
-    void add_frame(int frame);
+    bool add_frame(int frame);
+    void remove_frame(int frame);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
+    std::set<int> frames;
     std::set<POI*, poi_cmp> POIs;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);

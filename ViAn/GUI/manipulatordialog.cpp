@@ -5,6 +5,8 @@
 
 ManipulatorDialog::ManipulatorDialog(QWidget* parent) : QDialog(parent) {
     QFormLayout* layout = new QFormLayout;
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     // Spin box setup
     brightness_box = new QSpinBox(this);
     contrast_box = new QDoubleSpinBox(this);

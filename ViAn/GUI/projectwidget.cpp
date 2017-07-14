@@ -23,13 +23,8 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
  * Creates a create project dialog
  */
 void ProjectWidget::new_project() {
-    if (m_proj == nullptr) {
-        ProjectDialog* proj_dialog = new ProjectDialog();
-        QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
-    } else {
-        close_project();
-        new_project();
-    }
+    ProjectDialog* proj_dialog = new ProjectDialog();
+    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
 }
 
 /**
@@ -40,6 +35,7 @@ void ProjectWidget::new_project() {
  * @param project_path
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
+    close_project();
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
@@ -104,7 +100,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis tag) {
+void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis* tag) {
     TagItem* tag_item = new TagItem(tag, TAG_ITEM);
     vid_proj->add_analysis(tag_item->get_tag());
     for (int i = 0; i < m_videos->childCount(); i++) {
@@ -142,7 +138,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->setExpanded(true);
     for (std::pair<int,Analysis*> ana : vid_proj->get_analyses()){
         if (ana.second->type == TAG) {
-            TagItem* tag_item = new TagItem(*ana.second, TAG_ITEM);
+            TagItem* tag_item = new TagItem(ana.second, TAG_ITEM);
             tag_item->setText(0, QString::fromStdString(ana.second->get_name()));
             vid->addChild(tag_item);
             vid->setExpanded(true);
@@ -220,14 +216,15 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project());
+        emit marked_video(vid_item->get_video_project(), -1);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
+        emit enable_tag_btn(false);
         break;
     } case ANALYSIS_ITEM: {
-        tree_item_clicked(item->parent(), 0);
+        tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         emit marked_analysis(ana_item->get_analysis());
         emit set_detections(true);
@@ -237,11 +234,12 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         }
         break;
     } case TAG_ITEM: {
-        tree_item_clicked(item->parent(), 0);
+        tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
         emit marked_tag(tag_item->get_tag());
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
+        emit enable_tag_btn(true);
         break;
     } case FOLDER_ITEM: {
         break;
@@ -256,8 +254,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
  * Slot function to save the open project
  */
 void ProjectWidget::save_project() {
-    m_proj->save_project();
-    emit set_status_bar("Project saved");
+    if (m_proj != nullptr) {
+        m_proj->save_project();
+        emit set_status_bar("Project saved");
+    }
 }
 
 /**
@@ -265,13 +265,14 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project() {
-    if (m_proj != nullptr) close_project();
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
+        if (m_proj != nullptr) close_project();
         emit set_status_bar("Opening project");
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
+        parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
         emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
             VideoProject* vid_proj = vid_pair.second;

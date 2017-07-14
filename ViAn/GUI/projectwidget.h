@@ -24,6 +24,7 @@ signals:
     void marked_tag(Analysis*);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
+    void enable_tag_btn(bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
     void set_status_bar(QString);
@@ -34,7 +35,7 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Analysis tag);
+    void add_tag(VideoProject*, Analysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
     void open_project();
@@ -43,7 +44,8 @@ public slots:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 private slots:
-    void tree_item_clicked(QTreeWidgetItem *item, const int& col = -1);
+    void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
+
 private:
     void create_default_tree();
     void tree_add_video();
