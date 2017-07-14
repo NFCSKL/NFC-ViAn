@@ -7,9 +7,13 @@
 #include <QDebug>
 #include <QShortcut>
 #include <QScrollBar>
+#include <QProgressDialog>
 
+#include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
 #include "Analysis/AnalysisController.h"
+#include "imageexporter.h"
+
 #include <opencv2/videoio.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
@@ -59,6 +63,14 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
 
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+}
+
+VideoProject *VideoWidget::get_current_video_project(){
+    return m_vid_proj;
+}
+
+std::pair<int, int> VideoWidget::get_frame_interval(){
+    return m_interval;
 }
 
 /**
@@ -120,6 +132,8 @@ void VideoWidget::set_btn_icons() {
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+    set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
+    set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     zoom_in_btn->setCheckable(true);
     move_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
@@ -145,6 +159,8 @@ void VideoWidget::set_btn_tool_tip() {
     zoom_out_btn->setToolTip(tr("Zoom out"));
     fit_btn->setToolTip(tr("Scale the video to screen"));
     move_btn->setToolTip(tr("Panning tool"));
+    set_start_interval_btn->setToolTip("Set left interval point");
+    set_end_interval_btn->setToolTip("Set right interval point");
 }
 
 /**
@@ -164,6 +180,8 @@ void VideoWidget::set_btn_size() {
     btns.push_back(zoom_out_btn);
     btns.push_back(fit_btn);
     btns.push_back(move_btn);
+    btns.push_back(set_start_interval_btn);
+    btns.push_back(set_end_interval_btn);
     
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
@@ -212,6 +230,8 @@ void VideoWidget::set_btn_shortcuts() {
     new_tag_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
+    set_start_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left));
+    set_end_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right));
 }
 
 /**
@@ -272,6 +292,8 @@ void VideoWidget::add_btns_to_layouts() {
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
     control_row->addLayout(zoom_btns);
+    control_row->addWidget(set_start_interval_btn);
+    control_row->addWidget(set_end_interval_btn);
 
     vertical_layout->addLayout(control_row);
 }
@@ -306,6 +328,8 @@ void VideoWidget::connect_btns() {
     connect(frame_wgt, &FrameWidget::trigger_zoom_out, zoom_out_btn, &QPushButton::click);
 
     connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
+    connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
+    connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
 }
 
 /**
@@ -374,6 +398,41 @@ void VideoWidget::set_total_time(int time) {
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
+}
+
+/**
+ * @brief VideoWidget::set_interval_start_clicked
+ * Sets the start point of the frame interval
+ */
+void VideoWidget::set_interval_start_clicked() {
+    m_interval.first = current_frame;
+//    if (current_frame < m_interval.second) {
+//        m_interval.first = current_frame;
+//    } else if (current_frame > m_interval.second){
+//        // Trying to set start after end, flip
+//        m_interval.first = m_interval.second;
+//        m_interval.second = current_frame;
+//    }
+    set_status_bar("Frame interval updated: " +
+                   QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
+
+}
+
+/**
+ * @brief VideoWidget::set_interval_end_clicked
+ * Sets the end of the frame interval
+*/
+void VideoWidget::set_interval_end_clicked() {
+    m_interval.second = current_frame;
+    /*if (current_frame > m_interval.first){
+        m_interval.second = current_frame;
+    } *//*else if (current_frame < m_interval.first) {
+        // Trying to set end before start, flip
+        m_interval.second = m_interval.first;
+        m_interval.first = current_frame;
+    }*/
+    set_status_bar("Frame interval updated: " +
+                   QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
 }
 
 /**
@@ -622,6 +681,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
     }
 
     if (m_vid_proj != vid_proj) {
+        m_interval = make_pair(0,0);
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
             emit set_stop_video();

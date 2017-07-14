@@ -31,6 +31,8 @@ private:
     int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
+
+    std::pair<int, int> m_interval = std::make_pair(0, 1);
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -40,6 +42,9 @@ public:
     video_player* m_video_player;
     FrameWidget* frame_wgt;
     AnalysisSlider* playback_slider;
+
+    VideoProject* get_current_video_project();
+    std::pair<int, int> get_frame_interval();
 
 signals:
     void first_frame(cv::Mat frame);
@@ -88,6 +93,8 @@ public slots:
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
+    void set_interval_start_clicked();
+    void set_interval_end_clicked();
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
     void enable_tag_btn(bool);
@@ -120,6 +127,8 @@ private:
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
     QPushButton* move_btn;
+    QPushButton* set_start_interval_btn;
+    QPushButton* set_end_interval_btn;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas

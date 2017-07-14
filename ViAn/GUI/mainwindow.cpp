@@ -8,6 +8,7 @@
 #include <QMenuBar>
 #include <QTime>
 #include <QDebug>
+#include <QProgressDialog>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
@@ -16,6 +17,7 @@
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
+#include "GUI/frameexporterdialog.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -287,6 +289,11 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
 
+
+    QAction* export_act  =new QAction(tr("&Frames"));
+
+
+
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
     clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
@@ -300,6 +307,11 @@ void MainWindow::init_tools_menu() {
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
+
+    // Export submenu
+    QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
+    export_menu->addAction(export_act);
+
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
@@ -335,6 +347,8 @@ void MainWindow::init_tools_menu() {
     text_act->setStatusTip(tr("Text tool"));
 
     //Connect
+    connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+
 }
 
 /**
@@ -370,6 +384,46 @@ void MainWindow::cont_bri() {
     ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt->m_video_player, SLOT(set_bright_cont(int,double)));
     man_dialog->exec();
+}
+
+void MainWindow::export_images(){
+    std::pair<int, int> interval = video_wgt->get_frame_interval();
+    VideoProject* vid_proj = video_wgt->get_current_video_project();
+    if (vid_proj == nullptr){
+        set_status_bar("A video needs to be selected");
+        return;
+    }
+
+    if (interval.first > interval.second) {
+        int tmp = interval.second;
+        interval.second = interval.first;
+        interval.first = tmp;
+    }
+    ImageExporter* im_exp = new ImageExporter();
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->getDir(),
+                                        video_wgt->m_video_player->get_num_frames() - 1,
+                                        interval);
+    if (!exporter_dialog.exec()){
+        delete im_exp;
+        return;
+    }
+
+    interval = im_exp->get_interval();
+    QProgressDialog* progress = new QProgressDialog(
+                "Exporting images...", "Abort", 0, abs(interval.first - interval.second) + 1, this, Qt::WindowMinimizeButtonHint);
+
+    connect(im_exp, &ImageExporter::finished_msg, this, &MainWindow::set_status_bar);
+    connect(progress, &QProgressDialog::canceled, im_exp, ImageExporter::abort);
+    connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
+
+    QThread* exporter_thread = new QThread;
+    im_exp->moveToThread(exporter_thread);
+    connect(exporter_thread, &QThread::started, im_exp, &ImageExporter::export_images);
+    connect(im_exp, &ImageExporter::finished, exporter_thread, &QThread::quit);
+    connect(im_exp, &ImageExporter::finished, im_exp, &ImageExporter::deleteLater);
+    connect(exporter_thread, &QThread::finished, exporter_thread, &QThread::deleteLater);
+    progress->show();
+    exporter_thread->start();
 }
 
 /**
