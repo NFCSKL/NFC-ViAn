@@ -34,7 +34,6 @@ void FrameWidget::set_analysis(Analysis* analysis) {
  */
 void FrameWidget::clear_analysis() {
     m_analysis = nullptr;
-    ooi_rects.clear();
 }
 
 /**
@@ -45,13 +44,19 @@ void FrameWidget::clear_analysis() {
 void FrameWidget::set_detections_on_frame(int frame_num) {
     if (m_analysis != nullptr) {
         ooi_rects = m_analysis->get_detections_on_frame(frame_num);
-        repaint();
     }
 }
 
 void FrameWidget::set_detections(bool detections) {
     m_detections = detections;
-    repaint();  //Repaint to update the current frame directly
+}
+
+void FrameWidget::set_show_detections(bool show) {
+    show_detections = show;
+}
+
+void FrameWidget::update(){
+    repaint();
 }
 
 void FrameWidget::draw_image(cv::Mat image) {
@@ -110,7 +115,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF zoom(zoom_start_pos, zoom_end_pos);
         painter.drawRect(zoom);
     }
-    if (m_detections) {
+    if (m_detections && show_detections) {
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
             QPoint br(rect.x+rect.width, rect.y+rect.height);

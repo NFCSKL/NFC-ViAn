@@ -630,6 +630,8 @@ void VideoWidget::on_new_frame(int frame_num) {
     set_current_time(frame_num / m_video_player->get_frame_rate());
     frame_line_edit->setText(QString::number(current_frame));
     emit set_detections_on_frame(frame_num);
+    frame_wgt->update();
+    playback_slider->update();
 }
 
 void VideoWidget::on_playback_slider_pressed() {

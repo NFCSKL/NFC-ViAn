@@ -28,7 +28,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
-    if (m_show_pois) {
+    if (m_show_pois && show_on_slider) {
         QBrush brush = Qt::yellow;
 
         //Get one frames width on the slider
@@ -46,7 +46,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
-    } else if (m_show_tags) {
+    } else if (m_show_tags && show_on_slider) {
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
         for (auto frame : frames) {
             double first = (groove_rect.left()+(double)frame*c);
@@ -62,6 +62,10 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     }
     option.subControls = QStyle::SC_SliderHandle;
     painter.drawComplexControl(QStyle::CC_Slider, option);
+}
+
+void AnalysisSlider::update() {
+    repaint();
 }
 
 /**
@@ -83,13 +87,10 @@ void AnalysisSlider::set_tag(Analysis *analysis) {
     for (auto frame : analysis->frames) {
         this->frames.push_back(frame);
     }
-
-    repaint();
 }
 
 void AnalysisSlider::set_interval(int frame) {
     interval = frame;
-    repaint();
 }
 
 /**
@@ -199,7 +200,6 @@ bool AnalysisSlider::is_in_POI(int frame) {
  */
 void AnalysisSlider::set_show_pois(bool show_pois) {
     m_show_pois = show_pois;
-    repaint();
 }
 
 /**
@@ -208,7 +208,10 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
     m_show_tags = show_tags;
-    repaint();
+}
+
+void AnalysisSlider::set_show_on_slider(bool show) {
+    show_on_slider = show;
 }
 
 /**

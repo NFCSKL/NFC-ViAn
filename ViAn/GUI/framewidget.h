@@ -31,6 +31,7 @@ class FrameWidget : public QWidget
     bool do_zoom = false;
     bool do_zoom_out = false;
     bool m_detections = false;
+    bool show_detections = true;
 
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
@@ -56,6 +57,8 @@ public slots:
     void clear_analysis();
     void set_detections_on_frame(int);
     void set_detections(bool);
+    void set_show_detections(bool);
+    void update();
 protected:
     QImage _qimage;
     cv::Mat _tmp;
