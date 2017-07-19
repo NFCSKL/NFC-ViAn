@@ -28,9 +28,9 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
-    if (m_show_pois && show_on_slider) {
+    if ((m_show_pois||m_show_tags)&& show_on_slider) {
         QBrush brush = Qt::yellow;
-
+        if(m_show_tags) brush = Qt::red;
         //Get one frames width on the slider
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
 
@@ -46,13 +46,6 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
-    } else if (m_show_tags && show_on_slider) {
-        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
-        for (auto frame : frames) {
-            double first = (groove_rect.left()+(double)frame*c);
-            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, Qt::red);
-        }
     }
     if (interval != -1) {
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
@@ -64,7 +57,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
 }
 
-void AnalysisSlider::update() {
+void AnalysisSlider::update(){
     repaint();
 }
 
@@ -73,20 +66,19 @@ void AnalysisSlider::update() {
  * Adds all POIs to the slider
  * @param analysis
  */
-void AnalysisSlider::set_analysis(Analysis* analysis) {
+void AnalysisSlider::set_analysis(AnalysisMeta* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        for (auto p : analysis->POIs) {
-            add_slider_interval(p->start_frame, p->end_frame);
+        for (auto p : analysis->getIntervals()) {
+            add_slider_interval(p->getStart(), p->getEnd());
         }
     }
+    repaint();
 }
 
-void AnalysisSlider::set_tag(Analysis *analysis) {
-    this->frames.clear();
-    for (auto frame : analysis->frames) {
-        this->frames.push_back(frame);
-    }
+void AnalysisSlider::set_tag(Tag *tag)
+{
+    set_analysis(new AnalysisMeta(static_cast<Analysis>(*tag)));
 }
 
 void AnalysisSlider::set_interval(int frame) {

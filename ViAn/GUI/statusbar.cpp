@@ -21,7 +21,7 @@ void StatusBar::add_analysis_bar() {
     ana_prog->setOrientation(Qt::Horizontal);
     ana_prog->setMaximumHeight(PROG_BAR_HEIGHT);
     ana_prog->setMaximumWidth(PROG_BAR_WIDTH);
-    //anal_prog->setMaximum(100);
+    //ana_prog->setMaximum(100);
 
     addPermanentWidget(ana_prog);
 }

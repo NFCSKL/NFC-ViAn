@@ -9,7 +9,7 @@
 #include "Video/shapes/zoomrectangle.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
-#include "Project/Analysis/analysis.h"
+#include "Project/Analysis/analysismeta.h"
 
 enum click_tool {NONE, ZOOM, MOVE};
 
@@ -53,7 +53,7 @@ public slots:
     void draw_from_playback(cv::Mat frame);
     void toggle_zoom(bool value);
     void set_scroll_area_size(QSize size);
-    void set_analysis(Analysis*);
+    void set_analysis(AnalysisMeta *);
     void clear_analysis();
     void set_detections_on_frame(int);
     void set_detections(bool);

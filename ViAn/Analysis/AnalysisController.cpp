@@ -75,6 +75,7 @@ void AnalysisController::run() {
     analysis.set_name("Analysis");
     analysis.save_saveable(m_save_path);
     AnalysisMeta analysis_meta (analysis);
+    analysis_meta.type = MOTION_DETECTION;
     emit analysis_done(analysis_meta);
     delete method;
 }

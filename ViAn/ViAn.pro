@@ -36,7 +36,8 @@ SOURCES += main.cpp \
     Video/frameprocessor.cpp \
     GUI/tagdialog.cpp \
     imageexporter.cpp \
-    GUI/frameexporterdialog.cpp
+    GUI/frameexporterdialog.cpp \
+    Project/Analysis/tag.cpp
 
 
 #
@@ -66,7 +67,8 @@ HEADERS += Test/test_video_player.h \
     Video/frameprocessor.h \
     GUI/tagdialog.h \
     imageexporter.h \
-    GUI/frameexporterdialog.h
+    GUI/frameexporterdialog.h \
+    Project/Analysis/tag.h
 
 #
 # LIBRARY

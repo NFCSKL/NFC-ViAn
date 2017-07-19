@@ -79,7 +79,6 @@ std::vector<OOI> MotionDetection::analyse_frame(){
             cv::Rect rect = cv::boundingRect(contour);
             OOIs.push_back(OOI(rect));
         }
-    }
-
+    }    
     return OOIs;
 }

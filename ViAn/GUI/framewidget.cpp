@@ -24,8 +24,8 @@ void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
 
-void FrameWidget::set_analysis(Analysis* analysis) {
-    m_analysis = analysis;
+void FrameWidget::set_analysis(AnalysisMeta* analysis) {
+    m_analysis = analysis->get_analysis();
 }
 
 /**

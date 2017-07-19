@@ -65,7 +65,7 @@ Analysis AnalysisMethod::run_analysis() {
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
                 m_POI->set_end_frame(current_frame_index - 1);
-                m_analysis.add_POI(m_POI);
+                m_analysis.add_interval(m_POI);
                 m_POI = new POI();
                 detecting = false;
             } else if (!detections.empty()) {
@@ -97,7 +97,7 @@ Analysis AnalysisMethod::run_analysis() {
     // video gets an end frame.
     if (detecting) {
         m_POI->set_end_frame(current_frame_index);
-        m_analysis.add_POI(m_POI);
+        m_analysis.add_interval(m_POI);
     }
     capture.release();
     return m_analysis;

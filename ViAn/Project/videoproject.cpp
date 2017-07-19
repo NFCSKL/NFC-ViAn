@@ -49,7 +49,7 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-Analysis* VideoProject::get_analysis(const int& id) {
+AnalysisMeta *VideoProject::get_analysis(const int& id) {
     return m_analyses[id];
 }
 
@@ -58,7 +58,7 @@ Analysis* VideoProject::get_analysis(const int& id) {
  * @param id of the analysis
  */
 void VideoProject::delete_analysis(const int& id) {
-    Analysis* am = m_analyses.at(id);
+    AnalysisMeta* am = m_analyses.at(id);
     m_analyses.erase(id);
     am->delete_saveable();
     delete am;
@@ -82,7 +82,7 @@ void VideoProject::delete_bookmark(const int &id) {
  * @return analyses
  * return all analyses.
  */
-std::map<ID, Analysis *> VideoProject::get_analyses() {
+std::map<ID, AnalysisMeta *> VideoProject::get_analyses() {
     return m_analyses;
 }
 
@@ -108,7 +108,7 @@ void VideoProject::read(const QJsonObject& json){
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();
-        Analysis* analysis = new Analysis();
+        AnalysisMeta* analysis = new AnalysisMeta();
         analysis->read(json_analysis);
         add_analysis(analysis);
     }
@@ -134,7 +134,7 @@ void VideoProject::write(QJsonObject& json){
     QJsonArray json_analyses;
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
-        Analysis* an = it2->second;
+        AnalysisMeta* an = it2->second;
         an->write(json_analysis);
         json_analyses.append(json_analysis);
     }
@@ -162,7 +162,7 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * @return id of the analysis
  * Adds analysis to video project.
  */
-ID VideoProject::add_analysis(Analysis *analysis){
+ID VideoProject::add_analysis(AnalysisMeta *analysis){
     m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
     return m_ana_cnt++;
 }
@@ -177,7 +177,7 @@ void VideoProject::delete_artifacts(){
         temp->remove_exported_image();
     }
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
-        Analysis* temp = it2->second;
+        AnalysisMeta* temp = it2->second;
         temp->delete_saveable();
 
     }
