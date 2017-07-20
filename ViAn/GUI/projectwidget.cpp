@@ -8,6 +8,7 @@
 #include <QDirIterator>
 #include <iostream>
 #include <algorithm>
+#include "Project/recentproject.h"
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -259,6 +260,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
 void ProjectWidget::save_project() {
     if (m_proj != nullptr) {
         m_proj->save_project();
+
+        RecentProject rp;
+        rp.load_recent();
+        rp.update_recent(m_proj->getName(), m_proj->full_path());
         emit set_status_bar("Project saved");
     }
 }
@@ -267,8 +272,7 @@ void ProjectWidget::save_project() {
  * @brief ProjectWidget::open_project
  * Slot function to open a previously created project
  */
-void ProjectWidget::open_project() {
-    QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
+void ProjectWidget::open_project(QString project_path) {
     if (!project_path.isEmpty()) {
         if (m_proj != nullptr) close_project();
         emit set_status_bar("Opening project");

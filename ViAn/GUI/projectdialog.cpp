@@ -10,8 +10,7 @@
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("New project");
     // remove question mark from the title bar
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);

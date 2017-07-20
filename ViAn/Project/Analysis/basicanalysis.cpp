@@ -66,7 +66,7 @@ int BasicAnalysis::get_type() const
     return type;
 }
 
-interval_set BasicAnalysis::get_interval() const
+interval_set BasicAnalysis::get_intervals() const
 {
     return m_intervals;
 }

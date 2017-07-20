@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QTime>
+#include <QTimer>
 #include <QDebug>
 #include <QProgressDialog>
 #include <chrono>
@@ -18,6 +19,7 @@
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
+
 
 /**
  * @brief MainWindow::MainWindow
@@ -74,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
-    connect(main_toolbar->open_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
+    connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
@@ -120,9 +122,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
+    connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
 
     connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
+
+    // Recent projects menu
+    RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
+    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
+    QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
 
@@ -195,7 +205,7 @@ void MainWindow::init_file_menu() {
     // Connet with signals and slots
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
-    connect(open_project_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
+    connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
     connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
@@ -448,4 +458,9 @@ void MainWindow::export_images(){
  */
 void MainWindow::options() {
     emit set_status_bar("Opening options");
+}
+
+void MainWindow::open_project_dialog(){
+    QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
+    open_project(project_path);
 }
