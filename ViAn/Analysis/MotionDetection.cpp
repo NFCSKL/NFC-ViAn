@@ -30,8 +30,8 @@ void MotionDetection::setup_analysis(){
  * not part of the background. Rectangles that mark the detected areas are saved for use
  * during video playback.
  */
-std::vector<OOI> MotionDetection::analyse_frame(){
-    std::vector<OOI> OOIs;
+std::vector<DetectionBox> MotionDetection::analyse_frame(){
+    std::vector<DetectionBox> OOIs;
     std::vector<std::vector<cv::Point> > contours;
 
     // Updates background model
@@ -77,7 +77,7 @@ std::vector<OOI> MotionDetection::analyse_frame(){
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > SMALLEST_OBJECT_SIZE) {
             cv::Rect rect = cv::boundingRect(contour);
-            OOIs.push_back(OOI(rect));
+            OOIs.push_back(DetectionBox(rect));
         }
     }    
     return OOIs;

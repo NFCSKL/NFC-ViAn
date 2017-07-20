@@ -17,7 +17,7 @@ public:
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
 
     virtual void setup_analysis() = 0;
-    virtual std::vector<OOI> analyse_frame() = 0;
+    virtual std::vector<DetectionBox> analyse_frame() = 0;
 
     bool sample_current_frame();
     bool load_video();

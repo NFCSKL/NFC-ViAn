@@ -1,16 +1,16 @@
-#include "ooi.h"
+#include "detectionbox.h"
 
 /**
  * @brief OOI::OOI
  */
-OOI::OOI(){}
+DetectionBox::DetectionBox(){}
 
 /**
  * @brief OOI::OOI
  * @param upper_left
  * @param down_right
  */
-OOI::OOI(std::pair<int, int> upper_left, std::pair<int, int> down_right){
+DetectionBox::DetectionBox(std::pair<int, int> upper_left, std::pair<int, int> down_right){
     this->upper_left = upper_left;
     this->lower_right = down_right;
 }
@@ -21,7 +21,7 @@ OOI::OOI(std::pair<int, int> upper_left, std::pair<int, int> down_right){
  * @param height
  * @param width
  */
-OOI::OOI(std::pair<int, int> upper_left, int height, int width){
+DetectionBox::DetectionBox(std::pair<int, int> upper_left, int height, int width){
     this->upper_left = upper_left;
     this ->lower_right = std::make_pair(upper_left.second + width, upper_left.second + height);
 }
@@ -31,7 +31,7 @@ OOI::OOI(std::pair<int, int> upper_left, int height, int width){
  * Creates an OOI from a cv::Rect.
  * @param rect
  */
-OOI::OOI(cv::Rect rect) {
+DetectionBox::DetectionBox(cv::Rect rect) {
     upper_left = std::make_pair(rect.x, rect.y);
     lower_right = std::make_pair(rect.x + rect.width, rect.y + rect.height);
 }
@@ -41,7 +41,7 @@ OOI::OOI(cv::Rect rect) {
  * Reads OOI from json format.
  * @param json
  */
-void OOI::read(const QJsonObject &json){
+void DetectionBox::read(const QJsonObject &json){
     this->upper_left.first = json["UL_X"].toInt();
     this->upper_left.second = json["UL_Y"].toInt();
 
@@ -54,7 +54,7 @@ void OOI::read(const QJsonObject &json){
  * Writes OOI to json format.
  * @param json
  */
-void OOI::write(QJsonObject &json){
+void DetectionBox::write(QJsonObject &json){
     json["UL_X"] = this->upper_left.first;
     json["UL_Y"] = this->upper_left.second;
 
@@ -67,7 +67,7 @@ void OOI::write(QJsonObject &json){
  * Returns the rectangle specified by the OOI.
  * @return
  */
-cv::Rect OOI::get_rect() {
+cv::Rect DetectionBox::get_rect() {
     return cv::Rect(upper_left.first, upper_left.second, lower_right.first - upper_left.first,
                       lower_right.second - upper_left.second);
 }
@@ -77,7 +77,7 @@ cv::Rect OOI::get_rect() {
  * Scales the coordinates in the OOI according to the scale ratio parameter.
  * @param scale_ratio
  */
-void OOI::scale_coordinates(float scale_ratio) {
+void DetectionBox::scale_coordinates(float scale_ratio) {
     this->upper_left.first *= scale_ratio;
     this->upper_left.second *= scale_ratio;
     this->lower_right.first *= scale_ratio;

@@ -21,7 +21,7 @@ private:
     const cv::Size BLUR_SIZE = cv::Size(31,31);
 
     void setup_analysis() override;
-    std::vector<OOI> analyse_frame() override;
+    std::vector<DetectionBox> analyse_frame() override;
 
     const int DILATION_DEGREE = 16;
     const int SMALLEST_OBJECT_SIZE = 500;

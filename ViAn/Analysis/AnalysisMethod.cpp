@@ -50,7 +50,7 @@ Analysis AnalysisMethod::run_analysis() {
         return m_analysis;
     }
     calculate_scaling_factor();
-    std::vector<OOI> detections;
+    std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
     POI* m_POI = new POI();
     while(!aborted && capture.read(frame)) {
@@ -71,7 +71,7 @@ Analysis AnalysisMethod::run_analysis() {
             } else if (!detections.empty()) {
                 detecting = true;
                 if (scaling_needed) {
-                    for (OOI detection : detections) {
+                    for (DetectionBox detection : detections) {
                         detection.scale_coordinates(1.0/scaling_ratio);
                     }
                 }

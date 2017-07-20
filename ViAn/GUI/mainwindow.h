@@ -18,7 +18,7 @@
 #include "action.h"
 
 #include "Analysis/AnalysisController.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 
 #include "videowidget.h"
 #include "projectwidget.h"

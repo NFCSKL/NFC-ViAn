@@ -30,7 +30,7 @@ bool Saveable::save_saveable(const std::string& file_name,
                              const std::string& dir_path, const SAVE_FORMAT& save_format){
     QDir dir;
     dir.mkpath(QString::fromStdString(dir_path)); // Make required directory path
-    return save_saveable(dir_path + "/" + file_name); // Call with full path dir + "/file_name"
+    return save_saveable(dir_path + "/" + file_name, save_format); // Call with full path dir + "/file_name"
 }
 
 /**
@@ -44,8 +44,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
                     ? QString::fromStdString(full_path + ".json")
                     : QString::fromStdString(full_path + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){  // Attempt to open full_path
-        qDebug() << "Couldn't open save file"+
-                 save_file.fileName();   // Send warning if unsuccessful
+        qDebug() << "Couldn't open save file", save_file.fileName().toStdString().c_str();   // Send warning if unsuccessful
         return false;
     }
     QJsonObject json_saveable;                  // Data to be saved
@@ -84,7 +83,7 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
     if (!load_file.open(QIODevice::ReadOnly)) {     // Attempt to open file
         qWarning("Couldn't open load file %s ",
 
-                 load_file.fileName()); // Could not open file
+                 load_file.fileName().toStdString().c_str()); // Could not open file
         // Ur code handling failure
         return false;
     }

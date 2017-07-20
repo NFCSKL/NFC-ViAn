@@ -7,9 +7,9 @@
 #include <tuple>
 
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
-    an_col = new AnalysisController("", "", MOTION_DETECTION);
+    an_col = new AnalysisController(this);
     connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
-    connect(an_col, SIGNAL(analysis_done(AnalysisMeta)), this, SLOT(analysis_done(AnalysisMeta)));
+    connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
 }
 
 /**
@@ -56,12 +56,12 @@ void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidge
  * Slot function to be called when an analysis is completed
  * Removes the current analysis from the queue and start the next one if there is one
  */
-void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
+void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     analysis_queue.pop_front();
     emit remove_analysis_bar();
     emit name_in_tree(current_analysis, "Analysis");
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
-    AnalysisMeta* am = new AnalysisMeta(analysis);
+    AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(am);
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis->parent());
     vid->get_video_project()->add_analysis(am);

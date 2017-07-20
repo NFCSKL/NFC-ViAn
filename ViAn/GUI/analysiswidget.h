@@ -28,7 +28,7 @@ private:
 public slots:
     void start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item);
     void send_progress(int);
-    void analysis_done(AnalysisMeta);
+    void analysis_done(AnalysisProxy);
     
 signals:
     void add_analysis_bar(void);

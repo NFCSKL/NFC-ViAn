@@ -60,8 +60,10 @@ signals:
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Tag*);
-    void tag_updated(Tag*);
+
+    void add_basic_analysis(VideoProject*, BasicAnalysis*);
+    void tag_updated(BasicAnalysis*);
+
     void set_interval(int);
     void set_status_bar(QString);
 public slots:
@@ -75,7 +77,8 @@ public slots:
     void tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
-    void set_tag(Tag *);
+    void set_basic_analysis(BasicAnalysis *);
+
     void clear_tag(void);
     void interval_clicked(void);
     void zoom_out_clicked(void);

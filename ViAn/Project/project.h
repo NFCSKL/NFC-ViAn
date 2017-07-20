@@ -15,7 +15,7 @@
 #include "videoproject.h"
 #include "video.h"
 #include "Filehandler/saveable.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 
 using ID = int;
 /**

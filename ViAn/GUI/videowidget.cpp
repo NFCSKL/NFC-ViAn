@@ -492,18 +492,18 @@ void VideoWidget::analysis_btn_clicked() {
 }
 
 void VideoWidget::tag_frame() {
-    if (m_tag->type == TAG){
-        if (m_tag->add_frame(current_frame)) {
-            emit tag_updated(m_tag);
-            emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
-        } else {
-            m_tag->remove_frame(current_frame);
-            emit tag_updated(m_tag);
-            emit set_status_bar("Frame untagged");
-        }
-    } else {
-        emit set_status_bar("Select a tag");
+    Tag* tag = dynamic_cast<Tag*>(m_tag);
+    if (tag->add_frame(current_frame)) {
+        emit tag_updated(tag);
+        emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
+        return;
+    }else {
+        tag->remove_frame(current_frame);
+        emit tag_updated(tag);
+        emit set_status_bar("Frame untagged");
+        return;
     }
+    emit set_status_bar("Select a tag");
 }
 
 void VideoWidget::new_tag_clicked() {
@@ -513,13 +513,14 @@ void VideoWidget::new_tag_clicked() {
 }
 
 void VideoWidget::new_tag(QString name) {
-    Tag* tag = new Tag();
-    tag->set_name(name.toStdString());
-    emit add_tag(m_vid_proj, tag);
+    BasicAnalysis* tag = new Tag();
+    tag->m_name = name.toStdString();
+    emit add_basic_analysis(m_vid_proj, tag);
 }
 
-void VideoWidget::set_tag(Tag *tag) {
-    m_tag = tag;
+void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
+    m_tag = dynamic_cast<Tag*>(basic_analysis);
+
 }
 
 void VideoWidget::clear_tag() {
@@ -537,7 +538,7 @@ void VideoWidget::interval_clicked() {
     }
     int lower = std::min(current_frame, playback_slider->interval);
     int upper = std::max(current_frame, playback_slider->interval);
-    m_tag->add_interval(new POI(lower, upper));
+    m_tag->add_interval(new AnalysisInterval(lower, upper));
     emit set_interval(-1);
     emit tag_updated(m_tag);
 }

@@ -18,7 +18,7 @@
 class Saveable
 {
 private:
-    std::string m_full_path; // Used to save complete saved path, i.e /Dir/Path/file.ending
+    std::string m_full_path = "INVALID PATH"; // Used to save complete saved path, i.e /Dir/Path/file.ending
 public:
 
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
@@ -50,7 +50,7 @@ public:
      */
     virtual void write(QJsonObject& json) = 0 ;
 
-    std::string full_path() const;
+    virtual std::string full_path() const;
 };
 
 #endif // SAVABLE_H
