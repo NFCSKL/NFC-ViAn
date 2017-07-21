@@ -34,6 +34,16 @@ void Analysis::write(QJsonObject &json){
     json["POI:s"] = json_POIs;
 }
 
+SAVE_TYPE Analysis::get_save_type() const
+{
+    return DETECTION;
+}
+
+ANALYSIS_TYPE Analysis::get_type() const
+{
+    return type;
+}
+
 std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num)
 {
     std::vector<cv::Rect> res;

@@ -14,12 +14,14 @@ class POI : public AnalysisInterval{
     std::map<int,std::vector<DetectionBox>> OOIs = {};
 public:
     POI();    
+    void read(const QJsonObject& json) override;
+    void write(QJsonObject& json) override;
+
     void add_detections(int frame_num, std::vector<DetectionBox> detections);
     void set_end_frame(int frame_num);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     friend class Analysis;
-    void read(const QJsonObject& json);
-    void write(QJsonObject& json);
+
 };
 
 

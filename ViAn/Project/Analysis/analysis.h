@@ -16,11 +16,12 @@
 class Analysis : public BasicAnalysis {
     friend class AnalysisMeta;
 public:
-    int type = MOTION_DETECTION;
+    ANALYSIS_TYPE type;
 public:
-
-    virtual void read(const QJsonObject& json);
-    virtual void write(QJsonObject& json);
+    virtual void read(const QJsonObject& json) override;
+    virtual void write(QJsonObject& json) override;
+    virtual SAVE_TYPE get_save_type() const override;
+    virtual ANALYSIS_TYPE get_type() const override;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);
     std::string get_name() const;

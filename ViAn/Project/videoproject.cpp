@@ -107,8 +107,21 @@ void VideoProject::read(const QJsonObject& json){
 
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
-        QJsonObject json_analysis = json_analyses[j].toObject();
-        AnalysisProxy* analysis = new AnalysisProxy();
+        QJsonObject json_analysis = json_analyses[j].toObject();        
+        BasicAnalysis* analysis;
+        SAVE_TYPE save_type = (SAVE_TYPE)json_analysis["save_type"].toInt();
+        switch(save_type){
+        case INTERVAL:
+            analysis = new Tag();
+            break;
+        case DETECTION:
+            analysis = new AnalysisProxy();
+            break;
+        default:
+            analysis = new BasicAnalysis();
+            qWarning("Undefined analysis, read as default basic analysis");
+            break;
+        }
         analysis->read(json_analysis);
         add_analysis(analysis);
     }
@@ -135,6 +148,7 @@ void VideoProject::write(QJsonObject& json){
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
         BasicAnalysis* an = it2->second;
+        json_analysis["save_type"] = an->get_save_type(); // Check for type in read
         an->write(json_analysis);
         json_analyses.append(json_analysis);
     }

@@ -139,7 +139,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     emit set_status_bar("Video added: " + vid_name);
     m_videos->setExpanded(true);
     for (std::pair<int,BasicAnalysis*> ana : vid_proj->get_analyses()){
-        if (ana.second->type == TAG) {
+        if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second), TAG_ITEM);
             tag_item->setText(0, QString::fromStdString(ana.second->m_name));
             vid->addChild(tag_item);

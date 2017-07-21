@@ -23,7 +23,7 @@ DetectionBox::DetectionBox(std::pair<int, int> upper_left, std::pair<int, int> d
  */
 DetectionBox::DetectionBox(std::pair<int, int> upper_left, int height, int width){
     this->upper_left = upper_left;
-    this ->lower_right = std::make_pair(upper_left.second + width, upper_left.second + height);
+    this->lower_right = std::make_pair(upper_left.second + width, upper_left.second + height);
 }
 
 /**

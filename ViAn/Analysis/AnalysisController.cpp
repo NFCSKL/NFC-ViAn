@@ -54,7 +54,6 @@ void AnalysisController::run() {
     analysis.m_name = "Analysis";
     analysis.save_saveable(m_save_path);
     AnalysisProxy analysis_meta (analysis, analysis.full_path());
-    analysis_meta.type = MOTION_DETECTION;
     emit analysis_done(analysis_meta);
     delete method;
 }

@@ -1,10 +1,4 @@
 #include "tag.h"
-
-Tag::Tag()
-{
-    type = TAG;
-}
-
 /**
  * @brief Tag::add_frame
  * @param frame
@@ -20,6 +14,11 @@ void Tag::remove_frame(int frame) {
 void Tag::add_interval(AnalysisInterval *an_interval){
     BasicAnalysis::add_interval(an_interval);
     merge_intervals();
+}
+
+ANALYSIS_TYPE Tag::get_type() const
+{
+    return TAG;
 }
 /**
  * @brief Tag::merge_intervals

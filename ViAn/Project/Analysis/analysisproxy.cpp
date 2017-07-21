@@ -11,7 +11,7 @@ AnalysisProxy::AnalysisProxy()
 }
 
 AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
-    file_analysis(file_analysis)
+    file_analysis(file_analysis)    
 {
 }
 
@@ -26,20 +26,18 @@ Analysis* AnalysisProxy::load_analysis() {
 }
 AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
     : BasicAnalysis(other),
-      file_analysis(file)
+      file_analysis(file),
+      type(other.type)
 {
 }
 
 AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
     BasicAnalysis(other),
-    file_analysis(other.file_analysis)
+    file_analysis(other.file_analysis),
+    type(other.type)
 {
 }
 
-std::string AnalysisProxy::full_path() const
-{
-    return file_analysis;
-}
 
 /**
  * @brief AnalysisMeta::read
@@ -52,7 +50,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_poi = json_intervals[i].toObject();
         POI* poi = new POI();
-        poi->read(json);
+        poi->read(json_poi);
         m_intervals.insert(poi);
     }
 }
@@ -73,4 +71,19 @@ void AnalysisProxy::write(QJsonObject &json) {
         intervals.push_back(interval);
     }
     json["intervals"] = intervals;
+}
+
+SAVE_TYPE AnalysisProxy::get_save_type() const
+{
+    return DETECTION;
+}
+
+ANALYSIS_TYPE AnalysisProxy::get_type() const
+{
+    return type;
+}
+
+std::string AnalysisProxy::full_path() const
+{
+    return file_analysis;
 }

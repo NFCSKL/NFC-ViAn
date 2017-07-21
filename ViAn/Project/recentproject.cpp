@@ -16,7 +16,6 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
     auto item = std::find(recent_items.begin(), recent_items.end(), new_proj);
     if (item != recent_items.end()) recent_items.erase(item);
     recent_items.push_front(new_proj);
-
     QDir().mkpath(QString::fromStdString(PATH));
     save_saveable(PATH + "/" +FILE_NAME);
 }
@@ -39,7 +38,8 @@ void RecentProject::read(const QJsonObject &json) {
     for (auto j : json["recent"].toArray()) {
         QJsonObject pair = j.toObject();
         QString key = pair.keys()[0];  //  Is always of length 1
-        recent_items.push_back(std::make_pair(key.toStdString(), pair.value(key).toString().toStdString()));
+        if(QFile(pair.value(key).toString()).exists())
+            recent_items.push_back(std::make_pair(key.toStdString(), pair.value(key).toString().toStdString()));
     }
 }
 
@@ -56,5 +56,6 @@ void RecentProject::write(QJsonObject &json) {
     }
     json["recent"] = j_array;
 }
+
 
 

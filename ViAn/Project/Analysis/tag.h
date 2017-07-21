@@ -1,13 +1,14 @@
 #ifndef TAG_H
 #define TAG_H
-#include "analysis.h"
+#include "basicanalysis.h"
+class BasicAnalysis;
 class Tag : public BasicAnalysis
 {
 public:
-    Tag();
     bool add_frame(int frame);
     void remove_frame(int frame);
-    virtual void add_interval(AnalysisInterval *an_interval);
+    void add_interval(AnalysisInterval *an_interval) override;
+    virtual ANALYSIS_TYPE get_type() const override;
 private:
     void merge_intervals();
 };

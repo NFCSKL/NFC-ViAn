@@ -23,7 +23,7 @@ Project* Project::fromFile(const std::string &full_path)
  * @param vid_path := path for videos folder
  */
 Project::Project(const std::string& name, const std::string& dir_path){
-    m_name = name;
+    m_name = name;    
     m_dir = dir_path + "/" + name + "/";
     m_dir_bookmarks = m_dir + "/Bookmarks/";
     m_dir_videos = dir_path;

@@ -14,16 +14,20 @@
  */
 class AnalysisProxy : public BasicAnalysis
 {
-    std::string file_analysis = "";
+    std::string file_analysis = "";    
+    ANALYSIS_TYPE type;
 public:
     AnalysisProxy();
     AnalysisProxy(const std::string file_analysis);
     Analysis *load_analysis(); // Only use this if all analysisinformation is needed
     AnalysisProxy(const Analysis &other, const std::string file);
     AnalysisProxy(const AnalysisProxy &other);
-    virtual std::string full_path() const;
-    virtual void read(const QJsonObject& json);
-    virtual void write(QJsonObject& json);
+
+    virtual ANALYSIS_TYPE get_type() const override;
+    virtual SAVE_TYPE get_save_type() const override;
+    virtual std::string full_path() const override;
+    virtual void read(const QJsonObject& json) override;
+    virtual void write(QJsonObject& json) override;
 };
 Q_DECLARE_METATYPE(AnalysisProxy)
 #endif // ANALYSISPROXY_H
