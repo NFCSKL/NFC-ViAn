@@ -125,7 +125,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             painter.drawRect(detect_rect);
         }
     }
-
     painter.end();
 }
 

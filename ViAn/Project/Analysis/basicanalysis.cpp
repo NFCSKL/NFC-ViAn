@@ -1,18 +1,13 @@
 #include "basicanalysis.h"
 #include "tag.h"
 #include "analysis.h"
-BasicAnalysis::BasicAnalysis()
-{
 
-}
+BasicAnalysis::BasicAnalysis() {}
 
 BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
     m_name(other.m_name),
-    m_intervals(other.m_intervals)
-{
-
+    m_intervals(other.m_intervals) {
 }
-
 
 /**
  * @brief BasicAnalysis::add_POI

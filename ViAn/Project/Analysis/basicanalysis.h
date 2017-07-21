@@ -12,10 +12,10 @@ const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_
                                                                      std::make_pair("Tag",TAG)};
 struct interval_cmp {
     bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {
-        return lhs->get_start() < rhs->get_start();
+        return lhs->get_start() <= rhs->get_start();
     }
 };
-using interval_set = std::set<AnalysisInterval*, interval_cmp> ;
+using interval_set = std::set<AnalysisInterval*, interval_cmp>;
 class BasicAnalysis : public Saveable
 {       
 
