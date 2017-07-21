@@ -34,7 +34,7 @@ void Tag::merge_intervals(){
     while (it != intervals.end()){
        if (current->get_interval().second +1 >= (*it)->get_interval().first){ // you might want to change it to >=
            auto m_end = std::max((*it)->get_interval().second, current->get_interval().second);
-           auto m_start = current->get_interval().first;
+           auto m_start = std::min((*it)->get_interval().first, current->get_interval().first);
            AnalysisInterval* merged = new AnalysisInterval(m_end,m_start);
            AnalysisInterval* temp = *it;
            current = merged;
