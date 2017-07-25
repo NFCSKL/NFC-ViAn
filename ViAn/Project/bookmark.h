@@ -18,7 +18,7 @@ enum BOOKMARK_TYPE {UNSORTED, DISPUTED, REFERENCE};
  * marked points in a video and an associated frame.
  */
 class VideoProject;
-class Bookmark : public Saveable{
+class Bookmark : public Writeable{
     VideoProject* m_vid_proj;
 //    int m_type = UNSORTED;
 //    std::string m_container_name = "";

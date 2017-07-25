@@ -195,5 +195,4 @@ void Bookmark::create_file_path() {
  * Removes the exported image, if there is one.
  */
 void Bookmark::remove_exported_image() {
-    delete_saveable();
 }

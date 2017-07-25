@@ -8,6 +8,11 @@ AnalysisInterval::AnalysisInterval(int start, int end)
 
 AnalysisInterval::AnalysisInterval() {}
 
+AnalysisInterval::~AnalysisInterval()
+{
+
+}
+
 /**
  * @brief POI::read
  * Reads POI from json format.

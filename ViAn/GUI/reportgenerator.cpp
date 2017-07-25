@@ -133,7 +133,7 @@ QString ReportGenerator::calculate_time(int ms) {
 void ReportGenerator::add_bookmarks(QAxObject* selection) {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     for (Bookmark* bookmark : all_bookmarks) {
-        QString pic_path = QString::fromStdString(bookmark->full_path());
+        QString pic_path = QString::fromStdString(bookmark);
         //Fix to make path work with windows word
         //application when spaces are involved
         pic_path.replace("/", "\\\\");

@@ -2,7 +2,7 @@
 #define REPORT_H
 #include <string>
 #include "Filehandler/saveable.h"
-class Report : public Saveable{
+class Report : public Writeable{
     std::string file_path;
 public:
     Report(std::string file_path);

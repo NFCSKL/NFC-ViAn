@@ -3,7 +3,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "Filehandler/saveable.h"
-class AnalysisInterval : public Saveable
+class AnalysisInterval : public Writeable
 {
     using interval = std::pair<int,int>;    
 protected:
@@ -12,6 +12,7 @@ protected:
 public:
     AnalysisInterval(int start, int end);
     AnalysisInterval();
+    virtual ~AnalysisInterval();
     bool in_interval(int frame) const;
     int get_start() const;
     int get_end() const;

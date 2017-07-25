@@ -7,7 +7,7 @@
 #include <QString>
 #include "Filehandler/saveable.h"
 typedef int ID;
-class Video : Saveable{
+class Video : Writeable{
     std::string m_name;
 public:
     Video();

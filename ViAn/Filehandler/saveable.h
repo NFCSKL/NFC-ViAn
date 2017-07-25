@@ -9,13 +9,14 @@
 #include <QTextStream>
 #include <QJsonDocument>
 #include <QDebug>
+#include "writeable.h"
 /**
  * @brief The Saveable class
  * The saveable class is an abstract class
  * used to guarantee an objects ability to be saved
  * as a json or binary in filehandler.
  */
-class Saveable
+class Saveable : public Writeable
 {
 private:
     std::string m_full_path = "INVALID PATH"; // Used to save complete saved path, i.e /Dir/Path/file.ending
@@ -33,22 +34,6 @@ public:
     virtual bool save_saveable(const std::string &file_name, const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
     virtual bool save_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
     virtual bool delete_saveable(); // Deletes saved file := m_full_path
-
-    /**
-     * @brief read
-     * @param json
-     * Read is used for loading data, implement this for interiting class.
-     * this function will be called to read when loading.
-     */
-    virtual void read(const QJsonObject& json) = 0;
-
-    /**
-     * @brief read
-     * @param json
-     * Read is used for saving data, implement this for interiting class.
-     * this function will be called to read when saving.
-     */
-    virtual void write(QJsonObject& json) = 0 ;
 
     virtual std::string full_path() const;
 };
