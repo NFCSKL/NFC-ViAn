@@ -239,8 +239,8 @@ void MainWindow::init_edit_menu() {
     options_act->setStatusTip(tr("Program options"));
 
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    connect(cw_act, &QAction::triggered, video_wgt->m_video_player, &video_player::rotate_right);
-    connect(ccw_act, &QAction::triggered, video_wgt->m_video_player, &video_player::rotate_left);
+    connect(cw_act, &QAction::triggered, video_wgt->v_controller, &VideoController::rotate_right);
+    connect(ccw_act, &QAction::triggered, video_wgt->v_controller, &VideoController::rotate_left);
     connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 
@@ -426,7 +426,7 @@ void MainWindow::gen_report() {
 void MainWindow::cont_bri() {
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
-    connect(man_dialog, SIGNAL(values(int,double)), video_wgt->m_video_player, SLOT(set_bright_cont(int,double)));
+    connect(man_dialog, SIGNAL(values(int,double)), video_wgt->v_controller, SIGNAL(set_bright_cont(int,double)));
     man_dialog->exec();
 }
 
@@ -445,7 +445,7 @@ void MainWindow::export_images(){
     }
     ImageExporter* im_exp = new ImageExporter();
     FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->getDir(),
-                                        video_wgt->m_video_player->get_num_frames() - 1,
+                                        video_wgt->get_current_video_length() - 1,
                                         interval);
     if (!exporter_dialog.exec()){
         delete im_exp;

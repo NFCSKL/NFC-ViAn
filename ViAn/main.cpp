@@ -10,6 +10,7 @@
 
 
 Q_DECLARE_METATYPE(cv::Mat)
+Q_DECLARE_METATYPE(std::string)
 /**
  * @brief qMain
  * Constructor
@@ -21,6 +22,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    qRegisterMetaType<std::string>();
     qRegisterMetaType<BasicAnalysis>();
     qRegisterMetaType<AnalysisProxy>();
     bool unit_testing = false;

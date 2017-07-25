@@ -1,14 +1,10 @@
 #include "framewidget.h"
 #include <QDebug>
 #include "Project/Analysis/analysis.h"
+#include <QTime>
+#include <QThread>
 
-FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
-}
-
-void FrameWidget::draw_from_playback(cv::Mat frame) {
-    current_frame = frame;
-    draw_image(frame);
-}
+FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 
 void FrameWidget::toggle_zoom(bool value) {
     if (value) {
@@ -59,29 +55,30 @@ void FrameWidget::update(){
     repaint();
 }
 
-void FrameWidget::draw_image(cv::Mat image) {
-    // Convert the image to the RGB888 format
-    switch (image.type()) {
+cv::Mat FrameWidget::get_mat() const {
+    return _tmp_frame.clone();
+}
+
+void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
+    current_frame = frame;
+    switch (frame.type()) {
         case CV_8UC1:
-            cvtColor(image, _tmp, CV_GRAY2RGB);
+            cvtColor(frame, _tmp_frame, CV_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(image, _tmp, CV_BGR2RGB);
+            cvtColor(frame, _tmp_frame, CV_BGR2RGB);
             break;
     }
 
     // QImage needs the data to be stored continuously in memory
-    assert(_tmp.isContinuous());
+    assert(frame.isContinuous());
     // Assign OpenCV's image buffer to the QImage. Note that the bytesPerLine parameter
     // (http://qt-project.org/doc/qt-4.8/qimage.html#QImage-6) is 3*width because each pixel
     // has three bytes.
-    _qimage = QImage(_tmp.data, _tmp.cols, _tmp.rows, _tmp.cols*3, QImage::Format_RGB888);
-    this->setFixedSize(image.cols, image.rows);
+    _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
+    setFixedSize(_qimage.size());
+    set_detections_on_frame(frame_index);
     repaint();
-}
-
-cv::Mat FrameWidget::get_mat() const {
-    return _tmp.clone();
 }
 
 /**
@@ -101,8 +98,8 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         int width = end.x() - start.x();
         int height = end.y() - start.y();
 
-        double width_ratio = double(width) / current_frame.cols;
-        double height_mod = std::copysign(current_frame.rows * width_ratio, height);
+        double width_ratio = double(width) / _qimage.width();
+        double height_mod = std::copysign(_qimage.height() * width_ratio, height);
 
         end = QPoint(end.x(), start.y() + height_mod);
 
@@ -261,15 +258,15 @@ void FrameWidget::end_zoom() {
     // Scale factor
     int width = std::abs(zoom_start_pos.x() - zoom_end_pos.x());
     int height = std::abs(zoom_start_pos.y() - zoom_end_pos.y());
-    double width_ratio = current_frame.cols / double(width );
-    double height_ratio = current_frame.rows / double(height);
+    double width_ratio = _qimage.width() / double(width );
+    double height_ratio = _qimage.height() / double(height);
 
     // ROI rect points
     int wid = zoom_end_pos.x() - zoom_start_pos.x();
     int hei = zoom_end_pos.y() - zoom_start_pos.y();
 
-    double wid_ratio = double(wid) / current_frame.cols;
-    double height_mod = std::copysign(current_frame.rows * wid_ratio, hei);
+    double wid_ratio = double(wid) / _qimage.width();
+    double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
     QPoint end = QPoint(zoom_end_pos.x(), zoom_start_pos.y() + height_mod);
 
     cv::Rect zoom_rect(cv::Point(zoom_start_pos.x(), zoom_start_pos.y()), cv::Point(end.x(), end.y()));

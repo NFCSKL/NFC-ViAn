@@ -229,18 +229,18 @@ void video_player::set_playback_pos(int pos) {
         // The playback is paused and thus the playback thread is sleeping
         // Force frame processing in another thread to prevent GUI lag
         // Ignore position update if already processing
-        if (processing_thread != nullptr && processing_thread->isRunning()) return;
+//        if (processing_thread != nullptr && processing_thread->isRunning()) return;
 
-        processing_thread = new QThread;
-        FrameProcessor* processor = new FrameProcessor(frame, rotate_direction, pos, manipulator, zoomer, &frame_lock, &capture);
-        processor->moveToThread(processing_thread);
+//        processing_thread = new QThread;
+//        FrameProcessor* processor = new FrameProcessor(frame, rotate_direction, pos, manipulator, zoomer, &frame_lock, &capture);
+//        processor->moveToThread(processing_thread);
 
-        connect(processing_thread, &QThread::finished, processor, &FrameProcessor::deleteLater);
-        connect(processor, &FrameProcessor::done, processing_thread, &QThread::quit);
-        connect(processing_thread, &QThread::started, processor, &FrameProcessor::process);
-        connect(processor, SIGNAL(done_processing(cv::Mat)), this, SIGNAL(processed_image(cv::Mat)));
-        connect(processor, SIGNAL(frame_num(int)), this, SIGNAL(update_current_frame(int)));
-        processing_thread->start();
+//        connect(processing_thread, &QThread::finished, processor, &FrameProcessor::deleteLater);
+//        connect(processor, &FrameProcessor::done, processing_thread, &QThread::quit);
+//        connect(processing_thread, &QThread::started, processor, &FrameProcessor::process);
+//        connect(processor, SIGNAL(done_processing(cv::Mat)), this, SIGNAL(processed_image(cv::Mat)));
+//        connect(processor, SIGNAL(frame_num(int)), this, SIGNAL(update_current_frame(int)));
+//        processing_thread->start();
     } else {
         frame_lock.lock();
         capture.set(CV_CAP_PROP_POS_FRAMES, pos);   // Set next frame to be read

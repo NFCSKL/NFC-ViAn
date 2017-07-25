@@ -12,7 +12,7 @@ class Zoomer
     QSize m_viewport_size;
     QPoint anchor;
     cv::Size m_frame_size;
-    cv::Rect m_zoom_rect, m_frame_rect;
+    cv::Rect m_frame_rect;
     int m_interpol_method = cv::INTER_NEAREST;
     double m_scale_factor = 1;
 public:
@@ -26,6 +26,7 @@ public:
     void fit_viewport();
     void flip();
     void reset();
+    cv::Rect  m_zoom_rect;
 
     void scale_frame(cv::Mat& frame) const;
     cv::Rect get_zoom_rect() const;
