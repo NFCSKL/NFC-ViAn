@@ -17,6 +17,11 @@ VideoProject::VideoProject(){
     this->video = new Video();
 }
 
+VideoProject::~VideoProject(){
+    delete m_overlay;
+    delete video;
+}
+
 /**
  * @brief VideoProject::get_video
  * @return video
@@ -92,6 +97,7 @@ std::map<ID, BasicAnalysis*> VideoProject::get_analyses() {
  * Read videoproject parameters from json object.
  */
 void VideoProject::read(const QJsonObject& json){
+    m_tree_index = json["tree_index"].toString().toStdString();
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     // Read bookmarks from json
@@ -133,6 +139,7 @@ void VideoProject::read(const QJsonObject& json){
  * Write videoproject parameters to json object.
  */
 void VideoProject::write(QJsonObject& json){
+    json["tree_index"] = QString::fromStdString(m_tree_index);
     this->video->write(json);
     // Write bookmarks to json
     QJsonArray json_bookmarks;
@@ -169,6 +176,19 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
     return m_bm_cnt++;
 }
 
+void VideoProject::set_tree_index(std::stack<int> tree_index) {
+    m_tree_index.clear();
+    while (!tree_index.empty()) {
+        m_tree_index.append(std::to_string(tree_index.top()));
+        tree_index.pop();
+        m_tree_index.append(":");
+    }
+}
+
+void VideoProject::set_project(Project *proj){
+    m_project = proj;
+}
+
 /**
  * @brief VideoProject::add_analysis
  * @param analysis to be added
@@ -193,4 +213,13 @@ void VideoProject::delete_artifacts(){
         BasicAnalysis* temp = it2->second;
         temp->delete_saveable();
     }
+}
+
+void VideoProject::remove_from_project()
+{
+    m_project->remove_video_project(this);
+}
+
+string VideoProject::get_index_path() {
+    return m_tree_index;
 }

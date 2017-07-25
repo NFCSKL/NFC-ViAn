@@ -34,6 +34,7 @@ void FrameProcessor::on_set_zoom_rect(QPoint p1, QPoint p2) {
  * @param frame_height  : height of the frames from the currently loaded video
  */
 void FrameProcessor::on_video_info(int frame_width, int frame_height, int, int) {
+    m_rotate_direction = ROTATE_NONE;
     m_zoomer.reset();
     m_manipulator.reset();
 

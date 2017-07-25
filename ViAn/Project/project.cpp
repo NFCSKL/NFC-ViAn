@@ -37,7 +37,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
  */
 Project::~Project(){
     for (auto vid_it = m_videos.begin(); vid_it != m_videos.end(); ++vid_it) {
-        delete vid_it->second;
+        delete *vid_it;
     }
     for (auto rep_it = m_reports.begin(); rep_it != m_reports.end(); ++rep_it) {
         delete rep_it->second;
@@ -48,9 +48,9 @@ Project::~Project(){
  * @brief Project::add_video
  * @return Video ID to be used for identifying the video.
  */
-ID Project::add_video_project(VideoProject *vid_proj){
-    m_videos.insert(std::make_pair(m_vid_count, vid_proj));
-    return m_vid_count++;
+void Project::add_video_project(VideoProject *vid_proj){
+    vid_proj->set_project(this);
+    m_videos.push_back(vid_proj);
 }
 
 /**
@@ -58,10 +58,10 @@ ID Project::add_video_project(VideoProject *vid_proj){
  * @param id
  * Remove video from videos and delete its contents.
  */
-void Project::remove_video_project(const int& id){
-    VideoProject* temp = m_videos.at(id);
-    delete temp;
-    m_videos.erase(id);
+void Project::remove_video_project(VideoProject* vid_proj){
+    auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
+    if (it == m_videos.end()) return;
+    m_videos.erase(it);
 }
 
 
@@ -93,10 +93,10 @@ void Project::remove_report(const int &id)
  */
 void Project::delete_artifacts(){
     // Delete files in all videoprojects
-    for(auto it = m_videos.begin(); it != m_videos.end(); it++){
-        VideoProject* vp = it->second;
-        vp->delete_artifacts();
+    for (auto it = m_videos.begin(); it != m_videos.end(); it++) {
+        (*it)->delete_artifacts();
     }
+
     // Delete all reports.
     for(auto it = m_reports.begin(); it != m_reports.end(); it++){
         Report* temp = (*it).second;
@@ -156,8 +156,7 @@ void Project::write(QJsonObject& json){
     // Write Videos to json
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         QJsonObject json_vid_proj;
-        VideoProject* v = it->second;
-        v->write(json_vid_proj);
+        (*it)->write(json_vid_proj);
         json_proj.append(json_vid_proj);
     }
     json["videos"] = json_proj;
@@ -187,7 +186,7 @@ bool Project::save_project(){
  * @brief Project::get_videos
  * @return videos&
  */
-std::map<ID, VideoProject*> &Project::get_videos(){
+std::vector<VideoProject*> &Project::get_videos(){
     return m_videos;
 }
 
@@ -196,8 +195,8 @@ std::map<ID, VideoProject*> &Project::get_videos(){
  * @param id
  * @return Returns the video with the specified id.
  */
-VideoProject* Project::get_video(ID id) {
-    return m_videos[id];
+VideoProject* Project::get_video(const int& v_pos) {
+    return m_videos.at(v_pos);
 }
 
 /**

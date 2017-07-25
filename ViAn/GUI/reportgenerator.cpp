@@ -63,11 +63,11 @@ void ReportGenerator::create_report() {
  * on other places aswell.
  */
 void ReportGenerator::create_list_of_names() {
-    std::map<ID, VideoProject*> videos = proj->get_videos();
+    std::vector<VideoProject*> videos = proj->get_videos();
 
     // get all bookmarks for a project by iterating over each videos bookmarks.
-    for(std::pair<ID, VideoProject*> video : videos) {
-        std::map<ID, Bookmark *> bookmark_list = video.second->get_bookmarks();
+    for(auto it = videos.begin(); it != videos.end(); it++) {
+        std::map<ID, Bookmark *> bookmark_list = (*it)->get_bookmarks();
         for(std::pair<ID,Bookmark*> vid_bm_pair : bookmark_list) {
             Bookmark* video_bookmark = vid_bm_pair.second;
             all_bookmarks.push_back(video_bookmark);
@@ -133,7 +133,7 @@ QString ReportGenerator::calculate_time(int ms) {
 void ReportGenerator::add_bookmarks(QAxObject* selection) {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     for (Bookmark* bookmark : all_bookmarks) {
-        QString pic_path = QString::fromStdString(bookmark);
+        QString pic_path = "QString::fromStdString(bookmark)";
         //Fix to make path work with windows word
         //application when spaces are involved
         pic_path.replace("/", "\\\\");

@@ -33,6 +33,7 @@ SOURCES += main.cpp \
     GUI/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
+    Project/projecttreestate.cpp \
     GUI/tagdialog.cpp \
     imageexporter.cpp \
     GUI/frameexporterdialog.cpp \
@@ -46,7 +47,6 @@ SOURCES += main.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
     Project/Analysis/detectionbox.cpp
-
 
 #
 # TEST
@@ -72,6 +72,7 @@ HEADERS += \
     GUI/analysiswidget.h \
     GUI/manipulatordialog.h \
     Video/frameprocessor.h \
+    Project/projecttreestate.h \
     GUI/tagdialog.h \
     imageexporter.h \
     GUI/frameexporterdialog.h \

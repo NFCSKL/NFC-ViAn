@@ -7,12 +7,22 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include "Project/project.h"
+#include "TreeItems/itemtypes.h"
+#include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
+
+class Project;
+class VideoItem;
+class FolderItem;
+class AnalysisProxy;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    QTreeWidgetItem* m_videos;
+    QTreeWidgetItem* clicked_item = nullptr;
+    QPoint* clicked_point = nullptr;
+    QTreeWidgetItem* selection_parent = nullptr;
+    bool selecting = false;
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     Project* m_proj = nullptr;
@@ -49,18 +59,27 @@ public slots:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 private slots:
+    void context_menu(const QPoint& point);
+    void remove_item();
+    void rename_item();
+    void create_folder_item();
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
-
+    void check_selection();
+    void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 private:
-    void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
     QStringList mimeTypes() const;
     void file_dropped(QString path);
     void folder_dropped(QString path);
+    void insert_dropped(VideoItem* item);
+    std::stack<int> get_index_path(QTreeWidgetItem* item);
+    VideoItem* get_video_item(VideoProject* v_proj, QTreeWidgetItem* s_item = nullptr);
+    void insert_to_path_index(VideoProject* vid_proj);
+    void save_item_data(QTreeWidgetItem* item = nullptr);
+    void add_analyses_to_item(VideoItem* v_item);
 signals:
     void project_closed();
-protected:
 
 
 };

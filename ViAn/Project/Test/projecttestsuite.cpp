@@ -11,15 +11,15 @@ void ProjectTestsuite::add_remove_vid_proj_test()
     VideoProject* vp2 = new VideoProject(new Video("v2"));
     VideoProject* vp3 = new VideoProject(new Video("v3"));
 
-    int idx1 = proj->add_video_project(vp1);
-    int idx2 = proj->add_video_project(vp2);
-    int idx3 = proj->add_video_project(vp3);
+    proj->add_video_project(vp1);
+    proj->add_video_project(vp2);
+    proj->add_video_project(vp3);
 
     QCOMPARE(proj->m_videos.size() , unsigned(3));
 
-    proj->remove_video_project(idx1);
-    proj->remove_video_project(idx2);
-    proj->remove_video_project(idx3);
+    proj->remove_video_project(vp1);
+    proj->remove_video_project(vp2);
+    proj->remove_video_project(vp3);
 
     QCOMPARE(proj->m_videos.size() , unsigned(0));
 }
@@ -53,9 +53,9 @@ void ProjectTestsuite::save_load_test(){
     VideoProject* vp2 = new VideoProject(new Video("v2"));
     VideoProject* vp3 = new VideoProject(new Video("v3"));
 
-    int idx1 = proj->add_video_project(vp1);
-    int idx2 = proj->add_video_project(vp2);
-    int idx3 = proj->add_video_project(vp3);
+    proj->add_video_project(vp1);
+    proj->add_video_project(vp2);
+    proj->add_video_project(vp3);
 
     Report* r1 = new Report("tr_1");
     Report* r2 = new Report("tr_2");
@@ -77,9 +77,9 @@ void ProjectTestsuite::save_load_test(){
     QCOMPARE(proj->m_reports.size(), unsigned(3));
     QCOMPARE(proj->m_videos.size(), unsigned(3));
 
-    proj->remove_video_project(idx1);
-    proj->remove_video_project(idx2);
-    proj->remove_video_project(idx3);
+    proj->remove_video_project(vp1);
+    proj->remove_video_project(vp2);
+    proj->remove_video_project(vp3);
 
     proj->remove_report(idx4);
     proj->remove_report(idx5);
