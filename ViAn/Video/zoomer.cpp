@@ -193,6 +193,10 @@ double Zoomer::get_scale_factor() const {
     return m_scale_factor;
 }
 
+QPoint Zoomer::get_anchor() const {
+    return anchor;
+}
+
 void Zoomer::force_bounds() {
     m_zoom_rect.height = std::min(m_frame_size.height, m_zoom_rect.height);
     m_zoom_rect.width = std::min(m_frame_size.width, m_zoom_rect.width);

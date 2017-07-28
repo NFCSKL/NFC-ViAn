@@ -18,7 +18,7 @@ enum click_tool {NONE, ZOOM, MOVE};
 class FrameWidget : public QWidget
 {
     Q_OBJECT
-    QPainter*  painter;
+    QPainter* painter;
     QSize m_scroll_area_size;
     cv::Rect original_rect; // Contains the size of the unmodified frame
 
@@ -29,11 +29,14 @@ class FrameWidget : public QWidget
     Analysis* m_analysis = nullptr;
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
+    QPoint anchor = QPoint(0,0);
     bool draw_zoom_rect = false;
     bool do_zoom = false;
     bool do_zoom_out = false;
     bool m_detections = false;
     bool show_detections = true;
+
+    double m_scale_factor = 1;
 
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
@@ -44,7 +47,6 @@ signals:
     void video_pressed(QPoint pos);
     void video_released(QPoint pos);
     void video_moved(QPoint pos);
-    void zoom_factor(double scale_factor);
     void current_size(int width, int height);
     void moved_xy(int x, int y);
     void current_frame_size(QSize size);
@@ -59,6 +61,8 @@ public slots:
     void set_detections_on_frame(int);
     void set_detections(bool);
     void set_show_detections(bool);
+    void set_anchor(QPoint);
+    void set_scale_factor(double scale_factor);
     void update();
 protected:
     QImage _qimage;

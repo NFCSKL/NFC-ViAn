@@ -36,13 +36,17 @@ signals:
     void set_draw_area_size(QSize size);
     void zoom_out();
     void fit_screen();
+    void original_size();
     void move_zoom_rect(int x, int y);
+    void resize();
     void rotate_right();
     void rotate_left();
     void set_bright_cont(int b_val, double c_val);
 
     // FROM PROCESSOR
     void display_image(cv::Mat frame, int frame_index);
+    void scale_factor(double);
+    void anchor(QPoint);
 
 protected:
     void run();

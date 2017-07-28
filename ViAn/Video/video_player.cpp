@@ -149,6 +149,7 @@ void video_player::process_frame() {
 
     // Scales the frame
     if (zoomer->get_scale_factor() != 1) zoomer->scale_frame(manipulated_frame);
+    emit scale_factor(zoomer->get_scale_factor());
 
     // Applies brightness and contrast
     manipulator->apply(manipulated_frame);

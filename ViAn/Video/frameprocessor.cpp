@@ -17,17 +17,6 @@ void FrameProcessor::on_new_frame(cv::Mat frame, int frame_index) {
 }
 
 /**
- * @brief FrameProcessor::on_set_zoom_rect
- * Slot function that updates the zoom rect
- * @param p1 : top-left corner of the rectangle
- * @param p2 : top-right corner of the rectangle
- */
-void FrameProcessor::on_set_zoom_rect(QPoint p1, QPoint p2) {
-    m_zoomer.set_zoom_rect(p1, p2);
-    process_frame();
-}
-
-/**
  * @brief FrameProcessor::on_video_info
  * Slot function that sets the frame size for the zoomer
  * @param frame_width   :   width of the frames from the currently loaded video
@@ -40,6 +29,8 @@ void FrameProcessor::on_video_info(int frame_width, int frame_height, int, int) 
 
     m_zoomer.set_frame_size(cv::Size(frame_width, frame_height));
     m_zoomer.fit_viewport();
+    set_scale_factor(m_zoomer.get_scale_factor());
+    set_anchor(m_zoomer.get_anchor());
 }
 
 /**
@@ -52,11 +43,26 @@ void FrameProcessor::on_set_draw_area_size(QSize size){
 }
 
 /**
+ * @brief FrameProcessor::on_set_zoom_rect
+ * Slot function that updates the zoom rect
+ * @param p1 : top-left corner of the rectangle
+ * @param p2 : top-right corner of the rectangle
+ */
+void FrameProcessor::on_set_zoom_rect(QPoint p1, QPoint p2) {
+    m_zoomer.set_zoom_rect(p1, p2);
+    set_scale_factor(m_zoomer.get_scale_factor());
+    set_anchor(m_zoomer.get_anchor());
+    process_frame();
+}
+
+/**
  * @brief FrameProcessor::on_zoom_out
  * Slot function that decreases the zoom
  */
 void FrameProcessor::on_zoom_out(){
     m_zoomer.set_scale_factor(m_zoomer.get_scale_factor() * 0.5);
+    set_scale_factor(m_zoomer.get_scale_factor());
+    set_anchor(m_zoomer.get_anchor());
     process_frame();
 }
 
@@ -66,6 +72,30 @@ void FrameProcessor::on_zoom_out(){
  */
 void FrameProcessor::on_fit_screen(){
     m_zoomer.fit_viewport();
+    set_scale_factor(m_zoomer.get_scale_factor());
+    set_anchor(m_zoomer.get_anchor());
+    process_frame();
+}
+
+/**
+ * @brief FrameProcessor::on_original_size
+ * Slot function for resizing the frame to its original size
+ */
+void FrameProcessor::on_original_size() {
+    m_zoomer.reset();
+    set_scale_factor(1);
+    set_anchor(QPoint(0,0));
+    process_frame();
+}
+
+/**
+ * @brief FrameProcessor::on_resize
+ * Slot function that updated the frame when it's resized
+ */
+void FrameProcessor::on_resize() {
+    m_zoomer.set_scale_factor(m_zoomer.get_scale_factor());
+    set_scale_factor(m_zoomer.get_scale_factor());
+    set_anchor(m_zoomer.get_anchor());
     process_frame();
 }
 
@@ -109,6 +139,7 @@ void FrameProcessor::on_set_bright_cont(int b_val, double c_val){
  */
 void FrameProcessor::on_move_zoom_rect(int x, int y) {
     m_zoomer.move_zoom_rect(x, y);
+    set_anchor(m_zoomer.get_anchor());
     process_frame();
 }
 
@@ -123,8 +154,6 @@ void FrameProcessor::process_frame() {
     if (m_frame.empty()) return;
 
     cv::Mat manipulated_frame = m_frame.clone();
-//    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
-//    processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
 
     // Rotates the frame, according to the choosen direction.
     // If direction is in the valid range the frame is rotated.
@@ -133,7 +162,7 @@ void FrameProcessor::process_frame() {
     }
 
     // Scales the frame
-    if (m_zoomer.get_scale_factor() != 1) m_zoomer.scale_frame(manipulated_frame);
+    m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);

@@ -37,11 +37,15 @@ public slots:
     void on_set_draw_area_size(QSize size);
     void on_zoom_out();
     void on_fit_screen();
+    void on_original_size();
+    void on_resize();
     void on_rotate_right();
     void on_rotate_left();
     void on_set_bright_cont(int b_val, double c_val);
     void on_move_zoom_rect(int x, int y);
 signals:
+    void set_scale_factor(double);
+    void set_anchor(QPoint);
     void done_processing(cv::Mat frame, int frame_index);
 private:
     void process_frame();

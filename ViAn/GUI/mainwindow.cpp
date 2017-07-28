@@ -374,7 +374,6 @@ void MainWindow::init_tools_menu() {
     tool_menu->addAction(move_act);
 
     undo_act->setShortcut(QKeySequence::Undo);
-    fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
     undo_act->setStatusTip(tr("Undo last drawing"));

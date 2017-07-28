@@ -32,7 +32,9 @@ void VideoController::run() {
     connect(this, &VideoController::set_draw_area_size, f_processor, &FrameProcessor::on_set_draw_area_size);
     connect(this, &VideoController::zoom_out, f_processor, &FrameProcessor::on_zoom_out);
     connect(this, &VideoController::fit_screen, f_processor, &FrameProcessor::on_fit_screen);
+    connect(this, &VideoController::original_size, f_processor, &FrameProcessor::on_original_size);
     connect(this, &VideoController::move_zoom_rect, f_processor, &FrameProcessor::on_move_zoom_rect);
+    connect(this, &VideoController::resize, f_processor, &FrameProcessor::on_resize);
         // ROTATION
     connect(this, &VideoController::rotate_right, f_processor, &FrameProcessor::on_rotate_right);
     connect(this, &VideoController::rotate_left, f_processor, &FrameProcessor::on_rotate_left);
@@ -41,6 +43,8 @@ void VideoController::run() {
 
     // FROM PROCESSOR
     connect(f_processor, &FrameProcessor::done_processing, this, &VideoController::display_image);
+    connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoController::scale_factor);
+    connect(f_processor, &FrameProcessor::set_anchor, this, &VideoController::anchor);
 
     frame_timer->start(5);
     exec();

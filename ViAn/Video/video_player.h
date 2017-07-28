@@ -132,6 +132,7 @@ signals:
     void update_current_frame(const int frame);
     void frame_count(int value);
     void total_time(int time);
+    void scale_factor(double scale_factor);
 
 private slots:
     void on_set_analysis_results(Analysis analysis);

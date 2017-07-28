@@ -31,6 +31,7 @@ public:
     void scale_frame(cv::Mat& frame) const;
     cv::Rect get_zoom_rect() const;
     double get_scale_factor() const;
+    QPoint get_anchor() const;
 private:
     void force_bounds();
     void update_scale();

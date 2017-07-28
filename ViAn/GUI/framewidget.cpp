@@ -51,6 +51,10 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
+void FrameWidget::set_anchor(QPoint p) {
+    anchor = p;
+}
+
 void FrameWidget::update(){
     repaint();
 }
@@ -91,7 +95,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
 
     if (draw_zoom_rect) {
 
-
         QPoint start = zoom_start_pos;
         QPoint end = zoom_end_pos;
 
@@ -107,7 +110,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF tmp(start, end);
         painter.drawRect(tmp);
 
-
         painter.setPen(QColor(0,255,0));
         QRectF zoom(zoom_start_pos, zoom_end_pos);
         painter.drawRect(zoom);
@@ -116,8 +118,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
             QPoint br(rect.x+rect.width, rect.y+rect.height);
-
-            QRectF detect_rect(tl, br);
+            QRectF detect_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
             painter.setPen(QColor(0,0,255));
             painter.drawRect(detect_rect);
         }
@@ -197,6 +198,10 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+void FrameWidget::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+}
+
 /**
  * @brief FrameWidget::init_panning
  * Init panning on frame
@@ -258,7 +263,7 @@ void FrameWidget::end_zoom() {
     // Scale factor
     int width = std::abs(zoom_start_pos.x() - zoom_end_pos.x());
     int height = std::abs(zoom_start_pos.y() - zoom_end_pos.y());
-    double width_ratio = _qimage.width() / double(width );
+    double width_ratio = _qimage.width() / double(width);
     double height_ratio = _qimage.height() / double(height);
 
     // ROI rect points
@@ -270,7 +275,7 @@ void FrameWidget::end_zoom() {
     QPoint end = QPoint(zoom_end_pos.x(), zoom_start_pos.y() + height_mod);
 
     cv::Rect zoom_rect(cv::Point(zoom_start_pos.x(), zoom_start_pos.y()), cv::Point(end.x(), end.y()));
-    double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
+    double scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
 
     emit zoom_points(zoom_start_pos, end);
 }
