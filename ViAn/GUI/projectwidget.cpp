@@ -539,9 +539,7 @@ void ProjectWidget::save_project() {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->getDir() + "treestate");
-
     m_proj->save_project();
-
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->getName(), m_proj->full_path());

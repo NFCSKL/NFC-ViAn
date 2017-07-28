@@ -11,7 +11,7 @@
 #include <opencv2/videoio/videoio.hpp>
 #include <opencv2/video/video.hpp>
 #include <opencv2/core/core.hpp>
-
+#include <atomic>
 class VideoPlayer : public QObject
 {
     Q_OBJECT

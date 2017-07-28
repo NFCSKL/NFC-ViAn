@@ -9,6 +9,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
     QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
     connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
+    connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
     bm_list = new BookmarkList(this);
     connect(bm_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
     bm_list_layout = new QVBoxLayout();
@@ -39,6 +40,27 @@ void BookmarkWidget::add_new_folder() {
     bm_list->addItem(f2);
     connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
 
+}
+
+void BookmarkWidget::generate_report()
+{
+    ReportContainer rp_cont;
+    for(int i = 0; i != bm_list->count(); ++i){
+        QListWidgetItem* item = bm_list->item(i);
+        if (item->type() == CONTAINER) {
+            BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
+            QString cat_name = QString::fromStdString(_tmp_cat->get_name());
+
+            std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
+            std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
+
+            RefDisp ref_disp = std::make_pair(_temp_ref, _temp_disp);
+            rp_cont.push_back(std::make_pair(cat_name, ref_disp));
+        }
+    }
+    processing_thread = new QThread;    
+    ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
+    rp_gen->create_report();
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, string> *container) {
@@ -72,8 +94,6 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     bool ok;
     QString text = get_input_text("", &ok);    
     if(!ok) return;
-    Bookmark* bookmark = new Bookmark(vid_proj, text.toStdString(), frame_nbr);
-    vid_proj->add_bookmark(bookmark);
 
     std::string file_name = vid_proj->get_video()->file_path;
     int index = file_name.find_last_of('/') + 1;
@@ -82,12 +102,13 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
 
     ImageGenerator im_gen(frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
-    im_gen.create_tiff(file_name);
+    std::string bm_file = im_gen.create_tiff(file_name);
+    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString() , frame_nbr);
+    vid_proj->add_bookmark(bookmark);
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
     bm_list->addItem(bm_item);
-
 }
 
 

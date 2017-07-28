@@ -12,7 +12,7 @@ public:
     ~ImageGenerator();
 
     std::string create_thumbnail(std::string name);
-    void create_tiff(std::string name);
+    std::string create_tiff(std::string name);
 
     static const unsigned int THUMBNAIL_SIZE;
 private:

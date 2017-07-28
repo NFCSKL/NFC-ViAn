@@ -13,7 +13,8 @@
 #include "bookmarkitem.h"
 #include "bookmarkcategory.h"
 #include "bookmarklist.h"
-
+#include "reportgenerator.h"
+#include <QThread>
 class BookmarkCategory;
 enum list_types {BOOKMARK, CONTAINER};
 class BookmarkWidget : public QWidget
@@ -25,10 +26,11 @@ class BookmarkWidget : public QWidget
     QVBoxLayout* layout;
     QScrollArea* scroll_area;
     QDockWidget* folder_dock;
+    QThread* processing_thread;
     const int TEXT_EDIT_MIN_HEIGHT = 64;
+
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
-
 signals:
     void play_bookmark_video(VideoProject* vid_proj, int frame_idx);
 public slots:
@@ -40,6 +42,7 @@ private slots:
 //    void item_context_menu(QPoint pos);
 private:
     void add_new_folder();
+    void generate_report();
     BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
     QString get_input_text(std::string text, bool* ok);
 };

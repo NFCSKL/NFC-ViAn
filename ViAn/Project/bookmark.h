@@ -23,12 +23,13 @@ class Bookmark : public Writeable{
 //    int m_type = UNSORTED;
 //    std::string m_container_name = "";
     std::vector<std::pair<int, std::string>> m_containers;  // Keeps track of all containers the bookmark resides in
-    std::string m_file;
+
     int frame_number = -1;       // Frame at which the bookmark was taken
     int time = -1;               // Time of the bookmark (in millisecs)
     std::string description = "";    // Description for the bookmark, given by user
 public:
-    Bookmark(VideoProject* vid_proj, const std::string& text, const int& frame_nbr);
+    std::string m_file;
+    Bookmark(VideoProject* vid_proj, const string file_name, const std::string& text, const int& frame_nbr);
     Bookmark();
     int get_time();
     int get_frame_number();

@@ -17,6 +17,7 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
+    reportgenerator.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
@@ -54,7 +55,7 @@ SOURCES += main.cpp \
 SOURCES +=\
     Test/test_report_generator.cpp
 
-HEADERS += \
+HEADERS += reportgenerator.h\
     Test/test_report_generator.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
@@ -85,7 +86,11 @@ HEADERS += \
     Project/Analysis/analysisinterval.h \
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
-    Project/Analysis/detectionbox.h
+    Project/Analysis/detectionbox.h \
+    table.h \
+    AxReport/axtable.h \
+    AxReport/axrange.h \
+    AxReport/axcell.h
 
 #
 # LIBRARY
@@ -98,7 +103,6 @@ HEADERS += Library/customdialog.h
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkitem.cpp \
-    GUI/reportgenerator.cpp \
     GUI/fpsdialog.cpp \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
@@ -108,7 +112,6 @@ SOURCES += GUI/mainwindow.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/reportgenerator.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/videowidget.h \

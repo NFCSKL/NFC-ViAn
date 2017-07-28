@@ -9,11 +9,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const std::string &text, const int &frame_nbr){
+Bookmark::Bookmark(VideoProject *vid_proj,const std::string file_name, const std::string &text, const int &frame_nbr){
     this->m_vid_proj = vid_proj;
     this->frame_number = frame_nbr;
     this->description = text;
-
+    this->m_file = file_name;
     std::pair<int, string> _tmp(UNSORTED, "");
     m_containers.push_back(_tmp);
 }
@@ -149,46 +149,6 @@ void Bookmark::write(QJsonObject& json){
     json["containers"] = containers;
 }
 
-/**
- * @brief Bookmark::export_frame
- * Export the frame of the bookmark to a tiff-file in the project folder.
- */
-void Bookmark::export_frame() {
-// Update file path in case there's already a file with this file name
-//    create_file_path();
-//    QImageWriter writer(file_path, "tiff");
-//    writer.write(frame);
-}
-
-/**
- * @brief Bookmark::create_file_path
- * Creates and updates the file path to export the bookmark frame to.
- */
-void Bookmark::create_file_path() {
-//    // Append FRAMENR.tiff to the directory path
-//    QString path = QString(dir_path);
-//    path.append("/");
-//    path.append(video_file_name);
-//    path.append("_");
-//    path.append(QString::number(frame_number));
-//    path.append(".tiff");
-         
-//    int counter = 1;
-//    while (QFile::exists(path)) {
-//        // If file exists, try FRAMENR(X).tiff
-//        path = QString(dir_path);
-//        path.append("/");
-//        path.append(video_file_name);
-//        path.append("_");
-//        path.append(QString::number(frame_number));
-//        path.append("(");
-//        path.append(QString::number(counter));
-//        path.append(").tiff");
-//        counter++;
-//    }
-//    // Update file path variable
-//    m_full_path = path;
-}
 
 /**
  * @brief Bookmark::remove_exported_image

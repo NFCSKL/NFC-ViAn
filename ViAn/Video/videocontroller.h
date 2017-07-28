@@ -11,7 +11,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "Video/frameprocessor.h"
-
+#include <atomic>
 class VideoController : public QThread {
     Q_OBJECT
     QTimer* frame_timer;

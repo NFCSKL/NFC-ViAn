@@ -30,7 +30,7 @@ bool Saveable::save_saveable(const std::string& file_name,
                              const std::string& dir_path, const SAVE_FORMAT& save_format){
     QDir dir;
     dir.mkpath(QString::fromStdString(dir_path)); // Make required directory path
-    return save_saveable(dir_path + "/" + file_name, save_format); // Call with full path dir + "/file_name"
+    return save_saveable(dir_path + file_name, save_format); // Call with full path dir + "/file_name"
 }
 
 /**
@@ -53,7 +53,6 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
     save_file.write(save_format == JSON         // Choose written format
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-    m_full_path = save_file.fileName().toStdString();
     return true;
 }
 
@@ -82,7 +81,6 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
     QFile load_file(QString::fromStdString(full_path));
     if (!load_file.open(QIODevice::ReadOnly)) {     // Attempt to open file
         qWarning("Couldn't open load file %s ",
-
                  load_file.fileName().toStdString().c_str()); // Could not open file
         // Ur code handling failure
         return false;
@@ -92,6 +90,6 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
     this->read(load_doc.object());                      // Read data to be loaded, OBS! Implement this when inheriting
-    m_full_path = load_file.fileName().toStdString();
+    m_full_path = full_path;
     return true;
 }
