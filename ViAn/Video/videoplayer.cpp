@@ -3,9 +3,18 @@
 #include <QDebug>
 #include <QTime>
 
-VideoPlayer::VideoPlayer(std::atomic<int>* frame, std::atomic<bool>* is_playing, QObject *parent) : QObject(parent) {
-    m_frame = frame;
+VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
+                         std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
+                         std::atomic_bool* new_video, video_sync* v_sync, QObject *parent) : QObject(parent) {
+    m_frame = frame_index;
     m_is_playing = is_playing;
+    m_new_frame = new_frame;
+
+    m_video_width = width;
+    m_video_height = height;
+    m_new_video = new_video;
+
+    m_v_sync = v_sync;
 }
 
 /**
@@ -22,8 +31,12 @@ void VideoPlayer::on_load_video(std::string video_path){
     m_capture.open(video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
-    emit video_info(m_video_width, m_video_height, m_frame_rate, m_last_frame);
+    emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
+
+    m_new_video->store(true);
+    m_v_sync->con_var.notify_all();
+
 
     set_frame();
 }
@@ -50,7 +63,7 @@ void VideoPlayer::on_update_speed(int speed_steps) {
  * It emits both the current frame and its index back to the controller object.
  */
 void VideoPlayer::playback_loop() {
-    QTime frame_rate_timer, loop_timer;
+    QTime frame_rate_timer;
     frame_rate_timer.start();
 
     while (m_is_playing->load()) {
@@ -60,17 +73,17 @@ void VideoPlayer::playback_loop() {
         if (!m_is_playing->load()) break;
 
         // Make sure playback sticks to the correct frame rate
-        if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) continue;
-        frame_rate_timer.restart();
-
-        if (!m_capture.read(frame)) {
-            m_is_playing->store(false);
+        if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) {
+            QThread::msleep(1); // Reduces busy waiting
             continue;
         }
+        frame_rate_timer.restart();
+
+        if (!synced_read()) break;
+
         ++*m_frame;
         ++current_frame;
         display_index();
-        display(frame.clone(), current_frame);
     }
     playback_stopped();
 }
@@ -83,16 +96,14 @@ void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
-        m_capture.read(frame);
-
+        synced_read();
         current_frame = frame_index;
-        display(frame.clone(), current_frame);
     }
 }
 
 /**
  * @brief VideoPlayer::check_events
- * Slot function for when the playback loop is not running
+ * Slot function for when the playback loop is not running1
  */
 void VideoPlayer::check_events() {
     if (m_is_playing->load()) playback_loop();
@@ -104,8 +115,28 @@ void VideoPlayer::check_events() {
  * Reads video information from the capture object.
  */
 void VideoPlayer::load_video_info() {
-    m_video_width = m_capture.get(CV_CAP_PROP_FRAME_WIDTH);
-    m_video_height = m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    m_video_width->store(m_capture.get(CV_CAP_PROP_FRAME_WIDTH));
+    m_video_height->store(m_capture.get(CV_CAP_PROP_FRAME_HEIGHT));
     m_frame_rate = m_capture.get(CV_CAP_PROP_FPS);
     m_last_frame = m_capture.get(CV_CAP_PROP_FRAME_COUNT) - 1;
+}
+
+bool VideoPlayer::synced_read(){
+    // Read new frame and notify processing thread
+   {
+        std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        if (!m_capture.read(m_v_sync->frame)) {
+            m_is_playing->store(false);
+            return false;
+        }
+        m_new_frame->store(true);
+    }
+    m_v_sync->con_var.notify_one();
+
+    // Wait for processing thread to finish processing new frame
+    {
+        std::unique_lock<std::mutex> lk(m_v_sync->lock);
+        m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
+    }
+    return true;
 }

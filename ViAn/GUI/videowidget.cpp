@@ -23,7 +23,8 @@
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video contoller
-    v_controller = new VideoController(&frame_index, &is_playing);
+    v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
+                                       &video_width, &video_height, &new_video, &v_sync);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -55,6 +56,7 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
     init_video_controller();
     v_controller->start();
+    init_frame_processor();
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -121,23 +123,38 @@ void VideoWidget::init_video_controller(){
     connect(speed_slider, SIGNAL(valueChanged(int)), v_controller, SIGNAL(update_speed(int)));
     connect(this, &VideoWidget::load_video, v_controller, &VideoController::load_video);
 
-    // Zoom control
-    connect(frame_wgt, SIGNAL(zoom_points(QPoint, QPoint)), v_controller, SIGNAL(set_zoom_rect(QPoint, QPoint)));
-    connect(scroll_area, SIGNAL(new_size(QSize)), v_controller, SIGNAL(set_draw_area_size(QSize)));
-    connect(zoom_out_btn, &QPushButton::clicked, v_controller, &VideoController::zoom_out);
-    connect(fit_btn, &QPushButton::clicked, v_controller, &VideoController::fit_screen);
-    connect(original_size_btn, &QPushButton::clicked, v_controller, &VideoController::original_size);
-    connect(frame_wgt, SIGNAL(moved_xy(int,int)), v_controller, SIGNAL(move_zoom_rect(int,int)));
-
     // Video data
-    connect(v_controller, &VideoController::display_image, frame_wgt, &FrameWidget::on_new_image);
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
 
-    connect(v_controller, SIGNAL(scale_factor(double)), frame_wgt, SLOT(set_scale_factor(double)));
-    connect(v_controller, SIGNAL(scale_factor(double)), this, SLOT(set_scale_factor(double)));
-    connect(v_controller, SIGNAL(anchor(QPoint)), frame_wgt, SLOT(set_anchor(QPoint)));
+
+}
+
+/**
+ * @brief VideoWidget::init_frame_processor
+ * Creates a new FrameProcessor instance which is then moved to a new thread.
+ */
+void VideoWidget::init_frame_processor() {
+    QTimer* process_timer = new QTimer(this);
+    f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
+                                     &video_height, &new_video, &m_settings, &v_sync, &frame_index);
+
+    QThread* processing_thread = new QThread();
+    f_processor->moveToThread(processing_thread);
+    connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
+    connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
+
+
+    connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
+    connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
+    connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+
+    connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
+    connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
+    connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+
+    processing_thread->start();
 }
 
 /**
@@ -161,6 +178,7 @@ void VideoWidget::set_btn_icons() {
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+
     zoom_label = new QLabel;
     zoom_label->setText("100%");
     zoom_label->setMinimumWidth(40);
@@ -190,7 +208,7 @@ void VideoWidget::set_btn_tool_tip() {
     zoom_in_btn->setToolTip(tr("Zoom in"));
     zoom_out_btn->setToolTip(tr("Zoom out"));
     fit_btn->setToolTip(tr("Scale the video to screen"));
-    original_size_btn->setToolTip(tr("Scale video to original size"));
+    original_size_btn->setToolTip(tr("Reset zoom"));
     set_start_interval_btn->setToolTip("Set left interval point");
     set_end_interval_btn->setToolTip("Set right interval point");
 }
@@ -325,7 +343,9 @@ void VideoWidget::add_btns_to_layouts() {
     zoom_btns->addWidget(zoom_out_btn);
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(original_size_btn);
+
     zoom_btns->addWidget(zoom_label);
+
 
     control_row->addLayout(zoom_btns);
 
@@ -342,16 +362,20 @@ void VideoWidget::add_btns_to_layouts() {
  * Connect all control buttons with signals and slots
  */
 void VideoWidget::connect_btns() {
+    // Playback
     connect(play_btn, &QPushButton::toggled, this, &VideoWidget::play_btn_toggled);
     connect(stop_btn, &QPushButton::clicked, this, &VideoWidget::stop_btn_clicked);
     connect(next_frame_btn, &QPushButton::clicked, this, &VideoWidget::next_frame_clicked);
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
 
+    // Analysis
     connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
-
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
+
+    // Tag
+
 
     connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
 
@@ -360,7 +384,15 @@ void VideoWidget::connect_btns() {
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
     connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
 
+    // Zoom
+    connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
     connect(frame_wgt, &FrameWidget::trigger_zoom_out, zoom_out_btn, &QPushButton::click);
+    connect(zoom_out_btn, &QPushButton::clicked, this, &VideoWidget::on_zoom_out);
+    connect(fit_btn, &QPushButton::clicked, this, &VideoWidget::on_fit_screen);
+    connect(original_size_btn, &QPushButton::clicked, this, &VideoWidget::on_original_size);
+
+    // Other
+    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
 
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
@@ -393,14 +425,6 @@ void VideoWidget::init_playback_slider() {
     connect(playback_slider, &QSlider::sliderMoved, this, &VideoWidget::on_playback_slider_moved);
 
     connect(frame_line_edit, &QLineEdit::editingFinished, this, &VideoWidget::frame_line_edit_finished);
-}
-
-/**
- * @brief FrameWidget::resizeEvent
- * @param event
- */
-void VideoWidget::resizeEvent(QResizeEvent *event) {
-    v_controller->resize();
 }
 
 void VideoWidget::stop_btn_clicked() {
@@ -472,7 +496,7 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-    emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
+    emit new_bookmark(m_vid_proj, frame_index.load(), bookmark_frame);
 }
 
 /**
@@ -606,8 +630,8 @@ void VideoWidget::analysis_play_btn_toggled(bool value) {
 }
 
 void VideoWidget::next_poi_btn_clicked() {
-    int new_frame = playback_slider->get_next_poi_start(current_frame);
-    if (new_frame == current_frame) {
+    int new_frame = playback_slider->get_next_poi_start(frame_index.load());
+    if (new_frame == frame_index.load()) {
         emit set_status_bar("Already at last POI");
     } else {
         frame_index.store(new_frame);
@@ -617,8 +641,9 @@ void VideoWidget::next_poi_btn_clicked() {
 }
 
 void VideoWidget::prev_poi_btn_clicked() {
-    int new_frame = playback_slider->get_prev_poi_start(current_frame);
-    if (new_frame == current_frame) {
+    int current_frame_index = frame_index.load();
+    int new_frame = playback_slider->get_prev_poi_start(current_frame_index);
+    if (new_frame == current_frame_index) {
         emit set_status_bar("Already at first POI");
     } else {
         frame_index.store(new_frame);
@@ -667,7 +692,6 @@ void VideoWidget::on_new_frame() {
         playback_slider->setValue(frame_num);
         playback_slider->blockSignals(false);
     }
-    current_frame = frame_num;
 
     set_current_time(frame_num / m_frame_rate);
     frame_line_edit->setText(QString::number(frame_num));
@@ -704,10 +728,6 @@ void VideoWidget::on_playback_slider_moved() {
         timer.restart();
     }
     on_new_frame();
-}
-
-void VideoWidget::fit_clicked() {
-    emit set_zoom(Utility::min_size_ratio(scroll_area->size(), current_frame_size));
 }
 
 /**
@@ -775,9 +795,106 @@ void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
 }
 
-void VideoWidget::update_bar_pos(int change_x, int change_y) {
-    h_bar->setSliderPosition(h_bar->sliderPosition() + change_x);
-    v_bar->setSliderPosition(v_bar->sliderPosition() + change_y);
+/**
+ * @brief VideoWidget::pan
+ * Notifies the frame processor when the zoom rectangle should be moved
+ * @param x movement
+ * @param y movement
+ */
+void VideoWidget::pan(int x, int y) {
+    update_processing_settings([&](){
+        z_settings.x_movement = x;
+        z_settings.y_movement = y;
+    });
+}
+
+/**
+ * @brief VideoWidget::set_zoom_rectangle
+ * Notifies the frame processor that a new zoom rectangle has been set
+ * @param p1 tl point of the zoom rectangle
+ * @param p2 br point of the zoom rectangle
+ */
+void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
+    update_processing_settings([&](){
+        z_settings.zoom_tl = p1;
+        z_settings.zoom_br = p2;
+    });
+}
+
+/**
+ * @brief VideoWidget::set_draw_area_size
+ * Notifies the frame processor that the draw area has changed size
+ * @param s Size of the area where the frame will be displayed
+ */
+void VideoWidget::set_draw_area_size(QSize s) {
+    update_processing_settings([&](){z_settings.draw_area_size = s;});
+}
+
+/**
+ * @brief VideoWidget::on_zoom_out
+ * Tells the frame processor to decrease zoom
+ */
+void VideoWidget::on_zoom_out(){
+    update_processing_settings([&](){z_settings.zoom_factor *= 0.5;});
+}
+
+/**
+ * @brief VideoWidget::on_fit_screen
+ * Tells the frame processor to fit the video to the current draw area
+ */
+void VideoWidget::on_fit_screen() {
+    update_processing_settings([&](){z_settings.fit = true;});
+}
+
+/**
+ * @brief VideoWidget::on_original_size
+ * Tells the frame processor to display the video in its original size
+ */
+void VideoWidget::on_original_size(){
+    update_processing_settings([&](){z_settings.original = true;});
+}
+
+/**
+ * @brief VideoWidget::update_brightness_contrast
+ * Notifies the frame processor of changes to the brightness and contrast values
+ * @param b_val brightness value
+ * @param c_val contrast value
+ */
+void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
+    update_processing_settings([&](){
+        m_settings.brightness = b_val;
+        m_settings.contrast = c_val;
+    });
+}
+
+/**
+ * @brief VideoWidget::rotate_cw
+ * Tells the frame processor to rotate the frame cw
+ */
+void VideoWidget::rotate_cw(){
+    update_processing_settings([&](){m_settings.rotate = 1;});
+}
+
+/**
+ * @brief VideoWidget::rotate_ccw
+ * Tells the frame processor to rotate the frame ccw
+ */
+void VideoWidget::rotate_ccw(){
+    update_processing_settings([&](){m_settings.rotate = -1;});
+}
+
+/**
+ * @brief VideoWidget::update_processing_settings
+ * This functions intended use is to update variables shared with the frame processor thread.
+ * After the change is made it will notify the frame processor.
+ * @param lambda function where the variable is changed
+ */
+void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
+    v_sync.lock.lock();
+    lambda();
+    settings_changed.store(true);
+    v_sync.lock.unlock();
+    v_sync.con_var.notify_all();
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {

@@ -5,39 +5,52 @@
 #include <QCoreApplication>
 
 #include <stack>
+#include <mutex>
+#include <atomic>
+#include <condition_variable>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
 #include <opencv2/video/video.hpp>
 #include <opencv2/core/core.hpp>
-#include <atomic>
-class VideoPlayer : public QObject
-{
+
+struct video_sync {
+    std::mutex lock;
+    std::condition_variable con_var;
+
+    cv::Mat frame;
+};
+
+class VideoPlayer : public QObject{
     Q_OBJECT
     cv::VideoCapture m_capture;
-    cv::Mat frame;
 
-    std::atomic<int>* m_frame;
+    std::atomic_int* m_frame;
+    std::atomic_bool* m_new_frame;
+    std::atomic_bool* m_new_video;
 
+    video_sync* m_v_sync;
 
-    int m_delay = 0;    // Delay time to reach the right frame rate
+    // Delay time to reach the right frame rate
+    int m_delay = 0;
 
     // Player state
-    std::atomic<bool>* m_is_playing;
+    std::atomic_bool* m_is_playing;
     bool m_video_loaded = false;
     bool m_playback_status = false;
     double speed_multiplier = 1;
     int current_frame = -1;
-    std::string m_vid_path = "D:/Testdata/Sequence 01.mp4";
 
     // Loaded video info
-    int m_video_width = 0;
-    int m_video_height = 0;
+    std::atomic_int* m_video_width;
+    std::atomic_int* m_video_height;
     int m_frame_rate = 0;
     int m_last_frame = 0;
 public:
-    explicit VideoPlayer(std::atomic<int>* frame, std::atomic<bool>* is_playing, QObject *parent = nullptr);
+    explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
+                         std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
+                         std::atomic_bool* new_video, video_sync* v_sync, QObject *parent = nullptr);
 
 signals:
     void display(cv::Mat frame, int frame_index);
@@ -54,6 +67,7 @@ public slots:
 private:
     void playback_loop();
     void load_video_info();
+    bool synced_read();
 };
 
 #endif // VIDEOPLAYER_H

@@ -1,4 +1,6 @@
 #include "zoomer.h"
+#include <math.h>
+#include <QtDebug>
 
 Zoomer::Zoomer() {
     anchor = QPoint(0,0);
@@ -121,7 +123,8 @@ void Zoomer::flip() {
                                   std::abs(m_frame_rect.height - m_zoom_rect.y));
     m_zoom_rect.width = std::min(std::abs(_tmp),
                                  std::abs(m_frame_size.width - m_zoom_rect.x));
-    force_bounds();
+    update_rect_size();
+
 }
 
 /**
@@ -129,8 +132,13 @@ void Zoomer::flip() {
  * Updates the zooming factor based on viewport and zoom rectangle sizes
  */
 void Zoomer::update_scale() {
+    if (m_zoom_rect.size() == cv::Size(0,0)) return;
     m_scale_factor = std::min(m_viewport_size.width() / double(m_zoom_rect.width),
                               m_viewport_size.height() / double(m_zoom_rect.height));
+}
+
+QSize Zoomer::get_viewport_size() const {
+    return m_viewport_size;
 }
 
 /**
@@ -146,8 +154,10 @@ void Zoomer::update_rect_size() {
 
     // Generate a new top-left and bottom-right corner for the rectangle
     // Makes sure the rectangle will not be bigger then the original frame
-    cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - int(width_diff / 2)), std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
-    cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)), std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
+    cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - int(width_diff / 2)),
+                                 std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
+    cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)),
+                                 std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
 
     cv::Rect _tmp = cv::Rect(new_tl, new_br);
     if (_tmp.area() > 1) {
@@ -171,7 +181,12 @@ void Zoomer::reset() {
  * Scales the frame 'frame'
  * @param frame
  */
-void Zoomer::scale_frame(cv::Mat &frame) const {
+void Zoomer::scale_frame(cv::Mat &frame) {
+    if (m_frame_size.width < m_zoom_rect.width || m_frame_size.height < m_zoom_rect.height) {
+        qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
+        fit_viewport();
+    }
+
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;
     cv::resize(frame(m_zoom_rect), frame, cv::Size(), m_scale_factor, m_scale_factor, interpol);

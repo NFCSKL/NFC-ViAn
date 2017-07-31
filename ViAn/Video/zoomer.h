@@ -7,14 +7,14 @@
 #include <opencv2/opencv.hpp>
 
 
-class Zoomer
-{
+class Zoomer{
     QSize m_viewport_size;
     QPoint anchor;
-    cv::Size m_frame_size;
+    cv::Size m_frame_size = cv::Size(0,0);
     cv::Rect m_frame_rect;
     int m_interpol_method = cv::INTER_NEAREST;
     double m_scale_factor = 1;
+
 public:
     Zoomer();
     Zoomer(const cv::Size frame_size);
@@ -28,14 +28,17 @@ public:
     void reset();
     cv::Rect  m_zoom_rect;
 
-    void scale_frame(cv::Mat& frame) const;
+    void scale_frame(cv::Mat& frame);
     cv::Rect get_zoom_rect() const;
     double get_scale_factor() const;
+
     QPoint get_anchor() const;
+    QSize get_viewport_size() const;
+
+    void update_rect_size();
 private:
     void force_bounds();
     void update_scale();
-    void update_rect_size();
 };
 
 #endif // ZOOMER_H
