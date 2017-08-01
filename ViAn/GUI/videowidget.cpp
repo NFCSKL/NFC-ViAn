@@ -24,7 +24,9 @@
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video contoller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &v_sync);
+                                       &video_width, &video_height, &new_video, &v_sync,
+                                       &player_con, &player_lock, &m_video_path,
+                                       &m_speed_step);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -119,16 +121,10 @@ void VideoWidget::init_layouts() {
  * Performs the initial setup that connects the video controller with the rest of the program.
  */
 void VideoWidget::init_video_controller(){
-    // Playback control
-    connect(speed_slider, SIGNAL(valueChanged(int)), v_controller, SIGNAL(update_speed(int)));
-    connect(this, &VideoWidget::load_video, v_controller, &VideoController::load_video);
-
     // Video data
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
-
-
 }
 
 /**
@@ -136,7 +132,6 @@ void VideoWidget::init_video_controller(){
  * Creates a new FrameProcessor instance which is then moved to a new thread.
  */
 void VideoWidget::init_frame_processor() {
-    QTimer* process_timer = new QTimer(this);
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
                                      &video_height, &new_video, &m_settings, &v_sync, &frame_index);
 
@@ -311,6 +306,8 @@ void VideoWidget::init_speed_slider() {
     speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
     speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
     speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
+
+    connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::update_playback_speed);
 }
 
 /**
@@ -739,8 +736,13 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
     if (!video_btns_enabled) enable_video_btns();
 
     if (m_vid_proj != vid_proj) {
+        player_lock.lock();
+        m_video_path = vid_proj->get_video()->file_path;
+        new_video.store(true);
+        player_lock.unlock();
+        player_con.notify_all();
+
         m_vid_proj = vid_proj;
-        load_video(vid_proj->get_video()->file_path);
         playback_slider->setValue(frame);
 
         m_interval = make_pair(0,0);
@@ -895,6 +897,10 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
     settings_changed.store(true);
     v_sync.lock.unlock();
     v_sync.con_var.notify_all();
+}
+
+void VideoWidget::update_playback_speed(int speed){
+    m_speed_step.store(speed);
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {

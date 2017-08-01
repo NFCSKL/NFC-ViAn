@@ -36,6 +36,13 @@ void FrameProcessor::check_events() {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load();});
 
+        // A new video has been loaded. Reset processing settings
+        if (m_new_video->load()) {
+            reset_settings();
+            lk.unlock();
+            continue;
+        }
+
         // Settings has been changed by the user
         if (m_changed->load()) {
             m_changed->store(false);
@@ -62,13 +69,6 @@ void FrameProcessor::check_events() {
             m_v_sync->con_var.notify_one();
             continue;
         }
-
-        // A new video has been loaded. Reset processing settings
-        if (m_new_video->load()) {
-            reset_settings();
-        }
-        lk.unlock();
-
     }
 }
 
