@@ -24,8 +24,8 @@
 
 #include "videowidget.h"
 #include "projectwidget.h"
-#include "analysiswidget.h"
-#include "bookmarkwidget.h"
+#include "Analysis/analysiswidget.h"
+#include "Bookmark/bookmarkwidget.h"
 #include "statusbar.h"
 
 using namespace std;

@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QTime>
 
-VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
+VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool *new_frame_video, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
@@ -33,12 +33,10 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_pl
  * It also emits the first frame back to the controller
  * @param video_path    :   Path to the video
  */
-void VideoPlayer::load_video(){
-    qDebug() << "load_video";
-    current_frame = -1;
-    m_is_playing->store(false);
-    m_frame->store(0);
 
+void VideoPlayer::load_video(){
+    current_frame = -1;
+    m_is_playing->store(false);    
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
@@ -92,14 +90,12 @@ void VideoPlayer::check_events() {
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
-            qDebug() << "in videoplayer_wait";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 load_video();
             } else if (current_frame != m_frame->load()) {
                 set_frame();
             }
-            qDebug() << "end videoplayer";
         } else {
             // Timer condition triggered. Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
@@ -137,7 +133,6 @@ void VideoPlayer::load_video_info() {
 bool VideoPlayer::synced_read(){
     // Read new frame and notify processing thread
    {
-        qDebug() << "sync_read";
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);

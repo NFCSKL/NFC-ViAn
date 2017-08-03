@@ -1,4 +1,4 @@
-#include "AnalysisController.h"
+#include "analysiscontroller.h"
 #include <vector>
 #include <QApplication>
 #include "opencv2/core/core.hpp"
@@ -8,8 +8,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/analysisproxy.h"
-#include "Analysis/MotionDetection.h"
-
+#include "Analysis/motiondetection.h"
+#include "Analysis/analysissettings.h"
 /**
  * @brief AnalysisController::AnalysisController
  * @param file_path path to the video file to be analysed
@@ -19,10 +19,9 @@
 AnalysisController::AnalysisController(QObject* parent) : QThread(parent) {
 }
 
-void AnalysisController::new_analysis(std::string save_path, std::string video_path, ANALYSIS_TYPE type) {
+void AnalysisController::new_analysis(AnalysisMethod* method,std::string save_path) {
     m_save_path = save_path;
-    m_video_path = video_path;
-    setup_analysis(video_path, type);
+    setup_analysis(method);
 }
 
 /**
@@ -31,15 +30,7 @@ void AnalysisController::new_analysis(std::string save_path, std::string video_p
  * @param file_path     path to the video file to be analysed
  * @param type          analysis type
  */
-void AnalysisController::setup_analysis(std::string video_path, ANALYSIS_TYPE type) {
-    switch (type) {
-    case MOTION_DETECTION:
-        method = new MotionDetection(video_path);
-        break;
-    default:
-        method = new MotionDetection(video_path);
-        break;
-    }
+void AnalysisController::setup_analysis(AnalysisMethod* method) {
     QObject::connect(method, SIGNAL(send_progress(int)),
                      this, SLOT(on_progress_update(int)));
 }
@@ -49,13 +40,7 @@ void AnalysisController::setup_analysis(std::string video_path, ANALYSIS_TYPE ty
  * Starts the analysis loop.
  */
 void AnalysisController::run() {
-    method->setup_analysis();
-    Analysis analysis = method->run_analysis();
-    analysis.m_name = "Analysis";
-    analysis.save_saveable(m_save_path);
-    AnalysisProxy analysis_meta (analysis, analysis.full_path());
-    emit analysis_done(analysis_meta);
-    delete method;
+    exec();
 }
 
 /**

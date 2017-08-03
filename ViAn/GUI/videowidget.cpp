@@ -1,7 +1,7 @@
 #include "videowidget.h"
 #include "utility.h"
-#include "drawscrollarea.h"
-#include "tagdialog.h"
+#include "GUI/drawscrollarea.h"
+#include "GUI/Analysis/tagdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -11,7 +11,7 @@
 
 #include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
-#include "Analysis/AnalysisController.h"
+#include "Analysis/analysiscontroller.h"
 #include "imageexporter.h"
 
 #include <opencv2/videoio.hpp>
@@ -75,6 +75,11 @@ std::pair<int, int> VideoWidget::get_frame_interval(){
  */
 int VideoWidget::get_current_video_length(){
     return m_frame_length;
+}
+
+void VideoWidget::quick_analysis(AnalysisSettings * settings)
+{
+    emit start_analysis(m_vid_proj, settings);
 }
 
 /**
@@ -366,11 +371,12 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
 
     // Analysis
-    connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
+
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
+    connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
     // Tag
 
 
@@ -550,14 +556,6 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
-void VideoWidget::analysis_btn_clicked() {
-    if (m_vid_proj != nullptr) {
-        emit start_analysis(m_vid_proj);
-    } else {
-        emit set_status_bar("No video selected");
-    }
-}
-
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr) {
         Tag* tag = dynamic_cast<Tag*>(m_tag);
@@ -732,9 +730,9 @@ void VideoWidget::on_playback_slider_moved() {
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
+void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+    int frame = -1;
     if (!video_btns_enabled) enable_video_btns();
-
     if (m_vid_proj != vid_proj) {
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;

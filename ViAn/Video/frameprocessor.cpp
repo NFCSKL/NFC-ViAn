@@ -34,21 +34,16 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load();});
-        qDebug() << "in frameprocesser";
-        qDebug() << m_v_sync->frame.rows;
+        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load();});;
         // A new video has been loaded. Reset processing settings
         if (m_new_video->load()) {
-            qDebug() << "new video";
             reset_settings();
             lk.unlock();
-            qDebug() << "end frameprocesser";
             continue;
         }
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug () << "hejchanged";
             m_changed->store(false);
 
             update_zoomer_settings();
@@ -58,14 +53,12 @@ void FrameProcessor::check_events() {
             if (!m_new_frame->load()) {
                 process_frame();
                 lk.unlock();
-                qDebug() << "end frameprocesser";
                 continue;
             }
         }
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
-            qDebug() << "new frame";
             m_new_frame->store(false);
             m_cur_frame_index = m_frame_index->load();
             m_frame = m_v_sync->frame.clone();
@@ -73,7 +66,6 @@ void FrameProcessor::check_events() {
 
             lk.unlock();
             m_v_sync->con_var.notify_one();
-            qDebug() << "end frameprocesser";
             continue;
         }
 
@@ -197,9 +189,7 @@ void FrameProcessor::reset_settings() {
     m_manipulator.reset();
     m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
     m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
-qDebug () << "hej";
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
-    qDebug () << "hej";
     m_zoomer.reset();
     // Centers zoom rectangle and displays the frame without zoom
     m_zoomer.fit_viewport();

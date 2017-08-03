@@ -1,6 +1,6 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
-#include "TreeItems/itemtypes.h"
+#include "GUI/TreeItems/analysisitem.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -88,15 +88,19 @@ void ProjectWidget::add_video() {
  * @param vid_proj
  * Start analysis on the selected video
  */
-void ProjectWidget::start_analysis(VideoProject* vid_proj) {
-    AnalysisItem* ana = new AnalysisItem();
-    VideoItem* v_item = get_video_item(vid_proj);
+void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir());
+    if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
+    if(settings->use_interval) method->setInterval(settings->interval);
+
     if (vid_proj == nullptr) return;
+    VideoItem* v_item = get_video_item(vid_proj);
+    AnalysisItem* ana = new AnalysisItem();
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
-    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
-    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
+    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
+    emit begin_analysis(item, method);
 }
 
 /**
@@ -120,7 +124,7 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
 }
 
 /**
- * @brief ProjectWidget::set_tree_item_name
+ * @brief ProjectWidget::set_tree_item_namebei
  * @param item
  * @param name
  * Slot to set the name if an item in the project tree
@@ -141,7 +145,6 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     insertTopLevelItem(topLevelItemCount(), vid_item);
     vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
     emit set_status_bar("Video added: " + vid_name);
-
     // Add analysis and tag
     add_analyses_to_item(vid_item);
 }
@@ -271,8 +274,6 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     }
 }
 
-
-
 /**
  * @brief ProjectWidget::update_index_paths
  * Stores GUI information of each tree item into its data member
@@ -360,6 +361,34 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
+void ProjectWidget::advanced_analysis()
+{
+    std::vector<VideoItem*> v_items;
+    QTreeWidgetItem* s_item = invisibleRootItem();
+    for (auto i = 0; i < s_item->childCount(); ++i) {
+        QTreeWidgetItem* item = s_item->child(i);
+        if (item->type() == VIDEO_ITEM) {
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            v_items.push_back(v_item);
+        }
+    }
+    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->getDir());
+    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    dialog->show();
+}
+
+void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj)
+{
+    if (vid_proj == nullptr) return;
+    VideoItem* v_item = get_video_item(vid_proj);
+    AnalysisItem* ana = new AnalysisItem();
+    v_item->addChild(ana);
+    ana->setText(0, "Loading");
+    v_item->setExpanded(true);
+    emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
+}
+
+
 /**
  * @brief ProjectWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
@@ -372,7 +401,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project(), -1);
+        emit marked_video(vid_item->get_video_project());
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -559,7 +588,7 @@ void ProjectWidget::open_project(QString project_path) {
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.load_state(m_proj->getDir() + "treestate.json");
+    tree_state.load_state(m_proj->getDir() + "treestate");
 
     parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
     emit proj_path(m_proj->getDir());

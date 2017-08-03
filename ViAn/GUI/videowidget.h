@@ -17,10 +17,10 @@
 #include <condition_variable>
 
 #include "framewidget.h"
-#include "analysisslider.h"
+#include "GUI/Analysis/analysisslider.h"
 #include "Video/video_player.h"
 #include "Project/videoproject.h"
-#include "drawscrollarea.h"
+#include "GUI/drawscrollarea.h"
 #include "Project/Analysis/tag.h"
 #include "Video/videocontroller.h"
 #include "Video/videoplayer.h"
@@ -93,16 +93,16 @@ signals:
     void ret_first_frame(void);
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
-    void start_analysis(VideoProject*);
+    void start_analysis(VideoProject*, AnalysisSettings*);
     void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(Video* video);
 public slots:
+    void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);
     void play_btn_toggled(bool status);
-    void analysis_btn_clicked(void);
     void tag_frame(void);
     void remove_tag_frame(void);
     void new_tag_clicked();
@@ -121,7 +121,9 @@ public slots:
     void on_playback_slider_released(void);
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
-    void load_marked_video(VideoProject* vid_proj, int frame);
+
+    void load_marked_video(VideoProject* vid_proj);
+
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
     void set_interval_start_clicked();
@@ -214,7 +216,6 @@ private:
     void init_speed_slider();
     void add_btns_to_layouts();
     void connect_btns();
-
     void init_playback_slider();
 private slots:
     void stop_btn_clicked(void);

@@ -5,10 +5,10 @@
 #include <QCoreApplication>
 
 #include <stack>
+#include "Project/video.h"
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
@@ -55,7 +55,7 @@ class VideoPlayer : public QObject{
     int m_frame_rate = 0;
     int m_last_frame = 0;
 public:
-    explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
+    explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video,std::atomic_bool* new_frame_video, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,

@@ -1,7 +1,84 @@
-#include "AnalysisMethod.h"
 #include <qdebug.h>
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/videoio/videoio.hpp"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/videoio/videoio.hpp>
+#include "Analysis/analysismethod.h"
+AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
+{
+    m_source_file = video_path;
+    std::size_t index = video_path.find_last_of('/') + 1;
+    std::string vid_name = video_path.substr(index);
+    index = vid_name.find_last_of('.');
+    vid_name = vid_name.substr(0,index);
+
+    m_save_path = save_path+vid_name +"-motion_analysis";
+    add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
+}
+
+/**
+ * @brief AnalysisMethod::abort_analysis
+ * Sets the necessary bools to abort an analysis.
+ */
+
+void AnalysisMethod::setBounding_box(const cv::Rect &value)
+{
+    bounding_box = value;
+    use_bounding_box = true;
+}
+
+AnalysisInterval AnalysisMethod::getInterval() const
+{
+    return interval;
+}
+
+void AnalysisMethod::setInterval(const AnalysisInterval &value)
+{
+    interval = value;
+    use_interval = true;
+}
+
+std::string AnalysisMethod::get_descr(const std::string& var)
+{
+    auto val_pair = m_settings.find(var);
+    if(val_pair != m_settings.end())
+        return val_pair->first;
+    qWarning("No variable \"%s found",var.c_str());
+    return "";
+}
+
+
+std::string AnalysisMethod::save_path() const
+{
+    return m_save_path;
+}
+void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
+{
+    m_settings[var] = value_default;
+    m_descriptions[var] = descr;
+}
+
+int AnalysisMethod::get_setting(const std::string &var)
+{
+    auto val_pair = m_settings.find(var);
+    if(val_pair != m_settings.end())
+        return val_pair->second;
+    qWarning("No variable \"%s found",var.c_str());
+    return -1;
+}
+
+void AnalysisMethod::set_setting(const std::string &var, int value)
+{
+    m_settings[var] = value;
+}
+
+std::vector<std::string> AnalysisMethod::get_var_names()
+{
+    std::vector<std::string> res;
+    for(auto pair : m_settings){
+        res.push_back(pair.first);
+    }
+    return res;
+}
+
 
 /**
  * @brief AnalysisMethod::set_include_exclude_area
@@ -9,6 +86,7 @@
  * @param points for the polygon that defines the exclusion area.
  */
 void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon) {
+
     if (!capture.isOpened())
         return;
 
@@ -30,7 +108,6 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
     exclude_frame = img;
 }
 
-
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.
@@ -45,22 +122,46 @@ bool AnalysisMethod::sample_current_frame() {
  * This is the main loop method for doing an analysis.
  * @return all detections from the performed analysis.
  */
-Analysis AnalysisMethod::run_analysis() {
+void AnalysisMethod::run() {
+    setup_analysis();
+    sample_freq = get_setting("SAMPLE_FREQUENCY");
+    capture.open(m_source_file);
     if (!capture.isOpened()) {
-        return m_analysis;
+        return;
     }
-    calculate_scaling_factor();
     std::vector<DetectionBox> detections;
-    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
-    POI* m_POI = new POI();
-    while(!aborted && capture.read(frame)) {
+    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
+    POI* m_POI = new POI();    
+    // If Interval is use, start analysis at frame
+    int end_frame = num_frames -1;
+    int start_frame = 0;
+    if(use_interval){
+        start_frame = interval.get_start();
+        capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
+        end_frame = interval.get_end();
+        num_frames = end_frame - start_frame;
+        current_frame_index = start_frame;
+    }
+    while(!aborted && capture.read(original_frame) &&
+          !(use_interval && (current_frame_index <= end_frame))) {
         // do frame analysis
-        if (sample_current_frame() || current_frame_index == num_frames-1) {
-            if (scaling_needed)
+        if (sample_current_frame() || current_frame_index == end_frame) {
+            // Slice frame if bounding box should be used
+            if(use_bounding_box){
+                cv::Mat temp (original_frame, bounding_box);
+                analysis_frame = temp;
+            }
+            else{
+                analysis_frame = original_frame;
+            }
+            if(!m_scaling_done){
+
+                calculate_scaling_factor();
+            }
+            if (scaling_needed){
                 scale_frame();
-
+            }
             detections = analyse_frame();
-
             // This if statement handles the sorting of OOIs detected
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
@@ -84,14 +185,14 @@ Analysis AnalysisMethod::run_analysis() {
              */
             m_POI->add_detections(current_frame_index, detections);
         }
-
         if (paused) {
             // TODO do pause stuff
             paused = false;
         }
 
-        emit send_progress(get_progress());
+        emit send_progress(get_progress(start_frame));
         ++current_frame_index;
+        original_frame.release();
     }
     // Makes sure that a POI that stretches to the end of the
     // video gets an end frame.
@@ -100,22 +201,22 @@ Analysis AnalysisMethod::run_analysis() {
         m_analysis.add_interval(m_POI);
     }
     capture.release();
-    return m_analysis;
+    m_analysis.save_saveable(m_save_path);
+    AnalysisProxy proxy(m_analysis, m_analysis.full_path());
+    emit finished_analysis(proxy);
+    emit finito();
 }
 
 /**
  * @brief AnalysisMethod::get_progress
  * @return Progression of analysis in whole percent.
  */
-int AnalysisMethod::get_progress() {
-    return current_frame_index*100/num_frames;
+int AnalysisMethod::get_progress(int start_frame) {
+    return ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
 
 }
 
-/**
- * @brief AnalysisMethod::abort_analysis
- * Sets the necessary bools to abort an analysis.
- */
+
 void AnalysisMethod::abort_analysis() {
     aborted = true;
     paused = false;
@@ -138,8 +239,9 @@ void AnalysisMethod::pause_analysis() {
  * on a frame to the original resolution of the video. This method does that.
  */
 void AnalysisMethod::calculate_scaling_factor() {
-    int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
-    int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    m_scaling_done = true;
+    int video_width = analysis_frame.cols;
+    int video_height = analysis_frame.rows;
     float height_ratio = float(FULL_HD_HEIGHT)/float(video_height);
     float width_ratio = float(FULL_HD_WIDTH)/float(video_width);
     if (height_ratio >= 1 && width_ratio >= 1) return;
@@ -163,7 +265,7 @@ void AnalysisMethod::calculate_scaling_factor() {
  */
 void AnalysisMethod::scale_frame() {
     cv::Size size(scaled_width,scaled_height);
-    cv::Mat dst(size,frame.type());
-    cv::resize(frame,dst,size); //resize frame
-    frame = dst;
+    cv::Mat dst(size,analysis_frame.type());
+    cv::resize(analysis_frame,dst,size); //resize frame
+    analysis_frame = dst;
 }

@@ -1,4 +1,5 @@
 #include "video.h"
+
 /**
  * @brief Video::Video
  */

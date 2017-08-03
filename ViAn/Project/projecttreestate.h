@@ -1,11 +1,10 @@
 #ifndef PROJECTTREESTATE_H
 #define PROJECTTREESTATE_H
 #include "Filehandler/saveable.h"
-#include "GUI/projectwidget.h"
 #include "Filehandler/saveable.h"
 #include "GUI/projectwidget.h"
-#include "GUI/TreeItems/itemtypes.h"
-
+#include "GUI/TreeItems/folderitem.h"
+#include "GUI/TreeItems/videoitem.h"
 class ProjectWidget;
 class ProjectTreeState : public Saveable {
     QTreeWidgetItem* m_tree = nullptr;

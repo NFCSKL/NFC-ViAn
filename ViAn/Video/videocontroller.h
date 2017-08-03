@@ -7,13 +7,12 @@
 #include <QPoint>
 #include <QSize>
 #include <QTimer>
+#include <atomic>
 #include <mutex>
-
 #include <opencv2/core/core.hpp>
-
 #include "videoplayer.h"
 #include "Video/frameprocessor.h"
-#include <atomic>
+#include "Project/video.h"
 class VideoController : public QThread {
     Q_OBJECT
     std::atomic<int>* m_frame;
@@ -22,7 +21,7 @@ class VideoController : public QThread {
     std::atomic_int* m_speed;
 
 
-    std::atomic<bool>* m_is_playing;
+    std::atomic_bool* m_is_playing;
     std::atomic_bool* m_new_video;
     std::atomic_bool* m_new_frame_video;
     std::atomic_bool* m_new_frame;
@@ -34,7 +33,7 @@ class VideoController : public QThread {
 
     video_sync* m_v_sync;
 public:
-    VideoController(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
+    VideoController(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                     std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                     std::atomic_bool* new_video, std::atomic_bool *new_frame_video, video_sync* v_sync, std::condition_variable* player_con,
                     std::mutex* player_lock, std::string* video_path, std::atomic_int* speed);

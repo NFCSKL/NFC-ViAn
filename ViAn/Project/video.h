@@ -6,9 +6,24 @@
 #include <QJsonObject>
 #include <QString>
 #include "Filehandler/saveable.h"
+struct VideoState{
+    int frame = 0;
+    int contrast = 0;
+    int brightness = 0;
+    int rotation = 0;
+    VideoState(){}
+    VideoState(VideoState&rh){
+        frame = rh.frame;
+        contrast = rh.contrast;
+        brightness = rh.brightness;
+        rotation = rh.rotation;
+    }
+};
 typedef int ID;
 class Video : Writeable{
     std::string m_name;
+public:
+    VideoState state;
 public:
     Video();
     Video(std::string file_path);

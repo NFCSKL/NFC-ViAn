@@ -12,8 +12,8 @@
 
 #include "Video/shapes/zoomrectangle.h"
 #include "Project/Analysis/analysisproxy.h"
-
-enum click_tool {NONE, ZOOM, MOVE};
+#include "Analysis/analysissettings.h"
+enum click_tool {NONE, ZOOM, MOVE,ANALYSIS_BOX};
 
 class FrameWidget : public QWidget
 {
@@ -28,9 +28,10 @@ class FrameWidget : public QWidget
     cv::Mat current_frame;
     Analysis* m_analysis = nullptr;
     // Zoom
-    QPoint zoom_start_pos, zoom_end_pos, prev_pos;
+    QPoint rect_start, rect_end, prev_pos;
+    bool mark_rect = false;
     QPoint anchor = QPoint(0,0);
-    bool draw_zoom_rect = false;
+
     bool do_zoom = false;
     bool do_zoom_out = false;
     bool m_detections = false;
@@ -44,6 +45,7 @@ public:
     cv::Mat get_mat() const;
 
 signals:
+    void quick_analysis(AnalysisSettings* settings);
     void video_pressed(QPoint pos);
     void video_released(QPoint pos);
     void video_moved(QPoint pos);
@@ -55,6 +57,7 @@ signals:
 public slots:
     void on_new_image(cv::Mat image, int frame_index);
     void toggle_zoom(bool value);
+    void set_analysis_tool();
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
     void clear_analysis();
@@ -75,9 +78,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 private:
     void init_panning(QPoint pos);
-    void init_zoom(QPoint pos);
+    void set_rect_start(QPoint pos);
     void panning(QPoint pos);
-    void zoom(QPoint pos);
+    void rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
 };

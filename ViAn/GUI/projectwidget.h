@@ -7,15 +7,20 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include "Project/project.h"
-#include "TreeItems/itemtypes.h"
+#include "GUI/TreeItems/tagitem.h"
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
-
+#include "Project/videoproject.h"
+#include "Analysis/analysismethod.h"
+#include "Analysis/motiondetection.h"
+#include "Analysis/analysisdialog.h"
+#include "TreeItems/analysisitem.h"
 class Project;
 class VideoItem;
 class FolderItem;
 class AnalysisProxy;
+class VideoProject;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
@@ -29,7 +34,7 @@ public:
 
 signals:
     void selected_media();
-    void marked_video(VideoProject* vid_proj, int frame = 0);
+    void marked_video(VideoProject* vid_proj);
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
 
@@ -42,14 +47,14 @@ signals:
     void set_poi_slider(bool);
     void set_tag_slider(bool);
     void set_status_bar(QString);
-    void begin_analysis(std::string, std::string, QTreeWidgetItem*);
+    void begin_analysis(QTreeWidgetItem*, AnalysisMethod*);
     void update_frame();
-
+    void new_vid_proj(VideoProject*);
 public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
-    void start_analysis(VideoProject*);
+    void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
@@ -58,6 +63,8 @@ public slots:
     void remove_project();
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+    void advanced_analysis();
+    void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
 private slots:
     void context_menu(const QPoint& point);
     void remove_item();

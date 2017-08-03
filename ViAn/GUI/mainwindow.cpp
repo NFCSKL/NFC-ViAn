@@ -13,8 +13,8 @@
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
-#include "Analysis/MotionDetection.h"
-#include "Analysis/AnalysisMethod.h"
+#include "Analysis/motiondetection.h"
+#include "Analysis/analysismethod.h"
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
@@ -45,9 +45,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
-    connect(video_wgt, SIGNAL(start_analysis(VideoProject*)), project_wgt, SLOT(start_analysis(VideoProject*)));
-    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*)));
 
+    connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
+    connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
+    connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
+            analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
@@ -58,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
     connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
-    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*,int)));
+    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*)));
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     bookmark_dock->setWidget(bookmark_wgt);    
 
@@ -295,7 +297,7 @@ void MainWindow::init_analysis_menu() {
     analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     analysis_act->setStatusTip(tr("Perform analysis"));
     analysis_menu->addAction(analysis_act);
-    connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
+    connect(analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
 }
 
 void MainWindow::init_interval_menu() {

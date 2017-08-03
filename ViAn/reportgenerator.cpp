@@ -108,7 +108,7 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_
 
     //Table indexed from 1, begin after title.
     int cell_row = 2;
-    for (int i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
+    for (size_t i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
         //Acess duplicate category title cells and merge them together
         QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);

@@ -18,36 +18,48 @@ TEMPLATE = app
 #
 SOURCES += main.cpp \
     reportgenerator.cpp \
-    GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
     utility.cpp \
     GUI/drawscrollarea.cpp \
     Video/zoomer.cpp \
-    GUI/analysisslider.cpp \
-    GUI/projectdialog.cpp \
+    GUI/Analysis/analysisslider.cpp \
     Project/Test/videoprojecttest.cpp \
-    GUI/bookmarkcategory.cpp \
+    GUI/Bookmark/bookmarkcategory.cpp \
     imagegenerator.cpp \
-    GUI/bookmarklist.cpp \
+    GUI/Bookmark/bookmarklist.cpp \
     GUI/statusbar.cpp \
-    GUI/analysiswidget.cpp \
+    GUI/Analysis/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
     Project/projecttreestate.cpp \
-    GUI/tagdialog.cpp \
+    GUI/Analysis/tagdialog.cpp \
     imageexporter.cpp \
-    GUI/frameexporterdialog.cpp \
     Project/Analysis/tag.cpp \
     Video/videocontroller.cpp \
     Video/videoplayer.cpp \
-    GUI/recentprojectdialog.cpp \
     Project/recentproject.cpp \
     Project/Analysis/basicanalysis.cpp \
     Project/Analysis/analysisinterval.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
-    Project/Analysis/detectionbox.cpp
+    Project/Analysis/detectionbox.cpp \
+    GUI/TreeItems/videoitem.cpp \
+    GUI/TreeItems/treeitem.cpp \
+    GUI/recentprojectdialog.cpp \
+    GUI/projectwidget.cpp \
+    GUI/projectdialog.cpp \
+    GUI/TreeItems/folderitem.cpp \
+    GUI/TreeItems/tagitem.cpp \
+    GUI/TreeItems/analysisitem.cpp \
+    GUI/fpsdialog.cpp \
+    GUI/frameexporterdialog.cpp \
+    GUI/framewidget.cpp \
+    GUI/videowidget.cpp \
+    Analysis/analysissettings.cpp \
+    GUI/Analysis/analysisdialog.cpp \
+    GUI/Analysis/videolistitem.cpp \
+    GUI/Analysis/queuewidget.cpp
 
 #
 # TEST
@@ -57,40 +69,48 @@ SOURCES +=\
 
 HEADERS += reportgenerator.h\
     Test/test_report_generator.h \
-    GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     utility.h \
     GUI/drawscrollarea.h \
     Video/zoomer.h \
-    GUI/analysisslider.h \
-    GUI/projectdialog.h \
+    GUI/Analysis/analysisslider.h \
     Project/Test/videoprojecttest.h \
-    GUI/bookmarkcategory.h \
+    GUI/Bookmark/bookmarkcategory.h \
     imagegenerator.h \
-    GUI/bookmarklist.h \
+    GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
-    GUI/analysiswidget.h \
+    GUI/Analysis/analysiswidget.h \
     GUI/manipulatordialog.h \
     Video/frameprocessor.h \
     Project/projecttreestate.h \
-    GUI/tagdialog.h \
+    GUI/Analysis/tagdialog.h \
     imageexporter.h \
-    GUI/frameexporterdialog.h \
     Project/Analysis/tag.h \
     Video/videocontroller.h \
     Video/videoplayer.h \
-    GUI/recentprojectdialog.h \
     Project/recentproject.h \
     Project/Analysis/basicanalysis.h \
     Project/Analysis/analysisinterval.h \
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
     Project/Analysis/detectionbox.h \
-    table.h \
-    AxReport/axtable.h \
-    AxReport/axrange.h \
-    AxReport/axcell.h
+    GUI/TreeItems/tagitem.h \
+    GUI/TreeItems/videoitem.h \
+    GUI/TreeItems/analysisitem.h \
+    GUI/TreeItems/treeitem.h \
+    GUI/projectdialog.h \
+    GUI/projectwidget.h \
+    GUI/recentprojectdialog.h \
+    GUI/fpsdialog.h \
+    GUI/frameexporterdialog.h \
+    GUI/framewidget.h \
+    GUI/videowidget.h \
+    Analysis/analysissettings.h \
+    Analysis/analysismethod.h \
+    GUI/Analysis/analysisdialog.h \
+    GUI/Analysis/videolistitem.h \
+    GUI/Analysis/queuewidget.h
 
 #
 # LIBRARY
@@ -102,22 +122,14 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/bookmarkitem.cpp \
-    GUI/fpsdialog.cpp \
-    GUI/videowidget.cpp \
-    GUI/framewidget.cpp \
-    GUI/projectwidget.cpp \
-    GUI/bookmarkwidget.cpp
+    GUI/Bookmark/bookmarkitem.cpp \
+    GUI/Bookmark/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/bookmarkitem.h \
-    GUI/fpsdialog.h \
-    GUI/videowidget.h \
-    GUI/framewidget.h \
-    GUI/projectwidget.h \
-    GUI/bookmarkwidget.h
+    GUI/Bookmark/bookmarkitem.h \
+    GUI/Bookmark/bookmarkwidget.h
 
 FORMS    +=
 
@@ -219,10 +231,9 @@ HEADERS +=Project/Test/projecttestsuite.h \
 #
 # ANALYSIS
 #
-SOURCES += Analysis/AnalysisMethod.cpp\
-    Analysis/MotionDetection.cpp \
-    Analysis/AnalysisController.cpp
+SOURCES += Analysis/analysismethod.cpp\
+    Analysis/motiondetection.cpp \
+    Analysis/analysiscontroller.cpp
 
-HEADERS +=Analysis/AnalysisMethod.h\
-    Analysis/MotionDetection.h \
-    Analysis/AnalysisController.h
+HEADERS += Analysis/motiondetection.h \
+    Analysis/analysiscontroller.h
