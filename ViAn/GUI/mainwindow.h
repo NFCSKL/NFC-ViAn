@@ -44,11 +44,27 @@ public:
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;
+    QAction* drawing_act;
+
+    QAction* color_act;
+
     RecentProjectDialog* rp_dialog;
+
 private slots:
     void gen_report(void);
     void cont_bri(void);
     void export_images();
+    void rectangle();
+    void circle();
+    void line();
+    void arrow();
+    void pen();
+    void text();
+    void undo();
+    void redo();
+    void clear();
+    void zoom();
+    void move();
 
 public slots:
     void options(void);
@@ -77,7 +93,6 @@ private:
     void init_interval_menu();
     void init_tools_menu();
     void init_help_menu();
-protected:
 };
 
 #endif // MAINWINDOW_H

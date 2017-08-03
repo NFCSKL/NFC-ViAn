@@ -9,7 +9,7 @@
 
 #include "opencv2/opencv.hpp"
 
-enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT};
+enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, ZOOM, MOVE, ANALYSIS_BOX};
 
 class Shape {
 

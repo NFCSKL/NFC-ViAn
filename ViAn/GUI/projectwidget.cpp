@@ -517,6 +517,7 @@ void ProjectWidget::remove_item() {
             delete item;
         }
     }
+    emit remove_overlay();
 
 }
 
@@ -607,6 +608,7 @@ void ProjectWidget::close_project() {
     if (m_proj == nullptr) return;
     emit set_status_bar("Closing project");
     emit project_closed();
+    emit remove_overlay();
     this->clear();
     delete m_proj;
     m_proj = nullptr;

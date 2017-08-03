@@ -56,6 +56,7 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 
     connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+
     init_video_controller();
     v_controller->start();
     init_frame_processor();
@@ -138,7 +139,7 @@ void VideoWidget::init_video_controller(){
  */
 void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index);
+                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
     QThread* processing_thread = new QThread();
     f_processor->moveToThread(processing_thread);
@@ -149,6 +150,12 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), this, SLOT(mouse_pressed(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
+    connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
+    connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
+    connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
 
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
@@ -348,7 +355,6 @@ void VideoWidget::add_btns_to_layouts() {
 
     zoom_btns->addWidget(zoom_label);
 
-
     control_row->addLayout(zoom_btns);
 
     interval_btns->addWidget(set_start_interval_btn);
@@ -378,11 +384,6 @@ void VideoWidget::connect_btns() {
 
     connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
     // Tag
-
-
-    connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
-
-    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
     connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
@@ -490,6 +491,11 @@ void VideoWidget::set_current_time(int time) {
  */
 void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
+}
+
+
+int VideoWidget::get_current_frame() {
+    return frame_index.load();
 }
 
 void VideoWidget::set_scale_factor(double scale_factor) {
@@ -688,8 +694,9 @@ void VideoWidget::on_new_frame() {
         playback_slider->blockSignals(false);
     }
 
+
     set_current_time(frame_num / m_frame_rate);
-    frame_line_edit->setText(QString::number(frame_num));
+    frame_line_edit->setText(QString::number(frame_index.load()));
 
     playback_slider->update();
 }
@@ -745,6 +752,9 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
 
         m_interval = make_pair(0,0);
 
+
+        //frame_wgt->set_overlay(m_vid_proj->get_overlay());
+        set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);
@@ -793,6 +803,92 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
 
 void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
+}
+
+void VideoWidget::set_overlay(Overlay *overlay) {
+    update_overlay_settings([&](){
+        o_settings.overlay = overlay;
+    });
+}
+
+void VideoWidget::set_overlay_removed() {
+    update_overlay_settings([&](){
+        o_settings.overlay_removed = true;
+    });
+}
+
+
+void VideoWidget::set_undo() {
+    update_overlay_settings([&](){
+        o_settings.undo = true;
+    });
+}
+
+void VideoWidget::set_redo() {
+    update_overlay_settings([&](){
+        o_settings.redo = true;
+    });
+}
+
+void VideoWidget::set_clear_drawings() {
+    update_overlay_settings([&](){
+        o_settings.clear_drawings = true;
+    });
+}
+
+void VideoWidget::set_tool(SHAPES tool) {
+    update_overlay_settings([&](){
+        o_settings.tool = tool;
+    });
+}
+
+void VideoWidget::set_tool_text(QString text, float font_scale) {
+    update_overlay_settings([&](){
+        o_settings.tool = TEXT;
+        o_settings.current_string = text;
+        o_settings.current_font_scale = font_scale;
+    });
+}
+
+void VideoWidget::set_color(QColor color) {
+    update_overlay_settings([&](){
+        o_settings.color = color;
+    });
+}
+
+void VideoWidget::mouse_pressed(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_clicked = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_released(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_released = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_moved(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_moved = true;
+        o_settings.pos = pos;
+    });
+}
+
+/**
+ * @brief VideoWidget::update_overlay_settings
+ * This functions intended use is to update variables shared with the frame processor thread.
+ * After the change is made it will notify the frame processor.
+ * @param lambda function where the variable is changed
+ */
+void VideoWidget::update_overlay_settings(std::function<void ()> lambda) {
+    v_sync.lock.lock();
+    lambda();
+    overlay_changed.store(true);
+    v_sync.lock.unlock();
+    v_sync.con_var.notify_all();
 }
 
 /**

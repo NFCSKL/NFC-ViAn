@@ -3,8 +3,7 @@
 /**
  * @brief Overlay::Overlay
  */
-Overlay::Overlay() {
-}
+Overlay::Overlay() {}
 
 /**
  * @brief Overlay::draw_overlay
@@ -12,22 +11,12 @@ Overlay::Overlay() {
  * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
-cv::Mat Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
+void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
-        foreach (Shape* s, overlays[frame_nr]) {
-            frame = s->draw(frame);
+        for (auto it = overlays[frame_nr].overlay.begin(); it != overlays[frame_nr].drawn; it++) {
+            frame = (*it)->draw(frame);
         }
     }
-    return frame;
-}
-
-/**
- * @brief Overlay::toggle_overlay
- * Toggles the showing of the overlay, and if video is paused updates
- * the frame in the GUI to show with/without overlay
- */
-void Overlay::toggle_overlay() {
-    show_overlay = !show_overlay;
 }
 
 /**
@@ -55,27 +44,11 @@ void Overlay::set_showing_overlay(bool value) {
  */
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
+}
 
-    // If the text option is chosen, a string and size will be entered by the user.
-    if (s == TEXT) {
-        std::string input_string = current_string.toStdString();
-        float input_font_scale = current_font_scale;
-        CustomDialog dialog("Choose text", NULL);
-        dialog.addLabel("Enter values:");
-        dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
-        dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
-                              &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
-                              "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
-
-        // Show the dialog (execution will stop here until the dialog is finished)
-        dialog.exec();
-
-        if (!dialog.wasCancelled() && !input_string.empty()) {
-            // Not cancelled and not empty field.
-            current_string = QString::fromStdString(input_string);
-            current_font_scale = input_font_scale;
-        }
-    }
+void Overlay::set_text_settings(QString text, float font_scale) {
+    current_string = text;
+    current_font_scale = font_scale;
 }
 
 /**
@@ -135,6 +108,26 @@ Shape* Overlay::get_empty_shape(SHAPES shape_type) {
 }
 
 /**
+ * @brief Overlay::empty_undo_list
+ * Clean the top end of the drawing list so you can't redo anymore
+ * @param frame_nr
+ */
+void Overlay::empty_undo_list(int frame_nr) {
+    overlays[frame_nr].overlay.erase(overlays[frame_nr].drawn, overlays[frame_nr].overlay.end());
+}
+
+/**
+ * @brief Overlay::add_drawing
+ * Add a drawing to the list of drawings
+ * @param shape
+ * @param frame_nr
+ */
+void Overlay::add_drawing(Shape* shape, int frame_nr) {
+    overlays[frame_nr].overlay.push_back(shape);
+    overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+}
+
+/**
  * @brief Overlay::mouse_pressed
  * Creates a drawing shape with the prechosen colour
  * and shape, if the overlay is visible.
@@ -145,22 +138,28 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
-                overlays[frame_nr].append(new Rectangle(current_colour, pos));
+                empty_undo_list(frame_nr);
+                add_drawing(new Rectangle(current_colour, pos), frame_nr);
                 break;
             case CIRCLE:
-                overlays[frame_nr].append(new Circle(current_colour, pos));
+                empty_undo_list(frame_nr);
+                add_drawing(new Circle(current_colour, pos), frame_nr);
                 break;
             case LINE:
-                overlays[frame_nr].append(new Line(current_colour, pos));
+                empty_undo_list(frame_nr);
+                add_drawing(new Line(current_colour, pos), frame_nr);
                 break;
             case ARROW:
-                overlays[frame_nr].append(new Arrow(current_colour, pos));
+                empty_undo_list(frame_nr);
+                add_drawing(new Arrow(current_colour, pos), frame_nr);
                 break;
             case PEN:
-                overlays[frame_nr].append(new Pen(current_colour, pos));
+                empty_undo_list(frame_nr);
+                add_drawing(new Pen(current_colour, pos), frame_nr);
                 break;
             case TEXT:
-                overlays[frame_nr].append(new Text(current_colour, pos, current_string, current_font_scale));
+                empty_undo_list(frame_nr);
+                add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
                 break;
             default:
                 break;
@@ -199,8 +198,16 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
 void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay) {
         // The last appended shape is the one we're currently drawing.
-        overlays[frame_nr].last()->update_drawing_pos(pos);
+        overlays[frame_nr].overlay.back()->update_drawing_pos(pos);
     }
+}
+
+std::map<int, FrameOverlay> Overlay::get_overlays() {
+    return overlays;
+}
+
+void Overlay::set_overlays(std::map<int, FrameOverlay> new_overlays) {
+    overlays = new_overlays;
 }
 
 /**
@@ -209,8 +216,14 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::undo(int frame_nr) {
-    if (show_overlay && !overlays[frame_nr].isEmpty()) {
-        overlays[frame_nr].takeLast(); // Requires a non-empty list.
+    if (show_overlay && overlays[frame_nr].overlay.begin() != overlays[frame_nr].drawn) {
+        overlays[frame_nr].drawn--;
+    }
+}
+
+void Overlay::redo(int frame_nr) {
+    if (show_overlay && overlays[frame_nr].overlay.end() != overlays[frame_nr].drawn) {
+        overlays[frame_nr].drawn++;
     }
 }
 
@@ -221,9 +234,16 @@ void Overlay::undo(int frame_nr) {
  */
 void Overlay::clear(int frame_nr) {
     if (show_overlay) {
-        overlays[frame_nr].clear();
+        overlays[frame_nr].overlay.clear();
+        overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
     }
 }
+
+//void Overlay::clear_overlay() {
+//    for (std::vector<Shape*> overlay : overlays) {
+//        overlay.clear();
+//    }
+//}
 
 /**
  * @brief Overlay::read
@@ -246,7 +266,7 @@ void Overlay::read(const QJsonObject& json) {
             SHAPES shape_t = static_cast<SHAPES>(shape_i);
             Shape* shape = get_empty_shape(shape_t);
             shape->read(json_shape);
-            overlays[frame_nr].append(shape);
+            add_drawing(shape, frame_nr);
         }
     }
 }
@@ -261,14 +281,14 @@ void Overlay::write(QJsonObject& json) {
     for (auto const& map_entry : overlays) {
         QJsonObject json_overlay;
         QJsonArray json_drawings;
-        foreach (Shape* s, map_entry.second) { // Second member is the value, i.e. the drawings.
+        for (auto it = map_entry.second.overlay.begin(); it != map_entry.second.drawn; it ++) {  // Second member is the value, i.e. the drawings.
             QJsonObject json_shape;
-            s->write(json_shape);
+            (*it)->write(json_shape);
             json_drawings.append(json_shape);
         }
         json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
         json_overlay["drawings"] = json_drawings;
-        json_overlays.append(json_overlay);
+        json_overlays.push_back(json_overlay);
     }
     json["overlays"] = json_overlays;
 }

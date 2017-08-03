@@ -5,12 +5,14 @@
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                                std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index) {
+                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed) {
     m_new_frame = new_frame;
 
+    m_overlay_changed = overlay_changed;
     m_changed = changed;
     m_z_settings = z_settings;
     m_man_settings = m_settings;
+    m_o_settings = o_settings;
     m_v_sync = v_sync;
     m_new_video = new_video;
 
@@ -34,10 +36,28 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load();});;
+        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
         // A new video has been loaded. Reset processing settings
         if (m_new_video->load()) {
             reset_settings();
+            m_overlay = m_o_settings->overlay;
+            m_o_settings->overlay_removed = false;
+
+            lk.unlock();
+            continue;
+        }
+
+        if (m_overlay == nullptr || m_o_settings->overlay_removed) {
+
+            m_overlay_changed->store(false);
+        }
+
+        // The overlay has been changed by the user
+        if (m_overlay_changed->load()) {
+            m_overlay_changed->store(false);
+            update_overlay_settings();
+
+            process_frame();
             lk.unlock();
             continue;
         }
@@ -60,7 +80,6 @@ void FrameProcessor::check_events() {
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
             m_new_frame->store(false);
-            m_cur_frame_index = m_frame_index->load();
             m_frame = m_v_sync->frame.clone();
             process_frame();
 
@@ -68,7 +87,6 @@ void FrameProcessor::check_events() {
             m_v_sync->con_var.notify_one();
             continue;
         }
-
     }
 
 }
@@ -95,6 +113,10 @@ void FrameProcessor::process_frame() {
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
     // imshow("test", tmp);
 
+    // Draws the overlay
+
+    m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
+
     // Scales the frame
     m_zoomer.scale_frame(manipulated_frame);
 
@@ -102,7 +124,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    done_processing(manipulated_frame, m_cur_frame_index);
+    done_processing(manipulated_frame, m_frame_index->load());
 }
 
 /**
@@ -174,6 +196,37 @@ void FrameProcessor::update_manipulator_settings() {
     m_man_settings->rotate = 0;
 }
 
+void FrameProcessor::update_overlay_settings() {
+    int curr_frame = m_frame_index->load();
+    m_overlay->set_tool(m_o_settings->tool);
+    m_overlay->set_colour(m_o_settings->color);
+    m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
+
+    if (m_o_settings->undo) {
+        m_o_settings->undo = false;
+        m_overlay->undo(curr_frame);
+
+    } else if (m_o_settings->redo) {
+        m_o_settings->redo = false;
+        m_overlay->redo(curr_frame);
+
+    } else if (m_o_settings->clear_drawings) {
+        m_o_settings->clear_drawings = false;
+        m_overlay->clear(curr_frame);
+
+    } else if (m_o_settings->mouse_clicked) {
+        m_o_settings->mouse_clicked = false;
+        m_overlay->mouse_pressed(m_o_settings->pos, curr_frame);
+
+    } else if (m_o_settings->mouse_released) {
+        m_o_settings->mouse_released = false;
+        m_overlay->mouse_released(m_o_settings->pos, curr_frame);
+
+    } else if (m_o_settings->mouse_moved) {
+        m_o_settings->mouse_moved = false;
+        m_overlay->mouse_moved(m_o_settings->pos, curr_frame);
+    }
+}
 
 /**
  * @brief FrameProcessor::reset_settings
@@ -202,4 +255,5 @@ void FrameProcessor::reset_settings() {
 
     set_anchor(m_zoomer.get_anchor());
     set_scale_factor(m_zoomer.get_scale_factor());
+
 }

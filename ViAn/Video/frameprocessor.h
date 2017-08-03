@@ -1,8 +1,6 @@
 #ifndef FRAMEPROCESSOR_H
 #define FRAMEPROCESSOR_H
 
-#include "framemanipulator.h"
-
 #include <QObject>
 #include <QImage>
 #include <QSize>
@@ -14,6 +12,8 @@
 #include <opencv2/videoio/videoio.hpp>
 
 #include "zoomer.h"
+#include "framemanipulator.h"
+#include "overlay.h"
 #include "Video/videoplayer.h"
 
 struct zoomer_settings {
@@ -44,19 +44,44 @@ struct manipulation_settings {
     int rotate = 0;
 };
 
+struct overlay_settings {
+    Overlay* overlay = nullptr;
+
+    QPoint pos = QPoint(0,0);
+    int frame_nr = 0;
+    bool mouse_clicked = false;
+    bool mouse_released = false;
+    bool mouse_moved = false;
+
+    bool undo = false;
+    bool redo = false;
+    bool clear_drawings = false;
+
+    bool overlay_removed = false;
+
+    SHAPES tool = NONE;
+    QColor color = Qt::red;
+    QString current_string = "Enter text";
+    float current_font_scale = 1;
+
+    bool show_overlay = true;
+};
+
 class FrameProcessor : public QObject {
     Q_OBJECT
     cv::Mat m_frame;
-    int m_cur_frame_index;
     std::atomic_int* m_frame_index;
 
     std::atomic_int* m_width;
     std::atomic_int* m_height;
 
     std::atomic_bool* m_new_frame;
+    std::atomic_bool* m_new_drawing;
     std::atomic_bool* m_changed;
+    std::atomic_bool* m_overlay_changed;
     std::atomic_bool* m_new_video;
 
+    overlay_settings* m_o_settings;
     zoomer_settings* m_z_settings;
     manipulation_settings* m_man_settings;
     video_sync* m_v_sync;
@@ -71,11 +96,12 @@ class FrameProcessor : public QObject {
 
     Zoomer m_zoomer;
     FrameManipulator m_manipulator;
+    Overlay* m_overlay = nullptr;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                    std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
-                   std::atomic_int* frame_index);
+                   std::atomic_int* frame_index, overlay_settings *o_settings, atomic_bool *overlay_changed);
 
 public slots:
     void check_events(void);
@@ -87,6 +113,7 @@ private:
     void process_frame();
     void update_zoomer_settings();
     void update_manipulator_settings();
+    void update_overlay_settings();
 
     void reset_settings();
 };

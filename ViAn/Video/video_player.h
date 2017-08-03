@@ -11,19 +11,16 @@
 #include <QWaitCondition>
 #include <QImage>
 #include "overlay.h"
-#include "analysisoverlay.h"
 #include "Project/Analysis/analysis.h"
 #include "zoomer.h"
 #include "framemanipulator.h"
 
 #include <chrono>
 
-using namespace std;
-
 class video_player : public QThread {
     Q_OBJECT
     cv::VideoCapture capture;
-    cv::Mat frame, manipulated_frame;   // Frame is the original frame read video capture
+    cv::Mat frame, manipulated_frame ,man_fram;   // Frame is the original frame read video capture
     QThread* processing_thread = nullptr;
 
     // Current capture data
@@ -31,7 +28,6 @@ class video_player : public QThread {
     int original_height;
     int original_width;
     double frame_rate;
-
     int new_frame_num;
     int frame_width;
     int frame_height;
@@ -67,7 +63,6 @@ class video_player : public QThread {
     int rotate_direction = ROTATE_NONE;
 
     Overlay* video_overlay;
-    AnalysisOverlay* analysis_overlay = new AnalysisOverlay();
 
     FrameManipulator* manipulator = nullptr;
 
@@ -82,7 +77,6 @@ public:
     bool is_playing();
     void set_showing_overlay(bool value);
     bool is_showing_overlay();
-    bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
     QImage get_current_frame_unscaled();
     bool video_open();
@@ -100,12 +94,9 @@ public:
     void dec_playback_speed();
 
     void set_slider_frame(int frame_nbr);
-    
 
-    void toggle_overlay();
-    void toggle_analysis_overlay();
-    void set_overlay_tool(SHAPES shape);
-    void set_overlay_colour(QColor colour);
+    Overlay* get_overlay();
+
     void undo_overlay();
     void clear_overlay();
     void toggle_analysis_area();
@@ -117,7 +108,6 @@ public:
     int get_video_width();
     int get_video_height();
     std::vector<cv::Point>* get_analysis_area_polygon();
-    void clear_analysis_overlay();
 
     friend class test_video_player;
 
@@ -134,8 +124,6 @@ signals:
     void total_time(int time);
     void scale_factor(double scale_factor);
 
-private slots:
-    void on_set_analysis_results(Analysis analysis);
 public slots:
     // All slot functions that manipulates a value used by the video thread must be locked
     // Playback
@@ -156,6 +144,14 @@ public slots:
     void rotate_left();
     // Frame manipulation (brightness, contrast)
     void set_bright_cont(int b_value, double c_value);
+
+    //Overlay
+    void set_overlay_colour(QColor colour);
+    void set_overlay_tool(SHAPES shape);
+    void video_mouse_pressed(QPoint pos);
+    void video_mouse_released(QPoint pos);
+    void video_mouse_moved(QPoint pos);
+    void update_overlay();
 protected:
     void run() override;
     void msleep(int ms);
@@ -165,7 +161,6 @@ private:
     void check_last_frame();
     cv::Mat scale_frame(cv::Mat &src);
     void process_frame();
-    void update_overlay();
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
     void scale_mat(double scale);

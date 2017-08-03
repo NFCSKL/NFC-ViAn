@@ -39,7 +39,7 @@ class VideoPlayer : public QObject{
 
 
     // Delay time to reach the right frame rate
-    int m_delay = 10;
+    int m_delay = 1;
 
     // Player state
     std::atomic_bool* m_is_playing;

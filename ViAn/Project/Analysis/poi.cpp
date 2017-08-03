@@ -58,7 +58,7 @@ void POI::read(const QJsonObject& json) {
         QJsonArray json_frame_OOIs = json[QString::number(i)].toArray();
         std::vector<DetectionBox> oois;
         for(int j = 0; j != json_frame_OOIs.size(); j++){
-            DetectionBox ooi;;
+            DetectionBox ooi;
             ooi.read(json_frame_OOIs[j].toObject());
             oois.push_back(ooi);
         }

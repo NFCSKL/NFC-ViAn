@@ -36,6 +36,11 @@ void FrameWidget::set_analysis(AnalysisProxy *analysis) {
  */
 void FrameWidget::clear_analysis() {
     m_analysis = nullptr;
+    ooi_rects.clear();
+}
+
+void FrameWidget::set_video_project(VideoProject* vid_proj) {
+    m_vid_proj = vid_proj;
 }
 
 /**
@@ -57,12 +62,59 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
+void FrameWidget::set_overlay(Overlay* overlay) {
+    video_overlay = overlay;
+}
+
+Overlay* FrameWidget::get_overlay() {
+    return video_overlay;
+}
+
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
 }
 
 void FrameWidget::update(){
     repaint();
+}
+
+void FrameWidget::set_tool(SHAPES tool) {
+    if (m_vid_proj != nullptr) {
+
+        if (tool == TEXT) {
+            QString current_string = "Enter text";
+            float current_font_scale = 1;
+            std::string input_string = current_string.toStdString();
+            float input_font_scale = current_font_scale;
+            CustomDialog dialog("Choose text", NULL);
+            dialog.addLabel("Enter values:");
+            dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
+            dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
+                                  &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
+                                  "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
+
+            // Show the dialog (execution will stop here until the dialog is finished)
+            dialog.exec();
+
+            if (!dialog.wasCancelled() && !input_string.empty()) {
+                // Not cancelled and not empty field.
+                current_string = QString::fromStdString(input_string);
+                current_font_scale = input_font_scale;
+            }
+            emit send_tool_text(current_string, current_font_scale);
+        } else {
+            emit send_tool(tool);
+        }
+
+        this->tool = tool;
+    }
+}
+
+void FrameWidget::set_overlay_color(QColor color) {
+    if (m_vid_proj != nullptr) {
+        emit send_color(color);
+        this->overlay_color = color;
+    }
 }
 
 cv::Mat FrameWidget::get_mat() const {
@@ -134,6 +186,10 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.end();
 }
 
+QPoint FrameWidget::scale_point(QPoint pos) {
+    return anchor + pos/m_scale_factor;
+}
+
 /**
  * @brief FrameWidget::resizeEvent
  * @param event
@@ -148,6 +204,8 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
     case ANALYSIS_BOX:
         set_rect_start(event->pos());
         break;
@@ -163,6 +221,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     default:
+        emit mouse_pressed(scale_point(event->pos()));
         break;
     }
 }
@@ -173,6 +232,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
     case ZOOM:
     {
         if (event->button() == Qt::RightButton) {
@@ -190,8 +251,8 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case ANALYSIS_BOX:
     {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
-        settings->setBounding_box(cv::Rect(rect_start.x(), rect_start.y(),
-                                           rect_end.x(),rect_end.y()));
+        settings->setBounding_box(cv::Rect(anchor.x() +rect_start.x()/m_scale_factor, anchor.y() + rect_start.y()/m_scale_factor,
+                                           anchor.x()+rect_end.x()/m_scale_factor,anchor.y()+rect_end.y()/m_scale_factor));
         emit quick_analysis(settings);
         qDebug () << "TODO:analysis rect needs scaling";
         tool = NONE;
@@ -199,6 +260,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     }
     default:
+        emit mouse_released(scale_point(event->pos()));
         break;
     }
 }
@@ -209,7 +271,10 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
     case ANALYSIS_BOX:
+
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
@@ -218,6 +283,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         }
         break;
     default:
+        emit mouse_moved(scale_point(event->pos()));
         break;
     }
 }
@@ -305,7 +371,3 @@ void FrameWidget::end_zoom() {
 
     emit zoom_points(rect_start, end);
 }
-
-
-
-
