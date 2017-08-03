@@ -24,7 +24,7 @@
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video contoller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &v_sync,
+                                       &video_width, &video_height, &new_video, &new_frame_video, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
                                        &m_speed_step);
 
@@ -133,7 +133,7 @@ void VideoWidget::init_video_controller(){
  */
 void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_video, &m_settings, &v_sync, &frame_index);
+                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index);
 
     QThread* processing_thread = new QThread();
     f_processor->moveToThread(processing_thread);
