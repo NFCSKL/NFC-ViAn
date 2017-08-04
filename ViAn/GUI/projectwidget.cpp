@@ -242,6 +242,19 @@ VideoItem *ProjectWidget::get_video_item(VideoProject *v_proj, QTreeWidgetItem* 
     return nullptr;
 }
 
+void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem*>& items)
+{
+    if(root->type() == VIDEO_ITEM) {
+        items.push_back(dynamic_cast<VideoItem*>(root));
+        return;
+    }
+    for(int i = 0; i < root->childCount(); i++){
+        QTreeWidgetItem* item = root->child(i);
+        if(item->type() == VIDEO_ITEM) items.push_back(dynamic_cast<VideoItem*>(item));
+        if(item->type() != VIDEO_ITEM) get_video_items(item, items);
+    }
+}
+
 /**
  * @brief ProjectWidget::insert_to_path_index
  * Inserts a VideoProject into the project tree based on its index_path
@@ -365,17 +378,13 @@ void ProjectWidget::advanced_analysis()
 {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
-    for (auto i = 0; i < s_item->childCount(); ++i) {
-        QTreeWidgetItem* item = s_item->child(i);
-        if (item->type() == VIDEO_ITEM) {
-            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
-            v_items.push_back(v_item);
-        }
-    }
+    get_video_items(s_item, v_items);
+    if(v_items.empty()) return;
     AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->getDir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }
+
 
 void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj)
 {
