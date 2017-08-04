@@ -47,8 +47,7 @@ void VideoPlayer::load_video(){
     m_new_video->store(false);
     m_new_frame_video->store(true);
 
-    set_frame();
-
+    synced_load_read();
     //m_v_sync->con_var.notify_all();
 }
 
@@ -133,6 +132,29 @@ void VideoPlayer::load_video_info() {
 }
 
 bool VideoPlayer::synced_read(){
+    // Read new frame and notify processing thread
+   {
+        std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        if (!m_capture.read(m_v_sync->frame)) {
+            m_is_playing->store(false);
+            playback_stopped();
+
+            return false;
+        }
+        m_new_frame->store(true);
+    }
+    m_v_sync->con_var.notify_one();
+
+    // Wait for processing thread to finish processing new frame
+    {
+        std::unique_lock<std::mutex> lk(m_v_sync->lock);
+        m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
+    }
+    return true;
+}
+
+
+bool VideoPlayer::synced_load_read(){
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
