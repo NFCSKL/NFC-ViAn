@@ -44,6 +44,7 @@ SOURCES += main.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
     Project/Analysis/detectionbox.cpp \
+    GUI/doubleclickbutton.cpp \
     GUI/TreeItems/videoitem.cpp \
     GUI/TreeItems/treeitem.cpp \
     GUI/recentprojectdialog.cpp \
@@ -95,6 +96,7 @@ HEADERS += reportgenerator.h\
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
     Project/Analysis/detectionbox.h \
+    GUI/doubleclickbutton.h \
     GUI/TreeItems/tagitem.h \
     GUI/TreeItems/videoitem.h \
     GUI/TreeItems/analysisitem.h \

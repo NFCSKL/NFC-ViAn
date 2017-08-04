@@ -174,7 +174,8 @@ void VideoWidget::set_btn_icons() {
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
     prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
     next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next_poi.png"), "", this);
-    prev_poi_btn = new QPushButton(QIcon("../ViAn/Icons/prev_poi.png"), "", this);
+    prev_poi_btn = new DoubleClickButton(this);
+    prev_poi_btn->setIcon(QIcon("../ViAn/Icons/prev_poi.png"));
     bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
@@ -290,6 +291,7 @@ void VideoWidget::set_btn_shortcuts() {
     new_tag_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     zoom_in_btn->setShortcut(Qt::Key_Z);
     fit_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+    original_size_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right));
 }
@@ -380,7 +382,8 @@ void VideoWidget::connect_btns() {
 
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
-    connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
+    connect(prev_poi_btn, &DoubleClickButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
+    connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
     connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
     // Tag

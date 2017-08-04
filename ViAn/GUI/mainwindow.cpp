@@ -320,11 +320,15 @@ void MainWindow::init_interval_menu() {
     QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
     QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
     QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
+
     tag_interval_act->setShortcut(tr("Shift+T"));
     rm_tag_interval_act->setShortcut(tr("Shift+R"));
+    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
+
     interval_menu->addAction(tag_interval_act);
     interval_menu->addAction(rm_tag_interval_act);
     interval_menu->addAction(rm_interval_act);
+
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
     connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
     connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
@@ -337,28 +341,29 @@ void MainWindow::init_interval_menu() {
 void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
 
+    QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
     color_act = new QAction(tr("&Color"), this);
-    QAction* zoom_in_act = new QAction(tr("Zoom &in"), this);
     QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
     QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
-    QAction* move_act = new QAction(tr("&Panning tool"), this);
+    QAction* reset_zoom_act = new QAction(tr("Re&set zoom"), this);
     QAction* rectangle_act = new QAction(tr("&Rectangle"), this);
-    QAction* circle_act = new QAction(tr("&Circle"), this);
-    QAction* line_act = new QAction(tr("&Line"), this);
+    QAction* circle_act = new QAction(tr("C&ircle"), this);
+    QAction* line_act = new QAction(tr("Li&ne"), this);
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
+
+    QAction* export_act = new QAction(tr("&Export interval"), this);
+    export_act->setShortcut(tr("Shift+E"));
     QAction* undo_act = new QAction(tr("&Undo"), this);
     QAction* redo_act = new QAction(tr("Re&do"), this);
     QAction* clear_act = new QAction(tr("C&lear"), this);
-
-    QAction* export_act  =new QAction(tr("&Frames"), this);
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
     zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
     fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
-    move_act->setIcon(QIcon("../ViAn/Icons/move.png"));
+    reset_zoom_act->setIcon(QIcon("../ViAn/Icons/move.png"));
     rectangle_act->setIcon(QIcon("../ViAn/Icons/box.png"));
     circle_act->setIcon(QIcon("../ViAn/Icons/circle.png"));
     line_act->setIcon(QIcon("../ViAn/Icons/line.png"));
@@ -373,6 +378,8 @@ void MainWindow::init_tools_menu() {
     QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
     export_menu->addAction(export_act);
 
+    tool_menu->addSeparator();
+
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
     drawing_tools->addAction(rectangle_act);
@@ -381,6 +388,7 @@ void MainWindow::init_tools_menu() {
     drawing_tools->addAction(arrow_act);
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
+
     tool_menu->addAction(undo_act);
     tool_menu->addAction(redo_act);
     tool_menu->addAction(clear_act);
@@ -388,7 +396,7 @@ void MainWindow::init_tools_menu() {
     tool_menu->addAction(zoom_in_act);
     tool_menu->addAction(zoom_out_act);
     tool_menu->addAction(fit_screen_act);
-    tool_menu->addAction(move_act);
+    tool_menu->addAction(reset_zoom_act);
 
     undo_act->setShortcut(QKeySequence::Undo);
     redo_act->setShortcut(QKeySequence::Redo);
@@ -399,7 +407,7 @@ void MainWindow::init_tools_menu() {
     zoom_in_act->setStatusTip(tr("Zoom in"));
     zoom_out_act->setStatusTip(tr("Zoom out"));
     fit_screen_act->setStatusTip(tr("Fit to screen"));
-    move_act->setStatusTip(tr("Panning tool"));
+    reset_zoom_act->setStatusTip(tr("Reset zoom"));
     rectangle_act->setStatusTip(tr("Rectangle tool"));
     circle_act->setStatusTip(tr("Circle tool"));
     line_act->setStatusTip(tr("Line tool"));
@@ -412,6 +420,8 @@ void MainWindow::init_tools_menu() {
 
     //Connect
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+    connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
+    connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
     connect(rectangle_act, &QAction::triggered, this, &MainWindow::rectangle);
     connect(circle_act, &QAction::triggered, this, &MainWindow::circle);
     connect(line_act, &QAction::triggered, this, &MainWindow::line);
@@ -422,7 +432,6 @@ void MainWindow::init_tools_menu() {
     connect(redo_act, &QAction::triggered, this, &MainWindow::redo);
     connect(clear_act, &QAction::triggered, this, &MainWindow::clear);
     connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
-    connect(move_act, &QAction::triggered, this, &MainWindow::move);
 }
 
 /**

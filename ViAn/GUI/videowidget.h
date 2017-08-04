@@ -16,6 +16,7 @@
 #include <mutex>
 #include <condition_variable>
 
+#include "doubleclickbutton.h"
 #include "framewidget.h"
 #include "GUI/Analysis/analysisslider.h"
 #include "Video/video_player.h"
@@ -181,7 +182,7 @@ private:
     QPushButton* next_frame_btn;
     QPushButton* prev_frame_btn;
     QPushButton* next_poi_btn;
-    QPushButton* prev_poi_btn;
+    DoubleClickButton* prev_poi_btn;
     QPushButton* analysis_btn;
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;    
