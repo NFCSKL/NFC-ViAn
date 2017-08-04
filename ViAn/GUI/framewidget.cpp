@@ -251,8 +251,17 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case ANALYSIS_BOX:
     {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
-        settings->setBounding_box(cv::Rect(anchor.x() +rect_start.x()/m_scale_factor, anchor.y() + rect_start.y()/m_scale_factor,
-                                           anchor.x()+rect_end.x()/m_scale_factor,anchor.y()+rect_end.y()/m_scale_factor));
+        int wid = rect_end.x() - rect_start.x();
+        int hei = rect_end.y() - rect_start.y();
+
+        double wid_ratio = double(wid) / _qimage.width();
+        double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
+        cv::Point end = cv::Point(rect_end.x(), rect_start.y() + height_mod);
+        cv::Point start (rect_start.x(), rect_start.y());
+        cv::Rect scaled = cv::Rect(cv::Point(anchor.x() + start.x / m_scale_factor, anchor.y() + start.y / m_scale_factor),
+                      cv::Point(anchor.x() + end.x / m_scale_factor, anchor.y() + end.y / m_scale_factor));
+
+        settings->setBounding_box(scaled);
         emit quick_analysis(settings);
         qDebug () << "TODO:analysis rect needs scaling";
         tool = NONE;
@@ -350,13 +359,6 @@ void FrameWidget::end_zoom() {
     mark_rect = false;
     repaint();
 
-    // Scale factor
-    int width = std::abs(rect_start.x() - rect_end.x());
-    int height = std::abs(rect_start.y() - rect_end.y());
-    double width_ratio = _qimage.width() / double(width );
-
-    double height_ratio = _qimage.height() / double(height);
-
     // ROI rect points
     int wid = rect_end.x() - rect_start.x();
     int hei = rect_end.y() - rect_start.y();
@@ -365,8 +367,8 @@ void FrameWidget::end_zoom() {
     double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
     QPoint end = QPoint(rect_end.x(), rect_start.y() + height_mod);
 
-    cv::Rect zoom_rect(cv::Point(rect_start.x(), rect_start.y()), cv::Point(end.x(), end.y()));
-    double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
+
+
 
 
     emit zoom_points(rect_start, end);
