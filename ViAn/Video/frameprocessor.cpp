@@ -66,8 +66,9 @@ void FrameProcessor::check_events() {
         if (m_changed->load()) {
             m_changed->store(false);
 
-            update_zoomer_settings();
+
             update_manipulator_settings();
+            update_zoomer_settings();
 
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load()) {

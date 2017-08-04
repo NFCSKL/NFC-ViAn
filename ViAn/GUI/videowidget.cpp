@@ -379,13 +379,12 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
 
     // Analysis
-
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_btn_clicked);
-
     connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
+
     // Tag
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
@@ -400,7 +399,6 @@ void VideoWidget::connect_btns() {
 
     // Other
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
-
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
 }
@@ -438,6 +436,7 @@ void VideoWidget::stop_btn_clicked() {
     set_status_bar("Stop");
     frame_index.store(0);
     is_playing.store(false);
+    play_btn->setChecked(false);
     on_new_frame();
 }
 
@@ -496,16 +495,26 @@ void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
 }
 
-
+/**
+ * @brief VideoWidget::get_current_frame
+ * @return
+ */
 int VideoWidget::get_current_frame() {
     return frame_index.load();
 }
 
+/**
+ * @brief VideoWidget::set_scale_factor
+ * @param scale_factor
+ */
 void VideoWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
     zoom_label->setText(QString::number(((int)(10000*m_scale_factor))/(double)100) +"%");
 }
 
+/**
+ * @brief VideoWidget::on_bookmark_clicked
+ */
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
     emit new_bookmark(m_vid_proj, frame_index.load(), bookmark_frame);
@@ -533,6 +542,12 @@ void VideoWidget::set_interval_end_clicked() {
     playback_slider->update();
 }
 
+/**
+ * @brief VideoWidget::set_interval
+ * Sets the interval from two ints
+ * @param start
+ * @param end
+ */
 void VideoWidget::set_interval(int start, int end) {
     m_interval.first = start;
     m_interval.second = end;
@@ -540,6 +555,9 @@ void VideoWidget::set_interval(int start, int end) {
     playback_slider->update();
 }
 
+/**
+ * @brief VideoWidget::delete_interval
+ */
 void VideoWidget::delete_interval() {
     m_interval.first = -1;
     m_interval.second = -1;
@@ -565,6 +583,10 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
+/**
+ * @brief VideoWidget::tag_frame
+ * Adds the current frame to a tag.
+ */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr) {
         Tag* tag = dynamic_cast<Tag*>(m_tag);
@@ -576,6 +598,10 @@ void VideoWidget::tag_frame() {
     emit set_status_bar("Select a tag");
 }
 
+/**
+ * @brief VideoWidget::remove_tag_frame
+ * Un-tags the current frarm
+ */
 void VideoWidget::remove_tag_frame() {
     if (m_tag != nullptr) {
         Tag* tag = dynamic_cast<Tag*>(m_tag);
@@ -587,18 +613,30 @@ void VideoWidget::remove_tag_frame() {
     emit set_status_bar("Select a tag");
 }
 
+/**
+ * @brief VideoWidget::new_tag_clicked
+ * New-tag button clicked
+ */
 void VideoWidget::new_tag_clicked() {
     TagDialog* tag_dialog = new TagDialog();
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
     tag_dialog->exec();
 }
 
+/**
+ * @brief VideoWidget::new_tag
+ * Creates a new tag
+ * @param name
+ */
 void VideoWidget::new_tag(QString name) {
     BasicAnalysis* tag = new Tag();
     tag->m_name = name.toStdString();
     emit add_basic_analysis(m_vid_proj, tag);
 }
 
+/**
+ * @brief VideoWidget::tag_interval
+ */
 void VideoWidget::tag_interval() {
     if (m_tag != nullptr) {
         if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
@@ -610,6 +648,10 @@ void VideoWidget::tag_interval() {
     }
 }
 
+/**
+ * @brief VideoWidget::remove_tag_interval
+ * For each frame in the interval, un-tag it
+ */
 void VideoWidget::remove_tag_interval() {
     if (m_tag != nullptr) {
         if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
@@ -633,6 +675,10 @@ void VideoWidget::analysis_play_btn_toggled(bool value) {
     analysis_only = value;
 }
 
+/**
+ * @brief VideoWidget::next_poi_btn_clicked
+ * Jump to next detection aren on the slider
+ */
 void VideoWidget::next_poi_btn_clicked() {
     int new_frame = playback_slider->get_next_poi_start(frame_index.load());
     if (new_frame == frame_index.load()) {
@@ -644,6 +690,10 @@ void VideoWidget::next_poi_btn_clicked() {
     }
 }
 
+/**
+ * @brief VideoWidget::prev_poi_btn_clicked
+ * * Jump to orevious detection aren on the slider
+ */
 void VideoWidget::prev_poi_btn_clicked() {
     int current_frame_index = frame_index.load();
     int new_frame = playback_slider->get_prev_poi_start(current_frame_index);
@@ -712,17 +762,26 @@ void VideoWidget::on_playback_slider_pressed() {
     playback_slider->set_blocked(true);
 }
 
+/**
+ * @brief VideoWidget::on_playback_slider_released
+ */
 void VideoWidget::on_playback_slider_released() {
     playback_slider->set_blocked(false);
     frame_index.store(playback_slider->value());
     on_new_frame();
 }
 
+/**
+ * @brief VideoWidget::on_playback_slider_value_changed
+ */
 void VideoWidget::on_playback_slider_value_changed() {
     frame_index.store(playback_slider->value());
     on_new_frame();
 }
 
+/**
+ * @brief VideoWidget::on_playback_slider_moved
+ */
 void VideoWidget::on_playback_slider_moved() {
     if (std::abs(playback_slider->value() - prev_frame_idx) % 5 == 0) {
         frame_index.store(playback_slider->value());
@@ -819,7 +878,6 @@ void VideoWidget::set_overlay_removed() {
         o_settings.overlay_removed = true;
     });
 }
-
 
 void VideoWidget::set_undo() {
     update_overlay_settings([&](){

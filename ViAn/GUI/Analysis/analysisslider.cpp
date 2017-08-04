@@ -27,12 +27,15 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     option.subControls = QStyle::SC_SliderGroove;
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
+
+    //Get one frame's width of the slider
     double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+
     QBrush brush = Qt::yellow;
 
+    // Draws the detections on slider and the tags
     if ((m_show_pois||m_show_tags)&& show_on_slider) {
         if(m_show_tags) brush = Qt::red;
-        //Get one frames width on the slider
 
         for (auto it = rects.begin(); it != rects.end(); ++it) {
             double first_frame = (double)(*it).first;
@@ -48,6 +51,8 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             painter.fillRect(rect, brush);
         }
     }
+
+    // Draws the interval
     if (show_interval) {
         brush = Qt::black;
         double first = (groove_rect.left()+(double)interval_first*c);

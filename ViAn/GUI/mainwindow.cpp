@@ -401,7 +401,6 @@ void MainWindow::init_tools_menu() {
     undo_act->setShortcut(QKeySequence::Undo);
     redo_act->setShortcut(QKeySequence::Redo);
     clear_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Delete));
-    fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
     zoom_in_act->setStatusTip(tr("Zoom in"));
