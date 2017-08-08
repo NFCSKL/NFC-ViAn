@@ -27,7 +27,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
     m_dir = dir_path + "/" + name + "/";
     m_dir_bookmarks = m_dir + "/Bookmarks/";
     m_dir_videos = dir_path;
-    m_file = m_dir  + name;
+    m_file = m_dir + name;
 }
 
 
@@ -122,7 +122,7 @@ void Project::read(const QJsonObject& json){
     m_dir = json["root_dir"].toString().toStdString();
     m_dir_bookmarks = json["bookmark_dir"].toString().toStdString();
     m_dir_videos = json["video_dir"].toString().toStdString();
-    m_file = m_dir +"/"+ m_name;
+    m_file = m_dir + m_name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
