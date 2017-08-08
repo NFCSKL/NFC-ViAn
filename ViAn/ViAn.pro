@@ -234,8 +234,6 @@ HEADERS +=Project/Test/projecttestsuite.h \
 # ANALYSIS
 #
 SOURCES += Analysis/analysismethod.cpp\
-    Analysis/motiondetection.cpp \
-    Analysis/analysiscontroller.cpp
+    Analysis/motiondetection.cpp
 
-HEADERS += Analysis/motiondetection.h \
-    Analysis/analysiscontroller.h
+HEADERS += Analysis/motiondetection.h

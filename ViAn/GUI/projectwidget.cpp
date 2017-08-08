@@ -37,6 +37,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
 }
 
+
 /**
  * @brief ProjectWidget::new_project
  * Creates a create project dialog

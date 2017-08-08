@@ -48,7 +48,7 @@ void ImageExporter::export_images() {
     }
 
     // Get number of digits in the last frame number
-    int max_digits = Utility().number_of_digits(capture.get(CV_CAP_PROP_FRAME_COUNT));
+    int max_digits = Utility::number_of_digits(capture.get(CV_CAP_PROP_FRAME_COUNT));
     int current_frame = m_export_interval.first;
     int progress = 0;
     std::string padded_number = "";
@@ -56,7 +56,7 @@ void ImageExporter::export_images() {
     cv::Mat frame;
     capture.set(CV_CAP_PROP_POS_FRAMES, m_export_interval.first);
     while (capture.read(frame) && (m_export_interval.first + progress) <= m_export_interval.second && !m_aborted) {
-        padded_number = Utility().zfill(std::to_string(current_frame), max_digits);
+        padded_number = Utility::zfill(std::to_string(current_frame), max_digits);
         cv::imwrite(m_export_path + padded_number + ".tiff", frame);
         current_frame++;
         emit update_progress(++progress);

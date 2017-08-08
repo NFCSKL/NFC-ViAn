@@ -6,11 +6,13 @@
 #include <QRunnable>
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
-#include "opencv2/videoio/videoio.hpp"
+#include "opencv2/videoio/videoio.hpp"44
 #include "Project/Analysis/analysis.h"
 #include "analysissettings.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Filehandler/saveable.h"
+#include <atomic>
+#include "utility.h"
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
 class AnalysisMethod : public QObject ,public QRunnable{
@@ -42,8 +44,6 @@ public:
     virtual std::vector<std::string> get_var_names();
 
     AnalysisMethod(const std::string &video_path, const std::string& save_path);
-    void abort_analysis();
-    void pause_analysis();
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
     void set_analysis_area(cv::Rect area);
     virtual void setup_analysis() = 0;
@@ -62,12 +62,11 @@ public:
 
     std::string save_path() const;
 
+    bool* aborted = nullptr;
 private:
     int prev_detection_frame = -1;
     bool detecting = false;
     bool paused = false;            // Control states
-    bool aborted = false;
-
 protected:
     const int FULL_HD_WIDTH = 1920;
     const int FULL_HD_HEIGHT = 1080;
@@ -94,6 +93,7 @@ protected:
 public slots:
     void run();
 signals:
+    void analysis_aborted();
     void send_progress(int progress);
     void finito(void);
     void finished_analysis(AnalysisProxy);

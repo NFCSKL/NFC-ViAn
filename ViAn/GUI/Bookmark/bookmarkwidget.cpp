@@ -36,7 +36,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
 }
 
 void BookmarkWidget::add_new_folder() {
-    BookmarkCategory* f2 = new BookmarkCategory("name", bm_list, CONTAINER);
+    BookmarkCategory* f2 = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), bm_list, CONTAINER);
     bm_list->addItem(f2);
     connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
 
@@ -54,7 +54,7 @@ void BookmarkWidget::generate_report()
             std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
             std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
 
-            RefDisp ref_disp = std::make_pair(_temp_ref, _temp_disp);
+            RefDisp ref_disp = std::make_pair(_temp_disp, _temp_ref);
             rp_cont.push_back(std::make_pair(cat_name, ref_disp));
         }
     }
@@ -99,10 +99,9 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     int index = file_name.find_last_of('/') + 1;
     file_name = file_name.substr(index);
     file_name += "_" + std::to_string(frame_nbr);
-
     ImageGenerator im_gen(frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
-    std::string bm_file = im_gen.create_tiff(file_name);
+    std::string bm_file = im_gen.create_bookmark(file_name);
     Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString() , frame_nbr);
     vid_proj->add_bookmark(bookmark);
 
@@ -111,7 +110,15 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     bm_list->addItem(bm_item);
 }
 
-
+void BookmarkWidget::export_original_frame(VideoProject* vid_proj,const int frame_nbr, cv::Mat frame)
+{
+    std::string file_name = vid_proj->get_video()->file_path;
+    int index = file_name.find_last_of('/') + 1;
+    file_name = file_name.substr(index);
+    file_name += "_" + std::to_string(frame_nbr);
+    ImageGenerator im_gen(frame, m_path);
+    im_gen.create_tiff(file_name);
+}
 void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;

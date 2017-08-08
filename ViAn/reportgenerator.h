@@ -9,6 +9,7 @@
 #include "dirent.h"
 #include "GUI/Bookmark/bookmarkitem.h"
 #include <ctime>
+#include "utility.h"
 enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
 using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
 using Category = std::pair<QString,RefDisp>;

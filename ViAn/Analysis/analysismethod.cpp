@@ -4,13 +4,11 @@
 #include "Analysis/analysismethod.h"
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
 {
-    cv::namedWindow("name");
     m_source_file = video_path;
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
-
     m_save_path = save_path+vid_name +"-motion_analysis";
     add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
 }
@@ -144,8 +142,8 @@ void AnalysisMethod::run() {
         current_frame_index = start_frame;
     }
 
-    while(!aborted && capture.read(original_frame) &&
-          !(use_interval && (current_frame_index <= end_frame))) {
+    while(!(*aborted) && capture.read(original_frame) &&
+          !(use_interval && (current_frame_index >= end_frame))) {
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
             // Slice frame if bounding box should be used
@@ -156,8 +154,6 @@ void AnalysisMethod::run() {
             else{
                 analysis_frame = original_frame;
             }
-            cv::rectangle(original_frame,bounding_box, cv::Scalar(0,255,0));
-            cv::imshow("name", original_frame);
             if(!m_scaling_done){
 
                 calculate_scaling_factor();
@@ -175,11 +171,6 @@ void AnalysisMethod::run() {
                 detecting = false;
             } else if (!detections.empty()) {
                 detecting = true;
-                if (scaling_needed) {
-                    for (DetectionBox detection : detections) {
-                        detection.scale_coordinates(1.0/scaling_ratio);
-                    }
-                }
                 m_POI->add_detections(current_frame_index, detections);
             }
         } else if (!detections.empty()) {
@@ -198,17 +189,24 @@ void AnalysisMethod::run() {
         ++current_frame_index;
         original_frame.release();
     }
-    // Makes sure that a POI that stretches to the end of the
-    // video gets an end frame.
-    if (detecting) {
-        m_POI->set_end_frame(current_frame_index);
-        m_analysis.add_interval(m_POI);
+    if(*aborted){
+        capture.release();
+        emit analysis_aborted();
+        emit finito();
+        return;
+    }else{
+        // Makes sure that a POI that stretches to the end of the
+        // video gets an end frame.
+        if (detecting) {
+            m_POI->set_end_frame(current_frame_index);
+            m_analysis.add_interval(m_POI);
+        }
+        capture.release();
+        m_analysis.save_saveable(m_save_path);
+        AnalysisProxy proxy(m_analysis, m_analysis.full_path());
+        emit finished_analysis(proxy);
+        emit finito();
     }
-    capture.release();
-    m_analysis.save_saveable(m_save_path);
-    AnalysisProxy proxy(m_analysis, m_analysis.full_path());
-    emit finished_analysis(proxy);
-    emit finito();
 }
 
 /**
@@ -218,20 +216,6 @@ void AnalysisMethod::run() {
 int AnalysisMethod::get_progress(int start_frame) {
     return ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
 
-}
-
-
-void AnalysisMethod::abort_analysis() {
-    aborted = true;
-    paused = false;
-}
-
-/**
- * @brief AnalysisMethod::pause_analysis
- * Sets the necessary bool to pause an analysis.
- */
-void AnalysisMethod::pause_analysis() {
-    paused = true;
 }
 
 /**

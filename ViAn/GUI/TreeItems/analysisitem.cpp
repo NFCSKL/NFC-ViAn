@@ -15,7 +15,9 @@ AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
     setText(0, "Analysis");
 }
 
-AnalysisItem::~AnalysisItem() {}
+AnalysisItem::~AnalysisItem() {
+    qDebug() << "destroying item";
+}
 
 void AnalysisItem::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis;

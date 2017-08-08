@@ -2,7 +2,6 @@
 #define MOTIONDETECTION_H
 #include "Project/Analysis/detectionbox.h"
 #include "analysismethod.h"
-#include "analysiscontroller.h"
 #include <string>
 
 /**
@@ -17,7 +16,7 @@ public:
     ~MotionDetection();
 
 private:
-    cv::Mat foreground_mask, background, blurred_frame, diff_frame, result, prev_frame, dilation_kernel;
+    cv::Mat foreground_mask, result, dilation_kernel, temp;
     cv::Ptr<cv::BackgroundSubtractor> background_subtractor;
 
     void init_settings() override;

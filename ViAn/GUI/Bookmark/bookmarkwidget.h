@@ -28,13 +28,14 @@ class BookmarkWidget : public QWidget
     QDockWidget* folder_dock;
     QThread* processing_thread;
     const int TEXT_EDIT_MIN_HEIGHT = 64;
-
+    int category_cnt = 1;
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
 signals:
     void play_bookmark_video(VideoProject* vid_proj, int frame_idx);
 public slots:
     void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
+    void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
     void clear_bookmarks();

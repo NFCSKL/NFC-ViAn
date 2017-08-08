@@ -1,5 +1,4 @@
 #include "analysiswidget.h"
-#include "Analysis/AnalysisController.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/videowidget.h"
 #include <QDebug>
@@ -7,12 +6,8 @@
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     queue_wgt = new QueueWidget();
-    queue_wgt->hide();
-    an_col = new AnalysisController(this);    
-    connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
-    connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
+    connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
-
 
 /**
  * @brief AnalysisWidget::start_analysis
@@ -24,7 +19,6 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     queue_wgt->enqueue(method);
-    queue_wgt->show();
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -33,7 +27,7 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
         queue_wgt->next();
         analysis_queue.push_back(analys);
         perform_analysis(analys);
-        current_analysis = item;
+        current_analysis_item = item;
     }
 }
 
@@ -44,24 +38,19 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
 void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> analys) {
-    emit add_analysis_bar();
-    //an_col->new_analysis(get<1>(analys),get<0>(analys));
-//    start = std::clock();
-//    an_col->start();
     AnalysisMethod* method = get<0>(analys);
-    QThread* analysis_thread = new QThread();
+    bool* abort_bool = new bool(false);
+    method->aborted = abort_bool;
+    abort_map.insert(std::make_pair(method,abort_bool));    
+    current_method = method;
 
-    method->moveToThread(analysis_thread);
-    connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run);
-    connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
-    connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
-
-    connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);
-    connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
+    connect(method, &AnalysisMethod::analysis_aborted, this, &AnalysisWidget::on_analysis_aborted);
+    connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);       
     connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
-//    QThreadPool::globalInstance()->start(method);
-    analysis_thread->start();
+    QThreadPool::globalInstance()->start(method);
+    emit add_analysis_bar();
+    queue_wgt->show();
 }
 
 /**
@@ -70,23 +59,53 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Slot function to be called when an analysis is completed
  * Removes the current analysis from the queue and start the next one if there is one
  */
-void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
+void AnalysisWidget::analysis_done(AnalysisProxy analysis) { 
+    emit name_in_tree(current_analysis_item, "Analysis");
+    emit show_progress(0);
     analysis_queue.pop_front();
-    emit remove_analysis_bar();
-    emit name_in_tree(current_analysis, "Analysis");
-    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
+    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(am);
-    VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis->parent());
+    VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis_item->parent());
     vid->get_video_project()->add_analysis(am);
-    current_analysis = nullptr;
-    duration = 0;   
+    current_analysis_item = nullptr;
+    duration = 0;
+
+
     queue_wgt->next();
     if (!analysis_queue.empty()) {
-        current_analysis = get<1>(analysis_queue.front());
+        current_analysis_item = get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
+    }else{
+        queue_wgt->hide();
     }
+    emit remove_analysis_bar();
+}
+
+void AnalysisWidget::abort_analysis()
+{
+    bool* abort = abort_map.at(current_method);
+    *abort = true;
+}
+
+void AnalysisWidget::on_analysis_aborted()
+{    
+    analysis_queue.pop_front();
+    delete current_analysis_item; // Delete item from tree
+    auto it = abort_map.find(current_method);   
+    abort_map.erase(it);
+
+    queue_wgt->next();
+    if (!analysis_queue.empty()) {        
+        current_analysis_item = get<1>(analysis_queue.front());
+        move_queue();
+        perform_analysis(analysis_queue.front());
+        return;
+    }
+    // Queue Empty
+    queue_wgt->hide();
+    emit remove_analysis_bar();
 }
 
 /**
@@ -117,6 +136,6 @@ void AnalysisWidget::send_progress(int progress) {
     }
     queue_wgt->update_progress(progress);
     std::string name = "Loading " + to_string(progress) + "%" + dots;
-    emit name_in_tree(current_analysis, QString::fromStdString(name));
+    emit name_in_tree(current_analysis_item, QString::fromStdString(name));
     emit show_progress(progress);
 }

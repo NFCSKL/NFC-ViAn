@@ -43,14 +43,14 @@ void ReportGenerator::create_report() {
 
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm)
 {
-    QString frame_nr = QString("Bildnummer %1").arg(bm->get_frame_number());
-    QString time = QString("Tidstämpel: %1").arg(calculate_time(bm->get_bookmark()->get_time()));
+    std::string f_name = Utility::name_from_path(bm->get_file_path().toStdString());
+    QString img_file = QString("Bild: %1").arg(QString::fromStdString(f_name));
+    QString frame_nr = QString("Bildnummer: %1").arg(bm->get_frame_number());
+
     QString bm_description = QString::fromStdString(bm->get_bookmark()->get_description());
-    QString description = "";
-    if (!bm_description.isEmpty()) {
-        description = QString("Beskrivning: %1").arg(bm_description);
-    }
-    return time + QString("\v") + frame_nr + QString("\v") + description;
+    QString description = QString("Beskrivning: %1").arg(bm_description);
+
+    return img_file + QString("\v") + frame_nr + QString("\v") + description;
 }
 
 

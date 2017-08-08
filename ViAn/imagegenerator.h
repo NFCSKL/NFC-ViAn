@@ -13,10 +13,12 @@ public:
 
     std::string create_thumbnail(std::string name);
     std::string create_tiff(std::string name);
+    std::string create_bookmark(std::string name);
+    std::string add_serial_number(std::string name, std::string file_end);
 
     static const unsigned int THUMBNAIL_SIZE;
 private:
-    void export_image(std::string s_path, int ext, unsigned int size = 0, bool keep_aspect_ratio = true);
+    std::string export_image(std::string s_path, int ext, unsigned int size = 0, bool keep_aspect_ratio = true);
     bool create_directory(std::string path);
 };
 

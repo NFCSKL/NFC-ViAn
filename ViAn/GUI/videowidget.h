@@ -58,7 +58,7 @@ private:
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
     std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
-    
+
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
 
@@ -67,7 +67,7 @@ private:
     int m_frame_rate = 0;
     int m_frame_length = 0;
 
-    std::pair<int, int> m_interval = std::make_pair(0, 0);
+    std::pair<int, int> m_interval = std::make_pair(-1, -1);
 
     FrameProcessor* f_processor;
 public:
@@ -104,7 +104,8 @@ signals:
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void set_status_bar(QString);
-    void load_video(Video* video);
+    void load_video(std::string video_path);
+    void export_original_frame(VideoProject* ,const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
@@ -133,6 +134,7 @@ public slots:
     void load_marked_video(VideoProject* vid_proj);
 
     void set_current_frame_size(QSize size);
+    void on_export_frame(void);
     void on_bookmark_clicked(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
@@ -185,7 +187,7 @@ private:
     DoubleClickButton* prev_poi_btn;
     QPushButton* analysis_btn;
     QPushButton* analysis_play_btn;
-    QPushButton* bookmark_btn;    
+    QPushButton* bookmark_btn;
     QPushButton* tag_btn;
     QPushButton* new_tag_btn;
     QPushButton* zoom_in_btn;
@@ -194,7 +196,7 @@ private:
     QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
-
+    QPushButton* export_frame_btn;
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
     QHBoxLayout* video_btns;      // Play, pause etc
@@ -203,7 +205,7 @@ private:
     QHBoxLayout* zoom_btns;       // Zoom buttons
     QHBoxLayout* interval_btns;   // Interval buttons
     QGridLayout* speed_slider_layout;
-    
+
     std::vector<QPushButton*> btns;
 
     QString convert_time(int time);

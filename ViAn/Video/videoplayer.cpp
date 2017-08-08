@@ -46,9 +46,6 @@ void VideoPlayer::load_video(){
 
     m_new_video->store(false);
     m_new_frame_video->store(true);
-
-    synced_load_read();
-    //m_v_sync->con_var.notify_all();
 }
 
 /**
@@ -89,11 +86,13 @@ void VideoPlayer::check_events() {
         std::unique_lock<std::mutex> lk(*m_player_lock);
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
-
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
+            qDebug() << "";
+            qDebug() << "in vid_play";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
-                load_video();
+                qDebug() << "wait load read video";
+                wait_load_read();
             } else if (current_frame != m_frame->load()) {
                 set_frame();
             }
@@ -154,10 +153,19 @@ bool VideoPlayer::synced_read(){
 }
 
 
-bool VideoPlayer::synced_load_read(){
+bool VideoPlayer::wait_load_read(){
+
+    // Wait for processing thread to finish processing new frame
+    {
+        std::unique_lock<std::mutex> lk(m_v_sync->lock);
+        m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
+    }
     // Read new frame and notify processing thread
-   {
+    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        qDebug() << "wait done => load";
+        load_video();
+        qDebug() << "load done => read frame";
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
             playback_stopped();
@@ -165,13 +173,8 @@ bool VideoPlayer::synced_load_read(){
             return false;
         }
         m_new_frame->store(true);
+        qDebug() << "new frame";
     }
     m_v_sync->con_var.notify_one();
-
-    // Wait for processing thread to finish processing new frame
-    {
-        std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
-    }
     return true;
 }

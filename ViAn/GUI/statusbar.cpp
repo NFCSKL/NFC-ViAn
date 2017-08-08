@@ -3,7 +3,11 @@
 #include <QProgressBar>
 
 StatusBar::StatusBar() {
-
+    ana_prog = new QProgressBar();
+    ana_prog->setOrientation(Qt::Horizontal);
+    ana_prog->setMaximumHeight(PROG_BAR_HEIGHT);
+    ana_prog->setMaximumWidth(PROG_BAR_WIDTH);
+    addPermanentWidget(ana_prog);
 }
 
 /**
@@ -17,13 +21,7 @@ void StatusBar::on_set_status_bar(QString status, int timer) {
 }
 
 void StatusBar::add_analysis_bar() {
-    ana_prog = new QProgressBar();
-    ana_prog->setOrientation(Qt::Horizontal);
-    ana_prog->setMaximumHeight(PROG_BAR_HEIGHT);
-    ana_prog->setMaximumWidth(PROG_BAR_WIDTH);
-    //ana_prog->setMaximum(100);
-
-    addPermanentWidget(ana_prog);
+    ana_prog->show();
 }
 
 void StatusBar::update_analysis_bar(int progress) {
@@ -31,6 +29,5 @@ void StatusBar::update_analysis_bar(int progress) {
 }
 
 void StatusBar::remove_analysis_bar() {
-    removeWidget(ana_prog);
-    delete ana_prog;
+    ana_prog->hide();
 }

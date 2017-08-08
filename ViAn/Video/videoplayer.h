@@ -75,7 +75,7 @@ private:
     void load_video();
     void load_video_info();
     bool synced_read();
-    bool synced_load_read();
+    bool wait_load_read();
     void set_playback_speed(int speed_steps);
 
 };

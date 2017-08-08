@@ -117,8 +117,22 @@ void FrameWidget::set_overlay_color(QColor color) {
     }
 }
 
-cv::Mat FrameWidget::get_mat() const {
+cv::Mat FrameWidget::get_modified_frame() const {
     return _tmp_frame.clone();
+}
+
+cv::Mat FrameWidget::get_org_frame() const
+{
+    cv::Mat tmp = current_frame.clone();
+    switch (tmp.type()) {
+        case CV_8UC1:
+            cvtColor(current_frame, tmp, CV_GRAY2RGB);
+            break;
+        case CV_8UC3:
+            cvtColor(current_frame, tmp, CV_BGR2RGB);
+            break;
+    }
+    return tmp;
 }
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
@@ -256,14 +270,13 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
 
         double wid_ratio = double(wid) / _qimage.width();
         double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
+
         cv::Point end = cv::Point(rect_end.x(), rect_start.y() + height_mod);
         cv::Point start (rect_start.x(), rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x() + start.x / m_scale_factor, anchor.y() + start.y / m_scale_factor),
                       cv::Point(anchor.x() + end.x / m_scale_factor, anchor.y() + end.y / m_scale_factor));
-
         settings->setBounding_box(scaled);
         emit quick_analysis(settings);
-        qDebug () << "TODO:analysis rect needs scaling";
         tool = NONE;
         mark_rect = false;
         break;
@@ -366,10 +379,6 @@ void FrameWidget::end_zoom() {
     double wid_ratio = double(wid) / _qimage.width();
     double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
     QPoint end = QPoint(rect_end.x(), rect_start.y() + height_mod);
-
-
-
-
 
     emit zoom_points(rect_start, end);
 }

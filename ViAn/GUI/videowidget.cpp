@@ -11,7 +11,6 @@
 
 #include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
-#include "Analysis/analysiscontroller.h"
 #include "imageexporter.h"
 
 #include <opencv2/videoio.hpp>
@@ -80,6 +79,11 @@ int VideoWidget::get_current_video_length(){
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings)
 {
+    if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second))
+    {
+        settings->setInterval(AnalysisInterval(m_interval.first,m_interval.second));
+        delete_interval();
+    }
     emit start_analysis(m_vid_proj, settings);
 }
 
@@ -109,8 +113,7 @@ void VideoWidget::init_layouts() {
     analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
     other_btns = new QHBoxLayout;      // Bookmark, tag
     zoom_btns = new QHBoxLayout;       // Zoom buttons
-    interval_btns = new QHBoxLayout;   // Interval buttons
-
+    interval_btns = new QHBoxLayout;   // Interval buttons    
     control_row->setAlignment(Qt::AlignLeft);
     video_btns->setSpacing(5);
     analysis_btns->setSpacing(5);
@@ -168,7 +171,7 @@ void VideoWidget::init_frame_processor() {
  * @brief VideoWidget::set_icons
  * Set icons on all buttons
  */
-void VideoWidget::set_btn_icons() {
+void VideoWidget::set_btn_icons() {    
     play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
@@ -177,15 +180,20 @@ void VideoWidget::set_btn_icons() {
     prev_poi_btn = new DoubleClickButton(this);
     prev_poi_btn->setIcon(QIcon("../ViAn/Icons/prev_poi.png"));
     bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
+    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/camera.png"),"",this);
+
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
     new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
 
+
     zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+
+
 
     zoom_label = new QLabel;
     zoom_label->setText("100%");
@@ -211,6 +219,7 @@ void VideoWidget::set_btn_tool_tip() {
     analysis_btn->setToolTip(tr("Analysis"));
     analysis_play_btn->setToolTip(tr("Play only the POIs"));
     bookmark_btn->setToolTip(tr("Bookmark the current frame"));
+    export_frame_btn->setToolTip("Export current frame");
     tag_btn->setToolTip(tr("Tag the current frame"));
     new_tag_btn->setToolTip(tr("Create a new tag"));
     zoom_in_btn->setToolTip(tr("Zoom in"));
@@ -239,7 +248,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(original_size_btn);
     btns.push_back(set_start_interval_btn);
     btns.push_back(set_end_interval_btn);
-
+    btns.push_back(export_frame_btn);
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
         btn->setEnabled(false);
@@ -258,7 +267,6 @@ void VideoWidget::set_btn_size() {
  */
 void VideoWidget::set_btn_tab_order() {
     // TODO update
-
     setTabOrder(prev_frame_btn, play_btn);
     setTabOrder(play_btn, next_frame_btn);
     setTabOrder(next_frame_btn, stop_btn);
@@ -278,7 +286,6 @@ void VideoWidget::set_btn_tab_order() {
  * Set shortcuts to the buttons
  */
 void VideoWidget::set_btn_shortcuts() {
-    play_btn->setShortcut(Qt::Key_Space);
     stop_btn->setShortcut(Qt::Key_X);
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
@@ -287,6 +294,7 @@ void VideoWidget::set_btn_shortcuts() {
     analysis_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_G));
     bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     tag_btn->setShortcut(Qt::Key_T);
+    export_frame_btn->setShortcut(Qt::Key_E);
     remove_frame_act = new QShortcut(Qt::Key_R, this);
     new_tag_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     zoom_in_btn->setShortcut(Qt::Key_Z);
@@ -345,6 +353,7 @@ void VideoWidget::add_btns_to_layouts() {
     control_row->addLayout(analysis_btns);
 
     other_btns->addWidget(bookmark_btn);
+    other_btns->addWidget(export_frame_btn);
     other_btns->addWidget(tag_btn);
     other_btns->addWidget(new_tag_btn);
 
@@ -399,6 +408,8 @@ void VideoWidget::connect_btns() {
 
     // Other
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
+    connect(export_frame_btn, &QPushButton::clicked, this, &VideoWidget::on_export_frame);
+
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
 }
@@ -516,8 +527,11 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  * @brief VideoWidget::on_bookmark_clicked
  */
 void VideoWidget::on_bookmark_clicked() {
-    cv::Mat bookmark_frame = frame_wgt->get_mat();
-    emit new_bookmark(m_vid_proj, frame_index.load(), bookmark_frame);
+    cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
+    cv::Mat org_frame = frame_wgt->get_org_frame();
+    int frame = frame_index.load();
+    emit new_bookmark(m_vid_proj, frame , bookmark_frame);
+    emit export_original_frame(m_vid_proj, frame, org_frame);
 }
 
 /**
@@ -638,13 +652,14 @@ void VideoWidget::new_tag(QString name) {
  * @brief VideoWidget::tag_interval
  */
 void VideoWidget::tag_interval() {
-    if (m_tag != nullptr) {
-        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-            m_tag->add_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-            playback_slider->set_basic_analysis(m_tag);
-        }
-    } else {
-        emit set_status_bar("No tag selected");
+    if(m_tag == nullptr){
+        emit set_status_bar("Please select a tag");
+        return;
+    }
+    if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
+        m_tag->add_interval(new AnalysisInterval(m_interval.first, m_interval.second));
+        playback_slider->set_basic_analysis(m_tag);
+        delete_interval();
     }
 }
 
@@ -1060,6 +1075,12 @@ void VideoWidget::update_playback_speed(int speed){
 
 void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
+}
+
+void VideoWidget::on_export_frame()
+{
+    int frame = frame_index.load();
+    emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
 }
 
 /**

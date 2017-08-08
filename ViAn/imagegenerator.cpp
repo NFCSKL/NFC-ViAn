@@ -17,23 +17,44 @@ ImageGenerator::~ImageGenerator() {
 }
 
 std::string ImageGenerator::create_thumbnail(std::string name) {
-    std::string save_path = m_path + "/_thumbnails/";
+    std::string save_path = m_path + "_thumbnails/";
     if (!create_directory(save_path)) return "";
-    export_image(save_path + name, PNG, ImageGenerator::THUMBNAIL_SIZE);
-    return save_path + name + ".png";
+    return export_image(save_path + name, PNG, ImageGenerator::THUMBNAIL_SIZE);
+
 }
 
 std::string ImageGenerator::create_tiff(std::string name) {
-    std::string save_path = m_path + "/Stills/";
-    if (!create_directory(save_path)) return "";
-    export_image(save_path + name, TIFF);
-    return save_path + name + ".tiff";
+    std::string save_path = m_path + "Stills/";
+    if (!create_directory(save_path)) return "";    
+    return export_image(save_path + name, TIFF);
 }
+
+std::string ImageGenerator::create_bookmark(std::string name) {
+    std::string save_path = m_path + "Bookmarks/";
+    if (!create_directory(save_path)) return "";
+    return export_image(save_path + name, TIFF);
+}
+
+std::string ImageGenerator::add_serial_number(std::string name, std::string file_end)
+{
+    QString qend = QString::fromStdString(file_end);
+    QString qname = QString::fromStdString(name);
+    QString res = qname+qend;
+    int i = 0;
+    if(QFile::exists(res)){
+        res = qname + QString("(%1)"+ qend).arg(i);
+    }
+    while(QFile::exists(res) && ++i){
+        res = qname + QString("(%1)"+ qend).arg(i);
+    }
+    return res.toStdString();
+}
+
 
 /**
  * @brief ImageGenerator::create_directory
  * Creates the full directory path.
- * @return true if the path exists/has been created
+ * @return true if the path exists/has been creat§ed
  */
 bool ImageGenerator::create_directory(std::string path){
     const QString q_path = QString::fromStdString(path);
@@ -44,7 +65,8 @@ bool ImageGenerator::create_directory(std::string path){
     return success;
 }
 
-void ImageGenerator::export_image(std::string s_path, int ext, const unsigned int size, bool keep_aspect_ratio) {
+std::string ImageGenerator::export_image(std::string requested_path, int ext, const unsigned int size, bool keep_aspect_ratio) {
+
     cv::Mat tmp = m_frame.clone();
     if (size > 0) {
         // Do resize
@@ -62,21 +84,23 @@ void ImageGenerator::export_image(std::string s_path, int ext, const unsigned in
             cvtColor(tmp, tmp, CV_BGR2RGB);
             break;
     }
-
+    std::string end;
     // Extension
     switch (ext) {
         case PNG:
-            s_path += ".png";
+            end = ".png";
             break;
         case TIFF:
-            s_path += ".tiff";
+            end = ".tiff";
             break;
         default:
-            s_path += ".png";
+            end = ".png";
             break;
     }
-    cv::imwrite(s_path, tmp);
+    std::string saved_path = add_serial_number(requested_path,end);
+    cv::imwrite(saved_path, tmp);
     tmp.release();
+    return saved_path;
 }
 
 

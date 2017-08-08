@@ -18,7 +18,7 @@ BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) : QListWidgetItem(QStrin
     hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + QString::number(bookmark->get_time()) + "\nDescription: ";
     QString description = QString::fromStdString(bookmark->get_description());
     setToolTip(hover_text + description);
-    this->setText(frame + "@" + v_name);
+    //this->setText(frame + "@" + v_name);
     this->bookmark = bookmark;
 }
 

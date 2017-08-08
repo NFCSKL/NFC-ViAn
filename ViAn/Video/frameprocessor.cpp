@@ -37,8 +37,10 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
+        qDebug() << "in fp";
         // A new video has been loaded. Reset processing settings
         if (m_new_video->load()) {
+            qDebug() << "fp load video";
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
@@ -48,22 +50,27 @@ void FrameProcessor::check_events() {
         }
 
         if (m_overlay == nullptr || m_o_settings->overlay_removed) {
-
             m_overlay_changed->store(false);
         }
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
+            qDebug() << "fp overlay changed";
             m_overlay_changed->store(false);
+            qDebug() << "update_overlay";
             update_overlay_settings();
-
-            process_frame();
+            qDebug() << "update_overlay_end";
+            // Skip reprocessing of old frame if there is a new
+            if (!m_new_frame->load()) {
+                process_frame();
+            }
             lk.unlock();
             continue;
         }
 
         // Settings has been changed by the user
         if (m_changed->load()) {
+            qDebug() << "mchanged";
             m_changed->store(false);
 
 
@@ -80,6 +87,7 @@ void FrameProcessor::check_events() {
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
+            qDebug() << "new_frame";
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
             process_frame();
@@ -115,13 +123,15 @@ void FrameProcessor::process_frame() {
     // imshow("test", tmp);
 
     // Draws the overlay
-
+    qDebug() << "draw overlay";
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
 
     // Scales the frame
+    qDebug() << "scale frame";
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
+    qDebug () << "brightness contrast";
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number

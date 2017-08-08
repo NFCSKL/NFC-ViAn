@@ -12,6 +12,7 @@ class QueueWidget : public QWidget
     QListWidget* m_queue;
     QVBoxLayout m_layout;
     QProgressBar* progressbar;
+    QPushButton* abort_btn;
     QLabel* m_line;
 public:
     QueueWidget(QWidget* parent = 0);
@@ -19,6 +20,10 @@ public:
     void enqueue(AnalysisMethod *method);
     void remove();
     void update_progress(int i);
+public slots:
+    void toggle_show();
+signals:
+    void abort_analysis();
 };
 
 #endif // QUEUEWIDGET_H
