@@ -1085,7 +1085,7 @@ void VideoWidget::on_export_frame()
 {
     int frame = frame_index.load();
     emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
-    emit set_status_bar("Frame " + std::to_string(frame) + " exported");
+    emit set_status_bar(QString("Frame %1 exported").arg(frame));
 }
 
 /**
