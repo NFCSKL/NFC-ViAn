@@ -3,13 +3,8 @@
 
 QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     m_queue = new QListWidget();
-    setWindowTitle(QString::fromStdString("Vian - AnalysisQueue"));
-//    m_queue->setAcceptDrops(true);
-//    m_queue->setDragEnabled(true);
+    setWindowTitle(QString::fromStdString("Vian - Analysis queue"));
 
-//    m_queue->setSelectionMode(QAbstractItemView::SingleSelection);
-//    m_queue->setDropIndicatorShown(true);
-//    m_queue->setDragDropMode(QAbstractItemView::InternalMove);
     abort_btn = new QPushButton(QIcon("../ViAn/Icons/abort.png"),"",this);
     QVBoxLayout* layout = new QVBoxLayout();
     QHBoxLayout* progress_layout = new QHBoxLayout();
