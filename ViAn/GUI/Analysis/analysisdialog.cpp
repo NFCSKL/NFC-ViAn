@@ -2,6 +2,7 @@
 
 AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string save_dir) : m_save_dir(save_dir)
 {
+    setWindowTitle(QString::fromStdString("Vian - Advanced analysis"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* v_lay = new QVBoxLayout();
     m_v_proj_list = new QListWidget(this);
