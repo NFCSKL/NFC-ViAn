@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    /**
+     * qRegisterMetaType i
+     */
     qRegisterMetaType<std::string>();
     qRegisterMetaType<BasicAnalysis>();
     qRegisterMetaType<AnalysisProxy>();
