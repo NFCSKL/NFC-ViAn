@@ -93,6 +93,15 @@ class FrameProcessor : public QObject {
     cv::Mat m_frame;
     std::atomic_int* m_frame_index;
 
+    /**
+     * @brief m_width, m_height
+     * Height and width of video
+     *
+     * OBS! If loading video crashes, it is likely
+     * due to these two settings being set incorrectly
+     * or unsynchronized with load. As it causes
+     * settingsprocessing race condition.
+     */
     std::atomic_int* m_width;
     std::atomic_int* m_height;
 
