@@ -70,10 +70,8 @@ std::string Utility::name_from_path(const std::string full_path)
  */
 cv::Rect Utility::scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor)
 {
-    cv::Point start(anchor.x + rect.tl().x/scale_factor, anchor.y = rect.tl().y/scale_factor);
-    double height_diff = rect.br().y - rect.tl().y;
-    double width_diff = rect.br().x - rect.tl().x;
-    cv::Point end (anchor.x + rect.tl().x + width_diff/scale_factor, anchor.y + rect.tl().y + height_diff/scale_factor);
+    cv::Point start(rect.tl().x/scale_factor - anchor.x/scale_factor, rect.tl().y/scale_factor - anchor.y/scale_factor);
+    cv::Point end(rect.br().x/scale_factor - anchor.x/scale_factor, rect.br().y/scale_factor - anchor.y/scale_factor);
     cv::Rect res = cv::Rect(start, end);
     return res;
 }
