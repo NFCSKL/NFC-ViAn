@@ -210,24 +210,28 @@ void VideoWidget::set_btn_icons() {
  * Set tooltip on all buttons
  */
 void VideoWidget::set_btn_tool_tip() {
-    play_btn->setToolTip(tr("Play video"));
-    stop_btn->setToolTip(tr("Stop video"));
-    next_frame_btn->setToolTip(tr("Next frame"));
-    prev_frame_btn->setToolTip(tr("Previous frame"));
-    next_poi_btn->setToolTip(tr("Next POI"));
-    prev_poi_btn->setToolTip(tr("Previous POI"));
-    analysis_btn->setToolTip(tr("Analysis"));
+    play_btn->setToolTip(tr("Play video: Space"));
+    stop_btn->setToolTip(tr("Stop video: X"));
+    next_frame_btn->setToolTip(tr("Next frame: Right"));
+    prev_frame_btn->setToolTip(tr("Previous frame: Left"));
+
+    next_poi_btn->setToolTip(tr("Next POI: Ctrl + Right"));
+    prev_poi_btn->setToolTip(tr("Previous POI: Ctrl + Left"));
+    analysis_btn->setToolTip(tr("Analysis: Ctrl + G"));
     analysis_play_btn->setToolTip(tr("Play only the POIs"));
-    bookmark_btn->setToolTip(tr("Bookmark the current frame"));
-    export_frame_btn->setToolTip("Export current frame");
-    tag_btn->setToolTip(tr("Tag the current frame"));
-    new_tag_btn->setToolTip(tr("Create a new tag"));
-    zoom_in_btn->setToolTip(tr("Zoom in"));
+
+    bookmark_btn->setToolTip(tr("Bookmark the current frame: Ctrl + B"));
+    export_frame_btn->setToolTip("Export current frame: E");
+    tag_btn->setToolTip(tr("Tag the current frame: T"));
+    new_tag_btn->setToolTip(tr("Create a new tag: Ctrl + T"));
+
+    zoom_in_btn->setToolTip(tr("Zoom in: Z"));
     zoom_out_btn->setToolTip(tr("Zoom out"));
-    fit_btn->setToolTip(tr("Scale the video to screen"));
-    original_size_btn->setToolTip(tr("Reset zoom"));
-    set_start_interval_btn->setToolTip("Set left interval point");
-    set_end_interval_btn->setToolTip("Set right interval point");
+    fit_btn->setToolTip(tr("Scale the video to screen: Ctrl + F"));
+    original_size_btn->setToolTip(tr("Reset zoom: Ctrl + R"));
+    set_start_interval_btn->setToolTip("Set left interval point: Shift + Left");
+    set_end_interval_btn->setToolTip("Set right interval point: Shift + Right");
+
 }
 
 /**
