@@ -35,5 +35,5 @@ AnalysisProxy* AnalysisItem::get_analysis() {
 void AnalysisItem::remove(){}
 
 void AnalysisItem::rename(){
-//    m_analysis->set_name(text(0).toStdString());
+    m_analysis->m_name = text(0).toStdString();
 }

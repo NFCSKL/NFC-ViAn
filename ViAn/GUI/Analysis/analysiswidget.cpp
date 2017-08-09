@@ -6,6 +6,7 @@
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     queue_wgt = new QueueWidget();
+    queue_wgt->hide();
     connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
@@ -59,9 +60,10 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Slot function to be called when an analysis is completed
  * Removes the current analysis from the queue and start the next one if there is one
  */
-void AnalysisWidget::analysis_done(AnalysisProxy analysis) { 
-    emit name_in_tree(current_analysis_item, "Analysis");
+void AnalysisWidget::analysis_done(AnalysisProxy analysis) {     
     emit show_progress(0);
+    analysis.m_name = "Analysis";
+    current_analysis_item->setText(0,"Analysis");
     analysis_queue.pop_front();
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     AnalysisProxy* am = new AnalysisProxy(analysis);

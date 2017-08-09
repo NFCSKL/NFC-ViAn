@@ -203,7 +203,7 @@ void AnalysisMethod::run() {
         }
         capture.release();
         m_analysis.save_saveable(m_save_path);
-        AnalysisProxy proxy(m_analysis, m_analysis.full_path());
+        AnalysisProxy proxy(m_analysis, m_analysis.full_path());       
         emit finished_analysis(proxy);
         emit finito();
     }

@@ -9,7 +9,7 @@ TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
 void TagItem::remove(){}
 
 void TagItem::rename() {
-//    m_tag->set_name(text(0).toStdString());
+    m_tag->m_name = text(0).toStdString();
 }
 
 Tag *TagItem::get_tag() {

@@ -6,7 +6,7 @@
 #include <QRunnable>
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
-#include "opencv2/videoio/videoio.hpp"44
+#include "opencv2/videoio/videoio.hpp"
 #include "Project/Analysis/analysis.h"
 #include "analysissettings.h"
 #include "Project/Analysis/analysisproxy.h"
