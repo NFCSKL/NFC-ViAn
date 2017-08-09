@@ -124,8 +124,7 @@ void FrameProcessor::process_frame() {
     // NICLAS
     // cv::Mat tmp = manipulated_frame.clone();
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
-    // imshow("test", tmp);
-
+    // cv::imshow("test", tmp);
     // Draws the overlay
     qDebug() << "draw overlay";
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
@@ -139,7 +138,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    done_processing(manipulated_frame, m_frame_index->load());
+    done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
 /**

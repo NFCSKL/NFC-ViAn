@@ -153,7 +153,7 @@ public slots:
 signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
-    void done_processing(cv::Mat frame, int frame_index);
+    void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
 private:
     void process_frame();
     void update_zoomer_settings();
