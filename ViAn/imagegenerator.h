@@ -3,6 +3,11 @@
 
 #include <opencv2/core/core.hpp>
 
+/**
+ * @brief The ImageGenerator class
+ * Class used to export single images
+ * and create thumbnails
+ */
 class ImageGenerator {
     cv::Mat m_frame;
     std::string m_path;

@@ -14,6 +14,24 @@ enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
 using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
 using Category = std::pair<QString,RefDisp>;
 using ReportContainer = std::vector<Category>;
+
+/**
+ * @brief The ReportGenerator class
+ * This class is used to generate reports from
+ * a vector of categories.
+ * It uses Words COM interface and QTs ActiveQt tool with
+ * QAxObjects to communicate with Word.
+ *
+ * Mainly to methods are used (very few are available)
+ *
+ * obj->dynamicCall("SomeString(param1, param2)", param1,param2)
+ * is used to make function calls
+
+* obj_return = obj->querySubObject("Range") is a request
+ * for member Range in obj. querySubObject is however used whenever
+ * a returned object is to be used in some way after the call.
+ *
+ */
 class ReportGenerator : public QObject {
     Q_OBJECT
     std::string m_path;
