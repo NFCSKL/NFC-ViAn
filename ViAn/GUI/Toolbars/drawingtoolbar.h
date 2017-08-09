@@ -6,6 +6,10 @@
 #include <QActionGroup>
 #include "Video/shapes/shape.h"
 
+/**
+ * @brief The DrawingToolbar class
+ * Toolbar for drawing tool
+ */
 class DrawingToolbar : public QToolBar
 {
     Q_OBJECT

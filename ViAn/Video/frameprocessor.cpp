@@ -32,13 +32,17 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
  * m_new_frame: copies and processes the current frame. This is done during ordinary playback
  * m_changed: indicates that one of the processing settings has been changed by the user and must be applied
  * m_new_video: a new video has been loaded, processing settings are restored
+ *
+ * OBS! Frameprocesser should never enter check_events during a load operation in video
+ * player, this introduces a race condition where frameprocesser may use old frame with new
+ * load settings
  */
 void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
         qDebug() << "in fp";
-        // A new video has been loaded. Reset processing settings
+        // A new video has been loaded. Reset processing settings    
         if (m_new_video->load()) {
             qDebug() << "fp load video";
             reset_settings();
@@ -141,7 +145,7 @@ void FrameProcessor::process_frame() {
 /**
  * @brief FrameProcessor::update_zoomer_settings
  * Updates the settings for the zoomer.
- * Modifies data from a shared pointer and should only be called after the frame_lock has been acquired
+ * Modifies data from a shared pointer and should only be called after the v_sync_lock has been acquired
  */
 void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
@@ -191,7 +195,7 @@ void FrameProcessor::update_zoomer_settings() {
  * @brief FrameProcessor::update_manipulator_settings
  * Updates manipulator and rotation settings.
  * Modifies data from a shared pointer and should therefor only be used after
- * the frame_lock has been acquired.
+ * the v_sync_lock has been acquired.
  */
 void FrameProcessor::update_manipulator_settings() {
     m_manipulator.set_brightness(m_man_settings->brightness);
@@ -207,32 +211,37 @@ void FrameProcessor::update_manipulator_settings() {
     m_man_settings->rotate = 0;
 }
 
+/**
+ * @brief FrameProcessor::update_overlay_settings
+ *
+ */
 void FrameProcessor::update_overlay_settings() {
     int curr_frame = m_frame_index->load();
     m_overlay->set_tool(m_o_settings->tool);
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
 
+    // Undo action
     if (m_o_settings->undo) {
         m_o_settings->undo = false;
-        m_overlay->undo(curr_frame);
-
+        m_overlay->undo(curr_frame);    
+    // Redo action
     } else if (m_o_settings->redo) {
         m_o_settings->redo = false;
-        m_overlay->redo(curr_frame);
-
+        m_overlay->redo(curr_frame);  
+    // Clear drawings action
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;
         m_overlay->clear(curr_frame);
-
+    // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
         m_overlay->mouse_pressed(m_o_settings->pos, curr_frame);
-
+    // Mouse released action
     } else if (m_o_settings->mouse_released) {
         m_o_settings->mouse_released = false;
         m_overlay->mouse_released(m_o_settings->pos, curr_frame);
-
+    // Mouse moved action
     } else if (m_o_settings->mouse_moved) {
         m_o_settings->mouse_moved = false;
         m_overlay->mouse_moved(m_o_settings->pos, curr_frame);
@@ -243,7 +252,7 @@ void FrameProcessor::update_overlay_settings() {
  * @brief FrameProcessor::reset_settings
  * Resets the processing settings.
  * Should be used after a new video has been loaded by the VideoPlayer.
- * (Modifies shared data. Use frame_lock)
+ * (Modifies shared data. Use v_sync_lock)
  */
 void FrameProcessor::reset_settings() {
     m_new_video->store(false);

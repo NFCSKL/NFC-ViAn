@@ -129,7 +129,6 @@ SOURCES += GUI/mainwindow.cpp \
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/action.h \
     GUI/Bookmark/bookmarkitem.h \
     GUI/Bookmark/bookmarkwidget.h
 

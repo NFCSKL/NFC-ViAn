@@ -17,6 +17,12 @@ public:
 
 private:
     cv::Mat foreground_mask, result, dilation_kernel, temp;
+
+    /**
+     * @brief background_subtractor
+     * OBS! TODO: This parameter seems to be leaking memory during analysis
+     * doesn't seem to be destroyed properly
+     */
     cv::Ptr<cv::BackgroundSubtractor> background_subtractor;
 
     void init_settings() override;
@@ -26,15 +32,6 @@ private:
     const int DETECTION_THRESHOLD = 25;
     const int GRAYSCALE_WHITE = 255;
     const cv::Size BLUR_SIZE = cv::Size(31,31);
-
-    const int OPEN_DEGREE = 16;
-    const int SMALLEST_OBJECT_SIZE = 500;
-    const int BACKGROUND_HISTORY = 500;
-    const int MOG2_THRESHOLD = 50;
-    const bool IGNORE_SHADOWS = false;
-
-signals:
-    void save_analysis(Analysis analysis);
 };
 
 #endif // MOTIONDETECTION_H

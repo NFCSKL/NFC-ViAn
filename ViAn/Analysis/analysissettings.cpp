@@ -2,10 +2,8 @@
 
 AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
                                    AnalysisInterval interval,
-                                   cv::Rect bounding_box,
-                                   int sample_rate)
-    : type(type),
-      SAMPLE_RATE(sample_rate)
+                                   cv::Rect bounding_box)
+    : type(type)
 {
     setInterval(interval);
     setBounding_box(bounding_box);

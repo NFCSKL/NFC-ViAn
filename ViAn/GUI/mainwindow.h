@@ -15,7 +15,6 @@
 
 #include "Library/customdialog.h"
 #include "reportgenerator.h"
-#include "action.h"
 
 #include "GUI/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"

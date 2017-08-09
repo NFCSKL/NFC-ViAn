@@ -6,23 +6,39 @@
 #include <QLayout>
 #include <QProgressBar>
 #include "videolistitem.h"
+
+/**
+ * @brief The QueueWidget class
+ * Widget for queue of analyses
+ */
 class QueueWidget : public QWidget
 {
     Q_OBJECT
+    // List containing queue
     QListWidget* m_queue;
-    QVBoxLayout m_layout;
-    QProgressBar* progressbar;
-    QPushButton* abort_btn;
+
+    // Label containing name of current analysis
     QLabel* m_line;
+
+    // Analysis progressbar
+    QProgressBar* progressbar;
+
+    // Button to abort analysis
+    QPushButton* abort_btn;
+
 public:
     QueueWidget(QWidget* parent = 0);
+    // Move queue forward
     void next();
+    // Append method to queue
     void enqueue(AnalysisMethod *method);
-    void remove();
+    // Update progressbar
     void update_progress(int i);
 public slots:
+    // Hide/Show widget
     void toggle_show();
 signals:
+    // Analysis aborted
     void abort_analysis();
 };
 

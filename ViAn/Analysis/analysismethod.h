@@ -15,19 +15,54 @@
 #include "utility.h"
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
+
+/**
+ * @brief The AnalysisMethod class
+ * This class intended to use as Interface for all analysis types.
+ * It's implementation is limited to saving rectangles and time intervals for
+ * detection.
+ */
 class AnalysisMethod : public QObject ,public QRunnable{
     Q_OBJECT    
-    Settings m_settings;
-    SettingsDescr m_descriptions;
-    std::string m_save_path;
-    std::string m_source_file;
-    bool m_scaling_done = false;
+    Settings m_settings;                // Custom integer settings for constants
+    SettingsDescr m_descriptions;       // Descriptions for settings constants
+    std::string m_save_path;            // Save path for finished analysis
+    std::string m_source_file;          // Source video file used by opencv capture
+
+    bool m_scaling_done = false;        // Control states
+    int prev_detection_frame = -1;
+    bool detecting = false;
+    bool paused = false;
+
 protected:
     AnalysisInterval interval;
     cv::Rect bounding_box;
     bool use_interval = false;
     bool use_bounding_box = false;
 
+    bool do_exclusion = false;
+    bool scaling_needed = false;
+
+    const int FULL_HD_WIDTH = 1920;
+    const int FULL_HD_HEIGHT = 1080;
+
+    int num_frames = -1;            // Total number of video frames
+    unsigned int sample_freq = 1;   // Sample frequency of analysis
+    int current_frame_index = 0;    // The current frame number
+
+    int scaled_width = -1;          // Width after scaling
+    int scaled_height = -1;         // Height -----
+    float scaling_ratio = 1.0;      // Scaling factor
+
+    cv::VideoCapture capture;       // Video source
+
+    cv::Mat analysis_frame, exclude_frame, original_frame;
+    Analysis m_analysis;
+
+
+    bool m_exclude_polygon;
+    std::vector<cv::Point> include_exclude_poly;
+protected:
     // Implement this in subclass,
     // using set_setting(Var,value) for all desired settings
     virtual void init_settings() = 0;
@@ -36,60 +71,34 @@ protected:
 
     virtual void add_setting(const std::string& var, int value_default, const std::string& descr);
 
+    void calculate_scaling_factor();
+    void scale_frame();
 
 public:
-    std::string get_descr(const std::string& var_name);
-    virtual int get_setting(const std::string& var);
-    virtual void set_setting(const std::string& var, int value);
-    virtual std::vector<std::string> get_var_names();
+     AnalysisMethod(const std::string &video_path, const std::string& save_path);
 
-    AnalysisMethod(const std::string &video_path, const std::string& save_path);
-    void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
-    void set_analysis_area(cv::Rect area);
+    std::string get_descr(const std::string& var_name);          // Get variable description
+    virtual int get_setting(const std::string& var);             // Get integer value for variable
+    virtual void set_setting(const std::string& var, int value); // Set singled variable
+    virtual std::vector<std::string> get_var_names();            // Get all variable names
     virtual void setup_analysis() = 0;
     virtual std::vector<DetectionBox> analyse_frame() = 0;
 
-    bool sample_current_frame();
-    bool load_video();
-
-
-    int get_progress(int start_frame);
-
-    void setBounding_box(const cv::Rect &value);
-
+    int get_progress(int start_frame);  // Returns progress of analysis 1-100%
+    void setBounding_box(const cv::Rect &value); // Sets bounding box to analyse in video
     AnalysisInterval getInterval() const;
     void setInterval(const AnalysisInterval &value);
-
     std::string save_path() const;
 
-    bool* aborted = nullptr;
-private:
-    int prev_detection_frame = -1;
-    bool detecting = false;
-    bool paused = false;            // Control states
-protected:
-    const int FULL_HD_WIDTH = 1920;
-    const int FULL_HD_HEIGHT = 1080;
+    void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
+    void set_analysis_area(cv::Rect area);
 
-    int num_frames = -1;
-    unsigned int sample_freq = 1;
-    int current_frame_index = 0;    // The current frame number
 
-    int scaled_width = -1;
-    int scaled_height = -1;
-    float scaling_ratio = 1.0;
+    bool sample_current_frame(); // Check if current frame is to be sampled
 
-    cv::VideoCapture capture;       // Video source
-    cv::Mat analysis_frame, exclude_frame, original_frame;   // The frame fetched last
-    Analysis m_analysis;
 
-    bool do_exclusion = false;
-    bool scaling_needed = false;
-    bool m_exclude_polygon;
-    std::vector<cv::Point> include_exclude_poly;
+    bool* aborted = nullptr;    // Bool checked if analysis should be aborted
 
-    void calculate_scaling_factor();
-    void scale_frame();
 public slots:
     void run();
 signals:

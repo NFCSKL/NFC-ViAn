@@ -94,21 +94,37 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     repaint();
 }
 
+/**
+ * @brief AnalysisSlider::set_interval
+ * @param start
+ * @param end
+ */
 void AnalysisSlider::set_interval(int start, int end) {
     interval_first = start;
     interval_second = end;
 }
 
+/**
+ * @brief AnalysisSlider::clear_interval
+ */
 void AnalysisSlider::clear_interval() {
     interval_first = -1;
     interval_second = -1;
 }
 
+/**
+ * @brief AnalysisSlider::set_interval_first
+ * @return
+ */
 int AnalysisSlider::set_interval_first() {
     interval_first = value();
     return interval_first;
 }
 
+/**
+ * @brief AnalysisSlider::set_interval_second
+ * @return
+ */
 int AnalysisSlider::set_interval_second() {
     interval_second = value();
     return interval_second;
@@ -231,10 +247,18 @@ void AnalysisSlider::set_show_tags(bool show_tags) {
     m_show_tags = show_tags;
 }
 
+/**
+ * @brief AnalysisSlider::set_show_on_slider
+ * @param show
+ */
 void AnalysisSlider::set_show_on_slider(bool show) {
     show_on_slider = show;
 }
 
+/**
+ * @brief AnalysisSlider::set_show_interval
+ * @param show
+ */
 void AnalysisSlider::set_show_interval(bool show) {
     show_interval = show;
 }
@@ -252,14 +276,26 @@ void AnalysisSlider::set_blocked(bool value) {
     m_blocked = value;
 }
 
+/**
+ * @brief AnalysisSlider::is_blocked
+ * @return
+ */
 bool AnalysisSlider::is_blocked() {
     return m_blocked;
 }
 
+/**
+ * @brief AnalysisSlider::get_was_paused
+ * @return
+ */
 bool AnalysisSlider::get_was_paused() {
     return m_was_paused;
 }
 
+/**
+ * @brief AnalysisSlider::set_was_paused
+ * @param value
+ */
 void AnalysisSlider::set_was_paused(bool value) {
     m_was_paused = value;
 }

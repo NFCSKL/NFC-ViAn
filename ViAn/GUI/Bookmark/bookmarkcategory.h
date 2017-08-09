@@ -18,26 +18,33 @@
 class BookmarkCategory : public QObject, public QListWidgetItem
 {
     Q_OBJECT
+    // Title line
     QLineEdit* m_title = nullptr;
+    // Category name
+    std::string m_name;
+    // Widget layout
     QVBoxLayout*  layout = nullptr;
+    // Scroll areas for disp_ref
     QScrollArea* disputed = nullptr;
     QScrollArea* reference = nullptr;
+    // Disp ref lists
     BookmarkList* disp_list = nullptr;
     BookmarkList* ref_list = nullptr;
-    std::string m_name;
 public:
     explicit BookmarkCategory(std::string name, QListWidget *parent = nullptr, int type = 0);
     ~BookmarkCategory();
+    // Add item to disp list
     void add_disp_item(BookmarkItem* bm);
+    // Add item to ref list
     void add_ref_item(BookmarkItem* bm);
 
     std::string get_name();
     std::vector<BookmarkItem*> get_disputed();
     std::vector<BookmarkItem*> get_references();
-    QMenu* create_menu();
+
     void update_title(const QString &title);
     BookmarkCategory* copy(QListWidget* new_parent);
-private:
+private:  
     QScrollArea* make_scrollable_container(BookmarkList* cont);
 private slots:
     void on_text_edited(QString name);

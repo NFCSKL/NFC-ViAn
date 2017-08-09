@@ -21,8 +21,6 @@ public:
 private:
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
     Bookmark* bookmark;
-protected:
-//    void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif // BOOKMARKITEM_H

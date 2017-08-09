@@ -61,15 +61,6 @@ std::vector<BookmarkItem *> BookmarkCategory::get_references() {
     return items;
 }
 
-/**
- * @brief BookmarkCategory::create_menu
- * Creates and returns a QMenu. The calling function is responsible for deleting it
- * @return
- */
-QMenu *BookmarkCategory::create_menu(){
-    QMenu* menu = nullptr;
-}
-
 void BookmarkCategory::update_title(const QString &title){
     m_title->setText(title);
 }

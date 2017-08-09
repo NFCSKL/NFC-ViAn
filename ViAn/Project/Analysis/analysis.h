@@ -13,6 +13,10 @@
 #include "detectionbox.h"
 #include "basicanalysis.h"
 
+/**
+ * @brief The Analysis class
+ *
+ */
 class Analysis : public BasicAnalysis {
     friend class AnalysisMeta;
 public:

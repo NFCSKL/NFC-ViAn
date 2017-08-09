@@ -7,10 +7,15 @@
 #include <set>
 #include "Project/Analysis/basicanalysis.h"
 #include "Project/Analysis/tag.h"
-
-
+/**
+ * @brief The AnalysisSlider class
+ * This class represents a conventional slider
+ * With additions for displaying intervals of interest
+ * and chossing intervals
+ */
 class AnalysisSlider : public QSlider {
     Q_OBJECT
+    // Control variables
     bool m_blocked = false;
     bool m_was_paused = false;
     bool m_show_pois = false;
@@ -29,30 +34,46 @@ public:
     int interval_first = -1;
     int interval_second = -1;
 
+    // Control functions
     void set_blocked(bool value);
     bool is_blocked();
     bool get_was_paused();
     void set_was_paused(bool value);
+
+    // Interval settings
     void add_slider_interval(int start_frame, int end_frame);
+    int set_interval_first();
+    int set_interval_second();
+
+    // POI functions
+    bool is_in_POI(int frame);
     int get_next_poi_start(int curr_frame);
     int get_next_poi_end(int frame);
     int get_prev_poi_start(int curr_frame);
-    bool is_in_POI(int frame);
-    int set_interval_first();
-    int set_interval_second();
+
+
+
 protected:
     void paintEvent(QPaintEvent *ev);
-public slots:
+public slots:    
+
+    // Set analysis to be used when displaying slider pois
     void set_basic_analysis(BasicAnalysis *analysis);
 
+    // Wrapped repaint
     void update();
 
+    // Interval slots
     void set_interval(int start, int end);
     void clear_interval(void);
+
+    // Control slots
     void set_show_pois(bool);
     void set_show_tags(bool);
     void set_show_on_slider(bool);
     void set_show_interval(bool);
+
+    // Remove all displayed intervals of interest
     void clear_slider();
 
 private:
