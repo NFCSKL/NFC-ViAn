@@ -65,11 +65,9 @@ SOURCES += main.cpp \
 #
 # TEST
 #
-SOURCES +=\
-    Test/test_report_generator.cpp
+SOURCES +=
 
 HEADERS += reportgenerator.h\
-    Test/test_report_generator.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     utility.h \
