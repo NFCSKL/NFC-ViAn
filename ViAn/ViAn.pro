@@ -142,7 +142,6 @@ RESOURCES += resources.qrc
 #
 SOURCES += \
     Video/overlay.cpp \
-    Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/line.cpp \
@@ -155,7 +154,6 @@ SOURCES += \
     Video/framemanipulator.cpp
 HEADERS += \
     Video/overlay.h \
-    Video/analysisoverlay.h \
     Video/shapes/arrow.h \
     Video/shapes/circle.h \
     Video/shapes/line.h \

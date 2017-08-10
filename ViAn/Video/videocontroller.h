@@ -13,6 +13,12 @@
 #include "videoplayer.h"
 #include "Video/frameprocessor.h"
 #include "Project/video.h"
+
+/**
+ * @brief The VideoController class
+ * Video controller is used as a forwarding interface which controlls
+ * the Videoplayer thread.
+ */
 class VideoController : public QThread {
     Q_OBJECT
     std::atomic<int>* m_frame;

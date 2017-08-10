@@ -270,8 +270,9 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         cv::Point end = cv::Point(rect_end.x(), rect_end.y());
         cv::Point start (rect_start.x(), rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
-                      cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));
+                      cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));        
         settings->setBounding_box(scaled);
+
         emit quick_analysis(settings);
         tool = NONE;
         mark_rect = false;
@@ -292,7 +293,6 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
-
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
@@ -347,7 +347,12 @@ void FrameWidget::panning(QPoint pos) {
  * @param pos
  */
 void FrameWidget::rect_update(QPoint pos) {
-    rect_end = pos;
+    // Force image boundries
+    int tmpx = std::min(pos.x(),_qimage.width()-1);
+    int ex = std::max(0, tmpx);
+    int tmpy = std::min(pos.y(), _qimage.height()-1);
+    int ey = std::max(0,tmpy);
+    rect_end = QPoint(ex, ey);
     mark_rect = true;
     repaint();
 }

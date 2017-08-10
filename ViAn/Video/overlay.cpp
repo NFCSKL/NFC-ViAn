@@ -239,12 +239,6 @@ void Overlay::clear(int frame_nr) {
     }
 }
 
-//void Overlay::clear_overlay() {
-//    for (std::vector<Shape*> overlay : overlays) {
-//        overlay.clear();
-//    }
-//}
-
 /**
  * @brief Overlay::read
  * @param json
