@@ -13,6 +13,8 @@ Project* Project::fromFile(const std::string &full_path)
 {
     Project* proj = new Project();
     proj->load_saveable(full_path);
+    // ensure changes to paths are saved
+    proj->save_saveable(full_path);
     return proj;
 }
 
