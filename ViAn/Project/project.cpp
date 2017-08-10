@@ -25,8 +25,7 @@ Project* Project::fromFile(const std::string &full_path)
 Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;    
     m_dir = dir_path + "/" + name + "/";
-    m_dir_bookmarks = m_dir + "/Bookmarks/";
-    m_dir_videos = dir_path;
+    m_dir_bookmarks = m_dir + "Bookmarks/";
     m_file = m_dir + name;
 }
 
@@ -48,9 +47,10 @@ Project::~Project(){
  * @brief Project::add_video
  * @return Video ID to be used for identifying the video.
  */
-void Project::add_video_project(VideoProject *vid_proj){
+ID Project::add_video_project(VideoProject *vid_proj){
     vid_proj->set_project(this);
     m_videos.push_back(vid_proj);
+    return m_vid_count++;
 }
 
 /**
@@ -107,7 +107,6 @@ void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
     m_dir = json["root_dir"].toString().toStdString();
     m_dir_bookmarks = json["bookmark_dir"].toString().toStdString();
-    m_dir_videos = json["video_dir"].toString().toStdString();
     m_file = m_dir + m_name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
@@ -136,7 +135,6 @@ void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(m_name);
     json["root_dir"] =  QString::fromStdString(m_dir);
     json["bookmark_dir"] = QString::fromStdString(m_dir_bookmarks);
-    json["video_dir"] = QString::fromStdString(m_dir_videos);
     json["full_path"] = QString::fromStdString(m_file);
     QJsonArray json_proj;
     // Write Videos to json
@@ -193,10 +191,6 @@ std::string Project::getDir_bookmarks() const
     return m_dir_bookmarks;
 }
 
-std::string Project::getDir_videos() const
-{
-    return m_dir_videos;
-}
 
 std::string Project::getDir() const {
     return m_dir;
