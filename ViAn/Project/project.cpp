@@ -92,24 +92,10 @@ void Project::remove_report(const int &id)
  * Delete all projects files.
  */
 void Project::delete_artifacts(){
-    // Delete files in all videoprojects
-    for (auto it = m_videos.begin(); it != m_videos.end(); it++) {
-        (*it)->delete_artifacts();
-    }
-
-    // Delete all reports.
-    for(auto it = m_reports.begin(); it != m_reports.end(); it++){
-        Report* temp = (*it).second;
-        QFile file (QString::fromStdString(temp->get_file_path()));
-        file.remove();
-    }
-    // Delete directories
-    delete_saveable();
-    QDir directory;
-    QString q_dir = QString::fromStdString(m_dir);
-    QString q_dir_bookmarks = QString::fromStdString(m_dir_bookmarks);
-    directory.rmdir(q_dir_bookmarks);
-    directory.rmdir(q_dir);
+    QDir dir(QString::fromStdString(m_dir));
+    // Delete directory and all of its contents
+    // Including subdirectories and their contents.
+    dir.removeRecursively();
 }
 
 /**

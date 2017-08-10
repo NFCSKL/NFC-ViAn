@@ -511,7 +511,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
 
 /**
  * @brief ProjectWidget::remove_item
- * Deletes all selected items.n
+ * Deletes all selected items.
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
