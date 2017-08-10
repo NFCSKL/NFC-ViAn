@@ -833,8 +833,6 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
 
         m_interval = make_pair(0,0);
 
-
-        //frame_wgt->set_overlay(m_vid_proj->get_overlay());
         set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
@@ -871,6 +869,14 @@ void VideoWidget::enable_tag_btn(bool b) {
     tag_btn->setEnabled(b);
 }
 
+/**
+ * @brief VideoWidget::on_video_info
+ * @param video_width
+ * @param video_height
+ * @param frame_rate
+ * @param last_frame
+ * notified of new settings when videoplayer has loaded a new video
+ */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     m_video_width = video_width;
     m_video_height = video_height;
@@ -885,6 +891,10 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
 void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
 }
+
+/**
+ *  Functions changing synchronized settings
+ */
 
 void VideoWidget::set_overlay(Overlay *overlay) {
     update_overlay_settings([&](){
