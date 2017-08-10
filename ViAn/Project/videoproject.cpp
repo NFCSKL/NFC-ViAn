@@ -189,6 +189,18 @@ void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
+void VideoProject::reset_root_dir(const string &dir)
+{
+    for(auto bm : m_bookmarks){
+        bm.second->reset_root_dir(dir);
+    }
+    for(auto an : m_analyses){
+        if(an.second->get_save_type() == DETECTION){ ;
+            dynamic_cast<AnalysisProxy*>(an.second)->reset_root_dir(dir);
+        }
+    }
+}
+
 /**
  * @brief VideoProject::add_analysis
  * @param analysis to be added

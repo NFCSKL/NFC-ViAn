@@ -1,7 +1,7 @@
 #include "analysisproxy.h"
 #include <QJsonObject>
 #include <QString>
-
+#include "utility.h"
 
 /**
  * @brief AnalysisMeta::AnalysisMeta
@@ -36,6 +36,11 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
     file_analysis(other.file_analysis),
     type(other.type)
 {
+}
+
+void AnalysisProxy::reset_root_dir(const std::string &dir)
+{
+    file_analysis = dir+Utility::name_from_path(file_analysis);
 }
 
 
