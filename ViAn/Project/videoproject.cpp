@@ -192,7 +192,7 @@ void VideoProject::set_project(Project *proj){
 void VideoProject::reset_root_dir(const string &dir)
 {
     for(auto bm : m_bookmarks){
-        bm.second->reset_root_dir(dir);
+        bm.second->reset_root_dir(dir+"Bookmarks/");
     }
     for(auto an : m_analyses){
         if(an.second->get_save_type() == DETECTION){ ;

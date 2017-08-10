@@ -26,7 +26,7 @@ Bookmark::Bookmark() {
 }
 
 void Bookmark::reset_root_dir(const std::string &dir)
-{
+{    
     m_file = dir+Utility::name_from_path(m_file);
 }
 
