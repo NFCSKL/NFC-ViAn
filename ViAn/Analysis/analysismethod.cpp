@@ -14,72 +14,6 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
 }
 
 /**
- * @brief AnalysisMethod::abort_analysis
- * Sets the necessary bools to abort an analysis.
- */
-
-void AnalysisMethod::setBounding_box(const cv::Rect &value)
-{
-    bounding_box = value;
-    use_bounding_box = true;
-}
-
-AnalysisInterval AnalysisMethod::getInterval() const
-{
-    return interval;
-}
-
-void AnalysisMethod::setInterval(const AnalysisInterval &value)
-{
-    interval = value;
-    use_interval = true;
-}
-
-std::string AnalysisMethod::get_descr(const std::string& var)
-{
-    auto val_pair = m_settings.find(var);
-    if(val_pair != m_settings.end())
-        return val_pair->first;
-    qWarning("No variable \"%s found",var.c_str());
-    return "";
-}
-
-
-std::string AnalysisMethod::save_path() const
-{
-    return m_save_path;
-}
-void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
-{
-    m_settings[var] = value_default;
-    m_descriptions[var] = descr;
-}
-
-int AnalysisMethod::get_setting(const std::string &var)
-{
-    auto val_pair = m_settings.find(var);
-    if(val_pair != m_settings.end())
-        return val_pair->second;
-    qWarning("No variable \"%s found",var.c_str());
-    return -1;
-}
-
-void AnalysisMethod::set_setting(const std::string &var, int value)
-{
-    m_settings[var] = value;
-}
-
-std::vector<std::string> AnalysisMethod::get_var_names()
-{
-    std::vector<std::string> res;
-    for(auto pair : m_settings){
-        res.push_back(pair.first);
-    }
-    return res;
-}
-
-
-/**
  * @brief AnalysisMethod::set_include_exclude_area
  * Sets an exlusion frame that will be used to exclude detections in a specific area of each frame.
  * @param points for the polygon that defines the exclusion area.
@@ -131,9 +65,10 @@ void AnalysisMethod::run() {
     std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
     POI* m_POI = new POI();    
-    // If Interval is use, start analysis at frame
+
     int end_frame = num_frames -1;
     int start_frame = 0;
+    // If Interval should be used, use interval frames
     if(use_interval){
         start_frame = interval.get_start();
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
@@ -154,6 +89,8 @@ void AnalysisMethod::run() {
             else{
                 analysis_frame = original_frame;
             }
+            // If scaling is needed, i.e if video is high resolution
+            // calculate scaling factor and scale frame
             if(!m_scaling_done){
 
                 calculate_scaling_factor();
@@ -184,7 +121,7 @@ void AnalysisMethod::run() {
             // TODO do pause stuff
             paused = false;
         }
-
+        // Send progress, update index and release current frame
         emit send_progress(get_progress(start_frame));
         ++current_frame_index;
         original_frame.release();
@@ -256,4 +193,68 @@ void AnalysisMethod::scale_frame() {
     cv::Mat dst(size,analysis_frame.type());
     cv::resize(analysis_frame,dst,size); //resize frame
     analysis_frame = dst;
+}
+
+/**
+ *  Getters and setters
+ */
+
+void AnalysisMethod::setBounding_box(const cv::Rect &value)
+{
+    bounding_box = value;
+    use_bounding_box = true;
+}
+
+AnalysisInterval AnalysisMethod::getInterval() const
+{
+    return interval;
+}
+
+void AnalysisMethod::setInterval(const AnalysisInterval &value)
+{
+    interval = value;
+    use_interval = true;
+}
+
+std::string AnalysisMethod::get_descr(const std::string& var)
+{
+    auto val_pair = m_settings.find(var);
+    if(val_pair != m_settings.end())
+        return val_pair->first;
+    qWarning("No variable \"%s found",var.c_str());
+    return "";
+}
+
+
+std::string AnalysisMethod::save_path() const
+{
+    return m_save_path;
+}
+void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
+{
+    m_settings[var] = value_default;
+    m_descriptions[var] = descr;
+}
+
+int AnalysisMethod::get_setting(const std::string &var)
+{
+    auto val_pair = m_settings.find(var);
+    if(val_pair != m_settings.end())
+        return val_pair->second;
+    qWarning("No variable \"%s found",var.c_str());
+    return -1;
+}
+
+void AnalysisMethod::set_setting(const std::string &var, int value)
+{
+    m_settings[var] = value;
+}
+
+std::vector<std::string> AnalysisMethod::get_var_names()
+{
+    std::vector<std::string> res;
+    for(auto pair : m_settings){
+        res.push_back(pair.first);
+    }
+    return res;
 }

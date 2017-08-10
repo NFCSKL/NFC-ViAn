@@ -14,14 +14,24 @@
 #include <opencv2/videoio/videoio.hpp>
 #include <opencv2/video/video.hpp>
 #include <opencv2/core/core.hpp>
-
+/**
+ * @brief The video_sync struct
+ * Video stream synchronization struct
+ */
 struct video_sync {
+    // Lock for videostream
     std::mutex lock;
+    // Conditional wait(used with lock)
     std::condition_variable con_var;
-
+    // Frame to lock
     cv::Mat frame;
 };
-
+/**
+ * @brief The VideoPlayer class
+ * operates on an opencv capture object. Videoplayer handles reading
+ * new frames as well as regulating framerate, pausing and jumping frames
+ * in the video.
+ */
 class VideoPlayer : public QObject{
     Q_OBJECT
     cv::VideoCapture m_capture;

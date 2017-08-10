@@ -29,12 +29,19 @@ std::string ImageGenerator::create_tiff(std::string name) {
     return export_image(save_path + name, TIFF);
 }
 
+
 std::string ImageGenerator::create_bookmark(std::string name) {
     std::string save_path = m_path + "Bookmarks/";
     if (!create_directory(save_path)) return "";
     return export_image(save_path + name, TIFF);
 }
-
+/**
+ * @brief ImageGenerator::add_serial_number
+ * @param name
+ * @param file_end
+ * @return
+ * Appends (i) to file if i-1 images with same name exist
+ */
 std::string ImageGenerator::add_serial_number(std::string name, std::string file_end)
 {
     QString qend = QString::fromStdString(file_end);
@@ -65,6 +72,15 @@ bool ImageGenerator::create_directory(std::string path){
     return success;
 }
 
+/**
+ * @brief ImageGenerator::export_image
+ * @param requested_path
+ * @param ext
+ * @param size
+ * @param keep_aspect_ratio
+ * @return
+ * Export single image to requested path with extension ext
+ */
 std::string ImageGenerator::export_image(std::string requested_path, int ext, const unsigned int size, bool keep_aspect_ratio) {
 
     cv::Mat tmp = m_frame.clone();

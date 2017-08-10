@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QTreeWidgetItem>
 #include <tuple>
-AnalysisWidget::AnalysisWidget(QWidget *parent) {
+AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
     queue_wgt = new QueueWidget();
     queue_wgt->hide();
     connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));

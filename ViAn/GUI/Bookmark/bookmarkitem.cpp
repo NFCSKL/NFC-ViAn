@@ -79,5 +79,6 @@ QString BookmarkItem::get_file_path()
  */
 void BookmarkItem::update_description(const QString& text) {
     this->bookmark->set_description(text.toStdString());
+    setText(text);
     setToolTip(hover_text + text);
 }

@@ -196,7 +196,7 @@ void MainWindow::init_file_menu() {
     open_project_act->setShortcuts(QKeySequence::Open);     //Ctrl + O
     save_project_act->setShortcuts(QKeySequence::Save);     //Ctrl + S
     close_project_act->setShortcuts(QKeySequence::Close);   //Ctrl + F4
-    remove_project_act->setShortcuts(QKeySequence::Delete); //Del
+    //remove_project_act->setShortcuts(QKeySequence::Delete); //Del
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
     quit_act->setShortcut(QKeySequence(tr("Ctrl+E")));      //Ctrl + E
 

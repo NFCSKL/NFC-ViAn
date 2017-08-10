@@ -11,25 +11,33 @@
 #include "GUI/TreeItems/analysisitem.h"
 #include "videolistitem.h"
 class VideoItem;
+/**
+ * @brief The AnalysisDialog class
+ *  This Dialog is used for advanced analysis
+ */
 class AnalysisDialog : public QDialog
 {
     Q_OBJECT
+    // Lists of videoprojects to potentially analyse
     QListWidget* m_v_proj_list;
+    // Variable settings fields
     std::map<std::string,QLineEdit*> m_settings;
-    MotionDetection* method;
+    // Directory to save analysis
     std::string m_save_dir;
 
-    QLineEdit* interval;
-    QLineEdit* bounding_box;
+    MotionDetection* method;
 public:
     AnalysisDialog(std::vector<VideoItem*> vid_projs, string save_dir);
 public slots:
     void ok_btn_clicked();
     void cancel_btn_clicked();
 signals:
+    // Send to start analysis
     void start_analysis(AnalysisMethod* method, VideoProject* vid_proj);
 private:
+    // Add settings to form layout
     void add_settings(QFormLayout* form);
+    // Set setting sn form layout to method
     void set_settings(AnalysisMethod* method);
 };
 

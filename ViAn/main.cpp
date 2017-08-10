@@ -2,7 +2,6 @@
 #include <opencv2/opencv.hpp>
 
 #include "Test/test_video_player.h"
-#include "Test/test_report_generator.h"
 #include "GUI/mainwindow.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Test/projecttestsuite.h"
@@ -22,6 +21,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    /**
+     * qRegisterMetaType i
+     */
     qRegisterMetaType<std::string>();
     qRegisterMetaType<BasicAnalysis>();
     qRegisterMetaType<AnalysisProxy>();

@@ -73,7 +73,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
 void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return;
     // TODO: HANDLE CASE. Only open video files
-    QStringList video_paths = QFileDialog().getOpenFileNames(this, tr("Add video"), m_proj->getDir_videos().c_str());
+    QStringList video_paths = QFileDialog().getOpenFileNames(this, tr("Add video"), m_proj->getDir().c_str());
     for (auto video_path : video_paths){
         int index = video_path.lastIndexOf('/') + 1;
         QString vid_name = video_path.right(video_path.length() - index);

@@ -1,25 +1,42 @@
 #include "queuewidget.h"
 
-
+/**
+ * @brief QueueWidget::QueueWidget
+ * @param parent
+ * Setup widget layout
+ */
 QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
-    m_queue = new QListWidget();
+    // Set Title
     setWindowTitle(QString::fromStdString("Vian - Analysis queue"));
-
+    // Create queue
+    m_queue = new QListWidget();
+    // Create Abort button
     abort_btn = new QPushButton(QIcon("../ViAn/Icons/abort.png"),"",this);
+    // Create main layout
     QVBoxLayout* layout = new QVBoxLayout();
+    // Layout for current analysis
     QHBoxLayout* progress_layout = new QHBoxLayout();
     m_line = new QLabel();
     progressbar = new QProgressBar();
     progress_layout->addWidget(m_line);
     progress_layout->addWidget(progressbar);
     progress_layout->addWidget(abort_btn);
+    // Connect abort button to abort
     connect(abort_btn, &QPushButton::pressed, this, &QueueWidget::abort_analysis);
+    // Add current analysis layout to main layout
     layout->addLayout(progress_layout);
-    layout->addWidget(m_queue);
+    // Add queue
+    layout->addWidget(m_queue);    
     setLayout(layout);
+    // Show widget
     show();
 }
 
+/**
+ * @brief QueueWidget::next
+ * Move queue forward if queue non empty,
+ * otherwise reset current analysis representation
+ */
 void QueueWidget::next()
 {
     QListWidgetItem* item;
@@ -34,6 +51,11 @@ void QueueWidget::next()
     }
 }
 
+/**
+ * @brief QueueWidget::enqueue
+ * @param method
+ * Add method to back of queue
+ */
 void QueueWidget::enqueue(AnalysisMethod *method)
 {
     abort_btn->show();
@@ -49,11 +71,20 @@ void QueueWidget::enqueue(AnalysisMethod *method)
     m_queue->addItem(item);
 }
 
+/**
+ * @brief QueueWidget::update_progress
+ * @param i
+ * Update progressbar progress
+ */
 void QueueWidget::update_progress(int i)
 {    
     progressbar->setValue(i);
 }
 
+/**
+ * @brief QueueWidget::toggle_show
+ * Hide/Show this widget
+ */
 void QueueWidget::toggle_show()
 {
     if(this->isVisible()) hide();

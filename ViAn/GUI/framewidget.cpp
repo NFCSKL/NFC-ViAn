@@ -123,31 +123,32 @@ cv::Mat FrameWidget::get_modified_frame() const {
 
 cv::Mat FrameWidget::get_org_frame() const
 {
-    cv::Mat tmp = current_frame.clone();
+    cv::Mat tmp = m_org_image.clone();
     switch (tmp.type()) {
         case CV_8UC1:
-            cvtColor(current_frame, tmp, CV_GRAY2RGB);
+            cvtColor(m_org_image, tmp, CV_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(current_frame, tmp, CV_BGR2RGB);
+            cvtColor(m_org_image, tmp, CV_BGR2RGB);
             break;
     }
     return tmp;
 }
 
-void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
-    current_frame = frame;
-    switch (frame.type()) {
+void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index) {
+    current_frame = mod_image;
+    m_org_image = org_image;
+    switch (mod_image.type()) {
         case CV_8UC1:
-            cvtColor(frame, _tmp_frame, CV_GRAY2RGB);
+            cvtColor(mod_image, _tmp_frame, CV_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(frame, _tmp_frame, CV_BGR2RGB);
+            cvtColor(mod_image, _tmp_frame, CV_BGR2RGB);
             break;
     }
 
     // QImage needs the data to be stored continuously in memory
-    assert(frame.isContinuous());
+    assert(mod_image.isContinuous());
     // Assign OpenCV's image buffer to the QImage. Note that the bytesPerLine parameter
     // (http://qt-project.org/doc/qt-4.8/qimage.html#QImage-6) is 3*width because each pixel
     // has three bytes.
@@ -170,7 +171,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         if(tool == ZOOM){
             QPoint start = rect_start;
             QPoint end = rect_end;
-
 
             int width = end.x() - start.x();
             int height = end.y() - start.y();
@@ -221,7 +221,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
-        set_rect_start(event->pos());
+        if(event->button() == Qt::LeftButton)
+            set_rect_start(event->pos());
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
@@ -265,17 +266,13 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case ANALYSIS_BOX:
     {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
-        int wid = rect_end.x() - rect_start.x();
-        int hei = rect_end.y() - rect_start.y();
 
-        double wid_ratio = double(wid) / _qimage.width();
-        double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
-
-        cv::Point end = cv::Point(rect_end.x(), rect_start.y() + height_mod);
+        cv::Point end = cv::Point(rect_end.x(), rect_end.y());
         cv::Point start (rect_start.x(), rect_start.y());
-        cv::Rect scaled = cv::Rect(cv::Point(anchor.x() + start.x / m_scale_factor, anchor.y() + start.y / m_scale_factor),
-                      cv::Point(anchor.x() + end.x / m_scale_factor, anchor.y() + end.y / m_scale_factor));
+        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
+                      cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));        
         settings->setBounding_box(scaled);
+
         emit quick_analysis(settings);
         tool = NONE;
         mark_rect = false;
@@ -296,7 +293,6 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
-
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
@@ -351,7 +347,12 @@ void FrameWidget::panning(QPoint pos) {
  * @param pos
  */
 void FrameWidget::rect_update(QPoint pos) {
-    rect_end = pos;
+    // Force image boundries
+    int tmpx = std::min(pos.x(),_qimage.width()-1);
+    int ex = std::max(0, tmpx);
+    int tmpy = std::min(pos.y(), _qimage.height()-1);
+    int ey = std::max(0,tmpy);
+    rect_end = QPoint(ex, ey);
     mark_rect = true;
     repaint();
 }

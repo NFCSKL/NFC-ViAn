@@ -114,17 +114,8 @@ void Zoomer::fit_viewport() {
 void Zoomer::flip() {
     // Flips the original frame size
     set_frame_size(cv::Size(m_frame_size.height, m_frame_size.width));
-
-    // Flips the zoom rect size
-    // Must be within the frame size
-    // TODO correct matrix rotation
-    int _tmp = m_zoom_rect.height;
-    m_zoom_rect.height = std::min(std::abs(m_zoom_rect.width),
-                                  std::abs(m_frame_rect.height - m_zoom_rect.y));
-    m_zoom_rect.width = std::min(std::abs(_tmp),
-                                 std::abs(m_frame_size.width - m_zoom_rect.x));
-    update_rect_size();
-
+    // Reset orginal state when rotating
+    reset();
 }
 
 /**

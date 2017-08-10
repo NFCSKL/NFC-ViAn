@@ -73,7 +73,7 @@ signals:
     void mouse_released(QPoint);
     void mouse_moved(QPoint);
 public slots:
-    void on_new_image(cv::Mat image, int frame_index);
+    void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
     void toggle_zoom(bool value);
     void set_analysis_tool();
     void set_scroll_area_size(QSize size);
@@ -91,6 +91,7 @@ public slots:
 protected:
     QImage _qimage;
     cv::Mat _tmp_frame;
+    cv::Mat m_org_image;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 

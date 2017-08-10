@@ -7,6 +7,11 @@
 
 #include <QDebug>
 
+/**
+ * @brief ProjectDialog::ProjectDialog
+ * @param parent
+ * Dialog usd to create new projects.
+ */
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("New project");
     // remove question mark from the title bar

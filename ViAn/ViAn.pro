@@ -65,11 +65,9 @@ SOURCES += main.cpp \
 #
 # TEST
 #
-SOURCES +=\
-    Test/test_report_generator.cpp
+SOURCES +=
 
 HEADERS += reportgenerator.h\
-    Test/test_report_generator.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     utility.h \
@@ -129,7 +127,6 @@ SOURCES += GUI/mainwindow.cpp \
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/action.h \
     GUI/Bookmark/bookmarkitem.h \
     GUI/Bookmark/bookmarkwidget.h
 
@@ -143,7 +140,6 @@ RESOURCES += resources.qrc
 #
 SOURCES += \
     Video/overlay.cpp \
-    Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/line.cpp \
@@ -156,7 +152,6 @@ SOURCES += \
     Video/framemanipulator.cpp
 HEADERS += \
     Video/overlay.h \
-    Video/analysisoverlay.h \
     Video/shapes/arrow.h \
     Video/shapes/circle.h \
     Video/shapes/line.h \

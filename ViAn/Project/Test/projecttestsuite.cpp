@@ -72,7 +72,6 @@ void ProjectTestsuite::save_load_test(){
 
     QCOMPARE(proj->m_name , proj2->m_name);
     QCOMPARE(proj->m_dir , proj2->m_dir);
-    QCOMPARE(proj->m_dir_videos , proj2->m_dir_videos);
 
     QCOMPARE(proj->m_reports.size(), unsigned(3));
     QCOMPARE(proj->m_videos.size(), unsigned(3));

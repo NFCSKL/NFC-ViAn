@@ -32,7 +32,7 @@ class Project : public Saveable{
     std::string m_name = "";
     std::string m_dir = "";
     std::string m_dir_bookmarks = "";
-    std::string m_dir_videos = "";
+
     std::vector<VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
     int m_vid_count = 0;
@@ -43,7 +43,7 @@ public:
     ~Project();
 
     ID add_report(Report* report);
-    void add_video_project(VideoProject *vid_proj);
+    ID add_video_project(VideoProject *vid_proj);
     // TODO
     //ID add_drawing();
     // void remove_drawing();
@@ -62,7 +62,6 @@ public:
     std::vector<VideoProject *>& get_videos();
     VideoProject* get_video(const int& v_pos);
     std::string getDir_bookmarks() const;
-    std::string getDir_videos() const;
     std::string getDir() const;
     std::string getName() const;
 

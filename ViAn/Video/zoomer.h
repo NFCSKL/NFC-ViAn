@@ -6,7 +6,12 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
-
+/**
+ * @brief The Zoomer class
+ * the Zoomer class is used to represent a smart zoom rectangle
+ * which updates it's scaling and anchor implicitly on requsts given that
+ * it's settings are updated properly
+ */
 class Zoomer{
     QSize m_viewport_size;
     QPoint anchor;

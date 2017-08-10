@@ -12,7 +12,11 @@
 
 #include "Project/recentproject.h"
 #include "GUI/projectdialog.h"
-
+/**
+ * @brief The RecentProjectDialog class
+ * Startup dialog used to open recently used projects
+ * create new or open an existing one.
+ */
 class RecentProjectDialog : public QDialog {
     Q_OBJECT
     QHBoxLayout* h_layout;

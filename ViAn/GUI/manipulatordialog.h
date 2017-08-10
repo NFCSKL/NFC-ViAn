@@ -8,6 +8,10 @@
 #include <QSpinBox>
 #include <QDialogButtonBox>
 
+/**
+ * @brief The ManipulatorDialog class
+ * Dialog used to modify brightness and contrast.
+ */
 class ManipulatorDialog : public QDialog {
     Q_OBJECT
     QSpinBox* brightness_box;

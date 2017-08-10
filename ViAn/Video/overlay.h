@@ -19,13 +19,23 @@
 #include "shapes/analysarea.h"
 #include "Library/customdialog.h"
 #include "opencv2/opencv.hpp"
-
+#include "Filehandler/writeable.h"
+/**
+ * @brief The FrameOverlay struct
+ * used for performing undo/redo operations
+ */
 struct FrameOverlay{
+    // Representing all shapes
     std::vector<Shape*> overlay;
+    // Representing the end of drawn shapes
     std::vector<Shape*>::iterator drawn = overlay.end();
 };
 
-class Overlay : public QObject {
+/**
+ * @brief The Overlay class
+ * The overlay handles drawing on shapes and it's various operations,
+ */
+class Overlay : public QObject, public Writeable {
     Q_OBJECT
 
 public slots:

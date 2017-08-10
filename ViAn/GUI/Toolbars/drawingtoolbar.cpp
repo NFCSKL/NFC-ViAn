@@ -74,6 +74,12 @@ void DrawingToolbar::color_tool_clicked() {
     }
 }
 
+/**
+ * @brief On click events
+ * for each tool:
+ * set_status_bar("Some tool")
+ * set_overlay(TOOL_TYPE)
+ */
 void DrawingToolbar::pen_tool_clicked() {
     emit set_status_bar("Pen tool");
     emit set_overlay_tool(PEN);
