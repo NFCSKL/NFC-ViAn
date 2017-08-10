@@ -23,6 +23,7 @@ public:
     AnalysisProxy(const Analysis &other, const std::string file);
     AnalysisProxy(const AnalysisProxy &other);
 
+    void reset_root_dir(const std::string& dir);
     virtual ANALYSIS_TYPE get_type() const override;
     virtual SAVE_TYPE get_save_type() const override;
     virtual std::string full_path() const override;

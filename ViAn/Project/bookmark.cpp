@@ -25,6 +25,11 @@ Bookmark::Bookmark(VideoProject *vid_proj,const std::string file_name, const std
 Bookmark::Bookmark() {
 }
 
+void Bookmark::reset_root_dir(const std::string &dir)
+{
+    m_file = dir+Utility::name_from_path(m_file);
+}
+
 /**
  * @brief Bookmark::get_time
  * @return Returns the time in the video where the bookmark points to (in millisecs).

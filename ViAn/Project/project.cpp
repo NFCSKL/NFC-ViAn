@@ -105,9 +105,10 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
-    m_dir = json["root_dir"].toString().toStdString();
-    m_dir_bookmarks = json["bookmark_dir"].toString().toStdString();
-    m_file = m_dir + m_name;
+    m_file = full_path();
+    std::string tmp = full_path();
+    m_dir = tmp.substr(0,tmp.find_last_of("/")+1);
+    m_dir_bookmarks = m_dir + "Bookmarks/";
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -115,6 +116,7 @@ void Project::read(const QJsonObject& json){
         VideoProject* v = new VideoProject();
         v->read(json_vid_proj);
         add_video_project(v);
+        v->reset_root_dir(m_dir);
     }    
     // Read reports from json
     QJsonArray json_reports = json["reports"].toArray();
@@ -123,6 +125,7 @@ void Project::read(const QJsonObject& json){
         Report* report = new Report();
         report->read(json_report);
         add_report(report);
+        report->reset_root_dir(m_dir);
     }
 }
 
@@ -133,9 +136,7 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(m_name);
-    json["root_dir"] =  QString::fromStdString(m_dir);
-    json["bookmark_dir"] = QString::fromStdString(m_dir_bookmarks);
-    json["full_path"] = QString::fromStdString(m_file);
+    json["root_dir"] =  QString::fromStdString(m_dir);        
     QJsonArray json_proj;
     // Write Videos to json
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){

@@ -31,6 +31,7 @@ public:
     std::string m_file;
     Bookmark(VideoProject* vid_proj, const string file_name, const std::string& text, const int& frame_nbr);
     Bookmark();
+    void reset_root_dir(const std::string& dir);
     int get_time();
     int get_frame_number();
     std::vector<std::pair<int, std::string>> get_containers();

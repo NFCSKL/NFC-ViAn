@@ -40,6 +40,7 @@ bool Saveable::save_saveable(const std::string& file_name,
  * @return true if successfull, false else
  */
 bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format) {
+    m_full_path = full_path;
     QFile save_file(QString::fromStdString(full_path));
     if(!save_file.open(QIODevice::WriteOnly)){  // Attempt to open full_path
         qDebug() << "Couldn't open save file", save_file.fileName().toStdString().c_str();   // Send warning if unsuccessful
@@ -51,7 +52,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
     save_file.write(save_format == JSON         // Choose written format
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-    m_full_path = full_path;
+
     return true;
 }
 
@@ -77,6 +78,7 @@ bool Saveable::delete_saveable()
  * Loads saveable from binary or json file.
  */
 bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& save_format){
+    m_full_path = full_path;
     QFile load_file(QString::fromStdString(full_path));
     if (!load_file.open(QIODevice::ReadOnly)) {     // Attempt to open file
         qWarning("Couldn't open load file %s ",
@@ -89,6 +91,6 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
     this->read(load_doc.object());                      // Read data to be loaded, OBS! Implement this when inheriting
-    m_full_path = full_path;
+
     return true;
 }
