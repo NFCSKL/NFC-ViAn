@@ -177,7 +177,7 @@ void FrameProcessor::update_zoomer_settings() {
     // Set original size (no zoom)
     else if (m_z_settings->original){
         m_z_settings->original = false;
-        m_zoomer.set_scale_factor(1);
+        m_zoomer.reset();
     }
 
     // Store changes made
