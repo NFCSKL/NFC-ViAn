@@ -221,7 +221,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
-        set_rect_start(event->pos());
+        if(event->button() == Qt::LeftButton)
+            set_rect_start(event->pos());
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
