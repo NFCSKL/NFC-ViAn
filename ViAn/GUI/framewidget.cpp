@@ -265,11 +265,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case ANALYSIS_BOX:
     {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
-        int wid = rect_end.x() - rect_start.x();
-        int hei = rect_end.y() - rect_start.y();
-
-        double wid_ratio = double(wid) / _qimage.width();
-        double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
 
         cv::Point end = cv::Point(rect_end.x(), rect_end.y());
         cv::Point start (rect_start.x(), rect_start.y());
