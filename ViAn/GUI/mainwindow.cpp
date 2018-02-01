@@ -570,6 +570,10 @@ void MainWindow::options() {
 }
 
 void MainWindow::open_project_dialog(){
-    QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
+    QString project_path = QFileDialog().getOpenFileName(
+                this,
+                tr("Open project"),
+                QDir::homePath(),
+                "*.vian");
     open_project(project_path);
 }
