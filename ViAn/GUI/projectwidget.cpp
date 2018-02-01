@@ -398,6 +398,23 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
     emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
 }
 
+/**
+ * @brief ProjectWidget::prompt_save
+ * Prompts the user for a save before continuing.
+ * Returns false on cancel
+ */
+void ProjectWidget::prompt_save() {
+    QMessageBox delete_box(this);
+    delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setText("There are unsaved changes.\n");
+    delete_box.setInformativeText("Do you wish to save before closing the project?");
+    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    delete_box.setDefaultButton(QMessageBox::No);
+    if (delete_box.exec() == QMessageBox::Yes) {
+        save_project();
+    }
+}
+
 
 /**
  * @brief ProjectWidget::tree_item_clicked
@@ -615,7 +632,13 @@ void ProjectWidget::open_project(QString project_path) {
  */
 void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
+    // Prompt: There are unsaved changes in the project. Do you wish to save before continuing?
     if (m_proj == nullptr) return;
+
+    bool cont = false;
+    if (!m_proj->is_saved()){
+        prompt_save();
+    }
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();

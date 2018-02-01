@@ -1,5 +1,11 @@
 #include "videoproject.h"
 
+
+void VideoProject::changed(){
+    if (this->m_project == nullptr) return;
+    this->m_project->set_unsaved(true);
+}
+
 /**
  * @brief VideoProject::VideoProject
  * @param v
@@ -67,6 +73,7 @@ void VideoProject::delete_analysis(const int& id) {
     m_analyses.erase(id);
     am->delete_saveable();
     delete am;
+    this->changed();
 }
 
 /**
@@ -80,6 +87,7 @@ void VideoProject::delete_bookmark(const int &id) {
     m_bookmarks.erase(id);
     bm->remove_exported_image();
     delete bm;
+    this->changed();
 }
 
 /**
@@ -173,6 +181,7 @@ void VideoProject::write(QJsonObject& json){
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
     bookmark->set_video_project(this);
+    this->changed();
     return m_bm_cnt++;
 }
 
@@ -183,14 +192,14 @@ void VideoProject::set_tree_index(std::stack<int> tree_index) {
         tree_index.pop();
         m_tree_index.append(":");
     }
+    this->changed();
 }
 
 void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
-void VideoProject::reset_root_dir(const string &dir)
-{
+void VideoProject::reset_root_dir(const string &dir){
     for(auto bm : m_bookmarks){
         bm.second->reset_root_dir(dir+"Bookmarks/");
     }
@@ -209,6 +218,8 @@ void VideoProject::reset_root_dir(const string &dir)
  */
 ID VideoProject::add_analysis(BasicAnalysis *analysis){
     m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    this->changed();
+    analysis->set_video_projct(this);
     return m_ana_cnt++;
 }
 
@@ -225,10 +236,12 @@ void VideoProject::delete_artifacts(){
         BasicAnalysis* temp = it2->second;
         temp->delete_saveable();
     }
+    this->changed();
 }
 
 void VideoProject::remove_from_project()
 {
+    this->changed();
     m_project->remove_video_project(this);
 }
 

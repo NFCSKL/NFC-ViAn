@@ -16,15 +16,14 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
  */
 void BasicAnalysis::add_interval(AnalysisInterval *ai){
     m_intervals.insert(ai);
+    this->changed();
 }
 
-SAVE_TYPE BasicAnalysis::get_save_type() const
-{
+SAVE_TYPE BasicAnalysis::get_save_type() const {
     return INTERVAL;
 }
 
-ANALYSIS_TYPE BasicAnalysis::get_type() const
-{
+ANALYSIS_TYPE BasicAnalysis::get_type() const {
     return BASIC_ANALYSIS;
 }
 
@@ -61,12 +60,19 @@ void BasicAnalysis::write(QJsonObject &json){
     json["POI:s"] = json_ais;
 }
 
-std::string BasicAnalysis::get_name() const
-{
+std::string BasicAnalysis::get_name() const {
     return m_name;
 }
 
-interval_set BasicAnalysis::get_intervals() const
-{
+interval_set BasicAnalysis::get_intervals() const {
     return m_intervals;
+}
+
+void BasicAnalysis::changed(){
+    if (m_v_proj == nullptr) return;
+    m_v_proj->changed();
+}
+
+void BasicAnalysis::set_video_project(VideoProject *v_proj) {
+    this->m_v_proj = v_proj;
 }

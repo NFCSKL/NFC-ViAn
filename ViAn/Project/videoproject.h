@@ -31,6 +31,8 @@ class VideoProject : public Saveable{
     Project* m_project = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_cnt = 0; // Analysis id counter
+
+
 public:
 
     VideoProject(Video* v); //Needs to have a video
@@ -62,6 +64,7 @@ public:
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,BasicAnalysis*> get_analyses();
     BasicAnalysis *get_analysis(const int &id);
+    void changed();
 
 };
 

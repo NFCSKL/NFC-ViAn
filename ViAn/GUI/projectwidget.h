@@ -67,6 +67,7 @@ public slots:
     void dropEvent(QDropEvent *event);
     void advanced_analysis();
     void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
+    void prompt_save();
 private slots:
     void context_menu(const QPoint& point);
     void remove_item();
