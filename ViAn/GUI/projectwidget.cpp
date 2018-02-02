@@ -224,7 +224,7 @@ std::stack<int> ProjectWidget::get_index_path(QTreeWidgetItem *item){
 
 /**
  * @brief ProjectWidget::get_video_item
- * Searches the project tree for the VideoItem containing the VideoProjectt v_proj
+ * Searches the project tree for the VideoItem containing the VideoProject v_proj
  * @param v_proj    :   target VideoProject
  * @return VideoItem*   :   the correct VideoItem if found else nullptr
  */
@@ -524,11 +524,28 @@ void ProjectWidget::remove_item() {
     delete_box.setDefaultButton(QMessageBox::No);
     if (delete_box.exec() == QMessageBox::Yes) {
         for (auto item : selectedItems()) {
+            if (item->type() == FOLDER_ITEM) {
+                //for ()
+
+            }
+
+            qDebug() << "in for";
+            if (item->type() == VIDEO_ITEM) {
+                qDebug() << "is video";
+                VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+                remove_video(vid_item);
+            }
+            //} else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
             delete item;
         }
     }
     emit remove_overlay();
+    //emit project_closed();
 
+}
+
+void ProjectWidget::remove_video(VideoItem* vid_item) {
+    emit item_removed(vid_item->get_video_project());
 }
 
 /**
@@ -616,6 +633,7 @@ void ProjectWidget::open_project(QString project_path) {
 void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     if (m_proj == nullptr) return;
+    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(""));
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
@@ -639,6 +657,7 @@ void ProjectWidget::remove_project() {
     int reply = msg_box.exec();
 
     if (reply != QMessageBox::Yes) return;
+    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
     m_proj->delete_artifacts();

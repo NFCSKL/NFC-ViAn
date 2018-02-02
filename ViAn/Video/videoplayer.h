@@ -67,7 +67,7 @@ class VideoPlayer : public QObject{
 public:
     explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
-                         std::atomic_bool* new_video,std::atomic_bool* new_frame_video, video_sync* v_sync, std::condition_variable* player_con,
+                         std::atomic_bool* new_video, std::atomic_bool* new_frame_video, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
                          std::atomic_int* speed_step, QObject *parent = nullptr);
 
@@ -82,8 +82,8 @@ public slots:
     void set_frame();
     void check_events(void);
 private:
-    void load_video();
     void load_video_info();
+    void load_video();
     bool synced_read();
     bool wait_load_read();
     void set_playback_speed(int speed_steps);

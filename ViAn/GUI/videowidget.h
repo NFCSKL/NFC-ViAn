@@ -132,6 +132,8 @@ public slots:
     void on_playback_slider_moved(void);
 
     void load_marked_video(VideoProject* vid_proj);
+    void clear_current_video();
+    void remove_item(VideoProject* vid_proj);
 
     void set_current_frame_size(QSize size);
     void on_export_frame(void);
@@ -218,7 +220,7 @@ private:
     bool video_btns_enabled = false;
     bool analysis_only = false;
 
-    void enable_video_btns();
+    void set_video_btns(bool b);
 
     void init_control_buttons();
     void init_layouts();
