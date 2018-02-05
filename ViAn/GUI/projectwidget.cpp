@@ -524,28 +524,27 @@ void ProjectWidget::remove_item() {
     delete_box.setDefaultButton(QMessageBox::No);
     if (delete_box.exec() == QMessageBox::Yes) {
         for (auto item : selectedItems()) {
+            qDebug() << "in for, selected items";
             if (item->type() == FOLDER_ITEM) {
-                //for ()
-
+                std::vector<VideoItem*> v_items;
+                get_video_items(item, v_items);
+                for (auto v_item : v_items) {
+                    emit item_removed(v_item->get_video_project());
+                }
             }
 
-            qDebug() << "in for";
-            if (item->type() == VIDEO_ITEM) {
+            else if (item->type() == VIDEO_ITEM) {
                 qDebug() << "is video";
                 VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-                remove_video(vid_item);
+                emit item_removed(vid_item->get_video_project());
             }
-            //} else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
+            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
+                qDebug() << "in tag or analysis";
+            }
             delete item;
         }
     }
     emit remove_overlay();
-    //emit project_closed();
-
-}
-
-void ProjectWidget::remove_video(VideoItem* vid_item) {
-    emit item_removed(vid_item->get_video_project());
 }
 
 /**
