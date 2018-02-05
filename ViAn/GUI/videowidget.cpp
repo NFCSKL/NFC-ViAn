@@ -23,7 +23,7 @@
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video controller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &new_frame_video, &v_sync,
+                                       &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
                                        &m_speed_step);
 
@@ -859,10 +859,16 @@ void VideoWidget::clear_current_video() {
     if (video_btns_enabled) set_video_btns(false);
     qDebug() << "disable butns";
 
+    player_lock.lock();
+    video_loaded.store(false);
+    player_lock.unlock();
+    player_con.notify_all();
+
     playback_slider->setValue(frame);
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
     set_total_time(0);
+
     frame_wgt->close();
 }
 

@@ -58,6 +58,7 @@ private:
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
     std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
+    std::atomic_bool video_loaded{false};       // True when a video is loaded/open
 
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
