@@ -88,8 +88,6 @@ private:
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
-
-    void remove_video(VideoItem* vid_item);
 signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);

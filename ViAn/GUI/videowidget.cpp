@@ -820,6 +820,7 @@ void VideoWidget::on_playback_slider_moved() {
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     int frame = -1;
+    if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
         player_lock.lock();
@@ -861,6 +862,8 @@ void VideoWidget::clear_current_video() {
     playback_slider->setValue(frame);
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
+    set_total_time(0);
+    frame_wgt->close();
 }
 
 void VideoWidget::set_video_btns(bool b) {
