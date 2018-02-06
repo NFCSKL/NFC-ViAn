@@ -59,7 +59,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
-    m_proj = new Project(_tmp_name, _tmp_path); 
+    m_proj = new Project(_tmp_name, _tmp_path);
     m_proj->save_project();
     _tmp_path.append(_tmp_name);
     emit proj_path(m_proj->getDir());

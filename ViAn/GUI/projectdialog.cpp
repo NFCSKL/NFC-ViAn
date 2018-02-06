@@ -4,6 +4,7 @@
 #include <QBoxLayout>
 #include <QFormLayout>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -14,8 +15,9 @@
  */
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("New project");
+    setModal(true);
     // remove question mark from the title bar
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
@@ -57,6 +59,20 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
+    QString m_dir = path_text->text() + "/" + name_text->text() + "/";
+    QDir pathDir(m_dir);
+    if (pathDir.exists()) {
+        qDebug() << "path exists";
+        QMessageBox msg_box;
+        msg_box.setModal(true);
+        msg_box.setText("This folder already exist. Are you sure you wan't to continue?");
+        msg_box.setInformativeText("This will overrite the current project.");
+        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msg_box.setDefaultButton(QMessageBox::No);
+        int reply = msg_box.exec();
+        if (reply != QMessageBox::Yes) return;
+    }
+
     emit project_path(name_text->text(), path_text->text());
     close();
 
