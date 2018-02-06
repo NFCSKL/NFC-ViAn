@@ -851,9 +851,11 @@ void VideoWidget::remove_item(VideoProject* vid_proj) {
     if (get_current_video_project() == vid_proj) clear_current_video();
 }
 
+/**
+ * @brief VideoWidget::clear_current_video
+ * Removes the video from the videoplayer
+ */
 void VideoWidget::clear_current_video() {
-
-    //m_vid_proj == nullptr;
     qDebug() << "In Clear current video in vid_wg";
     int frame = -1;
     if (video_btns_enabled) set_video_btns(false);
@@ -873,10 +875,6 @@ void VideoWidget::clear_current_video() {
 }
 
 void VideoWidget::set_video_btns(bool b) {
-    if (b) {
-        qDebug() << "true";
-    } else qDebug() << "false";
-
     for (QPushButton* btn : btns) {
         btn->setEnabled(b);
     }

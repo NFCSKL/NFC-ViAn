@@ -37,7 +37,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
 
 void VideoPlayer::load_video(){
     m_video_loaded->store(true);
-    current_frame = -1; //<----
+    current_frame = -1;
     m_is_playing->store(false);
     m_frame->store(0);
     m_capture.open(*m_video_path);
@@ -73,8 +73,6 @@ void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
-        qDebug() << "set_frame";
-        qDebug() << frame_index;
         current_frame = frame_index;
         synced_read();
     }
