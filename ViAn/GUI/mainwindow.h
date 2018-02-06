@@ -25,6 +25,8 @@
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "statusbar.h"
+#include "Toolbars/maintoolbar.h"
+#include "Toolbars/drawingtoolbar.h"
 
 using namespace std;
 class AnalysisWindow;
@@ -131,6 +133,10 @@ private:
     QMenu* export_menu;
     QMenu* drawing_tools;
     QMenu* help_menu;
+
+    MainToolbar* main_toolbar;
+    DrawingToolbar* draw_toolbar;
+    QAction* toggle_draw_toolbar;
 
     void init_file_menu();
     void init_edit_menu();

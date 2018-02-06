@@ -15,8 +15,6 @@
 #include "Video/shapes/shape.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
-#include "Toolbars/maintoolbar.h"
-#include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
@@ -75,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_help_menu();
 
     // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
@@ -83,9 +81,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
 
     // Draw toolbar
-    DrawingToolbar* draw_toolbar = new DrawingToolbar();
+    draw_toolbar = new DrawingToolbar();
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
-    QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
+    toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
