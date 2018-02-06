@@ -39,13 +39,6 @@ public:
     ~MainWindow();
 
     StatusBar* status_bar;
-    QAction* show_analysis_queue;
-    QAction* detect_intv_act;
-    QAction* bound_box_act;
-    QAction* interval_act;
-    QAction* drawing_act;
-
-    QAction* color_act;
 
     RecentProjectDialog* rp_dialog;
 
@@ -68,6 +61,7 @@ private slots:
 public slots:
     void options(void);
     void open_project_dialog();
+    void enable_project_tools(bool b);
 
 signals:
     void set_status_bar(QString);
@@ -80,10 +74,63 @@ private:
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
 
+    AnalysisWindow *analysis_window;
+
+    QAction* new_project_act;
+    QAction* add_vid_act;
+    QAction* open_project_act;
+    QAction* save_project_act;
+    QAction* close_project_act;
+    QAction* remove_project_act;
+    QAction* gen_report_act;
+    QAction* quit_act;
+
+    QAction* cont_bri_act;
+    QAction* cw_act;
+    QAction* ccw_act;
+    QAction* options_act;
+
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
+    QAction* detect_intv_act;
+    QAction* bound_box_act;
+    QAction* interval_act;
+    QAction* drawing_act;
+    QAction* show_analysis_queue;
 
-    AnalysisWindow *analysis_window;
+    QAction* analysis_act;
+
+    QAction* tag_interval_act;
+    QAction* rm_tag_interval_act;
+    QAction* rm_interval_act;
+
+    QAction* export_act;
+    QAction* color_act;
+    QAction* rectangle_act;
+    QAction* circle_act;
+    QAction* line_act;
+    QAction* arrow_act;
+    QAction* pen_act;
+    QAction* text_act;
+    QAction* undo_act;
+    QAction* redo_act;
+    QAction* clear_act;
+    QAction* zoom_in_act;
+    QAction* zoom_out_act;
+    QAction* fit_screen_act;
+    QAction* reset_zoom_act;
+
+    QAction* help_act;
+
+    QMenu* file_menu;
+    QMenu* edit_menu;
+    QMenu* view_menu;
+    QMenu* analysis_menu;
+    QMenu* interval_menu;
+    QMenu* tool_menu;
+    QMenu* export_menu;
+    QMenu* drawing_tools;
+    QMenu* help_menu;
 
     void init_file_menu();
     void init_edit_menu();
