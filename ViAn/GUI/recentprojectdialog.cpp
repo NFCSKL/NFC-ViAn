@@ -66,6 +66,10 @@ void RecentProjectDialog::on_open_btn_clicked(){
     open_project_from_file();
 }
 
+/**
+ * @brief RecentProjectDialog::on_confirm_btn_clicked
+ * Accepts dialog and emits signal to open the selected project
+ */
 void RecentProjectDialog::on_confirm_btn_clicked(){
     if (recent_list->selectedItems().length() == 0) return;
     open_project(recent_list->currentItem()->toolTip());
