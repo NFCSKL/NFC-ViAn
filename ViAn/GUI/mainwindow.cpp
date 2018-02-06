@@ -15,8 +15,6 @@
 #include "Video/shapes/shape.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
-#include "Toolbars/maintoolbar.h"
-#include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
@@ -26,6 +24,7 @@
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
+    setWindowTitle("ViAn - Create a project to get started");
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -74,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_help_menu();
 
     // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
@@ -82,9 +81,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
 
     // Draw toolbar
-    DrawingToolbar* draw_toolbar = new DrawingToolbar();
+    draw_toolbar = new DrawingToolbar();
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
-    QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
+    toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
@@ -121,6 +120,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
     connect(project_wgt, SIGNAL(enable_tag_btn(bool)), video_wgt, SLOT(enable_tag_btn(bool)));
+    connect(project_wgt, SIGNAL(enable_menu_items(bool)), this, SLOT(enable_project_tools(bool)));
 
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
@@ -141,6 +141,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
     QTimer::singleShot(0, rp_dialog, SLOT(exec()));
+
+    enable_project_tools(false);
 }
 
 
@@ -156,17 +158,17 @@ MainWindow::~MainWindow() {
  * Set up the file menu
  */
 void MainWindow::init_file_menu() {
-    QMenu* file_menu = menuBar()->addMenu(tr("&File"));
+    file_menu = menuBar()->addMenu(tr("&File"));
 
     // Init actions
-    QAction* new_project_act = new QAction(tr("&New project"), this);
-    QAction* add_vid_act = new QAction(tr("&Add video"), this);
-    QAction* open_project_act = new QAction(tr("&Open project"), this);
-    QAction* save_project_act = new QAction(tr("&Save project"), this);
-    QAction* gen_report_act = new QAction(tr("&Generate report"), this);
-    QAction* close_project_act = new QAction(tr("&Close project"), this);
-    QAction* remove_project_act = new QAction(tr("&Remove project"), this);
-    QAction* quit_act = new QAction(tr("&Quit"), this);
+    new_project_act = new QAction(tr("&New project"), this);
+    add_vid_act = new QAction(tr("&Add video"), this);
+    open_project_act = new QAction(tr("&Open project"), this);
+    save_project_act = new QAction(tr("&Save project"), this);
+    gen_report_act = new QAction(tr("&Generate report"), this);
+    close_project_act = new QAction(tr("&Close project"), this);
+    remove_project_act = new QAction(tr("&Remove project"), this);
+    quit_act = new QAction(tr("&Quit"), this);
 
     // Set icons
     //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));     //add if wanted
@@ -226,12 +228,12 @@ void MainWindow::init_file_menu() {
  * Set up the edit menu
  */
 void MainWindow::init_edit_menu() {
-    QMenu* edit_menu = menuBar()->addMenu(tr("&Edit"));
+    edit_menu = menuBar()->addMenu(tr("&Edit"));
 
-    QAction* cont_bri_act = new QAction(tr("&Contrast/Brightness"), this);
-    QAction* cw_act = new QAction(tr("&Rotate 90°"), this);
-    QAction* ccw_act = new QAction(tr("Ro&tate 90°"), this);
-    QAction* options_act = new QAction(tr("&Options"), this);
+    cont_bri_act = new QAction(tr("&Contrast/Brightness"), this);
+    cw_act = new QAction(tr("&Rotate 90°"), this);
+    ccw_act = new QAction(tr("Ro&tate 90°"), this);
+    options_act = new QAction(tr("&Options"), this);
 
     cont_bri_act->setIcon(QIcon("../ViAn/Icons/screen.png"));
     cw_act->setIcon(QIcon("../ViAn/Icons/right.png"));
@@ -260,7 +262,7 @@ void MainWindow::init_edit_menu() {
  * Set up the view menu
  */
 void MainWindow::init_view_menu() {
-    QMenu* view_menu = menuBar()->addMenu(tr("&View"));
+    view_menu = menuBar()->addMenu(tr("&View"));
 
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
@@ -314,21 +316,22 @@ void MainWindow::init_view_menu() {
  * Set up the analysis menu
  */
 void MainWindow::init_analysis_menu() {
-    QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
+    analysis_menu = menuBar()->addMenu(tr("&Analysis"));
 
-    QAction* analysis_act = new QAction(tr("&Perform analysis"), this);
+    analysis_act = new QAction(tr("&Perform analysis"), this);
     analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     analysis_act->setStatusTip(tr("Perform analysis"));
     analysis_menu->addAction(analysis_act);
+
     connect(analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
 }
 
 void MainWindow::init_interval_menu() {
-    QMenu* interval_menu = menuBar()->addMenu(tr("&Interval"));
+    interval_menu = menuBar()->addMenu(tr("&Interval"));
 
-    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
-    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
-    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
+    tag_interval_act = new QAction(tr("&Tag interval"), this);
+    rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
+    rm_interval_act = new QAction(tr("&Delete interval"), this);
 
     tag_interval_act->setShortcut(tr("Shift+T"));
     rm_tag_interval_act->setShortcut(tr("Shift+R"));
@@ -348,25 +351,25 @@ void MainWindow::init_interval_menu() {
  * Set up the tools menu
  */
 void MainWindow::init_tools_menu() {
-    QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
+    tool_menu = menuBar()->addMenu(tr("&Tools"));
 
-    QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
+    zoom_in_act = new QAction(tr("&Zoom in"), this);
     color_act = new QAction(tr("&Color"), this);
-    QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
-    QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
-    QAction* reset_zoom_act = new QAction(tr("Re&set zoom"), this);
-    QAction* rectangle_act = new QAction(tr("&Rectangle"), this);
-    QAction* circle_act = new QAction(tr("C&ircle"), this);
-    QAction* line_act = new QAction(tr("Li&ne"), this);
-    QAction* arrow_act = new QAction(tr("&Arrow"), this);
-    QAction* pen_act = new QAction(tr("&Pen"), this);
-    QAction* text_act = new QAction(tr("&Text"), this);
+    zoom_out_act = new QAction(tr("Zoom &out"), this);
+    fit_screen_act = new QAction(tr("&Fit to screen"), this);
+    reset_zoom_act = new QAction(tr("Re&set zoom"), this);
+    rectangle_act = new QAction(tr("&Rectangle"), this);
+    circle_act = new QAction(tr("C&ircle"), this);
+    line_act = new QAction(tr("Li&ne"), this);
+    arrow_act = new QAction(tr("&Arrow"), this);
+    pen_act = new QAction(tr("&Pen"), this);
+    text_act = new QAction(tr("&Text"), this);
 
-    QAction* export_act = new QAction(tr("&Export interval"), this);
+    export_act = new QAction(tr("&Export interval"), this);
     export_act->setShortcut(tr("Shift+E"));
-    QAction* undo_act = new QAction(tr("&Undo"), this);
-    QAction* redo_act = new QAction(tr("Re&do"), this);
-    QAction* clear_act = new QAction(tr("C&lear"), this);
+    undo_act = new QAction(tr("&Undo"), this);
+    redo_act = new QAction(tr("Re&do"), this);
+    clear_act = new QAction(tr("C&lear"), this);
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
@@ -384,13 +387,13 @@ void MainWindow::init_tools_menu() {
     clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
 
     // Export submenu
-    QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
+    export_menu = tool_menu->addMenu(tr("&Export"));
     export_menu->addAction(export_act);
 
     tool_menu->addSeparator();
 
     tool_menu->addAction(color_act);
-    QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
+    drawing_tools = tool_menu->addMenu(tr("&Shapes"));
     drawing_tools->addAction(rectangle_act);
     drawing_tools->addAction(circle_act);
     drawing_tools->addAction(line_act);
@@ -447,8 +450,8 @@ void MainWindow::init_tools_menu() {
  * Set up the help menu
  */
 void MainWindow::init_help_menu() {
-    QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
-    QAction* help_act = new QAction(tr("Open manual"), this);
+    help_menu = menuBar()->addMenu(tr("&Help"));
+    help_act = new QAction(tr("Open manual"), this);
     help_act->setIcon(QIcon("../ViAn/Icons/question.png"));
     help_menu->addAction(help_act);
     help_act->setShortcut(tr("Ctrl+h"));
@@ -572,4 +575,39 @@ void MainWindow::options() {
 void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     open_project(project_path);
+}
+
+/**
+ * @brief MainWindow::enable_project_tools
+ * @param b
+ * Enable/disable the actions in the menus that needs a project to function
+ */
+void MainWindow::enable_project_tools(bool b) {
+    add_vid_act->setEnabled(b);
+    save_project_act->setEnabled(b);
+    close_project_act->setEnabled(b);
+    remove_project_act->setEnabled(b);
+    gen_report_act->setEnabled(b);
+    cont_bri_act->setEnabled(b);
+    cw_act->setEnabled(b);
+    ccw_act->setEnabled(b);
+    analysis_act->setEnabled(b);
+    tag_interval_act->setEnabled(b);
+    rm_tag_interval_act->setEnabled(b);
+    rm_interval_act->setEnabled(b);
+    export_act->setEnabled(b);
+    color_act->setEnabled(b);
+    rectangle_act->setEnabled(b);
+    circle_act->setEnabled(b);
+    line_act->setEnabled(b);
+    arrow_act->setEnabled(b);
+    pen_act->setEnabled(b);
+    text_act->setEnabled(b);
+    undo_act->setEnabled(b);
+    redo_act->setEnabled(b);
+    clear_act->setEnabled(b);
+    zoom_in_act->setEnabled(b);
+    zoom_out_act->setEnabled(b);
+    fit_screen_act->setEnabled(b);
+    reset_zoom_act->setEnabled(b);
 }

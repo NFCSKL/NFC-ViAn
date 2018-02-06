@@ -63,6 +63,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     m_proj->save_project();
     _tmp_path.append(_tmp_name);
     emit proj_path(m_proj->getDir());
+    emit enable_menu_items(true);
 }
 
 /**
@@ -71,7 +72,10 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  * Creates a file dialog and creates a video project based on file path
  */
 void ProjectWidget::add_video() {
-    if (m_proj == nullptr)  return;
+    if (m_proj == nullptr) {
+        emit set_status_bar("No project found. Please create or open a project first.");
+        return;
+    }
     // TODO: HANDLE CASE. Only open video files
     QStringList video_paths = QFileDialog().getOpenFileNames(this, tr("Add video"), m_proj->getDir().c_str());
     for (auto video_path : video_paths){
@@ -574,7 +578,10 @@ void ProjectWidget::create_folder_item() {
  * Slot function to save the open project
  */
 void ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return;
+    if (m_proj == nullptr) {
+        emit set_status_bar("No project found. Please create or open a project first.");
+        return;
+    }
     save_item_data();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -607,6 +614,7 @@ void ProjectWidget::open_project(QString project_path) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
     }
+    emit enable_menu_items(true);
 }
 
 /**
@@ -615,10 +623,14 @@ void ProjectWidget::open_project(QString project_path) {
  */
 void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
-    if (m_proj == nullptr) return;
+    if (m_proj == nullptr) {
+        emit set_status_bar("No project found. Please create or open a project first.");
+        return;
+    }
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
+    emit enable_menu_items(false);
     this->clear();
     delete m_proj;
     m_proj = nullptr;
@@ -630,7 +642,10 @@ void ProjectWidget::close_project() {
  */
 void ProjectWidget::remove_project() {
     // TODO Does this delete all images?
-    if (m_proj == nullptr) return;
+    if (m_proj == nullptr) {
+        emit set_status_bar("No project found. Please create or open a project first.");
+        return;
+    }
     QMessageBox msg_box;
     msg_box.setText("Are you sure you want to remove the project?");
     msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
@@ -646,4 +661,5 @@ void ProjectWidget::remove_project() {
     delete m_proj;
     m_proj = nullptr;
     emit project_closed();
+    emit enable_menu_items(false);
 }

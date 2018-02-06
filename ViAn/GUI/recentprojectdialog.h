@@ -23,7 +23,8 @@ class RecentProjectDialog : public QDialog {
     QVBoxLayout* v_main_layout;
     QVBoxLayout* v_btn_layout;
     QPushButton* new_btn;
-    QPushButton* open_btn;
+    QPushButton* open_other_btn;
+    QPushButton* confirm_btn;
     QListWidget* recent_list;
 public:
     RecentProjectDialog(QWidget* parent = nullptr);
@@ -35,6 +36,7 @@ private slots:
     void on_item_double_clicked(QListWidgetItem* item);
     void on_new_btn_clicked();
     void on_open_btn_clicked();
+    void on_confirm_btn_clicked();
 };
 
 #endif // RECENTPROJECTDIALOG_H
