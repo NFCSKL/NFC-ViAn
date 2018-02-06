@@ -45,6 +45,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 void ProjectWidget::new_project() {
     ProjectDialog* proj_dialog = new ProjectDialog();
     QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
+    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
 }
 
 /**
@@ -591,6 +592,7 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project(QString project_path) {
+    qDebug() << project_path;
     if (project_path.isEmpty()) return;
     if (m_proj != nullptr) close_project();
     set_status_bar("Opening project");

@@ -66,16 +66,26 @@ void ProjectDialog::ok_btn_clicked() {
         QMessageBox msg_box;
         msg_box.setModal(true);
         msg_box.setText("This folder already exist. Are you sure you wan't to continue?");
-        msg_box.setInformativeText("This will overrite the current project.");
-        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msg_box.setInformativeText("Yes will overrite and Open will open the current project.");
+        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Open);
         msg_box.setDefaultButton(QMessageBox::No);
         int reply = msg_box.exec();
+        if (reply == QMessageBox::Open) {
+            qDebug() << path_text->text();
+            if (path_text->text() == "") {
+                qDebug() << "is empty";
+                m_dir = "C:" + m_dir;
+            }
+            emit open_project(m_dir + name_text->text());
+            qDebug() << m_dir;
+            qDebug() << "open project";
+            close();
+            return;
+        }
         if (reply != QMessageBox::Yes) return;
     }
-
     emit project_path(name_text->text(), path_text->text());
     close();
-
 }
 
 void ProjectDialog::cancel_btn_clicked() {
