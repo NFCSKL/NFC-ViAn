@@ -18,10 +18,13 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
 
     new_btn = new QPushButton(tr("New project"));
     new_btn->setToolTip(tr("Start a new project"));
-    open_btn = new QPushButton(tr("Open project"));
-    open_btn->setToolTip(tr("Open a project from file"));
-    v_btn_layout->addWidget(new_btn);                           // Second row second col first row
-    v_btn_layout->addWidget(open_btn);                          // Second row second col second row
+    open_other_btn = new QPushButton(tr("Open project..."));
+    open_other_btn->setToolTip(tr("Open a project from file"));
+    confirm_btn = new QPushButton(tr("Open"));
+    confirm_btn->setToolTip(tr("Open selected project"));
+    v_btn_layout->addWidget(new_btn);                                 // Second row second col first row
+    v_btn_layout->addWidget(open_other_btn);                          // Second row second col second row
+    v_btn_layout->addWidget(confirm_btn);                          // Second row second col third row
 
     for (auto project : RecentProject().load_recent()) {
         QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(project.first));
@@ -31,7 +34,8 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
 
     connect(recent_list, &QListWidget::itemDoubleClicked, this, &RecentProjectDialog::on_item_double_clicked);
     connect(new_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_new_btn_clicked);
-    connect(open_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_open_btn_clicked);
+    connect(open_other_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_open_btn_clicked);
+    connect(confirm_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_confirm_btn_clicked);
 }
 
 /**
@@ -49,8 +53,8 @@ void RecentProjectDialog::on_item_double_clicked(QListWidgetItem* item) {
  * Accepts dialog and emits signal to create a new project
  */
 void RecentProjectDialog::on_new_btn_clicked(){
-    accept();
     new_project();
+    accept();
 }
 
 /**
@@ -60,4 +64,10 @@ void RecentProjectDialog::on_new_btn_clicked(){
 void RecentProjectDialog::on_open_btn_clicked(){
     accept();
     open_project_from_file();
+}
+
+void RecentProjectDialog::on_confirm_btn_clicked(){
+    if (recent_list->selectedItems().length() == 0) return;
+    open_project(recent_list->currentItem()->toolTip());
+    accept();
 }
