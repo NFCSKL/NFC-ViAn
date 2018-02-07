@@ -16,9 +16,15 @@ void FrameWidget::toggle_zoom(bool value) {
     }
 }
 
-void FrameWidget::set_analysis_tool()
-{
-    tool = ANALYSIS_BOX;
+void FrameWidget::set_analysis_tool(bool status) {
+    if (status) {
+        tool = ANALYSIS_BOX;
+        setCursor(Qt::CrossCursor);
+    } else {
+        tool = NONE;
+        unsetCursor();
+    }
+
 }
 
 
@@ -265,17 +271,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     }
     case ANALYSIS_BOX:
     {
-        AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
-
-        cv::Point end = cv::Point(rect_end.x(), rect_end.y());
-        cv::Point start (rect_start.x(), rect_start.y());
-        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
-                      cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));        
-        settings->setBounding_box(scaled);
-
-        emit quick_analysis(settings);
-        tool = NONE;
-        mark_rect = false;
+        set_analysis_settings();
         break;
     }
     default:
@@ -304,6 +300,29 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         emit mouse_moved(scale_point(event->pos()));
         break;
     }
+}
+
+void FrameWidget::set_analysis_settings() {
+    QMessageBox msg_box;
+    msg_box.setText("Quick analysis");
+    msg_box.setInformativeText("Do you wanna start an analysis on the marked area?");
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    int reply = msg_box.exec();
+
+    if (reply != QMessageBox::Yes) return;
+
+    AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
+
+    cv::Point end = cv::Point(rect_end.x(), rect_end.y());
+    cv::Point start (rect_start.x(), rect_start.y());
+    cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
+                  cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));
+    settings->setBounding_box(scaled);
+
+    emit quick_analysis(settings);
+    //tool = NONE;
+    //unsetCursor();
+    mark_rect = false;
 }
 
 void FrameWidget::set_scale_factor(double scale_factor) {

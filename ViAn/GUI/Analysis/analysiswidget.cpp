@@ -85,14 +85,12 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     emit remove_analysis_bar();
 }
 
-void AnalysisWidget::abort_analysis()
-{
+void AnalysisWidget::abort_analysis() {
     bool* abort = abort_map.at(current_method);
     *abort = true;
 }
 
-void AnalysisWidget::on_analysis_aborted()
-{    
+void AnalysisWidget::on_analysis_aborted() {
     analysis_queue.pop_front();
     delete current_analysis_item; // Delete item from tree
     auto it = abort_map.find(current_method);   
@@ -107,6 +105,7 @@ void AnalysisWidget::on_analysis_aborted()
     }
     // Queue Empty
     queue_wgt->hide();
+    //queue_wgt->toggle_show();
     emit remove_analysis_bar();
 }
 
