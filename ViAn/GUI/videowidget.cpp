@@ -78,8 +78,7 @@ int VideoWidget::get_current_video_length(){
 }
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
-    if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second))
-    {
+    if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
         settings->setInterval(AnalysisInterval(m_interval.first,m_interval.second));
         delete_interval();
     }
@@ -926,6 +925,12 @@ void VideoWidget::set_redo() {
 void VideoWidget::set_clear_drawings() {
     update_overlay_settings([&](){
         o_settings.clear_drawings = true;
+    });
+}
+
+void VideoWidget::set_show_overlay(bool show) {
+    update_overlay_settings([&](){
+        o_settings.show_overlay = show;
     });
 }
 

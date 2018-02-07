@@ -309,19 +309,18 @@ void FrameWidget::set_analysis_settings() {
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     int reply = msg_box.exec();
 
-    if (reply != QMessageBox::Yes) return;
+    if (reply == QMessageBox::Yes) {
 
-    AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
+        AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
 
-    cv::Point end = cv::Point(rect_end.x(), rect_end.y());
-    cv::Point start (rect_start.x(), rect_start.y());
-    cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
-                  cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));
-    settings->setBounding_box(scaled);
+        cv::Point end = cv::Point(rect_end.x(), rect_end.y());
+        cv::Point start (rect_start.x(), rect_start.y());
+        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
+                      cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));
+        settings->setBounding_box(scaled);
 
-    emit quick_analysis(settings);
-    //tool = NONE;
-    //unsetCursor();
+        emit quick_analysis(settings);
+    }
     mark_rect = false;
 }
 

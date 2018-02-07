@@ -71,7 +71,7 @@ struct overlay_settings {
     bool undo = false;
     bool redo = false;
     bool clear_drawings = false;
-
+    bool show_overlay = true;
     bool overlay_removed = false;
 
     SHAPES tool = NONE;
@@ -79,7 +79,6 @@ struct overlay_settings {
     QString current_string = "Enter text";
     float current_font_scale = 1;
 
-    bool show_overlay = true;
 };
 /**
  * @brief The FrameProcessor class

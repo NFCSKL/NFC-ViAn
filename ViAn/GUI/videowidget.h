@@ -147,6 +147,7 @@ public slots:
     void on_playback_stopped(void);
 
     void set_overlay_removed();
+    void set_show_overlay(bool show);
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);

@@ -303,10 +303,10 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+    connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
     // TODO, connect signal back from queue widget to correctly
     // set view checkbox when queuewidget toggle_show triggered from elsewhere
     connect(show_analysis_queue, &QAction::toggled, analysis_wgt->queue_wgt, &QueueWidget::toggle_show);
-    //connect(drawing_act, &QAction::toggled, video_wgt->frame_wgt->get_overlay(), &Overlay::set_showing_overlay);
 }
 
 /**
