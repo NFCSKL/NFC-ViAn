@@ -79,9 +79,11 @@ private:
     ProjectWidget* project_wgt;
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
+    QueueWidget* queue_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
+    QAction* toggle_queue_wgt;
 
     AnalysisWindow *analysis_window;
 

@@ -36,7 +36,7 @@ public:
     std::deque<tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
 
     // Widget representing the current analysis queue
-    QueueWidget* queue_wgt;
+    QueueWidget* m_queue_wgt;
 
     // Item in project tree corresponding to
     // the currently executing method
@@ -51,6 +51,7 @@ private:
     // Moves the queue forward
     void move_queue();
 public slots:
+    void set_queue_wgt(QueueWidget* queue_wgt);
 
     // Incoming request to start analysis
     void start_analysis(QTreeWidgetItem* item, AnalysisMethod *method);

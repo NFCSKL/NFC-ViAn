@@ -28,10 +28,13 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    QDockWidget* queue_dock = new QDockWidget(tr("Analysis queue"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
+    toggle_queue_wgt = queue_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -56,6 +59,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     bookmark_dock->close();
+    
+    // Initialize analysis queue widget
+    queue_wgt = new QueueWidget();
+    queue_dock->setWidget(queue_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, queue_dock);
+    queue_dock->setFloating(true);
+    queue_dock->close();
+    analysis_wgt->set_queue_wgt(queue_wgt);
 
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
@@ -282,6 +293,7 @@ void MainWindow::init_view_menu() {
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
+    view_menu->addAction(toggle_queue_wgt);
     view_menu->addSeparator();
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
@@ -291,11 +303,12 @@ void MainWindow::init_view_menu() {
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
+    toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
-    show_analysis_queue->setStatusTip(tr("Show/Hide Analysis queue"));
+    show_analysis_queue->setStatusTip(tr("Show/hide Analysis queue"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
@@ -306,7 +319,7 @@ void MainWindow::init_view_menu() {
     connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
     // TODO, connect signal back from queue widget to correctly
     // set view checkbox when queuewidget toggle_show triggered from elsewhere
-    connect(show_analysis_queue, &QAction::toggled, analysis_wgt->queue_wgt, &QueueWidget::toggle_show);
+    connect(show_analysis_queue, &QAction::toggled, analysis_wgt->m_queue_wgt, &QueueWidget::toggle_show);
 }
 
 /**
