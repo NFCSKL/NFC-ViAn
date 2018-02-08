@@ -28,7 +28,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;    
     m_dir = dir_path + "/" + name + "/";
     m_dir_bookmarks = m_dir + "Bookmarks/";
-    m_file = m_dir + name;
+    m_file = m_dir + name + ".vian";
 }
 
 

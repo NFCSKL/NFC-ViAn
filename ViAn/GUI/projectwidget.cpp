@@ -72,8 +72,21 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  */
 void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return;
-    // TODO: HANDLE CASE. Only open video files
-    QStringList video_paths = QFileDialog().getOpenFileNames(this, tr("Add video"), m_proj->getDir().c_str());
+
+    //Build string to limit file selection
+    QString extensions = "Videos (";
+    for (auto it = allowed_vid_exts.begin(); it != allowed_vid_exts.end(); ++it){
+        extensions += "*." + QString::fromStdString(*it) + " ";
+    }
+    extensions += ")";
+
+    // Create actual dialog
+    QStringList video_paths = QFileDialog().getOpenFileNames(
+                this,
+                tr("Add video"),
+                m_proj->getDir().c_str(),
+                extensions);
+
     for (auto video_path : video_paths){
         int index = video_path.lastIndexOf('/') + 1;
         QString vid_name = video_path.right(video_path.length() - index);
@@ -165,16 +178,10 @@ QStringList ProjectWidget::mimeTypes() const {
  * @param path  : path to the video file
  */
 void ProjectWidget::file_dropped(QString path) {
-    std::set<std::string> exts {"mkv", "flv", "vob", "ogv", "ogg",
-                                "264", "263", "mjpeg", "avc", "m2ts",
-                                "mts", "avi", "mov", "qt", "wmv", "mp4",
-                                "m4p", "m4v", "mpg", "mp2", "mpeg",
-                                "mpe", "mpv", "m2v", "m4v", "3gp", "3g2",
-                                "flv", "f4v", "f4p", "f4a", "f4b"};
     QFileInfo tmp(path);
     std::string ext = tmp.suffix().toStdString();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (exts.find(ext) != exts.end()) {
+    if (allowed_vid_exts.find(ext) != allowed_vid_exts.end()) {
         // Add file
         int index = path.lastIndexOf('/') + 1;
         QString vid_name = path.right(path.length() - index);
