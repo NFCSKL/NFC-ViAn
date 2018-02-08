@@ -5,12 +5,12 @@
 #include <QTreeWidgetItem>
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
-    //m_queue_wgt = new QueueWidget();
-    //m_queue_wgt->hide();
+
 }
 
 void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
     m_queue_wgt = queue_wgt;
+
     connect(m_queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
@@ -24,6 +24,7 @@ void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     m_queue_wgt->enqueue(method);
+    m_queue_wgt->show();
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -109,7 +110,6 @@ void AnalysisWidget::on_analysis_aborted() {
     }
     // Queue Empty
     m_queue_wgt->hide();
-    //queue_wgt->toggle_show();
     emit remove_analysis_bar();
 }
 

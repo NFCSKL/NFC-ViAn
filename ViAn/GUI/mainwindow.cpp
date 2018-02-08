@@ -277,19 +277,16 @@ void MainWindow::init_view_menu() {
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
     interval_act = new QAction(tr("&Interval"), this);
     drawing_act = new QAction(tr("&Paintings"), this);
-    show_analysis_queue = new QAction(tr("Analysis &Queue"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
     interval_act->setCheckable(true);
     drawing_act->setCheckable(true);
-    show_analysis_queue->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
     interval_act->setChecked(true);
     drawing_act->setChecked(true);
-    show_analysis_queue->setChecked(false);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
@@ -299,7 +296,6 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(bound_box_act);
     view_menu->addAction(interval_act);
     view_menu->addAction(drawing_act);
-    view_menu->addAction(show_analysis_queue);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
@@ -308,7 +304,6 @@ void MainWindow::init_view_menu() {
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
-    show_analysis_queue->setStatusTip(tr("Show/hide Analysis queue"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
@@ -319,7 +314,7 @@ void MainWindow::init_view_menu() {
     connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
     // TODO, connect signal back from queue widget to correctly
     // set view checkbox when queuewidget toggle_show triggered from elsewhere
-    connect(show_analysis_queue, &QAction::toggled, analysis_wgt->m_queue_wgt, &QueueWidget::toggle_show);
+    //connect(show_analysis_queue, &QAction::toggled, analysis_wgt->m_queue_wgt, &QueueWidget::toggle_show);
 }
 
 /**
