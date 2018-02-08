@@ -4,10 +4,9 @@
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
  */
-Project::Project()
-{
-
+Project::Project(){
 }
+
 //TODO Fix all these function names
 Project* Project::fromFile(const std::string &full_path)
 {
@@ -44,7 +43,6 @@ Project::~Project(){
     for (auto rep_it = m_reports.begin(); rep_it != m_reports.end(); ++rep_it) {
         delete rep_it->second;
     }
-    m_unsaved_changes = true;
 }
 
 /**
@@ -122,7 +120,8 @@ void Project::set_unsaved(bool changed) {
  * @return m_unsaved_changes
  */
 bool Project::is_saved() const {
-    return !m_unsaved_changes;
+    bool video_projects_saved = std::all_of(m_videos.begin(), m_videos.end(), [](VideoProject* vp){return vp->is_saved();});
+    return !m_unsaved_changes && video_projects_saved;
 }
 
 /**
@@ -154,6 +153,7 @@ void Project::read(const QJsonObject& json){
         add_report(report);
         report->reset_root_dir(m_dir);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -192,7 +192,6 @@ bool Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    m_unsaved_changes = false;
     return save_saveable(m_file);
 }
 

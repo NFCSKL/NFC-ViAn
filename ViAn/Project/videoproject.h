@@ -32,6 +32,8 @@ class VideoProject : public Saveable{
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_cnt = 0; // Analysis id counter
 
+    bool m_unsaved_changes = true;
+
 
 public:
 
@@ -64,7 +66,8 @@ public:
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,BasicAnalysis*> get_analyses();
     BasicAnalysis *get_analysis(const int &id);
-    void changed();
+
+    bool is_saved();
 
 };
 

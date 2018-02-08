@@ -6,7 +6,7 @@
 #include "analysisinterval.h"
 #include <typeinfo>
 #include <QJsonArray>
-#include "Project/videoproject.h"
+//#include "Project/videoproject.h"
 
 enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG =2, BASIC_ANALYSIS =3};
 enum SAVE_TYPE {DETECTION=10, INTERVAL=11};
@@ -20,7 +20,7 @@ struct interval_cmp {
 using interval_set = std::set<AnalysisInterval*, interval_cmp>;
 class BasicAnalysis : public Saveable
 {       
-    VideoProject* m_v_proj = nullptr;
+//    VideoProject* m_v_proj = nullptr;
 public:
     std::string m_name = "";
 protected:
@@ -39,7 +39,7 @@ public:
     interval_set get_intervals() const;
 
     void changed();
-    void set_video_project(VideoProject* v_proj);
+//    void set_video_project(VideoProject* v_proj);
 };
 
 Q_DECLARE_METATYPE(BasicAnalysis)

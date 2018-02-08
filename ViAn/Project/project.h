@@ -37,7 +37,7 @@ class Project : public Saveable{
     std::map<ID, Report*> m_reports;
     int m_vid_count = 0;
     int m_rp_count = 0;
-    bool m_unsaved_changes = false;
+    bool m_unsaved_changes = true;
 public:
     static Project* fromFile(const std::string& file_name);
     Project(const std::string& name, const std::string& dir_path);

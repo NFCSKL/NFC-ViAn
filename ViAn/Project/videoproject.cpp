@@ -1,11 +1,5 @@
 #include "videoproject.h"
 
-
-void VideoProject::changed(){
-    if (this->m_project == nullptr) return;
-    this->m_project->set_unsaved(true);
-}
-
 /**
  * @brief VideoProject::VideoProject
  * @param v
@@ -64,6 +58,10 @@ BasicAnalysis *VideoProject::get_analysis(const int& id) {
     return m_analyses[id];
 }
 
+bool VideoProject::is_saved() {
+    return !m_unsaved_changes;
+}
+
 /**
  * @brief VideoProject::remove_analysis
  * @param id of the analysis
@@ -73,7 +71,7 @@ void VideoProject::delete_analysis(const int& id) {
     m_analyses.erase(id);
     am->delete_saveable();
     delete am;
-    this->changed();
+    m_unsaved_changes = true;
 }
 
 /**
@@ -87,7 +85,7 @@ void VideoProject::delete_bookmark(const int &id) {
     m_bookmarks.erase(id);
     bm->remove_exported_image();
     delete bm;
-    this->changed();
+    m_unsaved_changes = true;
 }
 
 /**
@@ -139,6 +137,7 @@ void VideoProject::read(const QJsonObject& json){
         analysis->read(json_analysis);
         add_analysis(analysis);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -171,6 +170,7 @@ void VideoProject::write(QJsonObject& json){
     QJsonObject json_overlay;
     this->m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
+    m_unsaved_changes = false;
 }
 
 /**
@@ -181,7 +181,7 @@ void VideoProject::write(QJsonObject& json){
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
     bookmark->set_video_project(this);
-    this->changed();
+    m_unsaved_changes = true;
     return m_bm_cnt++;
 }
 
@@ -192,7 +192,7 @@ void VideoProject::set_tree_index(std::stack<int> tree_index) {
         tree_index.pop();
         m_tree_index.append(":");
     }
-    this->changed();
+    m_unsaved_changes = true;
 }
 
 void VideoProject::set_project(Project *proj){
@@ -218,8 +218,7 @@ void VideoProject::reset_root_dir(const string &dir){
  */
 ID VideoProject::add_analysis(BasicAnalysis *analysis){
     m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
-    this->changed();
-    analysis->set_video_projct(this);
+    m_unsaved_changes = true;
     return m_ana_cnt++;
 }
 
@@ -236,12 +235,10 @@ void VideoProject::delete_artifacts(){
         BasicAnalysis* temp = it2->second;
         temp->delete_saveable();
     }
-    this->changed();
+    m_unsaved_changes = true;
 }
 
-void VideoProject::remove_from_project()
-{
-    this->changed();
+void VideoProject::remove_from_project() {
     m_project->remove_video_project(this);
 }
 

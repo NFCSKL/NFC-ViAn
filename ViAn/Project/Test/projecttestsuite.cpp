@@ -1,10 +1,9 @@
 #include "projecttestsuite.h"
 
 ProjectTestsuite::ProjectTestsuite(QObject *parent) : QObject(parent) {
-
 }
-void ProjectTestsuite::add_remove_vid_proj_test()
-{
+
+void ProjectTestsuite::add_remove_vid_proj_test(){
     Project* proj = new Project("TEST_PROJ","C:/");
 
     VideoProject* vp1 = new VideoProject(new Video("v1"));
@@ -24,8 +23,7 @@ void ProjectTestsuite::add_remove_vid_proj_test()
     QCOMPARE(proj->m_videos.size() , unsigned(0));
 }
 
-void ProjectTestsuite::add_remove_report_test()
-{
+void ProjectTestsuite::add_remove_report_test(){
     Project* proj = new Project("TEST_PROJ","C:/");
 
     Report* r1 = new Report("tr_1");
@@ -108,4 +106,75 @@ void ProjectTestsuite::delete_files_test(){
     proj->delete_artifacts();
     QDir dir;
     QVERIFY(!dir.exists(QString::fromStdString(proj->m_dir)));
+}
+
+/**
+ * @brief ProjectTestsuite::save_status_test
+ * Tests if changes made to the project structure properly
+ * updates the save status of the project instance.
+ * This is important since this status is used to prompt
+ * the user to save before closing a project.
+ */
+void ProjectTestsuite::save_status_test(){
+    // Create temporary project directory
+    QTemporaryDir directory;
+    directory.setAutoRemove(true);
+    QVERIFY(directory.isValid());
+
+    std::string project_path = directory.path().toStdString();
+    std::unique_ptr<Project> project(new Project("testproject", project_path));
+    QVERIFY(!project->is_saved());
+
+    // Verify save updates status correctly
+    project->save_project();
+    QVERIFY(project->is_saved());
+
+    // VIDEOPROJECT
+    // Verify that adding a video project updates status
+    VideoProject* video_project = new VideoProject(new Video("v1"));
+    project->add_video_project(video_project);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // VIDEOPROJECT/BOOKMARK
+    // Verify that modifying a video project updates status
+    // Verify that adding a bookmark updates status
+    Bookmark* bookmark = new Bookmark();
+    int bookmark_id = video_project->add_bookmark(bookmark);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // Verify that removing a bookmark updates status
+    video_project->delete_bookmark(bookmark_id);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // VIDEOPROJECT/REPORT
+    // Verify that adding a report updates status
+    Report* report = new Report();
+    int report_id = project->add_report(report);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // Verify that removing a report updates status
+    project->remove_report(report_id);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // VIDEOPROJECT/ANALYSIS
+    // Verify that adding an analysis updates status
+    BasicAnalysis* analysis = new BasicAnalysis();
+    int analysis_id = video_project->add_analysis(analysis);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // Verify that removing an analysis updates status
+    video_project->delete_analysis(analysis_id);
+    QVERIFY(!project->is_saved());
+    project->save_project();
+
+    // Verify that removing a video project updates status
+    project->remove_video_project(video_project);
+    QVERIFY(!project->is_saved());
+    project->save_project();
 }
