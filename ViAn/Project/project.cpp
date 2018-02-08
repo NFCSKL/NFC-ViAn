@@ -4,13 +4,12 @@
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
  */
-Project::Project()
-{
+Project::Project(){
 
 }
+
 //TODO Fix all these function names
-Project* Project::fromFile(const std::string &full_path)
-{
+Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->load_saveable(full_path);
     // ensure changes to paths are saved
@@ -25,10 +24,20 @@ Project* Project::fromFile(const std::string &full_path)
  * @param vid_path := path for videos folder
  */
 Project::Project(const std::string& name, const std::string& dir_path){
-    m_name = name;    
-    m_dir = dir_path + "/" + name + "/";
-    m_dir_bookmarks = m_dir + "Bookmarks/";
-    m_file = m_dir + name + ".vian";
+    qDebug() << tmp_dir.path();
+    if(tmp_dir.isValid()){
+        m_name = name;
+        m_path = dir_path;
+        m_dir = tmp_dir.path().toStdString() + "/" + name + "/";
+        m_dir_bookmarks = m_dir + "Bookmarks/";
+        m_file = m_dir + name + ".vian";
+
+        std::cout << "m_path--->" << m_path << std::endl;
+        std::cout << "m_dir--->" << m_dir << std::endl;
+        std::cout << "m_dir_bookmarks--->" << m_dir_bookmarks << std::endl;
+
+        save_project();
+    }
 }
 
 
@@ -170,6 +179,20 @@ bool Project::save_project(){
 }
 
 /**
+ * @brief Project::save_project
+ * @return sets saved =true
+ */
+bool Project::save_project_on_path(){
+    QDir directory;
+    std::string dir = m_path + "/" + m_name + "/";
+    std::string dir_bookmarks = dir + "Bookmarks/";
+    std::string file = dir + m_name + ".vian";
+    directory.mkpath(QString::fromStdString(dir));
+    directory.mkpath(QString::fromStdString(dir_bookmarks));
+    return save_saveable(file);
+}
+
+/**
  * @brief Project::get_videos
  * @return videos&
  */
@@ -189,8 +212,7 @@ VideoProject* Project::get_video(const int& v_pos) {
 /**
  * @brief Project::Project
  */
-std::string Project::getDir_bookmarks() const
-{
+std::string Project::getDir_bookmarks() const {
     return m_dir_bookmarks;
 }
 
@@ -199,7 +221,10 @@ std::string Project::getDir() const {
     return m_dir;
 }
 
-std::string Project::getName() const
-{
+std::string Project::getName() const {
     return m_name;
+}
+
+std::string Project::get_path() const {
+    return m_path;
 }

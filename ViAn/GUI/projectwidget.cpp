@@ -8,11 +8,13 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QShortcut>
+#include <QTemporaryDir>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include "Project/projecttreestate.h"
 #include "Project/recentproject.h"
+
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -56,12 +58,13 @@ void ProjectWidget::new_project() {
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
     close_project();
-    std::string _tmp_name = project_name.toStdString();
-    std::string _tmp_path = project_path.toStdString();
+    std::string name = project_name.toStdString();
+    std::string path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
-    m_proj = new Project(_tmp_name, _tmp_path); 
-    m_proj->save_project();
-    _tmp_path.append(_tmp_name);
+
+    m_proj = new Project(name, path);
+    //m_proj->save_project(tmp_dir.path().toStdString());
+    path.append(name);
     emit proj_path(m_proj->getDir());
 }
 
@@ -586,7 +589,8 @@ void ProjectWidget::save_project() {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->getDir() + "treestate");
-    m_proj->save_project();
+    m_proj->save_project();  // <--- should be like move folder
+    m_proj->save_project_on_path();
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->getName(), m_proj->full_path());

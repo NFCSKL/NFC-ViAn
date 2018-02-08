@@ -11,6 +11,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDir>
+#include <QTemporaryDir>
 // vian
 #include "videoproject.h"
 #include "video.h"
@@ -28,11 +29,13 @@ using ID = int;
 class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
-    std::string m_file = "";
     std::string m_name = "";
+    std::string m_path = "";
     std::string m_dir = "";
     std::string m_dir_bookmarks = "";
+    std::string m_file = "";
 
+    QTemporaryDir tmp_dir;
     std::vector<VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
     int m_vid_count = 0;
@@ -57,6 +60,7 @@ public:
 
     bool is_saved() const;
     bool save_project();
+    bool save_project_on_path();
     bool load_project();
 
     std::vector<VideoProject *>& get_videos();
@@ -64,6 +68,7 @@ public:
     std::string getDir_bookmarks() const;
     std::string getDir() const;
     std::string getName() const;
+    std::string get_path() const;
 
 private:
     Project();

@@ -1,4 +1,5 @@
 #include "recentproject.h"
+#include <QDebug>
 
 const std::string RecentProject::FILE_NAME = "recent_projects";
 const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString();
@@ -17,7 +18,7 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
     if (item != recent_items.end()) recent_items.erase(item);
     recent_items.push_front(new_proj);
     QDir().mkpath(QString::fromStdString(PATH));
-    save_saveable(PATH + "/" +FILE_NAME);
+    save_saveable(PATH + "/ViAn/" +FILE_NAME);
 }
 
 /**
@@ -26,7 +27,7 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  * @return
  */
 std::list<std::pair<std::string, std::string>> RecentProject::load_recent(){
-    load_saveable(PATH + "/" + FILE_NAME);
+    load_saveable(PATH + "/ViAn/" + FILE_NAME);
     return recent_items;
 }
 
