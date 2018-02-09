@@ -58,7 +58,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     close_project();
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
-    parentWidget()->parentWidget()->setWindowTitle(project_name);
+    set_main_window_name(project_name);
     m_proj = new Project(_tmp_name, _tmp_path); 
     m_proj->save_project();
     _tmp_path.append(_tmp_name);
@@ -524,7 +524,6 @@ void ProjectWidget::remove_item() {
     delete_box.setDefaultButton(QMessageBox::No);
     if (delete_box.exec() == QMessageBox::Yes) {
         for (auto item : selectedItems()) {
-            qDebug() << "in for, selected items";
             if (item->type() == FOLDER_ITEM) {
                 std::vector<VideoItem*> v_items;
                 get_video_items(item, v_items);
@@ -534,13 +533,13 @@ void ProjectWidget::remove_item() {
             }
 
             else if (item->type() == VIDEO_ITEM) {
-                qDebug() << "is video";
                 VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
                 emit item_removed(vid_item->get_video_project());
             }
-            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
-                qDebug() << "in tag or analysis";
-            }
+            // TODO Fix these cases
+//            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
+//
+//            }
             delete item;
         }
     }
@@ -617,7 +616,7 @@ void ProjectWidget::open_project(QString project_path) {
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->getDir() + "treestate");
 
-    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
+    set_main_window_name(QString::fromStdString(m_proj->getName()));
     emit proj_path(m_proj->getDir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
@@ -632,7 +631,7 @@ void ProjectWidget::open_project(QString project_path) {
 void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     if (m_proj == nullptr) return;
-    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(""));
+    set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
@@ -656,7 +655,7 @@ void ProjectWidget::remove_project() {
     int reply = msg_box.exec();
 
     if (reply != QMessageBox::Yes) return;
-    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(""));
+    set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
     m_proj->delete_artifacts();
@@ -665,4 +664,8 @@ void ProjectWidget::remove_project() {
     m_proj = nullptr;
     emit project_closed();
     emit remove_overlay();
+}
+
+void ProjectWidget::set_main_window_name(QString name) {
+    parentWidget()->parentWidget()->setWindowTitle(name);
 }

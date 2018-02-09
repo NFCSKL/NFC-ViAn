@@ -847,7 +847,6 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
-    qDebug() << "Before if";
     if (get_current_video_project() == vid_proj) clear_current_video();
 }
 
@@ -856,10 +855,8 @@ void VideoWidget::remove_item(VideoProject* vid_proj) {
  * Removes the video from the videoplayer
  */
 void VideoWidget::clear_current_video() {
-    qDebug() << "In Clear current video in vid_wg";
     int frame = -1;
     if (video_btns_enabled) set_video_btns(false);
-    qDebug() << "disable butns";
 
     player_lock.lock();
     video_loaded.store(false);
