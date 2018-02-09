@@ -37,6 +37,7 @@ class ProjectWidget : public QTreeWidget
                                 "flv", "f4v", "f4p", "f4a", "f4b"};
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
+    ~ProjectWidget();
     Project* m_proj = nullptr;
 
 signals:

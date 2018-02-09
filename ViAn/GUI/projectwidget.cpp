@@ -39,6 +39,10 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
 }
 
+ProjectWidget::~ProjectWidget() {
+    delete m_proj;
+}
+
 
 /**
  * @brief ProjectWidget::new_project
@@ -253,8 +257,7 @@ VideoItem *ProjectWidget::get_video_item(VideoProject *v_proj, QTreeWidgetItem* 
     return nullptr;
 }
 
-void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem*>& items)
-{
+void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem*>& items) {
     if(root->type() == VIDEO_ITEM) {
         items.push_back(dynamic_cast<VideoItem*>(root));
         return;
@@ -285,7 +288,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     if (elems.size() > 0) {
         // Follow index path
         QTreeWidgetItem* item = topLevelItem(std::stoi(elems[0]));
-        for (auto i = 1; i < elems.size(); ++i) {
+        for (decltype(elems.size()) i = 1; i < elems.size(); ++i) {
             if (item->child(std::stoi(elems[i]))) item = item->child(std::stoi(elems[i]));
         }
 
@@ -385,8 +388,7 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
-void ProjectWidget::advanced_analysis()
-{
+void ProjectWidget::advanced_analysis() {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
@@ -397,8 +399,7 @@ void ProjectWidget::advanced_analysis()
 }
 
 
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj)
-{
+void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj) {
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
     AnalysisItem* ana = new AnalysisItem();
@@ -417,6 +418,7 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
+    Q_UNUSED( col )
     get_index_path(item);
     switch(item->type()){
     case VIDEO_ITEM: {
@@ -589,11 +591,11 @@ void ProjectWidget::save_project() {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->getDir() + "treestate");
-    m_proj->save_project();  // <--- should be like move folder
-    m_proj->save_project_on_path();
+    m_proj->save_project();
+    m_proj->save_project_from_tmp();
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->getName(), m_proj->full_path());
+    rp.update_recent(m_proj->getName(), m_proj->get_save_path());
     set_status_bar("Project saved");
 }
 

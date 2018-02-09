@@ -149,6 +149,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
  * Destructor
  */
 MainWindow::~MainWindow() {
+    delete video_wgt;
+    delete project_wgt;
+    delete analysis_wgt;
+    delete bookmark_wgt;
 }
 
 /**

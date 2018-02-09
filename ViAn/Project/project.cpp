@@ -24,18 +24,13 @@ Project* Project::fromFile(const std::string &full_path){
  * @param vid_path := path for videos folder
  */
 Project::Project(const std::string& name, const std::string& dir_path){
-    qDebug() << tmp_dir.path();
     if(tmp_dir.isValid()){
         m_name = name;
         m_path = dir_path;
         m_dir = tmp_dir.path().toStdString() + "/" + name + "/";
         m_dir_bookmarks = m_dir + "Bookmarks/";
-        m_file = m_dir + name + ".vian";
-
-        std::cout << "m_path--->" << m_path << std::endl;
-        std::cout << "m_dir--->" << m_dir << std::endl;
-        std::cout << "m_dir_bookmarks--->" << m_dir_bookmarks << std::endl;
-
+        m_tmp_path = m_dir + name + ".vian";  // full_path();
+        m_save_path = m_path + "/" + name + "/" + name + ".vian";
         save_project();
     }
 }
@@ -90,8 +85,7 @@ ID Project::add_report(Report *report){
  * @brief Project::remove_report
  * @param id
  */
-void Project::remove_report(const int &id)
-{
+void Project::remove_report(const int &id) {
     Report* temp = m_reports.at(id);
     delete temp;
     m_reports.erase(id);
@@ -116,7 +110,7 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
-    m_file = full_path();
+    m_tmp_path = full_path();
     std::string tmp = full_path();
     m_dir = tmp.substr(0,tmp.find_last_of("/")+1);
     m_dir_bookmarks = m_dir + "Bookmarks/";
@@ -175,21 +169,57 @@ bool Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    return save_saveable(m_file);
+    return save_saveable(m_tmp_path);
 }
 
 /**
  * @brief Project::save_project
  * @return sets saved =true
  */
-bool Project::save_project_on_path(){
-    QDir directory;
-    std::string dir = m_path + "/" + m_name + "/";
-    std::string dir_bookmarks = dir + "Bookmarks/";
-    std::string file = dir + m_name + ".vian";
-    directory.mkpath(QString::fromStdString(dir));
-    directory.mkpath(QString::fromStdString(dir_bookmarks));
-    return save_saveable(file);
+bool Project::save_project_from_tmp(){
+    return copy_directory_files(QString::fromStdString(m_dir), QString::fromStdString(m_path + "/" + m_name + "/"), true);
+}
+
+/**
+ * @brief Project::copy_directory_files
+ * @param from_dir
+ * @param to_dir
+ * @param coverFileIfExist
+ * @return
+ * Iterates over from_dir and copies all files and sub-directories to to_dir
+ */
+bool Project::copy_directory_files(const QString &from_dir, const QString &to_dir, bool coverFileIfExist){
+    QDir source_dir(from_dir);
+    QDir target_dir(to_dir);
+    if(!target_dir.exists()){    /* if directory don't exists, build it */
+        if(!target_dir.mkdir(target_dir.absolutePath()))
+            return false;
+    }
+
+    QFileInfoList fileInfoList = source_dir.entryInfoList();
+    foreach(QFileInfo fileInfo, fileInfoList){
+        if(fileInfo.fileName() == "." || fileInfo.fileName() == "..")
+            continue;
+
+        if(fileInfo.isDir()){    /* if it is directory, copy recursively*/
+            if(!copy_directory_files(fileInfo.filePath(),
+                target_dir.filePath(fileInfo.fileName()),
+                coverFileIfExist))
+                return false;
+        }
+        else {            /* if coverFileIfExist == true, remove old file first */
+            if(coverFileIfExist && target_dir.exists(fileInfo.fileName())){
+                target_dir.remove(fileInfo.fileName());
+            }
+
+            // files copy
+            if(!QFile::copy(fileInfo.filePath(),
+                target_dir.filePath(fileInfo.fileName()))){
+                    return false;
+            }
+        }
+    }
+    return true;
 }
 
 /**
@@ -216,7 +246,6 @@ std::string Project::getDir_bookmarks() const {
     return m_dir_bookmarks;
 }
 
-
 std::string Project::getDir() const {
     return m_dir;
 }
@@ -227,4 +256,8 @@ std::string Project::getName() const {
 
 std::string Project::get_path() const {
     return m_path;
+}
+
+std::string Project::get_save_path() const {
+    return m_save_path;
 }

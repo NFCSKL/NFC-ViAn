@@ -41,7 +41,6 @@ bool Saveable::save_saveable(const std::string& file_name,
  */
 bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format) {
     m_full_path = full_path;
-    qDebug() << "full_path in savable" << QString::fromStdString(full_path);
     QFile save_file(QString::fromStdString(full_path));
     if(!save_file.open(QIODevice::WriteOnly)){  // Attempt to open full_path
         qDebug() << "Couldn't open save file", save_file.fileName().toStdString().c_str();   // Send warning if unsuccessful
@@ -63,8 +62,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
  * Delete previously set path m_full_path
  * m_full_path is set by both save_saveable and load saveable
  */
-bool Saveable::delete_saveable()
-{
+bool Saveable::delete_saveable() {
     QFile file(QString::fromStdString(m_full_path));
     if(file.exists()) return file.remove();
     qDebug() << "Couldn't delete file: " + QString::fromStdString(m_full_path);

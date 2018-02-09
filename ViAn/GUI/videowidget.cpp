@@ -61,6 +61,10 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     init_frame_processor();
 }
 
+VideoWidget::~VideoWidget(){
+
+}
+
 VideoProject *VideoWidget::get_current_video_project(){
     return m_vid_proj;
 }

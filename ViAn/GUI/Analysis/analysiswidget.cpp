@@ -10,6 +10,10 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
     connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
+AnalysisWidget::~AnalysisWidget(){
+
+}
+
 /**
  * @brief AnalysisWidget::start_analysis
  * @param save_path     : path to the save map
