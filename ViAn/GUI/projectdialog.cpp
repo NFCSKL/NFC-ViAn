@@ -60,25 +60,22 @@ void ProjectDialog::browse_btn_clicked() {
 
 void ProjectDialog::ok_btn_clicked() {
     QString m_dir = path_text->text() + "/" + name_text->text() + "/";
+    if (path_text->text() == "") {
+        m_dir = "C:" + m_dir;
+    }
     QDir pathDir(m_dir);
     if (pathDir.exists()) {
         // Create confirmation dialog since the path already exists
         QMessageBox msg_box;
         msg_box.setModal(true);
-        msg_box.setText("This folder already exist. Are you sure you wan't to continue?");
-        msg_box.setInformativeText("Yes will overrite and Open will open the current project.");
+        msg_box.setText("This project already exist. Are you sure you want to continue?");
+        msg_box.setInformativeText("Open will open the existing project.");
         msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Open);
         msg_box.setDefaultButton(QMessageBox::No);
         int reply = msg_box.exec();
         // Open the already existing project
         if (reply == QMessageBox::Open) {
-            qDebug() << path_text->text();
-            if (path_text->text() == "") {
-                m_dir = "C:" + m_dir;
-            }
             emit open_project(m_dir + name_text->text());
-            qDebug() << m_dir;
-            qDebug() << "open project";
             close();
             return;
         }
