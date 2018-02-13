@@ -30,11 +30,11 @@ class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
     std::string m_name = "";
-    std::string m_path = ""; // Path to where project folder is saved
-    std::string m_dir = "";  //Path to the project temp folder
+    std::string m_dir = "";  // Path to the project folder --- c:/name/
+    std::string m_tmp_dir = "";  //Path to the project temp folder --- /temp/ViAn-XXXXXX/name/
     std::string m_dir_bookmarks = "";
-    std::string m_tmp_path = "";  // Path to the project file's temporary folder
-    std::string m_save_path = ""; // Path to the project file where it is saved.
+    std::string m_tmp_path = "";  // Path to the project file's temporary folder --- /temp/ViAn-XXXXXX/name/name.vian
+    std::string m_save_path = ""; // Path to the project file where it is saved. --- /name/name.vian
 
     QTemporaryDir tmp_dir;
     std::vector<VideoProject*> m_videos;
@@ -61,7 +61,7 @@ public:
 
     bool is_saved() const;
     bool save_project();
-    bool save_project_from_tmp();
+    bool move_project_from_tmp();
     bool copy_directory_files(const QString &fromDir, const QString &toDir, bool coverFileIfExist);
     bool load_project();
 
@@ -70,9 +70,9 @@ public:
     std::vector<VideoProject *>& get_videos();
     VideoProject* get_video(const int& v_pos);
     std::string getDir_bookmarks() const;
-    std::string getDir() const;
+    std::string get_dir() const;
+    std::string get_tmp_dir() const;
     std::string getName() const;
-    std::string get_path() const;
     std::string get_save_path() const;
 
 private:

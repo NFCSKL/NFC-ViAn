@@ -11,7 +11,6 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
 }
 
 AnalysisWidget::~AnalysisWidget(){
-
 }
 
 /**

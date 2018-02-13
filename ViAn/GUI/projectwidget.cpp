@@ -41,6 +41,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
 ProjectWidget::~ProjectWidget() {
     delete m_proj;
+    qDebug() << "destructor proj_wgt";
 }
 
 
@@ -69,7 +70,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     m_proj = new Project(name, path);
     //m_proj->save_project(tmp_dir.path().toStdString());
     path.append(name);
-    emit proj_path(m_proj->getDir());
+    emit proj_path(m_proj->get_tmp_dir());
 }
 
 /**
@@ -91,7 +92,7 @@ void ProjectWidget::add_video() {
     QStringList video_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add video"),
-                m_proj->getDir().c_str(),
+                m_proj->get_tmp_dir().c_str(),
                 extensions);
 
     for (auto video_path : video_paths){
@@ -110,7 +111,7 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir());
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->setInterval(settings->interval);
 
@@ -393,7 +394,7 @@ void ProjectWidget::advanced_analysis() {
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->getDir());
+    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_tmp_dir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }
@@ -586,13 +587,18 @@ void ProjectWidget::create_folder_item() {
  * Slot function to save the open project
  */
 void ProjectWidget::save_project() {
+    // TODO Check if already exist and ask to overwrite
+    // TODO remove current version
+
+
     if (m_proj == nullptr ) return;
     save_item_data();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.save_state(m_proj->getDir() + "treestate");
+    qDebug() << "Dirrrr" << QString::fromStdString(m_proj->get_tmp_dir());
+    tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
     m_proj->save_project();
-    m_proj->save_project_from_tmp();
+    m_proj->move_project_from_tmp();
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->getName(), m_proj->get_save_path());
@@ -604,18 +610,21 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project(QString project_path) {
+    // TODO Open in temp map
+
     if (project_path.isEmpty()) return;
     if (m_proj != nullptr) close_project();
     set_status_bar("Opening project");
-
     m_proj = Project::fromFile(project_path.toStdString());
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.load_state(m_proj->getDir() + "treestate");
+    qDebug() << "Project path" << QString::fromStdString(project_path.toStdString());
+    qDebug() << "Dirr in open" << QString::fromStdString(m_proj->get_dir());
+    tree_state.load_state(m_proj->get_dir() + "treestate");
 
     parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
-    emit proj_path(m_proj->getDir());
+    emit proj_path(m_proj->get_tmp_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);

@@ -153,6 +153,7 @@ MainWindow::~MainWindow() {
     delete project_wgt;
     delete analysis_wgt;
     delete bookmark_wgt;
+    qDebug() << "destructor main done";
 }
 
 /**
@@ -539,7 +540,7 @@ void MainWindow::export_images(){
         interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
-    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->getDir(),
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_tmp_dir(),
                                         video_wgt->get_current_video_length() - 1,
                                         interval);
     if (!exporter_dialog.exec()){
