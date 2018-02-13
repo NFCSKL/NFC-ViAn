@@ -32,9 +32,6 @@ class AnalysisWidget : public QWidget
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
 
-    // Destructor
-    ~AnalysisWidget();
-
     // Internal queue for analyses
     std::deque<tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
 

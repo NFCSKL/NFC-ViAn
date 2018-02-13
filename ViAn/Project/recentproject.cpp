@@ -1,5 +1,4 @@
 #include "recentproject.h"
-#include <QDebug>
 
 const std::string RecentProject::FILE_NAME = "recent_projects";
 const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString();

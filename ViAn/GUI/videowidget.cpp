@@ -62,7 +62,6 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 }
 
 VideoWidget::~VideoWidget(){
-
 }
 
 VideoProject *VideoWidget::get_current_video_project(){

@@ -5,37 +5,19 @@
  * Empty private constructor, used for Project::fromFile
  */
 Project::Project(){
-//    if(tmp_dir.isValid()){
-//        m_path = m_dir;
-//        m_dir = tmp_dir.path().toStdString() + "/" + m_name + "/";
-//    } else qDebug() << "Something went wrong while creating the temporary folder.";
 }
 
 //TODO Fix all these function names
 Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
-    //proj->m_path = proj->m_dir;
-    //proj->save_project();
-
-
     proj->load_saveable(full_path);
     // ensure changes to paths are saved
     proj->save_saveable(full_path);
-
-    proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
-    proj->m_tmp_path = proj->m_tmp_dir + proj->m_name + ".vian";
-
-
-    qDebug() << "Full path in from file" << QString::fromStdString(full_path);
-
-    qDebug() << "dir in from file" << QString::fromStdString(proj->m_dir);
-
-    qDebug() << "save path in from file" << QString::fromStdString(proj->m_save_path);
-
-    qDebug() << "tmp_dir in from file (temp)" << QString::fromStdString(proj->m_tmp_dir);
-    qDebug() << "m_tmp_path in from file (temp)" << QString::fromStdString(proj->m_tmp_path);
-    //proj->save_saveable(proj->m_tmp_path);
-    proj->save_project();
+    if(proj->tmp_dir.isValid()){
+        proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
+        proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";
+        proj->save_project();
+    }
     return proj;
 }
 
@@ -51,8 +33,8 @@ Project::Project(const std::string& name, const std::string& dir_path){
         m_dir = dir_path + "/" + name + "/";
         m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
         m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
-        m_tmp_path = m_tmp_dir + name + ".vian";  // full_path();
-        m_save_path = m_dir + name + ".vian";
+        m_tmp_file = m_tmp_dir + name + ".vian";  // full_path();
+        m_file = m_dir + name + ".vian";
         save_project();
     } else qDebug() << "Something went wrong while creating the temporary folder.";
 }
@@ -63,12 +45,8 @@ Project::Project(const std::string& name, const std::string& dir_path){
  * Clears contents of video map
  */
 Project::~Project(){
-    for (auto vid_it = m_videos.begin(); vid_it != m_videos.end(); ++vid_it) {
-        delete *vid_it;
-    }
-    for (auto rep_it = m_reports.begin(); rep_it != m_reports.end(); ++rep_it) {
-        delete rep_it->second;
-    }
+    m_videos.clear();
+    m_reports.clear();
 }
 
 /**
@@ -85,6 +63,7 @@ ID Project::add_video_project(VideoProject *vid_proj){
  * @brief Project::remove_video
  * @param id
  * Remove video from videos and delete its contents.
+ * TODO, not used
  */
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
@@ -132,7 +111,7 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
-    m_save_path = full_path();
+    m_file = full_path();
     std::string tmp = full_path();
     m_dir = tmp.substr(0,tmp.find_last_of("/")+1);
     m_dir_bookmarks = m_dir + "Bookmarks/";
@@ -191,8 +170,7 @@ bool Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(m_tmp_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    qDebug() << "m_tmp_dir" << QString::fromStdString(m_tmp_dir);
-    return save_saveable(m_tmp_path);
+    return save_saveable(m_tmp_file);
 }
 
 /**
@@ -277,10 +255,10 @@ std::string Project::get_tmp_dir() const {
     return m_tmp_dir;
 }
 
-std::string Project::getName() const {
+std::string Project::get_name() const {
     return m_name;
 }
 
-std::string Project::get_save_path() const {
-    return m_save_path;
+std::string Project::get_file() const {
+    return m_file;
 }

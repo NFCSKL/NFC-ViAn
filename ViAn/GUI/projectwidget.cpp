@@ -8,13 +8,11 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QShortcut>
-#include <QTemporaryDir>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include "Project/projecttreestate.h"
 #include "Project/recentproject.h"
-
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -41,7 +39,6 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
 ProjectWidget::~ProjectWidget() {
     delete m_proj;
-    qDebug() << "destructor proj_wgt";
 }
 
 
@@ -52,6 +49,7 @@ ProjectWidget::~ProjectWidget() {
 void ProjectWidget::new_project() {
     ProjectDialog* proj_dialog = new ProjectDialog();
     QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
+    delete proj_dialog;
 }
 
 /**
@@ -66,9 +64,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string name = project_name.toStdString();
     std::string path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
-
     m_proj = new Project(name, path);
-    //m_proj->save_project(tmp_dir.path().toStdString());
     path.append(name);
     emit proj_path(m_proj->get_tmp_dir());
 }
@@ -289,7 +285,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     if (elems.size() > 0) {
         // Follow index path
         QTreeWidgetItem* item = topLevelItem(std::stoi(elems[0]));
-        for (decltype(elems.size()) i = 1; i < elems.size(); ++i) {
+        for (auto i = 1; i < elems.size(); ++i) {
             if (item->child(std::stoi(elems[i]))) item = item->child(std::stoi(elems[i]));
         }
 
@@ -419,7 +415,6 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    Q_UNUSED( col )
     get_index_path(item);
     switch(item->type()){
     case VIDEO_ITEM: {
@@ -587,21 +582,27 @@ void ProjectWidget::create_folder_item() {
  * Slot function to save the open project
  */
 void ProjectWidget::save_project() {
-    // TODO Check if already exist and ask to overwrite
-    // TODO remove current version
-
-
     if (m_proj == nullptr ) return;
+    QDir dir(QString::fromStdString(m_proj->get_dir()));
+    if (dir.exists()) {
+        QMessageBox msg_box;
+        msg_box.setModal(true);
+        msg_box.setText("This project already exist. Do you wanna overwrite it?");
+        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msg_box.setDefaultButton(QMessageBox::No);
+        int reply = msg_box.exec();
+        if (reply == QMessageBox::No) return;
+    }
+
     save_item_data();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    qDebug() << "Dirrrr" << QString::fromStdString(m_proj->get_tmp_dir());
     tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
     m_proj->save_project();
     m_proj->move_project_from_tmp();
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->getName(), m_proj->get_save_path());
+    rp.update_recent(m_proj->get_name(), m_proj->get_file());
     set_status_bar("Project saved");
 }
 
@@ -610,8 +611,6 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project(QString project_path) {
-    // TODO Open in temp map
-
     if (project_path.isEmpty()) return;
     if (m_proj != nullptr) close_project();
     set_status_bar("Opening project");
@@ -619,11 +618,9 @@ void ProjectWidget::open_project(QString project_path) {
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    qDebug() << "Project path" << QString::fromStdString(project_path.toStdString());
-    qDebug() << "Dirr in open" << QString::fromStdString(m_proj->get_dir());
     tree_state.load_state(m_proj->get_dir() + "treestate");
 
-    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
+    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->get_name()));
     emit proj_path(m_proj->get_tmp_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
@@ -659,7 +656,6 @@ void ProjectWidget::remove_project() {
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msg_box.setDefaultButton(QMessageBox::No);
     int reply = msg_box.exec();
-
     if (reply != QMessageBox::Yes) return;
     emit set_status_bar("Removing project and associated files");
 

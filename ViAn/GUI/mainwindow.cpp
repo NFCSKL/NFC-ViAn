@@ -153,7 +153,6 @@ MainWindow::~MainWindow() {
     delete project_wgt;
     delete analysis_wgt;
     delete bookmark_wgt;
-    qDebug() << "destructor main done";
 }
 
 /**
