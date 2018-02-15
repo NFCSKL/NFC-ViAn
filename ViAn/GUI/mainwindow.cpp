@@ -28,7 +28,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
-    QDockWidget* queue_dock = new QDockWidget(tr("Analysis queue"), this);
+    queue_dock = new QDockWidget(tr("Analysis queue"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
 
+    connect(analysis_wgt, SIGNAL(show_analysis_queue(bool)), this, SLOT(show_analysis_dock(bool)));
     connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
     connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
     connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
@@ -580,4 +581,12 @@ void MainWindow::options() {
 void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     open_project(project_path);
+}
+
+void MainWindow::show_analysis_dock(bool show) {
+    if (show) {
+        queue_dock->show();
+    } else {
+        queue_dock->close();
+    }
 }

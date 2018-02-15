@@ -24,7 +24,7 @@ void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     m_queue_wgt->enqueue(method);
-    m_queue_wgt->show();
+    emit show_analysis_queue(true);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -56,7 +56,7 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
     QThreadPool::globalInstance()->start(method);
     emit add_analysis_bar();
-    m_queue_wgt->show();
+    emit show_analysis_queue(true);
 }
 
 /**
@@ -85,7 +85,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
         move_queue();
         perform_analysis(analysis_queue.front());
     }else{
-        m_queue_wgt->hide();
+        emit show_analysis_queue(false);
     }
     emit remove_analysis_bar();
 }
@@ -109,7 +109,7 @@ void AnalysisWidget::on_analysis_aborted() {
         return;
     }
     // Queue Empty
-    m_queue_wgt->hide();
+    emit show_analysis_queue(false);
     emit remove_analysis_bar();
 }
 

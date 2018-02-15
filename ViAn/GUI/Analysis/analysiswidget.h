@@ -79,6 +79,9 @@ signals:
 
     // Set analysis name in project tree
     void name_in_tree(QTreeWidgetItem*, QString);
+
+    // Show or hide the analysis queue window
+    void show_analysis_queue(bool);
 };
 
 #endif // ANALYSISWIDGET_H
