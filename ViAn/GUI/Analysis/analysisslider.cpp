@@ -95,6 +95,24 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
 }
 
 /**
+ * @brief AnalysisSlider::set_ana_interval
+ * @param analysis
+ * Set interval to the interval the analysis was run on
+ */
+void AnalysisSlider::set_ana_interval(BasicAnalysis* analysis) {
+    qDebug() << "in set interval";
+    if (!analysis->use_interval) return;
+    qDebug() << "after if";
+    set_interval(analysis->get_ana_interval().get_start(), analysis->get_ana_interval().get_end());
+    repaint();
+}
+
+void AnalysisSlider::hide_ana_interval() {
+    clear_interval();
+    repaint();
+}
+
+/**
  * @brief AnalysisSlider::set_interval
  * @param start
  * @param end

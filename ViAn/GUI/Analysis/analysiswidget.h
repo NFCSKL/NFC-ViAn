@@ -29,6 +29,7 @@ class AnalysisWidget : public QWidget
     std::string dots = "";
     std::clock_t start;
     int duration = 0;
+    int duplicate_save_file_inc = 1;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
 
@@ -50,6 +51,7 @@ private:
 
     // Moves the queue forward
     void move_queue();
+
 public slots:
 
     // Incoming request to start analysis

@@ -19,7 +19,10 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
  */
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
+
+    // Add the analysis to the queue in the queue widget
     queue_wgt->enqueue(method);
+
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -54,6 +57,23 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
     queue_wgt->show();
 }
 
+//std::string AnalysisWidget::check_save_path(std::string path, int increment) {
+//    std::string new_path = path;
+//    new_path.append(std::to_string(increment));
+//    qDebug() << "new path" << QString::fromStdString(new_path);
+//    QDir dir(QString::fromStdString(path));
+//    QDir new_dir(QString::fromStdString(new_path));
+
+//    if (!dir.exists()) {
+//        return path;
+//    } else if (!new_dir.exists()) {
+//        return new_path;
+//    } else {
+//        check_save_path(path, ++increment);
+//    }
+//    return "";
+//}
+
 /**
  * @brief AnalysisWidget::analysis_done
  * @param analysis
@@ -62,7 +82,15 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  */
 void AnalysisWidget::analysis_done(AnalysisProxy analysis) {     
     emit show_progress(0);
+    qDebug() << "get name before:" << QString::fromStdString(analysis.get_name());
     analysis.m_name = "Analysis";
+    //std::string path = check_save_path(analysis.full_path());
+//    if (path != "") {
+//        analysis.save_saveable(path);
+//        qDebug() << QString::fromStdString(path);
+//    }
+
+    qDebug() << "get name after:" << QString::fromStdString(analysis.get_name());
     current_analysis_item->setText(0,"Analysis");
     analysis_queue.pop_front();
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
@@ -85,14 +113,12 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     emit remove_analysis_bar();
 }
 
-void AnalysisWidget::abort_analysis()
-{
+void AnalysisWidget::abort_analysis() {
     bool* abort = abort_map.at(current_method);
     *abort = true;
 }
 
-void AnalysisWidget::on_analysis_aborted()
-{    
+void AnalysisWidget::on_analysis_aborted() {
     analysis_queue.pop_front();
     delete current_analysis_item; // Delete item from tree
     auto it = abort_map.find(current_method);   

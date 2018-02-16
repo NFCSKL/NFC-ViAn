@@ -4,7 +4,9 @@
 #include <utility>
 #include <set>
 #include "analysisinterval.h"
+#include "opencv2/core/core.hpp"
 #include <typeinfo>
+#include <QPoint>
 #include <QJsonArray>
 enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG =2, BASIC_ANALYSIS =3};
 enum SAVE_TYPE {DETECTION=10, INTERVAL=11};
@@ -20,7 +22,14 @@ class BasicAnalysis : public Saveable
 {       
 
 public:
-    std::string m_name = "";
+    std::string m_name = "2";
+    AnalysisInterval m_ana_interval;
+    cv::Rect bounding_box;
+    QPoint rect_start, rect_end;
+    bool use_interval = false;
+    bool use_bounding_box = false;
+
+
 protected:
     interval_set m_intervals;
 public:
@@ -35,7 +44,10 @@ public:
 
     std::string get_name() const;
     interval_set get_intervals() const;
-
+    AnalysisInterval get_ana_interval() const;
+    cv::Rect get_bounding_box() const;
+    QPoint get_rect_start() const;
+    QPoint get_rect_end() const;
 
 };
 

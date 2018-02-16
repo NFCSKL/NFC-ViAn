@@ -27,6 +27,7 @@ class FrameWidget : public QWidget
     cv::Rect original_rect; // Contains the size of the unmodified frame
 
     std::vector<cv::Rect> ooi_rects;
+    cv::Rect bounding_box;
 
     SHAPES tool = NONE;
     QColor overlay_color = Qt::red;
@@ -34,6 +35,10 @@ class FrameWidget : public QWidget
     Analysis* m_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
     Overlay* video_overlay;
+
+    // Analysis bounding box
+    QPoint ana_rect_start, ana_rect_end;
+    bool show_box = false;
 
     // Zoom
     QPoint rect_start, rect_end, prev_pos;
@@ -76,6 +81,8 @@ public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
     void toggle_zoom(bool value);
     void set_analysis_tool();
+    void set_bounding_box(BasicAnalysis* analysis);
+    void hide_bounding_box();
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
     void clear_analysis();
@@ -100,9 +107,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 private:
     void init_panning(QPoint pos);
-    void set_rect_start(QPoint pos);
     void panning(QPoint pos);
-    void rect_update(QPoint pos);
+    QPoint rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
     QPoint scale_point(QPoint pos);

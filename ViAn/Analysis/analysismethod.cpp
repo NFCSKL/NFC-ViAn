@@ -139,11 +139,33 @@ void AnalysisMethod::run() {
             m_analysis.add_interval(m_POI);
         }
         capture.release();
+        m_analysis.m_ana_interval = interval;
+        m_analysis.bounding_box = bounding_box;
+        m_analysis.use_interval = use_interval;
+        m_analysis.use_bounding_box = use_bounding_box;
+        m_analysis.rect_start = rect_start;
+        m_analysis.rect_end = rect_end;
+        qDebug() << "before check" << QString::fromStdString(m_save_path);
+        m_save_path = check_save_path(m_save_path);
+        qDebug() << "after check" << QString::fromStdString(m_save_path);
         m_analysis.save_saveable(m_save_path);
+        m_analysis.m_name = "hehehe";
         AnalysisProxy proxy(m_analysis, m_analysis.full_path());       
         emit finished_analysis(proxy);
         emit finito();
     }
+}
+
+std::string AnalysisMethod::check_save_path(std::string path, int increment) {
+    std::string new_path = path + std::to_string(increment);
+    QFile file(QString::fromStdString(path));
+    QFile new_file(QString::fromStdString(new_path));
+    if (!file.exists()) {
+        return path;
+    } else if (!new_file.exists()) {
+        return new_path;
+    }
+    return check_save_path(path, ++increment);
 }
 
 /**
@@ -199,19 +221,25 @@ void AnalysisMethod::scale_frame() {
  *  Getters and setters
  */
 
-void AnalysisMethod::setBounding_box(const cv::Rect &value)
-{
+cv::Rect AnalysisMethod::get_bounding_box() const {
+    return bounding_box;
+}
+
+void AnalysisMethod::setBounding_box(const cv::Rect &value) {
     bounding_box = value;
     use_bounding_box = true;
 }
 
-AnalysisInterval AnalysisMethod::getInterval() const
-{
+void AnalysisMethod::set_bounding_box_points(const QPoint &start, const QPoint &end) {
+    rect_start= start;
+    rect_end = end;
+}
+
+AnalysisInterval AnalysisMethod::getInterval() const {
     return interval;
 }
 
-void AnalysisMethod::setInterval(const AnalysisInterval &value)
-{
+void AnalysisMethod::setInterval(const AnalysisInterval &value) {
     interval = value;
     use_interval = true;
 }

@@ -54,6 +54,21 @@ void FrameWidget::set_detections_on_frame(int frame_num) {
     }
 }
 
+void FrameWidget::set_bounding_box(BasicAnalysis* analysis) {
+    qDebug() << "in set_box";
+    if (!analysis->use_bounding_box) return;
+    qDebug() << "after if";
+    show_box = true;
+    ana_rect_start = analysis->get_rect_start();
+    ana_rect_end = analysis->get_rect_end();
+    repaint();
+}
+
+void FrameWidget::hide_bounding_box() {
+    show_box = false;
+    repaint();
+}
+
 void FrameWidget::set_detections(bool detections) {
     m_detections = detections;
 }
@@ -167,7 +182,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (mark_rect) {
-
         if(tool == ZOOM){
             QPoint start = rect_start;
             QPoint end = rect_end;
@@ -187,6 +201,12 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         painter.setPen(QColor(0,255,0));
         QRectF zoom(rect_start, rect_end);
         painter.drawRect(zoom);
+    }
+    if (show_box) {
+        painter.setPen(QColor(100,250,100));
+        //QRectF ana_box(scale_point(ana_rect_start), scale_point(ana_rect_end));
+        QRectF ana_box(ana_rect_start, ana_rect_end);
+        painter.drawRect(ana_box);
     }
     if (m_detections && show_detections) {
         for (cv::Rect rect : ooi_rects) {
@@ -221,8 +241,11 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
-        if(event->button() == Qt::LeftButton)
-            set_rect_start(event->pos());
+        if(event->button() == Qt::LeftButton) {
+            ana_rect_start = event->pos();
+            //ana_rect_end = event->pos();
+            show_box = true;
+        }
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
@@ -231,7 +254,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             if (event->modifiers() == Qt::ControlModifier) {
                 do_zoom_out = true;
             } else {
-                set_rect_start(event->pos());
+                rect_start = event->pos();
             }
         }
         break;
@@ -267,15 +290,16 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
 
-        cv::Point end = cv::Point(rect_end.x(), rect_end.y());
-        cv::Point start (rect_start.x(), rect_start.y());
+        cv::Point end = cv::Point(ana_rect_end.x(), ana_rect_end.y());
+        cv::Point start (ana_rect_start.x(), ana_rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
                       cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));        
         settings->setBounding_box(scaled);
+        settings->set_bounding_box_points(ana_rect_start, ana_rect_end);
 
         emit quick_analysis(settings);
         tool = NONE;
-        mark_rect = false;
+        show_box = false;
         break;
     }
     default:
@@ -293,11 +317,18 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
+        if (event->buttons() == Qt::RightButton){
+            panning(event->pos());
+        } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
+            ana_rect_end = rect_update(event->pos());
+        }
+        break;
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
         } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
-            rect_update(event->pos());
+            mark_rect = true;
+            rect_end = rect_update(event->pos());
         }
         break;
     default:
@@ -321,15 +352,6 @@ void FrameWidget::init_panning(QPoint pos) {
 }
 
 /**
- * @brief FrameWidget::init_zoom
- * Init zoom on frame
- * @param pos
- */
-void FrameWidget::set_rect_start(QPoint pos) {
-    rect_start = pos;
-}
-
-/**
  * @brief FrameWidget::panning
  * Is panning. Emits the new pos on frame.
  * @param pos
@@ -346,15 +368,14 @@ void FrameWidget::panning(QPoint pos) {
  * Updates and redraws the zooming rect
  * @param pos
  */
-void FrameWidget::rect_update(QPoint pos) {
+QPoint FrameWidget::rect_update(QPoint pos) {
     // Force image boundries
     int tmpx = std::min(pos.x(),_qimage.width()-1);
     int ex = std::max(0, tmpx);
     int tmpy = std::min(pos.y(), _qimage.height()-1);
     int ey = std::max(0,tmpy);
-    rect_end = QPoint(ex, ey);
-    mark_rect = true;
     repaint();
+    return QPoint(ex, ey);
 }
 
 /**

@@ -37,6 +37,7 @@ class AnalysisMethod : public QObject ,public QRunnable{
 protected:
     AnalysisInterval interval;
     cv::Rect bounding_box;
+    QPoint rect_start, rect_end;
     bool use_interval = false;
     bool use_bounding_box = false;
 
@@ -85,7 +86,9 @@ public:
     virtual std::vector<DetectionBox> analyse_frame() = 0;
 
     int get_progress(int start_frame);  // Returns progress of analysis 1-100%
+    cv::Rect get_bounding_box() const;
     void setBounding_box(const cv::Rect &value); // Sets bounding box to analyse in video
+    void set_bounding_box_points(const QPoint &start, const QPoint &end);
     AnalysisInterval getInterval() const;
     void setInterval(const AnalysisInterval &value);
     std::string save_path() const;
@@ -93,6 +96,7 @@ public:
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
     void set_analysis_area(cv::Rect area);
 
+    std::string check_save_path(std::string path, int increment = 2);
 
     bool sample_current_frame(); // Check if current frame is to be sampled
 
