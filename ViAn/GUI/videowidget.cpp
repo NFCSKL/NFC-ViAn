@@ -21,9 +21,9 @@
 
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
-    // Init video contoller
+    // Init video controller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &new_frame_video, &v_sync,
+                                       &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
                                        &m_speed_step);
 
@@ -820,7 +820,8 @@ void VideoWidget::on_playback_slider_moved() {
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     int frame = -1;
-    if (!video_btns_enabled) enable_video_btns();
+    if (!frame_wgt->isVisible()) frame_wgt->show();
+    if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
@@ -845,14 +846,41 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     }
 }
 
-void VideoWidget::enable_video_btns() {
-    for (QPushButton* btn : btns) {
-        btn->setEnabled(true);
-    }
-    playback_slider->setEnabled(true);
-    frame_line_edit->setEnabled(true);
-    speed_slider->setEnabled(true);
+void VideoWidget::remove_item(VideoProject* vid_proj) {
+    if (get_current_video_project() == vid_proj) clear_current_video();
 }
+
+/**
+ * @brief VideoWidget::clear_current_video
+ * Removes the video from the videoplayer
+ */
+void VideoWidget::clear_current_video() {
+    int frame = -1;
+    if (video_btns_enabled) set_video_btns(false);
+
+    player_lock.lock();
+    video_loaded.store(false);
+    player_lock.unlock();
+    player_con.notify_all();
+
+    playback_slider->setValue(frame);
+    play_btn->setChecked(false);
+    playback_slider->set_interval(-1, -1);
+    set_total_time(0);
+
+    frame_wgt->close();
+}
+
+void VideoWidget::set_video_btns(bool b) {
+    for (QPushButton* btn : btns) {
+        btn->setEnabled(b);
+    }
+    playback_slider->setEnabled(b);
+    frame_line_edit->setEnabled(b);
+    speed_slider->setEnabled(b);
+    video_btns_enabled = b;
+}
+
 
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     next_poi_btn->setEnabled(b);
