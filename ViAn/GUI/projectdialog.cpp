@@ -4,6 +4,7 @@
 #include <QBoxLayout>
 #include <QFormLayout>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -14,8 +15,9 @@
  */
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("New project");
+    setModal(true);
     // remove question mark from the title bar
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
@@ -57,9 +59,30 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
+    QString m_dir = path_text->text() + "/" + name_text->text() + "/";
+    if (path_text->text() == "") {
+        m_dir = "C:" + m_dir;
+    }
+    QDir pathDir(m_dir);
+    if (pathDir.exists()) {
+        // Create confirmation dialog since the path already exists
+        QMessageBox msg_box;
+        msg_box.setModal(true);
+        msg_box.setText("This project already exist. Are you sure you want to continue?");
+        msg_box.setInformativeText("Open will open the existing project.");
+        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Open);
+        msg_box.setDefaultButton(QMessageBox::No);
+        int reply = msg_box.exec();
+        // Open the already existing project
+        if (reply == QMessageBox::Open) {
+            emit open_project(m_dir + name_text->text());
+            close();
+            return;
+        }
+        if (reply != QMessageBox::Yes) return;
+    }
     emit project_path(name_text->text(), path_text->text());
     close();
-
 }
 
 void ProjectDialog::cancel_btn_clicked() {
