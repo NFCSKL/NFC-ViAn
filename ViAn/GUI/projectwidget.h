@@ -47,8 +47,7 @@ signals:
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
-    void show_analysis_details(BasicAnalysis*);
-    void hide_analysis_details();
+    void show_analysis_details(bool);
 
     void set_detections(bool);
     void enable_poi_btns(bool, bool);

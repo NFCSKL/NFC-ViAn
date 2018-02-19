@@ -83,8 +83,7 @@ public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
     void toggle_zoom(bool value);
     void set_analysis_tool();
-    void set_bounding_box(BasicAnalysis* analysis);
-    void hide_bounding_box();
+    void show_bounding_box(bool b);
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
     void clear_analysis();

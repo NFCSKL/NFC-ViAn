@@ -1,7 +1,7 @@
 #include "analysissettings.h"
 
 AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
-                                   AnalysisInterval interval,
+                                   std::pair<int, int> interval,
                                    cv::Rect bounding_box)
     : type(type)
 {
@@ -36,7 +36,7 @@ ANALYSIS_TYPE AnalysisSettings::getType() const {
     return type;
 }
 
-AnalysisInterval AnalysisSettings::getInterval() const {
+std::pair<int, int> AnalysisSettings::get_interval() const {
     return interval;
 }
 
@@ -48,7 +48,7 @@ QPoint AnalysisSettings::get_box_end() const {
     return box_end;
 }
 
-void AnalysisSettings::setInterval(const AnalysisInterval &value) {
+void AnalysisSettings::setInterval(const std::pair<int, int> &value) {
     interval = value;
     use_interval = true;
 }

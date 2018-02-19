@@ -79,7 +79,7 @@ int VideoWidget::get_current_video_length(){
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
-        settings->setInterval(AnalysisInterval(m_interval.first,m_interval.second));
+        settings->setInterval(m_interval);
         delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);

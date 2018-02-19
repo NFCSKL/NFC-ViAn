@@ -7,8 +7,11 @@
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 
 void FrameWidget::toggle_zoom(bool value) {
-    qDebug() << anchor.x() << anchor.y();
-    qDebug() << "scale factor" << m_scale_factor;
+    //qDebug() << anchor.x() << anchor.y();
+    //qDebug() << "scale factor" << m_scale_factor;
+    qDebug() << m_analysis->get_ana_interval().first << m_analysis->get_ana_interval().second;
+    qDebug() << m_analysis->bounding_box.x << m_analysis->bounding_box.y;
+    qDebug() << bounding_box.x << bounding_box.y;
     if (value) {
         tool = ZOOM;
         setCursor(Qt::CrossCursor);
@@ -56,24 +59,12 @@ void FrameWidget::set_detections_on_frame(int frame_num) {
     }
 }
 
-void FrameWidget::set_bounding_box(BasicAnalysis* analysis) {
-    qDebug() << "in set_box";
-    if (!analysis->use_bounding_box) return;
-    qDebug() << "after if";
-    show_box = true;
-    ana_rect_start = analysis->get_rect_start();
-    ana_rect_end = analysis->get_rect_end();
-    bounding_box = analysis->get_bounding_box();
-    repaint();
-}
-
-void FrameWidget::hide_bounding_box() {
-    show_box = false;
+void FrameWidget::show_bounding_box(bool b) {
+    show_box = b;
     repaint();
 }
 
 void FrameWidget::set_detections(bool detections) {
-
     m_detections = detections;
 }
 
@@ -222,8 +213,8 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     if (show_box) {
         painter.setPen(QColor(180,200,200));
 
-        QPoint tl(bounding_box.x, bounding_box.y);
-        QPoint br(bounding_box.x+bounding_box.width, bounding_box.y+bounding_box.height);
+        QPoint tl(m_analysis->bounding_box.x, m_analysis->bounding_box.y);
+        QPoint br(m_analysis->bounding_box.x+m_analysis->bounding_box.width, m_analysis->bounding_box.y+m_analysis->bounding_box.height);
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.drawRect(bounding_rect);
 

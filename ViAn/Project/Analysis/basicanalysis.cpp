@@ -75,7 +75,7 @@ interval_set BasicAnalysis::get_intervals() const {
     return m_intervals;
 }
 
-AnalysisInterval BasicAnalysis::get_ana_interval() const {
+std::pair<int, int> BasicAnalysis::get_ana_interval() const {
     return m_ana_interval;
 }
 

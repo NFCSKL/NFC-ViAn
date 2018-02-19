@@ -70,9 +70,9 @@ void AnalysisMethod::run() {
     int start_frame = 0;
     // If Interval should be used, use interval frames
     if(use_interval){
-        start_frame = interval.get_start();
+        start_frame = interval.first;
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
-        end_frame = interval.get_end();
+        end_frame = interval.second;
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame;
     }
@@ -235,11 +235,11 @@ void AnalysisMethod::set_bounding_box_points(const QPoint &start, const QPoint &
     rect_end = end;
 }
 
-AnalysisInterval AnalysisMethod::getInterval() const {
+std::pair<int, int> AnalysisMethod::get_interval() const {
     return interval;
 }
 
-void AnalysisMethod::setInterval(const AnalysisInterval &value) {
+void AnalysisMethod::set_interval(const std::pair<int, int> &value) {
     interval = value;
     use_interval = true;
 }

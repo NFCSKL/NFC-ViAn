@@ -5,7 +5,7 @@
 #include <QSlider>
 #include <vector>
 #include <set>
-#include "Project/Analysis/basicanalysis.h"
+#include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/tag.h"
 /**
  * @brief The AnalysisSlider class
@@ -22,6 +22,7 @@ class AnalysisSlider : public QSlider {
     bool m_show_tags = false;
     bool show_on_slider = true;
     bool show_interval = true;
+    bool show_ana_interval = false;
 
     //Change this to set how many frames the POI buttons should ignore
     const int JUMP_INTERVAL = 0;
@@ -30,9 +31,11 @@ public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
     int last_poi_end = -1;
-    int interval = -1;
-    int interval_first = -1;
-    int interval_second = -1;
+
+    Analysis* m_analysis = nullptr;
+
+    std::pair<int, int> m_interval = std::make_pair(-1, -1);
+    std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
 
     // Control functions
     void set_blocked(bool value);
@@ -57,13 +60,14 @@ protected:
     void paintEvent(QPaintEvent *ev);
 public slots:    
 
+    // Set analysis to be used when displaying analysis interval
+    void set_analysis(AnalysisProxy*analysis);
+
     // Set analysis to be used when displaying slider pois
     void set_basic_analysis(BasicAnalysis *analysis);
 
     // Set interval to the interval the analysis was run on
-    void set_ana_interval(BasicAnalysis* analysis);
-
-    void hide_ana_interval();
+    void set_ana_interval();
 
     // Wrapped repaint
     void update();
@@ -77,6 +81,7 @@ public slots:
     void set_show_tags(bool);
     void set_show_on_slider(bool);
     void set_show_interval(bool);
+    void set_show_ana_interval(bool);
 
     // Remove all displayed intervals of interest
     void clear_slider();

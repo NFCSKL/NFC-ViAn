@@ -108,7 +108,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
         method->setBounding_box(settings->bounding_box);
         method->set_bounding_box_points(settings->get_box_start(), settings->get_box_end());
     }
-    if(settings->use_interval) method->setInterval(settings->interval);
+    if(settings->use_interval) method->set_interval(settings->get_interval());
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -427,7 +427,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         emit enable_tag_btn(false);
-        emit hide_analysis_details();
         emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
@@ -529,14 +528,16 @@ void ProjectWidget::context_menu(const QPoint &point) {
  * Show the analysis' details, interval and bounding box
  */
 void ProjectWidget::show_details() {
-    qDebug() << "in show details";
-    QTreeWidgetItem* item = selectedItems().front();
-    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
-    show_analysis_details(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
+    emit show_analysis_details(true);
+//    qDebug() << "in show details";
+//    QTreeWidgetItem* item = selectedItems().front();
+//    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+//    emit show_analysis_details(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
 }
 
 void ProjectWidget::hide_details() {
-    emit hide_analysis_details();
+    emit show_analysis_details(false);
+    //emit hide_analysis_details();
 }
 
 

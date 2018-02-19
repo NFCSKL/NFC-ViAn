@@ -23,7 +23,8 @@ class BasicAnalysis : public Saveable
 
 public:
     std::string m_name = "2";
-    AnalysisInterval m_ana_interval;
+    std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
+    //int m_ana_start, m_ana_end;
     cv::Rect bounding_box;
     QPoint rect_start, rect_end;
     bool use_interval = false;
@@ -44,7 +45,7 @@ public:
 
     std::string get_name() const;
     interval_set get_intervals() const;
-    AnalysisInterval get_ana_interval() const;
+    std::pair<int, int> get_ana_interval() const;
     cv::Rect get_bounding_box() const;
     QPoint get_rect_start() const;
     QPoint get_rect_end() const;
