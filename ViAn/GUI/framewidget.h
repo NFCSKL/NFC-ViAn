@@ -50,6 +50,7 @@ class FrameWidget : public QWidget
     bool m_detections = false;
     bool show_detections = true;
 
+    int current_frame_nr = 0;
     double m_scale_factor = 1;
 
 public:
@@ -58,6 +59,7 @@ public:
     cv::Mat get_modified_frame() const;
     cv::Mat get_org_frame() const;
     void set_overlay(Overlay *overlay);
+    void set_current_frame_nr(int);
     Overlay* get_overlay();
 
 signals:

@@ -769,6 +769,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     playback_slider->update();
+    frame_wgt->set_current_frame_nr(frame_num);
 }
 
 /**

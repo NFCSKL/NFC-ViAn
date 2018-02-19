@@ -114,6 +114,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
 }
 
 void AnalysisWidget::abort_analysis() {
+    qDebug() << "abort";
     bool* abort = abort_map.at(current_method);
     *abort = true;
 }
