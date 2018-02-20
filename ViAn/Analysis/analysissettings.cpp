@@ -27,25 +27,12 @@ void AnalysisSettings::setBounding_box(const cv::Rect &value) {
     use_bounding_box = true;
 }
 
-void AnalysisSettings::set_bounding_box_points(const QPoint &start, const QPoint &end) {
-    box_start = start;
-    box_end = end;
-}
-
 ANALYSIS_TYPE AnalysisSettings::getType() const {
     return type;
 }
 
 std::pair<int, int> AnalysisSettings::get_interval() const {
     return interval;
-}
-
-QPoint AnalysisSettings::get_box_start() const {
-    return box_start;
-}
-
-QPoint AnalysisSettings::get_box_end() const {
-    return box_end;
 }
 
 void AnalysisSettings::setInterval(const std::pair<int, int> &value) {

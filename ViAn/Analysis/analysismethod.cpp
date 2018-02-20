@@ -143,13 +143,8 @@ void AnalysisMethod::run() {
         m_analysis.bounding_box = bounding_box;
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
-        m_analysis.rect_start = rect_start;
-        m_analysis.rect_end = rect_end;
-        qDebug() << "before check" << QString::fromStdString(m_save_path);
         m_save_path = check_save_path(m_save_path);
-        qDebug() << "after check" << QString::fromStdString(m_save_path);
         m_analysis.save_saveable(m_save_path);
-        m_analysis.m_name = "hehehe";
         AnalysisProxy proxy(m_analysis, m_analysis.full_path());       
         emit finished_analysis(proxy);
         emit finito();
@@ -228,11 +223,6 @@ cv::Rect AnalysisMethod::get_bounding_box() const {
 void AnalysisMethod::setBounding_box(const cv::Rect &value) {
     bounding_box = value;
     use_bounding_box = true;
-}
-
-void AnalysisMethod::set_bounding_box_points(const QPoint &start, const QPoint &end) {
-    rect_start= start;
-    rect_end = end;
 }
 
 std::pair<int, int> AnalysisMethod::get_interval() const {

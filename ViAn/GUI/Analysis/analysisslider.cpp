@@ -128,8 +128,11 @@ void AnalysisSlider::set_ana_interval() {
     m_ana_interval = std::make_pair(m_analysis->get_ana_interval().first, m_analysis->get_ana_interval().second);
 }
 
+/**
+ * @brief AnalysisSlider::set_show_ana_interval
+ * @param show
+ */
 void AnalysisSlider::set_show_ana_interval(bool show) {
-    if (show )qDebug() << "truee";
     show_ana_interval = show;
     repaint();
 }

@@ -4,7 +4,6 @@
 AnalysisInterval::AnalysisInterval(int start, int end) {
     m_start = start;
     m_end = end;
-    qDebug() << start << "-" << end;
 }
 
 AnalysisInterval::AnalysisInterval() {}

@@ -7,11 +7,6 @@
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 
 void FrameWidget::toggle_zoom(bool value) {
-    //qDebug() << anchor.x() << anchor.y();
-    //qDebug() << "scale factor" << m_scale_factor;
-    qDebug() << m_analysis->get_ana_interval().first << m_analysis->get_ana_interval().second;
-    qDebug() << m_analysis->bounding_box.x << m_analysis->bounding_box.y;
-    qDebug() << bounding_box.x << bounding_box.y;
     if (value) {
         tool = ZOOM;
         setCursor(Qt::CrossCursor);
@@ -30,6 +25,11 @@ void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
 
+/**
+ * @brief FrameWidget::set_analysis
+ * @param analysis
+ * Set the analysis and the pois on the current frame
+ */
 void FrameWidget::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis->load_analysis();
     set_detections_on_frame(current_frame_nr);
@@ -212,18 +212,12 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     if (show_box) {
         painter.setPen(QColor(180,200,200));
-
         QPoint tl(m_analysis->bounding_box.x, m_analysis->bounding_box.y);
         QPoint br(m_analysis->bounding_box.x+m_analysis->bounding_box.width, m_analysis->bounding_box.y+m_analysis->bounding_box.height);
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.drawRect(bounding_rect);
-
-
-//        QRectF ana_box((ana_rect_start-anchor)*m_scale_factor, (ana_rect_end-anchor)*m_scale_factor);
-//        painter.drawRect(ana_box);
     }
     if (m_detections && show_detections) {
-        qDebug() << "length" << ooi_rects.size();
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
             QPoint br(rect.x+rect.width, rect.y+rect.height);
@@ -259,7 +253,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         if(event->button() == Qt::LeftButton) {
             ana_rect_start = event->pos();
             ana_rect_end = event->pos();
-            //show_box = true;
         }
         break;
     case ZOOM:
@@ -274,7 +267,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     default:
-        qDebug() << "press default";
         emit mouse_pressed(scale_point(event->pos()));
         break;
     }
@@ -311,7 +303,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x() + start.x / m_scale_factor, anchor.y() + start.y / m_scale_factor),
                       cv::Point(anchor.x() + end.x / m_scale_factor, anchor.y() + end.y / m_scale_factor));
         settings->setBounding_box(scaled);
-        settings->set_bounding_box_points(ana_rect_start, ana_rect_end);
 
         emit quick_analysis(settings);
         tool = NONE;
@@ -335,7 +326,6 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case ANALYSIS_BOX:
         if (event->buttons() == Qt::LeftButton) {
             ana_rect_end = rect_update(event->pos());
-            //show_box = true;
         }
         break;
     case ZOOM:
