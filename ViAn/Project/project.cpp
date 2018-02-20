@@ -17,7 +17,7 @@ Project* Project::fromFile(const std::string &full_path){
         proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
         proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";
         proj->save_project();
-    }
+    } else qWarning() << "Something went wrong while creating the temporary folder.";
     return proj;
 }
 
@@ -36,7 +36,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
         m_tmp_file = m_tmp_dir + name + ".vian";  // full_path();
         m_file = m_dir + name + ".vian";
         save_project();
-    } else qDebug() << "Something went wrong while creating the temporary folder.";
+    } else qWarning() << "Something went wrong while creating the temporary folder.";
 }
 
 

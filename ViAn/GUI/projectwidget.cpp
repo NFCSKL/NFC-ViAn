@@ -49,7 +49,6 @@ ProjectWidget::~ProjectWidget() {
 void ProjectWidget::new_project() {
     ProjectDialog* proj_dialog = new ProjectDialog();
     QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
-    delete proj_dialog;
 }
 
 /**
