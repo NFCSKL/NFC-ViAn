@@ -1,42 +1,67 @@
 #include "manipulatordialog.h"
-#include <QFormLayout>
 #include <QPushButton>
+#include <QDebug>
 #include <Video/framemanipulator.h>
 
-ManipulatorDialog::ManipulatorDialog(QWidget* parent) : QDialog(parent) {
-    QFormLayout* layout = new QFormLayout;
+ManipulatorDialog::ManipulatorDialog(int b, double c, QWidget* parent) : QDialog(parent) {
+    contrast = c;
+    brightness = b;
+
+    layout = new QFormLayout;
+    brightness_layout = new QFormLayout;
+    contrast_layout = new QFormLayout;
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    // Spin box setup
-    brightness_box = new QSpinBox(this);
-    contrast_box = new QDoubleSpinBox(this);
-    brightness_box->setSingleStep(FrameManipulator().BRIGHTNESS_STEP);
-    brightness_box->setMinimum(FrameManipulator().BRIGHTNESS_MIN);
-    brightness_box->setMaximum(FrameManipulator().BRIGHTNESS_MAX);
-    contrast_box->setSingleStep(FrameManipulator().CONTRAST_STEP);
-    contrast_box->setMinimum(FrameManipulator().CONTRAST_MIN);
-    contrast_box->setMaximum(FrameManipulator().CONTRAST_MAX);
+    brightness_slider = new QSlider(Qt::Horizontal, this);
+    contrast_slider = new QSlider(Qt::Horizontal, this);
+    brightness_value_label = new QLabel(this);
+    contrast_value_label = new QLabel(this);
+    brightness_value_label->setMinimumWidth(25);
+    contrast_value_label->setMinimumWidth(25);
+    brightness_slider->setSingleStep(FrameManipulator().BRIGHTNESS_STEP);
+    brightness_slider->setMaximum(FrameManipulator().BRIGHTNESS_MAX);
+    brightness_slider->setMinimum(FrameManipulator().BRIGHTNESS_MIN);
+    brightness_slider->setValue(brightness);
+    brightness_value_label->setText(QString::number(brightness_slider->value()));
 
-    connect(this->brightness_box, SIGNAL(valueChanged(int)), this, SLOT(b_changed(int)));
-    connect(this->contrast_box, SIGNAL(valueChanged(double)), this, SLOT(c_changed(double)));
+    contrast_slider->setSingleStep(FrameManipulator().CONTRAST_STEP*DOUBLE_TO_INT);
+    contrast_slider->setMaximum(FrameManipulator().CONTRAST_MAX*DOUBLE_TO_INT);
+    contrast_slider->setMinimum(FrameManipulator().CONTRAST_MIN*DOUBLE_TO_INT);
+    contrast_slider->setValue(contrast*DOUBLE_TO_INT);
+    contrast_value_label->setText(QString::number(contrast_slider->value()/DOUBLE_TO_INT));
 
-    layout->addRow("Brightness", brightness_box);
-    layout->addRow("Contrast", contrast_box);
+    connect(this->brightness_slider, SIGNAL(valueChanged(int)), this, SLOT(b_changed(int)));
+    connect(this->contrast_slider, SIGNAL(valueChanged(int)), this, SLOT(c_changed(int)));
+
+    brightness_layout->addRow(brightness_value_label, brightness_slider);
+    contrast_layout->addRow(contrast_value_label, contrast_slider);
+    layout->addRow("Brightness", brightness_layout);
+    layout->addRow("Contrast", contrast_layout);
 
     //Button setup
     btn_box = new QDialogButtonBox(Qt::Horizontal, this);
     btn_box->addButton(QDialogButtonBox::Ok);
-    btn_box->addButton(QDialogButtonBox::Apply)->setEnabled(false);
     btn_box->addButton(QDialogButtonBox::Cancel);
     btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
 
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ManipulatorDialog::ok_clicked);
-    connect(btn_box->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &ManipulatorDialog::apply_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &ManipulatorDialog::cancel_clicked);
     connect(btn_box->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &ManipulatorDialog::reset_clicked);
 
     layout->addWidget(btn_box);
     setLayout(layout);
+    setWindowTitle(tr("Brightness and Contrast"));
+}
+
+ManipulatorDialog::~ManipulatorDialog() {
+    delete brightness_value_label;
+    delete contrast_value_label;
+    delete brightness_slider;
+    delete contrast_slider;
+    delete btn_box;
+    delete brightness_layout;
+    delete contrast_layout;
+    delete layout;
 }
 
 /**
@@ -44,17 +69,8 @@ ManipulatorDialog::ManipulatorDialog(QWidget* parent) : QDialog(parent) {
  * Emits the current values and closes the dialog
  */
 void ManipulatorDialog::ok_clicked() {
-    emit values(brightness_box->value(), contrast_box->value());
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT);
     close();
-}
-
-/**
- * @brief ManipulatorDialog::apply_clicked
- * Emits the current values and disables the apply button
- */
-void ManipulatorDialog::apply_clicked() {
-    btn_box->button(QDialogButtonBox::Apply)->setEnabled(false);
-    emit values(brightness_box->value(), contrast_box->value());
 }
 
 /**
@@ -62,6 +78,7 @@ void ManipulatorDialog::apply_clicked() {
  * Closes the dialog
  */
 void ManipulatorDialog::cancel_clicked() {
+    emit values(brightness, contrast);
     close();
 }
 
@@ -70,8 +87,8 @@ void ManipulatorDialog::cancel_clicked() {
  * Restores the spin box values to those defined in frame manipulator
  */
 void ManipulatorDialog::reset_clicked() {
-    brightness_box->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
-    contrast_box->setValue(FrameManipulator().CONTRAST_DEFAULT);
+    brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
+    contrast_slider->setValue(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT);
 }
 
 /**
@@ -80,7 +97,8 @@ void ManipulatorDialog::reset_clicked() {
  * @param value
  */
 void ManipulatorDialog::b_changed(int value) {
-    btn_box->button(QDialogButtonBox::Apply)->setEnabled(true);
+    brightness_value_label->setText(QString::number(value));
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT);
 }
 
 /**
@@ -88,6 +106,8 @@ void ManipulatorDialog::b_changed(int value) {
  * Enables the apply button
  * @param value
  */
-void ManipulatorDialog::c_changed(double value) {
-    btn_box->button(QDialogButtonBox::Apply)->setEnabled(true);
+void ManipulatorDialog::c_changed(int value) {
+    QString text = QString::number(value/DOUBLE_TO_INT);
+    contrast_value_label->setText(text);
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT);
 }

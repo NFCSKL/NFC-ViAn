@@ -126,16 +126,12 @@ void FrameProcessor::process_frame() {
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
     // cv::imshow("test", tmp);
     // Draws the overlay
-    qDebug() << "draw overlay";
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
-    qDebug() << "overlay drawn";
 
     // Scales the frame
-    qDebug() << "scale frame";
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
-    qDebug () << "brightness contrast";
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number

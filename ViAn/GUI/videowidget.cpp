@@ -1075,6 +1075,8 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
+    brightness = b_val;
+    contrast = c_val;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1147,3 +1149,10 @@ void VideoWidget::frame_line_edit_finished() {
     }
 }
 
+int VideoWidget::get_brightness() {
+    return brightness;
+}
+
+double VideoWidget::get_contrast() {
+    return contrast;
+}

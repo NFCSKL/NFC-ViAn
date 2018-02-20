@@ -519,7 +519,7 @@ void MainWindow::gen_report() {
  */
 void MainWindow::cont_bri() {
     emit set_status_bar("Opening contrast/brightness settings");
-    ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
+    ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
     man_dialog->exec();
 }

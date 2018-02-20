@@ -60,7 +60,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
     set_main_window_name(project_name);
-    m_proj = new Project(_tmp_name, _tmp_path); 
+    m_proj = new Project(_tmp_name, _tmp_path);
     m_proj->save_project();
     _tmp_path.append(_tmp_name);
     emit proj_path(m_proj->getDir());
@@ -114,7 +114,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
-    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
+    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
     emit begin_analysis(item, method);
 }
 
