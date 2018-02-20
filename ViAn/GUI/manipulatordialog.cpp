@@ -1,6 +1,5 @@
 #include "manipulatordialog.h"
 #include <QPushButton>
-#include <QDebug>
 #include <Video/framemanipulator.h>
 
 ManipulatorDialog::ManipulatorDialog(int b, double c, QWidget* parent) : QDialog(parent) {

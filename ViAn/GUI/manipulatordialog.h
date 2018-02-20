@@ -38,7 +38,6 @@ public:
     ~ManipulatorDialog();
 private slots:
     void ok_clicked();
-    //void apply_clicked();
     void cancel_clicked();
     void reset_clicked();
     void b_changed(int value);
