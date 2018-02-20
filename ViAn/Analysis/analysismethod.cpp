@@ -151,6 +151,14 @@ void AnalysisMethod::run() {
     }
 }
 
+/**
+ * @brief AnalysisMethod::check_save_path
+ * @param path
+ * @param increment
+ * @return new save path
+ * Checks if path exists and if it does adds a number to the end to prevent
+ * that path overwrites the old one
+ */
 std::string AnalysisMethod::check_save_path(std::string path, int increment) {
     std::string new_path = path + std::to_string(increment);
     QFile file(QString::fromStdString(path));

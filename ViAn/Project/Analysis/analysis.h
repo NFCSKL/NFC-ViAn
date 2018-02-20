@@ -8,7 +8,6 @@
 #include <map>
 #include <set>
 #include "Filehandler/saveable.h"
-//#include "opencv2/core/core.hpp"
 #include "poi.h"
 #include "detectionbox.h"
 #include "basicanalysis.h"
@@ -20,8 +19,6 @@
 class Analysis : public BasicAnalysis {
     friend class AnalysisProxy;
 public:
-    //AnalysisInterval interval;
-    //cv::Rect bounding_box;
     ANALYSIS_TYPE type;
 public:
     virtual void read(const QJsonObject& json) override;
@@ -29,7 +26,6 @@ public:
     virtual SAVE_TYPE get_save_type() const override;
     virtual ANALYSIS_TYPE get_type() const override;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
-    //void set_name(const std::string &name);
     std::string get_name() const;
 
 };
