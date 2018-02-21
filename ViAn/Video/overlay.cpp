@@ -1,4 +1,5 @@
 #include "overlay.h"
+#include <QDebug>
 
 /**
  * @brief Overlay::Overlay
@@ -127,6 +128,30 @@ void Overlay::add_drawing(Shape* shape, int frame_nr) {
     overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
 }
 
+void Overlay::get_drawing(QPoint pos, int frame_nr) {
+    current_drawing = nullptr;
+    for (auto shape : overlays[frame_nr].overlay) {
+        if (point_in_drawing(pos, shape)) {
+            current_drawing = shape;
+        }
+    }
+}
+
+bool Overlay::point_in_drawing(QPoint pos, Shape *shape) {
+    cv::Rect drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
+    return drawing.contains(qpoint_to_point(pos));
+}
+
+/**
+ * @brief Shape::qpoint_to_point
+ * Converts QPoint to OpenCV Point.
+ * @param pnt QPoint to be converted.
+ * @return Returns converted Point.
+ */
+cv::Point Overlay::qpoint_to_point(QPoint pnt) {
+    return cv::Point(pnt.x(), pnt.y());
+}
+
 /**
  * @brief Overlay::mouse_pressed
  * Creates a drawing shape with the prechosen colour
@@ -160,6 +185,10 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
             case TEXT:
                 empty_undo_list(frame_nr);
                 add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
+                break;
+            case HAND:
+                get_drawing(pos, frame_nr);
+                prev_point = pos;
                 break;
             default:
                 break;
@@ -196,9 +225,18 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
-    if (show_overlay) {
-        // The last appended shape is the one we're currently drawing.
-        overlays[frame_nr].overlay.back()->update_drawing_pos(pos);
+    if (show_overlay && !overlays[frame_nr].overlay.empty()) {
+        if (current_shape == HAND) {
+            if (current_drawing == nullptr) return;
+            QPoint diff_point = pos - prev_point;
+            current_drawing->move_shape(diff_point);
+            prev_point = pos;
+        } else if (current_shape == TEXT) {
+            overlays[frame_nr].overlay.back()->update_text(pos);
+        } else {
+            // The last appended shape is the one we're currently drawing.
+            overlays[frame_nr].overlay.back()->update_drawing_pos(pos);
+        }
     }
 }
 

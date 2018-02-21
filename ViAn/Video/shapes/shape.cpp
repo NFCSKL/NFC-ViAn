@@ -35,6 +35,20 @@ void Shape::update_drawing_pos(QPoint pos) {
     draw_end = qpoint_to_point(pos);
 }
 
+void Shape::update_text(QPoint pos) {
+    draw_start = qpoint_to_point(pos);
+}
+
+/**
+ * @brief Shape::move_shape
+ * @param diff_point
+ * Adds the diff_pointer to the shape and therefore moves it that much
+ */
+void Shape::move_shape(QPoint diff_point) {
+    draw_start += qpoint_to_point(diff_point);
+    draw_end += qpoint_to_point(diff_point);
+}
+
 /**
  * @brief Shape::qcolor_to_scalar
  * Converts QColor to OpenCV Scalar.
@@ -55,6 +69,30 @@ cv::Scalar Shape::qcolor_to_scalar(QColor col) {
  */
 cv::Point Shape::qpoint_to_point(QPoint pnt) {
     return cv::Point(pnt.x(), pnt.y());
+}
+
+/**
+ * @brief Shape::get_draw_start
+ * @return draw_start
+ */
+cv::Point Shape::get_draw_start() {
+    return draw_start;
+}
+
+/**
+ * @brief Shape::get_draw_end
+ * @return draw_end
+ */
+cv::Point Shape::get_draw_end() {
+    return draw_end;
+}
+
+/**
+ * @brief Shape::get_shape
+ * @return shape
+ */
+SHAPES Shape::get_shape() {
+    return shape;
 }
 
 /**

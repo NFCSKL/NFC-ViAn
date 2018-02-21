@@ -69,6 +69,12 @@ private:
     Shape* get_empty_shape(SHAPES shape_type);
     void empty_undo_list(int frame_nr);
     void add_drawing(Shape *shape, int frame_nr);
+    void get_drawing(QPoint pos, int frame_nr);
+    bool point_in_drawing(QPoint pos, Shape* shape);
+    cv::Point qpoint_to_point(QPoint pnt);
+    
+    Shape* current_drawing = nullptr;
+    QPoint prev_point;
 
     bool show_overlay = true;
 

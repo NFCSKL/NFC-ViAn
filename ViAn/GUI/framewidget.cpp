@@ -9,10 +9,12 @@ FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 void FrameWidget::toggle_zoom(bool value) {
     if (value) {
         tool = ZOOM;
+        emit send_tool(ZOOM);
         setCursor(Qt::CrossCursor);
     } else {
         unsetCursor();
         tool = NONE;
+        emit send_tool(NONE);
     }
 }
 

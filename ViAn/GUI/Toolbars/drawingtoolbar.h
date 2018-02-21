@@ -26,6 +26,7 @@ public:
     QAction* circle_tool_act;
     QAction* line_tool_act;
     QAction* text_tool_act;
+    QAction* hand_tool_act;
     QAction* undo_tool_act;
     QAction* redo_tool_act;
     QAction* clear_tool_act;
@@ -42,6 +43,7 @@ private slots:
     void circle_tool_clicked();
     void line_tool_clicked();
     void text_tool_clicked();
+    void hand_tool_clicked();
 signals:
     void set_status_bar(QString);
     void set_color(QColor);

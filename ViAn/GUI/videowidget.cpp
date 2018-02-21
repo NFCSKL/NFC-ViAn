@@ -955,6 +955,9 @@ void VideoWidget::set_clear_drawings() {
 }
 
 void VideoWidget::set_tool(SHAPES tool) {
+    if (tool != ZOOM) {
+        zoom_in_btn->setChecked(false);
+    }
     update_overlay_settings([&](){
         o_settings.tool = tool;
     });

@@ -9,7 +9,7 @@
 
 #include "opencv2/opencv.hpp"
 
-enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, ZOOM, MOVE, ANALYSIS_BOX};
+enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, HAND, ZOOM, MOVE, ANALYSIS_BOX};
 
 class Shape {
 
@@ -17,6 +17,8 @@ public:
     Shape(SHAPES s);
     Shape(SHAPES s, QColor col, QPoint pos);
     void update_drawing_pos(QPoint pos);
+    void update_text(QPoint pos);
+    void move_shape(QPoint p);
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
 
@@ -28,6 +30,10 @@ public:
 
     static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
     static constexpr double ALPHA = 0.6; // Costant used for the opacity.
+
+    cv::Point get_draw_start();
+    cv::Point get_draw_end();
+    SHAPES get_shape();
 
 protected:
     SHAPES shape;
