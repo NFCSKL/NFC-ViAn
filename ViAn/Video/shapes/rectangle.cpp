@@ -33,6 +33,7 @@ cv::Mat Rectangle::draw(cv::Mat &frame) {
  * @param pos
  */
 void Rectangle::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**

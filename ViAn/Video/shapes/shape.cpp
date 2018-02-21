@@ -1,5 +1,6 @@
 #include "shape.h"
 #include <iostream>
+#include <QDebug>
 
 /**
  * @brief Shape::Shape
@@ -36,7 +37,12 @@ void Shape::update_drawing_pos(QPoint pos) {
 }
 
 void Shape::update_text(QPoint pos) {
+    qDebug() << "in update";
     draw_start = qpoint_to_point(pos);
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
+    qDebug() << draw_start.x << draw_end.x;
+    qDebug() << draw_start.y << draw_end.y;
 }
 
 /**
@@ -93,6 +99,10 @@ cv::Point Shape::get_draw_end() {
  */
 SHAPES Shape::get_shape() {
     return shape;
+}
+
+void Shape::set_text_size(cv::Size size) {
+    text_size = size;
 }
 
 /**

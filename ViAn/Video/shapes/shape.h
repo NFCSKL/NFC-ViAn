@@ -34,12 +34,14 @@ public:
     cv::Point get_draw_start();
     cv::Point get_draw_end();
     SHAPES get_shape();
+    void set_text_size(cv::Size size);
 
 protected:
     SHAPES shape;
     cv::Scalar colour;
     cv::Point draw_start;
     cv::Point draw_end;
+    cv::Size text_size;
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);

@@ -33,6 +33,7 @@ cv::Mat Circle::draw(cv::Mat &frame) {
  * @param pos
  */
 void Circle::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**

@@ -40,6 +40,7 @@ cv::Mat Text::draw(cv::Mat &frame) {
  * @param pos
  */
 void Text::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**

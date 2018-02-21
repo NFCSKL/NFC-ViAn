@@ -32,6 +32,7 @@ cv::Mat Arrow::draw(cv::Mat &frame) {
  * @param pos
  */
 void Arrow::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**

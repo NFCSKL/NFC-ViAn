@@ -77,6 +77,7 @@ private:
     QPoint prev_point;
 
     bool show_overlay = true;
+    int baseline = 0;
 
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;

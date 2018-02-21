@@ -59,11 +59,8 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
-            qDebug() << "fp overlay changed";
             m_overlay_changed->store(false);
-            qDebug() << "update_overlay";
             update_overlay_settings();
-            qDebug() << "update_overlay_end";
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load()) {
                 process_frame();
@@ -126,16 +123,12 @@ void FrameProcessor::process_frame() {
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
     // cv::imshow("test", tmp);
     // Draws the overlay
-    qDebug() << "draw overlay";
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
-    qDebug() << "overlay drawn";
 
     // Scales the frame
-    qDebug() << "scale frame";
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
-    qDebug () << "brightness contrast";
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number

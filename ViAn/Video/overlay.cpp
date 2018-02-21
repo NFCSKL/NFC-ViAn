@@ -124,6 +124,9 @@ void Overlay::empty_undo_list(int frame_nr) {
  * @param frame_nr
  */
 void Overlay::add_drawing(Shape* shape, int frame_nr) {
+    if (shape->get_shape() == TEXT) {
+        shape->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, shape->LINE_THICKNESS, &baseline));
+    }
     overlays[frame_nr].overlay.push_back(shape);
     overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
 }
@@ -132,6 +135,7 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
     current_drawing = nullptr;
     for (auto shape : overlays[frame_nr].overlay) {
         if (point_in_drawing(pos, shape)) {
+            qDebug() << "Found one";
             current_drawing = shape;
         }
     }
@@ -228,6 +232,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay && !overlays[frame_nr].overlay.empty()) {
         if (current_shape == HAND) {
             if (current_drawing == nullptr) return;
+            qDebug() << "in hand";
             QPoint diff_point = pos - prev_point;
             current_drawing->move_shape(diff_point);
             prev_point = pos;

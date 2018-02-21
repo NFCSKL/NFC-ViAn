@@ -32,6 +32,7 @@ cv::Mat Line::draw(cv::Mat &frame) {
  * @param pos
  */
 void Line::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**
