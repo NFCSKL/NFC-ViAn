@@ -17,7 +17,7 @@ Project* Project::fromFile(const std::string &full_path){
         proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
         proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";
         proj->save_project();
-    } else qWarning() << "Something went wrong while creating the temporary folder.";
+    } else return nullptr;
     return proj;
 }
 
@@ -28,14 +28,15 @@ Project* Project::fromFile(const std::string &full_path){
  * @param vid_path := path for videos folder
  */
 Project::Project(const std::string& name, const std::string& dir_path){
+    m_name = name;
+    m_dir = dir_path + "/" + name + "/";
+    m_file = m_dir + name + ".vian";
     if(tmp_dir.isValid()){
-        m_name = name;
-        m_dir = dir_path + "/" + name + "/";
         m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
         m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
         m_tmp_file = m_tmp_dir + name + ".vian";  // full_path();
-        m_file = m_dir + name + ".vian";
         save_project();
+        tmp_dir_valid = true;
     } else qWarning() << "Something went wrong while creating the temporary folder.";
 }
 
@@ -98,7 +99,7 @@ void Project::remove_report(const int &id) {
  * Delete all projects files.
  */
 void Project::delete_artifacts(){
-    QDir dir(QString::fromStdString(m_tmp_dir));
+    QDir dir(QString::fromStdString(m_dir));
     // Delete directory and all of its contents
     // Including subdirectories and their contents.
     dir.removeRecursively();

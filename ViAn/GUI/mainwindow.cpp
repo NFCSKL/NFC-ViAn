@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <QMessageBox>
 #include <iostream>
 #include <sstream>
 #include <QCloseEvent>

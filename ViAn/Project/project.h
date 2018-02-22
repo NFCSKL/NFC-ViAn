@@ -46,6 +46,8 @@ public:
     Project(const std::string& name, const std::string& dir_path);
     ~Project();
 
+    bool tmp_dir_valid = false;
+
     ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
     // TODO

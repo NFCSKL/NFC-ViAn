@@ -96,6 +96,7 @@ private:
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
+    bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void project_closed();
 

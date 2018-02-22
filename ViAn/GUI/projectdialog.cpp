@@ -4,6 +4,7 @@
 #include <QBoxLayout>
 #include <QFormLayout>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -15,7 +16,7 @@
 ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("New project");
     // remove question mark from the title bar
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
@@ -57,9 +58,18 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
+    QDir dir(path_text->text());
+    if (dir.exists()) {
+        QMessageBox msg_box;
+        msg_box.setText("This project already exist. Do you wanna continue?");
+        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msg_box.setDefaultButton(QMessageBox::No);
+        int reply = msg_box.exec();
+        if (reply != QMessageBox::Yes) return;
+    }
+
     emit project_path(name_text->text(), path_text->text());
     close();
-
 }
 
 void ProjectDialog::cancel_btn_clicked() {

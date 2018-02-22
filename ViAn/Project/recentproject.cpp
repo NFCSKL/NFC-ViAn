@@ -1,7 +1,7 @@
 #include "recentproject.h"
 
 const std::string RecentProject::FILE_NAME = "recent_projects";
-const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString();
+const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString()+ "/ViAn/";
 
 RecentProject::RecentProject(){}
 
@@ -15,9 +15,10 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
     std::pair<std::string, std::string> new_proj = std::make_pair(name, project_path);
     auto item = std::find(recent_items.begin(), recent_items.end(), new_proj);
     if (item != recent_items.end()) recent_items.erase(item);
+    if (recent_items.size() >= 10) recent_items.resize(10);
     recent_items.push_front(new_proj);
     QDir().mkpath(QString::fromStdString(PATH));
-    save_saveable(PATH + "/ViAn/" +FILE_NAME);
+    save_saveable(PATH + FILE_NAME);
 }
 
 /**
@@ -26,7 +27,7 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  * @return
  */
 std::list<std::pair<std::string, std::string>> RecentProject::load_recent(){
-    load_saveable(PATH + "/ViAn/" + FILE_NAME);
+    load_saveable(PATH + FILE_NAME);
     return recent_items;
 }
 

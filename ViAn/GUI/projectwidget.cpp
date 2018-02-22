@@ -59,11 +59,17 @@ void ProjectWidget::new_project() {
  * @param project_path
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
-    close_project();
     std::string name = project_name.toStdString();
     std::string path = project_path.toStdString();
+    Project* new_proj = new Project(name, path);
+    if (!new_proj->tmp_dir_valid) {
+        delete m_proj;
+        m_proj = nullptr;
+        return;
+    }
+    close_project();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
-    m_proj = new Project(name, path);
+    m_proj = new_proj;
     path.append(name);
     emit proj_path(m_proj->get_tmp_dir());
 }
@@ -522,14 +528,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
-    QMessageBox delete_box(this);
-    delete_box.setIcon(QMessageBox::Warning);
-    delete_box.setText("Deleting item(s)\n"
-                       "(Unselected items within selected folders will be deleted as well)");
-    delete_box.setInformativeText("Do you wish to continue?");
-    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    delete_box.setDefaultButton(QMessageBox::No);
-    if (delete_box.exec() == QMessageBox::Yes) {
+    QString text = "Deleting item(s)\n"
+                   "(Unselected items within selected folders will be deleted as well)";
+    QString info_text = "Do you wish to continue?";
+    if (message_box(text, info_text, true)) {
         for (auto item : selectedItems()) {
             delete item;
         }
@@ -582,17 +584,6 @@ void ProjectWidget::create_folder_item() {
  */
 void ProjectWidget::save_project() {
     if (m_proj == nullptr ) return;
-    QDir dir(QString::fromStdString(m_proj->get_dir()));
-    if (dir.exists()) {
-        QMessageBox msg_box;
-        msg_box.setModal(true);
-        msg_box.setText("This project already exist. Do you wanna overwrite it?");
-        msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msg_box.setDefaultButton(QMessageBox::No);
-        int reply = msg_box.exec();
-        if (reply == QMessageBox::No) return;
-    }
-
     save_item_data();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -612,8 +603,13 @@ void ProjectWidget::save_project() {
 void ProjectWidget::open_project(QString project_path) {
     if (project_path.isEmpty()) return;
     if (m_proj != nullptr) close_project();
+    Project* new_proj = Project::fromFile(project_path.toStdString());
+    if (new_proj == nullptr) {
+        qWarning() << "Something went wrong while creating the temporary folder.";
+        return;
+    }
+    m_proj = new_proj;
     set_status_bar("Opening project");
-    m_proj = Project::fromFile(project_path.toStdString());
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -649,18 +645,35 @@ void ProjectWidget::close_project() {
 void ProjectWidget::remove_project() {
     // TODO Does this delete all images?
     if (m_proj == nullptr) return;
-    QMessageBox msg_box;
-    msg_box.setText("Are you sure you want to remove the project?");
-    msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
-    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msg_box.setDefaultButton(QMessageBox::No);
-    int reply = msg_box.exec();
-    if (reply != QMessageBox::Yes) return;
+    QString text = "Are you sure you want to remove the project?";
+    QString info_text = "This will delete all project files (images, reports, etc).";
+    if (message_box(text, info_text)) return;
+
     emit set_status_bar("Removing project and associated files");
 
     m_proj->delete_artifacts();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
+    emit remove_overlay();
     emit project_closed();
+}
+
+/**
+ * @brief ProjectWidget::message_box
+ * Creates a popup yes/no message box with the inputed text
+ * @param text  :   Text
+ * @param info_text :   Informative text
+ * @param warning   :   true will make the message box a warning box
+ * @return Yes returns true and no returns false
+ */
+bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
+    QMessageBox msg_box;
+    if (warning) msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setText(text);
+    msg_box.setInformativeText(info_text);
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg_box.setDefaultButton(QMessageBox::No);
+    int reply = msg_box.exec();
+    return reply == QMessageBox::Yes;
 }
