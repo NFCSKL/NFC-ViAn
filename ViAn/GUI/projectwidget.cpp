@@ -49,6 +49,7 @@ ProjectWidget::~ProjectWidget() {
 void ProjectWidget::new_project() {
     ProjectDialog* proj_dialog = new ProjectDialog();
     QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
+    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
 }
 
 /**
@@ -68,7 +69,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
         return;
     }
     close_project();
-    parentWidget()->parentWidget()->setWindowTitle(project_name);
+    set_main_window_name(project_name);
     m_proj = new_proj;
     path.append(name);
     emit proj_path(m_proj->get_tmp_dir());
@@ -240,7 +241,7 @@ std::stack<int> ProjectWidget::get_index_path(QTreeWidgetItem *item){
 
 /**
  * @brief ProjectWidget::get_video_item
- * Searches the project tree for the VideoItem containing the VideoProjectt v_proj
+ * Searches the project tree for the VideoItem containing the VideoProject v_proj
  * @param v_proj    :   target VideoProject
  * @return VideoItem*   :   the correct VideoItem if found else nullptr
  */
@@ -533,11 +534,26 @@ void ProjectWidget::remove_item() {
     QString info_text = "Do you wish to continue?";
     if (message_box(text, info_text, true)) {
         for (auto item : selectedItems()) {
+            if (item->type() == FOLDER_ITEM) {
+                std::vector<VideoItem*> v_items;
+                get_video_items(item, v_items);
+                for (auto v_item : v_items) {
+                    emit item_removed(v_item->get_video_project());
+                }
+            }
+
+            else if (item->type() == VIDEO_ITEM) {
+                VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+                emit item_removed(vid_item->get_video_project());
+            }
+            // TODO Fix these cases
+//            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
+//
+//            }
             delete item;
         }
     }
     emit remove_overlay();
-
 }
 
 /**
@@ -614,8 +630,7 @@ void ProjectWidget::open_project(QString project_path) {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
-
-    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->get_name()));
+    set_main_window_name(QString::fromStdString(m_proj->getName()));
     emit proj_path(m_proj->get_tmp_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
@@ -630,6 +645,7 @@ void ProjectWidget::open_project(QString project_path) {
 void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     if (m_proj == nullptr) return;
+    set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
@@ -648,7 +664,8 @@ void ProjectWidget::remove_project() {
     QString text = "Are you sure you want to remove the project?";
     QString info_text = "This will delete all project files (images, reports, etc).";
     if (message_box(text, info_text)) return;
-
+  
+    set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
     m_proj->delete_artifacts();
@@ -657,6 +674,11 @@ void ProjectWidget::remove_project() {
     m_proj = nullptr;
     emit remove_overlay();
     emit project_closed();
+    emit remove_overlay();
+}
+
+void ProjectWidget::set_main_window_name(QString name) {
+    parentWidget()->parentWidget()->setWindowTitle(name);
 }
 
 /**

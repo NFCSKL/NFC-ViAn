@@ -58,6 +58,7 @@ private:
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
     std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
+    std::atomic_bool video_loaded{false};       // True when a video is loaded/open
 
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
@@ -133,6 +134,8 @@ public slots:
     void on_playback_slider_moved(void);
 
     void load_marked_video(VideoProject* vid_proj);
+    void clear_current_video();
+    void remove_item(VideoProject* vid_proj);
 
     void set_current_frame_size(QSize size);
     void on_export_frame(void);
@@ -219,7 +222,7 @@ private:
     bool video_btns_enabled = false;
     bool analysis_only = false;
 
-    void enable_video_btns();
+    void set_video_btns(bool b);
 
     void init_control_buttons();
     void init_layouts();

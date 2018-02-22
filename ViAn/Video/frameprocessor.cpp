@@ -128,6 +128,7 @@ void FrameProcessor::process_frame() {
     // Draws the overlay
     qDebug() << "draw overlay";
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
+    qDebug() << "overlay drawn";
 
     // Scales the frame
     qDebug() << "scale frame";

@@ -84,6 +84,7 @@ private slots:
     void check_selection();
     void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 private:
+    void set_main_window_name(QString name);
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
     QStringList mimeTypes() const;
@@ -99,6 +100,7 @@ private:
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void project_closed();
+    void item_removed(VideoProject* vid_proj);
 
 
 };
