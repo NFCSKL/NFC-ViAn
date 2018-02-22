@@ -310,7 +310,6 @@ void FrameWidget::set_analysis_settings() {
     int reply = msg_box.exec();
 
     if (reply == QMessageBox::Yes) {
-
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
 
         cv::Point end = cv::Point(rect_end.x(), rect_end.y());
@@ -322,6 +321,7 @@ void FrameWidget::set_analysis_settings() {
         emit quick_analysis(settings);
     }
     mark_rect = false;
+    repaint();
 }
 
 void FrameWidget::set_scale_factor(double scale_factor) {
