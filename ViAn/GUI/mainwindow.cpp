@@ -581,5 +581,5 @@ void MainWindow::open_project_dialog(){
                 tr("Open project"),
                 QDir::homePath(),
                 "*.vian");
-    open_project(project_path);
+    emit open_project(project_path);
 }

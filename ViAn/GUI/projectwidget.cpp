@@ -617,6 +617,7 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project(QString project_path) {
+    qDebug() << "in open" << project_path;
     if (project_path.isEmpty()) return;
     if (m_proj != nullptr) close_project();
     Project* new_proj = Project::fromFile(project_path.toStdString());
@@ -630,7 +631,7 @@ void ProjectWidget::open_project(QString project_path) {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
-    set_main_window_name(QString::fromStdString(m_proj->getName()));
+    set_main_window_name(QString::fromStdString(m_proj->get_name()));
     emit proj_path(m_proj->get_tmp_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
