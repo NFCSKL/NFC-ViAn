@@ -17,7 +17,6 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 void BasicAnalysis::add_interval(AnalysisInterval *ai){
     m_intervals.insert(ai);
     m_unsaved_changes = true;
-//    this->changed();
 }
 
 SAVE_TYPE BasicAnalysis::get_save_type() const {
@@ -75,11 +74,3 @@ bool BasicAnalysis::is_saved() const{
     return !m_unsaved_changes;
 }
 
-//void BasicAnalysis::changed(){
-//    if (m_v_proj == nullptr) return;
-//    m_v_proj->changed();
-//}
-
-//void BasicAnalysis::set_video_project(VideoProject *v_proj) {
-//    this->m_v_proj = v_proj;
-//}

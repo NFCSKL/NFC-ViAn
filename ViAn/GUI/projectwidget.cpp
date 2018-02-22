@@ -404,9 +404,9 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
  * Returns false on cancel
  */
 bool ProjectWidget::prompt_save() {
-    qDebug() << "PROMPT SAVE";
-    QMessageBox delete_box(this);
     bool ok = true;
+
+    QMessageBox delete_box(this);
     delete_box.setIcon(QMessageBox::Warning);
     delete_box.setText("There are unsaved changes.");
     delete_box.setInformativeText("Do you wish to save before continuing?");
@@ -421,7 +421,6 @@ bool ProjectWidget::prompt_save() {
                 ok = false;
                 break;
     }
-    qDebug() << ok;
     return ok;
 }
 
@@ -619,7 +618,6 @@ void ProjectWidget::save_project() {
  * Returns true if the project has been opened.
  */
 bool ProjectWidget::open_project(QString project_path) {
-    qDebug() << "OPENING PROJECT";
     if (project_path.isEmpty()) return false;
 
     bool closed = false;
@@ -628,11 +626,9 @@ bool ProjectWidget::open_project(QString project_path) {
         if (!closed) return false;
     }
 
-    qDebug() << "OPENING PROJECT";
-
     set_status_bar("Opening project");
-
     m_proj = Project::fromFile(project_path.toStdString());
+
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -649,12 +645,10 @@ bool ProjectWidget::open_project(QString project_path) {
 
 /**
  * @brief ProjectWidget::close_project
- * Closes the current project if there is one
+ * Closes the current project if there is one and user accepts prompt
  * Returns true if the project has been closed.
  */
 bool ProjectWidget::close_project() {
-    // TODO Check for unsaved changes before closing
-    // Prompt: There are unsaved changes in the project. Do you wish to save before continuing?
     if (m_proj == nullptr) return true;
 
     // Prompt user to save. If cancel keep the current project
@@ -662,7 +656,6 @@ bool ProjectWidget::close_project() {
     if (!m_proj->is_saved()){
         abort_close = !prompt_save();
         if (abort_close) {
-            qDebug() << "Close project canceled";
             return false;
         }
     }

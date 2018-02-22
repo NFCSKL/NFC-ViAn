@@ -29,7 +29,7 @@ class Bookmark : public Writeable{
     int time = -1;               // Time of the bookmark (in millisecs)
     std::string description = "";    // Description for the bookmark, given by user
 
-    bool m_unsaved_changes = true;  // Track wether the class instance has unsaved changes
+    bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
 public:
     std::string m_file;
     Bookmark(VideoProject* vid_proj, const string file_name, const std::string& text, const int& frame_nbr);
