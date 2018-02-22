@@ -19,6 +19,7 @@ enum BOOKMARK_TYPE {UNSORTED, DISPUTED, REFERENCE};
  */
 class VideoProject;
 class Bookmark : public Writeable{
+    friend class BookmarkTest;
     VideoProject* m_vid_proj;
 //    int m_type = UNSORTED;
 //    std::string m_container_name = "";
@@ -27,6 +28,8 @@ class Bookmark : public Writeable{
     int frame_number = -1;       // Frame at which the bookmark was taken
     int time = -1;               // Time of the bookmark (in millisecs)
     std::string description = "";    // Description for the bookmark, given by user
+
+    bool m_unsaved_changes = true;  // Track wether the class instance has unsaved changes
 public:
     std::string m_file;
     Bookmark(VideoProject* vid_proj, const string file_name, const std::string& text, const int& frame_nbr);
@@ -46,6 +49,7 @@ public:
     bool remove();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
+    bool is_saved() const;
     Q_DECL_DEPRECATED void export_frame();
     Q_DECL_DEPRECATED void create_file_path();
     Q_DECL_DEPRECATED void remove_exported_image();

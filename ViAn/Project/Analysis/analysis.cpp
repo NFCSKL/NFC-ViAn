@@ -14,6 +14,7 @@ void Analysis::read(const QJsonObject &json){
         poi->read(json_poi);
         this->add_interval(poi);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -32,6 +33,7 @@ void Analysis::write(QJsonObject &json){
         json_POIs.append(json_POI);
     }
     json["POI:s"] = json_POIs;
+    m_unsaved_changes = false;
 }
 
 SAVE_TYPE Analysis::get_save_type() const

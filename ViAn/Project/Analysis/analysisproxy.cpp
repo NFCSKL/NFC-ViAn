@@ -22,6 +22,7 @@ AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
 Analysis* AnalysisProxy::load_analysis() {
     Analysis* analysis = new Analysis();    
     analysis->load_saveable(file_analysis);
+    m_unsaved_changes = false;
     return analysis;
 }
 AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
@@ -41,6 +42,7 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
 void AnalysisProxy::reset_root_dir(const std::string &dir)
 {
     file_analysis = dir+Utility::name_from_path(file_analysis);
+    m_unsaved_changes = true;
 }
 
 
@@ -58,6 +60,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
         poi->read(json_poi);
         m_intervals.insert(poi);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -76,6 +79,7 @@ void AnalysisProxy::write(QJsonObject &json) {
         intervals.push_back(interval);
     }
     json["intervals"] = intervals;
+    m_unsaved_changes = false;
 }
 
 SAVE_TYPE AnalysisProxy::get_save_type() const

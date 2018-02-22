@@ -23,6 +23,7 @@ class BasicAnalysis : public Saveable
 //    VideoProject* m_v_proj = nullptr;
 public:
     std::string m_name = "";
+    bool m_unsaved_changes = true;
 protected:
     interval_set m_intervals;
 public:
@@ -38,7 +39,7 @@ public:
     std::string get_name() const;
     interval_set get_intervals() const;
 
-    void changed();
+    bool is_saved() const;
 //    void set_video_project(VideoProject* v_proj);
 };
 

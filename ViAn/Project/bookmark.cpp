@@ -25,9 +25,9 @@ Bookmark::Bookmark(VideoProject *vid_proj,const std::string file_name, const std
 Bookmark::Bookmark() {
 }
 
-void Bookmark::reset_root_dir(const std::string &dir)
-{    
+void Bookmark::reset_root_dir(const std::string &dir){    
     m_file = dir+Utility::name_from_path(m_file);
+    m_unsaved_changes = true;
 }
 
 /**
@@ -68,18 +68,24 @@ std::string Bookmark::get_description() {
  * @param text
  */
 void Bookmark::set_description(const std::string& text) {
+    qDebug() << "NEW BOOKMARK DESCRIPTION " << QString::fromStdString(text);
     description = text;
+    m_unsaved_changes = true;
 }
 
 void Bookmark::add_container(string name, int type) {
     std::pair<int, std::string> container(type, name);
     m_containers.push_back(container);
+    m_unsaved_changes = true;
 }
 
 void Bookmark::remove_container(string name, int type) {
     std::pair<int, std::string> container(type, name);
     auto cont = std::find(m_containers.begin(), m_containers.end(), container);
-    if (cont != m_containers.end()) m_containers.erase(cont);
+    if (cont != m_containers.end()) {
+        m_containers.erase(cont);
+        m_unsaved_changes = true;
+    }
 }
 
 /**
@@ -91,6 +97,7 @@ void Bookmark::remove_container(string name, int type) {
 void Bookmark::rename_container(std::string old_name, std::string new_name) {
     std::for_each(m_containers.begin(), m_containers.end(),
                   [&old_name, &new_name](std::pair<int, std::string> &c){if (c.second == old_name) c.second = new_name;});
+    m_unsaved_changes = true;
 }
 
 /**
@@ -128,6 +135,7 @@ void Bookmark::read(const QJsonObject& json){
         std::pair<int,std::string> _tmp(container["type"].toInt(), container["container"].toString().toStdString());
         m_containers.push_back(_tmp);
     }
+    m_unsaved_changes = false;
 
 }
 
@@ -152,6 +160,12 @@ void Bookmark::write(QJsonObject& json){
         containers.push_back(container);
     }
     json["containers"] = containers;
+    m_unsaved_changes = false;
+}
+
+
+bool Bookmark::is_saved() const{
+    return !m_unsaved_changes;
 }
 
 

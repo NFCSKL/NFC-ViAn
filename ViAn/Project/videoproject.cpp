@@ -59,7 +59,11 @@ BasicAnalysis *VideoProject::get_analysis(const int& id) {
 }
 
 bool VideoProject::is_saved() {
-    return !m_unsaved_changes;
+    bool bookmarks_saved = std::all_of(m_bookmarks.begin(), m_bookmarks.end(),
+                                       [](std::map<ID,Bookmark*>::const_reference t){return t.second->is_saved();});
+    bool analyses_saved = std::all_of(m_analyses.begin(), m_analyses.end(),
+                                       [](std::map<ID,BasicAnalysis*>::const_reference t){return t.second->is_saved();});
+    return !m_unsaved_changes && analyses_saved && bookmarks_saved && m_overlay->is_saved();
 }
 
 /**
@@ -240,6 +244,7 @@ void VideoProject::delete_artifacts(){
 
 void VideoProject::remove_from_project() {
     m_project->remove_video_project(this);
+    m_unsaved_changes = true;
 }
 
 string VideoProject::get_index_path() {

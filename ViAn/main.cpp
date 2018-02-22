@@ -6,7 +6,7 @@
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Test/projecttestsuite.h"
 #include "Project/Test/videoprojecttest.h"
-
+#include "Project/Test/bookmarktest.h"
 
 Q_DECLARE_METATYPE(cv::Mat)
 Q_DECLARE_METATYPE(std::string)
@@ -30,7 +30,8 @@ int main(int argc, char *argv[])
     bool unit_testing = true;
     if(unit_testing){
         QTest::qExec(new ProjectTestsuite());
-        //QTest::qExec(new VideoProjectTest());
+        QTest::qExec(new BookmarkTest());
+        QTest::qExec(new VideoProjectTest());
     }
     w.show();
     return a.exec();

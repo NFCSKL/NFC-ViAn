@@ -400,19 +400,29 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
 
 /**
  * @brief ProjectWidget::prompt_save
- * Prompts the user for a save before continuing.
+ * Prompts the user for to save before continuing.
  * Returns false on cancel
  */
-void ProjectWidget::prompt_save() {
+bool ProjectWidget::prompt_save() {
+    qDebug() << "PROMPT SAVE";
     QMessageBox delete_box(this);
+    bool ok = true;
     delete_box.setIcon(QMessageBox::Warning);
-    delete_box.setText("There are unsaved changes.\n");
-    delete_box.setInformativeText("Do you wish to save before closing the project?");
-    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    delete_box.setDefaultButton(QMessageBox::No);
-    if (delete_box.exec() == QMessageBox::Yes) {
-        save_project();
+    delete_box.setText("There are unsaved changes.");
+    delete_box.setInformativeText("Do you wish to save before continuing?");
+    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    delete_box.setDefaultButton(QMessageBox::Yes);
+
+    switch (delete_box.exec()){
+        case QMessageBox::Yes:
+                save_project();
+                break;
+        case QMessageBox::Cancel:
+                ok = false;
+                break;
     }
+    qDebug() << ok;
+    return ok;
 }
 
 
@@ -606,10 +616,20 @@ void ProjectWidget::save_project() {
 /**
  * @brief ProjectWidget::open_project
  * Slot function to open a previously created project
+ * Returns true if the project has been opened.
  */
-void ProjectWidget::open_project(QString project_path) {
-    if (project_path.isEmpty()) return;
-    if (m_proj != nullptr) close_project();
+bool ProjectWidget::open_project(QString project_path) {
+    qDebug() << "OPENING PROJECT";
+    if (project_path.isEmpty()) return false;
+
+    bool closed = false;
+    if (m_proj != nullptr) {
+        closed = close_project();
+        if (!closed) return false;
+    }
+
+    qDebug() << "OPENING PROJECT";
+
     set_status_bar("Opening project");
 
     m_proj = Project::fromFile(project_path.toStdString());
@@ -624,27 +644,36 @@ void ProjectWidget::open_project(QString project_path) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
     }
+    return true;
 }
 
 /**
  * @brief ProjectWidget::close_project
  * Closes the current project if there is one
+ * Returns true if the project has been closed.
  */
-void ProjectWidget::close_project() {
+bool ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     // Prompt: There are unsaved changes in the project. Do you wish to save before continuing?
-    if (m_proj == nullptr) return;
+    if (m_proj == nullptr) return true;
 
-    bool cont = false;
+    // Prompt user to save. If cancel keep the current project
+    bool abort_close = false;
     if (!m_proj->is_saved()){
-        prompt_save();
+        abort_close = !prompt_save();
+        if (abort_close) {
+            qDebug() << "Close project canceled";
+            return false;
+        }
     }
+
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
+    return true;
 }
 
 /**
