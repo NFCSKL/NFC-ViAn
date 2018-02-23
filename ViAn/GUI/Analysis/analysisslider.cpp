@@ -55,43 +55,58 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Draws the analysis interval
     if (show_ana_interval) {
         brush = Qt::darkMagenta;
-        double first = (groove_rect.left()+(double)m_ana_interval.first*c);
-        double second = (groove_rect.left()+(double)m_ana_interval.second*c);
-        if (m_ana_interval.first != -1 && m_ana_interval.second != -1 && m_ana_interval.first <= m_ana_interval.second) {
-            QRect rect(first, groove_rect.top()+groove_rect.height()/3, 1+second-first, groove_rect.height()/3);
-            painter.fillRect(rect, brush);
-        }
-        if (m_ana_interval.first != -1) {
-            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, brush);
-        }
-        if (m_ana_interval.second != -1) {
-            QRect rect(second, groove_rect.top(), 1, groove_rect.height());
+        draw_interval(m_ana_interval, groove_rect, c);
+        for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }
     }
-
     // Draws the interval
     if (show_interval) {
         brush = Qt::black;
-        double first = (groove_rect.left()+(double)m_interval.first*c);
-        double second = (groove_rect.left()+(double)m_interval.second*c);
-        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-            QRect rect(first, groove_rect.top()+groove_rect.height()/3, 1+second-first, groove_rect.height()/3);
-            painter.fillRect(rect, brush);
-        }
-        if (m_interval.first != -1) {
-            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, brush);
-        }
-        if (m_interval.second != -1) {
-            QRect rect(second, groove_rect.top(), 1, groove_rect.height());
+        draw_interval(m_interval, groove_rect, c);
+        for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }
     }
-
     option.subControls = QStyle::SC_SliderHandle;
     painter.drawComplexControl(QStyle::CC_Slider, option);
+}
+
+/**
+ * @brief AnalysisSlider::draw_interval
+ * Draw
+ * @param interval
+ */
+void AnalysisSlider::draw_interval(std::pair<int, int> interval, QRect groove, double frame_width) {
+    double first = (groove.left()+(double)interval.first*frame_width);
+    double second = (groove.left()+(double)interval.second*frame_width);
+    interval_rects.clear();
+
+    // Draw the interval
+    if (valid_interval(interval)) {
+        QRect rect(first, groove.top()+groove.height()/3, 1+second-first, groove.height()/3);
+        interval_rects.push_back(rect);
+    }
+    // Draw the interval start marker
+    if (interval.first != -1) {
+        QRect rect(first, groove.top(), 1, groove.height());
+        interval_rects.push_back(rect);
+    }
+    // Draw the interval end marker
+    if (interval.second != -1) {
+        QRect rect(second, groove.top(), 1, groove.height());
+        interval_rects.push_back(rect);
+    }
+}
+
+/**
+ * @brief AnalysisSlider::valid_interval
+ * @param interval
+ * @return true if interval is a valid interval
+ */
+bool AnalysisSlider::valid_interval(std::pair<int, int> interval) {
+    // Checks if both ends of the interval is set and the end is larger than the start
+    return interval.first != -1 && interval.second != -1 && interval.first <= interval.second;
 }
 
 void AnalysisSlider::update(){

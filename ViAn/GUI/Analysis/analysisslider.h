@@ -48,6 +48,10 @@ public:
     int set_interval_first();
     int set_interval_second();
 
+    // Drawing interval functions
+    void draw_interval(std::pair<int, int> interval, QRect groove, double frame_width);
+    bool valid_interval(std::pair<int, int> interval);
+
     // POI functions
     bool is_in_POI(int frame);
     int get_next_poi_start(int curr_frame);
@@ -89,6 +93,7 @@ public slots:
 private:
     std::vector<int> frames;
     std::vector<std::pair<int, int>> rects;
+    std::vector<QRect> interval_rects;
 };
 
 #endif // ANALYSISSLIDER_H

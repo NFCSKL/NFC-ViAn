@@ -210,7 +210,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
     }
-    if (show_box) {
+    if (show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
         QPoint tl(m_analysis->bounding_box.x, m_analysis->bounding_box.y);
         QPoint br(m_analysis->bounding_box.x+m_analysis->bounding_box.width, m_analysis->bounding_box.y+m_analysis->bounding_box.height);

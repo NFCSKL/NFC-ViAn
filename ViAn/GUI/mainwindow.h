@@ -43,6 +43,7 @@ public:
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;
+    QAction* ana_details_act;
     QAction* drawing_act;
 
     QAction* color_act;
@@ -64,6 +65,7 @@ private slots:
     void clear();
     void zoom();
     void move();
+    void set_ana_details(bool);
 
 public slots:
     void options(void);

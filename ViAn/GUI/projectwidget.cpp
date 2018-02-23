@@ -426,8 +426,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         emit enable_tag_btn(false);
-        emit show_analysis_details(false);
-        emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());

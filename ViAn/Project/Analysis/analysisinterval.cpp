@@ -8,8 +8,7 @@ AnalysisInterval::AnalysisInterval(int start, int end) {
 
 AnalysisInterval::AnalysisInterval() {}
 
-AnalysisInterval::~AnalysisInterval()
-{
+AnalysisInterval::~AnalysisInterval() {
 
 }
 
@@ -51,22 +50,14 @@ bool AnalysisInterval::at_edge(int frame_num) {
     return false;
 }
 
-bool AnalysisInterval::in_interval(int frame) const
-{
+bool AnalysisInterval::in_interval(int frame) const {
    return frame >= m_start && frame <= m_end;
 }
 
-int AnalysisInterval::get_start() const
-{
+int AnalysisInterval::get_start() const {
     return m_start;
 }
 
-int AnalysisInterval::get_end() const
-{
+int AnalysisInterval::get_end() const {
     return m_end;
-}
-
-AnalysisInterval::interval AnalysisInterval::get_interval()
-{
-    return std::make_pair(m_start, m_end);
 }
