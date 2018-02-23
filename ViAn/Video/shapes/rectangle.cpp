@@ -22,7 +22,7 @@ Rectangle::Rectangle(QColor col, QPoint pos) : Shape(SHAPES::RECTANGLE, col, pos
  */
 cv::Mat Rectangle::draw(cv::Mat &frame) {
     cv::Rect rect(draw_start, draw_end);
-    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
+    cv::rectangle(frame, rect, color, LINE_THICKNESS);
     return frame;
 }
 

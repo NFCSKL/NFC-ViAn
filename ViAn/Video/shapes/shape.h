@@ -35,10 +35,11 @@ public:
     cv::Point get_draw_end();
     SHAPES get_shape();
     void set_text_size(cv::Size size);
+    void invert_color();
 
 protected:
     SHAPES shape;
-    cv::Scalar colour;
+    cv::Scalar color;
     cv::Point draw_start;
     cv::Point draw_end;
     cv::Size text_size;

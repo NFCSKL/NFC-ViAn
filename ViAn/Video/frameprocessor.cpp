@@ -226,6 +226,10 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;
         m_overlay->clear(curr_frame);
+    // Delete the current drawing
+    } else if (m_o_settings->delete_drawing) {
+        m_o_settings->delete_drawing = false;
+        m_overlay->delete_drawing(curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;

@@ -954,6 +954,12 @@ void VideoWidget::set_clear_drawings() {
     });
 }
 
+void VideoWidget::set_delete_drawing() {
+    update_overlay_settings([&](){
+        o_settings.delete_drawing = true;
+    });
+}
+
 void VideoWidget::set_tool(SHAPES tool) {
     if (tool != ZOOM) {
         zoom_in_btn->setChecked(false);

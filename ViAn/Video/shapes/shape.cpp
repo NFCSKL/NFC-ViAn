@@ -8,7 +8,7 @@
  */
 Shape::Shape(SHAPES s) {
     shape = s;
-    colour = cv::Scalar();
+    color = cv::Scalar();
     draw_start = cv::Point();
     draw_end = cv::Point();
 }
@@ -20,7 +20,7 @@ Shape::Shape(SHAPES s) {
  */
 Shape::Shape(SHAPES s, QColor col, QPoint pos) {
     shape = s;
-    colour = qcolor_to_scalar(col);
+    color = qcolor_to_scalar(col);
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
 }
@@ -105,6 +105,10 @@ void Shape::set_text_size(cv::Size size) {
     text_size = size;
 }
 
+void Shape::invert_color() {
+    color = cv::Scalar::all(255) - color;
+}
+
 /**
  * @brief Shape::read_shape
  * @param json
@@ -113,9 +117,9 @@ void Shape::set_text_size(cv::Size size) {
 void Shape::read_shape(const QJsonObject& json){
     int shape_i = json["shape"].toInt();
     this->shape = static_cast<SHAPES>(shape_i);
-    this->colour[0] = json["b"].toInt();
-    this->colour[1] = json["g"].toInt();
-    this->colour[2] = json["r"].toInt();
+    this->color[0] = json["b"].toInt();
+    this->color[1] = json["g"].toInt();
+    this->color[2] = json["r"].toInt();
     this->draw_start.x = json["p1x"].toInt();
     this->draw_start.y = json["p1y"].toInt();
     this->draw_end.x = json["p2x"].toInt();
@@ -129,9 +133,9 @@ void Shape::read_shape(const QJsonObject& json){
  */
 void Shape::write_shape(QJsonObject& json){
     json["shape"] = this->shape;
-    json["b"] = this->colour[0];
-    json["g"] = this->colour[1];
-    json["r"] = this->colour[2];
+    json["b"] = this->color[0];
+    json["g"] = this->color[1];
+    json["r"] = this->color[2];
     json["p1x"] = this->draw_start.x;
     json["p1y"] = this->draw_start.y;
     json["p2x"] = this->draw_end.x;

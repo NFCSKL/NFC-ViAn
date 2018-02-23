@@ -29,7 +29,7 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES
  */
 cv::Mat Text::draw(cv::Mat &frame) {
     cv::putText(frame, string.toStdString(), draw_start, cv::FONT_HERSHEY_SIMPLEX, font_scale,
-                colour, LINE_THICKNESS);
+                color, LINE_THICKNESS);
     return frame;
 }
 

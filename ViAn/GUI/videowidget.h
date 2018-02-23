@@ -89,6 +89,7 @@ public:
     void set_undo();
     void set_redo();
     void set_clear_drawings();
+    void set_delete_drawing();
 
 signals:
     void first_frame(cv::Mat frame);

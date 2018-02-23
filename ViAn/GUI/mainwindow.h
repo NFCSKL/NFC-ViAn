@@ -62,6 +62,7 @@ private slots:
     void undo();
     void redo();
     void clear();
+    void delete_drawing();
     void zoom();
     void move();
 

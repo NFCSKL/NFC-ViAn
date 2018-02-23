@@ -21,7 +21,7 @@ Line::Line(QColor col, QPoint pos) : Shape(SHAPES::LINE, col, pos) {
  * @return Returns the frame with drawing.
  */
 cv::Mat Line::draw(cv::Mat &frame) {
-    cv::line(frame, draw_start, draw_end, colour, LINE_THICKNESS);
+    cv::line(frame, draw_start, draw_end, color, LINE_THICKNESS);
     return frame;
 }
 

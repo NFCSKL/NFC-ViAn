@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QInputDialog>
+#include <algorithm>
 #include "shapes/shape.h"
 #include "shapes/rectangle.h"
 #include "shapes/circle.h"
@@ -57,6 +58,7 @@ public:
     void undo(int frame_nr);
     void redo(int frame_nr);
     void clear(int frame_nr);
+    void delete_drawing(int frame_nr);
     void clear_overlay();
 
     void read(const QJsonObject& json);

@@ -29,7 +29,7 @@ public:
     QAction* hand_tool_act;
     QAction* undo_tool_act;
     QAction* redo_tool_act;
-    QAction* clear_tool_act;
+    QAction* delete_tool_act;
 
     QActionGroup* tools;
 

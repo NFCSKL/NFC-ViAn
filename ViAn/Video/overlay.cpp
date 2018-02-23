@@ -131,7 +131,14 @@ void Overlay::add_drawing(Shape* shape, int frame_nr) {
     overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
 }
 
+/**
+ * @brief Overlay::get_drawing
+ * Set the clicked drawing to current drawing
+ * @param pos
+ * @param frame_nr
+ */
 void Overlay::get_drawing(QPoint pos, int frame_nr) {
+    if (current_drawing != nullptr) current_drawing->invert_color();
     current_drawing = nullptr;
     for (auto shape : overlays[frame_nr].overlay) {
         if (point_in_drawing(pos, shape)) {
@@ -139,8 +146,15 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
             current_drawing = shape;
         }
     }
+    if (current_drawing != nullptr) current_drawing->invert_color();
 }
 
+/**
+ * @brief Overlay::point_in_drawing
+ * @param pos
+ * @param shape
+ * @return true if the point pos is in the hidden rect of drawing shape
+ */
 bool Overlay::point_in_drawing(QPoint pos, Shape *shape) {
     cv::Rect drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
     return drawing.contains(qpoint_to_point(pos));
@@ -264,6 +278,11 @@ void Overlay::undo(int frame_nr) {
     }
 }
 
+/**
+ * @brief Overlay::redo
+ * Redo the drawings on the overlay, if the overlay is visible
+ * @param frame_nr
+ */
 void Overlay::redo(int frame_nr) {
     if (show_overlay && overlays[frame_nr].overlay.end() != overlays[frame_nr].drawn) {
         overlays[frame_nr].drawn++;
@@ -279,6 +298,26 @@ void Overlay::clear(int frame_nr) {
     if (show_overlay) {
         overlays[frame_nr].overlay.clear();
         overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+    }
+}
+
+/**
+ * @brief Overlay::delete_drawing
+ * Delete the current drawing if the overlay is visible.
+ * @param frame_nr Number of the frame currently shown in the video.
+ */
+void Overlay::delete_drawing(int frame_nr) {
+    if (!show_overlay) return;
+    vector<Shape*>::iterator it = overlays[frame_nr].overlay.begin();
+    while (it != overlays[frame_nr].overlay.end()) {
+        if (*it == current_drawing) {
+            it = overlays[frame_nr].overlay.erase(it);
+            overlays[frame_nr].drawn--;
+            current_drawing = nullptr;
+            return;
+        } else {
+            ++it;
+        }
     }
 }
 

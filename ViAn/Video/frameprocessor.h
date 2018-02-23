@@ -71,6 +71,7 @@ struct overlay_settings {
     bool undo = false;
     bool redo = false;
     bool clear_drawings = false;
+    bool delete_drawing = false;
 
     bool overlay_removed = false;
 
