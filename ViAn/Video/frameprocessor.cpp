@@ -41,10 +41,8 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
-        qDebug() << "in fp";
         // A new video has been loaded. Reset processing settings    
         if (m_new_video->load()) {
-            qDebug() << "fp load video";
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
