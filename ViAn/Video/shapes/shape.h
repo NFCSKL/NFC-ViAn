@@ -30,6 +30,7 @@ public:
 
     static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
     static constexpr double ALPHA = 0.6; // Costant used for the opacity.
+    static const int RGB_MAX = 255;      // Constant used for inverting colors.
 
     cv::Point get_draw_start();
     cv::Point get_draw_end();
@@ -43,6 +44,7 @@ protected:
     cv::Point draw_start;
     cv::Point draw_end;
     cv::Size text_size;
+    bool inverted = false;
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);
