@@ -37,10 +37,12 @@ public:
     SHAPES get_shape();
     void set_text_size(cv::Size size);
     void invert_color();
+    void set_thickness(QPoint pos);
 
 protected:
     SHAPES shape;
     cv::Scalar color;
+    int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;
     cv::Size text_size;

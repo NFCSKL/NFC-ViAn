@@ -157,6 +157,7 @@ public slots:
     void mouse_pressed(QPoint pos, bool);
     void mouse_released(QPoint pos, bool right_click);
     void mouse_moved(QPoint pos);
+    void mouse_scroll(QPoint pos);
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);

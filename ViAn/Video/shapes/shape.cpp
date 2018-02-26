@@ -110,6 +110,13 @@ void Shape::invert_color() {
     inverted = !inverted;
 }
 
+void Shape::set_thickness(QPoint pos) {
+    int new_thick = thickness + pos.y();
+    if ((shape == CIRCLE || shape == RECTANGLE) && new_thick <= -2) return;
+    if (!(shape == CIRCLE || shape == RECTANGLE) && new_thick <= -1) return;
+    thickness = new_thick;
+}
+
 /**
  * @brief Shape::read_shape
  * @param json

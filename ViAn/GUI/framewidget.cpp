@@ -309,6 +309,14 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+void FrameWidget::wheelEvent(QWheelEvent *event) {
+    QPoint num_degree = event->angleDelta() / 8;
+    QPoint num_steps = num_degree / 15;
+    qDebug() << num_steps;
+    emit mouse_scroll(num_steps);
+    event->accept();
+}
+
 void FrameWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
 }

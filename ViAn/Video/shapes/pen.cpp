@@ -22,7 +22,7 @@ Pen::Pen(QColor col, QPoint pos) : Shape(SHAPES::PEN, col, pos) {
  */
 cv::Mat Pen::draw(cv::Mat &frame) {
     for (std::pair<cv::Point, cv::Point> line : lines) {
-        cv::line(frame, line.first, line.second, color, LINE_THICKNESS);
+        cv::line(frame, line.first, line.second, color, thickness);
     }
     return frame;
 }

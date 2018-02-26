@@ -67,6 +67,7 @@ struct overlay_settings {
     bool mouse_clicked = false;
     bool mouse_released = false;
     bool mouse_moved = false;
+    bool mouse_scroll = false;
 
     bool undo = false;
     bool redo = false;

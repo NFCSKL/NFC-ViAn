@@ -54,6 +54,7 @@ public:
     void mouse_pressed(QPoint pos, int frame_nr, bool right_click);
     void mouse_released(QPoint pos, int frame_nr, bool right_click);
     void mouse_moved(QPoint pos, int frame_nr);
+    void mouse_scroll(QPoint pos, int frame_nr);
     void update_drawing_position(QPoint pos, int frame_nr);
     void undo(int frame_nr);
     void redo(int frame_nr);

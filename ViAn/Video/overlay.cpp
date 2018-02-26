@@ -242,6 +242,10 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr);
 }
 
+void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
+    current_drawing->set_thickness(pos);
+}
+
 /**
  * @brief Overlay::update_drawing_position
  * Updates the position of the end point of the shape currently being drawn
