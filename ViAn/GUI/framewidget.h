@@ -69,8 +69,8 @@ signals:
     void send_tool_text(QString, float);
     void send_color(QColor color);
 
-    void mouse_pressed(QPoint);
-    void mouse_released(QPoint);
+    void mouse_pressed(QPoint, bool);
+    void mouse_released(QPoint, bool);
     void mouse_moved(QPoint);
 public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);

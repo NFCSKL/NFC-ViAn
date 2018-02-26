@@ -238,7 +238,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     default:
-        emit mouse_pressed(scale_point(event->pos()));
+        bool right_click = (event->button() == Qt::RightButton);
+        emit mouse_pressed(scale_point(event->pos()), right_click);
         break;
     }
 }
@@ -281,7 +282,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     }
     default:
-        emit mouse_released(scale_point(event->pos()));
+        emit mouse_released(scale_point(event->pos()), false);
         break;
     }
 }

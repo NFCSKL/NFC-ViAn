@@ -51,8 +51,8 @@ public:
     void set_colour(QColor col);
     QColor get_colour();
     SHAPES get_tool();
-    void mouse_pressed(QPoint pos, int frame_nr);
-    void mouse_released(QPoint pos, int frame_nr);
+    void mouse_pressed(QPoint pos, int frame_nr, bool right_click);
+    void mouse_released(QPoint pos, int frame_nr, bool right_click);
     void mouse_moved(QPoint pos, int frame_nr);
     void update_drawing_position(QPoint pos, int frame_nr);
     void undo(int frame_nr);
@@ -77,6 +77,7 @@ private:
     
     Shape* current_drawing = nullptr;
     QPoint prev_point;
+    bool m_right_click = false;
 
     bool show_overlay = true;
     int baseline = 0;

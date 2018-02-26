@@ -177,7 +177,7 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
+void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
@@ -205,6 +205,11 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
                 add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
                 break;
             case HAND:
+                if (right_click) {
+
+                    m_right_click = right_click;
+                    break;
+                }
                 get_drawing(pos, frame_nr);
                 prev_point = pos;
                 break;
@@ -221,8 +226,9 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::mouse_released(QPoint pos, int frame_nr) {
+void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
     update_drawing_position(pos, frame_nr);
+    m_right_click = right_click;
 }
 
 /**
@@ -246,6 +252,13 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay && !overlays[frame_nr].overlay.empty()) {
         if (current_shape == HAND) {
             if (current_drawing == nullptr) return;
+            if (m_right_click && current_drawing->get_shape() == TEXT) {
+                return;
+            }
+            else if (m_right_click){
+                current_drawing->update_drawing_pos(pos);
+                return;
+            }
             qDebug() << "in hand";
             QPoint diff_point = pos - prev_point;
             current_drawing->move_shape(diff_point);

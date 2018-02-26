@@ -233,11 +233,11 @@ void FrameProcessor::update_overlay_settings() {
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
-        m_overlay->mouse_pressed(m_o_settings->pos, curr_frame);
+        m_overlay->mouse_pressed(m_o_settings->pos, curr_frame, m_o_settings->right_click);
     // Mouse released action
     } else if (m_o_settings->mouse_released) {
         m_o_settings->mouse_released = false;
-        m_overlay->mouse_released(m_o_settings->pos, curr_frame);
+        m_overlay->mouse_released(m_o_settings->pos, curr_frame, m_o_settings->right_click);
     // Mouse moved action
     } else if (m_o_settings->mouse_moved) {
         m_o_settings->mouse_moved = false;
