@@ -240,6 +240,7 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->mouse_moved) {
         m_o_settings->mouse_moved = false;
         m_overlay->mouse_moved(m_o_settings->pos, curr_frame);
+    // Mouse scroll wheel action
     } else if (m_o_settings->mouse_scroll) {
         m_o_settings->mouse_scroll = false;
         m_overlay->mouse_scroll(m_o_settings->pos, curr_frame);
