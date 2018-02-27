@@ -36,13 +36,15 @@ void Shape::update_drawing_pos(QPoint pos) {
     draw_end = qpoint_to_point(pos);
 }
 
-void Shape::update_text(QPoint pos) {
-    qDebug() << "in update";
+/**
+ * @brief Shape::update_text_pos
+ * Updates the start and end point of the text-drawing
+ * @param pos
+ */
+void Shape::update_text_pos(QPoint pos) {
     draw_start = qpoint_to_point(pos);
     cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
     draw_end = p;
-    qDebug() << draw_start.x << draw_end.x;
-    qDebug() << draw_start.y << draw_end.y;
 }
 
 /**
@@ -105,16 +107,34 @@ void Shape::set_text_size(cv::Size size) {
     text_size = size;
 }
 
+/**
+ * @brief Shape::invert_color
+ * Inverts the color by subtracting its RGB value from 255
+ */
 void Shape::invert_color() {
     color = cv::Scalar::all(RGB_MAX) - color;
     inverted = !inverted;
 }
 
+/**
+ * @brief Shape::set_thickness
+ * Sets the shape's thickness with checks so it can't go into the negatives.
+ * Circle and rectangle allow one step of negative which will fill the shape.
+ * @param pos
+ */
 void Shape::set_thickness(QPoint pos) {
     int new_thick = thickness + pos.y();
     if ((shape == CIRCLE || shape == RECTANGLE) && new_thick <= -2) return;
     if (!(shape == CIRCLE || shape == RECTANGLE) && new_thick <= -1) return;
     thickness = new_thick;
+}
+
+void Shape::set_current_frame(int frame) {
+    current_frame = frame;
+}
+
+int Shape::get_current_frame() {
+    return current_frame;
 }
 
 /**
@@ -138,6 +158,7 @@ void Shape::read_shape(const QJsonObject& json){
  * @brief Shape::write_shape
  * @param json
  * Writes a shape to a Json object.
+ * If the shape is the current_drawing, save its original color instead of the inverted
  */
 void Shape::write_shape(QJsonObject& json){
     json["shape"] = this->shape;

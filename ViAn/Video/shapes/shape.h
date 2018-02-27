@@ -17,7 +17,7 @@ public:
     Shape(SHAPES s);
     Shape(SHAPES s, QColor col, QPoint pos);
     void update_drawing_pos(QPoint pos);
-    void update_text(QPoint pos);
+    void update_text_pos(QPoint pos);
     void move_shape(QPoint p);
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
@@ -38,6 +38,8 @@ public:
     void set_text_size(cv::Size size);
     void invert_color();
     void set_thickness(QPoint pos);
+    void set_current_frame(int frame);
+    int get_current_frame();
 
 protected:
     SHAPES shape;
@@ -47,6 +49,7 @@ protected:
     cv::Point draw_end;
     cv::Size text_size;
     bool inverted = false;
+    int current_frame;
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);

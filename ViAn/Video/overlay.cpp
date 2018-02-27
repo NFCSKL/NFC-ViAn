@@ -142,8 +142,8 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
     current_drawing = nullptr;
     for (auto shape : overlays[frame_nr].overlay) {
         if (point_in_drawing(pos, shape)) {
-            qDebug() << "Found one";
             current_drawing = shape;
+            current_drawing->set_current_frame(frame_nr);
         }
     }
     if (current_drawing != nullptr) current_drawing->invert_color();
@@ -206,7 +206,6 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                 break;
             case HAND:
                 if (right_click) {
-
                     m_right_click = right_click;
                     break;
                 }
@@ -242,8 +241,17 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
     update_drawing_position(pos, frame_nr);
 }
 
+/**
+ * @brief Overlay::mouse_scroll
+ * Updates the thickness of the lines of the current drawing
+ * when scrolling the mouse wheel.
+ * @param pos Mouse wheel delta.
+ * @param frame_nr Number of the frame currently shown in the video.
+ */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
-    current_drawing->set_thickness(pos);
+    if (current_drawing->get_current_frame() == frame_nr && show_overlay) {
+        current_drawing->set_thickness(pos);
+    }
 }
 
 /**
@@ -263,12 +271,11 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
                 current_drawing->update_drawing_pos(pos);
                 return;
             }
-            qDebug() << "in hand";
             QPoint diff_point = pos - prev_point;
             current_drawing->move_shape(diff_point);
             prev_point = pos;
         } else if (current_shape == TEXT) {
-            overlays[frame_nr].overlay.back()->update_text(pos);
+            overlays[frame_nr].overlay.back()->update_text_pos(pos);
         } else {
             // The last appended shape is the one we're currently drawing.
             overlays[frame_nr].overlay.back()->update_drawing_pos(pos);

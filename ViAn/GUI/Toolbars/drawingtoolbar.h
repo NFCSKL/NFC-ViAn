@@ -15,7 +15,6 @@ class DrawingToolbar : public QToolBar
     Q_OBJECT
     void create_actions();
     void create_buttons();
-    void set_exclusive_checkability();
 public:
     DrawingToolbar();
 

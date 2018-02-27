@@ -309,10 +309,13 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+/**
+ * @brief FrameWidget::wheelEvent
+ * @param event
+ */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
-    qDebug() << num_steps;
     emit mouse_scroll(num_steps);
     event->accept();
 }
