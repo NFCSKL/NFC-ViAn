@@ -75,7 +75,7 @@ signals:
 public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
     void toggle_zoom(bool value);
-    void set_analysis_tool();
+    void set_analysis_tool(bool status);
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
     void clear_analysis();
@@ -101,6 +101,7 @@ protected:
 private:
     void init_panning(QPoint pos);
     void set_rect_start(QPoint pos);
+    void set_analysis_settings();
     void panning(QPoint pos);
     void rect_update(QPoint pos);
     void end_panning();

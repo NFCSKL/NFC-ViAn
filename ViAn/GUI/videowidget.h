@@ -74,6 +74,7 @@ private:
     FrameProcessor* f_processor;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
+    ~VideoWidget();
 
     // Lock and wait condition to sleep player when video is paused
     video_player* m_video_player;
@@ -154,6 +155,7 @@ public slots:
     void on_playback_stopped(void);
 
     void set_overlay_removed();
+    void set_show_overlay(bool show);
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);

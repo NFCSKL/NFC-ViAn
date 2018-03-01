@@ -12,7 +12,6 @@ VideoItem::VideoItem(): TreeItem(VIDEO_ITEM) {
 }
 
 VideoItem::~VideoItem(){
-    m_vid_proj->remove_from_project();
     delete m_vid_proj;
 }
 

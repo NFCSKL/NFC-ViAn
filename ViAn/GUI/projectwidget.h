@@ -37,6 +37,7 @@ class ProjectWidget : public QTreeWidget
                                 "flv", "f4v", "f4p", "f4a", "f4b"};
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
+    ~ProjectWidget();
     Project* m_proj = nullptr;
 
 signals:
@@ -96,6 +97,7 @@ private:
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
+    bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);

@@ -12,6 +12,7 @@ class RecentProject : public Saveable {
     std::list<std::pair<std::string, std::string>> recent_items;
     static const std::string FILE_NAME;
     static const std::string PATH;
+    static const int RECENT_MAX = 10;
 public:
     RecentProject();
 
