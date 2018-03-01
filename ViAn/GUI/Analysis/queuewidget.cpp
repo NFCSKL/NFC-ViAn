@@ -28,6 +28,9 @@ QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     // Add queue
     layout->addWidget(m_queue);    
     setLayout(layout);
+    if(m_queue->count() == 0){
+        abort_btn->hide();
+    }
     // Show widget
     show();
 }
@@ -37,8 +40,7 @@ QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
  * Move queue forward if queue non empty,
  * otherwise reset current analysis representation
  */
-void QueueWidget::next()
-{
+void QueueWidget::next() {
     QListWidgetItem* item;
     m_line->setText(QString(""));
     progressbar->setValue(0);
@@ -56,8 +58,7 @@ void QueueWidget::next()
  * @param method
  * Add method to back of queue
  */
-void QueueWidget::enqueue(AnalysisMethod *method)
-{
+void QueueWidget::enqueue(AnalysisMethod *method) {
     abort_btn->show();
     progressbar->show();
     AnalysisListItem* item = new AnalysisListItem(method);
@@ -76,8 +77,7 @@ void QueueWidget::enqueue(AnalysisMethod *method)
  * @param i
  * Update progressbar progress
  */
-void QueueWidget::update_progress(int i)
-{    
+void QueueWidget::update_progress(int i) {
     progressbar->setValue(i);
 }
 
@@ -85,8 +85,7 @@ void QueueWidget::update_progress(int i)
  * @brief QueueWidget::toggle_show
  * Hide/Show this widget
  */
-void QueueWidget::toggle_show()
-{
+void QueueWidget::toggle_show() {
     if(this->isVisible()) hide();
     else show();
 }

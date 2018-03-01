@@ -217,6 +217,7 @@ void FrameProcessor::update_manipulator_settings() {
  */
 void FrameProcessor::update_overlay_settings() {
     int curr_frame = m_frame_index->load();
+    m_overlay->set_showing_overlay(m_o_settings->show_overlay);
     m_overlay->set_tool(m_o_settings->tool);
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
@@ -224,11 +225,11 @@ void FrameProcessor::update_overlay_settings() {
     // Undo action
     if (m_o_settings->undo) {
         m_o_settings->undo = false;
-        m_overlay->undo(curr_frame);    
+        m_overlay->undo(curr_frame);
     // Redo action
     } else if (m_o_settings->redo) {
         m_o_settings->redo = false;
-        m_overlay->redo(curr_frame);  
+        m_overlay->redo(curr_frame);
     // Clear drawings action
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;
