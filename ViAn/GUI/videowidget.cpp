@@ -21,9 +21,9 @@
 
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
-    // Init video contoller
+    // Init video controller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &new_frame_video, &v_sync,
+                                       &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
                                        &m_speed_step);
 
@@ -59,6 +59,9 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     init_video_controller();
     v_controller->start();
     init_frame_processor();
+}
+
+VideoWidget::~VideoWidget(){
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -182,15 +185,14 @@ void VideoWidget::set_btn_icons() {
 
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
-    tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
-    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
+    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
+    tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
 
 
     zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
-
 
 
     zoom_label = new QLabel;
@@ -200,6 +202,7 @@ void VideoWidget::set_btn_icons() {
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     play_btn->setCheckable(true);
     zoom_in_btn->setCheckable(true);
+    analysis_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
 }
 
@@ -220,8 +223,8 @@ void VideoWidget::set_btn_tool_tip() {
 
     bookmark_btn->setToolTip(tr("Bookmark the current frame: Ctrl + B"));
     export_frame_btn->setToolTip("Export current frame: E");
-    tag_btn->setToolTip(tr("Tag the current frame: T"));
     new_tag_btn->setToolTip(tr("Create a new tag: Ctrl + T"));
+    tag_btn->setToolTip(tr("Tag the current frame: T"));
 
     zoom_in_btn->setToolTip(tr("Zoom in: Z"));
     zoom_out_btn->setToolTip(tr("Zoom out"));
@@ -276,11 +279,15 @@ void VideoWidget::set_btn_tab_order() {
     setTabOrder(prev_poi_btn, analysis_btn);
     setTabOrder(analysis_btn, next_poi_btn);
     setTabOrder(next_poi_btn, bookmark_btn);
-    setTabOrder(bookmark_btn, tag_btn);
+    setTabOrder(bookmark_btn, export_frame_btn);
+    setTabOrder(export_frame_btn, new_tag_btn);
+    setTabOrder(new_tag_btn, tag_btn);
     setTabOrder(tag_btn, zoom_in_btn);
     setTabOrder(zoom_in_btn, zoom_out_btn);
     setTabOrder(zoom_out_btn, fit_btn);
     setTabOrder(fit_btn, original_size_btn);
+    setTabOrder(original_size_btn, set_start_interval_btn);
+    setTabOrder(set_start_interval_btn, set_end_interval_btn);
 }
 
 /**
@@ -356,8 +363,8 @@ void VideoWidget::add_btns_to_layouts() {
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(export_frame_btn);
-    other_btns->addWidget(tag_btn);
     other_btns->addWidget(new_tag_btn);
+    other_btns->addWidget(tag_btn);
 
     control_row->addLayout(other_btns);
 
@@ -394,7 +401,7 @@ void VideoWidget::connect_btns() {
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_btn_clicked);
-    connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
+    connect(analysis_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::set_analysis_tool);
 
     // Tag
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
@@ -819,7 +826,8 @@ void VideoWidget::on_playback_slider_moved() {
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     int frame = -1;
-    if (!video_btns_enabled) enable_video_btns();
+    if (!frame_wgt->isVisible()) frame_wgt->show();
+    if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
@@ -844,14 +852,41 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
     }
 }
 
-void VideoWidget::enable_video_btns() {
-    for (QPushButton* btn : btns) {
-        btn->setEnabled(true);
-    }
-    playback_slider->setEnabled(true);
-    frame_line_edit->setEnabled(true);
-    speed_slider->setEnabled(true);
+void VideoWidget::remove_item(VideoProject* vid_proj) {
+    if (get_current_video_project() == vid_proj) clear_current_video();
 }
+
+/**
+ * @brief VideoWidget::clear_current_video
+ * Removes the video from the videoplayer
+ */
+void VideoWidget::clear_current_video() {
+    int frame = -1;
+    if (video_btns_enabled) set_video_btns(false);
+
+    player_lock.lock();
+    video_loaded.store(false);
+    player_lock.unlock();
+    player_con.notify_all();
+
+    playback_slider->setValue(frame);
+    play_btn->setChecked(false);
+    playback_slider->set_interval(-1, -1);
+    set_total_time(0);
+
+    frame_wgt->close();
+}
+
+void VideoWidget::set_video_btns(bool b) {
+    for (QPushButton* btn : btns) {
+        btn->setEnabled(b);
+    }
+    playback_slider->setEnabled(b);
+    frame_line_edit->setEnabled(b);
+    speed_slider->setEnabled(b);
+    video_btns_enabled = b;
+}
+
 
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     next_poi_btn->setEnabled(b);
@@ -922,6 +957,12 @@ void VideoWidget::set_redo() {
 void VideoWidget::set_clear_drawings() {
     update_overlay_settings([&](){
         o_settings.clear_drawings = true;
+    });
+}
+
+void VideoWidget::set_show_overlay(bool show) {
+    update_overlay_settings([&](){
+        o_settings.show_overlay = show;
     });
 }
 
@@ -1115,6 +1156,7 @@ void VideoWidget::frame_line_edit_finished() {
         emit set_status_bar("Error! Input is negative!");
     } else {
         frame_index.store(converted);
+        on_new_frame();
     }
 }
 

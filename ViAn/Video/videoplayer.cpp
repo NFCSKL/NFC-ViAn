@@ -5,7 +5,7 @@
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
-                         std::atomic_bool* new_video, std::atomic_bool *new_frame_video, video_sync* v_sync, std::condition_variable* player_con,
+                         std::atomic_bool* new_video, std::atomic_bool *new_frame_video, std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
                          std::atomic_int* speed_step, QObject *parent) : QObject(parent) {
 
@@ -18,6 +18,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
     m_video_height = height;
     m_new_video = new_video;
     m_new_frame_video = new_frame_video;
+    m_video_loaded = video_loaded;
     m_v_sync = v_sync;
     m_player_con = player_con;
     m_player_lock = player_lock;
@@ -35,6 +36,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
  */
 
 void VideoPlayer::load_video(){
+    m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
     m_frame->store(0);
@@ -70,9 +72,9 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
     if (frame_index >= 0 && frame_index <= m_last_frame) {
-        m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);        
-        synced_read();
+        m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
         current_frame = frame_index;
+        synced_read();
     }
 }
 
@@ -86,14 +88,17 @@ void VideoPlayer::check_events() {
         std::unique_lock<std::mutex> lk(*m_player_lock);
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
-        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
+        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
             qDebug() << "";
             qDebug() << "in vid_play";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 qDebug() << "wait load read video";
                 wait_load_read();
-            } else if (current_frame != m_frame->load()) {
+            } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
+                qDebug() << "curr: ";
+                qDebug() << current_frame;
+                qDebug() << m_frame->load();
                 set_frame();
             }
         } else {
@@ -173,7 +178,6 @@ bool VideoPlayer::wait_load_read(){
             return false;
         }
         m_new_frame->store(true);
-        qDebug() << "new frame";
     }
     m_v_sync->con_var.notify_one();
     return true;

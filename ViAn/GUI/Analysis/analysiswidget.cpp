@@ -5,9 +5,13 @@
 #include <QTreeWidgetItem>
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
-    queue_wgt = new QueueWidget();
-    queue_wgt->hide();
-    connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
+
+}
+
+void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
+    m_queue_wgt = queue_wgt;
+
+    connect(m_queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
 /**
@@ -19,16 +23,15 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
  */
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
-
     // Add the analysis to the queue in the queue widget
-    queue_wgt->enqueue(method);
-
+    m_queue_wgt->enqueue(method);
+    emit show_analysis_queue(true);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
         emit name_in_tree(item, QString::fromStdString(name));
     } else {
-        queue_wgt->next();
+        m_queue_wgt->next();
         analysis_queue.push_back(analys);
         perform_analysis(analys);
         current_analysis_item = item;
@@ -54,7 +57,7 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
     QThreadPool::globalInstance()->start(method);
     emit add_analysis_bar();
-    queue_wgt->show();
+    emit show_analysis_queue(true);
 }
 
 /**
@@ -77,13 +80,13 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     duration = 0;
 
 
-    queue_wgt->next();
+    m_queue_wgt->next();
     if (!analysis_queue.empty()) {
         current_analysis_item = get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
     }else{
-        queue_wgt->hide();
+        emit show_analysis_queue(false);
     }
     emit remove_analysis_bar();
 }
@@ -99,7 +102,7 @@ void AnalysisWidget::on_analysis_aborted() {
     auto it = abort_map.find(current_method);   
     abort_map.erase(it);
 
-    queue_wgt->next();
+    m_queue_wgt->next();
     if (!analysis_queue.empty()) {        
         current_analysis_item = get<1>(analysis_queue.front());
         move_queue();
@@ -107,7 +110,7 @@ void AnalysisWidget::on_analysis_aborted() {
         return;
     }
     // Queue Empty
-    queue_wgt->hide();
+    emit show_analysis_queue(false);
     emit remove_analysis_bar();
 }
 
@@ -137,7 +140,7 @@ void AnalysisWidget::send_progress(int progress) {
             dots += ".";
         }
     }
-    queue_wgt->update_progress(progress);
+    m_queue_wgt->update_progress(progress);
     std::string name = "Loading " + to_string(progress) + "%" + dots;
     emit name_in_tree(current_analysis_item, QString::fromStdString(name));
     emit show_progress(progress);

@@ -70,20 +70,24 @@ private slots:
 public slots:
     void options(void);
     void open_project_dialog();
+    void show_analysis_dock(bool);
 
 signals:
     void set_status_bar(QString);
     void open_project(QString proj_path);
 
 private:
+    QDockWidget* queue_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
+    QueueWidget* queue_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
+    QAction* toggle_queue_wgt;
 
     AnalysisWindow *analysis_window;
 
