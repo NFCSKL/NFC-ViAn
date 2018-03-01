@@ -34,11 +34,12 @@ private:
     QScrollBar* h_bar;
     QSize current_frame_size;
     QTime timer;
-    double h_step_size, v_step_size;
 
     int prev_frame_idx;
     int POI_end;
     double m_scale_factor = 1;
+    int brightness = 0;
+    double contrast = 1;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -91,6 +92,9 @@ public:
     void set_redo();
     void set_clear_drawings();
     void set_delete_drawing();
+
+    int get_brightness();
+    double get_contrast();
 
 signals:
     void first_frame(cv::Mat frame);

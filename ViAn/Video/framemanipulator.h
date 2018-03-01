@@ -10,6 +10,8 @@ public:
     FrameManipulator();
     void set_brightness(int value);
     void set_contrast(double value);
+    int get_brightness();
+    double get_contrast();
     void contrast_frame(cv::Mat &src);
     void apply(cv::Mat& src);
     void reset();

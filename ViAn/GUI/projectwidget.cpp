@@ -123,7 +123,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
-    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
+    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
     emit begin_analysis(item, method);
 }
 

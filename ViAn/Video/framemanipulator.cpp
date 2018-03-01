@@ -23,6 +23,14 @@ void FrameManipulator::set_contrast(double value) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, value));
 }
 
+int FrameManipulator::get_brightness() {
+    return beta;
+}
+
+double FrameManipulator::get_contrast() {
+    return alpha;
+}
+
 
 /**
  * @brief FrameManipulator::apply
