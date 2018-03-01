@@ -617,7 +617,6 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project(QString project_path) {
-    qDebug() << "in open" << project_path;
     if (project_path.isEmpty()) return;
     if (m_proj != nullptr) close_project();
     Project* new_proj = Project::fromFile(project_path.toStdString());

@@ -69,10 +69,7 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug() << "mchanged";
             m_changed->store(false);
-
-
             update_manipulator_settings();
             update_zoomer_settings();
 
@@ -86,7 +83,6 @@ void FrameProcessor::check_events() {
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
-            qDebug() << "new_frame";
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
             process_frame();

@@ -78,11 +78,7 @@ cv::Rect DetectionBox::get_rect() {
  * @param scale_ratio
  */
 void DetectionBox::scale_coordinates(float scale_ratio) {
-    qDebug() << "scale_coordinates";
-    qDebug() << scale_ratio;
-    qDebug() << "prev: " <<upper_left.first;
     this->upper_left.first *= scale_ratio;
-    qDebug() << "after: " <<upper_left.first;
     this->upper_left.second *= scale_ratio;
     this->lower_right.first *= scale_ratio;
     this->lower_right.second *= scale_ratio;
