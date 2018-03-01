@@ -15,7 +15,7 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
     std::pair<std::string, std::string> new_proj = std::make_pair(name, project_path);
     auto item = std::find(recent_items.begin(), recent_items.end(), new_proj);
     if (item != recent_items.end()) recent_items.erase(item);
-    if (recent_items.size() >= 10) recent_items.resize(10);
+    if (recent_items.size() >= RECENT_MAX) recent_items.resize(RECENT_MAX);
     recent_items.push_front(new_proj);
     QDir().mkpath(QString::fromStdString(PATH));
     save_saveable(PATH + FILE_NAME);
