@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <QMessageBox>
 #include <iostream>
 #include <sstream>
 #include <QCloseEvent>
@@ -27,10 +26,13 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    queue_dock = new QDockWidget(tr("Analysis queue"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
+    toggle_queue_wgt = queue_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -45,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
 
+    connect(analysis_wgt, SIGNAL(show_analysis_queue(bool)), this, SLOT(show_analysis_dock(bool)));
     connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
     connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
     connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
@@ -55,6 +58,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     bookmark_dock->close();
+    
+    // Initialize analysis queue widget
+    queue_wgt = new QueueWidget();
+    queue_dock->setWidget(queue_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, queue_dock);
+    queue_dock->setFloating(true);
+    queue_dock->close();
+    analysis_wgt->set_queue_wgt(queue_wgt);
 
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
@@ -151,6 +162,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
  * Destructor
  */
 MainWindow::~MainWindow() {
+    delete video_wgt;
+    delete project_wgt;
+    delete analysis_wgt;
+    delete bookmark_wgt;
 }
 
 /**
@@ -268,36 +283,33 @@ void MainWindow::init_view_menu() {
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
     interval_act = new QAction(tr("&Interval"), this);
     drawing_act = new QAction(tr("&Paintings"), this);
-    show_analysis_queue = new QAction(tr("Analysis &Queue"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
     interval_act->setCheckable(true);
     drawing_act->setCheckable(true);
-    show_analysis_queue->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
     interval_act->setChecked(true);
     drawing_act->setChecked(true);
-    show_analysis_queue->setChecked(false);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
+    view_menu->addAction(toggle_queue_wgt);
     view_menu->addSeparator();
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
     view_menu->addAction(interval_act);
     view_menu->addAction(drawing_act);
-    view_menu->addAction(show_analysis_queue);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
+    toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
-    show_analysis_queue->setStatusTip(tr("Show/Hide Analysis queue"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
@@ -305,10 +317,7 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
-    // TODO, connect signal back from queue widget to correctly
-    // set view checkbox when queuewidget toggle_show triggered from elsewhere
-    connect(show_analysis_queue, &QAction::toggled, analysis_wgt->queue_wgt, &QueueWidget::toggle_show);
-    //connect(drawing_act, &QAction::toggled, video_wgt->frame_wgt->get_overlay(), &Overlay::set_showing_overlay);
+    connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
 }
 
 /**
@@ -541,7 +550,7 @@ void MainWindow::export_images(){
         interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
-    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->getDir(),
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_tmp_dir(),
                                         video_wgt->get_current_video_length() - 1,
                                         interval);
     if (!exporter_dialog.exec()){
@@ -581,5 +590,13 @@ void MainWindow::open_project_dialog(){
                 tr("Open project"),
                 QDir::homePath(),
                 "*.vian");
-    open_project(project_path);
+    emit open_project(project_path);
+}
+
+void MainWindow::show_analysis_dock(bool show) {
+    if (show) {
+        queue_dock->show();
+    } else if (queue_dock->isFloating()) {
+        queue_dock->close();
+    }
 }
