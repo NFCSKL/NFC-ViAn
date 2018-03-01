@@ -144,7 +144,7 @@ cv::Mat ZoomRectangle::draw(cv::Mat &frame) {
     // CV_8UC3 means 8-bit unsigned 3-channel array.
     cv::Mat coloured_area(area.size(), CV_8UC3, cv::Scalar(125, 125, 125));
     cv::addWeighted(coloured_area, ALPHA, area, 1.0 - ALPHA , 0.0, area);
-    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
+    cv::rectangle(frame, rect, color, LINE_THICKNESS);
     return frame;
 }
 

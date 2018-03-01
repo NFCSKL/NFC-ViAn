@@ -23,9 +23,12 @@ void DrawingToolbar::create_actions() {
     circle_tool_act = new QAction(QIcon("../ViAn/Icons/circle.png"), tr("Circle tool"), this);
     line_tool_act = new QAction(QIcon("../ViAn/Icons/line.png"), tr("Line tool"), this);
     text_tool_act = new QAction(QIcon("../ViAn/Icons/text.png"), tr("Text tool"), this);
+    hand_tool_act = new QAction(QIcon("../ViAn/Icons/hand.png"), tr("Hand tool"), this);
     undo_tool_act = new QAction(QIcon("../ViAn/Icons/undo.png"), tr("Undo last drawing"), this);
     redo_tool_act = new QAction(QIcon("../ViAn/Icons/redo.png"), tr("Redo last drawing"), this);
-    clear_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Clear all drawings"), this);
+    delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
+
+    delete_tool_act->setShortcut(QKeySequence::Delete);
 
     tools = new QActionGroup(this);
     tools->addAction(pen_tool_act);
@@ -34,6 +37,7 @@ void DrawingToolbar::create_actions() {
     tools->addAction(circle_tool_act);
     tools->addAction(line_tool_act);
     tools->addAction(text_tool_act);
+    tools->addAction(hand_tool_act);
     for (QAction* act: tools->actions()) {
         act->setCheckable(true);
     }
@@ -47,6 +51,7 @@ void DrawingToolbar::create_actions() {
     connect(circle_tool_act, &QAction::triggered, this, &DrawingToolbar::circle_tool_clicked);
     connect(line_tool_act, &QAction::triggered, this, &DrawingToolbar::line_tool_clicked);
     connect(text_tool_act, &QAction::triggered, this, &DrawingToolbar::text_tool_clicked);
+    connect(hand_tool_act, &QAction::triggered, this, &DrawingToolbar::hand_tool_clicked);
 }
 
 /**
@@ -58,7 +63,7 @@ void DrawingToolbar::create_buttons() {
     addActions(tools->actions());
     addAction(undo_tool_act);
     addAction(redo_tool_act);
-    addAction(clear_tool_act);
+    addAction(delete_tool_act);
 }
 
 /**
@@ -108,4 +113,9 @@ void DrawingToolbar::line_tool_clicked() {
 void DrawingToolbar::text_tool_clicked() {
     emit set_status_bar("Text tool");
     emit set_overlay_tool(TEXT);
+}
+
+void DrawingToolbar::hand_tool_clicked() {
+    emit set_status_bar("Hand tool");
+    emit set_overlay_tool(HAND);
 }

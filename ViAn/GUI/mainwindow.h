@@ -25,6 +25,7 @@
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "statusbar.h"
+#include "Toolbars/drawingtoolbar.h"
 
 using namespace std;
 class AnalysisWindow;
@@ -39,6 +40,7 @@ public:
     ~MainWindow();
 
     StatusBar* status_bar;
+    DrawingToolbar* draw_toolbar;
     QAction* show_analysis_queue;
     QAction* detect_intv_act;
     QAction* bound_box_act;
@@ -62,6 +64,7 @@ private slots:
     void undo();
     void redo();
     void clear();
+    void delete_drawing();
     void zoom();
     void move();
 

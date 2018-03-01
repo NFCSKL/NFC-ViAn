@@ -90,6 +90,7 @@ public:
     void set_undo();
     void set_redo();
     void set_clear_drawings();
+    void set_delete_drawing();
 
 signals:
     void first_frame(cv::Mat frame);
@@ -155,9 +156,10 @@ public slots:
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);
-    void mouse_pressed(QPoint pos);
-    void mouse_released(QPoint pos);
+    void mouse_pressed(QPoint pos, bool);
+    void mouse_released(QPoint pos, bool right_click);
     void mouse_moved(QPoint pos);
+    void mouse_scroll(QPoint pos);
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);

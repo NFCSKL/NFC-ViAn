@@ -1,4 +1,5 @@
 #include "overlay.h"
+#include <QDebug>
 
 /**
  * @brief Overlay::Overlay
@@ -123,8 +124,50 @@ void Overlay::empty_undo_list(int frame_nr) {
  * @param frame_nr
  */
 void Overlay::add_drawing(Shape* shape, int frame_nr) {
+    if (shape->get_shape() == TEXT) {
+        shape->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, shape->LINE_THICKNESS, &baseline));
+    }
     overlays[frame_nr].overlay.push_back(shape);
     overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+}
+
+/**
+ * @brief Overlay::get_drawing
+ * Set the clicked drawing to current drawing
+ * @param pos
+ * @param frame_nr
+ */
+void Overlay::get_drawing(QPoint pos, int frame_nr) {
+    if (current_drawing != nullptr) current_drawing->invert_color();
+    current_drawing = nullptr;
+    for (auto shape : overlays[frame_nr].overlay) {
+        if (point_in_drawing(pos, shape)) {
+            current_drawing = shape;
+            current_drawing->set_current_frame(frame_nr);
+        }
+    }
+    if (current_drawing != nullptr) current_drawing->invert_color();
+}
+
+/**
+ * @brief Overlay::point_in_drawing
+ * @param pos
+ * @param shape
+ * @return true if the point pos is in the hidden rect of drawing shape
+ */
+bool Overlay::point_in_drawing(QPoint pos, Shape *shape) {
+    cv::Rect drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
+    return drawing.contains(qpoint_to_point(pos));
+}
+
+/**
+ * @brief Shape::qpoint_to_point
+ * Converts QPoint to OpenCV Point.
+ * @param pnt QPoint to be converted.
+ * @return Returns converted Point.
+ */
+cv::Point Overlay::qpoint_to_point(QPoint pnt) {
+    return cv::Point(pnt.x(), pnt.y());
 }
 
 /**
@@ -134,7 +177,7 @@ void Overlay::add_drawing(Shape* shape, int frame_nr) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
+void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:
@@ -161,6 +204,14 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
                 empty_undo_list(frame_nr);
                 add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
                 break;
+            case HAND:
+                if (right_click) {
+                    m_right_click = right_click;
+                    break;
+                }
+                get_drawing(pos, frame_nr);
+                prev_point = pos;
+                break;
             default:
                 break;
         }
@@ -174,8 +225,9 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::mouse_released(QPoint pos, int frame_nr) {
+void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
     update_drawing_position(pos, frame_nr);
+    m_right_click = right_click;
 }
 
 /**
@@ -190,15 +242,44 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
 }
 
 /**
+ * @brief Overlay::mouse_scroll
+ * Updates the thickness of the lines of the current drawing
+ * when scrolling the mouse wheel.
+ * @param pos Mouse wheel delta.
+ * @param frame_nr Number of the frame currently shown in the video.
+ */
+void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
+    if (current_drawing->get_current_frame() == frame_nr && show_overlay) {
+        current_drawing->set_thickness(pos);
+    }
+}
+
+/**
  * @brief Overlay::update_drawing_position
  * Updates the position of the end point of the shape currently being drawn
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
-    if (show_overlay) {
-        // The last appended shape is the one we're currently drawing.
-        overlays[frame_nr].overlay.back()->update_drawing_pos(pos);
+    if (show_overlay && !overlays[frame_nr].overlay.empty()) {
+        if (current_shape == HAND) {
+            if (current_drawing == nullptr) return;
+            if (m_right_click && current_drawing->get_shape() == TEXT) {
+                return;
+            }
+            else if (m_right_click){
+                current_drawing->update_drawing_pos(pos);
+                return;
+            }
+            QPoint diff_point = pos - prev_point;
+            current_drawing->move_shape(diff_point);
+            prev_point = pos;
+        } else if (current_shape == TEXT) {
+            overlays[frame_nr].overlay.back()->update_text_pos(pos);
+        } else {
+            // The last appended shape is the one we're currently drawing.
+            overlays[frame_nr].overlay.back()->update_drawing_pos(pos);
+        }
     }
 }
 
@@ -221,6 +302,11 @@ void Overlay::undo(int frame_nr) {
     }
 }
 
+/**
+ * @brief Overlay::redo
+ * Redo the drawings on the overlay, if the overlay is visible
+ * @param frame_nr
+ */
 void Overlay::redo(int frame_nr) {
     if (show_overlay && overlays[frame_nr].overlay.end() != overlays[frame_nr].drawn) {
         overlays[frame_nr].drawn++;
@@ -236,6 +322,26 @@ void Overlay::clear(int frame_nr) {
     if (show_overlay) {
         overlays[frame_nr].overlay.clear();
         overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+    }
+}
+
+/**
+ * @brief Overlay::delete_drawing
+ * Delete the current drawing if the overlay is visible.
+ * @param frame_nr Number of the frame currently shown in the video.
+ */
+void Overlay::delete_drawing(int frame_nr) {
+    if (!show_overlay) return;
+    vector<Shape*>::iterator it = overlays[frame_nr].overlay.begin();
+    while (it != overlays[frame_nr].overlay.end()) {
+        if (*it == current_drawing) {
+            it = overlays[frame_nr].overlay.erase(it);
+            overlays[frame_nr].drawn--;
+            current_drawing = nullptr;
+            return;
+        } else {
+            ++it;
+        }
     }
 }
 

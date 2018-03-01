@@ -9,10 +9,12 @@ FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 void FrameWidget::toggle_zoom(bool value) {
     if (value) {
         tool = ZOOM;
+        emit send_tool(ZOOM);
         setCursor(Qt::CrossCursor);
     } else {
         unsetCursor();
         tool = NONE;
+        emit send_tool(NONE);
     }
 }
 
@@ -242,7 +244,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     default:
-        emit mouse_pressed(scale_point(event->pos()));
+        bool right_click = (event->button() == Qt::RightButton);
+        emit mouse_pressed(scale_point(event->pos()), right_click);
         break;
     }
 }
@@ -275,7 +278,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     }
     default:
-        emit mouse_released(scale_point(event->pos()));
+        emit mouse_released(scale_point(event->pos()), false);
         break;
     }
 }
@@ -300,6 +303,17 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         emit mouse_moved(scale_point(event->pos()));
         break;
     }
+}
+
+/**
+ * @brief FrameWidget::wheelEvent
+ * @param event
+ */
+void FrameWidget::wheelEvent(QWheelEvent *event) {
+    QPoint num_degree = event->angleDelta() / 8;
+    QPoint num_steps = num_degree / 15;
+    emit mouse_scroll(num_steps);
+    event->accept();
 }
 
 void FrameWidget::set_analysis_settings() {
