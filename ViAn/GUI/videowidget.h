@@ -73,6 +73,7 @@ private:
     FrameProcessor* f_processor;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
+    ~VideoWidget();
 
     // Lock and wait condition to sleep player when video is paused
     video_player* m_video_player;

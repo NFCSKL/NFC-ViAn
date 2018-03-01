@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <QMessageBox>
 #include <iostream>
 #include <sstream>
 #include <QCloseEvent>
@@ -164,6 +163,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
  * Destructor
  */
 MainWindow::~MainWindow() {
+    delete video_wgt;
+    delete project_wgt;
+    delete analysis_wgt;
+    delete bookmark_wgt;
 }
 
 /**
@@ -544,7 +547,7 @@ void MainWindow::export_images(){
         interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
-    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->getDir(),
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_tmp_dir(),
                                         video_wgt->get_current_video_length() - 1,
                                         interval);
     if (!exporter_dialog.exec()){
@@ -584,7 +587,7 @@ void MainWindow::open_project_dialog(){
                 tr("Open project"),
                 QDir::homePath(),
                 "*.vian");
-    open_project(project_path);
+    emit open_project(project_path);
 }
 
 void MainWindow::show_analysis_dock(bool show) {

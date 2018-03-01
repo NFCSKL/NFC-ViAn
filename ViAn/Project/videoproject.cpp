@@ -1,4 +1,5 @@
 #include "videoproject.h"
+#include <QDebug>
 
 /**
  * @brief VideoProject::VideoProject
@@ -225,11 +226,6 @@ void VideoProject::delete_artifacts(){
         BasicAnalysis* temp = it2->second;
         temp->delete_saveable();
     }
-}
-
-void VideoProject::remove_from_project()
-{
-    m_project->remove_video_project(this);
 }
 
 string VideoProject::get_index_path() {

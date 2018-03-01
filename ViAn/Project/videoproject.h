@@ -54,7 +54,6 @@ public:
     void delete_analysis(const int& id);
     void delete_bookmark(const int& id);
     void delete_artifacts();
-    void remove_from_project();
 
     std::string get_index_path();
     Video* get_video();
