@@ -56,7 +56,7 @@ public:
     void write(QJsonObject& json);
     void delete_artifacts();
 
-    void set_unsaved(bool changed);
+    void set_unsaved(const bool& changed);
 
     bool is_saved() const;
     bool save_project();

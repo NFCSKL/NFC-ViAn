@@ -37,6 +37,8 @@ public:
     std::string get_name() const;
     interval_set get_intervals() const;
 
+    void set_name(const std::string& new_name);
+
     bool is_saved() const;
 };
 

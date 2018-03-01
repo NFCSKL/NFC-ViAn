@@ -70,6 +70,11 @@ interval_set BasicAnalysis::get_intervals() const {
     return m_intervals;
 }
 
+void BasicAnalysis::set_name(const std::string &new_name){
+    m_name = new_name;
+    m_unsaved_changes = true;
+}
+
 bool BasicAnalysis::is_saved() const{
     return !m_unsaved_changes;
 }

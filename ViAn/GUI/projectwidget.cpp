@@ -35,6 +35,8 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
+
+    connect(this, &ProjectWidget::itemChanged, this, &ProjectWidget::update_item_data);
 }
 
 
@@ -370,6 +372,8 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
             if (item->type() == VIDEO_ITEM) {
                 auto vid_item = dynamic_cast<VideoItem*>(item);
                 vid_item->get_video_project()->set_tree_index(get_index_path(item));
+            } else if (item->type() == FOLDER_ITEM) {
+                m_proj->set_unsaved(true);
             }
         }
     }
@@ -494,6 +498,36 @@ void ProjectWidget::check_selection_level(QTreeWidgetItem*, QTreeWidgetItem*) {
 }
 
 /**
+ * @brief ProjectWidget::update_item_data
+ * Updates the underlying data structures of the tree items
+ * @param item:     item that has been changed
+ * @param column    column in item
+ */
+void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
+    Q_UNUSED(column);
+
+    std::string item_text = item->text(0).toStdString();
+    switch(item->type()) {
+        case TAG_ITEM: {
+            auto tag_item = dynamic_cast<TagItem*>(item);
+            Tag* tag = tag_item->get_tag();
+            if (tag->get_name() != item_text) tag->set_name(item_text);
+            break;
+        } case ANALYSIS_ITEM: {
+            auto analysis_item = dynamic_cast<AnalysisItem*>(item);
+            AnalysisProxy* analysis = analysis_item->get_analysis();
+            // AnalysisItems are added when an analysis is started
+            // and the proxy can thusly be a nullptr
+            if (analysis == nullptr) break;
+            if (analysis->get_name() != item_text) analysis->set_name(item_text);
+            break;
+        } case FOLDER_ITEM: {
+            m_proj->set_unsaved(true);
+        }
+    }
+}
+
+/**
  * @brief ProjectWidget::context_menu
  * Slot function triggered by customContextMenuRequested
  * Creates a context menu
@@ -593,6 +627,7 @@ void ProjectWidget::create_folder_item() {
     editItem(item);
     clearSelection();
     item->setSelected(true);
+    m_proj->set_unsaved(true);
 }
 
 /**

@@ -30,7 +30,7 @@ class ProjectWidget : public QTreeWidget
     bool selecting = false;
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
-    Project* m_proj = nullptr;
+    Project* m_proj = nullptr;    
 
 signals:
     void selected_media();
@@ -76,6 +76,8 @@ private slots:
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
     void check_selection();
     void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
+
+    void update_item_data(QTreeWidgetItem *item, int column);
 private:
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);

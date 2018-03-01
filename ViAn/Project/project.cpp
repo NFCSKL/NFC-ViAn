@@ -110,7 +110,7 @@ void Project::delete_artifacts(){
  * Should be used by video_project and analysis
  * @param changed
  */
-void Project::set_unsaved(bool changed) {
+void Project::set_unsaved(const bool& changed) {
     m_unsaved_changes = changed;
 }
 
