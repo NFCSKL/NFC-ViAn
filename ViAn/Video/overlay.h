@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QInputDialog>
+#include <algorithm>
 #include "shapes/shape.h"
 #include "shapes/rectangle.h"
 #include "shapes/circle.h"
@@ -50,13 +51,15 @@ public:
     void set_colour(QColor col);
     QColor get_colour();
     SHAPES get_tool();
-    void mouse_pressed(QPoint pos, int frame_nr);
-    void mouse_released(QPoint pos, int frame_nr);
+    void mouse_pressed(QPoint pos, int frame_nr, bool right_click);
+    void mouse_released(QPoint pos, int frame_nr, bool right_click);
     void mouse_moved(QPoint pos, int frame_nr);
+    void mouse_scroll(QPoint pos, int frame_nr);
     void update_drawing_position(QPoint pos, int frame_nr);
     void undo(int frame_nr);
     void redo(int frame_nr);
     void clear(int frame_nr);
+    void delete_drawing(int frame_nr);
     void clear_overlay();
 
     void read(const QJsonObject& json);
@@ -69,8 +72,16 @@ private:
     Shape* get_empty_shape(SHAPES shape_type);
     void empty_undo_list(int frame_nr);
     void add_drawing(Shape *shape, int frame_nr);
+    void get_drawing(QPoint pos, int frame_nr);
+    bool point_in_drawing(QPoint pos, Shape* shape);
+    cv::Point qpoint_to_point(QPoint pnt);
+    
+    Shape* current_drawing = nullptr;
+    QPoint prev_point;
+    bool m_right_click = false;
 
     bool show_overlay = true;
+    int baseline = 0;
 
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;

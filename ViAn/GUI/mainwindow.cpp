@@ -15,7 +15,6 @@
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
 #include "Toolbars/maintoolbar.h"
-#include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
@@ -93,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
 
     // Draw toolbar
-    DrawingToolbar* draw_toolbar = new DrawingToolbar();
+    draw_toolbar = new DrawingToolbar();
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
@@ -102,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
     connect(draw_toolbar->redo_tool_act, &QAction::triggered, this, &MainWindow::redo);
-    connect(draw_toolbar->clear_tool_act, &QAction::triggered, this, &MainWindow::clear);
+    connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
     // Status bar
@@ -482,27 +481,27 @@ void MainWindow::init_help_menu() {
 }
 
 void MainWindow::rectangle() {
-    video_wgt->frame_wgt->set_tool(RECTANGLE);
+    draw_toolbar->rectangle_tool_act->trigger();
 }
 
 void MainWindow::circle() {
-    video_wgt->frame_wgt->set_tool(CIRCLE);
+    draw_toolbar->circle_tool_act->trigger();
 }
 
 void MainWindow::line() {
-    video_wgt->frame_wgt->set_tool(LINE);
+    draw_toolbar->line_tool_act->trigger();
 }
 
 void MainWindow::arrow() {
-    video_wgt->frame_wgt->set_tool(ARROW);
+    draw_toolbar->arrow_tool_act->trigger();
 }
 
 void MainWindow::pen() {
-    video_wgt->frame_wgt->set_tool(PEN);
+    draw_toolbar->pen_tool_act->trigger();
 }
 
 void MainWindow::text() {
-    video_wgt->frame_wgt->set_tool(TEXT);
+    draw_toolbar->text_tool_act->trigger();
 }
 
 void MainWindow::undo() {
@@ -515,6 +514,10 @@ void MainWindow::redo() {
 
 void MainWindow::clear() {
     video_wgt->set_clear_drawings();
+}
+
+void MainWindow::delete_drawing() {
+    video_wgt->set_delete_drawing();
 }
 
 void MainWindow::zoom() {
@@ -544,7 +547,7 @@ void MainWindow::gen_report() {
  */
 void MainWindow::cont_bri() {
     emit set_status_bar("Opening contrast/brightness settings");
-    ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
+    ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
     man_dialog->exec();
 }

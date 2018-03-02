@@ -154,9 +154,10 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
-    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), this, SLOT(mouse_pressed(QPoint)));
-    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
+    connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
     connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
     connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
     connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
@@ -960,6 +961,12 @@ void VideoWidget::set_clear_drawings() {
     });
 }
 
+void VideoWidget::set_delete_drawing() {
+    update_overlay_settings([&](){
+        o_settings.delete_drawing = true;
+    });
+}
+
 void VideoWidget::set_show_overlay(bool show) {
     update_overlay_settings([&](){
         o_settings.show_overlay = show;
@@ -967,6 +974,9 @@ void VideoWidget::set_show_overlay(bool show) {
 }
 
 void VideoWidget::set_tool(SHAPES tool) {
+    if (tool != ZOOM) {
+        zoom_in_btn->setChecked(false);
+    }
     update_overlay_settings([&](){
         o_settings.tool = tool;
     });
@@ -986,23 +996,32 @@ void VideoWidget::set_color(QColor color) {
     });
 }
 
-void VideoWidget::mouse_pressed(QPoint pos) {
+void VideoWidget::mouse_pressed(QPoint pos, bool right_click) {
     update_overlay_settings([&](){
         o_settings.mouse_clicked = true;
         o_settings.pos = pos;
+        o_settings.right_click = right_click;
     });
 }
 
-void VideoWidget::mouse_released(QPoint pos) {
+void VideoWidget::mouse_released(QPoint pos, bool right_click) {
     update_overlay_settings([&](){
         o_settings.mouse_released = true;
         o_settings.pos = pos;
+        o_settings.right_click = right_click;
     });
 }
 
 void VideoWidget::mouse_moved(QPoint pos) {
     update_overlay_settings([&](){
         o_settings.mouse_moved = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_scroll(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_scroll = true;
         o_settings.pos = pos;
     });
 }
@@ -1087,6 +1106,8 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
+    brightness = b_val;
+    contrast = c_val;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1160,3 +1181,10 @@ void VideoWidget::frame_line_edit_finished() {
     }
 }
 
+int VideoWidget::get_brightness() {
+    return brightness;
+}
+
+double VideoWidget::get_contrast() {
+    return contrast;
+}

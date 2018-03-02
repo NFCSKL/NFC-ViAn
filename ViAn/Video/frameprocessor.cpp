@@ -41,10 +41,8 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
-        qDebug() << "in fp";
         // A new video has been loaded. Reset processing settings    
         if (m_new_video->load()) {
-            qDebug() << "fp load video";
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
@@ -59,11 +57,8 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
-            qDebug() << "fp overlay changed";
             m_overlay_changed->store(false);
-            qDebug() << "update_overlay";
             update_overlay_settings();
-            qDebug() << "update_overlay_end";
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load()) {
                 process_frame();
@@ -74,10 +69,7 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug() << "mchanged";
             m_changed->store(false);
-
-
             update_manipulator_settings();
             update_zoomer_settings();
 
@@ -91,7 +83,6 @@ void FrameProcessor::check_events() {
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
-            qDebug() << "new_frame";
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
             process_frame();
@@ -126,16 +117,12 @@ void FrameProcessor::process_frame() {
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
     // cv::imshow("test", tmp);
     // Draws the overlay
-    qDebug() << "draw overlay";
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
-    qDebug() << "overlay drawn";
 
     // Scales the frame
-    qDebug() << "scale frame";
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
-    qDebug () << "brightness contrast";
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
@@ -234,18 +221,26 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;
         m_overlay->clear(curr_frame);
+    // Delete the current drawing
+    } else if (m_o_settings->delete_drawing) {
+        m_o_settings->delete_drawing = false;
+        m_overlay->delete_drawing(curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
-        m_overlay->mouse_pressed(m_o_settings->pos, curr_frame);
+        m_overlay->mouse_pressed(m_o_settings->pos, curr_frame, m_o_settings->right_click);
     // Mouse released action
     } else if (m_o_settings->mouse_released) {
         m_o_settings->mouse_released = false;
-        m_overlay->mouse_released(m_o_settings->pos, curr_frame);
+        m_overlay->mouse_released(m_o_settings->pos, curr_frame, m_o_settings->right_click);
     // Mouse moved action
     } else if (m_o_settings->mouse_moved) {
         m_o_settings->mouse_moved = false;
         m_overlay->mouse_moved(m_o_settings->pos, curr_frame);
+    // Mouse scroll wheel action
+    } else if (m_o_settings->mouse_scroll) {
+        m_o_settings->mouse_scroll = false;
+        m_overlay->mouse_scroll(m_o_settings->pos, curr_frame);
     }
 }
 

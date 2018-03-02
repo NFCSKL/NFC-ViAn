@@ -1,5 +1,6 @@
 #include "shape.h"
 #include <iostream>
+#include <QDebug>
 
 /**
  * @brief Shape::Shape
@@ -7,7 +8,7 @@
  */
 Shape::Shape(SHAPES s) {
     shape = s;
-    colour = cv::Scalar();
+    color = cv::Scalar();
     draw_start = cv::Point();
     draw_end = cv::Point();
 }
@@ -19,7 +20,7 @@ Shape::Shape(SHAPES s) {
  */
 Shape::Shape(SHAPES s, QColor col, QPoint pos) {
     shape = s;
-    colour = qcolor_to_scalar(col);
+    color = qcolor_to_scalar(col);
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
 }
@@ -33,6 +34,27 @@ void Shape::update_drawing_pos(QPoint pos) {
     // Call handle_new_pos first because it might need the old draw_end value.
     handle_new_pos(pos);
     draw_end = qpoint_to_point(pos);
+}
+
+/**
+ * @brief Shape::update_text_pos
+ * Updates the start and end point of the text-drawing
+ * @param pos
+ */
+void Shape::update_text_pos(QPoint pos) {
+    draw_start = qpoint_to_point(pos);
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
+}
+
+/**
+ * @brief Shape::move_shape
+ * @param diff_point
+ * Adds the diff_pointer to the shape and therefore moves it that much
+ */
+void Shape::move_shape(QPoint diff_point) {
+    draw_start += qpoint_to_point(diff_point);
+    draw_end += qpoint_to_point(diff_point);
 }
 
 /**
@@ -58,6 +80,64 @@ cv::Point Shape::qpoint_to_point(QPoint pnt) {
 }
 
 /**
+ * @brief Shape::get_draw_start
+ * @return draw_start
+ */
+cv::Point Shape::get_draw_start() {
+    return draw_start;
+}
+
+/**
+ * @brief Shape::get_draw_end
+ * @return draw_end
+ */
+cv::Point Shape::get_draw_end() {
+    return draw_end;
+}
+
+/**
+ * @brief Shape::get_shape
+ * @return shape
+ */
+SHAPES Shape::get_shape() {
+    return shape;
+}
+
+void Shape::set_text_size(cv::Size size) {
+    text_size = size;
+}
+
+/**
+ * @brief Shape::invert_color
+ * Inverts the color by subtracting its RGB value from 255
+ */
+void Shape::invert_color() {
+    color = cv::Scalar::all(RGB_MAX) - color;
+    inverted = !inverted;
+}
+
+/**
+ * @brief Shape::set_thickness
+ * Sets the shape's thickness with checks so it can't go into the negatives.
+ * Circle and rectangle allow one step of negative which will fill the shape.
+ * @param pos
+ */
+void Shape::set_thickness(QPoint pos) {
+    int new_thick = thickness + pos.y();
+    if ((shape == CIRCLE || shape == RECTANGLE) && new_thick <= -2) return;
+    if (!(shape == CIRCLE || shape == RECTANGLE) && new_thick <= -1) return;
+    thickness = new_thick;
+}
+
+void Shape::set_current_frame(int frame) {
+    current_frame = frame;
+}
+
+int Shape::get_current_frame() {
+    return current_frame;
+}
+
+/**
  * @brief Shape::read_shape
  * @param json
  * Reads a shape from a Json object.
@@ -65,9 +145,9 @@ cv::Point Shape::qpoint_to_point(QPoint pnt) {
 void Shape::read_shape(const QJsonObject& json){
     int shape_i = json["shape"].toInt();
     this->shape = static_cast<SHAPES>(shape_i);
-    this->colour[0] = json["b"].toInt();
-    this->colour[1] = json["g"].toInt();
-    this->colour[2] = json["r"].toInt();
+    this->color[0] = json["b"].toInt();
+    this->color[1] = json["g"].toInt();
+    this->color[2] = json["r"].toInt();
     this->draw_start.x = json["p1x"].toInt();
     this->draw_start.y = json["p1y"].toInt();
     this->draw_end.x = json["p2x"].toInt();
@@ -78,12 +158,19 @@ void Shape::read_shape(const QJsonObject& json){
  * @brief Shape::write_shape
  * @param json
  * Writes a shape to a Json object.
+ * If the shape is the current_drawing, save its original color instead of the inverted
  */
 void Shape::write_shape(QJsonObject& json){
     json["shape"] = this->shape;
-    json["b"] = this->colour[0];
-    json["g"] = this->colour[1];
-    json["r"] = this->colour[2];
+    if (inverted) {
+        json["b"] = RGB_MAX - this->color[0];
+        json["g"] = RGB_MAX - this->color[1];
+        json["r"] = RGB_MAX - this->color[2];
+    } else {
+        json["b"] = this->color[0];
+        json["g"] = this->color[1];
+        json["r"] = this->color[2];
+    }
     json["p1x"] = this->draw_start.x;
     json["p1y"] = this->draw_start.y;
     json["p2x"] = this->draw_end.x;

@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QSize>
 
 #include "opencv2/opencv.hpp"
@@ -76,9 +77,10 @@ signals:
     void send_tool_text(QString, float);
     void send_color(QColor color);
 
-    void mouse_pressed(QPoint);
-    void mouse_released(QPoint);
+    void mouse_pressed(QPoint, bool);
+    void mouse_released(QPoint, bool);
     void mouse_moved(QPoint);
+    void mouse_scroll(QPoint);
 public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
     void toggle_zoom(bool value);
@@ -106,6 +108,8 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+
+    void wheelEvent(QWheelEvent *event) override;
 private:
     void init_panning(QPoint pos);
     void set_rect_start(QPoint pos);
