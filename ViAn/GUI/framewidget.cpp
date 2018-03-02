@@ -355,9 +355,10 @@ void FrameWidget::set_analysis_settings() {
         settings->setBounding_box(scaled);
 
         emit quick_analysis(settings);
-        tool = NONE;
-        show_box = false;
+        //tool = NONE;
+        //show_box = false;
     }
+    mark_rect = false;
     repaint();
 }
 

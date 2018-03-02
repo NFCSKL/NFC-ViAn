@@ -81,12 +81,3 @@ void QueueWidget::update_progress(int i) {
     progressbar->setValue(i);
 }
 
-/**
- * @brief QueueWidget::toggle_show
- * Hide/Show this widget
- */
-void QueueWidget::toggle_show() {
-    if(this->isVisible()) hide();
-    else show();
-}
-

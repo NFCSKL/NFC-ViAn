@@ -23,6 +23,7 @@ class BasicAnalysis : public Saveable
 
 public:
     std::string m_name = "2";
+    interval_set m_intervals;
     std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
     cv::Rect bounding_box;
     bool use_interval = false;
@@ -30,7 +31,7 @@ public:
 
 
 protected:
-    interval_set m_intervals;
+
 public:
 
     BasicAnalysis();
