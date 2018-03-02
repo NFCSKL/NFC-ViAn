@@ -11,8 +11,7 @@ AnalysisProxy::AnalysisProxy()
 }
 
 AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
-    file_analysis(file_analysis)    
-{
+    file_analysis(file_analysis) {
 }
 
 /**
@@ -27,8 +26,8 @@ Analysis* AnalysisProxy::load_analysis() {
 AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
     : BasicAnalysis(other),
       file_analysis(file),
-      type(other.type)
-{
+      type(other.type) {
+
 }
 
 AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :

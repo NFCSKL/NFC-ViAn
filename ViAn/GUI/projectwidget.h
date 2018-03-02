@@ -48,6 +48,7 @@ signals:
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
+    void show_analysis_details(bool);
 
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
@@ -79,6 +80,8 @@ private slots:
     void context_menu(const QPoint& point);
     void remove_item();
     void rename_item();
+    void show_details();
+    void hide_details();
     void create_folder_item();
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
     void check_selection();

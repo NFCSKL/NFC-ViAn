@@ -41,10 +41,10 @@ public:
 
     StatusBar* status_bar;
     DrawingToolbar* draw_toolbar;
-    QAction* show_analysis_queue;
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;
+    QAction* ana_details_act;
     QAction* drawing_act;
 
     QAction* color_act;
@@ -67,6 +67,7 @@ private slots:
     void delete_drawing();
     void zoom();
     void move();
+    void set_ana_details(bool);
 
 public slots:
     void options(void);

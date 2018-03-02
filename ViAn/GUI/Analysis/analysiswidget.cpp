@@ -23,6 +23,7 @@ void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
  */
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
+    // Add the analysis to the queue in the queue widget
     m_queue_wgt->enqueue(method);
     emit show_analysis_queue(true);
     if (!analysis_queue.empty()) {

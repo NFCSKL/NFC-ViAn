@@ -5,6 +5,15 @@
  * @param json
  */
 void Analysis::read(const QJsonObject &json){
+    int height = json["bounding box height"].toInt();
+    int width = json["bounding box width"].toInt();
+    int y = json["bounding box y"].toInt();
+    int x = json["bounding box x"].toInt();
+    this->bounding_box = cv::Rect(x, y, width, height);
+
+    this->m_ana_interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
+
+
     this->type = (ANALYSIS_TYPE)json["type"].toInt();
     this->m_name = json["name"].toString().toStdString();
     QJsonArray json_pois = json["POI:s"].toArray();
@@ -22,6 +31,12 @@ void Analysis::read(const QJsonObject &json){
  * @param json
  */
 void Analysis::write(QJsonObject &json){
+    json["bounding box height"] = this->bounding_box.height;
+    json["bounding box width"] = this->bounding_box.width;
+    json["bounding box y"] = this->bounding_box.y;
+    json["bounding box x"] = this->bounding_box.x;
+    json["interval start"] = this->m_ana_interval.first;
+    json["interval end"] = this->m_ana_interval.second;
     json["type"] = this->type;
     json["name"] = QString::fromStdString(this->m_name);
     QJsonArray json_POIs;

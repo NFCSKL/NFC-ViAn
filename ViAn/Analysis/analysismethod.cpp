@@ -70,9 +70,9 @@ void AnalysisMethod::run() {
     int start_frame = 0;
     // If Interval should be used, use interval frames
     if(use_interval){
-        start_frame = interval.get_start();
+        start_frame = interval.first;
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
-        end_frame = interval.get_end();
+        end_frame = interval.second;
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame;
     }
@@ -139,11 +139,36 @@ void AnalysisMethod::run() {
             m_analysis.add_interval(m_POI);
         }
         capture.release();
+        m_analysis.m_ana_interval = interval;
+        m_analysis.bounding_box = bounding_box;
+        m_analysis.use_interval = use_interval;
+        m_analysis.use_bounding_box = use_bounding_box;
+        m_save_path = check_save_path(m_save_path);
         m_analysis.save_saveable(m_save_path);
         AnalysisProxy proxy(m_analysis, m_analysis.full_path());       
         emit finished_analysis(proxy);
         emit finito();
     }
+}
+
+/**
+ * @brief AnalysisMethod::check_save_path
+ * @param path
+ * @param increment
+ * @return new save path
+ * Checks if path exists and if it does adds a number to the end to prevent
+ * that path overwrites the old one
+ */
+std::string AnalysisMethod::check_save_path(std::string path, int increment) {
+    std::string new_path = path + std::to_string(increment);
+    QFile file(QString::fromStdString(path));
+    QFile new_file(QString::fromStdString(new_path));
+    if (!file.exists()) {
+        return path;
+    } else if (!new_file.exists()) {
+        return new_path;
+    }
+    return check_save_path(path, ++increment);
 }
 
 /**
@@ -199,19 +224,20 @@ void AnalysisMethod::scale_frame() {
  *  Getters and setters
  */
 
-void AnalysisMethod::setBounding_box(const cv::Rect &value)
-{
+cv::Rect AnalysisMethod::get_bounding_box() const {
+    return bounding_box;
+}
+
+void AnalysisMethod::setBounding_box(const cv::Rect &value) {
     bounding_box = value;
     use_bounding_box = true;
 }
 
-AnalysisInterval AnalysisMethod::getInterval() const
-{
+std::pair<int, int> AnalysisMethod::get_interval() const {
     return interval;
 }
 
-void AnalysisMethod::setInterval(const AnalysisInterval &value)
-{
+void AnalysisMethod::set_interval(const std::pair<int, int> &value) {
     interval = value;
     use_interval = true;
 }

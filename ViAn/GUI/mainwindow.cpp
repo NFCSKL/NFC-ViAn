@@ -128,7 +128,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
     connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisProxy*)));
+    connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->playback_slider, SLOT(set_analysis(AnalysisProxy*)));
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
+    connect(project_wgt, SIGNAL(show_analysis_details(bool)), video_wgt->playback_slider, SLOT(set_show_ana_interval(bool)));
+    connect(project_wgt, SIGNAL(show_analysis_details(bool)), video_wgt->frame_wgt, SLOT(show_bounding_box(bool)));
+    connect(project_wgt, SIGNAL(show_analysis_details(bool)), this, SLOT(set_ana_details(bool)));
 
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
 
@@ -282,16 +286,19 @@ void MainWindow::init_view_menu() {
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
     interval_act = new QAction(tr("&Interval"), this);
+    ana_details_act = new QAction(tr("Analysis &Details"), this);
     drawing_act = new QAction(tr("&Paintings"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
     interval_act->setCheckable(true);
+    ana_details_act->setCheckable(true);
     drawing_act->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
     interval_act->setChecked(true);
+    ana_details_act->setChecked(false);
     drawing_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
@@ -301,6 +308,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
     view_menu->addAction(interval_act);
+    view_menu->addAction(ana_details_act);
     view_menu->addAction(drawing_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
@@ -309,6 +317,7 @@ void MainWindow::init_view_menu() {
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
+    ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
@@ -317,6 +326,9 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
+    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
 }
 
@@ -514,6 +526,10 @@ void MainWindow::zoom() {
 
 void MainWindow::move() {
     video_wgt->frame_wgt->set_tool(MOVE);
+}
+
+void MainWindow::set_ana_details(bool b) {
+    ana_details_act->setChecked(b);
 }
 
 /**

@@ -115,7 +115,7 @@ void ProjectWidget::add_video() {
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
     AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
-    if(settings->use_interval) method->setInterval(settings->interval);
+    if(settings->use_interval) method->set_interval(settings->get_interval());
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -431,7 +431,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         emit enable_tag_btn(false);
-        emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());
@@ -499,11 +498,15 @@ void ProjectWidget::context_menu(const QPoint &point) {
         // Clicked on item
         menu.addAction("New Folder", this, SLOT(create_folder_item()));
         menu.addSeparator();
-
-        switch (selectedItems().front()->type()) {
+        QTreeWidgetItem* item = selectedItems().front();
+        switch (item->type()) {
             case TAG_ITEM:
+                menu.addAction("Rename", this, SLOT(rename_item()));
+                break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Show details", this, SLOT(show_details()));
+                menu.addAction("Hide details", this, SLOT(hide_details()));
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -520,6 +523,23 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Remove", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
+}
+
+/**
+ * @brief ProjectWidget::show_details
+ * @param ana_item
+ * Show the analysis' details; interval and bounding box
+ */
+void ProjectWidget::show_details() {
+    emit show_analysis_details(true);
+}
+
+/**
+ * @brief ProjectWidget::hide_details
+ * Hide the analysis' details; interval and bounding box
+ */
+void ProjectWidget::hide_details() {
+    emit show_analysis_details(false);
 }
 
 

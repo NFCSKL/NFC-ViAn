@@ -6,7 +6,11 @@ BasicAnalysis::BasicAnalysis() {}
 
 BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
     m_name(other.m_name),
-    m_intervals(other.m_intervals) {
+    m_intervals(other.m_intervals),
+    m_ana_interval(other.m_ana_interval),
+    bounding_box(other.bounding_box),
+    use_interval(other.use_interval),
+    use_bounding_box(other.use_bounding_box){
 }
 
 /**
@@ -61,12 +65,18 @@ void BasicAnalysis::write(QJsonObject &json){
     json["POI:s"] = json_ais;
 }
 
-std::string BasicAnalysis::get_name() const
-{
+std::string BasicAnalysis::get_name() const {
     return m_name;
 }
 
-interval_set BasicAnalysis::get_intervals() const
-{
+interval_set BasicAnalysis::get_intervals() const {
     return m_intervals;
+}
+
+std::pair<int, int> BasicAnalysis::get_ana_interval() const {
+    return m_ana_interval;
+}
+
+cv::Rect BasicAnalysis::get_bounding_box() const {
+    return bounding_box;
 }

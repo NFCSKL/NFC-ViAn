@@ -26,7 +26,6 @@ void FrameWidget::set_analysis_tool(bool status) {
         tool = NONE;
         unsetCursor();
     }
-
 }
 
 
@@ -34,8 +33,14 @@ void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
 
+/**
+ * @brief FrameWidget::set_analysis
+ * @param analysis
+ * Set the analysis and the pois on the current frame
+ */
 void FrameWidget::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis->load_analysis();
+    set_detections_on_frame(current_frame_nr);
 }
 
 /**
@@ -62,6 +67,11 @@ void FrameWidget::set_detections_on_frame(int frame_num) {
     }
 }
 
+void FrameWidget::show_bounding_box(bool b) {
+    show_box = b;
+    repaint();
+}
+
 void FrameWidget::set_detections(bool detections) {
     m_detections = detections;
 }
@@ -80,6 +90,10 @@ Overlay* FrameWidget::get_overlay() {
 
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
+}
+
+void FrameWidget::set_current_frame_nr(int nr) {
+    current_frame_nr = nr;
 }
 
 void FrameWidget::update(){
@@ -175,7 +189,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (mark_rect) {
-
+        // Draw the zoom box with correct dimension
         if(tool == ZOOM){
             QPoint start = rect_start;
             QPoint end = rect_end;
@@ -192,9 +206,24 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             QRectF tmp(start, end);
             painter.drawRect(tmp);
         }
+        // Draw the zoom box
         painter.setPen(QColor(0,255,0));
         QRectF zoom(rect_start, rect_end);
         painter.drawRect(zoom);
+    }
+
+
+    if(tool == ANALYSIS_BOX){
+        painter.setPen(QColor(0,255,0));
+        QRectF analysis(ana_rect_start, ana_rect_end);
+        painter.drawRect(analysis);
+    }
+    if (show_box && m_analysis != nullptr) {
+        painter.setPen(QColor(180,200,200));
+        QPoint tl(m_analysis->bounding_box.x, m_analysis->bounding_box.y);
+        QPoint br(m_analysis->bounding_box.x+m_analysis->bounding_box.width, m_analysis->bounding_box.y+m_analysis->bounding_box.height);
+        QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+        painter.drawRect(bounding_rect);
     }
     if (m_detections && show_detections) {
         for (cv::Rect rect : ooi_rects) {
@@ -229,8 +258,10 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
-        if(event->button() == Qt::LeftButton)
-            set_rect_start(event->pos());
+        if(event->button() == Qt::LeftButton) {
+            ana_rect_start = event->pos();
+            ana_rect_end = event->pos();
+        }
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
@@ -239,7 +270,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             if (event->modifiers() == Qt::ControlModifier) {
                 do_zoom_out = true;
             } else {
-                set_rect_start(event->pos());
+                rect_start = event->pos();
             }
         }
         break;
@@ -292,11 +323,16 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case NONE:
         break;
     case ANALYSIS_BOX:
+        if (event->buttons() == Qt::LeftButton) {
+            ana_rect_end = rect_update(event->pos());
+        }
+        break;
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
         } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
-            rect_update(event->pos());
+            rect_end = rect_update(event->pos());
+            mark_rect = true;
         }
         break;
     default:
@@ -326,15 +362,15 @@ void FrameWidget::set_analysis_settings() {
     if (reply == QMessageBox::Yes) {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
 
-        cv::Point end = cv::Point(rect_end.x(), rect_end.y());
-        cv::Point start (rect_start.x(), rect_start.y());
+        cv::Point end = cv::Point(ana_rect_end.x(), ana_rect_end.y());
+        cv::Point start (ana_rect_start.x(), ana_rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
                       cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));
         settings->setBounding_box(scaled);
 
         emit quick_analysis(settings);
     }
-    mark_rect = false;
+    ana_rect_end = ana_rect_start;
     repaint();
 }
 
@@ -350,15 +386,6 @@ void FrameWidget::set_scale_factor(double scale_factor) {
 void FrameWidget::init_panning(QPoint pos) {
     prev_pos = pos;
     setCursor(Qt::ClosedHandCursor);
-}
-
-/**
- * @brief FrameWidget::init_zoom
- * Init zoom on frame
- * @param pos
- */
-void FrameWidget::set_rect_start(QPoint pos) {
-    rect_start = pos;
 }
 
 /**
@@ -378,15 +405,14 @@ void FrameWidget::panning(QPoint pos) {
  * Updates and redraws the zooming rect
  * @param pos
  */
-void FrameWidget::rect_update(QPoint pos) {
+QPoint FrameWidget::rect_update(QPoint pos) {
     // Force image boundries
     int tmpx = std::min(pos.x(),_qimage.width()-1);
     int ex = std::max(0, tmpx);
     int tmpy = std::min(pos.y(), _qimage.height()-1);
     int ey = std::max(0,tmpy);
-    rect_end = QPoint(ex, ey);
-    mark_rect = true;
     repaint();
+    return QPoint(ex, ey);
 }
 
 /**

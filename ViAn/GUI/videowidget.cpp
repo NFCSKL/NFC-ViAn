@@ -82,7 +82,7 @@ int VideoWidget::get_current_video_length(){
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
-        settings->setInterval(AnalysisInterval(m_interval.first,m_interval.second));
+        settings->setInterval(m_interval);
         delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);
@@ -333,7 +333,7 @@ void VideoWidget::init_speed_slider() {
     label1->setFont(f);
     label2->setFont(f);
     label3->setFont(f);
-    //laout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
+    //layout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
     speed_slider_layout->addWidget(speed_slider, 0, 0, 1, 5);
     speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
     speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
@@ -777,6 +777,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     playback_slider->update();
+    frame_wgt->set_current_frame_nr(frame_num);
 }
 
 /**

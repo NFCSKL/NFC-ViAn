@@ -14,7 +14,7 @@
  */
 class AnalysisProxy : public BasicAnalysis
 {
-    std::string file_analysis = "";    
+    std::string file_analysis = "";  // m_analysis.full_path()
     ANALYSIS_TYPE type;
 public:
     AnalysisProxy();
