@@ -60,7 +60,9 @@ SOURCES += main.cpp \
     Analysis/analysissettings.cpp \
     GUI/Analysis/analysisdialog.cpp \
     GUI/Analysis/videolistitem.cpp \
-    GUI/Analysis/queuewidget.cpp
+    GUI/Analysis/queuewidget.cpp \
+    Project/Analysis/drawingtag.cpp \
+    GUI/TreeItems/drawingtagitem.cpp
 
 #
 # TEST
@@ -110,7 +112,9 @@ HEADERS += reportgenerator.h\
     Analysis/analysismethod.h \
     GUI/Analysis/analysisdialog.h \
     GUI/Analysis/videolistitem.h \
-    GUI/Analysis/queuewidget.h
+    GUI/Analysis/queuewidget.h \
+    Project/Analysis/drawingtag.h \
+    GUI/TreeItems/drawingtagitem.h
 
 #
 # LIBRARY

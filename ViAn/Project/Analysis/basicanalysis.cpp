@@ -1,6 +1,7 @@
 #include "basicanalysis.h"
 #include "tag.h"
 #include "analysis.h"
+#include "drawingtag.h"
 
 BasicAnalysis::BasicAnalysis() {}
 
@@ -20,6 +21,10 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
  */
 void BasicAnalysis::add_interval(AnalysisInterval *ai){
     m_intervals.insert(ai);
+}
+
+void BasicAnalysis::clear_intervals() {
+    m_intervals.clear();
 }
 
 SAVE_TYPE BasicAnalysis::get_save_type() const

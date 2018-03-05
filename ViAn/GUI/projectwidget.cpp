@@ -1,6 +1,5 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
-#include "GUI/TreeItems/analysisitem.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -134,21 +133,31 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
  * Adds a tag 'tag' under vid_proj
  */
 void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* tag) {
-    TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(tag));
     vid_proj->add_analysis(tag);
-
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
         set_status_bar("Something went wrong when adding tag: " + QString::fromStdString(tag->get_name()));
         return;
     }
 
-    vid_item->addChild(tag_item);
+    if (tag->get_type() == DRAWING_TAG) {
+        DrawingTagItem* item = new DrawingTagItem(dynamic_cast<DrawingTag*>(tag));
+        vid_item->addChild(item);
+        clearSelection();
+        item->setSelected(true);
+        tree_item_clicked(item);
+    } else {
+        TagItem* item = new TagItem(dynamic_cast<Tag*>(tag));
+        vid_item->addChild(item);
+        clearSelection();
+        item->setSelected(true);
+        tree_item_clicked(item);
+    }
     vid_item->setExpanded(true);
 }
 
 /**
- * @brief ProjectWidget::set_tree_item_namebei
+ * @brief ProjectWidget::set_tree_item_name
  * @param item
  * @param name
  * Slot to set the name if an item in the project tree
@@ -421,7 +430,9 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    get_index_path(item);
+    Q_UNUSED(col)
+    get_index_path(item); //Remove?
+
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -441,6 +452,15 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_detections(true);
         emit set_poi_slider(true);
         emit enable_poi_btns(true, true);
+        emit update_frame();
+        break;
+    } case DRAWING_TAG_ITEM: {
+        tree_item_clicked(item->parent());
+        DrawingTagItem* tag_item = dynamic_cast<DrawingTagItem*>(item);
+        emit marked_basic_analysis(tag_item->get_tag());
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+        emit enable_tag_btn(true);
         emit update_frame();
         break;
     } case TAG_ITEM: {
@@ -503,6 +523,9 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 break;
+            case DRAWING_TAG_ITEM:
+                menu.addAction("Update", this, SLOT(update_tag_drawing()));
+                break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Show details", this, SLOT(show_details()));
@@ -514,6 +537,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Tag drawings", this, SLOT(tag_drawings()));
             default:
                 // VIDEO_ITEM
                 break;
@@ -523,6 +547,36 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Remove", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
+}
+
+void ProjectWidget::tag_drawings() {
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
+    BasicAnalysis* basic_tag = new DrawingTag();
+    basic_tag->m_name = "Drawings tag";
+    VideoProject* vid_proj = vid_item->get_video_project();
+    DrawingTag* tag = dynamic_cast<DrawingTag*>(basic_tag);
+
+    for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
+        if (frame_overlay.second.overlay.size() > 0) {
+            tag->add_frame(frame_overlay.first);
+        }
+    }
+    add_basic_analysis(vid_proj, basic_tag);
+}
+
+void ProjectWidget::update_tag_drawing() {
+    DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    VideoProject* vid_proj = vid_item->get_video_project();
+    DrawingTag* tag = item->get_tag();
+    tag->clear_intervals();
+    for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
+        if (frame_overlay.second.overlay.size() > 0) {
+            tag->add_frame(frame_overlay.first);
+        }
+    }
+
+    tree_item_clicked(item);
 }
 
 /**

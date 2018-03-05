@@ -9,14 +9,16 @@
 #include <vector>
 #include "Project/project.h"
 #include "GUI/TreeItems/tagitem.h"
+#include "GUI/TreeItems/analysisitem.h"
+#include "GUI/TreeItems/drawingtagitem.h"
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
+#include "Project/Analysis/drawingtag.h"
 #include "Project/videoproject.h"
 #include "Analysis/analysismethod.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysisdialog.h"
-#include "TreeItems/analysisitem.h"
 class Project;
 class VideoItem;
 class FolderItem;
@@ -80,6 +82,8 @@ private slots:
     void context_menu(const QPoint& point);
     void remove_item();
     void rename_item();
+    void tag_drawings();
+    void update_tag_drawing();
     void show_details();
     void hide_details();
     void create_folder_item();

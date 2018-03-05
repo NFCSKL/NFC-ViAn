@@ -8,7 +8,7 @@
 #include <typeinfo>
 #include <QPoint>
 #include <QJsonArray>
-enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG =2, BASIC_ANALYSIS =3};
+enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG =2, BASIC_ANALYSIS =3, DRAWING_TAG = 4};
 enum SAVE_TYPE {DETECTION=10, INTERVAL=11};
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
                                                                      std::make_pair("Tag",TAG)};
@@ -42,6 +42,7 @@ public:
     virtual SAVE_TYPE get_save_type() const;
     virtual ANALYSIS_TYPE get_type() const;
 
+    void clear_intervals();
     std::string get_name() const;
     interval_set get_intervals() const;
     std::pair<int, int> get_ana_interval() const;
