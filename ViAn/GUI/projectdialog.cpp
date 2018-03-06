@@ -32,6 +32,8 @@ ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
 
+    path_text->setText("C:/");
+
     QHBoxLayout* browse_layout = new QHBoxLayout;
     browse_layout->addWidget(path_text);
     browse_layout->addWidget(browse_btn);

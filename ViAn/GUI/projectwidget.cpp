@@ -112,7 +112,7 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir());
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir(), m_proj->get_dir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->set_interval(settings->get_interval());
 
@@ -146,7 +146,7 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
         clearSelection();
         item->setSelected(true);
         tree_item_clicked(item);
-    } else {
+    } else if (tag->get_type() == TAG) {
         TagItem* item = new TagItem(dynamic_cast<Tag*>(tag));
         vid_item->addChild(item);
         clearSelection();
@@ -328,7 +328,7 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM) {
+        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM || child->type() == DRAWING_TAG_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
             r_item->rename();
         }
@@ -346,9 +346,14 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-        } else {
+        } else if (ana.second->get_type() == DRAWING_TAG) {
+            DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<DrawingTag*>(ana.second));
+            v_item->addChild(tag_item);
+        } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else {
+            qWarning() << "Something went wrong while adding analyses to items.";
         }
     }
 }
@@ -405,7 +410,7 @@ void ProjectWidget::advanced_analysis() {
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_tmp_dir());
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_tmp_dir(), m_proj->get_dir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }
@@ -679,7 +684,7 @@ void ProjectWidget::save_project() {
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
     m_proj->save_project();
-    m_proj->move_project_from_tmp();
+    m_proj->move_project_from_tmp(); // might not want
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file());
@@ -701,7 +706,7 @@ void ProjectWidget::open_project(QString project_path) {
     m_proj = new_proj;
     set_status_bar("Opening project");
     // Load project tree structure
-    ProjectTreeState tree_state;
+    ProjectTreeState tree_state; //Some error/Warning
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
     set_main_window_name(QString::fromStdString(m_proj->get_name()));

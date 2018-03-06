@@ -43,7 +43,7 @@ ANALYSIS_TYPE BasicAnalysis::get_type() const
  * @param json
  */
 void BasicAnalysis::read(const QJsonObject &json){
-    this->m_name = json["name"].toString().toStdString();
+    m_name = json["name"].toString().toStdString();
     QJsonArray json_intervals = json["POI:s"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_interval = json_intervals[i].toObject();

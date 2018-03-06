@@ -24,10 +24,11 @@ class AnalysisDialog : public QDialog
     std::map<std::string,QLineEdit*> m_settings;
     // Directory to save analysis
     std::string m_save_dir;
+    std::string m_tmp_save_dir;
 
     MotionDetection* method;
 public:
-    AnalysisDialog(std::vector<VideoItem*> vid_projs, string save_dir);
+    AnalysisDialog(std::vector<VideoItem*> vid_projs, string tmp_save_dir, string save_dir);
 public slots:
     void ok_btn_clicked();
     void cancel_btn_clicked();

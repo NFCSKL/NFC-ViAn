@@ -379,16 +379,21 @@ void Overlay::read(const QJsonObject& json) {
 void Overlay::write(QJsonObject& json) {
     QJsonArray json_overlays;
     for (auto const& map_entry : overlays) {
-        QJsonObject json_overlay;
-        QJsonArray json_drawings;
-        for (auto it = map_entry.second.overlay.begin(); it != map_entry.second.drawn; it ++) {  // Second member is the value, i.e. the drawings.
-            QJsonObject json_shape;
-            (*it)->write(json_shape);
-            json_drawings.append(json_shape);
+        if (map_entry.second.overlay.begin() != map_entry.second.drawn) {
+            QJsonObject json_overlay;
+            QJsonArray json_drawings;
+            qDebug() << "in write";
+            qDebug() << "size" << map_entry.second.overlay.size();
+            for (auto it = map_entry.second.overlay.begin(); it != map_entry.second.drawn; it ++) {  // Second member is the value, i.e. the drawings.
+                qDebug() << "in for";
+                QJsonObject json_shape;
+                (*it)->write(json_shape);
+                json_drawings.append(json_shape);
+            }
+            json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
+            json_overlay["drawings"] = json_drawings;
+            json_overlays.push_back(json_overlay);
         }
-        json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
-        json_overlay["drawings"] = json_drawings;
-        json_overlays.push_back(json_overlay);
     }
     json["overlays"] = json_overlays;
 }

@@ -15,7 +15,7 @@
 class AnalysisProxy : public BasicAnalysis
 {
     std::string file_analysis = "";  // m_analysis.full_path()
-    ANALYSIS_TYPE type;
+    ANALYSIS_TYPE type = MOTION_DETECTION;
 public:
     AnalysisProxy();
     AnalysisProxy(const std::string file_analysis);

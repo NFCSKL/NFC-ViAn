@@ -27,7 +27,9 @@ class AnalysisMethod : public QObject ,public QRunnable{
     Settings m_settings;                // Custom integer settings for constants
     SettingsDescr m_descriptions;       // Descriptions for settings constants
     std::string m_save_path;            // Save path for finished analysis
+    std::string m_tmp_save_path;        // Temp save path for finished analysis
     std::string m_source_file;          // Source video file used by opencv capture
+    std::string m_ana_name;             // The name of the analysis
 
     bool m_scaling_done = false;        // Control states
     int prev_detection_frame = -1;
@@ -76,7 +78,7 @@ protected:
     void scale_frame();
 
 public:
-     AnalysisMethod(const std::string &video_path, const std::string& save_path);
+     AnalysisMethod(const std::string &video_path, const std::string &tmp_save_path, const std::string& save_path);
 
     std::string get_descr(const std::string& var_name);          // Get variable description
     virtual int get_setting(const std::string& var);             // Get integer value for variable
@@ -91,11 +93,12 @@ public:
     std::pair<int, int> get_interval() const;
     void set_interval(const std::pair<int, int> &value);
     std::string save_path() const;
+    std::string tmp_save_path() const;
 
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
     void set_analysis_area(cv::Rect area);
 
-    std::string check_save_path(std::string path, int increment = 2);
+    std::string check_save_path(std::string name, int increment = 2);
 
     bool sample_current_frame(); // Check if current frame is to be sampled
 

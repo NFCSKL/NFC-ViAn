@@ -12,7 +12,7 @@ Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->load_saveable(full_path);
     // ensure changes to paths are saved
-    proj->save_saveable(full_path);
+    //proj->save_saveable(full_path);
     if(proj->tmp_dir.isValid()){
         proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
         proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";
@@ -29,7 +29,7 @@ Project* Project::fromFile(const std::string &full_path){
  */
 Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;
-    m_dir = dir_path + "/" + name + "/";
+    m_dir = dir_path + name + "/";
     m_file = m_dir + name + ".vian";
     if(tmp_dir.isValid()){
         m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
@@ -143,7 +143,7 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(m_name);
-    json["root_dir"] =  QString::fromStdString(m_tmp_dir);
+    json["root_dir"] =  QString::fromStdString(m_dir);
     QJsonArray json_proj;
     // Write Videos to json
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){
@@ -175,8 +175,8 @@ bool Project::save_project(){
 }
 
 /**
- * @brief Project::save_project
- * @return sets saved =true
+ * @brief Project::move_project_from_tmp
+ * @return true if success
  */
 bool Project::move_project_from_tmp(){
     return copy_directory_files(QString::fromStdString(m_tmp_dir), QString::fromStdString(m_dir), true);
