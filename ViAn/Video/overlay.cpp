@@ -249,6 +249,7 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
+    if (!current_drawing) return;
     if (current_drawing->get_current_frame() == frame_nr && show_overlay) {
         current_drawing->set_thickness(pos);
     }
