@@ -18,6 +18,7 @@ public:
 
 signals:
     void project_path(QString name, QString path);
+    void open_project(QString proj_path);
 
 public slots:
 

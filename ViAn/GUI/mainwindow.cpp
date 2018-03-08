@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
     connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*)));
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
-    bookmark_dock->setWidget(bookmark_wgt);    
+    bookmark_dock->setWidget(bookmark_wgt);
 
     //Initialize menu bar
     init_file_menu();
@@ -111,6 +111,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
+
+    connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
+    connect(project_wgt, SIGNAL(item_removed(VideoProject*)), video_wgt, SLOT(remove_item(VideoProject*)));
 
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
@@ -577,6 +580,10 @@ void MainWindow::options() {
 }
 
 void MainWindow::open_project_dialog(){
-    QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
+    QString project_path = QFileDialog().getOpenFileName(
+                this,
+                tr("Open project"),
+                QDir::homePath(),
+                "*.vian");
     open_project(project_path);
 }

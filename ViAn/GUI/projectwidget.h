@@ -6,6 +6,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <vector>
 #include "Project/project.h"
 #include "GUI/TreeItems/tagitem.h"
 #include <stack>
@@ -28,6 +29,12 @@ class ProjectWidget : public QTreeWidget
     QPoint* clicked_point = nullptr;
     QTreeWidgetItem* selection_parent = nullptr;
     bool selecting = false;
+    std::set<std::string> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
+                                "264", "263", "mjpeg", "avc", "m2ts",
+                                "mts", "avi", "mov", "qt", "wmv", "mp4",
+                                "m4p", "m4v", "mpg", "mp2", "mpeg",
+                                "mpe", "mpv", "m2v", "m4v", "3gp", "3g2",
+                                "flv", "f4v", "f4p", "f4a", "f4b"};
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     Project* m_proj = nullptr;    
@@ -79,6 +86,7 @@ private slots:
 
     void update_item_data(QTreeWidgetItem *item, int column);
 private:
+    void set_main_window_name(QString name);
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
     QStringList mimeTypes() const;
@@ -93,6 +101,7 @@ private:
     void add_analyses_to_item(VideoItem* v_item);
 signals:
     void project_closed();
+    void item_removed(VideoProject* vid_proj);
 
 
 };

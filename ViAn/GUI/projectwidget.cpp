@@ -47,6 +47,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 void ProjectWidget::new_project() {
     ProjectDialog* proj_dialog = new ProjectDialog();
     QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
+    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
 }
 
 /**
@@ -60,7 +61,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     close_project();
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
-    parentWidget()->parentWidget()->setWindowTitle(project_name);
+    set_main_window_name(project_name);
     m_proj = new Project(_tmp_name, _tmp_path); 
     m_proj->save_project();
     _tmp_path.append(_tmp_name);
@@ -74,8 +75,21 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  */
 void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return;
-    // TODO: HANDLE CASE. Only open video files
-    QStringList video_paths = QFileDialog().getOpenFileNames(this, tr("Add video"), m_proj->getDir().c_str());
+
+    //Build string to limit file selection
+    QString extensions = "Videos (";
+    for (auto it = allowed_vid_exts.begin(); it != allowed_vid_exts.end(); ++it){
+        extensions += "*." + QString::fromStdString(*it) + " ";
+    }
+    extensions += ")";
+
+    // Create actual dialog
+    QStringList video_paths = QFileDialog().getOpenFileNames(
+                this,
+                tr("Add video"),
+                m_proj->getDir().c_str(),
+                extensions);
+
     for (auto video_path : video_paths){
         int index = video_path.lastIndexOf('/') + 1;
         QString vid_name = video_path.right(video_path.length() - index);
@@ -167,16 +181,10 @@ QStringList ProjectWidget::mimeTypes() const {
  * @param path  : path to the video file
  */
 void ProjectWidget::file_dropped(QString path) {
-    std::set<std::string> exts {"mkv", "flv", "vob", "ogv", "ogg",
-                                "264", "263", "mjpeg", "avc", "m2ts",
-                                "mts", "avi", "mov", "qt", "wmv", "mp4",
-                                "m4p", "m4v", "mpg", "mp2", "mpeg",
-                                "mpe", "mpv", "m2v", "m4v", "3gp", "3g2",
-                                "flv", "f4v", "f4p", "f4a", "f4b"};
     QFileInfo tmp(path);
     std::string ext = tmp.suffix().toStdString();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (exts.find(ext) != exts.end()) {
+    if (allowed_vid_exts.find(ext) != allowed_vid_exts.end()) {
         // Add file
         int index = path.lastIndexOf('/') + 1;
         QString vid_name = path.right(path.length() - index);
@@ -226,7 +234,7 @@ std::stack<int> ProjectWidget::get_index_path(QTreeWidgetItem *item){
 
 /**
  * @brief ProjectWidget::get_video_item
- * Searches the project tree for the VideoItem containing the VideoProjectt v_proj
+ * Searches the project tree for the VideoItem containing the VideoProject v_proj
  * @param v_proj    :   target VideoProject
  * @return VideoItem*   :   the correct VideoItem if found else nullptr
  */
@@ -584,11 +592,26 @@ void ProjectWidget::remove_item() {
     delete_box.setDefaultButton(QMessageBox::No);
     if (delete_box.exec() == QMessageBox::Yes) {
         for (auto item : selectedItems()) {
+            if (item->type() == FOLDER_ITEM) {
+                std::vector<VideoItem*> v_items;
+                get_video_items(item, v_items);
+                for (auto v_item : v_items) {
+                    emit item_removed(v_item->get_video_project());
+                }
+            }
+
+            else if (item->type() == VIDEO_ITEM) {
+                VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+                emit item_removed(vid_item->get_video_project());
+            }
+            // TODO Fix these cases
+//            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
+//
+//            }
             delete item;
         }
     }
     emit remove_overlay();
-
 }
 
 /**
@@ -669,7 +692,7 @@ bool ProjectWidget::open_project(QString project_path) {
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->getDir() + "treestate");
 
-    parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
+    set_main_window_name(QString::fromStdString(m_proj->getName()));
     emit proj_path(m_proj->getDir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
@@ -695,6 +718,8 @@ bool ProjectWidget::close_project() {
         }
     }
 
+    set_main_window_name(QString::fromStdString(""));
+
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
@@ -719,6 +744,7 @@ void ProjectWidget::remove_project() {
     int reply = msg_box.exec();
 
     if (reply != QMessageBox::Yes) return;
+    set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
     m_proj->delete_artifacts();
@@ -726,4 +752,9 @@ void ProjectWidget::remove_project() {
     delete m_proj;
     m_proj = nullptr;
     emit project_closed();
+    emit remove_overlay();
+}
+
+void ProjectWidget::set_main_window_name(QString name) {
+    parentWidget()->parentWidget()->setWindowTitle(name);
 }
