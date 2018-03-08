@@ -68,7 +68,6 @@ std::string Bookmark::get_description() {
  * @param text
  */
 void Bookmark::set_description(const std::string& text) {
-    qDebug() << "NEW BOOKMARK DESCRIPTION " << QString::fromStdString(text);
     description = text;
     m_unsaved_changes = true;
 }
