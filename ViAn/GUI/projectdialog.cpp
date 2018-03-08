@@ -59,12 +59,10 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
-    QString m_dir = path_text->text() + "/" + name_text->text() + "/";
-    if (path_text->text() == "") {
-        m_dir = "C:" + m_dir;
-    }
-    QDir pathDir(m_dir);
-    if (pathDir.exists()) {
+    QString m_path = path_text->text() + "/" + name_text->text() + "/" + name_text->text() + ".vian";
+
+    QFile pathFile(m_path);
+    if (pathFile.exists()) {
         // Create confirmation dialog since the path already exists
         QMessageBox msg_box;
         msg_box.setModal(true);
@@ -75,7 +73,7 @@ void ProjectDialog::ok_btn_clicked() {
         int reply = msg_box.exec();
         // Open the already existing project
         if (reply == QMessageBox::Open) {
-            emit open_project(m_dir + name_text->text());
+            emit open_project(m_path);
             close();
             return;
         }

@@ -34,11 +34,12 @@ private:
     QScrollBar* h_bar;
     QSize current_frame_size;
     QTime timer;
-    double h_step_size, v_step_size;
 
     int prev_frame_idx;
     int POI_end;
     double m_scale_factor = 1;
+    int brightness = 0;
+    double contrast = 1;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -73,6 +74,7 @@ private:
     FrameProcessor* f_processor;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
+    ~VideoWidget();
 
     // Lock and wait condition to sleep player when video is paused
     video_player* m_video_player;
@@ -89,6 +91,10 @@ public:
     void set_undo();
     void set_redo();
     void set_clear_drawings();
+    void set_delete_drawing();
+
+    int get_brightness();
+    double get_contrast();
 
 signals:
     void first_frame(cv::Mat frame);
@@ -150,12 +156,14 @@ public slots:
     void on_playback_stopped(void);
 
     void set_overlay_removed();
+    void set_show_overlay(bool show);
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);
-    void mouse_pressed(QPoint pos);
-    void mouse_released(QPoint pos);
+    void mouse_pressed(QPoint pos, bool);
+    void mouse_released(QPoint pos, bool right_click);
     void mouse_moved(QPoint pos);
+    void mouse_scroll(QPoint pos);
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);

@@ -37,7 +37,8 @@ class ProjectWidget : public QTreeWidget
                                 "flv", "f4v", "f4p", "f4a", "f4b"};
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
-    Project* m_proj = nullptr;    
+    ~ProjectWidget();
+    Project* m_proj = nullptr;
 
 signals:
     void selected_media();
@@ -47,6 +48,7 @@ signals:
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
+    void show_analysis_details(bool);
 
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
@@ -79,6 +81,8 @@ private slots:
     void context_menu(const QPoint& point);
     void remove_item();
     void rename_item();
+    void show_details();
+    void hide_details();
     void create_folder_item();
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
     void check_selection();
@@ -99,6 +103,7 @@ private:
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
+    bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);

@@ -22,7 +22,7 @@ cv::Mat Circle::draw(cv::Mat &frame) {
     cv::Size size = rect.size();
     cv::Point center = (rect.br() + rect.tl())*0.5;
     cv::RotatedRect bounding_rect(center, size, 0);
-    cv::ellipse(frame, bounding_rect, colour, LINE_THICKNESS);
+    cv::ellipse(frame, bounding_rect, color, thickness);
     return frame;
 }
 
@@ -33,6 +33,7 @@ cv::Mat Circle::draw(cv::Mat &frame) {
  * @param pos
  */
 void Circle::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**

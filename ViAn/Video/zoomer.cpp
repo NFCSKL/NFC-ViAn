@@ -177,10 +177,6 @@ void Zoomer::scale_frame(cv::Mat &frame) {
         qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
         fit_viewport();
     }
-    qDebug() << frame.rows;
-    qDebug() << frame.cols;
-    qDebug() << m_frame_size.width;
-    qDebug() << m_frame_size.height;
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;
     cv::resize(frame(m_zoom_rect), frame, cv::Size(), m_scale_factor, m_scale_factor, interpol);

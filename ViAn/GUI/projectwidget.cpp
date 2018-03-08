@@ -39,6 +39,10 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::itemChanged, this, &ProjectWidget::update_item_data);
 }
 
+ProjectWidget::~ProjectWidget() {
+    delete m_proj;
+}
+
 
 /**
  * @brief ProjectWidget::new_project
@@ -58,14 +62,19 @@ void ProjectWidget::new_project() {
  * @param project_path
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
+    std::string name = project_name.toStdString();
+    std::string path = project_path.toStdString();
+    Project* new_proj = new Project(name, path);
+    if (!new_proj->tmp_dir_valid) {
+        delete m_proj;
+        m_proj = nullptr;
+        return;
+    }
     close_project();
-    std::string _tmp_name = project_name.toStdString();
-    std::string _tmp_path = project_path.toStdString();
     set_main_window_name(project_name);
-    m_proj = new Project(_tmp_name, _tmp_path); 
-    m_proj->save_project();
-    _tmp_path.append(_tmp_name);
-    emit proj_path(m_proj->getDir());
+    m_proj = new_proj;
+    path.append(name);
+    emit proj_path(m_proj->get_tmp_dir());
 }
 
 /**
@@ -87,7 +96,7 @@ void ProjectWidget::add_video() {
     QStringList video_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add video"),
-                m_proj->getDir().c_str(),
+                m_proj->get_tmp_dir().c_str(),
                 extensions);
 
     for (auto video_path : video_paths){
@@ -106,9 +115,9 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir());
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
-    if(settings->use_interval) method->setInterval(settings->interval);
+    if(settings->use_interval) method->set_interval(settings->get_interval());
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -116,7 +125,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
-    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
+    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
     emit begin_analysis(item, method);
 }
 
@@ -253,8 +262,7 @@ VideoItem *ProjectWidget::get_video_item(VideoProject *v_proj, QTreeWidgetItem* 
     return nullptr;
 }
 
-void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem*>& items)
-{
+void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem*>& items) {
     if(root->type() == VIDEO_ITEM) {
         items.push_back(dynamic_cast<VideoItem*>(root));
         return;
@@ -387,20 +395,18 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
-void ProjectWidget::advanced_analysis()
-{
+void ProjectWidget::advanced_analysis() {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->getDir());
+    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_tmp_dir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }
 
 
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj)
-{
+void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj) {
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
     AnalysisItem* ana = new AnalysisItem();
@@ -455,7 +461,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         emit enable_tag_btn(false);
-        emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());
@@ -553,11 +558,15 @@ void ProjectWidget::context_menu(const QPoint &point) {
         // Clicked on item
         menu.addAction("New Folder", this, SLOT(create_folder_item()));
         menu.addSeparator();
-
-        switch (selectedItems().front()->type()) {
+        QTreeWidgetItem* item = selectedItems().front();
+        switch (item->type()) {
             case TAG_ITEM:
+                menu.addAction("Rename", this, SLOT(rename_item()));
+                break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Show details", this, SLOT(show_details()));
+                menu.addAction("Hide details", this, SLOT(hide_details()));
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -576,6 +585,23 @@ void ProjectWidget::context_menu(const QPoint &point) {
     menu.exec(mapToGlobal(point));
 }
 
+/**
+ * @brief ProjectWidget::show_details
+ * @param ana_item
+ * Show the analysis' details; interval and bounding box
+ */
+void ProjectWidget::show_details() {
+    emit show_analysis_details(true);
+}
+
+/**
+ * @brief ProjectWidget::hide_details
+ * Hide the analysis' details; interval and bounding box
+ */
+void ProjectWidget::hide_details() {
+    emit show_analysis_details(false);
+}
+
 
 /**
  * @brief ProjectWidget::remove_item
@@ -583,14 +609,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
-    QMessageBox delete_box(this);
-    delete_box.setIcon(QMessageBox::Warning);
-    delete_box.setText("Deleting item(s)\n"
-                       "(Unselected items within selected folders will be deleted as well)");
-    delete_box.setInformativeText("Do you wish to continue?");
-    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    delete_box.setDefaultButton(QMessageBox::No);
-    if (delete_box.exec() == QMessageBox::Yes) {
+    QString text = "Deleting item(s)\n"
+                   "(Unselected items within selected folders will be deleted as well)";
+    QString info_text = "Do you wish to continue?";
+    if (message_box(text, info_text, true)) {
         for (auto item : selectedItems()) {
             if (item->type() == FOLDER_ITEM) {
                 std::vector<VideoItem*> v_items;
@@ -662,11 +684,12 @@ void ProjectWidget::save_project() {
     save_item_data();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.save_state(m_proj->getDir() + "treestate");
+    tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
     m_proj->save_project();
+    m_proj->move_project_from_tmp();
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->getName(), m_proj->full_path());
+    rp.update_recent(m_proj->get_name(), m_proj->get_file());
     set_status_bar("Project saved");
 }
 
@@ -678,22 +701,24 @@ void ProjectWidget::save_project() {
 bool ProjectWidget::open_project(QString project_path) {
     if (project_path.isEmpty()) return false;
 
-    bool closed = false;
-    if (m_proj != nullptr) {
-        closed = close_project();
-        if (!closed) return false;
-    }
+    if (m_proj != nullptr && !close_project())
+        return false;
 
     set_status_bar("Opening project");
-    m_proj = Project::fromFile(project_path.toStdString());
-
+    auto new_proj = Project::fromFile(project_path.toStdString());
+    if (new_proj == nullptr) {
+        qWarning() << "Something went wrong while creating the temporary folder.";
+        return false;
+    }
+    m_proj = new_proj;
+    set_status_bar("Opening project");
+\
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.load_state(m_proj->getDir() + "treestate");
-
-    set_main_window_name(QString::fromStdString(m_proj->getName()));
-    emit proj_path(m_proj->getDir());
+    tree_state.load_state(m_proj->get_dir() + "treestate");
+    set_main_window_name(QString::fromStdString(m_proj->get_name()));
+    emit proj_path(m_proj->get_tmp_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
@@ -736,14 +761,10 @@ bool ProjectWidget::close_project() {
 void ProjectWidget::remove_project() {
     // TODO Does this delete all images?
     if (m_proj == nullptr) return;
-    QMessageBox msg_box;
-    msg_box.setText("Are you sure you want to remove the project?");
-    msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
-    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msg_box.setDefaultButton(QMessageBox::No);
-    int reply = msg_box.exec();
-
-    if (reply != QMessageBox::Yes) return;
+    QString text = "Are you sure you want to remove the project?";
+    QString info_text = "This will delete all project files (images, reports, etc).";
+    if (message_box(text, info_text)) return;
+  
     set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
@@ -751,10 +772,30 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
+    emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
 }
 
 void ProjectWidget::set_main_window_name(QString name) {
     parentWidget()->parentWidget()->setWindowTitle(name);
+}
+
+/**
+ * @brief ProjectWidget::message_box
+ * Creates a popup yes/no message box with the inputed text
+ * @param text  :   Text
+ * @param info_text :   Informative text
+ * @param warning   :   true will make the message box a warning box
+ * @return Yes returns true and no returns false
+ */
+bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
+    QMessageBox msg_box;
+    if (warning) msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setText(text);
+    msg_box.setInformativeText(info_text);
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg_box.setDefaultButton(QMessageBox::No);
+    int reply = msg_box.exec();
+    return reply == QMessageBox::Yes;
 }

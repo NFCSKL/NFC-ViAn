@@ -52,31 +52,70 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
         }
     }
 
-    // Draws the interval
-    if (show_interval) {
-        brush = Qt::black;
-        double first = (groove_rect.left()+(double)interval_first*c);
-        double second = (groove_rect.left()+(double)interval_second*c);
-        if (interval_first != -1 && interval_second != -1 && interval_first <= interval_second) {
-            QRect rect(first, groove_rect.top()+groove_rect.height()/3, 1+second-first, groove_rect.height()/3);
-            painter.fillRect(rect, brush);
-        }
-        if (interval_first != -1) {
-            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, brush);
-        }
-        if (interval_second != -1) {
-            QRect rect(second, groove_rect.top(), 1, groove_rect.height());
+    // Draws the analysis interval
+    if (show_ana_interval) {
+        brush = Qt::darkMagenta;
+        draw_interval(m_ana_interval, groove_rect, c);
+        for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }
     }
-
+    // Draws the interval
+    if (show_interval) {
+        brush = Qt::black;
+        draw_interval(m_interval, groove_rect, c);
+        for (auto rect : interval_rects) {
+            painter.fillRect(rect, brush);
+        }
+    }
     option.subControls = QStyle::SC_SliderHandle;
     painter.drawComplexControl(QStyle::CC_Slider, option);
 }
 
+/**
+ * @brief AnalysisSlider::draw_interval
+ * Draw
+ * @param interval
+ */
+void AnalysisSlider::draw_interval(std::pair<int, int> interval, QRect groove, double frame_width) {
+    double first = (groove.left()+(double)interval.first*frame_width);
+    double second = (groove.left()+(double)interval.second*frame_width);
+    interval_rects.clear();
+
+    // Draw the interval
+    if (valid_interval(interval)) {
+        QRect rect(first, groove.top()+groove.height()/3, 1+second-first, groove.height()/3);
+        interval_rects.push_back(rect);
+    }
+    // Draw the interval start marker
+    if (interval.first != -1) {
+        QRect rect(first, groove.top(), 1, groove.height());
+        interval_rects.push_back(rect);
+    }
+    // Draw the interval end marker
+    if (interval.second != -1) {
+        QRect rect(second, groove.top(), 1, groove.height());
+        interval_rects.push_back(rect);
+    }
+}
+
+/**
+ * @brief AnalysisSlider::valid_interval
+ * @param interval
+ * @return true if interval is a valid interval
+ */
+bool AnalysisSlider::valid_interval(std::pair<int, int> interval) {
+    // Checks if both ends of the interval is set and the end is larger than the start
+    return interval.first != -1 && interval.second != -1 && interval.first <= interval.second;
+}
+
 void AnalysisSlider::update(){
     repaint();
+}
+
+void AnalysisSlider::set_analysis(AnalysisProxy * analysis) {
+    m_analysis = analysis->load_analysis();
+    set_ana_interval();
 }
 
 /**
@@ -87,10 +126,29 @@ void AnalysisSlider::update(){
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
+
         for (auto p : analysis->get_intervals()) {
             add_slider_interval(p->get_start(), p->get_end());
         }
     }
+    repaint();
+}
+
+/**
+ * @brief AnalysisSlider::set_ana_interval
+ * @param analysis
+ * Set interval to the interval the analysis was run on
+ */
+void AnalysisSlider::set_ana_interval() {
+    m_ana_interval = std::make_pair(m_analysis->get_ana_interval().first, m_analysis->get_ana_interval().second);
+}
+
+/**
+ * @brief AnalysisSlider::set_show_ana_interval
+ * @param show
+ */
+void AnalysisSlider::set_show_ana_interval(bool show) {
+    show_ana_interval = show;
     repaint();
 }
 
@@ -100,16 +158,15 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
  * @param end
  */
 void AnalysisSlider::set_interval(int start, int end) {
-    interval_first = start;
-    interval_second = end;
+    m_interval = std::make_pair(start, end);
 }
 
 /**
  * @brief AnalysisSlider::clear_interval
  */
 void AnalysisSlider::clear_interval() {
-    interval_first = -1;
-    interval_second = -1;
+    m_interval.first = -1;
+    m_interval.second = -1;
 }
 
 /**
@@ -117,8 +174,8 @@ void AnalysisSlider::clear_interval() {
  * @return
  */
 int AnalysisSlider::set_interval_first() {
-    interval_first = value();
-    return interval_first;
+    m_interval.first = value();
+    return m_interval.first;
 }
 
 /**
@@ -126,8 +183,8 @@ int AnalysisSlider::set_interval_first() {
  * @return
  */
 int AnalysisSlider::set_interval_second() {
-    interval_second = value();
-    return interval_second;
+    m_interval.second = value();
+    return m_interval.second;
 }
 
 /**

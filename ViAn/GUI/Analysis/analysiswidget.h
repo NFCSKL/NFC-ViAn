@@ -29,6 +29,7 @@ class AnalysisWidget : public QWidget
     std::string dots = "";
     std::clock_t start;
     int duration = 0;
+    int duplicate_save_file_inc = 1;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
 
@@ -36,7 +37,7 @@ public:
     std::deque<tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
 
     // Widget representing the current analysis queue
-    QueueWidget* queue_wgt;
+    QueueWidget* m_queue_wgt;
 
     // Item in project tree corresponding to
     // the currently executing method
@@ -50,7 +51,9 @@ private:
 
     // Moves the queue forward
     void move_queue();
+
 public slots:
+    void set_queue_wgt(QueueWidget* queue_wgt);
 
     // Incoming request to start analysis
     void start_analysis(QTreeWidgetItem* item, AnalysisMethod *method);
@@ -78,6 +81,9 @@ signals:
 
     // Set analysis name in project tree
     void name_in_tree(QTreeWidgetItem*, QString);
+
+    // Show or hide the analysis queue window
+    void show_analysis_queue(bool);
 };
 
 #endif // ANALYSISWIDGET_H

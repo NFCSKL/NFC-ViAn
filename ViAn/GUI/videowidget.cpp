@@ -61,6 +61,9 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     init_frame_processor();
 }
 
+VideoWidget::~VideoWidget(){
+}
+
 VideoProject *VideoWidget::get_current_video_project(){
     return m_vid_proj;
 }
@@ -77,11 +80,9 @@ int VideoWidget::get_current_video_length(){
     return m_frame_length;
 }
 
-void VideoWidget::quick_analysis(AnalysisSettings * settings)
-{
-    if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second))
-    {
-        settings->setInterval(AnalysisInterval(m_interval.first,m_interval.second));
+void VideoWidget::quick_analysis(AnalysisSettings * settings) {
+    if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
+        settings->setInterval(m_interval);
         delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);
@@ -153,9 +154,10 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
-    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), this, SLOT(mouse_pressed(QPoint)));
-    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
+    connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
     connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
     connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
     connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
@@ -184,15 +186,14 @@ void VideoWidget::set_btn_icons() {
 
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
-    tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
-    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
+    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
+    tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
 
 
     zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
-
 
 
     zoom_label = new QLabel;
@@ -202,6 +203,7 @@ void VideoWidget::set_btn_icons() {
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     play_btn->setCheckable(true);
     zoom_in_btn->setCheckable(true);
+    analysis_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
 }
 
@@ -222,8 +224,8 @@ void VideoWidget::set_btn_tool_tip() {
 
     bookmark_btn->setToolTip(tr("Bookmark the current frame: Ctrl + B"));
     export_frame_btn->setToolTip("Export current frame: E");
-    tag_btn->setToolTip(tr("Tag the current frame: T"));
     new_tag_btn->setToolTip(tr("Create a new tag: Ctrl + T"));
+    tag_btn->setToolTip(tr("Tag the current frame: T"));
 
     zoom_in_btn->setToolTip(tr("Zoom in: Z"));
     zoom_out_btn->setToolTip(tr("Zoom out"));
@@ -278,11 +280,15 @@ void VideoWidget::set_btn_tab_order() {
     setTabOrder(prev_poi_btn, analysis_btn);
     setTabOrder(analysis_btn, next_poi_btn);
     setTabOrder(next_poi_btn, bookmark_btn);
-    setTabOrder(bookmark_btn, tag_btn);
+    setTabOrder(bookmark_btn, export_frame_btn);
+    setTabOrder(export_frame_btn, new_tag_btn);
+    setTabOrder(new_tag_btn, tag_btn);
     setTabOrder(tag_btn, zoom_in_btn);
     setTabOrder(zoom_in_btn, zoom_out_btn);
     setTabOrder(zoom_out_btn, fit_btn);
     setTabOrder(fit_btn, original_size_btn);
+    setTabOrder(original_size_btn, set_start_interval_btn);
+    setTabOrder(set_start_interval_btn, set_end_interval_btn);
 }
 
 /**
@@ -327,7 +333,7 @@ void VideoWidget::init_speed_slider() {
     label1->setFont(f);
     label2->setFont(f);
     label3->setFont(f);
-    //laout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
+    //layout->addWidget(widget, int row, int column, int rowSpan, int columnSpan)
     speed_slider_layout->addWidget(speed_slider, 0, 0, 1, 5);
     speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
     speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
@@ -358,8 +364,8 @@ void VideoWidget::add_btns_to_layouts() {
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(export_frame_btn);
-    other_btns->addWidget(tag_btn);
     other_btns->addWidget(new_tag_btn);
+    other_btns->addWidget(tag_btn);
 
     control_row->addLayout(other_btns);
 
@@ -396,7 +402,7 @@ void VideoWidget::connect_btns() {
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_btn_clicked);
-    connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
+    connect(analysis_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::set_analysis_tool);
 
     // Tag
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
@@ -771,6 +777,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     playback_slider->update();
+    frame_wgt->set_current_frame_nr(frame_num);
 }
 
 /**
@@ -954,7 +961,22 @@ void VideoWidget::set_clear_drawings() {
     });
 }
 
+void VideoWidget::set_delete_drawing() {
+    update_overlay_settings([&](){
+        o_settings.delete_drawing = true;
+    });
+}
+
+void VideoWidget::set_show_overlay(bool show) {
+    update_overlay_settings([&](){
+        o_settings.show_overlay = show;
+    });
+}
+
 void VideoWidget::set_tool(SHAPES tool) {
+    if (tool != ZOOM) {
+        zoom_in_btn->setChecked(false);
+    }
     update_overlay_settings([&](){
         o_settings.tool = tool;
     });
@@ -974,23 +996,32 @@ void VideoWidget::set_color(QColor color) {
     });
 }
 
-void VideoWidget::mouse_pressed(QPoint pos) {
+void VideoWidget::mouse_pressed(QPoint pos, bool right_click) {
     update_overlay_settings([&](){
         o_settings.mouse_clicked = true;
         o_settings.pos = pos;
+        o_settings.right_click = right_click;
     });
 }
 
-void VideoWidget::mouse_released(QPoint pos) {
+void VideoWidget::mouse_released(QPoint pos, bool right_click) {
     update_overlay_settings([&](){
         o_settings.mouse_released = true;
         o_settings.pos = pos;
+        o_settings.right_click = right_click;
     });
 }
 
 void VideoWidget::mouse_moved(QPoint pos) {
     update_overlay_settings([&](){
         o_settings.mouse_moved = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_scroll(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_scroll = true;
         o_settings.pos = pos;
     });
 }
@@ -1075,6 +1106,8 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
+    brightness = b_val;
+    contrast = c_val;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1144,6 +1177,14 @@ void VideoWidget::frame_line_edit_finished() {
         emit set_status_bar("Error! Input is negative!");
     } else {
         frame_index.store(converted);
+        on_new_frame();
     }
 }
 
+int VideoWidget::get_brightness() {
+    return brightness;
+}
+
+double VideoWidget::get_contrast() {
+    return contrast;
+}

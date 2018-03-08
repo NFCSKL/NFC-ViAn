@@ -35,8 +35,7 @@ public:
     // Update progressbar
     void update_progress(int i);
 public slots:
-    // Hide/Show widget
-    void toggle_show();
+
 signals:
     // Analysis aborted
     void abort_analysis();

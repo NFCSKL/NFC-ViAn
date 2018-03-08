@@ -1,4 +1,5 @@
 #include "videoproject.h"
+#include <QDebug>
 
 /**
  * @brief VideoProject::VideoProject

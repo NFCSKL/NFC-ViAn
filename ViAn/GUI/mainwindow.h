@@ -25,6 +25,7 @@
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "statusbar.h"
+#include "Toolbars/drawingtoolbar.h"
 
 using namespace std;
 class AnalysisWindow;
@@ -39,10 +40,11 @@ public:
     ~MainWindow();
 
     StatusBar* status_bar;
-    QAction* show_analysis_queue;
+    DrawingToolbar* draw_toolbar;
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;
+    QAction* ana_details_act;
     QAction* drawing_act;
 
     QAction* color_act;
@@ -62,26 +64,32 @@ private slots:
     void undo();
     void redo();
     void clear();
+    void delete_drawing();
     void zoom();
     void move();
+    void set_ana_details(bool);
 
 public slots:
     void options(void);
     void open_project_dialog();
+    void show_analysis_dock(bool);
 
 signals:
     void set_status_bar(QString);
     void open_project(QString proj_path);
 
 private:
+    QDockWidget* queue_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
+    QueueWidget* queue_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
+    QAction* toggle_queue_wgt;
 
     AnalysisWindow *analysis_window;
 

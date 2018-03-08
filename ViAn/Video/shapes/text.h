@@ -18,6 +18,8 @@ public:
 private:
     QString string;
     double font_scale;
+    cv::Size text_size;
+    int baseline = 0;
 };
 
 #endif // TEXT_H
