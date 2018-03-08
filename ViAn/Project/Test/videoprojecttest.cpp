@@ -132,3 +132,47 @@ void VideoProjectTest::save_load_delete_test(){
     dir.rmpath("C:/TEST/VID_PROJ_TEST/");
     QVERIFY(!dir.exists("C:/TEST/VID_PROJ_TEST/"));
 }
+
+void VideoProjectTest::save_status_test() {
+    std::unique_ptr<VideoProject> video_project(new VideoProject);
+    video_project->m_unsaved_changes = false;
+
+    BasicAnalysis* analysis = new BasicAnalysis();
+    int analysis_id = video_project->add_analysis(analysis);
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    Bookmark* bookmark = new Bookmark();
+    int bookmark_id = video_project->add_bookmark(bookmark);
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    std::stack<int> test_index;
+    video_project->set_tree_index(test_index);
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    video_project->set_project(new Project("TEST_NAME","TEST_DIR"));
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    video_project->reset_root_dir("TEST_DIR");
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    video_project->delete_analysis(analysis_id);
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    video_project->delete_bookmark(bookmark_id);
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    video_project->delete_artifacts();
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+
+    video_project->remove_from_project();
+    QVERIFY(!video_project->is_saved());
+    video_project->m_unsaved_changes = false;
+}

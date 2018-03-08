@@ -60,7 +60,8 @@ SOURCES += main.cpp \
     Analysis/analysissettings.cpp \
     GUI/Analysis/analysisdialog.cpp \
     GUI/Analysis/videolistitem.cpp \
-    GUI/Analysis/queuewidget.cpp
+    GUI/Analysis/queuewidget.cpp \
+    Project/Test/bookmarktest.cpp
 
 #
 # TEST
@@ -110,7 +111,8 @@ HEADERS += reportgenerator.h\
     Analysis/analysismethod.h \
     GUI/Analysis/analysisdialog.h \
     GUI/Analysis/videolistitem.h \
-    GUI/Analysis/queuewidget.h
+    GUI/Analysis/queuewidget.h \
+    Project/Test/bookmarktest.h
 
 #
 # LIBRARY

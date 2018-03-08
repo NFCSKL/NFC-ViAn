@@ -31,6 +31,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;
     m_dir = dir_path + "/" + name + "/";
     m_file = m_dir + name + ".vian";
+
     if(tmp_dir.isValid()){
         m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
         m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
@@ -38,6 +39,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
         save_project();
         tmp_dir_valid = true;
     } else qWarning() << "Something went wrong while creating the temporary folder.";
+    m_unsaved_changes = true;
 }
 
 
@@ -57,6 +59,7 @@ Project::~Project(){
 ID Project::add_video_project(VideoProject *vid_proj){
     vid_proj->set_project(this);
     m_videos.push_back(vid_proj);
+    m_unsaved_changes = true;
     return m_vid_count++;
 }
 
@@ -70,6 +73,7 @@ void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
     m_videos.erase(it);
+    m_unsaved_changes = true;
 }
 
 
@@ -80,6 +84,7 @@ void Project::remove_video_project(VideoProject* vid_proj){
  */
 ID Project::add_report(Report *report){
     m_reports.insert(std::make_pair(m_rp_count,report));   
+    m_unsaved_changes = true;
     return m_rp_count++;
 }
 
@@ -91,6 +96,7 @@ void Project::remove_report(const int &id) {
     Report* temp = m_reports.at(id);
     delete temp;
     m_reports.erase(id);
+    m_unsaved_changes = true;
 }
 
 
@@ -103,6 +109,26 @@ void Project::delete_artifacts(){
     // Delete directory and all of its contents
     // Including subdirectories and their contents.
     dir.removeRecursively();
+}
+
+/**
+ * @brief Project::set_saved_status
+ * Set unsaved status
+ * Should be used by video_project and analysis
+ * @param changed
+ */
+void Project::set_unsaved(const bool& changed) {
+    m_unsaved_changes = changed;
+}
+
+/**
+ * @brief Project::is_saved
+ * Check if the project has unsaved changes
+ * @return m_unsaved_changes
+ */
+bool Project::is_saved() const {
+    bool video_projects_saved = std::all_of(m_videos.begin(), m_videos.end(), [](VideoProject* vp){return vp->is_saved();});
+    return !m_unsaved_changes && video_projects_saved;
 }
 
 /**
@@ -134,6 +160,7 @@ void Project::read(const QJsonObject& json){
         add_report(report);
         report->reset_root_dir(m_dir);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -161,6 +188,7 @@ void Project::write(QJsonObject& json){
         json_reports.append(json_report);
     }
     json["reports"] = json_reports;
+    m_unsaved_changes = false;
 }
 
 /**

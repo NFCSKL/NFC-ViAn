@@ -20,15 +20,14 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
  */
 void BasicAnalysis::add_interval(AnalysisInterval *ai){
     m_intervals.insert(ai);
+    m_unsaved_changes = true;
 }
 
-SAVE_TYPE BasicAnalysis::get_save_type() const
-{
+SAVE_TYPE BasicAnalysis::get_save_type() const {
     return INTERVAL;
 }
 
-ANALYSIS_TYPE BasicAnalysis::get_type() const
-{
+ANALYSIS_TYPE BasicAnalysis::get_type() const {
     return BASIC_ANALYSIS;
 }
 
@@ -46,6 +45,7 @@ void BasicAnalysis::read(const QJsonObject &json){
         interval->read(json_interval);
         this->add_interval(interval);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -63,6 +63,7 @@ void BasicAnalysis::write(QJsonObject &json){
         json_ais.append(json_ai);
     }
     json["POI:s"] = json_ais;
+    m_unsaved_changes = false;
 }
 
 std::string BasicAnalysis::get_name() const {
@@ -71,6 +72,15 @@ std::string BasicAnalysis::get_name() const {
 
 interval_set BasicAnalysis::get_intervals() const {
     return m_intervals;
+}
+
+void BasicAnalysis::set_name(const std::string &new_name){
+    m_name = new_name;
+    m_unsaved_changes = true;
+}
+
+bool BasicAnalysis::is_saved() const{
+    return !m_unsaved_changes;
 }
 
 std::pair<int, int> BasicAnalysis::get_ana_interval() const {

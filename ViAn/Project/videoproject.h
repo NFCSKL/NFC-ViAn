@@ -31,6 +31,10 @@ class VideoProject : public Saveable{
     Project* m_project = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_cnt = 0; // Analysis id counter
+
+    bool m_unsaved_changes = true;
+
+
 public:
 
     VideoProject(Video* v); //Needs to have a video
@@ -55,12 +59,16 @@ public:
     void delete_bookmark(const int& id);
     void delete_artifacts();
 
+    void remove_from_project();
+
     std::string get_index_path();
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,BasicAnalysis*> get_analyses();
     BasicAnalysis *get_analysis(const int &id);
+
+    bool is_saved();
 
 };
 

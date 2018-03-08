@@ -3,6 +3,7 @@
 #include "Project/Analysis/analysis.h"
 #include <QTime>
 #include <QThread>
+#include "utility.h"
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 
@@ -220,8 +221,10 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     if (show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
-        QPoint tl(m_analysis->bounding_box.x, m_analysis->bounding_box.y);
-        QPoint br(m_analysis->bounding_box.x+m_analysis->bounding_box.width, m_analysis->bounding_box.y+m_analysis->bounding_box.height);
+
+        auto box = m_analysis->get_bounding_box();
+        QPoint tl = Utility::from_cvpoint(box.tl());
+        QPoint br = Utility::from_cvpoint(box.br());
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.drawRect(bounding_rect);
     }

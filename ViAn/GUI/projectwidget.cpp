@@ -35,6 +35,8 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
+
+    connect(this, &ProjectWidget::itemChanged, this, &ProjectWidget::update_item_data);
 }
 
 ProjectWidget::~ProjectWidget() {
@@ -386,6 +388,8 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
             if (item->type() == VIDEO_ITEM) {
                 auto vid_item = dynamic_cast<VideoItem*>(item);
                 vid_item->get_video_project()->set_tree_index(get_index_path(item));
+            } else if (item->type() == FOLDER_ITEM) {
+                m_proj->set_unsaved(true);
             }
         }
     }
@@ -410,6 +414,32 @@ void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProjec
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
     emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
+}
+
+/**
+ * @brief ProjectWidget::prompt_save
+ * Prompts the user for to save before continuing.
+ * Returns false on cancel
+ */
+bool ProjectWidget::prompt_save() {
+    bool ok = true;
+
+    QMessageBox delete_box(this);
+    delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setText("There are unsaved changes.");
+    delete_box.setInformativeText("Do you wish to save before continuing?");
+    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    delete_box.setDefaultButton(QMessageBox::Yes);
+
+    switch (delete_box.exec()){
+        case QMessageBox::Yes:
+                save_project();
+                break;
+        case QMessageBox::Cancel:
+                ok = false;
+                break;
+    }
+    return ok;
 }
 
 
@@ -478,6 +508,36 @@ void ProjectWidget::check_selection(){
  */
 void ProjectWidget::check_selection_level(QTreeWidgetItem*, QTreeWidgetItem*) {
     if (selectedItems().count() == 1) selection_parent = selectedItems().front()->parent();
+}
+
+/**
+ * @brief ProjectWidget::update_item_data
+ * Updates the underlying data structures of the tree items
+ * @param item:     item that has been changed
+ * @param column    column in item
+ */
+void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
+    Q_UNUSED(column);
+
+    std::string item_text = item->text(0).toStdString();
+    switch(item->type()) {
+        case TAG_ITEM: {
+            auto tag_item = dynamic_cast<TagItem*>(item);
+            Tag* tag = tag_item->get_tag();
+            if (tag->get_name() != item_text) tag->set_name(item_text);
+            break;
+        } case ANALYSIS_ITEM: {
+            auto analysis_item = dynamic_cast<AnalysisItem*>(item);
+            AnalysisProxy* analysis = analysis_item->get_analysis();
+            // AnalysisItems are added when an analysis is started
+            // and the proxy can thusly be a nullptr
+            if (analysis == nullptr) break;
+            if (analysis->get_name() != item_text) analysis->set_name(item_text);
+            break;
+        } case FOLDER_ITEM: {
+            m_proj->set_unsaved(true);
+        }
+    }
 }
 
 /**
@@ -612,6 +672,7 @@ void ProjectWidget::create_folder_item() {
     editItem(item);
     clearSelection();
     item->setSelected(true);
+    m_proj->set_unsaved(true);
 }
 
 /**
@@ -635,17 +696,23 @@ void ProjectWidget::save_project() {
 /**
  * @brief ProjectWidget::open_project
  * Slot function to open a previously created project
+ * Returns true if the project has been opened.
  */
-void ProjectWidget::open_project(QString project_path) {
-    if (project_path.isEmpty()) return;
-    if (m_proj != nullptr) close_project();
-    Project* new_proj = Project::fromFile(project_path.toStdString());
+bool ProjectWidget::open_project(QString project_path) {
+    if (project_path.isEmpty()) return false;
+
+    if (m_proj != nullptr && !close_project())
+        return false;
+
+    set_status_bar("Opening project");
+    auto new_proj = Project::fromFile(project_path.toStdString());
     if (new_proj == nullptr) {
         qWarning() << "Something went wrong while creating the temporary folder.";
-        return;
+        return false;
     }
     m_proj = new_proj;
     set_status_bar("Opening project");
+\
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -656,22 +723,35 @@ void ProjectWidget::open_project(QString project_path) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
     }
+    return true;
 }
 
 /**
  * @brief ProjectWidget::close_project
- * Closes the current project if there is one
+ * Closes the current project if there is one and user accepts prompt
+ * Returns true if the project has been closed.
  */
-void ProjectWidget::close_project() {
-    // TODO Check for unsaved changes before closing
-    if (m_proj == nullptr) return;
+bool ProjectWidget::close_project() {
+    if (m_proj == nullptr) return true;
+
+    // Prompt user to save. If cancel keep the current project
+    bool abort_close = false;
+    if (!m_proj->is_saved()){
+        abort_close = !prompt_save();
+        if (abort_close) {
+            return false;
+        }
+    }
+
     set_main_window_name(QString::fromStdString(""));
+
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
+    return true;
 }
 
 /**
