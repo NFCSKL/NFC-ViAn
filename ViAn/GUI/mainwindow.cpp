@@ -11,7 +11,7 @@
 #include <QProgressDialog>
 #include <chrono>
 #include <thread>
-#include "Video/shapes/shape.h"
+#include "Video/shapes/shapes.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
 #include "Toolbars/maintoolbar.h"
@@ -26,12 +26,15 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
+    toggle_drawing_wgt = drawing_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
 
     // Initialize video widget
@@ -58,6 +61,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     bookmark_dock->close();
+
+    // Initialize drawing widget
+    drawing_wgt = new DrawingWidget();
+    drawing_dock->setWidget(drawing_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, drawing_dock);
+    //connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), drawing_wgt, SLOT(add_drawing(Shapes*, int)));
+    connect(drawing_wgt, SIGNAL(jump_to_frame(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*, int)));
+    connect(drawing_wgt, SIGNAL(set_current_drawing(Shapes*)), video_wgt, SLOT(set_current_drawing(Shapes*)));
+    connect(drawing_wgt, SIGNAL(delete_drawing(Shapes*)), this, SLOT(delete_drawing(Shapes*)));
+    connect(drawing_wgt, SIGNAL(clear_frame(int)), this, SLOT(clear(int)));
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();
@@ -70,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
     connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
-    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*)));
+    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*, int)));
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     bookmark_dock->setWidget(bookmark_wgt);
 
@@ -101,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
     connect(draw_toolbar->redo_tool_act, &QAction::triggered, this, &MainWindow::redo);
-    connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_drawing);
+    connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_current_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
     // Status bar
@@ -121,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
+    connect(project_wgt, &ProjectWidget::marked_video, drawing_wgt, &DrawingWidget::set_video_project);
 
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
     connect(project_wgt, SIGNAL(item_removed(VideoProject*)), video_wgt, SLOT(remove_item(VideoProject*)));
@@ -461,7 +475,7 @@ void MainWindow::init_tools_menu() {
     connect(text_act, &QAction::triggered, this, &MainWindow::text);
     connect(undo_act, &QAction::triggered, this, &MainWindow::undo);
     connect(redo_act, &QAction::triggered, this, &MainWindow::redo);
-    connect(clear_act, &QAction::triggered, this, &MainWindow::clear);
+    connect(clear_act, &QAction::triggered, this, &MainWindow::clear_current);
     connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
 }
 
@@ -512,12 +526,20 @@ void MainWindow::redo() {
     video_wgt->set_redo();
 }
 
-void MainWindow::clear() {
-    video_wgt->set_clear_drawings();
+void MainWindow::clear(int frame) {
+    video_wgt->set_clear_drawings(frame);
 }
 
-void MainWindow::delete_drawing() {
-    video_wgt->set_delete_drawing();
+void MainWindow::clear_current() {
+    video_wgt->set_clear_drawings(-1);
+}
+
+void MainWindow::delete_drawing(Shapes *shape) {
+    video_wgt->set_delete_drawing(shape);
+}
+
+void MainWindow::delete_current_drawing() {
+    video_wgt->set_delete_drawing(nullptr);
 }
 
 void MainWindow::zoom() {

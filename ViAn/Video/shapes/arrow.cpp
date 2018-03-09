@@ -3,7 +3,7 @@
 /**
  * @brief Arrow::Arrow
  */
-Arrow::Arrow() : Shape(SHAPES::ARROW) {
+Arrow::Arrow() : Shapes(SHAPES::ARROW) {
 }
 
 /**
@@ -11,7 +11,7 @@ Arrow::Arrow() : Shape(SHAPES::ARROW) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Arrow::Arrow(QColor col, QPoint pos) : Shape(SHAPES::ARROW, col, pos) {
+Arrow::Arrow(QColor col, QPoint pos) : Shapes(SHAPES::ARROW, col, pos) {
 }
 
 /**

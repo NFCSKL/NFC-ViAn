@@ -60,7 +60,13 @@ SOURCES += main.cpp \
     Analysis/analysissettings.cpp \
     GUI/Analysis/analysisdialog.cpp \
     GUI/Analysis/videolistitem.cpp \
-    GUI/Analysis/queuewidget.cpp
+    GUI/Analysis/queuewidget.cpp \
+    GUI/DrawingItems/frameitem.cpp \
+    GUI/DrawingItems/listitem.cpp \
+    GUI/DrawingItems/rectitem.cpp \
+    GUI/drawingwidget.cpp \
+    Video/shapes/shapes.cpp \
+    GUI/DrawingItems/circleitem.cpp
 
 #
 # TEST
@@ -110,7 +116,13 @@ HEADERS += reportgenerator.h\
     Analysis/analysismethod.h \
     GUI/Analysis/analysisdialog.h \
     GUI/Analysis/videolistitem.h \
-    GUI/Analysis/queuewidget.h
+    GUI/Analysis/queuewidget.h \
+    GUI/DrawingItems/frameitem.h \
+    GUI/DrawingItems/listitem.h \
+    GUI/DrawingItems/rectitem.h \
+    GUI/drawingwidget.h \
+    Video/shapes/shapes.h \
+    GUI/DrawingItems/circleitem.h
 
 #
 # LIBRARY
@@ -145,7 +157,6 @@ SOURCES += \
     Video/shapes/line.cpp \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
-    Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
@@ -157,7 +168,6 @@ HEADERS += \
     Video/shapes/line.h \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
-    Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h \

@@ -3,7 +3,7 @@
 /**
  * @brief Pen::Pen
  */
-Pen::Pen() : Shape(SHAPES::PEN) {
+Pen::Pen() : Shapes(SHAPES::PEN) {
 }
 
 /**
@@ -11,7 +11,7 @@ Pen::Pen() : Shape(SHAPES::PEN) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Pen::Pen(QColor col, QPoint pos) : Shape(SHAPES::PEN, col, pos) {
+Pen::Pen(QColor col, QPoint pos) : Shapes(SHAPES::PEN, col, pos) {
 }
 
 /**

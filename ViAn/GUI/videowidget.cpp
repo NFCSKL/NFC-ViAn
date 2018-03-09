@@ -825,8 +825,8 @@ void VideoWidget::on_playback_slider_moved() {
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj) {
-    int frame = -1;
+void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
+    int frame = load_frame;
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
@@ -955,15 +955,17 @@ void VideoWidget::set_redo() {
     });
 }
 
-void VideoWidget::set_clear_drawings() {
+void VideoWidget::set_clear_drawings(int frame) {
     update_overlay_settings([&](){
         o_settings.clear_drawings = true;
+        o_settings.frame = frame;
     });
 }
 
-void VideoWidget::set_delete_drawing() {
+void VideoWidget::set_delete_drawing(Shapes *shape) {
     update_overlay_settings([&](){
         o_settings.delete_drawing = true;
+        o_settings.shape = shape;
     });
 }
 
@@ -1023,6 +1025,13 @@ void VideoWidget::mouse_scroll(QPoint pos) {
     update_overlay_settings([&](){
         o_settings.mouse_scroll = true;
         o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::set_current_drawing(Shapes* shape) {
+    update_overlay_settings([&](){
+        o_settings.set_current_drawing = true;
+        o_settings.shape = shape;
     });
 }
 

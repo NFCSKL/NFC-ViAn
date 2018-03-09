@@ -9,7 +9,7 @@
 #include <QJsonArray>
 #include <QInputDialog>
 #include <algorithm>
-#include "shapes/shape.h"
+#include "shapes/shapes.h"
 #include "shapes/rectangle.h"
 #include "shapes/circle.h"
 #include "shapes/line.h"
@@ -21,16 +21,6 @@
 #include "Library/customdialog.h"
 #include "opencv2/opencv.hpp"
 #include "Filehandler/writeable.h"
-/**
- * @brief The FrameOverlay struct
- * used for performing undo/redo operations
- */
-struct FrameOverlay{
-    // Representing all shapes
-    std::vector<Shape*> overlay;
-    // Representing the end of drawn shapes
-    std::vector<Shape*>::iterator drawn = overlay.end();
-};
 
 /**
  * @brief The Overlay class
@@ -59,24 +49,25 @@ public:
     void undo(int frame_nr);
     void redo(int frame_nr);
     void clear(int frame_nr);
-    void delete_drawing(int frame_nr);
+    void delete_drawing(Shapes *shape);
     void clear_overlay();
 
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-    std::map<int, FrameOverlay> get_overlays();
-    void set_overlays(std::map<int, FrameOverlay>);
+    std::map<int, std::vector<Shapes*>> get_overlays();
+    void set_overlays(std::map<int, std::vector<Shapes*>>);
+    void set_current_drawing(Shapes* shape);
 
 private:
-    Shape* get_empty_shape(SHAPES shape_type);
+    Shapes* get_empty_shape(SHAPES shape_type);
     void empty_undo_list(int frame_nr);
-    void add_drawing(Shape *shape, int frame_nr);
+    void add_drawing(Shapes *shape, int frame_nr);
     void get_drawing(QPoint pos, int frame_nr);
-    bool point_in_drawing(QPoint pos, Shape* shape);
+    bool point_in_drawing(QPoint pos, Shapes* shape);
     cv::Point qpoint_to_point(QPoint pnt);
     
-    Shape* current_drawing = nullptr;
+    Shapes* current_drawing = nullptr;
     QPoint prev_point;
     bool m_right_click = false;
 
@@ -88,7 +79,10 @@ private:
     QString current_string = "Enter text";
     float current_font_scale = 1;
 
-    std::map<int, FrameOverlay> overlays;
+    std::map<int, std::vector<Shapes*>> overlays;
+
+signals:
+    void new_drawing(Shapes* shape, int frame_nr);
 };
 
 #endif // OVERLAY_H

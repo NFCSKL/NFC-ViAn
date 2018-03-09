@@ -1,9 +1,9 @@
 #ifndef CIRCLE_H
 #define CIRCLE_H
 
-#include "shape.h"
+#include "shapes.h"
 
-class Circle : public Shape {
+class Circle : public Shapes {
 public:
     Circle();
     Circle(QColor col, QPoint pos);

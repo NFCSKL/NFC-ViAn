@@ -1,6 +1,6 @@
 #include "circle.h"
 
-Circle::Circle() : Shape(SHAPES::CIRCLE) {
+Circle::Circle() : Shapes(SHAPES::CIRCLE) {
 }
 
 /**
@@ -8,7 +8,7 @@ Circle::Circle() : Shape(SHAPES::CIRCLE) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Circle::Circle(QColor col, QPoint pos) : Shape(SHAPES::CIRCLE, col, pos) {
+Circle::Circle(QColor col, QPoint pos) : Shapes(SHAPES::CIRCLE, col, pos) {
 }
 
 /**

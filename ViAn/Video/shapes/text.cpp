@@ -3,7 +3,7 @@
 /**
  * @brief Text::Text
  */
-Text::Text() : Shape(SHAPES::TEXT) {
+Text::Text() : Shapes(SHAPES::TEXT) {
     string = QString();
     font_scale = 0;
 }
@@ -15,7 +15,7 @@ Text::Text() : Shape(SHAPES::TEXT) {
  * @param strng String to be displayed
  * @param fnt_scl Font scale of the string
  */
-Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES::TEXT, col, pos) {
+Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPES::TEXT, col, pos) {
     string = strng;
     font_scale = fnt_scl;
     text_size = cv::getTextSize(string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);

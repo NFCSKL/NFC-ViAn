@@ -220,11 +220,11 @@ void FrameProcessor::update_overlay_settings() {
     // Clear drawings action
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;
-        m_overlay->clear(curr_frame);
+        m_overlay->clear(m_o_settings->frame);
     // Delete the current drawing
     } else if (m_o_settings->delete_drawing) {
         m_o_settings->delete_drawing = false;
-        m_overlay->delete_drawing(curr_frame);
+        m_overlay->delete_drawing(m_o_settings->shape);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
@@ -241,6 +241,10 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->mouse_scroll) {
         m_o_settings->mouse_scroll = false;
         m_overlay->mouse_scroll(m_o_settings->pos, curr_frame);
+    // Set current drawing action
+    } else if (m_o_settings->set_current_drawing) {
+        m_o_settings->set_current_drawing = false;
+        m_overlay->set_current_drawing(m_o_settings->shape);
     }
 }
 

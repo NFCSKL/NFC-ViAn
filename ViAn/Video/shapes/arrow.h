@@ -1,9 +1,9 @@
 #ifndef ARROW_H
 #define ARROW_H
 
-#include "shape.h"
+#include "shapes.h"
 
-class Arrow : public Shape {
+class Arrow : public Shapes {
 public:
     Arrow();
     Arrow(QColor col, QPoint pos);

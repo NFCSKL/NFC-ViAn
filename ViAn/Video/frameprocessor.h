@@ -63,7 +63,7 @@ struct overlay_settings {
     Overlay* overlay = nullptr;
 
     QPoint pos = QPoint(0,0);
-    int frame_nr = 0;
+    int frame = 0;
     bool mouse_clicked = false;
     bool mouse_released = false;
     bool mouse_moved = false;
@@ -76,11 +76,13 @@ struct overlay_settings {
     bool show_overlay = true;
     bool overlay_removed = false;
     bool right_click = false;
+    bool set_current_drawing = false;
 
     SHAPES tool = NONE;
     QColor color = Qt::red;
     QString current_string = "Enter text";
     float current_font_scale = 1;
+    Shapes* shape = nullptr;
 
 };
 /**

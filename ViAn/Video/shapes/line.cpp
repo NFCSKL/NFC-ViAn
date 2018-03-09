@@ -3,7 +3,7 @@
 /**
  * @brief Line::Line
  */
-Line::Line() : Shape(SHAPES::LINE) {
+Line::Line() : Shapes(SHAPES::LINE) {
 }
 
 /**
@@ -11,7 +11,7 @@ Line::Line() : Shape(SHAPES::LINE) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Line::Line(QColor col, QPoint pos) : Shape(SHAPES::LINE, col, pos) {
+Line::Line(QColor col, QPoint pos) : Shapes(SHAPES::LINE, col, pos) {
 }
 
 /**

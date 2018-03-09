@@ -1,9 +1,9 @@
 #ifndef PEN_H
 #define PEN_H
 
-#include "shape.h"
+#include "shapes.h"
 
-class Pen : public Shape {
+class Pen : public Shapes {
 public:
     Pen();
     Pen(QColor col, QPoint pos);

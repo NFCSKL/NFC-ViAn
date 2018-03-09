@@ -4,7 +4,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QActionGroup>
-#include "Video/shapes/shape.h"
+#include "Video/shapes/shapes.h"
 
 /**
  * @brief The DrawingToolbar class

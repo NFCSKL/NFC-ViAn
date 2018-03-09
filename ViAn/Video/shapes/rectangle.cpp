@@ -3,7 +3,7 @@
 /**
  * @brief Rectangle::Rectangle
  */
-Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
+Rectangle::Rectangle() : Shapes(SHAPES::RECTANGLE) {
 }
 
 /**
@@ -11,7 +11,7 @@ Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Rectangle::Rectangle(QColor col, QPoint pos) : Shape(SHAPES::RECTANGLE, col, pos) {
+Rectangle::Rectangle(QColor col, QPoint pos) : Shapes(SHAPES::RECTANGLE, col, pos) {
 }
 
 /**

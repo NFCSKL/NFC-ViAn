@@ -1,9 +1,9 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "shape.h"
+#include "shapes.h"
 
-class Text : public Shape {
+class Text : public Shapes {
 public:
     Text();
     Text(QColor col, QPoint pos, QString strng, double fnt_scl);
