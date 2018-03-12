@@ -1,6 +1,6 @@
 #include "frameitem.h"
 
-FrameItem::FrameItem(int frame) : TreeItem(FRAME_ITEM) {
+FrameItem::FrameItem(int frame) : ShapeItem(FRAME_ITEM) {
     m_frame = frame;
     setText(0, QString::number(frame));
 }

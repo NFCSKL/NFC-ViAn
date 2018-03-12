@@ -8,6 +8,8 @@
 #include "DrawingItems/frameitem.h"
 #include "DrawingItems/rectitem.h"
 #include "DrawingItems/circleitem.h"
+#include "DrawingItems/lineitem.h"
+#include "DrawingItems/arrowitem.h"
 
 
 class DrawingWidget : public QTreeWidget
@@ -23,11 +25,12 @@ public:
 private:
     void add_item_in_order(FrameItem *item);
     void remove_from_tree(QTreeWidgetItem* item);
-
+    void add_drawings_to_frame(FrameItem *f_item);
 public slots:
     void set_overlay(Overlay* overlay);
     void set_video_project(VideoProject* vid_proj);
     void add_drawing(Shapes* shape, int frame_nr);
+    void save_item_data(QTreeWidgetItem* item = nullptr);
     void tree_item_clicked(QTreeWidgetItem* item, const int& col = 0);
     void context_menu(const QPoint& point);
     void rename_item();

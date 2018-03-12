@@ -1,9 +1,9 @@
 #ifndef FRAMEITEM_H
 #define FRAMEITEM_H
 
-#include "GUI/TreeItems/treeitem.h"
+#include "shapeitem.h"
 
-class FrameItem : public TreeItem {
+class FrameItem : public ShapeItem {
     int m_frame;
 public:
     FrameItem(int frame);

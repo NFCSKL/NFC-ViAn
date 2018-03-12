@@ -71,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(drawing_wgt, SIGNAL(set_current_drawing(Shapes*)), video_wgt, SLOT(set_current_drawing(Shapes*)));
     connect(drawing_wgt, SIGNAL(delete_drawing(Shapes*)), this, SLOT(delete_drawing(Shapes*)));
     connect(drawing_wgt, SIGNAL(clear_frame(int)), this, SLOT(clear(int)));
+    connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();

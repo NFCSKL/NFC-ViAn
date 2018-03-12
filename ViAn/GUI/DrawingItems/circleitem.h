@@ -1,14 +1,14 @@
 #ifndef CIRCLEITEM_H
 #define CIRCLEITEM_H
 
-#include "GUI/TreeItems/treeitem.h"
+#include "shapeitem.h"
 #include "Video/shapes/circle.h"
 
-class CircleItem : public TreeItem {
+class CircleItem : public ShapeItem {
     Circle* m_circle;
 public:
     CircleItem(Circle *circle);
-    Circle* get_circle();
+    Circle* get_shape();
     void rename();
     void remove();
 };

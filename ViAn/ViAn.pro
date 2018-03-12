@@ -62,11 +62,13 @@ SOURCES += main.cpp \
     GUI/Analysis/videolistitem.cpp \
     GUI/Analysis/queuewidget.cpp \
     GUI/DrawingItems/frameitem.cpp \
-    GUI/DrawingItems/listitem.cpp \
     GUI/DrawingItems/rectitem.cpp \
     GUI/drawingwidget.cpp \
     Video/shapes/shapes.cpp \
-    GUI/DrawingItems/circleitem.cpp
+    GUI/DrawingItems/circleitem.cpp \
+    GUI/DrawingItems/lineitem.cpp \
+    GUI/DrawingItems/arrowitem.cpp \
+    GUI/DrawingItems/shapeitem.cpp
 
 #
 # TEST
@@ -118,11 +120,13 @@ HEADERS += reportgenerator.h\
     GUI/Analysis/videolistitem.h \
     GUI/Analysis/queuewidget.h \
     GUI/DrawingItems/frameitem.h \
-    GUI/DrawingItems/listitem.h \
     GUI/DrawingItems/rectitem.h \
     GUI/drawingwidget.h \
     Video/shapes/shapes.h \
-    GUI/DrawingItems/circleitem.h
+    GUI/DrawingItems/circleitem.h \
+    GUI/DrawingItems/lineitem.h \
+    GUI/DrawingItems/arrowitem.h \
+    GUI/DrawingItems/shapeitem.h
 
 #
 # LIBRARY

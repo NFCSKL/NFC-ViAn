@@ -29,14 +29,43 @@ void DrawingWidget::update_from_overlay() {
     if (m_overlay == nullptr) return;
     for (auto& overlay : m_overlay->get_overlays()) {
         if (overlay.second.size() != 0) {
-            QList<QTreeWidgetItem*> list = findItems(QString::number(overlay.first), Qt::MatchFixedString);
-            if (list.empty()) {
+            // Check if the frame nr already exist in widget tree
+            if (findItems(QString::number(overlay.first), Qt::MatchFixedString).empty()) {
                 FrameItem* frame_item = new FrameItem(overlay.first);
                 insertTopLevelItem(topLevelItemCount(), frame_item);
+                add_drawings_to_frame(frame_item);
             }
         }
     }
-    //sortItems(0, Qt::AscendingOrder);
+}
+
+void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
+    for (Shapes* shape : m_overlay->get_overlays()[f_item->get_frame()]) {
+        switch (shape->get_shape()) {
+        case RECTANGLE: {
+            RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
+            f_item->addChild(rect_item);
+            break;
+        }
+        case CIRCLE: {
+            CircleItem* circle_item = new CircleItem(dynamic_cast<Circle*>(shape));
+            f_item->addChild(circle_item);
+            break;
+        }
+        case LINE: {
+            LineItem* line_item = new LineItem(dynamic_cast<Line*>(shape));
+            f_item->addChild(line_item);
+            break;
+        }
+        case ARROW: {
+            ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
+            f_item->addChild(arrow_item);
+            break;
+        }
+        default:
+            break;
+        }
+    }
 }
 
 /**
@@ -71,6 +100,20 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         frame_item->setExpanded(true);
         break;
     }
+    case LINE: {
+        LineItem* line_item = new LineItem(dynamic_cast<Line*>(shape));
+        frame_item->addChild(line_item);
+        line_item->setText(0, "Line");
+        frame_item->setExpanded(true);
+        break;
+    }
+    case ARROW: {
+        ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
+        frame_item->addChild(arrow_item);
+        arrow_item->setText(0, "Arrow");
+        frame_item->setExpanded(true);
+        break;
+    }
     default:
         break;
     }
@@ -93,6 +136,29 @@ void DrawingWidget::add_item_in_order(FrameItem *item) {
     insertTopLevelItem(topLevelItemCount(), item);
 }
 
+void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
+    if (item == nullptr) item = invisibleRootItem();
+    for (auto i = 0; i < item->childCount(); ++i){
+        auto child = item->child(i);
+
+        switch (child->type()) {
+        case FRAME_ITEM:
+            save_item_data(child);
+            break;
+        case RECT_ITEM:
+        case CIRCLE_ITEM:
+        case LINE_ITEM:
+        case ARROW_ITEM: {
+            auto a_item = dynamic_cast<ShapeItem*>(child);
+            a_item->rename();
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
+
 /**
  * @brief DrawingWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
@@ -113,16 +179,28 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
         RectItem* rect_item = dynamic_cast<RectItem*>(item);
         emit jump_to_frame(m_vid_proj, frame_item->get_frame());
-        emit set_current_drawing(rect_item->get_rect());
-        qDebug() << "rect_item";
+        emit set_current_drawing(rect_item->get_shape());
         break;
     }
     case CIRCLE_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
         CircleItem* circle_item = dynamic_cast<CircleItem*>(item);
         emit jump_to_frame(m_vid_proj, frame_item->get_frame());
-        emit set_current_drawing(circle_item->get_circle());
-        qDebug() << "circle_item";
+        emit set_current_drawing(circle_item->get_shape());
+        break;
+    }
+    case LINE_ITEM: {
+        FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
+        LineItem* line_item = dynamic_cast<LineItem*>(item);
+        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
+        emit set_current_drawing(line_item->get_shape());
+        break;
+    }
+    case ARROW_ITEM: {
+        FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
+        ArrowItem* arrow_item = dynamic_cast<ArrowItem*>(item);
+        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
+        emit set_current_drawing(arrow_item->get_shape());
         break;
     }
     default:
@@ -137,14 +215,12 @@ void DrawingWidget::context_menu(const QPoint &point) {
     if (item == nullptr) return;
     switch (item->type()) {
     case FRAME_ITEM:
-        menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addAction("Remove", this, SLOT(remove_item()));
         break;
     case RECT_ITEM:
-        menu.addAction("Rename", this, SLOT(rename_item()));
-        menu.addAction("Remove", this, SLOT(remove_item()));
-        break;
     case CIRCLE_ITEM:
+    case LINE_ITEM:
+    case ARROW_ITEM:
         menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addAction("Remove", this, SLOT(remove_item()));
         break;
@@ -167,22 +243,34 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
     QTreeWidgetItem* parent;
     switch (item->type()) {
     case FRAME_ITEM:
-        qDebug() << item->childCount();
         while (item->childCount() != 0) {
             remove_from_tree(item->child(0));
-            qDebug() << item->childCount();
         }
         delete item;
         break;
     case RECT_ITEM:
-        shape = dynamic_cast<RectItem*>(item)->get_rect();
+        shape = dynamic_cast<RectItem*>(item)->get_shape();
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;
         if (parent->childCount() == 0) delete parent;
         break;
     case CIRCLE_ITEM:
-        shape = dynamic_cast<CircleItem*>(item)->get_circle();
+        shape = dynamic_cast<CircleItem*>(item)->get_shape();
+        emit delete_drawing(shape);
+        parent = item->parent();
+        delete item;
+        if (parent->childCount() == 0) delete parent;
+        break;
+    case LINE_ITEM:
+        shape = dynamic_cast<LineItem*>(item)->get_shape();
+        emit delete_drawing(shape);
+        parent = item->parent();
+        delete item;
+        if (parent->childCount() == 0) delete parent;
+        break;
+    case ARROW_ITEM:
+        shape = dynamic_cast<ArrowItem*>(item)->get_shape();
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;
@@ -191,5 +279,4 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
     default:
         break;
     }
-
 }
