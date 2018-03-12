@@ -44,7 +44,7 @@ public:
     void set_name(std::string name);
 
 protected:
-    SHAPES shape;
+    SHAPES shape = NONE;
     cv::Scalar color;
     int thickness = 2;
     cv::Point draw_start;

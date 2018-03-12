@@ -955,6 +955,14 @@ void VideoWidget::set_redo() {
     });
 }
 
+void VideoWidget::set_update_text(QString text, Shapes* shape) {
+    update_overlay_settings([&](){
+        o_settings.update_text = true;
+        o_settings.shape = shape;
+        o_settings.text = text;
+    });
+}
+
 void VideoWidget::set_clear_drawings(int frame) {
     update_overlay_settings([&](){
         o_settings.clear_drawings = true;

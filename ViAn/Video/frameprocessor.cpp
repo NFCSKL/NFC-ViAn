@@ -217,6 +217,10 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->redo) {
         m_o_settings->redo = false;
         m_overlay->redo(curr_frame);
+    // Update text action
+    } else if (m_o_settings->update_text) {
+        m_o_settings->update_text = false;
+        m_overlay->update_text(m_o_settings->text, m_o_settings->shape);
     // Clear drawings action
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;

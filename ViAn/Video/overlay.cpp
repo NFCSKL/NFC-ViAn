@@ -148,11 +148,17 @@ void Overlay::set_current_drawing(Shapes *shape) {
 }
 
 void Overlay::undo(int frame_nr) {
-
+    Q_UNUSED(frame_nr)
 }
 
 void Overlay::redo(int frame_nr) {
+    Q_UNUSED(frame_nr)
+}
 
+void Overlay::update_text(QString text, Shapes* shape) {
+    if (shape->get_shape() == TEXT) {
+        dynamic_cast<Text*>(shape)->set_text(text);
+    }
 }
 
 /**

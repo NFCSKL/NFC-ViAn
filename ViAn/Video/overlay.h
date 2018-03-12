@@ -48,6 +48,7 @@ public:
     void update_drawing_position(QPoint pos, int frame_nr);
     void undo(int frame_nr);
     void redo(int frame_nr);
+    void update_text(QString, Shapes*shape);
     void clear(int frame_nr);
     void delete_drawing(Shapes *shape);
     void clear_overlay();
@@ -74,7 +75,7 @@ private:
     bool show_overlay = true;
     int baseline = 0;
 
-    SHAPES current_shape = RECTANGLE;
+    SHAPES current_shape = NONE;
     QColor current_colour = Qt::red;
     QString current_string = "Enter text";
     float current_font_scale = 1;

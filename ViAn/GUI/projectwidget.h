@@ -93,7 +93,6 @@ private:
     QStringList mimeTypes() const;
     void file_dropped(QString path);
     void folder_dropped(QString path);
-    void insert_dropped(VideoItem* item);
     std::stack<int> get_index_path(QTreeWidgetItem* item);
     VideoItem* get_video_item(VideoProject* v_proj, QTreeWidgetItem* s_item = nullptr);
     void get_video_items(QTreeWidgetItem* root, std::vector<VideoItem *> &items);

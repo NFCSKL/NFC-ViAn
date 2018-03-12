@@ -2,6 +2,7 @@
 
 FrameItem::FrameItem(int frame) : ShapeItem(FRAME_ITEM) {
     m_frame = frame;
+    setFlags(flags() | Qt::ItemIsDropEnabled);
     setText(0, QString::number(frame));
 }
 

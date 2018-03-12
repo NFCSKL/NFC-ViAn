@@ -71,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(drawing_wgt, SIGNAL(set_current_drawing(Shapes*)), video_wgt, SLOT(set_current_drawing(Shapes*)));
     connect(drawing_wgt, SIGNAL(delete_drawing(Shapes*)), this, SLOT(delete_drawing(Shapes*)));
     connect(drawing_wgt, SIGNAL(clear_frame(int)), this, SLOT(clear(int)));
+    connect(drawing_wgt, SIGNAL(update_text(QString, Shapes*)), this, SLOT(update_text(QString, Shapes*)));
     connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
     
     // Initialize analysis queue widget
@@ -525,6 +526,10 @@ void MainWindow::undo() {
 
 void MainWindow::redo() {
     video_wgt->set_redo();
+}
+
+void MainWindow::update_text(QString text, Shapes* shape) {
+    video_wgt->set_update_text(text, shape);
 }
 
 void MainWindow::clear(int frame) {

@@ -17,6 +17,7 @@ Text::Text() : Shapes(SHAPES::TEXT) {
  */
 Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPES::TEXT, col, pos) {
     string = strng;
+    set_name(strng.toStdString());
     font_scale = fnt_scl;
     text_size = cv::getTextSize(string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
 }
@@ -41,6 +42,14 @@ cv::Mat Text::draw(cv::Mat &frame) {
  */
 void Text::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
+}
+
+void Text::set_text(QString text) {
+    string = text;
+}
+
+QString Text::get_text() {
+    return string;
 }
 
 /**

@@ -10,6 +10,7 @@
 #include "DrawingItems/circleitem.h"
 #include "DrawingItems/lineitem.h"
 #include "DrawingItems/arrowitem.h"
+#include "DrawingItems/textitem.h"
 
 
 class DrawingWidget : public QTreeWidget
@@ -35,12 +36,17 @@ public slots:
     void context_menu(const QPoint& point);
     void rename_item();
     void remove_item();
+    void change_text();
+
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 
 signals:
     void jump_to_frame(VideoProject*, int);
     void set_current_drawing(Shapes* shape);
     void delete_drawing(Shapes* shape);
     void clear_frame(int);
+    void update_text(QString, Shapes*);
 };
 
 #endif // DRAWINGWIDGET_H

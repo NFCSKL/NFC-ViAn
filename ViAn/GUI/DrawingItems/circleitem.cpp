@@ -2,6 +2,7 @@
 
 CircleItem::CircleItem(Circle* circle) : ShapeItem(CIRCLE_ITEM) {
     m_circle = circle;
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, QString::fromStdString(circle->get_name()));
 }
 

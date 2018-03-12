@@ -1,7 +1,9 @@
 #include "rectitem.h"
+#include <QDebug>
 
 RectItem::RectItem(Rectangle* rect) : ShapeItem(RECT_ITEM) {
     m_rect = rect;
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, QString::fromStdString(rect->get_name()));
 }
 

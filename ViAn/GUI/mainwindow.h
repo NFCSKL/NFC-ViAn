@@ -64,6 +64,7 @@ private slots:
     void text();
     void undo();
     void redo();
+    void update_text(QString, Shapes*);
     void clear(int frame);
     void clear_current();
     void delete_drawing(Shapes* shape);

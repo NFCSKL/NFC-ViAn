@@ -2,6 +2,7 @@
 
 LineItem::LineItem(Line* line) : ShapeItem(LINE_ITEM) {
     m_line = line;
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, QString::fromStdString(line->get_name()));
 }
 

@@ -1,19 +1,26 @@
 #include <QHeaderView>
 #include "drawingwidget.h"
 #include <QMenu>
+#include <QDebug>
+#include <QDropEvent>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
     setDragDropMode(QAbstractItemView::InternalMove);
+    //viewport()->setAcceptDrops(true);
+    //setDragEnabled(true);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 }
 
 void DrawingWidget::set_overlay(Overlay* overlay) {
+    if (overlay == nullptr) qDebug() << "NULL";
     m_overlay = overlay;
     clear();
+    qDebug() << "before update";
     update_from_overlay();
+    qDebug() << "update done";
     // Wrong, gets a new connect everytime
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
 }
@@ -29,11 +36,14 @@ void DrawingWidget::update_from_overlay() {
     if (m_overlay == nullptr) return;
     for (auto& overlay : m_overlay->get_overlays()) {
         if (overlay.second.size() != 0) {
+            qDebug() << "size" << overlay.second.size();
             // Check if the frame nr already exist in widget tree
             if (findItems(QString::number(overlay.first), Qt::MatchFixedString).empty()) {
                 FrameItem* frame_item = new FrameItem(overlay.first);
                 insertTopLevelItem(topLevelItemCount(), frame_item);
+                qDebug() << "before add to frame" << frame_item->get_frame();
                 add_drawings_to_frame(frame_item);
+                qDebug() << "after add to framae";
             }
         }
     }
@@ -41,6 +51,11 @@ void DrawingWidget::update_from_overlay() {
 
 void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
     for (Shapes* shape : m_overlay->get_overlays()[f_item->get_frame()]) {
+        if (shape == nullptr) {
+            qDebug() << "IT IS NULL";
+        } else {
+            qDebug() << "type" << shape->get_shape();
+        }
         switch (shape->get_shape()) {
         case RECTANGLE: {
             RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
@@ -60,6 +75,11 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
         case ARROW: {
             ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
             f_item->addChild(arrow_item);
+            break;
+        }
+        case TEXT: {
+            TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
+            f_item->addChild(text_item);
             break;
         }
         default:
@@ -114,6 +134,13 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         frame_item->setExpanded(true);
         break;
     }
+    case TEXT: {
+        TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
+        frame_item->addChild(text_item);
+        //text_item->setText(0, "Text");
+        frame_item->setExpanded(true);
+        break;
+    }
     default:
         break;
     }
@@ -148,7 +175,8 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
         case RECT_ITEM:
         case CIRCLE_ITEM:
         case LINE_ITEM:
-        case ARROW_ITEM: {
+        case ARROW_ITEM:
+        case TEXT_ITEM: {
             auto a_item = dynamic_cast<ShapeItem*>(child);
             a_item->rename();
             break;
@@ -176,31 +204,37 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         break;
     }
     case RECT_ITEM: {
-        FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
         RectItem* rect_item = dynamic_cast<RectItem*>(item);
-        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
-        emit set_current_drawing(rect_item->get_shape());
+        Shapes* shape = rect_item->get_shape();
+        emit jump_to_frame(m_vid_proj, shape->get_frame());
+        emit set_current_drawing(shape);
         break;
     }
     case CIRCLE_ITEM: {
-        FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
         CircleItem* circle_item = dynamic_cast<CircleItem*>(item);
-        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
-        emit set_current_drawing(circle_item->get_shape());
+        Shapes* shape = circle_item->get_shape();
+        emit jump_to_frame(m_vid_proj, shape->get_frame());
+        emit set_current_drawing(shape);
         break;
     }
     case LINE_ITEM: {
-        FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
         LineItem* line_item = dynamic_cast<LineItem*>(item);
-        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
-        emit set_current_drawing(line_item->get_shape());
+        Shapes* shape = line_item->get_shape();
+        emit jump_to_frame(m_vid_proj, shape->get_frame());
+        emit set_current_drawing(shape);
         break;
     }
     case ARROW_ITEM: {
-        FrameItem* frame_item = dynamic_cast<FrameItem*>(item->parent());
         ArrowItem* arrow_item = dynamic_cast<ArrowItem*>(item);
-        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
-        emit set_current_drawing(arrow_item->get_shape());
+        Shapes* shape = arrow_item->get_shape();
+        emit jump_to_frame(m_vid_proj, shape->get_frame());
+        emit set_current_drawing(shape);
+        break;
+    }case TEXT_ITEM: {
+        TextItem* text_item = dynamic_cast<TextItem*>(item);
+        Shapes* shape = text_item->get_shape();
+        emit jump_to_frame(m_vid_proj, shape->get_frame());
+        emit set_current_drawing(shape);
         break;
     }
     default:
@@ -224,6 +258,11 @@ void DrawingWidget::context_menu(const QPoint &point) {
         menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addAction("Remove", this, SLOT(remove_item()));
         break;
+    case TEXT_ITEM:
+        menu.addAction("Change text", this, SLOT(change_text()));
+        menu.addAction("Rename", this, SLOT(rename_item()));
+        menu.addAction("Remove", this, SLOT(remove_item()));
+        break;
     default:
         break;
     }
@@ -232,6 +271,19 @@ void DrawingWidget::context_menu(const QPoint &point) {
 
 void DrawingWidget::rename_item() {
     editItem(currentItem());
+}
+
+void DrawingWidget::change_text() {
+    Text* text = dynamic_cast<TextItem*>(currentItem())->get_shape();
+    //text->set_text("jkflsda");
+    QInputDialog dialog;
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setLabelText("Enter the new text:");
+    int reply = dialog.exec();
+    if (reply) {
+        //text->set_text(dialog.textValue());
+        emit update_text(dialog.textValue(), text);
+    }
 }
 
 void DrawingWidget::remove_item() {
@@ -276,7 +328,48 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         delete item;
         if (parent->childCount() == 0) delete parent;
         break;
+    case TEXT_ITEM:
+        shape = dynamic_cast<TextItem*>(item)->get_shape();
+        emit delete_drawing(shape);
+        parent = item->parent();
+        delete item;
+        if (parent->childCount() == 0) delete parent;
+        break;
     default:
         break;
     }
+}
+
+/**
+ * @brief DrawingWidget::dragEnterEvent
+ * Makes sure the DrawingWidget only accepts drops containing objects of the correct mime type
+ * @param event
+ */
+void DrawingWidget::dragEnterEvent(QDragEnterEvent *event) {
+    if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")){
+        // TreeItem
+        event->setDropAction(Qt::MoveAction);
+        event->accept();
+    }
+}
+
+/**
+ * @brief DrawingWidget::dropEvent
+ * Handels drop events.
+ * Calls upon standard dropEvent for TreeItems.
+ * @param event
+ */
+void DrawingWidget::dropEvent(QDropEvent *event) {
+    //QList<QTreeWidgetItem*> items = selectedItems();
+    //QModelIndex dropped_index = indexAt(event->pos());
+    //if (!dropped_index.isValid()) return;
+
+    QTreeWidget::dropEvent(event);
+    // Update index paths
+//    for (auto item : items) {
+//        if (item->type() == VIDEO_ITEM) {
+//            auto vid_item = dynamic_cast<VideoItem*>(item);
+//            vid_item->get_video_project()->set_tree_index(get_index_path(item));
+//        }
+//    }
 }

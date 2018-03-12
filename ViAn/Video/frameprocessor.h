@@ -71,6 +71,7 @@ struct overlay_settings {
 
     bool undo = false;
     bool redo = false;
+    bool update_text = false;
     bool clear_drawings = false;
     bool delete_drawing = false;
     bool show_overlay = true;
@@ -80,6 +81,7 @@ struct overlay_settings {
 
     SHAPES tool = NONE;
     QColor color = Qt::red;
+    QString text = "";
     QString current_string = "Enter text";
     float current_font_scale = 1;
     Shapes* shape = nullptr;

@@ -2,6 +2,7 @@
 
 ArrowItem::ArrowItem(Arrow* arrow) : ShapeItem(ARROW_ITEM) {
     m_arrow = arrow;
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, QString::fromStdString((arrow->get_name())));
 }
 
