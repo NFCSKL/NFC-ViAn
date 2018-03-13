@@ -12,7 +12,6 @@ AnalysisProxy::AnalysisProxy()
 
 AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
     file_analysis(file_analysis) {
-    qDebug() << "const 1";
 }
 
 /**
@@ -28,7 +27,6 @@ AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
     : BasicAnalysis(other),
       file_analysis(file),
       type(other.type) {
-    qDebug() << "const 2";
 }
 
 AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
@@ -36,13 +34,10 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
     file_analysis(other.file_analysis),
     type(other.type)
 {
-    qDebug() << "const 3";
 }
 
 void AnalysisProxy::reset_root_dir(const std::string &dir) {
-    qDebug() << "before" << QString::fromStdString(file_analysis);
     file_analysis = dir+Utility::name_from_path(file_analysis);
-    qDebug() << "after" << QString::fromStdString(file_analysis);
 }
 
 

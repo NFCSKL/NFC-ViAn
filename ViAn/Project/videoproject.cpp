@@ -199,8 +199,6 @@ void VideoProject::reset_root_dir(const string &dir) {
         bm.second->reset_root_dir(dir+"Bookmarks/");
     }
     for(auto& an : m_analyses){
-        qDebug() << "type" << an.second->get_type();
-        qDebug() << "type2" << m_analyses[0]->get_type();
         if(an.second->get_type() == MOTION_DETECTION){ ;
             dynamic_cast<AnalysisProxy*>(an.second)->reset_root_dir(dir);
         }

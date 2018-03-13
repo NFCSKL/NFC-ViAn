@@ -146,11 +146,7 @@ void AnalysisMethod::run() {
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
         m_ana_name = check_save_path(m_ana_name);
-        qDebug() << "m_ana_name" << QString::fromStdString(m_ana_name);
-        qDebug() << "m_tmp_save_path" << QString::fromStdString(m_tmp_save_path);
-        qDebug() << "m_save_path" << QString::fromStdString(m_save_path);
         m_analysis.save_saveable(m_tmp_save_path + m_ana_name);
-        qDebug() << "fullpath" << QString::fromStdString(m_analysis.full_path());
 
         AnalysisProxy proxy(m_analysis, m_save_path + m_ana_name);
         emit finished_analysis(proxy);
