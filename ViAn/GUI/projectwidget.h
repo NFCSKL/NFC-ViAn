@@ -109,7 +109,6 @@ signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
 
-
 };
 
 #endif // PROJECTWIDGET_H

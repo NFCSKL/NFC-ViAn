@@ -89,16 +89,10 @@ void VideoPlayer::check_events() {
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
-            qDebug() << "";
-            qDebug() << "in vid_play";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
-                qDebug() << "wait load read video";
                 wait_load_read();
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
-                qDebug() << "curr: ";
-                qDebug() << current_frame;
-                qDebug() << m_frame->load();
                 set_frame();
             }
         } else {

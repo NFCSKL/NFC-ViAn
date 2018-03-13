@@ -529,6 +529,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 break;
             case DRAWING_TAG_ITEM:
+                menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Update", this, SLOT(update_tag_drawing()));
                 break;
             case ANALYSIS_ITEM:
@@ -543,6 +544,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 menu.addAction("Tag drawings", this, SLOT(tag_drawings()));
+                break;
             default:
                 // VIDEO_ITEM
                 break;
@@ -661,6 +663,14 @@ void ProjectWidget::create_folder_item() {
         s_item->setExpanded(true);
     } else if (s_item->type() == VIDEO_ITEM) {
         QTreeWidgetItem* p_item =  s_item->parent();
+        if (p_item == nullptr) {
+            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
+        } else {
+            int index = p_item->indexOfChild(s_item);
+            p_item->insertChild(index + 1, item);
+        }
+    } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
+        QTreeWidgetItem* p_item = s_item->parent()->parent();
         if (p_item == nullptr) {
             insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
         } else {
