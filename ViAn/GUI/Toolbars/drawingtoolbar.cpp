@@ -28,7 +28,10 @@ void DrawingToolbar::create_actions() {
     redo_tool_act = new QAction(QIcon("../ViAn/Icons/redo.png"), tr("Redo last drawing"), this);
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
 
-    delete_tool_act->setShortcut(QKeySequence::Delete);
+    undo_tool_act->setDisabled(true);
+    redo_tool_act->setDisabled(true);
+
+    //delete_tool_act->setShortcut(QKeySequence::Delete);
 
     tools = new QActionGroup(this);
     tools->addAction(pen_tool_act);

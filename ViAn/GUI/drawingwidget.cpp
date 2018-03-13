@@ -3,27 +3,34 @@
 #include <QMenu>
 #include <QDebug>
 #include <QDropEvent>
+#include <QShortcut>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
-    setDragDropMode(QAbstractItemView::InternalMove);
-    //viewport()->setAcceptDrops(true);
-    //setDragEnabled(true);
+    //setDragDropMode(QAbstractItemView::InternalMove);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
+
+    // Widget only shortcut for creating a new folder
+    QShortcut* delete_sc = new QShortcut(this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    delete_sc->setKey(QKeySequence(QKeySequence::Delete));
+    connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::remove_item);
 }
 
 void DrawingWidget::set_overlay(Overlay* overlay) {
     if (overlay == nullptr) qDebug() << "NULL";
+    disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
     m_overlay = overlay;
     clear();
     qDebug() << "before update";
     update_from_overlay();
     qDebug() << "update done";
-    // Wrong, gets a new connect everytime
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
 }
+
+
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
     if (m_vid_proj != vid_proj) { //disconnect then reconnect and check if nullptr
@@ -341,35 +348,11 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
 }
 
 /**
- * @brief DrawingWidget::dragEnterEvent
- * Makes sure the DrawingWidget only accepts drops containing objects of the correct mime type
- * @param event
- */
-void DrawingWidget::dragEnterEvent(QDragEnterEvent *event) {
-    if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")){
-        // TreeItem
-        event->setDropAction(Qt::MoveAction);
-        event->accept();
-    }
-}
-
-/**
  * @brief DrawingWidget::dropEvent
  * Handels drop events.
  * Calls upon standard dropEvent for TreeItems.
  * @param event
  */
 void DrawingWidget::dropEvent(QDropEvent *event) {
-    //QList<QTreeWidgetItem*> items = selectedItems();
-    //QModelIndex dropped_index = indexAt(event->pos());
-    //if (!dropped_index.isValid()) return;
-
-    QTreeWidget::dropEvent(event);
-    // Update index paths
-//    for (auto item : items) {
-//        if (item->type() == VIDEO_ITEM) {
-//            auto vid_item = dynamic_cast<VideoItem*>(item);
-//            vid_item->get_video_project()->set_tree_index(get_index_path(item));
-//        }
-//    }
+    //QTreeWidget::dropEvent(event);
 }

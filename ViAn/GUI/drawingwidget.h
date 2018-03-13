@@ -38,7 +38,6 @@ public slots:
     void remove_item();
     void change_text();
 
-    void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
 signals:

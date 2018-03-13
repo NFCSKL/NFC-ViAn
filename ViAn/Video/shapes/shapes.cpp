@@ -25,13 +25,23 @@ Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     draw_end = qpoint_to_point(pos);
 }
 
+void Shapes::edit_shape(QPoint diff_point, QPoint pos) {
+    QPoint start_point = QPoint(draw_start.x, draw_start.y) - pos;
+    QPoint end_point = QPoint(draw_end.x, draw_end.y) - pos;
+    if (start_point.manhattanLength() < end_point.manhattanLength()) {
+        draw_start += qpoint_to_point(diff_point);
+    } else {
+        draw_end += qpoint_to_point(diff_point);
+    }
+}
+
 /**
  * @brief Shape::update_drawing_pos
  * Updates the position of the end point of the drawing
  * @param pos
  */
 void Shapes::update_drawing_pos(QPoint pos) {
-    // Call handle_new_pos first because it might need the old draw_end value.
+    // Call handle_new_pos first because it might need the old draw_end value. Only in pen
     handle_new_pos(pos);
     draw_end = qpoint_to_point(pos);
 }

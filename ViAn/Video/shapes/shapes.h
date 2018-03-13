@@ -16,6 +16,7 @@ class Shapes {
 public:
     Shapes(SHAPES s);
     Shapes(SHAPES s, QColor col, QPoint pos);
+    void edit_shape(QPoint diff_point, QPoint pos);
     void update_drawing_pos(QPoint pos);
     void update_text_pos(QPoint pos);
     void move_shape(QPoint p);

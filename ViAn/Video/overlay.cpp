@@ -138,7 +138,9 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
             current_drawing = shape;
         }
     }
-    if (current_drawing != nullptr) current_drawing->invert_color();
+    if (current_drawing != nullptr) {
+        current_drawing->invert_color();
+    }
 }
 
 void Overlay::set_current_drawing(Shapes *shape) {
@@ -211,12 +213,12 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                 add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
                 break;
             case HAND:
+                prev_point = pos;
                 if (right_click) {
                     m_right_click = right_click;
                     break;
                 }
                 get_drawing(pos, frame_nr);
-                prev_point = pos;
                 break;
             default:
                 break;
@@ -274,7 +276,10 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
                 return;
             }
             else if (m_right_click){
-                current_drawing->update_drawing_pos(pos);
+                QPoint diff_point = pos - prev_point;
+                current_drawing->edit_shape(diff_point, pos);
+                prev_point = pos;
+                //current_drawing->update_drawing_pos(pos);
                 return;
             }
             QPoint diff_point = pos - prev_point;
