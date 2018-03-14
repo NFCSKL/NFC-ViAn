@@ -11,8 +11,6 @@ Project::Project(){
 Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->load_saveable(full_path);
-    // ensure changes to paths are saved
-    //proj->save_saveable(full_path);
     if(proj->tmp_dir.isValid()){
         proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
         proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";

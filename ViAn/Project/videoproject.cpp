@@ -193,7 +193,6 @@ void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
-// Why
 void VideoProject::reset_root_dir(const string &dir) {
     for(auto bm : m_bookmarks){
         bm.second->reset_root_dir(dir+"Bookmarks/");

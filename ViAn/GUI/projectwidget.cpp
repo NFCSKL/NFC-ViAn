@@ -556,6 +556,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
     menu.exec(mapToGlobal(point));
 }
 
+/**
+ * @brief ProjectWidget::tag_drawings
+ *  Creates a tag from all the drawings in the current video project
+ */
 void ProjectWidget::tag_drawings() {
     VideoItem* vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
     BasicAnalysis* basic_tag = new DrawingTag();
@@ -571,6 +575,10 @@ void ProjectWidget::tag_drawings() {
     add_basic_analysis(vid_proj, basic_tag);
 }
 
+/**
+ * @brief ProjectWidget::update_tag_drawing
+ * Update the drawing tag so it matches with all the current drawings
+ */
 void ProjectWidget::update_tag_drawing() {
     DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
@@ -694,7 +702,7 @@ void ProjectWidget::save_project() {
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
     m_proj->save_project();
-    m_proj->move_project_from_tmp(); // might not want
+    m_proj->move_project_from_tmp();
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file());
@@ -716,7 +724,7 @@ void ProjectWidget::open_project(QString project_path) {
     m_proj = new_proj;
     set_status_bar("Opening project");
     // Load project tree structure
-    ProjectTreeState tree_state; //Some error/Warning
+    ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
     set_main_window_name(QString::fromStdString(m_proj->get_name()));

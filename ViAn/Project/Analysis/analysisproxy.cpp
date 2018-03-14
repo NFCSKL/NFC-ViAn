@@ -75,17 +75,10 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["intervals"] = intervals;
 }
 
-SAVE_TYPE AnalysisProxy::get_save_type() const
-{
-    return DETECTION;
-}
-
-ANALYSIS_TYPE AnalysisProxy::get_type() const
-{
+ANALYSIS_TYPE AnalysisProxy::get_type() const {
     return type;
 }
 
-std::string AnalysisProxy::full_path() const
-{
+std::string AnalysisProxy::full_path() const {
     return file_analysis;
 }

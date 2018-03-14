@@ -27,13 +27,7 @@ void BasicAnalysis::clear_intervals() {
     m_intervals.clear();
 }
 
-SAVE_TYPE BasicAnalysis::get_save_type() const
-{
-    return INTERVAL;
-}
-
-ANALYSIS_TYPE BasicAnalysis::get_type() const
-{
+ANALYSIS_TYPE BasicAnalysis::get_type() const {
     return BASIC_ANALYSIS;
 }
 
