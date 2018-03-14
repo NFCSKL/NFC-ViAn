@@ -574,6 +574,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
             default:
                 // VIDEO_ITEM
                 break;
@@ -583,6 +584,11 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Remove", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
+}
+
+void ProjectWidget::open_video_in_widget() {
+    VideoItem* v_item = dynamic_cast<VideoItem*>(currentItem());
+    emit open_in_widget(v_item->get_video_project());
 }
 
 /**

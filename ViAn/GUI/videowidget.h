@@ -77,7 +77,6 @@ public:
     ~VideoWidget();
 
     // Lock and wait condition to sleep player when video is paused
-    video_player* m_video_player;
     FrameWidget* frame_wgt;
     AnalysisSlider* playback_slider;
 

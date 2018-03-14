@@ -79,6 +79,7 @@ public slots:
     bool prompt_save();
 private slots:
     void context_menu(const QPoint& point);
+    void open_video_in_widget();
     void remove_item();
     void rename_item();
     void show_details();
@@ -107,6 +108,7 @@ private:
 signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
+    void open_in_widget(VideoProject* vid_proj);
 
 
 };

@@ -62,6 +62,45 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 }
 
 VideoWidget::~VideoWidget(){
+    /*
+    delete scroll_area;
+    delete v_controller;
+    delete vertical_layout;
+    delete frame_wgt;
+    delete control_row;
+    delete video_btns;
+    delete analysis_btns;
+    delete other_btns;
+    delete zoom_btns;
+    delete interval_btns;
+    delete speed_slider_layout;
+    delete play_btn;
+    delete stop_btn;
+    delete next_frame_btn;
+    delete prev_frame_btn;
+    delete next_poi_btn;
+    delete prev_poi_btn;
+    delete bookmark_btn;
+    delete export_frame_btn;
+    delete analysis_btn;
+    delete analysis_play_btn;
+    delete new_tag_btn;
+    delete tag_btn;
+    delete zoom_in_btn;
+    delete zoom_out_btn;
+    delete fit_btn;
+    delete original_size_btn;
+    delete zoom_label;
+    delete set_start_interval_btn;
+    delete set_end_interval_btn;
+    delete remove_frame_act;
+    delete speed_slider;
+    delete current_time;
+    delete total_time;
+    delete playback_slider;
+    delete f_processor;
+    delete m_vid_proj;
+    */
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
