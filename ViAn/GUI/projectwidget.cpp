@@ -96,7 +96,7 @@ void ProjectWidget::add_video() {
     QStringList video_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add video"),
-                m_proj->get_tmp_dir().c_str(),
+                m_proj->get_dir().c_str(),
                 extensions);
 
     for (auto video_path : video_paths){
