@@ -66,6 +66,14 @@ void BasicAnalysis::write(QJsonObject &json){
     m_unsaved_changes = false;
 }
 
+ID BasicAnalysis::get_id() {
+    return id;
+}
+
+void BasicAnalysis::set_id(ID new_id) {
+    id = new_id;
+}
+
 std::string BasicAnalysis::get_name() const {
     return m_name;
 }

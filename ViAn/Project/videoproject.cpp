@@ -222,9 +222,16 @@ void VideoProject::reset_root_dir(const string &dir){
  * Adds analysis to video project.
  */
 ID VideoProject::add_analysis(BasicAnalysis *analysis){
-    m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    m_analyses.insert(std::make_pair(m_ana_id, analysis));
+    analysis->set_id(m_ana_id);
     m_unsaved_changes = true;
-    return m_ana_cnt++;
+    return m_ana_id++;
+}
+
+void VideoProject::remove_analysis(BasicAnalysis *analysis) {
+    m_analyses.erase(analysis->get_id());
+    m_unsaved_changes = true;
+    delete analysis;
 }
 
 /**

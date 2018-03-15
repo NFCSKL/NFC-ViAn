@@ -72,6 +72,7 @@ public slots:
     bool open_project(QString project_path="");
     bool close_project();
     void remove_project();
+    void remove_tree_item(QTreeWidgetItem*item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void advanced_analysis();
