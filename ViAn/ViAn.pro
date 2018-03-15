@@ -62,7 +62,8 @@ SOURCES += main.cpp \
     GUI/Analysis/videolistitem.cpp \
     GUI/Analysis/queuewidget.cpp \
     Project/Analysis/drawingtag.cpp \
-    GUI/TreeItems/drawingtagitem.cpp
+    GUI/TreeItems/drawingtagitem.cpp \
+    Project/Test/bookmarktest.cpp
 
 #
 # TEST
@@ -114,7 +115,8 @@ HEADERS += reportgenerator.h\
     GUI/Analysis/videolistitem.h \
     GUI/Analysis/queuewidget.h \
     Project/Analysis/drawingtag.h \
-    GUI/TreeItems/drawingtagitem.h
+    GUI/TreeItems/drawingtagitem.h \
+    Project/Test/bookmarktest.h
 
 #
 # LIBRARY

@@ -129,6 +129,7 @@ void Overlay::add_drawing(Shape* shape, int frame_nr) {
     }
     overlays[frame_nr].overlay.push_back(shape);
     overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+    m_unsaved_changes = true;
 }
 
 /**
@@ -249,6 +250,7 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
+    if (!current_drawing) return;
     if (current_drawing->get_current_frame() == frame_nr && show_overlay) {
         current_drawing->set_thickness(pos);
     }
@@ -289,6 +291,11 @@ std::map<int, FrameOverlay> Overlay::get_overlays() {
 
 void Overlay::set_overlays(std::map<int, FrameOverlay> new_overlays) {
     overlays = new_overlays;
+    m_unsaved_changes = true;
+}
+
+bool Overlay::is_saved() const{
+    return !m_unsaved_changes;
 }
 
 /**
@@ -300,6 +307,7 @@ void Overlay::undo(int frame_nr) {
     if (show_overlay && overlays[frame_nr].overlay.begin() != overlays[frame_nr].drawn) {
         overlays[frame_nr].drawn--;
     }
+    m_unsaved_changes = true;
 }
 
 /**
@@ -311,6 +319,7 @@ void Overlay::redo(int frame_nr) {
     if (show_overlay && overlays[frame_nr].overlay.end() != overlays[frame_nr].drawn) {
         overlays[frame_nr].drawn++;
     }
+    m_unsaved_changes = true;
 }
 
 /**
@@ -322,6 +331,7 @@ void Overlay::clear(int frame_nr) {
     if (show_overlay) {
         overlays[frame_nr].overlay.clear();
         overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+        m_unsaved_changes = true;
     }
 }
 
@@ -369,6 +379,7 @@ void Overlay::read(const QJsonObject& json) {
             add_drawing(shape, frame_nr);
         }
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -393,5 +404,6 @@ void Overlay::write(QJsonObject& json) {
         }
     }
     json["overlays"] = json_overlays;
+    m_unsaved_changes = false;
 }
 

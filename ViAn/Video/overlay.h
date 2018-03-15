@@ -38,7 +38,7 @@ struct FrameOverlay{
  */
 class Overlay : public QObject, public Writeable {
     Q_OBJECT
-
+    bool m_unsaved_changes = true;
 public slots:
     void set_tool(SHAPES s);
 public:
@@ -67,6 +67,8 @@ public:
 
     std::map<int, FrameOverlay> get_overlays();
     void set_overlays(std::map<int, FrameOverlay>);
+
+    bool is_saved() const;
 
 private:
     Shape* get_empty_shape(SHAPES shape_type);

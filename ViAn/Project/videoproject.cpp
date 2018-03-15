@@ -59,6 +59,14 @@ BasicAnalysis *VideoProject::get_analysis(const int& id) {
     return m_analyses[id];
 }
 
+bool VideoProject::is_saved() {
+    bool bookmarks_saved = std::all_of(m_bookmarks.begin(), m_bookmarks.end(),
+                                       [](std::map<ID,Bookmark*>::const_reference t){return t.second->is_saved();});
+    bool analyses_saved = std::all_of(m_analyses.begin(), m_analyses.end(),
+                                       [](std::map<ID,BasicAnalysis*>::const_reference t){return t.second->is_saved();});
+    return !m_unsaved_changes && analyses_saved && bookmarks_saved && m_overlay->is_saved();
+}
+
 /**
  * @brief VideoProject::remove_analysis
  * @param id of the analysis
@@ -68,6 +76,7 @@ void VideoProject::delete_analysis(const int& id) {
     m_analyses.erase(id);
     am->delete_saveable();
     delete am;
+    m_unsaved_changes = true;
 }
 
 /**
@@ -81,6 +90,7 @@ void VideoProject::delete_bookmark(const int &id) {
     m_bookmarks.erase(id);
     bm->remove_exported_image();
     delete bm;
+    m_unsaved_changes = true;
 }
 
 /**
@@ -135,6 +145,7 @@ void VideoProject::read(const QJsonObject& json){
         analysis->read(json_analysis);
         add_analysis(analysis);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -167,6 +178,7 @@ void VideoProject::write(QJsonObject& json){
     QJsonObject json_overlay;
     this->m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
+    m_unsaved_changes = false;
 }
 
 /**
@@ -177,6 +189,7 @@ void VideoProject::write(QJsonObject& json){
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
     bookmark->set_video_project(this);
+    m_unsaved_changes = true;
     return m_bm_cnt++;
 }
 
@@ -187,6 +200,7 @@ void VideoProject::set_tree_index(std::stack<int> tree_index) {
         tree_index.pop();
         m_tree_index.append(":");
     }
+    m_unsaved_changes = true;
 }
 
 void VideoProject::set_project(Project *proj){
@@ -212,6 +226,7 @@ void VideoProject::reset_root_dir(const string &dir) {
  */
 ID VideoProject::add_analysis(BasicAnalysis *analysis){
     m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    m_unsaved_changes = true;
     return m_ana_cnt++;
 }
 
@@ -228,6 +243,12 @@ void VideoProject::delete_artifacts(){
         BasicAnalysis* temp = it2->second;
         temp->delete_saveable();
     }
+    m_unsaved_changes = true;
+}
+
+void VideoProject::remove_from_project() {
+    m_project->remove_video_project(this);
+    m_unsaved_changes = true;
 }
 
 string VideoProject::get_index_path() {
