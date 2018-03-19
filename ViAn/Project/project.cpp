@@ -307,6 +307,11 @@ void Project::set_file(std::string file) {
     m_file = file;
 }
 
+/**
+ * @brief Project::update_tmp
+ * Update the temporary files with the new name and path
+ * @param name
+ */
 void Project::update_tmp(string name) {
     QFile::rename(QString::fromStdString(m_tmp_file), QString::fromStdString(m_tmp_dir + name + ".vian"));
     QDir dir = QDir(QString::fromStdString(m_tmp_dir));

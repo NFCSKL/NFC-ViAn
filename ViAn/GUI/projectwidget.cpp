@@ -76,6 +76,11 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     emit proj_path(m_proj->get_tmp_dir());
 }
 
+/**
+ * @brief ProjectWidget::add_default_project
+ * Slot function called to create an empty project, a default project.
+ * Creates a new project and generates the default tree structure
+ */
 void ProjectWidget::add_default_project() {
     Project* default_project = new Project("default");
     if (!default_project->tmp_dir_valid) {
@@ -690,6 +695,9 @@ void ProjectWidget::create_folder_item() {
 /**
  * @brief ProjectWidget::save_project
  * Slot function to save the open project
+ * If the project is a default project it will
+ * prompt the user and ask for name and path.
+ * @return bool: saved succesful
  */
 bool ProjectWidget::save_project() {
     if (m_proj == nullptr ) return false;
@@ -712,6 +720,12 @@ bool ProjectWidget::save_project() {
     return true;
 }
 
+/**
+ * @brief ProjectWidget::save_as_project
+ * Updates the project with a new name and path
+ * @param project_name: new project name
+ * @param project_path: new project path
+ */
 void ProjectWidget::save_as_project(QString project_name, QString project_path) {
     std::string name = project_name.toStdString();
     std::string path = project_path.toStdString();
