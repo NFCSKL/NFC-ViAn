@@ -69,7 +69,7 @@ public slots:
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
-    void save_project();
+    bool save_project();
     void save_as_project(QString, QString);
     bool open_project(QString project_path="");
     bool close_project();

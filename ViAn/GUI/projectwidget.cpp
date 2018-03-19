@@ -445,7 +445,7 @@ bool ProjectWidget::prompt_save() {
 
     switch (delete_box.exec()){
         case QMessageBox::Yes:
-                save_project();
+                ok = save_project();
                 break;
         case QMessageBox::Cancel:
                 ok = false;
@@ -691,14 +691,13 @@ void ProjectWidget::create_folder_item() {
  * @brief ProjectWidget::save_project
  * Slot function to save the open project
  */
-void ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return;
+bool ProjectWidget::save_project() {
+    if (m_proj == nullptr ) return false;
     if (m_proj->is_default_proj) {
         ProjectDialog* proj_dialog = new ProjectDialog(nullptr, "Save as...");
         connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(save_as_project(QString, QString)));
         connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
-        proj_dialog->exec();
-        return;
+        return proj_dialog->exec();
     }
     save_item_data();
     ProjectTreeState tree_state;
@@ -710,6 +709,7 @@ void ProjectWidget::save_project() {
     rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file());
     set_status_bar("Project saved");
+    return true;
 }
 
 void ProjectWidget::save_as_project(QString project_name, QString project_path) {
@@ -782,6 +782,8 @@ bool ProjectWidget::close_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
+
+    add_default_project();
     return true;
 }
 
@@ -806,6 +808,8 @@ void ProjectWidget::remove_project() {
     emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
+
+    add_default_project();
 }
 
 void ProjectWidget::set_main_window_name(QString name) {
