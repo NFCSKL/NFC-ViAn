@@ -96,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
+    //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
@@ -528,7 +529,7 @@ void MainWindow::delete_drawing() {
 }
 
 void MainWindow::zoom() {
-    video_wgt->frame_wgt->set_tool(ZOOM);
+    video_wgt->frame_wgt->set_tool(ZOOMIN);
 }
 
 void MainWindow::move() {

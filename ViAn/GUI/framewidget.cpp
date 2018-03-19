@@ -7,29 +7,6 @@
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 
-void FrameWidget::toggle_zoom(bool value) {
-    if (value) {
-        tool = ZOOM;
-        emit send_tool(ZOOM);
-        setCursor(Qt::CrossCursor);
-    } else {
-        unsetCursor();
-        tool = NONE;
-        emit send_tool(NONE);
-    }
-}
-
-void FrameWidget::set_analysis_tool(bool status) {
-    if (status) {
-        tool = ANALYSIS_BOX;
-        setCursor(Qt::CrossCursor);
-    } else {
-        tool = NONE;
-        unsetCursor();
-    }
-}
-
-
 void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
@@ -102,34 +79,70 @@ void FrameWidget::update(){
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
-    if (m_vid_proj != nullptr) {
+    if (tool == TEXT) {
+        QString current_string = "Enter text";
+        float current_font_scale = 1;
+        std::string input_string = current_string.toStdString();
+        float input_font_scale = current_font_scale;
+        CustomDialog dialog("Choose text", NULL);
+        dialog.addLabel("Enter values:");
+        dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
+        dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
+                              &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
+                              "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
 
-        if (tool == TEXT) {
-            QString current_string = "Enter text";
-            float current_font_scale = 1;
-            std::string input_string = current_string.toStdString();
-            float input_font_scale = current_font_scale;
-            CustomDialog dialog("Choose text", NULL);
-            dialog.addLabel("Enter values:");
-            dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
-            dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
-                                  &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
-                                  "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
+        // Show the dialog (execution will stop here until the dialog is finished)
+        dialog.exec();
 
-            // Show the dialog (execution will stop here until the dialog is finished)
-            dialog.exec();
-
-            if (!dialog.wasCancelled() && !input_string.empty()) {
-                // Not cancelled and not empty field.
-                current_string = QString::fromStdString(input_string);
-                current_font_scale = input_font_scale;
-            }
-            emit send_tool_text(current_string, current_font_scale);
-        } else {
-            emit send_tool(tool);
+        if (!dialog.wasCancelled() && !input_string.empty()) {
+            // Not cancelled and not empty field.
+            current_string = QString::fromStdString(input_string);
+            current_font_scale = input_font_scale;
         }
+        emit send_tool_text(current_string, current_font_scale);
+    } else {
+        emit send_tool(tool);
+    }
 
-        this->tool = tool;
+    m_tool = tool;
+    set_cursor(m_tool);
+}
+
+/**
+ * @brief FrameWidget::set_cursor
+ * @param tool
+ * Set the cursor depending on the current tool
+ */
+void FrameWidget::set_cursor(SHAPES tool) {
+    switch (tool) {
+    case NONE:
+        unsetCursor();
+        break;
+    case ANALYSIS_BOX:
+    case ZOOMIN:
+    case RECTANGLE:
+    case CIRCLE:
+        setCursor(Qt::CrossCursor);
+        break;
+    case ZOOMOUT:
+        setCursor(Qt::ArrowCursor);
+        break;
+    case MOVE:
+        setCursor(Qt::OpenHandCursor);
+        break;
+    case PEN:
+    case ARROW:
+    case LINE:
+    case TEXT:
+        setCursor(Qt::UpArrowCursor);
+        break;
+        //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
+    case HAND:
+        setCursor(Qt::SizeAllCursor);
+        break;
+    default:
+        unsetCursor();
+        break;
     }
 }
 
@@ -191,7 +204,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
 
     if (mark_rect) {
         // Draw the zoom box with correct dimension
-        if(tool == ZOOM){
+        if(m_tool == ZOOMIN){
             QPoint start = rect_start;
             QPoint end = rect_end;
 
@@ -214,7 +227,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
 
 
-    if(tool == ANALYSIS_BOX){
+    if(m_tool == ANALYSIS_BOX){
         painter.setPen(QColor(0,255,0));
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
@@ -249,6 +262,7 @@ QPoint FrameWidget::scale_point(QPoint pos) {
  * @param event
  */
 void FrameWidget::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED (event)
     emit current_size(width(), height());
 }
 
@@ -257,7 +271,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
  * @param event
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
-    switch (tool) {
+    switch (m_tool) {
     case NONE:
         break;
     case ANALYSIS_BOX:
@@ -266,7 +280,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             ana_rect_end = event->pos();
         }
         break;
-    case ZOOM:
+    case ZOOMIN:
         if (event->button() == Qt::RightButton) {
             init_panning(event->pos());
         } else if (event->button() == Qt::LeftButton) {
@@ -276,6 +290,9 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
                 rect_start = event->pos();
             }
         }
+        break;
+    case MOVE:
+        init_panning(event->pos());
         break;
     default:
         bool right_click = (event->button() == Qt::RightButton);
@@ -289,28 +306,30 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
-    switch (tool) {
+    switch (m_tool) {
     case NONE:
         break;
-    case ZOOM:
-    {
+    case ANALYSIS_BOX:
+        set_analysis_settings();
+        break;
+    case ZOOMIN:
         if (event->button() == Qt::RightButton) {
             end_panning();
         } else if (event->button() == Qt::LeftButton){
             if (do_zoom_out) {
-                emit trigger_zoom_out();
+                emit trigger_zoom_out(0.5);
                 do_zoom_out = false;
             }else {
                 end_zoom();
             }
         }
         break;
-    }
-    case ANALYSIS_BOX:
-    {
-        set_analysis_settings();
+    case ZOOMOUT:
+        emit trigger_zoom_out(0.5);
         break;
-    }
+    case MOVE:
+        end_panning();
+        break;
     default:
         emit mouse_released(scale_point(event->pos()), false);
         break;
@@ -322,7 +341,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
-    switch (tool) {
+    switch (m_tool) {
     case NONE:
         break;
     case ANALYSIS_BOX:
@@ -330,13 +349,16 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             ana_rect_end = rect_update(event->pos());
         }
         break;
-    case ZOOM:
+    case ZOOMIN:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
         } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
             rect_end = rect_update(event->pos());
             mark_rect = true;
         }
+        break;
+    case MOVE:
+        panning(event->pos());
         break;
     default:
         emit mouse_moved(scale_point(event->pos()));
@@ -351,8 +373,24 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
 void FrameWidget::wheelEvent(QWheelEvent *event) {
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
-    emit mouse_scroll(num_steps);
-    event->accept();
+    switch (m_tool) {
+    case HAND:
+        emit mouse_scroll(num_steps);
+        event->accept();
+        break;
+    case ZOOMIN:
+    case ZOOMOUT:
+    case MOVE:
+        if (num_steps.y() < 0) {
+            emit trigger_zoom_out(0.9);
+        } else {
+            emit trigger_zoom_out(1.1);
+        }
+        break;
+    default:
+        break;
+    }
+
 }
 
 void FrameWidget::set_analysis_settings() {
@@ -423,7 +461,11 @@ QPoint FrameWidget::rect_update(QPoint pos) {
  * Panning stopped
  */
 void FrameWidget::end_panning() {
-    setCursor(Qt::CrossCursor);
+    if (m_tool == ZOOMIN) {
+        setCursor(Qt::CrossCursor);
+    } else if (m_tool == MOVE){
+        setCursor(Qt::OpenHandCursor);
+    }
 }
 
 /**
