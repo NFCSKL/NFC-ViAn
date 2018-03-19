@@ -73,7 +73,19 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     close_project();
     set_main_window_name(project_name);
     m_proj = new_proj;
-    path.append(name);
+    emit proj_path(m_proj->get_tmp_dir());
+}
+
+void ProjectWidget::add_default_project() {
+    Project* default_project = new Project("default");
+    if (!default_project->tmp_dir_valid) {
+        delete m_proj;
+        m_proj = nullptr;
+        exit(0);
+        return;
+    }
+    set_main_window_name("default");
+    m_proj = default_project;
     emit proj_path(m_proj->get_tmp_dir());
 }
 
@@ -681,6 +693,13 @@ void ProjectWidget::create_folder_item() {
  */
 void ProjectWidget::save_project() {
     if (m_proj == nullptr ) return;
+    if (m_proj->is_default_proj) {
+        ProjectDialog* proj_dialog = new ProjectDialog(nullptr, "Save as...");
+        connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(save_as_project(QString, QString)));
+        connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
+        proj_dialog->exec();
+        return;
+    }
     save_item_data();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -691,6 +710,18 @@ void ProjectWidget::save_project() {
     rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file());
     set_status_bar("Project saved");
+}
+
+void ProjectWidget::save_as_project(QString project_name, QString project_path) {
+    std::string name = project_name.toStdString();
+    std::string path = project_path.toStdString();
+    m_proj->set_name(name);
+    m_proj->set_dir(path + "/" + name + "/");
+    m_proj->set_file(m_proj->get_dir() + name + ".vian");
+    m_proj->update_tmp(name);
+    m_proj->is_default_proj = false;
+    set_main_window_name(project_name);
+    save_project();
 }
 
 /**

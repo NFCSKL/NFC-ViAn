@@ -29,8 +29,13 @@ Project* Project::fromFile(const std::string &full_path){
  */
 Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;
-    m_dir = dir_path + "/" + name + "/";
-    m_file = m_dir + name + ".vian";
+    if (dir_path == "default") {
+        is_default_proj = true;
+    } else {
+        m_dir = dir_path + "/" + name + "/";
+        m_file = m_dir + name + ".vian";
+        m_unsaved_changes = true;
+    }
 
     if(tmp_dir.isValid()){
         m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
@@ -39,7 +44,6 @@ Project::Project(const std::string& name, const std::string& dir_path){
         save_project();
         tmp_dir_valid = true;
     } else qWarning() << "Something went wrong while creating the temporary folder.";
-    m_unsaved_changes = true;
 }
 
 
@@ -94,7 +98,6 @@ ID Project::add_report(Report *report){
  */
 void Project::remove_report(const int &id) {
     Report* temp = m_reports.at(id);
-    delete temp;
     m_reports.erase(id);
     m_unsaved_changes = true;
 }
@@ -290,4 +293,26 @@ std::string Project::get_name() const {
 
 std::string Project::get_file() const {
     return m_file;
+}
+
+void Project::set_name(std::string name) {
+    m_name = name;
+}
+
+void Project::set_dir(std::string dir) {
+    m_dir = dir;
+}
+
+void Project::set_file(std::string file) {
+    m_file = file;
+}
+
+void Project::update_tmp(string name) {
+    QFile::rename(QString::fromStdString(m_tmp_file), QString::fromStdString(m_tmp_dir + name + ".vian"));
+    QDir dir = QDir(QString::fromStdString(m_tmp_dir));
+    dir.rename(dir.path(), tmp_dir.path() + "/" + QString::fromStdString(name));
+
+    m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
+    m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
+    m_tmp_file = m_tmp_dir + name + ".vian";
 }
