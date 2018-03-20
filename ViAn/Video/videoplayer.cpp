@@ -28,6 +28,12 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
 
 }
 
+VideoPlayer::~VideoPlayer() {
+    qDebug() << "in videoplayer destructor";
+    loop = false;
+    m_player_con->notify_all();
+}
+
 /**
  * @brief VideoPlayer::on_load_video
  * Loads the video and updates member variables with video information.
@@ -84,11 +90,11 @@ void VideoPlayer::set_frame() {
  */
 void VideoPlayer::check_events() {
     std::chrono::duration<double> elapsed{0};
-    while (true) {
+    while (loop) {
         std::unique_lock<std::mutex> lk(*m_player_lock);
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
-        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
+        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return !loop || m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
             qDebug() << "";
             qDebug() << "in vid_play";
             // Notified from the VideoWidget
@@ -102,6 +108,10 @@ void VideoPlayer::check_events() {
                 set_frame();
             }
         } else {
+            if (!loop) {
+
+            }
+
             // Timer condition triggered. Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
             if (speed != m_cur_speed_step) {

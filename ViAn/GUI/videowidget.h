@@ -72,6 +72,7 @@ private:
     std::pair<int, int> m_interval = std::make_pair(-1, -1);
 
     FrameProcessor* f_processor;
+    QThread* processing_thread;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
     ~VideoWidget();

@@ -26,7 +26,7 @@ VideoController::VideoController(std::atomic<int>* frame_index, std::atomic_bool
 }
 
 void VideoController::run() {
-    VideoPlayer* v_player = new VideoPlayer(m_frame, m_is_playing, m_new_frame,
+    v_player = new VideoPlayer(m_frame, m_is_playing, m_new_frame,
                                             m_width, m_height, m_new_video, m_new_frame_video, m_video_loaded,
                                             m_v_sync, m_player_con, m_player_lock, m_video_path,
                                             m_speed);
@@ -37,7 +37,17 @@ void VideoController::run() {
     connect(v_player, &VideoPlayer::playback_stopped, this, &VideoController::playback_stopped);
 
     v_player->check_events();
-    exec();
+    //exec();
+    qDebug() << "ayayayayaya after events";
     delete v_player;
 
+}
+
+VideoController::~VideoController() {
+    qDebug() << "video controller is kill";
+    quit();
+    v_player->loop = false;
+    qDebug() << "inb4 wait";
+    wait();
+    qDebug() << "video controller is kill - done";
 }

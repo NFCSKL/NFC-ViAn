@@ -24,6 +24,12 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
     // cv::namedWindow("test");
 }
 
+FrameProcessor::~FrameProcessor() {
+    qDebug() << "in processor";
+    loop = false;
+    m_v_sync->con_var.notify_one();
+}
+
 /**
  * @brief FrameProcessor::check_events
  * This method handles all processing requests and will sleep when there is none.
@@ -38,9 +44,14 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
  * load settings
  */
 void FrameProcessor::check_events() {
-    while (true) {
+    while (loop) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
+        m_v_sync->con_var.wait(lk, [&]{return !loop || m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
+        if (!loop) {
+            lk.unlock();
+            continue;
+        }
+
         // A new video has been loaded. Reset processing settings    
         if (m_new_video->load()) {
             reset_settings();

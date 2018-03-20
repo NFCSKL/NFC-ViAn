@@ -45,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
-    connect(this, &MainWindow::load_video_in_widget, widget_video, &VideoWidget::load_marked_video);
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
@@ -173,6 +172,7 @@ MainWindow::~MainWindow() {
     delete project_wgt;
     delete analysis_wgt;
     delete bookmark_wgt;
+    delete queue_wgt;
 }
 
 /**
@@ -343,28 +343,24 @@ void MainWindow::init_analysis_menu() {
     QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
 
     QAction* analysis_act = new QAction(tr("&Perform analysis"), this);
-    //QAction* video_widget_act = new QAction(tr("Open video &widget"), this);
     analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     analysis_act->setStatusTip(tr("Perform analysis"));
-    //video_widget_act->setStatusTip("Open a new video widget");
     analysis_menu->addAction(analysis_act);
-    //analysis_menu->addAction(video_widget_act);
     connect(analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
-    //connect(video_widget_act, &QAction::triggered, this, &MainWindow::open_widget);
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    //QDockWidget* video_dock = new QDockWidget(tr("Video widget"), this);
+    VideoWidget* widget_video = new VideoWidget();
     widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
     widget_video->show();
-    //widget_video->setAttribute(Qt::WA_DeleteOnClose);
-    emit load_video_in_widget(vid_proj);
 
-    //disconnect(project_wgt, &ProjectWidget::open_in_widget, widget_video, &VideoWidget::load_marked_video);
-    //widget_video->deleteLater();
-    //video_dock->setWidget(widget_video);
-    //addDockWidget(Qt::TopDockWidgetArea, video_dock);
-    //video_dock->setFloating(true);
+
+    // ---------------------------------------
+    widget_video->setAttribute(Qt::WA_DeleteOnClose);
+    widget_video->load_marked_video(vid_proj);
+    connect(widget_video, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
+    connect(widget_video, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
+    connect(widget_video, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
 }
 
 void MainWindow::init_interval_menu() {

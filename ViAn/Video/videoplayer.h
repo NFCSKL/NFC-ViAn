@@ -70,7 +70,8 @@ public:
                          std::atomic_bool* new_video, std::atomic_bool* new_frame_video, std::atomic_bool* video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
                          std::atomic_int* speed_step, QObject *parent = nullptr);
-
+    ~VideoPlayer();
+    bool loop = true;
 
 signals:
     void display(cv::Mat frame, int frame_index);

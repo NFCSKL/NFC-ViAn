@@ -57,23 +57,26 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
 
     init_video_controller();
+
     v_controller->start();
     init_frame_processor();
 }
 
 VideoWidget::~VideoWidget(){
-    /*
-    delete scroll_area;
+    qDebug() << "video widget before";
+
+    delete f_processor;
+    qDebug() << "after delete";
+    processing_thread->quit();
+    qDebug() << "after quit";
+    processing_thread->wait();
+    qDebug() << "after wait";
+    delete processing_thread;
+    qDebug() << "delete thread";
+    
     delete v_controller;
-    delete vertical_layout;
+
     delete frame_wgt;
-    delete control_row;
-    delete video_btns;
-    delete analysis_btns;
-    delete other_btns;
-    delete zoom_btns;
-    delete interval_btns;
-    delete speed_slider_layout;
     delete play_btn;
     delete stop_btn;
     delete next_frame_btn;
@@ -82,12 +85,9 @@ VideoWidget::~VideoWidget(){
     delete prev_poi_btn;
     delete bookmark_btn;
     delete export_frame_btn;
-    delete analysis_btn;
     delete analysis_play_btn;
     delete new_tag_btn;
     delete tag_btn;
-    delete zoom_in_btn;
-    delete zoom_out_btn;
     delete fit_btn;
     delete original_size_btn;
     delete zoom_label;
@@ -98,9 +98,19 @@ VideoWidget::~VideoWidget(){
     delete current_time;
     delete total_time;
     delete playback_slider;
-    delete f_processor;
-    delete m_vid_proj;
-    */
+
+//    delete control_row;
+//    delete video_btns;
+//    delete analysis_btns;
+//    delete other_btns;
+//    delete zoom_btns;
+//    delete interval_btns;
+    delete speed_slider_layout;
+
+//    delete scroll_area;
+    delete vertical_layout;
+
+    qDebug() << "Im kill";
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -184,7 +194,7 @@ void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
                                      &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
-    QThread* processing_thread = new QThread();
+    processing_thread = new QThread();
     f_processor->moveToThread(processing_thread);
     connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
     connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);

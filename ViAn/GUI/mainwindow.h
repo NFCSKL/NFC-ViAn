@@ -78,13 +78,11 @@ public slots:
 signals:
     void set_status_bar(QString);
     void open_project(QString proj_path);
-    void load_video_in_widget(VideoProject*);
 
 private:
     QDockWidget* queue_dock;
 
     VideoWidget* video_wgt;
-    VideoWidget* widget_video = new VideoWidget();
     ProjectWidget* project_wgt;
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;

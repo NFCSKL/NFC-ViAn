@@ -144,12 +144,15 @@ class FrameProcessor : public QObject {
     FrameManipulator m_manipulator;
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
+
+
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                    std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
                    std::atomic_int* frame_index, overlay_settings *o_settings, atomic_bool *overlay_changed);
-
+    ~FrameProcessor();
+    bool loop = true;
 public slots:
     void check_events(void);
 signals:
