@@ -210,14 +210,7 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                 add_drawing(new Pen(current_colour, pos), frame_nr);
                 break;
             case TEXT:
-            qDebug() << " in clicked";
-            if (holding_text) {
-                holding_text = false;
-                break;
-            }
                 add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
-
-                holding_text = true;
                 break;
             case HAND:
                 prev_point = pos;
@@ -253,7 +246,6 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_moved(QPoint pos, int frame_nr) {
-    qDebug() << "in moved";
     update_drawing_position(pos, frame_nr);
 }
 
@@ -294,10 +286,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             current_drawing->move_shape(diff_point);
             prev_point = pos;
         } else if (current_shape == TEXT) {
-            qDebug() << holding_text;
-            if (holding_text) {
-                overlays[frame_nr].back()->update_text_pos(pos);
-            }
+            overlays[frame_nr].back()->update_text_pos(pos);
         } else {
             // The last appended shape is the one we're currently drawing.
             overlays[frame_nr].back()->update_drawing_pos(pos);

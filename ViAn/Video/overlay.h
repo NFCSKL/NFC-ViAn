@@ -71,7 +71,6 @@ private:
     Shapes* current_drawing = nullptr;
     QPoint prev_point;
     bool m_right_click = false;
-    bool holding_text = false;
 
     bool show_overlay = true;
     int baseline = 0;
