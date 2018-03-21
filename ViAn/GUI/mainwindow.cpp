@@ -138,6 +138,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::marked_video, drawing_wgt, &DrawingWidget::set_video_project);
 
+    connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
     connect(project_wgt, SIGNAL(item_removed(VideoProject*)), video_wgt, SLOT(remove_item(VideoProject*)));
 

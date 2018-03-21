@@ -20,17 +20,23 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
 }
 
 void DrawingWidget::set_overlay(Overlay* overlay) {
-    if (overlay == nullptr) qDebug() << "NULL";
-    disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+    clear_overlay();
+
     m_overlay = overlay;
-    clear();
     qDebug() << "before update";
     update_from_overlay();
     qDebug() << "update done";
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
 }
 
-
+void DrawingWidget::clear_overlay() {
+    if (m_overlay != nullptr) {
+        save_item_data();
+        disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+        m_overlay = nullptr;
+    }
+    clear();
+}
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
     if (m_vid_proj != vid_proj) { //disconnect then reconnect and check if nullptr
@@ -57,7 +63,9 @@ void DrawingWidget::update_from_overlay() {
 }
 
 void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
-    for (Shapes* shape : m_overlay->get_overlays()[f_item->get_frame()]) {
+    std::vector<Shapes*> list = m_overlay->get_overlays()[f_item->get_frame()];
+    qDebug() << "in add drawing to frame" << list.size();
+    for (auto shape : list) {
         if (shape == nullptr) {
             qDebug() << "IT IS NULL";
         } else {
@@ -282,7 +290,6 @@ void DrawingWidget::rename_item() {
 
 void DrawingWidget::change_text() {
     Text* text = dynamic_cast<TextItem*>(currentItem())->get_shape();
-    //text->set_text("jkflsda");
     QInputDialog dialog;
     dialog.setInputMode(QInputDialog::TextInput);
     dialog.setLabelText("Enter the new text:");

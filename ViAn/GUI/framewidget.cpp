@@ -273,6 +273,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         break;
+    case TEXT:
+        setMouseTracking(!hasMouseTracking());
     default:
         bool right_click = (event->button() == Qt::RightButton);
         emit mouse_pressed(scale_point(event->pos()), right_click);

@@ -621,6 +621,7 @@ void ProjectWidget::save_project() {
     if (m_proj == nullptr ) return;
     save_item_data();
     emit save_draw_wgt();
+
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
@@ -692,7 +693,6 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-    emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
 }

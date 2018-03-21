@@ -10,8 +10,8 @@ TextItem::TextItem(Text* text) : ShapeItem(TEXT_ITEM) {
 void TextItem::remove() {}
 
 void TextItem::rename() {
-    m_text->set_name(text(0).toStdString());
-    //m_text->set_name(m_text->get_text().toStdString());
+    //m_text->set_name(text(0).toStdString());
+    m_text->set_name(m_text->get_text().toStdString());
 }
 
 Text* TextItem::get_shape() {

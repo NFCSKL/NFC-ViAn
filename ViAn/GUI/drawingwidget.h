@@ -28,6 +28,7 @@ private:
     void remove_from_tree(QTreeWidgetItem* item);
     void add_drawings_to_frame(FrameItem *f_item);
 public slots:
+    void clear_overlay();
     void set_overlay(Overlay* overlay);
     void set_video_project(VideoProject* vid_proj);
     void add_drawing(Shapes* shape, int frame_nr);
