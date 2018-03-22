@@ -24,15 +24,29 @@ Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
 }
-
-void Shapes::edit_shape(QPoint diff_point, QPoint pos) {
+/**
+ * @brief Shapes::set_anchor
+ * @param pos
+ * Set the anchor to draw_start or draw_end
+ * This is used in edit shape to know which point to edit
+ */
+void Shapes::set_anchor(QPoint pos) {
     QPoint start_point = QPoint(draw_start.x, draw_start.y) - pos;
     QPoint end_point = QPoint(draw_end.x, draw_end.y) - pos;
     if (start_point.manhattanLength() < end_point.manhattanLength()) {
-        draw_start += qpoint_to_point(diff_point);
+        anchor = true;
     } else {
-        draw_end += qpoint_to_point(diff_point);
+        anchor = false;
     }
+}
+
+/**
+ * @brief Shapes::edit_shape
+ * @param diff_point
+ * Edits the shape, which point is edited is based on the anchor
+ */
+void Shapes::edit_shape(QPoint diff_point) {
+    (anchor) ? (draw_start += qpoint_to_point(diff_point)) : draw_end += qpoint_to_point(diff_point);
 }
 
 /**

@@ -216,6 +216,7 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                 prev_point = pos;
                 if (right_click) {
                     m_right_click = right_click;
+                    if (current_drawing) current_drawing->set_anchor(pos);
                     break;
                 }
                 get_drawing(pos, frame_nr);
@@ -276,9 +277,9 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 return;
             }
-            else if (m_right_click){
+            else if (m_right_click) {
                 QPoint diff_point = pos - prev_point;
-                current_drawing->edit_shape(diff_point, pos);
+                current_drawing->edit_shape(diff_point);
                 prev_point = pos;
                 //current_drawing->update_drawing_pos(pos);
                 return;

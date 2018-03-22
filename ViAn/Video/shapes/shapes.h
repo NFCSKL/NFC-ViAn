@@ -16,7 +16,8 @@ class Shapes {
 public:
     Shapes(SHAPES s);
     Shapes(SHAPES s, QColor col, QPoint pos);
-    void edit_shape(QPoint diff_point, QPoint pos);
+    void set_anchor(QPoint pos);
+    void edit_shape(QPoint diff_point);
     void update_drawing_pos(QPoint pos);
     void update_text_pos(QPoint pos);
     void move_shape(QPoint p);
@@ -50,6 +51,7 @@ protected:
     int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;
+    bool anchor; // true = draw start -- false = draw end
     cv::Size text_size;
     bool inverted = false;
     int frame;
