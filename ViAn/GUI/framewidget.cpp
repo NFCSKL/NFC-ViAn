@@ -398,8 +398,25 @@ void FrameWidget::init_panning(QPoint pos) {
  */
 void FrameWidget::panning(QPoint pos) {
     // Using panning
-    QPoint _tmp = prev_pos - pos;
-    emit moved_xy(_tmp.x(), _tmp.y());
+    int dx {prev_pos.x() - pos.x()};
+    int dy {prev_pos.y() - pos.y()};
+
+    panning_tracker.first += dx / m_scale_factor;
+    panning_tracker.second += dy/ m_scale_factor;
+
+    auto scale_panning = [] (double& actual, int& scaled) {
+        if (std::abs(actual) >= 1) {
+            scaled = std::floor(actual);
+            actual -= scaled;
+        }
+    };
+
+    int x{}, y{};
+    scale_panning(panning_tracker.first, x);
+    scale_panning(panning_tracker.second, y);
+
+
+    emit moved_xy(x, y);
     prev_pos = pos;
 }
 
