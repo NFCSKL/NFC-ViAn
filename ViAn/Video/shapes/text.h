@@ -13,6 +13,7 @@ public:
     void read(const QJsonObject& json) override;
     void set_text(QString text);
     QString get_text();
+    void set_font_scale(QPoint);
 
     // Constants describing the limit and precision of the font scale value.
     static constexpr double FONT_SCALE_MIN = 0.5, FONT_SCALE_MAX = 5.0, FONT_SCALE_STEP = 0.1;

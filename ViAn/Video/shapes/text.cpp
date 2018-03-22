@@ -44,6 +44,15 @@ void Text::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+void Text::set_font_scale(QPoint diff_point) {
+    int diff_sum = diff_point.x() + diff_point.y();
+    if (diff_sum > 0 && font_scale < FONT_SCALE_MAX) {
+        font_scale += FONT_SCALE_STEP;
+    } else if (diff_sum < 0 && font_scale > FONT_SCALE_MIN) {
+        font_scale += -FONT_SCALE_STEP;
+    }
+}
+
 void Text::set_text(QString text) {
     string = text;
 }

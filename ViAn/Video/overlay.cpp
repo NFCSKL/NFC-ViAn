@@ -259,6 +259,10 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
     if (!current_drawing) return;
+    if (current_drawing->get_shape() == TEXT) {
+        dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
+        return;
+    }
     if (current_drawing->get_frame() == frame_nr && show_overlay) {
         current_drawing->set_thickness(pos);
     }
@@ -275,13 +279,16 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
         if (current_shape == HAND) {
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
+                QPoint diff_point = pos - prev_point;
+                qDebug() << diff_point;
+                dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
+                prev_point = pos;
                 return;
             }
             else if (m_right_click) {
                 QPoint diff_point = pos - prev_point;
                 current_drawing->edit_shape(diff_point);
                 prev_point = pos;
-                //current_drawing->update_drawing_pos(pos);
                 return;
             }
             QPoint diff_point = pos - prev_point;
