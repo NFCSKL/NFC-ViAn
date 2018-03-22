@@ -261,6 +261,9 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
     if (!current_drawing) return;
     if (current_drawing->get_shape() == TEXT) {
         dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
+        double font_scale = dynamic_cast<Text*>(current_drawing)->get_font_scale();
+        current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
+        current_drawing->update_text_draw_end();
         return;
     }
     if (current_drawing->get_frame() == frame_nr && show_overlay) {
@@ -282,6 +285,9 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
                 QPoint diff_point = pos - prev_point;
                 qDebug() << diff_point;
                 dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
+                double font_scale = dynamic_cast<Text*>(current_drawing)->get_font_scale();
+                current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
+                current_drawing->update_text_draw_end();
                 prev_point = pos;
                 return;
             }

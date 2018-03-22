@@ -71,6 +71,11 @@ void Shapes::update_text_pos(QPoint pos) {
     draw_end = p;
 }
 
+void Shapes::update_text_draw_end() {
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
+}
+
 /**
  * @brief Shape::move_shape
  * @param diff_point

@@ -53,6 +53,10 @@ void Text::set_font_scale(QPoint diff_point) {
     }
 }
 
+double Text::get_font_scale() {
+    return font_scale;
+}
+
 void Text::set_text(QString text) {
     string = text;
 }
