@@ -39,7 +39,7 @@ void DrawingWidget::clear_overlay() {
 }
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
-    if (m_vid_proj != vid_proj) { //disconnect then reconnect and check if nullptr
+    if (m_vid_proj != vid_proj) {
         m_vid_proj = vid_proj;
         set_overlay(vid_proj->get_overlay());
     }
@@ -56,6 +56,7 @@ void DrawingWidget::update_from_overlay() {
                 insertTopLevelItem(topLevelItemCount(), frame_item);
                 qDebug() << "before add to frame" << frame_item->get_frame();
                 add_drawings_to_frame(frame_item);
+                dynamic_cast<QTreeWidgetItem*>(frame_item)->setExpanded(true);
                 qDebug() << "after add to framae";
             }
         }
