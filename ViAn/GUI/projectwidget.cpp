@@ -48,9 +48,12 @@ ProjectWidget::~ProjectWidget() {
  * Creates a create project dialog
  */
 void ProjectWidget::new_project() {
-    ProjectDialog* proj_dialog = new ProjectDialog();
-    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
-    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
+//    ProjectDialog* proj_dialog = new ProjectDialog();
+    qDebug() << "New project";
+//    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
+//    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
+    add_project("New project", "");
+
 }
 
 /**
@@ -64,33 +67,12 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string name = project_name.toStdString();
     std::string path = project_path.toStdString();
     Project* new_proj = new Project(name, path);
-    if (!new_proj->tmp_dir_valid) {
-        delete m_proj;
-        m_proj = nullptr;
-        return;
-    }
+
     close_project();
     set_main_window_name(project_name);
     m_proj = new_proj;
-    emit proj_path(m_proj->get_tmp_dir());
-}
-
-/**
- * @brief ProjectWidget::add_default_project
- * Slot function called to create an empty project, a default project.
- * Creates a new project and generates the default tree structure
- */
-void ProjectWidget::add_default_project() {
-    Project* default_project = new Project("default");
-    if (!default_project->tmp_dir_valid) {
-        delete m_proj;
-        m_proj = nullptr;
-        exit(0);
-        return;
-    }
-    set_main_window_name("default");
-    m_proj = default_project;
-    emit proj_path(m_proj->get_tmp_dir());
+    path.append(name);
+    emit proj_path(m_proj->get_dir());
 }
 
 /**
@@ -131,7 +113,7 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir(), m_proj->get_dir());
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_dir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->set_interval(settings->get_interval());
 
@@ -431,7 +413,7 @@ void ProjectWidget::advanced_analysis() {
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_tmp_dir(), m_proj->get_dir());
+    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_dir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }
@@ -770,24 +752,29 @@ void ProjectWidget::create_folder_item() {
 /**
  * @brief ProjectWidget::save_project
  * Slot function to save the open project
- * If the project is a default project it will
- * prompt the user and ask for name and path.
- * @return bool: saved succesful
  */
-bool ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return false;
-    if (m_proj->is_default_proj) {
-        ProjectDialog* proj_dialog = new ProjectDialog(nullptr, "Save as...");
-        connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(save_as_project(QString, QString)));
-        connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
-        return proj_dialog->exec();
+void ProjectWidget::save_project() {
+    if (m_proj == nullptr ) return;
+
+    QString name{}, path{};
+    if (m_proj->is_temporary()) {
+        ProjectDialog project_dialog(&name, &path);
+        int status = project_dialog.exec();
+
+        qDebug() << status;
+        if (status == project_dialog.Accepted) {
+            m_proj->set_name_and_path(name.toStdString(), path.toStdString());
+        }
+
     }
+    qDebug() << name << path;
+
     save_item_data();
     emit save_draw_wgt();
 
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
+    tree_state.save_state(m_proj->get_dir() + "treestate");
     m_proj->save_project();
     m_proj->move_project_from_tmp();
     RecentProject rp;
@@ -840,7 +827,7 @@ bool ProjectWidget::open_project(QString project_path) {
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
     set_main_window_name(QString::fromStdString(m_proj->get_name()));
-    emit proj_path(m_proj->get_tmp_dir());
+    emit proj_path(m_proj->get_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);

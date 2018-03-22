@@ -13,14 +13,11 @@
  * @param parent
  * Dialog usd to create new projects.
  */
-ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
-    if (name == "") {
-        setWindowTitle("New project");
-    } else {
-        setWindowTitle(name);
-    }
-
+ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QDialog(parent) {
+    setWindowTitle("New project");
     setModal(true);
+    m_name = name;
+    m_path = path;
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
@@ -54,8 +51,6 @@ ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
     connect(browse_btn, &QPushButton::clicked, this, &ProjectDialog::browse_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ProjectDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &ProjectDialog::cancel_btn_clicked);
-
-    show();
 }
 
 void ProjectDialog::browse_btn_clicked() {
@@ -66,9 +61,9 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
-    QString m_path = path_text->text() + "/" + name_text->text() + "/" + name_text->text() + ".vian";
+    QString path = path_text->text() + "/" + name_text->text() + "/" + name_text->text() + ".vian";
 
-    QFile pathFile(m_path);
+    QFile pathFile(path);
     if (pathFile.exists()) {
         // Create confirmation dialog since the path already exists
         QMessageBox msg_box;
@@ -80,17 +75,19 @@ void ProjectDialog::ok_btn_clicked() {
         int reply = msg_box.exec();
         // Open the already existing project
         if (reply == QMessageBox::Open) {
-            emit open_project(m_path);
+            emit open_project(path);
             close();
             return;
         }
         if (reply != QMessageBox::Yes) return;
     }
-    emit project_path(name_text->text(), path_text->text());
-    close();
+//    emit project_path(name_text->text(), path_text->text());
+    *m_name = name_text->text() + ".vian";
+    *m_path = path_text->text() + "/";
+    accept();
 }
 
 void ProjectDialog::cancel_btn_clicked() {
-    close();
+    reject();
 }
 

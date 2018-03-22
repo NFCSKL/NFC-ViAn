@@ -11,11 +11,8 @@ Project::Project(){
 Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->load_saveable(full_path);
-    if(proj->tmp_dir.isValid()){
-        proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
-        proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";
-        proj->save_project();
-    } else return nullptr;
+    // ensure changes to paths are saved
+    proj->save_saveable(full_path);
     return proj;
 }
 
@@ -27,21 +24,21 @@ Project* Project::fromFile(const std::string &full_path){
  */
 Project::Project(const std::string& name, const std::string& dir_path){
     m_name = name;
-    if (dir_path == "default") {
-        is_default_proj = true;
+    if (!dir_path.empty()) {
+    m_dir = dir_path + "/" + name + "/";
+    m_file = m_dir + name + ".vian";
     } else {
-        m_dir = dir_path + name + "/";
-        m_file = m_dir + name + ".vian";
-        m_unsaved_changes = true;
+        QTemporaryDir tmp_dir;
+        tmp_dir.setAutoRemove(false);
+        qDebug() << "Creating temporary project directory: " << tmp_dir.path();
+        if(tmp_dir.isValid()){
+            m_dir = tmp_dir.path().toStdString() + "/" + name + "/";
+            m_file = m_dir + name + ".vian";
+        } else qWarning() << "Something went wrong while creating the temporary folder.";
     }
-
-    if(tmp_dir.isValid()){
-        m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
-        m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
-        m_tmp_file = m_tmp_dir + name + ".vian";  // full_path();
-        save_project();
-        tmp_dir_valid = true;
-    } else qWarning() << "Something went wrong while creating the temporary folder.";
+    save_project();
+    m_dir_bookmarks = m_dir + "Bookmarks/";
+    m_unsaved_changes = true;
 }
 
 
@@ -122,6 +119,13 @@ void Project::set_unsaved(const bool& changed) {
     m_unsaved_changes = changed;
 }
 
+void Project::set_name_and_path(const std::string& name, const std::string& path) {
+    m_name = name;
+    m_dir = path + "/" + name + "/";
+    m_file = m_dir + m_name + ".vian";
+    m_dir_bookmarks = m_dir + "Bookmarks/";
+}
+
 /**
  * @brief Project::is_saved
  * Check if the project has unsaved changes
@@ -132,6 +136,10 @@ bool Project::is_saved() const {
     return !m_unsaved_changes && video_projects_saved;
 }
 
+bool Project::is_temporary() const {
+    return m_temporary;
+}
+
 /**
  * @brief Project::read
  * @param json
@@ -140,9 +148,9 @@ bool Project::is_saved() const {
 void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
     m_file = full_path();
-    std::string tmp = full_path();
-    m_dir = tmp.substr(0,tmp.find_last_of("/")+1);
+    m_dir = m_file.substr(0,m_file.find_last_of("/")+1);
     m_dir_bookmarks = m_dir + "Bookmarks/";
+    qDebug() << QString::fromStdString(m_dir);
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -198,9 +206,9 @@ void Project::write(QJsonObject& json){
  */
 bool Project::save_project(){
     QDir directory;
-    directory.mkpath(QString::fromStdString(m_tmp_dir));
+    directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    return save_saveable(m_tmp_file);
+    return save_saveable(m_file);
 }
 
 /**
@@ -208,7 +216,7 @@ bool Project::save_project(){
  * @return true if success
  */
 bool Project::move_project_from_tmp(){
-    return copy_directory_files(QString::fromStdString(m_tmp_dir), QString::fromStdString(m_dir), true);
+//    return copy_directory_files(QString::fromStdString(m_tmp_dir), QString::fromStdString(m_dir), true);
 }
 
 /**
@@ -253,6 +261,7 @@ bool Project::copy_directory_files(const QString &from_dir, const QString &to_di
     return true;
 }
 
+
 /**
  * @brief Project::get_videos
  * @return videos&
@@ -279,10 +288,6 @@ std::string Project::getDir_bookmarks() const {
 
 std::string Project::get_dir() const {
     return m_dir;
-}
-
-std::string Project::get_tmp_dir() const {
-    return m_tmp_dir;
 }
 
 std::string Project::get_name() const {

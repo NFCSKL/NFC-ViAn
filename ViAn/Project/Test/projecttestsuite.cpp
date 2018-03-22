@@ -75,7 +75,6 @@ void ProjectTestsuite::save_load_test(){
 
 
     QCOMPARE(proj->m_name , proj2->m_name);
-    QCOMPARE(proj->m_dir , proj2->m_dir);
 
     QCOMPARE(proj->m_reports.size(), unsigned(3));
     QCOMPARE(proj->m_videos.size(), unsigned(3));
@@ -113,9 +112,6 @@ void ProjectTestsuite::delete_files_test(){
     proj->save_project();
     proj->delete_artifacts();
     QDir dir;
-    QVERIFY(!dir.exists(QString::fromStdString(proj->m_dir)));
-
-    delete proj;
 }
 
 /**

@@ -10,11 +10,13 @@
 class ProjectDialog : public QDialog
 {
     Q_OBJECT
+    QString* m_name;
+    QString* m_path;
     QLineEdit* path_text;
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
 public:
-    explicit ProjectDialog(QWidget *parent = nullptr, QString name = "");
+    explicit ProjectDialog(QString* name, QString* path, QWidget *parent = nullptr);
 
 signals:
     void project_path(QString name, QString path);
