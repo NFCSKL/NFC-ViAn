@@ -130,6 +130,8 @@ void Overlay::add_drawing(Shapes* shape, int frame_nr) {
  * @param pos
  * @param frame_nr
  */
+
+// Unused
 void Overlay::get_drawing(QPoint pos, int frame_nr) {
     if (current_drawing != nullptr) current_drawing->invert_color();
     current_drawing = nullptr;
@@ -144,15 +146,19 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
 }
 
 void Overlay::set_current_drawing(Shapes *shape) {
-    if (current_drawing != nullptr) current_drawing->invert_color();
     current_drawing = shape;
-    if (current_drawing != nullptr) current_drawing->invert_color();
 }
 
+Shapes* Overlay::get_current_drawing() {
+    return current_drawing;
+}
+
+// Unused
 void Overlay::undo(int frame_nr) {
     Q_UNUSED(frame_nr)
 }
 
+// Unused
 void Overlay::redo(int frame_nr) {
     Q_UNUSED(frame_nr)
 }
@@ -169,6 +175,8 @@ void Overlay::update_text(QString text, Shapes* shape) {
  * @param shape
  * @return true if the point pos is in the hidden rect of drawing shape
  */
+
+// Unused
 bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
     cv::Rect drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
     return drawing.contains(qpoint_to_point(pos));
@@ -219,7 +227,6 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                     if (current_drawing) current_drawing->set_anchor(pos);
                     break;
                 }
-                //get_drawing(pos, frame_nr);
                 break;
             default:
                 break;
@@ -283,7 +290,6 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;
-                qDebug() << diff_point;
                 dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
                 double font_scale = dynamic_cast<Text*>(current_drawing)->get_font_scale();
                 current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
@@ -338,9 +344,7 @@ void Overlay::delete_drawing(Shapes* shape) {
     auto it = std::find(overlays[drawing->get_frame()].begin(), overlays[drawing->get_frame()].end(), shape);
 
     if (it != overlays[drawing->get_frame()].end()) {
-        qDebug() << "Frame:" << drawing->get_frame();
         overlays[drawing->get_frame()].erase(it);
-        //delete (*it);
     }
 }
 

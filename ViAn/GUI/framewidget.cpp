@@ -80,14 +80,6 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
-void FrameWidget::set_overlay(Overlay* overlay) {
-    video_overlay = overlay;
-}
-
-Overlay* FrameWidget::get_overlay() {
-    return video_overlay;
-}
-
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
 }
@@ -232,6 +224,15 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             painter.setPen(QColor(0,0,255));
             painter.drawRect(detect_rect);
         }
+    }
+    Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
+    if (current_drawing && current_frame_nr == current_drawing->get_frame()) {
+        QPen pen(Qt::white, 2, Qt::DashLine);
+        painter.setPen(pen);
+        QPoint tl(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
+        QPoint br(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
+        QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+        painter.drawRect(current_rect);
     }
     painter.end();
 }

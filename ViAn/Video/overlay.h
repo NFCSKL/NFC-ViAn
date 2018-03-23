@@ -59,6 +59,7 @@ public:
     std::map<int, std::vector<Shapes*>> get_overlays();
     void set_overlays(std::map<int, std::vector<Shapes*>>);
     void set_current_drawing(Shapes* shape);
+    Shapes* get_current_drawing();
 
 private:
     Shapes* get_empty_shape(SHAPES shape_type);
