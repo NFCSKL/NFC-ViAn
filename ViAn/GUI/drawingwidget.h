@@ -38,7 +38,7 @@ public slots:
     void context_menu(const QPoint& point);
     void rename_item();
     void remove_item();
-    void change_text();
+    void item_changed(QTreeWidgetItem*);
 
     void dropEvent(QDropEvent *event);
 

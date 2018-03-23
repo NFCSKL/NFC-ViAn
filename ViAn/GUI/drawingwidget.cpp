@@ -17,6 +17,8 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     delete_sc->setKey(QKeySequence(QKeySequence::Delete));
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::remove_item);
+
+    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(item_changed(QTreeWidgetItem*)));
 }
 
 void DrawingWidget::set_overlay(Overlay* overlay) {
@@ -115,6 +117,7 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
  * @param frame_nr
  */
 void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
+    QObject::blockSignals(true);
     FrameItem* frame_item;
     QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
 
@@ -170,6 +173,7 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
     default:
         break;
     }
+    QObject::blockSignals(false);
 }
 
 /**
@@ -301,7 +305,6 @@ void DrawingWidget::context_menu(const QPoint &point) {
         menu.addAction("Remove", this, SLOT(remove_item()));
         break;
     case TEXT_ITEM:
-        menu.addAction("Change text", this, SLOT(change_text()));
         menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addAction("Remove", this, SLOT(remove_item()));
         break;
@@ -315,16 +318,13 @@ void DrawingWidget::rename_item() {
     editItem(currentItem());
 }
 
-void DrawingWidget::change_text() {
-    Text* text = dynamic_cast<TextItem*>(currentItem())->get_shape();
-    QInputDialog dialog;
-    dialog.setInputMode(QInputDialog::TextInput);
-    dialog.setLabelText("Enter the new text:");
-    int reply = dialog.exec();
-    if (reply) {
-        //text->set_text(dialog.textValue());
-        emit update_text(dialog.textValue(), text);
+void DrawingWidget::item_changed(QTreeWidgetItem* item) {
+    if (item->type() == TEXT_ITEM) {
+        Text* text = dynamic_cast<TextItem*>(item)->get_shape();
+        emit update_text(item->text(0), text);
     }
+    auto a_item = dynamic_cast<ShapeItem*>(item);
+    a_item->rename();
 }
 
 void DrawingWidget::remove_item() {
