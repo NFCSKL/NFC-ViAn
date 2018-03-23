@@ -219,7 +219,7 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                     if (current_drawing) current_drawing->set_anchor(pos);
                     break;
                 }
-                get_drawing(pos, frame_nr);
+                //get_drawing(pos, frame_nr);
                 break;
             default:
                 break;

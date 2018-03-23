@@ -11,6 +11,7 @@
 #include "DrawingItems/lineitem.h"
 #include "DrawingItems/arrowitem.h"
 #include "DrawingItems/textitem.h"
+#include "DrawingItems/penitem.h"
 
 
 class DrawingWidget : public QTreeWidget
@@ -44,6 +45,7 @@ public slots:
 signals:
     void jump_to_frame(VideoProject*, int);
     void set_current_drawing(Shapes* shape);
+    void set_tool_hand();
     void delete_drawing(Shapes* shape);
     void clear_frame(int);
     void update_text(QString, Shapes*);

@@ -23,9 +23,7 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     clear_overlay();
 
     m_overlay = overlay;
-    qDebug() << "before update";
     update_from_overlay();
-    qDebug() << "update done";
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
 }
 
@@ -98,6 +96,11 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
             f_item->addChild(text_item);
             break;
         }
+        case PEN: {
+            PenItem* pen_item = new PenItem(dynamic_cast<Pen*>(shape));
+            f_item->addChild(pen_item);
+            break;
+        }
         default:
             break;
         }
@@ -157,6 +160,13 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         frame_item->setExpanded(true);
         break;
     }
+    case PEN: {
+        PenItem* pen_item = new PenItem(dynamic_cast<Pen*>(shape));
+        frame_item->addChild(pen_item);
+        pen_item->setText(0, "Pen");
+        frame_item->setExpanded(true);
+        break;
+    }
     default:
         break;
     }
@@ -192,6 +202,7 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
         case CIRCLE_ITEM:
         case LINE_ITEM:
         case ARROW_ITEM:
+        case PEN:
         case TEXT_ITEM: {
             auto a_item = dynamic_cast<ShapeItem*>(child);
             a_item->rename();
@@ -224,6 +235,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         Shapes* shape = rect_item->get_shape();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
+        emit set_tool_hand();
         break;
     }
     case CIRCLE_ITEM: {
@@ -231,6 +243,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         Shapes* shape = circle_item->get_shape();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
+        emit set_tool_hand();
         break;
     }
     case LINE_ITEM: {
@@ -238,6 +251,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         Shapes* shape = line_item->get_shape();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
+        emit set_tool_hand();
         break;
     }
     case ARROW_ITEM: {
@@ -245,12 +259,23 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         Shapes* shape = arrow_item->get_shape();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
+        emit set_tool_hand();
         break;
-    }case TEXT_ITEM: {
+    }
+    case TEXT_ITEM: {
         TextItem* text_item = dynamic_cast<TextItem*>(item);
         Shapes* shape = text_item->get_shape();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
+        emit set_tool_hand();
+        break;
+    }
+    case PEN_ITEM: {
+        PenItem* pen_item = dynamic_cast<PenItem*>(item);
+        Shapes* shape = pen_item->get_shape();
+        emit jump_to_frame(m_vid_proj, shape->get_frame());
+        emit set_current_drawing(shape);
+        emit set_tool_hand();
         break;
     }
     default:
@@ -271,6 +296,7 @@ void DrawingWidget::context_menu(const QPoint &point) {
     case CIRCLE_ITEM:
     case LINE_ITEM:
     case ARROW_ITEM:
+    case PEN_ITEM:
         menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addAction("Remove", this, SLOT(remove_item()));
         break;
@@ -345,6 +371,13 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         break;
     case TEXT_ITEM:
         shape = dynamic_cast<TextItem*>(item)->get_shape();
+        emit delete_drawing(shape);
+        parent = item->parent();
+        delete item;
+        if (parent->childCount() == 0) delete parent;
+        break;
+    case PEN_ITEM:
+        shape = dynamic_cast<PenItem*>(item)->get_shape();
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;

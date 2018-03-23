@@ -17,8 +17,6 @@
 #include "Analysis/analysissettings.h"
 #include "imagegenerator.h"
 
-//enum click_tool {NONE, ZOOM, MOVE,ANALYSIS_BOX};
-
 class FrameWidget : public QWidget
 {
 

@@ -9,6 +9,7 @@
 DrawingToolbar::DrawingToolbar() {
     create_actions();
     create_buttons();
+
 }
 
 /**
