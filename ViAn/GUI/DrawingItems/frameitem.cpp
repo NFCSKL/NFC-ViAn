@@ -10,6 +10,10 @@ void FrameItem::remove(){}
 
 void FrameItem::rename(){}
 
+Shapes* FrameItem::get_shape() {
+    return nullptr;
+}
+
 int FrameItem::get_frame() {
     return m_frame;
 }

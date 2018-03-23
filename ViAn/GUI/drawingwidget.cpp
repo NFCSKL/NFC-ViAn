@@ -234,49 +234,14 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         emit jump_to_frame(m_vid_proj, frame_item->get_frame());
         break;
     }
-    case RECT_ITEM: {
-        RectItem* rect_item = dynamic_cast<RectItem*>(item);
-        Shapes* shape = rect_item->get_shape();
-        emit jump_to_frame(m_vid_proj, shape->get_frame());
-        emit set_current_drawing(shape);
-        emit set_tool_hand();
-        break;
-    }
-    case CIRCLE_ITEM: {
-        CircleItem* circle_item = dynamic_cast<CircleItem*>(item);
-        Shapes* shape = circle_item->get_shape();
-        emit jump_to_frame(m_vid_proj, shape->get_frame());
-        emit set_current_drawing(shape);
-        emit set_tool_hand();
-        break;
-    }
-    case LINE_ITEM: {
-        LineItem* line_item = dynamic_cast<LineItem*>(item);
-        Shapes* shape = line_item->get_shape();
-        emit jump_to_frame(m_vid_proj, shape->get_frame());
-        emit set_current_drawing(shape);
-        emit set_tool_hand();
-        break;
-    }
-    case ARROW_ITEM: {
-        ArrowItem* arrow_item = dynamic_cast<ArrowItem*>(item);
-        Shapes* shape = arrow_item->get_shape();
-        emit jump_to_frame(m_vid_proj, shape->get_frame());
-        emit set_current_drawing(shape);
-        emit set_tool_hand();
-        break;
-    }
-    case TEXT_ITEM: {
-        TextItem* text_item = dynamic_cast<TextItem*>(item);
-        Shapes* shape = text_item->get_shape();
-        emit jump_to_frame(m_vid_proj, shape->get_frame());
-        emit set_current_drawing(shape);
-        emit set_tool_hand();
-        break;
-    }
+    case RECT_ITEM:
+    case CIRCLE_ITEM:
+    case LINE_ITEM:
+    case ARROW_ITEM:
+    case TEXT_ITEM:
     case PEN_ITEM: {
-        PenItem* pen_item = dynamic_cast<PenItem*>(item);
-        Shapes* shape = pen_item->get_shape();
+        ShapeItem* shape_item = dynamic_cast<ShapeItem*>(item);
+        Shapes* shape = shape_item->get_shape();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();
@@ -301,9 +266,6 @@ void DrawingWidget::context_menu(const QPoint &point) {
     case LINE_ITEM:
     case ARROW_ITEM:
     case PEN_ITEM:
-        menu.addAction("Rename", this, SLOT(rename_item()));
-        menu.addAction("Remove", this, SLOT(remove_item()));
-        break;
     case TEXT_ITEM:
         menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addAction("Remove", this, SLOT(remove_item()));
@@ -342,42 +304,12 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         delete item;
         break;
     case RECT_ITEM:
-        shape = dynamic_cast<RectItem*>(item)->get_shape();
-        emit delete_drawing(shape);
-        parent = item->parent();
-        delete item;
-        if (parent->childCount() == 0) delete parent;
-        break;
     case CIRCLE_ITEM:
-        shape = dynamic_cast<CircleItem*>(item)->get_shape();
-        emit delete_drawing(shape);
-        parent = item->parent();
-        delete item;
-        if (parent->childCount() == 0) delete parent;
-        break;
     case LINE_ITEM:
-        shape = dynamic_cast<LineItem*>(item)->get_shape();
-        emit delete_drawing(shape);
-        parent = item->parent();
-        delete item;
-        if (parent->childCount() == 0) delete parent;
-        break;
     case ARROW_ITEM:
-        shape = dynamic_cast<ArrowItem*>(item)->get_shape();
-        emit delete_drawing(shape);
-        parent = item->parent();
-        delete item;
-        if (parent->childCount() == 0) delete parent;
-        break;
     case TEXT_ITEM:
-        shape = dynamic_cast<TextItem*>(item)->get_shape();
-        emit delete_drawing(shape);
-        parent = item->parent();
-        delete item;
-        if (parent->childCount() == 0) delete parent;
-        break;
     case PEN_ITEM:
-        shape = dynamic_cast<PenItem*>(item)->get_shape();
+        shape = dynamic_cast<ShapeItem*>(item)->get_shape();
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;

@@ -10,6 +10,7 @@ public:
     int get_frame();
     void remove();
     void rename();
+    Shapes* get_shape();
 };
 
 #endif // FRAMEITEM_H
