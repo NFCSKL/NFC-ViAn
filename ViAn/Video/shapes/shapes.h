@@ -43,8 +43,8 @@ public:
     void set_thickness(QPoint pos);
     void set_frame(int);
     int get_frame();
-    std::string get_name();
-    void set_name(std::string name);
+    virtual QString get_name() = 0;
+    virtual void set_name(QString name) = 0;
 
 protected:
     SHAPES shape = NONE;
@@ -56,7 +56,7 @@ protected:
     cv::Size text_size;
     bool inverted = false;
     int frame;
-    std::string m_name = "Unknown shape";
+    QString m_name = "Unknown shape";
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);

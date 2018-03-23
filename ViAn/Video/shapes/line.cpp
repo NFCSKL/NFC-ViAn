@@ -35,6 +35,14 @@ void Line::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+QString Line::get_name() {
+    return m_name;
+}
+
+void Line::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Line::write
  * @param json
@@ -42,6 +50,7 @@ void Line::handle_new_pos(QPoint pos) {
  */
 void Line::write(QJsonObject& json) {
     write_shape(json);
+    json["name"] = m_name;
 }
 
 /**
@@ -51,4 +60,5 @@ void Line::write(QJsonObject& json) {
  */
 void Line::read(const QJsonObject& json) {
     read_shape(json);
+    m_name = json["name"].toString();
 }

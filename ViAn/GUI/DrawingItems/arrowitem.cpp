@@ -3,13 +3,13 @@
 ArrowItem::ArrowItem(Arrow* arrow) : ShapeItem(ARROW_ITEM) {
     m_arrow = arrow;
     setFlags(flags() | Qt::ItemIsDragEnabled);
-    setText(0, QString::fromStdString((arrow->get_name())));
+    setText(0, arrow->get_name());
 }
 
 void ArrowItem::remove() {}
 
 void ArrowItem::rename() {
-    m_arrow->set_name(text(0).toStdString());
+    m_arrow->set_name(text(0));
 }
 
 Arrow* ArrowItem::get_shape() {

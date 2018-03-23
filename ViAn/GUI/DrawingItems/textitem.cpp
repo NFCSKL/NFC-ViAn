@@ -3,15 +3,13 @@
 TextItem::TextItem(Text* text) : ShapeItem(TEXT_ITEM) {
     m_text = text;
     setFlags(flags() | Qt::ItemIsDragEnabled);
-    //setText(0, QString::fromStdString(text->get_name()));
-    setText(0, m_text->get_text());
+    setText(0, text->get_name());
 }
 
 void TextItem::remove() {}
 
 void TextItem::rename() {
-    //m_text->set_name(text(0).toStdString());
-    m_text->set_name(m_text->get_text().toStdString());
+    m_text->set_name(text(0));
 }
 
 Text* TextItem::get_shape() {

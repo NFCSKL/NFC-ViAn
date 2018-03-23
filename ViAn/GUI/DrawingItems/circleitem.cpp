@@ -3,13 +3,13 @@
 CircleItem::CircleItem(Circle* circle) : ShapeItem(CIRCLE_ITEM) {
     m_circle = circle;
     setFlags(flags() | Qt::ItemIsDragEnabled);
-    setText(0, QString::fromStdString(circle->get_name()));
+    setText(0, circle->get_name());
 }
 
 void CircleItem::remove() {}
 
 void CircleItem::rename() {
-    m_circle->set_name(text(0).toStdString());
+    m_circle->set_name(text(0));
 }
 
 Circle* CircleItem::get_shape() {

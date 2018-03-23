@@ -11,8 +11,11 @@ public:
     void handle_new_pos(QPoint pos) override;
     void write(QJsonObject& json) override;
     void read(const QJsonObject& json) override;
+    QString get_name() override;
+    void set_name(QString name) override;
 private:
     std::vector<std::pair<cv::Point, cv::Point>> lines;
+    QString m_name = "Pen";
 };
 
 #endif // PEN_H

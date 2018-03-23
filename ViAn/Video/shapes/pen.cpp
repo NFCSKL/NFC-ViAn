@@ -38,6 +38,14 @@ void Pen::handle_new_pos(QPoint pos) {
     lines.push_back(line);
 }
 
+QString Pen::get_name() {
+    return m_name;
+}
+
+void Pen::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Pen::write
  * @param json
@@ -55,6 +63,7 @@ void Pen::write(QJsonObject& json) {
         json_lines.append(json_line);
     }
     json["lines"] = json_lines;
+    json["name"] = m_name;
 }
 
 /**
@@ -76,4 +85,5 @@ void Pen::read(const QJsonObject& json) {
         std::pair<cv::Point, cv::Point> line(start, end);
         lines.push_back(line);
     }
+    m_name = json["name"].toString();
 }

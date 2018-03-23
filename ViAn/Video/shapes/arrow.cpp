@@ -35,6 +35,14 @@ void Arrow::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+QString Arrow::get_name() {
+    return m_name;
+}
+
+void Arrow::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Arrow::write
  * @param json
@@ -42,6 +50,7 @@ void Arrow::handle_new_pos(QPoint pos) {
  */
 void Arrow::write(QJsonObject& json) {
     write_shape(json);
+    json["name"] = m_name;
 }
 
 /**
@@ -51,4 +60,5 @@ void Arrow::write(QJsonObject& json) {
  */
 void Arrow::read(const QJsonObject& json) {
     read_shape(json);
+    m_name = json["name"].toString();
 }

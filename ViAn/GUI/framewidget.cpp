@@ -227,7 +227,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     if (current_drawing && current_frame_nr == current_drawing->get_frame()) {
-        QPen pen(Qt::white, 2, Qt::DashLine);
+        QPen pen(Qt::white, 1, Qt::DashLine);
         painter.setPen(pen);
         QPoint tl(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
         QPoint br(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);

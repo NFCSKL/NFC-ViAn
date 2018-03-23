@@ -49,15 +49,12 @@ void DrawingWidget::update_from_overlay() {
     if (m_overlay == nullptr) return;
     for (auto& overlay : m_overlay->get_overlays()) {
         if (overlay.second.size() != 0) {
-            qDebug() << "size" << overlay.second.size();
             // Check if the frame nr already exist in widget tree
             if (findItems(QString::number(overlay.first), Qt::MatchFixedString).empty()) {
                 FrameItem* frame_item = new FrameItem(overlay.first);
                 insertTopLevelItem(topLevelItemCount(), frame_item);
-                qDebug() << "before add to frame" << frame_item->get_frame();
                 add_drawings_to_frame(frame_item);
                 dynamic_cast<QTreeWidgetItem*>(frame_item)->setExpanded(true);
-                qDebug() << "after add to framae";
             }
         }
     }
@@ -65,13 +62,7 @@ void DrawingWidget::update_from_overlay() {
 
 void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
     std::vector<Shapes*> list = m_overlay->get_overlays()[f_item->get_frame()];
-    qDebug() << "in add drawing to frame" << list.size();
     for (auto shape : list) {
-        if (shape == nullptr) {
-            qDebug() << "IT IS NULL";
-        } else {
-            qDebug() << "type" << shape->get_shape();
-        }
         switch (shape->get_shape()) {
         case RECTANGLE: {
             RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
@@ -131,42 +122,36 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
     case RECTANGLE: {
         RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
         frame_item->addChild(rect_item);
-        rect_item->setText(0, "Rectangle");
         frame_item->setExpanded(true);
         break;
     }
     case CIRCLE: {
         CircleItem* circle_item = new CircleItem(dynamic_cast<Circle*>(shape));
         frame_item->addChild(circle_item);
-        circle_item->setText(0, "Circle");
         frame_item->setExpanded(true);
         break;
     }
     case LINE: {
         LineItem* line_item = new LineItem(dynamic_cast<Line*>(shape));
         frame_item->addChild(line_item);
-        line_item->setText(0, "Line");
         frame_item->setExpanded(true);
         break;
     }
     case ARROW: {
         ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
         frame_item->addChild(arrow_item);
-        arrow_item->setText(0, "Arrow");
         frame_item->setExpanded(true);
         break;
     }
     case TEXT: {
         TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
         frame_item->addChild(text_item);
-        //text_item->setText(0, "Text");
         frame_item->setExpanded(true);
         break;
     }
     case PEN: {
         PenItem* pen_item = new PenItem(dynamic_cast<Pen*>(shape));
         frame_item->addChild(pen_item);
-        pen_item->setText(0, "Pen");
         frame_item->setExpanded(true);
         break;
     }
@@ -242,6 +227,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     case PEN_ITEM: {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(item);
         Shapes* shape = shape_item->get_shape();
+        qDebug() << shape->get_name();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();
@@ -281,12 +267,12 @@ void DrawingWidget::rename_item() {
 }
 
 void DrawingWidget::item_changed(QTreeWidgetItem* item) {
-    if (item->type() == TEXT_ITEM) {
-        Text* text = dynamic_cast<TextItem*>(item)->get_shape();
-        emit update_text(item->text(0), text);
-    }
     auto a_item = dynamic_cast<ShapeItem*>(item);
     a_item->rename();
+    if (item->type() == TEXT_ITEM) {
+        Text* text = dynamic_cast<TextItem*>(item)->get_shape();
+        emit update_text(text->get_name(), text);
+    }
 }
 
 void DrawingWidget::remove_item() {

@@ -36,6 +36,14 @@ void Circle::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+QString Circle::get_name() {
+    return m_name;
+}
+
+void Circle::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Circle::write
  * @param json
@@ -43,6 +51,7 @@ void Circle::handle_new_pos(QPoint pos) {
  */
 void Circle::write(QJsonObject& json) {
     write_shape(json);
+    json["name"] = m_name;
 }
 
 /**
@@ -52,4 +61,5 @@ void Circle::write(QJsonObject& json) {
  */
 void Circle::read(const QJsonObject& json) {
     read_shape(json);
+    m_name = json["name"].toString();
 }
