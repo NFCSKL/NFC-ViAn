@@ -13,8 +13,13 @@
  * @param parent
  * Dialog usd to create new projects.
  */
-ProjectDialog::ProjectDialog(QWidget *parent) : QDialog(parent) {
-    setWindowTitle("New project");
+ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
+    if (name == "") {
+        setWindowTitle("New project");
+    } else {
+        setWindowTitle(name);
+    }
+
     setModal(true);
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
