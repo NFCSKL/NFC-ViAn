@@ -11,6 +11,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDir>
+#include <QFile>
 #include <QTemporaryDir>
 // vian
 #include "videoproject.h"
@@ -44,10 +45,11 @@ class Project : public Saveable{
     bool m_unsaved_changes = true;
 public:
     static Project* fromFile(const std::string& file_name);
-    Project(const std::string& name, const std::string& dir_path);
+    Project(const std::string& name, const std::string& dir_path = "default");
     ~Project();
 
     bool tmp_dir_valid = false;
+    bool is_default_proj = false;
 
     ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
@@ -77,6 +79,10 @@ public:
     std::string get_tmp_dir() const;
     std::string get_name() const;
     std::string get_file() const;
+    void set_name(std::string);
+    void set_dir(std::string);
+    void set_file(std::string);
+    void update_tmp(std::string name);
 
 private:
     Project();
