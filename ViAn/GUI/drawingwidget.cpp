@@ -63,39 +63,44 @@ void DrawingWidget::update_from_overlay() {
 void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
     std::vector<Shapes*> list = m_overlay->get_overlays()[f_item->get_frame()];
     for (auto shape : list) {
+        ShapeItem* s_item;
         switch (shape->get_shape()) {
         case RECTANGLE: {
-            RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
-            f_item->addChild(rect_item);
+            s_item = new RectItem(dynamic_cast<Rectangle*>(shape));
+            f_item->addChild(s_item);
             break;
         }
         case CIRCLE: {
-            CircleItem* circle_item = new CircleItem(dynamic_cast<Circle*>(shape));
-            f_item->addChild(circle_item);
+            s_item = new CircleItem(dynamic_cast<Circle*>(shape));
+            f_item->addChild(s_item);
             break;
         }
         case LINE: {
-            LineItem* line_item = new LineItem(dynamic_cast<Line*>(shape));
-            f_item->addChild(line_item);
+            s_item = new LineItem(dynamic_cast<Line*>(shape));
+            f_item->addChild(s_item);
             break;
         }
         case ARROW: {
-            ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
-            f_item->addChild(arrow_item);
+            s_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
+            f_item->addChild(s_item);
             break;
         }
         case TEXT: {
-            TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
-            f_item->addChild(text_item);
+            s_item = new TextItem(dynamic_cast<Text*>(shape));
+            f_item->addChild(s_item);
             break;
         }
         case PEN: {
-            PenItem* pen_item = new PenItem(dynamic_cast<Pen*>(shape));
-            f_item->addChild(pen_item);
+            s_item = new PenItem(dynamic_cast<Pen*>(shape));
+            f_item->addChild(s_item);
             break;
         }
         default:
             break;
+        }
+        if (shape == m_overlay->get_current_drawing()) {
+            qDebug() << "Same";
+            setCurrentItem(s_item);
         }
     }
 }
