@@ -45,6 +45,10 @@ void DrawingWidget::set_video_project(VideoProject *vid_proj) {
     }
 }
 
+/**
+ * @brief DrawingWidget::update_from_overlay
+ * Creates tree from drawings in the overlay
+ */
 void DrawingWidget::update_from_overlay() {
     if (m_overlay == nullptr) return;
     for (auto& overlay : m_overlay->get_overlays()) {
@@ -60,6 +64,11 @@ void DrawingWidget::update_from_overlay() {
     }
 }
 
+/**
+ * @brief DrawingWidget::add_drawings_to_frame
+ * Adds all drawings to the drawing widget tree
+ * @param f_item
+ */
 void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
     std::vector<Shapes*> list = m_overlay->get_overlays()[f_item->get_frame()];
     for (auto shape : list) {
@@ -183,6 +192,11 @@ void DrawingWidget::add_item_in_order(FrameItem *item) {
     insertTopLevelItem(topLevelItemCount(), item);
 }
 
+/**
+ * @brief DrawingWidget::save_item_data
+ * Stores GUI information of each tree item into its data member
+ * @param item
+ */
 void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
     if (item == nullptr) item = invisibleRootItem();
     for (auto i = 0; i < item->childCount(); ++i){
@@ -241,6 +255,12 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     }
 }
 
+/**
+ * @brief DrawingWidget::context_menu
+ * @param point
+ * Slot function triggered by customContextMenuRequested
+ * Creates a context menu
+ */
 void DrawingWidget::context_menu(const QPoint &point) {
     if (m_vid_proj == nullptr) return;
     QMenu menu(this);
@@ -265,10 +285,20 @@ void DrawingWidget::context_menu(const QPoint &point) {
     menu.exec(mapToGlobal(point));
 }
 
+/**
+ * @brief DrawingWidget::rename_item
+ * Slot function to start edit the current item
+ */
 void DrawingWidget::rename_item() {
     editItem(currentItem());
 }
 
+/**
+ * @brief DrawingWidget::item_changed
+ * @param item
+ * Slot function called on the signal itemChanged.
+ * Updates the item with the newly entered name
+ */
 void DrawingWidget::item_changed(QTreeWidgetItem* item) {
     auto a_item = dynamic_cast<ShapeItem*>(item);
     a_item->rename();
@@ -278,10 +308,21 @@ void DrawingWidget::item_changed(QTreeWidgetItem* item) {
     }
 }
 
+/**
+ * @brief DrawingWidget::remove_item
+ * Slot function for removing the current item from the tree
+ */
 void DrawingWidget::remove_item() {
     remove_from_tree(currentItem());
 }
 
+/**
+ * @brief DrawingWidget::remove_from_tree
+ * @param item
+ * Deletes item from the drawing tree.
+ * Calls itself recusively in case of a frame_item with multiple drawings.
+ * Also deletes the frame_item in case the item of the last drawing of that frame
+ */
 void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
     Shapes* shape;
     QTreeWidgetItem* parent;
@@ -302,7 +343,6 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;
-        //delete shape;
         if (parent->childCount() == 0) delete parent;
         break;
     default:
@@ -312,10 +352,11 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
 
 /**
  * @brief DrawingWidget::dropEvent
- * Handels drop events.
+ * Handles drop events.
  * Calls upon standard dropEvent for TreeItems.
  * @param event
  */
 void DrawingWidget::dropEvent(QDropEvent *event) {
+    Q_UNUSED (event)
     //QTreeWidget::dropEvent(event);
 }
