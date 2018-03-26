@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QProgressDialog>
+#include <QTemporaryDir>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
@@ -152,6 +153,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
+    project_wgt->add_default_project();
     // Recent projects menu
     RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
