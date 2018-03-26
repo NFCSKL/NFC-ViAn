@@ -229,7 +229,8 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         }
     }
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
-    if (current_drawing && current_frame_nr == current_drawing->get_frame()) {
+    bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
+    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame()) {
         QPen pen(Qt::white, 1, Qt::DashLine);
         painter.setPen(pen);
         QPoint tl(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);

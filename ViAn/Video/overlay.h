@@ -60,6 +60,7 @@ public:
     void set_overlays(std::map<int, std::vector<Shapes*>>);
     void set_current_drawing(Shapes* shape);
     Shapes* get_current_drawing();
+    bool get_show_overlay();
 
     bool is_saved() const;
 

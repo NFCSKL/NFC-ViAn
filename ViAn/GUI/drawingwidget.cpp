@@ -108,7 +108,6 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
             break;
         }
         if (shape == m_overlay->get_current_drawing()) {
-            qDebug() << "Same";
             setCurrentItem(s_item);
         }
     }

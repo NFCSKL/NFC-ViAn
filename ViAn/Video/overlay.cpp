@@ -34,7 +34,6 @@ bool Overlay::is_showing_overlay() {
  */
 void Overlay::set_showing_overlay(bool value) {
     show_overlay = value;
-    if (!show_overlay) set_current_drawing(nullptr);
 }
 
 /**
@@ -147,12 +146,16 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
 }
 
 void Overlay::set_current_drawing(Shapes *shape) {
-    if (shape->get_shape() == PEN) return;
+    if (shape && shape->get_shape() == PEN) return;
     current_drawing = shape;
 }
 
 Shapes* Overlay::get_current_drawing() {
     return current_drawing;
+}
+
+bool Overlay::get_show_overlay() {
+    return show_overlay;
 }
 
 // Unused
