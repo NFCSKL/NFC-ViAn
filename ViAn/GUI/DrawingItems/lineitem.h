@@ -11,6 +11,7 @@ public:
     Line* get_shape();
     void rename();
     void remove();
+    ~LineItem() override;
 };
 
 #endif // LINEITEM_H

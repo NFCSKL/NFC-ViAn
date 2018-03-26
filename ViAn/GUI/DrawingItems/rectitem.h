@@ -11,6 +11,7 @@ public:
     Rectangle* get_shape();
     void rename();
     void remove();
+    ~RectItem() override;
 };
 
 #endif // RECTITEM_H

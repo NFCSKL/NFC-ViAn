@@ -214,7 +214,6 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     Q_UNUSED(col)
     switch (item->type()) {
     case FRAME_ITEM: {
-        qDebug() << "frame_item";
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
         emit jump_to_frame(m_vid_proj, frame_item->get_frame());
         break;
@@ -227,7 +226,6 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     case PEN_ITEM: {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(item);
         Shapes* shape = shape_item->get_shape();
-        qDebug() << shape->get_name();
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();
@@ -299,6 +297,7 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;
+        //delete shape;
         if (parent->childCount() == 0) delete parent;
         break;
     default:

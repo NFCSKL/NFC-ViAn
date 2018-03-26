@@ -6,6 +6,8 @@ TextItem::TextItem(Text* text) : ShapeItem(TEXT_ITEM) {
     setText(0, text->get_name());
 }
 
+TextItem::~TextItem() {}
+
 void TextItem::remove() {}
 
 void TextItem::rename() {

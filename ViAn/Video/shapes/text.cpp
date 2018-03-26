@@ -20,6 +20,8 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPE
     text_size = cv::getTextSize(m_name.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
 }
 
+Text::~Text() {}
+
 /**
  * @brief Text::draw
  * Draws the object on top of the specified frame.

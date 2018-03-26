@@ -1,4 +1,5 @@
 #include "circle.h"
+#include <QDebug>
 
 Circle::Circle() : Shapes(SHAPES::CIRCLE) {
 }
@@ -10,6 +11,8 @@ Circle::Circle() : Shapes(SHAPES::CIRCLE) {
  */
 Circle::Circle(QColor col, QPoint pos) : Shapes(SHAPES::CIRCLE, col, pos) {
 }
+
+Circle::~Circle() {}
 
 /**
  * @brief Circle::draw

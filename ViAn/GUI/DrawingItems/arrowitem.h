@@ -8,6 +8,7 @@ class ArrowItem : public ShapeItem {
     Arrow* m_arrow;
 public:
     ArrowItem(Arrow* arrow);
+    ~ArrowItem() override;
     Arrow* get_shape();
     void rename();
     void remove();

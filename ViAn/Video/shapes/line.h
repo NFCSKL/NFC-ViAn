@@ -7,6 +7,7 @@ class Line : public Shapes {
 public:
     Line();
     Line(QColor col, QPoint pos);
+    ~Line() override;
     cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos) override;
     void write(QJsonObject& json) override;

@@ -14,6 +14,8 @@ Arrow::Arrow() : Shapes(SHAPES::ARROW) {
 Arrow::Arrow(QColor col, QPoint pos) : Shapes(SHAPES::ARROW, col, pos) {
 }
 
+Arrow::~Arrow() {}
+
 /**
  * @brief Arrow::draw
  * Draws the object on top of the specified frame.

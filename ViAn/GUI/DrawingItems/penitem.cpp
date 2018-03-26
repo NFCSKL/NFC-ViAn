@@ -6,6 +6,8 @@ PenItem::PenItem(Pen* pen) : ShapeItem(PEN_ITEM) {
     setText(0, pen->get_name());
 }
 
+PenItem::~PenItem() {}
+
 void PenItem::remove() {}
 
 void PenItem::rename() {

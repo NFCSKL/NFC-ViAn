@@ -14,6 +14,8 @@ Rectangle::Rectangle() : Shapes(SHAPES::RECTANGLE) {
 Rectangle::Rectangle(QColor col, QPoint pos) : Shapes(SHAPES::RECTANGLE, col, pos) {
 }
 
+Rectangle::~Rectangle() {}
+
 /**
  * @brief Rectangle::draw
  * Draws the object on top of the specified frame.

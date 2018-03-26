@@ -24,6 +24,9 @@ Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
 }
+
+Shapes::~Shapes() {}
+
 /**
  * @brief Shapes::set_anchor
  * @param pos

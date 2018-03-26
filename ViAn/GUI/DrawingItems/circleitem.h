@@ -11,6 +11,7 @@ public:
     Circle* get_shape();
     void rename();
     void remove();
+    ~CircleItem() override;
 };
 
 #endif // CIRCLEITEM_H

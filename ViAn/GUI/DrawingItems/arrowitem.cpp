@@ -6,6 +6,8 @@ ArrowItem::ArrowItem(Arrow* arrow) : ShapeItem(ARROW_ITEM) {
     setText(0, arrow->get_name());
 }
 
+ArrowItem::~ArrowItem() {}
+
 void ArrowItem::remove() {}
 
 void ArrowItem::rename() {

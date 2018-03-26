@@ -14,6 +14,8 @@ Pen::Pen() : Shapes(SHAPES::PEN) {
 Pen::Pen(QColor col, QPoint pos) : Shapes(SHAPES::PEN, col, pos) {
 }
 
+Pen::~Pen() {}
+
 /**
  * @brief Pen::draw
  * Draws the object on top of the specified frame.

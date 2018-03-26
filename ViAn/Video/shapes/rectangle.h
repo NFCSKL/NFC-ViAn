@@ -7,6 +7,7 @@ class Rectangle : public Shapes {
 public:
     Rectangle();
     Rectangle(QColor col, QPoint pos);
+    ~Rectangle() override;
     cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos) override;
     void write(QJsonObject& json) override;

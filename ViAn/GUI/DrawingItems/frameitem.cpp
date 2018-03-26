@@ -6,6 +6,8 @@ FrameItem::FrameItem(int frame) : ShapeItem(FRAME_ITEM) {
     setText(0, QString::number(frame));
 }
 
+FrameItem::~FrameItem() {}
+
 void FrameItem::remove(){}
 
 void FrameItem::rename(){}

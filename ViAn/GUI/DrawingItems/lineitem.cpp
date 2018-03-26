@@ -6,6 +6,8 @@ LineItem::LineItem(Line* line) : ShapeItem(LINE_ITEM) {
     setText(0, line->get_name());
 }
 
+LineItem::~LineItem() {}
+
 void LineItem::remove() {}
 
 void LineItem::rename() {

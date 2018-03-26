@@ -27,6 +27,7 @@ public:
 
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;
+    virtual ~Shapes();
 
     static cv::Scalar qcolor_to_scalar(QColor col);
     static cv::Point qpoint_to_point(QPoint pnt);

@@ -7,10 +7,12 @@ class FrameItem : public ShapeItem {
     int m_frame;
 public:
     FrameItem(int frame);
+
     int get_frame();
     void remove();
     void rename();
     Shapes* get_shape();
+    ~FrameItem() override;
 };
 
 #endif // FRAMEITEM_H

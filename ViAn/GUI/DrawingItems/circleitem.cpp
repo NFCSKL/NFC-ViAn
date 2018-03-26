@@ -1,10 +1,13 @@
 #include "circleitem.h"
+#include <QDebug>
 
 CircleItem::CircleItem(Circle* circle) : ShapeItem(CIRCLE_ITEM) {
     m_circle = circle;
     setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, circle->get_name());
 }
+
+CircleItem::~CircleItem() {}
 
 void CircleItem::remove() {}
 

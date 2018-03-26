@@ -11,6 +11,7 @@ public:
     Text* get_shape();
     void remove();
     void rename();
+    ~TextItem() override;
 };
 
 #endif // TEXTITEM_H

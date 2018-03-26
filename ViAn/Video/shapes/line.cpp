@@ -14,6 +14,8 @@ Line::Line() : Shapes(SHAPES::LINE) {
 Line::Line(QColor col, QPoint pos) : Shapes(SHAPES::LINE, col, pos) {
 }
 
+Line::~Line() {}
+
 /**
  * @brief Line::draw
  * Draws the object on top of the specified frame.

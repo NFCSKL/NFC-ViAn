@@ -11,6 +11,7 @@ public:
     Pen* get_shape();
     void rename();
     void remove();
+    ~PenItem() override;
 };
 
 #endif // PENITEM_H

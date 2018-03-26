@@ -164,10 +164,12 @@ void Overlay::redo(int frame_nr) {
     Q_UNUSED(frame_nr)
 }
 
-// Not needed ?
 void Overlay::update_text(QString text, Shapes* shape) {
     if (shape->get_shape() == TEXT) {
         dynamic_cast<Text*>(shape)->set_name(text);
+        double font_scale = dynamic_cast<Text*>(shape)->get_font_scale();
+        shape->set_text_size(cv::getTextSize(shape->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, shape->LINE_THICKNESS, &baseline));
+        shape->update_text_draw_end();
     }
 }
 
@@ -345,9 +347,14 @@ void Overlay::delete_drawing(Shapes* shape) {
 
     auto it = std::find(overlays[drawing->get_frame()].begin(), overlays[drawing->get_frame()].end(), shape);
 
+    if (shape == current_drawing) {
+        current_drawing = nullptr;
+    }
+
     if (it != overlays[drawing->get_frame()].end()) {
         overlays[drawing->get_frame()].erase(it);
     }
+    delete drawing;
 }
 
 /**
