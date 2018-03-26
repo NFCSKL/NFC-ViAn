@@ -498,6 +498,13 @@ void MainWindow::init_help_menu() {
     //connect
 }
 
+void MainWindow::closeEvent(QCloseEvent *event) {
+    if (project_wgt->close_project())
+        event->accept();
+    else
+        event->ignore();
+}
+
 void MainWindow::rectangle() {
     draw_toolbar->rectangle_tool_act->trigger();
 }

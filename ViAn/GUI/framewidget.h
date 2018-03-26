@@ -51,6 +51,8 @@ class FrameWidget : public QWidget
     int current_frame_nr = 0;
     double m_scale_factor = 1;
 
+    std::pair<double, double> panning_tracker {}; // Track when to actually pan. Based on current zoom level
+
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 

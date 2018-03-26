@@ -106,6 +106,8 @@ private:
     void init_interval_menu();
     void init_tools_menu();
     void init_help_menu();
+
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // MAINWINDOW_H

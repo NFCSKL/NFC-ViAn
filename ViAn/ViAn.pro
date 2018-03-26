@@ -70,7 +70,8 @@ SOURCES += main.cpp \
     GUI/DrawingItems/arrowitem.cpp \
     GUI/DrawingItems/shapeitem.cpp \
     GUI/DrawingItems/textitem.cpp \
-    GUI/DrawingItems/penitem.cpp
+    GUI/DrawingItems/penitem.cpp \
+    Project/Test/bookmarktest.cpp
 
 #
 # TEST
@@ -130,7 +131,8 @@ HEADERS += reportgenerator.h\
     GUI/DrawingItems/arrowitem.h \
     GUI/DrawingItems/shapeitem.h \
     GUI/DrawingItems/textitem.h \
-    GUI/DrawingItems/penitem.h
+    GUI/DrawingItems/penitem.h \
+    Project/Test/bookmarktest.h
 
 #
 # LIBRARY

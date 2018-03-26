@@ -3,6 +3,7 @@
 #include "Project/Analysis/analysis.h"
 #include <QTime>
 #include <QThread>
+#include "utility.h"
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
 
@@ -211,8 +212,10 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     if (show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
-        QPoint tl(m_analysis->bounding_box.x, m_analysis->bounding_box.y);
-        QPoint br(m_analysis->bounding_box.x+m_analysis->bounding_box.width, m_analysis->bounding_box.y+m_analysis->bounding_box.height);
+
+        auto box = m_analysis->get_bounding_box();
+        QPoint tl = Utility::from_cvpoint(box.tl());
+        QPoint br = Utility::from_cvpoint(box.br());
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.drawRect(bounding_rect);
     }
@@ -395,8 +398,25 @@ void FrameWidget::init_panning(QPoint pos) {
  */
 void FrameWidget::panning(QPoint pos) {
     // Using panning
-    QPoint _tmp = prev_pos - pos;
-    emit moved_xy(_tmp.x(), _tmp.y());
+    int dx {prev_pos.x() - pos.x()};
+    int dy {prev_pos.y() - pos.y()};
+
+    panning_tracker.first += dx / m_scale_factor;
+    panning_tracker.second += dy/ m_scale_factor;
+
+    auto scale_panning = [] (double& actual, int& scaled) {
+        if (std::abs(actual) >= 1) {
+            scaled = std::floor(actual);
+            actual -= scaled;
+        }
+    };
+
+    int x{}, y{};
+    scale_panning(panning_tracker.first, x);
+    scale_panning(panning_tracker.second, y);
+
+
+    emit moved_xy(x, y);
     prev_pos = pos;
 }
 

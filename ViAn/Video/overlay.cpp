@@ -122,6 +122,7 @@ void Overlay::add_drawing(Shapes* shape, int frame_nr) {
     shape->set_frame(frame_nr);
     overlays[frame_nr].push_back(shape);
     emit new_drawing(shape, frame_nr);
+    m_unsaved_changes = true;
 }
 
 /**
@@ -325,6 +326,11 @@ std::map<int,std::vector<Shapes*>> Overlay::get_overlays() {
 
 void Overlay::set_overlays(std::map<int, std::vector<Shapes*>> new_overlays) {
     overlays = new_overlays;
+    m_unsaved_changes = true;
+}
+
+bool Overlay::is_saved() const{
+    return !m_unsaved_changes;
 }
 
 /**
@@ -333,7 +339,10 @@ void Overlay::set_overlays(std::map<int, std::vector<Shapes*>> new_overlays) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::clear(int frame_nr) {
-    overlays[frame_nr].clear();
+    if (show_overlay) {
+        overlays[frame_nr].clear();
+        m_unsaved_changes = true;
+    }
 }
 
 /**
@@ -381,6 +390,7 @@ void Overlay::read(const QJsonObject& json) {
             add_drawing(shape, frame_nr);
         }
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -403,5 +413,6 @@ void Overlay::write(QJsonObject& json) {
         json_overlays.push_back(json_overlay);
     }
     json["overlays"] = json_overlays;
+    m_unsaved_changes = false;
 }
 

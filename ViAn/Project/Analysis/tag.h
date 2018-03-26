@@ -2,8 +2,8 @@
 #define TAG_H
 #include "basicanalysis.h"
 class BasicAnalysis;
-class Tag : public BasicAnalysis
-{
+
+class Tag : public BasicAnalysis {
 public:
     void remove_interval(AnalysisInterval *rm_interval);
     void add_frame(int frame);

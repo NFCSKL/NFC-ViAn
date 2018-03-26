@@ -8,6 +8,7 @@
 #include <typeinfo>
 #include <QPoint>
 #include <QJsonArray>
+
 enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG =2, BASIC_ANALYSIS =3};
 enum SAVE_TYPE {DETECTION=10, INTERVAL=11};
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
@@ -20,9 +21,9 @@ struct interval_cmp {
 using interval_set = std::set<AnalysisInterval*, interval_cmp>;
 class BasicAnalysis : public Saveable
 {       
-
 public:
     std::string m_name = "2";
+    bool m_unsaved_changes = true;
     interval_set m_intervals;
     std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
     cv::Rect bounding_box;
@@ -44,6 +45,10 @@ public:
 
     std::string get_name() const;
     interval_set get_intervals() const;
+
+    void set_name(const std::string& new_name);
+
+    bool is_saved() const;
     std::pair<int, int> get_ana_interval() const;
     cv::Rect get_bounding_box() const;
 };

@@ -28,7 +28,7 @@
  */
 class Overlay : public QObject, public Writeable {
     Q_OBJECT
-
+    bool m_unsaved_changes = true;
 public slots:
     void set_tool(SHAPES s);
 public:
@@ -60,6 +60,8 @@ public:
     void set_overlays(std::map<int, std::vector<Shapes*>>);
     void set_current_drawing(Shapes* shape);
     Shapes* get_current_drawing();
+
+    bool is_saved() const;
 
 private:
     Shapes* get_empty_shape(SHAPES shape_type);
