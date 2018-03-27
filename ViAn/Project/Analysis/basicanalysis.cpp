@@ -13,6 +13,15 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
     use_bounding_box(other.use_bounding_box){
 }
 
+BasicAnalysis::~BasicAnalysis() {
+    qDebug() << "basic analysis delete";
+    qDebug() << m_intervals.size();
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        m_intervals.erase(it);
+        delete *it;
+    }
+}
+
 /**
  * @brief BasicAnalysis::add_POI
  * Adds a POI to the BasicAnalysis.

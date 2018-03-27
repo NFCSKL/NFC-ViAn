@@ -645,6 +645,7 @@ void VideoWidget::new_tag_clicked() {
     TagDialog* tag_dialog = new TagDialog();
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
     tag_dialog->exec();
+
 }
 
 /**

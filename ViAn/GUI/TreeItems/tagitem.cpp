@@ -6,6 +6,11 @@ TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     setIcon(0, folder_icon);
 }
 
+TagItem::~TagItem() {
+    qDebug() << "tag item delete";
+    delete m_tag;
+}
+
 void TagItem::remove(){}
 
 void TagItem::rename() {

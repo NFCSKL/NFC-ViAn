@@ -68,7 +68,7 @@ bool VideoProject::is_saved() {
 }
 
 /**
- * @brief VideoProject::remove_analysis
+ * @brief VideoProject::delete_analysis
  * @param id of the analysis
  */
 void VideoProject::delete_analysis(const int& id) {
@@ -229,9 +229,11 @@ ID VideoProject::add_analysis(BasicAnalysis *analysis){
 }
 
 void VideoProject::remove_analysis(BasicAnalysis *analysis) {
+    qDebug() << "remove analysis";
     m_analyses.erase(analysis->get_id());
     m_unsaved_changes = true;
-    delete analysis;
+    //delete analysis;
+
 }
 
 /**
