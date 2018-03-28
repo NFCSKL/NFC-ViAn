@@ -643,6 +643,7 @@ void VideoWidget::remove_tag_frame() {
  */
 void VideoWidget::new_tag_clicked() {
     TagDialog* tag_dialog = new TagDialog();
+    tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
     tag_dialog->exec();
 

@@ -129,7 +129,6 @@ void AnalysisMethod::run() {
     if(*aborted){
         capture.release();
         emit analysis_aborted();
-        emit finito();
         return;
     }else{
         // Makes sure that a POI that stretches to the end of the
@@ -147,7 +146,6 @@ void AnalysisMethod::run() {
         m_analysis.save_saveable(m_save_path);
         AnalysisProxy proxy(m_analysis, m_analysis.full_path());       
         emit finished_analysis(proxy);
-        emit finito();
     }
 }
 

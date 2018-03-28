@@ -9,6 +9,13 @@ MainToolbar::MainToolbar() {
     create_buttons();
 }
 
+MainToolbar::~MainToolbar() {
+    delete add_video_act;
+    delete save_act;
+    delete open_act;
+    delete toggle_draw_toolbar_act;
+}
+
 /**
  * @brief MainToolbar::create_actions
  * Creates all actions and sets the drawing toolbar action to be checkable

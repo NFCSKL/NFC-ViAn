@@ -25,10 +25,7 @@ class VideoProject;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    QTreeWidgetItem* clicked_item = nullptr;
-    QPoint* clicked_point = nullptr;
     QTreeWidgetItem* selection_parent = nullptr;
-    bool selecting = false;
     std::set<std::string> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
                                 "264", "263", "mjpeg", "avc", "m2ts",
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",

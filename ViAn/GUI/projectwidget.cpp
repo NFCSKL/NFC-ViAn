@@ -104,6 +104,7 @@ void ProjectWidget::add_video() {
         QString vid_name = video_path.right(video_path.length() - index);
         // TODO Check if file is already added
         VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+        qDebug() << "added a new one";
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
     }
@@ -460,7 +461,8 @@ bool ProjectWidget::prompt_save() {
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    get_index_path(item);
+    Q_UNUSED (col)
+    //get_index_path(item);
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);

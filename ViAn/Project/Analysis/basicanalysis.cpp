@@ -15,11 +15,13 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 
 BasicAnalysis::~BasicAnalysis() {
     qDebug() << "basic analysis delete";
-    qDebug() << m_intervals.size();
-    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
-        m_intervals.erase(it);
-        delete *it;
-    }
+    qDebug() << "size1" << m_intervals.size();
+    m_intervals.clear();
+    qDebug() << "size2" << m_intervals.size();
+//    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+//        m_intervals.erase(it);
+//        //delete *it;
+//    }
 }
 
 /**

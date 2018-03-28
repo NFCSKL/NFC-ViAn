@@ -1,4 +1,10 @@
 #include "analysis.h"
+#include <QDebug>
+
+Analysis::~Analysis() {
+    qDebug() << "analysis is kill";
+}
+
 /**
  * @brief Analysis::read
  * Reads analysis from json format.
