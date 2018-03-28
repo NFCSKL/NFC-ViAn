@@ -5,7 +5,9 @@
 #include <QThread>
 #include "utility.h"
 
-FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
+FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
+    setMouseTracking(true);
+}
 
 void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
@@ -116,16 +118,13 @@ void FrameWidget::set_tool(SHAPES tool) {
 void FrameWidget::set_cursor(SHAPES tool) {
     switch (tool) {
     case NONE:
+    case ZOOM:
         unsetCursor();
         break;
     case ANALYSIS_BOX:
-    case ZOOMIN:
     case RECTANGLE:
     case CIRCLE:
         setCursor(Qt::CrossCursor);
-        break;
-    case ZOOMOUT:
-        setCursor(Qt::ArrowCursor);
         break;
     case MOVE:
         setCursor(Qt::OpenHandCursor);
@@ -204,7 +203,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
 
     if (mark_rect) {
         // Draw the zoom box with correct dimension
-        if(m_tool == ZOOMIN){
+        if(m_tool == ZOOM){
             QPoint start = rect_start;
             QPoint end = rect_end;
 
@@ -280,17 +279,22 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             ana_rect_end = event->pos();
         }
         break;
-    case ZOOMIN:
+    case ZOOM: {
         if (event->button() == Qt::RightButton) {
             init_panning(event->pos());
         } else if (event->button() == Qt::LeftButton) {
-            if (event->modifiers() == Qt::ControlModifier) {
-                do_zoom_out = true;
+            QRect zoom_rect(rect_start, rect_end);
+            if (zoom_rect.contains(event->pos())) {
+                end_zoom();
             } else {
                 rect_start = event->pos();
             }
+            mark_rect = false;
+            rect_end = rect_start;
+            repaint();
         }
         break;
+    }
     case MOVE:
         init_panning(event->pos());
         break;
@@ -312,20 +316,12 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case ANALYSIS_BOX:
         set_analysis_settings();
         break;
-    case ZOOMIN:
+    case ZOOM:
         if (event->button() == Qt::RightButton) {
             end_panning();
         } else if (event->button() == Qt::LeftButton){
-            if (do_zoom_out) {
-                emit trigger_zoom_out(0.5);
-                do_zoom_out = false;
-            }else {
-                end_zoom();
-            }
+
         }
-        break;
-    case ZOOMOUT:
-        emit trigger_zoom_out(0.5);
         break;
     case MOVE:
         end_panning();
@@ -349,19 +345,31 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             ana_rect_end = rect_update(event->pos());
         }
         break;
-    case ZOOMIN:
+    case ZOOM: {
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
-        } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
+        } else if (event->buttons() == Qt::LeftButton) {
             rect_end = rect_update(event->pos());
             mark_rect = true;
+        } else {
+            QRect zoom_rect(rect_start, rect_end);
+            if (zoom_rect.contains(event->pos()) && mark_rect) {
+                setCursor(QCursor(QPixmap("../ViAn/Icons/zoom_in.png")));
+            } else {
+                unsetCursor();
+            }
         }
         break;
+    }
     case MOVE:
-        panning(event->pos());
+        if (event->buttons() == Qt::LeftButton) {
+            panning(event->pos());
+        }
         break;
     default:
-        emit mouse_moved(scale_point(event->pos()));
+        if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
+            emit mouse_moved(scale_point(event->pos()));
+        }
         break;
     }
 }
@@ -378,13 +386,14 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
         emit mouse_scroll(num_steps);
         event->accept();
         break;
-    case ZOOMIN:
-    case ZOOMOUT:
     case MOVE:
-        if (num_steps.y() < 0) {
-            emit trigger_zoom_out(0.9);
-        } else {
-            emit trigger_zoom_out(1.1);
+    case ZOOM:
+        if (event->modifiers() == Qt::ControlModifier) {
+            if (num_steps.y() < 0) {
+                emit trigger_zoom_out(0.9);
+            } else {
+                emit trigger_zoom_out(1.1);
+            }
         }
         break;
     default:
@@ -478,7 +487,7 @@ QPoint FrameWidget::rect_update(QPoint pos) {
  * Panning stopped
  */
 void FrameWidget::end_panning() {
-    if (m_tool == ZOOMIN) {
+    if (m_tool == ZOOM) {
         setCursor(Qt::CrossCursor);
     } else if (m_tool == MOVE){
         setCursor(Qt::OpenHandCursor);

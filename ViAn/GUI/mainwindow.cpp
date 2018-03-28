@@ -106,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(draw_toolbar->redo_tool_act, &QAction::triggered, this, &MainWindow::redo);
     connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
+    draw_toolbar->zoom_tool_act->trigger();
 
     // Status bar
     status_bar = new StatusBar();
@@ -532,7 +533,7 @@ void MainWindow::delete_drawing() {
 }
 
 void MainWindow::zoom() {
-    video_wgt->frame_wgt->set_tool(ZOOMIN);
+    video_wgt->frame_wgt->set_tool(ZOOM);
 }
 
 void MainWindow::move() {

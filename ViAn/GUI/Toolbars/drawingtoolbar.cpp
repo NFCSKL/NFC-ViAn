@@ -20,7 +20,7 @@ void DrawingToolbar::create_actions() {
     analysis_tool_act = new QAction(QIcon("../ViAn/Icons/analysis.png"), tr("Analysis tool"), this);
     zoom_in_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_in.png"), tr("Zoom in tool"), this);
     zoom_out_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_out.png"), tr("Zoom out tool"), this);
-    pan_tool_act = new QAction(QIcon("../ViAn/Icons/hand.png"), tr("Panning tool"), this);
+    zoom_tool_act = new QAction(QIcon("../ViAn/Icons/hand.png"), tr("Panning tool"), this);
 
     color_tool_act = new QAction(QIcon("../ViAn/Icons/color.png"), tr("Color picker"), this);
     pen_tool_act = new QAction(QIcon("../ViAn/Icons/pen.png"), tr("Pen tool"), this);
@@ -35,14 +35,14 @@ void DrawingToolbar::create_actions() {
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
 
     delete_tool_act->setShortcut(QKeySequence::Delete);
-    zoom_in_tool_act->setShortcut(QKeySequence::ZoomIn);
-    zoom_out_tool_act->setShortcut(QKeySequence::ZoomOut);
+    zoom_in_tool_act->setShortcut(QKeySequence(Qt::Key_Plus));
+    zoom_out_tool_act->setShortcut(QKeySequence(Qt::Key_Minus));
 
     tools = new QActionGroup(this);
     tools->addAction(no_tool_act);
-    tools->addAction(analysis_tool_act);
-    tools->addAction(pan_tool_act);
 
+    tools->addAction(zoom_tool_act);
+    tools->addAction(analysis_tool_act);
     tools->addAction(pen_tool_act);
     tools->addAction(arrow_tool_act);
     tools->addAction(rectangle_tool_act);
@@ -61,7 +61,7 @@ void DrawingToolbar::create_actions() {
     connect(analysis_tool_act, &QAction::triggered, this, &DrawingToolbar::analysis_tool_act_clicked);
     connect(zoom_in_tool_act, &QAction::triggered, this, &DrawingToolbar::zoom_in_tool_act_clicked);
     connect(zoom_out_tool_act, &QAction::triggered, this, &DrawingToolbar::zoom_out_tool_act_clicked);
-    connect(pan_tool_act, &QAction::triggered, this, &DrawingToolbar::pan_tool_act_clicked);
+    connect(zoom_tool_act, &QAction::triggered, this, &DrawingToolbar::zoom_tool_act_clicked);
 
     connect(pen_tool_act, &QAction::triggered, this, &DrawingToolbar::pen_tool_clicked);
     connect(arrow_tool_act, &QAction::triggered, this, &DrawingToolbar::arrow_tool_clicked);
@@ -118,18 +118,16 @@ void DrawingToolbar::analysis_tool_act_clicked() {
 void DrawingToolbar::zoom_in_tool_act_clicked() {
     emit set_status_bar("Zoom in");
     emit step_zoom(1.1);
-    //emit set_overlay_tool(ZOOMIN);
 }
 
 void DrawingToolbar::zoom_out_tool_act_clicked() {
     emit set_status_bar("Zoom out");
     emit step_zoom(0.9);
-    //emit set_overlay_tool(ZOOMOUT);
 }
 
-void DrawingToolbar::pan_tool_act_clicked() {
+void DrawingToolbar::zoom_tool_act_clicked() {
     emit set_status_bar("Panning tool");
-    emit set_overlay_tool(MOVE);
+    emit set_overlay_tool(ZOOM);
 }
 
 void DrawingToolbar::pen_tool_clicked() {

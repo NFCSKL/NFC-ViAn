@@ -22,7 +22,7 @@ public:
     QAction* analysis_tool_act;
     QAction* zoom_in_tool_act;
     QAction* zoom_out_tool_act;
-    QAction* pan_tool_act;
+    QAction* zoom_tool_act;
     QAction* color_tool_act;
     QAction* pen_tool_act;
     QAction* arrow_tool_act;
@@ -45,7 +45,7 @@ private slots:
     void analysis_tool_act_clicked();
     void zoom_in_tool_act_clicked();
     void zoom_out_tool_act_clicked();
-    void pan_tool_act_clicked();
+    void zoom_tool_act_clicked();
 
     void pen_tool_clicked();
     void arrow_tool_clicked();
