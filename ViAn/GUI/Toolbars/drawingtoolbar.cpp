@@ -35,12 +35,12 @@ void DrawingToolbar::create_actions() {
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
 
     delete_tool_act->setShortcut(QKeySequence::Delete);
+    zoom_in_tool_act->setShortcut(QKeySequence::ZoomIn);
+    zoom_out_tool_act->setShortcut(QKeySequence::ZoomOut);
 
     tools = new QActionGroup(this);
     tools->addAction(no_tool_act);
     tools->addAction(analysis_tool_act);
-    tools->addAction(zoom_in_tool_act);
-    tools->addAction(zoom_out_tool_act);
     tools->addAction(pan_tool_act);
 
     tools->addAction(pen_tool_act);
@@ -78,6 +78,8 @@ void DrawingToolbar::create_actions() {
  */
 void DrawingToolbar::create_buttons() {
     addAction(color_tool_act);
+    addAction(zoom_in_tool_act);
+    addAction(zoom_out_tool_act);
     addActions(tools->actions());
     addAction(undo_tool_act);
     addAction(redo_tool_act);
@@ -114,13 +116,15 @@ void DrawingToolbar::analysis_tool_act_clicked() {
 }
 
 void DrawingToolbar::zoom_in_tool_act_clicked() {
-    emit set_status_bar("Zoom tool");
-    emit set_overlay_tool(ZOOMIN);
+    emit set_status_bar("Zoom in");
+    emit step_zoom(1.1);
+    //emit set_overlay_tool(ZOOMIN);
 }
 
 void DrawingToolbar::zoom_out_tool_act_clicked() {
-    emit set_status_bar("Zoom tool");
-    emit set_overlay_tool(ZOOMOUT);
+    emit set_status_bar("Zoom out");
+    emit step_zoom(0.9);
+    //emit set_overlay_tool(ZOOMOUT);
 }
 
 void DrawingToolbar::pan_tool_act_clicked() {

@@ -58,6 +58,7 @@ signals:
     void set_status_bar(QString);
     void set_color(QColor);
     void set_overlay_tool(SHAPES);
+    void step_zoom(double);
     void undo(void);
     void clear(void);
 };
