@@ -30,10 +30,10 @@ using ID = int;
 class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
-    std::string m_name = "";
-    std::string m_dir = "";  // Path to the project folder --- c:/name/
-    std::string m_dir_bookmarks = "";
-    std::string m_file = ""; // Path to the project file where it is saved. --- /name/name.vian
+    std::string m_name = "";            // Simply the project name
+    std::string m_dir = "";             // Path to the project folder: choosen path + project name
+    std::string m_dir_bookmarks = "";   // Project directory + /Bookmarks
+    std::string m_file = "";            // Full path to the project file: project path + project name + .vian
 
     std::vector<VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
@@ -46,9 +46,6 @@ public:
     Project(const std::string& name, const std::string& dir_path="");
     ~Project();
 
-    bool tmp_dir_valid = false;
-    bool is_default_proj = false;
-
     ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
     // TODO
@@ -60,19 +57,17 @@ public:
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    void delete_artifacts();
 
     void set_unsaved(const bool& changed);
     void set_name_and_path(const std::string& name, const std::string& path);
-
+    void set_temporary(const bool& is_temporary);
 
     bool is_saved() const;
     bool is_temporary() const;
     bool save_project();
-    bool move_project_from_tmp();
-    bool copy_directory_files(const QString &fromDir, const QString &toDir, bool coverFileIfExist);
-    bool load_project();
-    void update_naming();
+    bool copy_directory_files(const QString &fromDir, const QString &toDir, const bool& coverFileIfExist, const std::vector<std::string>& exclude_suffix);
+    bool remove_files();
+    std::string generate_tmp_directory();
 
     std::vector<VideoProject *>& get_videos();
     VideoProject* get_video(const int& v_pos);

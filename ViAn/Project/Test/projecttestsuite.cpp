@@ -110,7 +110,7 @@ void ProjectTestsuite::delete_files_test(){
     proj->add_report(r3);
 
     proj->save_project();
-    proj->delete_artifacts();
+    proj->remove_files();
     QDir dir;
 }
 

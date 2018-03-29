@@ -49,7 +49,6 @@ ProjectWidget::~ProjectWidget() {
  */
 void ProjectWidget::new_project() {
 //    ProjectDialog* proj_dialog = new ProjectDialog();
-    qDebug() << "New project";
 //    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
 //    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
     add_project("New project", "");
@@ -756,18 +755,28 @@ void ProjectWidget::create_folder_item() {
 void ProjectWidget::save_project() {
     if (m_proj == nullptr ) return;
 
-    QString name{}, path{};
+    // Move all project files if the current project is temporary
+    // i.e. has not been saved yet
     if (m_proj->is_temporary()) {
+        QString name{}, path{};
         ProjectDialog project_dialog(&name, &path);
         int status = project_dialog.exec();
 
-        qDebug() << status;
         if (status == project_dialog.Accepted) {
+            // User clicked ok, dialog checked for proper path & name
+            // Update project path
+            // TODO: Update window title to new project name
+            m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
+            m_proj->remove_files();
             m_proj->set_name_and_path(name.toStdString(), path.toStdString());
+            m_proj->set_temporary(false);
+            set_main_window_name(name);
+        } else {
+            // User aborted dialog, cancel save
+            return;
         }
 
     }
-    qDebug() << name << path;
 
     save_item_data();
     emit save_draw_wgt();
@@ -775,8 +784,9 @@ void ProjectWidget::save_project() {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->get_dir() + "treestate");
+
     m_proj->save_project();
-    m_proj->move_project_from_tmp();
+
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file());
@@ -879,7 +889,7 @@ void ProjectWidget::remove_project() {
     set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
-    m_proj->delete_artifacts();
+    m_proj->remove_files();
     this->clear();
     delete m_proj;
     m_proj = nullptr;

@@ -14,13 +14,14 @@
  * Dialog usd to create new projects.
  */
 ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QDialog(parent) {
-    setWindowTitle("New project");
+    setWindowTitle("Save project as");
     setModal(true);
     m_name = name;
     m_path = path;
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
+    path_text = new QLineEdit(default_path, this);
     name_text = new QLineEdit(this);
     path_text = new QLineEdit(this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
@@ -54,7 +55,10 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
 }
 
 void ProjectDialog::browse_btn_clicked() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"), path_text->text());
+    QDir standard;
+    standard.mkpath(default_path);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"),
+                                                    default_path);
     if(!dir.isEmpty()) {
         path_text->setText(dir);
     }
@@ -82,7 +86,7 @@ void ProjectDialog::ok_btn_clicked() {
         if (reply != QMessageBox::Yes) return;
     }
 //    emit project_path(name_text->text(), path_text->text());
-    *m_name = name_text->text() + ".vian";
+    *m_name = name_text->text();
     *m_path = path_text->text() + "/";
     accept();
 }
