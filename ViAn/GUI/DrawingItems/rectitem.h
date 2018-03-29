@@ -9,7 +9,7 @@ class RectItem : public ShapeItem {
 public:
     RectItem(Rectangle* rect);
     Rectangle* get_shape();
-    void rename();
+    void update_shape_name();
     void remove();
     ~RectItem() override;
 };

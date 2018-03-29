@@ -62,8 +62,6 @@ private slots:
     void arrow();
     void pen();
     void text();
-    void undo();
-    void redo();
     void update_text(QString, Shapes*);
     void clear(int frame);
     void clear_current();

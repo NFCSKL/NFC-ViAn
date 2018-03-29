@@ -7,11 +7,13 @@ RectItem::RectItem(Rectangle* rect) : ShapeItem(RECT_ITEM) {
     setText(0, rect->get_name());
 }
 
-RectItem::~RectItem() {}
+RectItem::~RectItem() {
+    delete m_rect;
+}
 
 void RectItem::remove() {}
 
-void RectItem::rename() {
+void RectItem::update_shape_name() {
     m_rect->set_name(text(0));
 }
 

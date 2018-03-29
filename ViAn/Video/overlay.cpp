@@ -158,16 +158,6 @@ bool Overlay::get_show_overlay() {
     return show_overlay;
 }
 
-// Unused
-void Overlay::undo(int frame_nr) {
-    Q_UNUSED(frame_nr)
-}
-
-// Unused
-void Overlay::redo(int frame_nr) {
-    Q_UNUSED(frame_nr)
-}
-
 void Overlay::update_text(QString text, Shapes* shape) {
     if (shape->get_shape() == TEXT) {
         dynamic_cast<Text*>(shape)->set_name(text);

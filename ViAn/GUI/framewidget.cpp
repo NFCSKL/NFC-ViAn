@@ -231,11 +231,13 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
     if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame()) {
-        QPen pen(Qt::white, 1, Qt::DashLine);
-        painter.setPen(pen);
         QPoint tl(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
         QPoint br(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
         QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+        painter.setPen(Qt::black);
+        painter.drawRect(current_rect);
+        QPen pen(Qt::white, 1, Qt::DashLine);
+        painter.setPen(pen);
         painter.drawRect(current_rect);
     }
     painter.end();

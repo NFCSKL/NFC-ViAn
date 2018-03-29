@@ -10,7 +10,7 @@ LineItem::~LineItem() {}
 
 void LineItem::remove() {}
 
-void LineItem::rename() {
+void LineItem::update_shape_name() {
     m_line->set_name(text(0));
 }
 

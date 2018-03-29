@@ -25,12 +25,7 @@ void DrawingToolbar::create_actions() {
     line_tool_act = new QAction(QIcon("../ViAn/Icons/line.png"), tr("Line tool"), this);
     text_tool_act = new QAction(QIcon("../ViAn/Icons/text.png"), tr("Text tool"), this);
     hand_tool_act = new QAction(QIcon("../ViAn/Icons/hand.png"), tr("Hand tool"), this);
-    undo_tool_act = new QAction(QIcon("../ViAn/Icons/undo.png"), tr("Undo last drawing"), this);
-    redo_tool_act = new QAction(QIcon("../ViAn/Icons/redo.png"), tr("Redo last drawing"), this);
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
-
-    undo_tool_act->setDisabled(true);
-    redo_tool_act->setDisabled(true);
 
     //delete_tool_act->setShortcut(QKeySequence::Delete);
 
@@ -65,8 +60,6 @@ void DrawingToolbar::create_actions() {
 void DrawingToolbar::create_buttons() {
     addAction(color_tool_act);
     addActions(tools->actions());
-    addAction(undo_tool_act);
-    addAction(redo_tool_act);
     addAction(delete_tool_act);
 }
 

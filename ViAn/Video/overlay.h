@@ -46,8 +46,6 @@ public:
     void mouse_moved(QPoint pos, int frame_nr);
     void mouse_scroll(QPoint pos, int frame_nr);
     void update_drawing_position(QPoint pos, int frame_nr);
-    void undo(int frame_nr);
-    void redo(int frame_nr);
     void update_text(QString, Shapes*shape);
     void clear(int frame_nr);
     void delete_drawing(Shapes *shape);
@@ -66,7 +64,6 @@ public:
 
 private:
     Shapes* get_empty_shape(SHAPES shape_type);
-    void empty_undo_list(int frame_nr);
     void add_drawing(Shapes *shape, int frame_nr);
     void get_drawing(QPoint pos, int frame_nr);
     bool point_in_drawing(QPoint pos, Shapes* shape);

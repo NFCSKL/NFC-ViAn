@@ -10,7 +10,7 @@ PenItem::~PenItem() {}
 
 void PenItem::remove() {}
 
-void PenItem::rename() {
+void PenItem::update_shape_name() {
     m_pen->set_name(text(0));
 }
 Pen* PenItem::get_shape() {

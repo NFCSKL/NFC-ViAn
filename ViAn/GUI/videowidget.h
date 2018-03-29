@@ -88,8 +88,6 @@ public:
 
     int get_current_video_length();
     void set_overlay(Overlay* overlay);
-    void set_undo();
-    void set_redo();
     void set_update_text(QString, Shapes*);
     void set_clear_drawings(int frame);
     void set_delete_drawing(Shapes* shape);

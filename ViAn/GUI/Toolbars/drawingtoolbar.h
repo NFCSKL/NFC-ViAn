@@ -26,8 +26,6 @@ public:
     QAction* line_tool_act;
     QAction* text_tool_act;
     QAction* hand_tool_act;
-    QAction* undo_tool_act;
-    QAction* redo_tool_act;
     QAction* delete_tool_act;
 
     QActionGroup* tools;
@@ -47,7 +45,6 @@ signals:
     void set_status_bar(QString);
     void set_color(QColor);
     void set_overlay_tool(SHAPES);
-    void undo(void);
     void clear(void);
 };
 

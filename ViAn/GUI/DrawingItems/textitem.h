@@ -10,7 +10,7 @@ public:
     TextItem(Text* text);
     Text* get_shape();
     void remove();
-    void rename();
+    void update_shape_name();
     ~TextItem() override;
 };
 

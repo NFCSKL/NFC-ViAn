@@ -10,7 +10,7 @@ public:
     ArrowItem(Arrow* arrow);
     ~ArrowItem() override;
     Arrow* get_shape();
-    void rename();
+    void update_shape_name();
     void remove();
 };
 

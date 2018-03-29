@@ -70,7 +70,14 @@ void DrawingWidget::update_from_overlay() {
  * @param f_item
  */
 void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
-    std::vector<Shapes*> list = m_overlay->get_overlays()[f_item->get_frame()];
+    std::vector<Shapes*> list;
+    try {
+        list = m_overlay->get_overlays().at(f_item->get_frame());
+    } catch (const std::out_of_range& e) {
+        qWarning() << "Can't load drawings, frame out of range";
+        return;
+    }
+
     for (auto shape : list) {
         ShapeItem* s_item;
         switch (shape->get_shape()) {
@@ -212,7 +219,7 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
         case PEN:
         case TEXT_ITEM: {
             auto a_item = dynamic_cast<ShapeItem*>(child);
-            a_item->rename();
+            a_item->update_shape_name();
             break;
         }
         default:
@@ -300,7 +307,7 @@ void DrawingWidget::rename_item() {
  */
 void DrawingWidget::item_changed(QTreeWidgetItem* item) {
     auto a_item = dynamic_cast<ShapeItem*>(item);
-    a_item->rename();
+    a_item->update_shape_name();
     if (item->type() == TEXT_ITEM) {
         Text* text = dynamic_cast<TextItem*>(item)->get_shape();
         emit update_text(text->get_name(), text);

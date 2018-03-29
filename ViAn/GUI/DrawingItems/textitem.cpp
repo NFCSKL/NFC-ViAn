@@ -10,7 +10,7 @@ TextItem::~TextItem() {}
 
 void TextItem::remove() {}
 
-void TextItem::rename() {
+void TextItem::update_shape_name() {
     m_text->set_name(text(0));
 }
 

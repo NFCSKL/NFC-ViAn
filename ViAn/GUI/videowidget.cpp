@@ -943,18 +943,6 @@ void VideoWidget::set_overlay_removed() {
     });
 }
 
-void VideoWidget::set_undo() {
-    update_overlay_settings([&](){
-        o_settings.undo = true;
-    });
-}
-
-void VideoWidget::set_redo() {
-    update_overlay_settings([&](){
-        o_settings.redo = true;
-    });
-}
-
 void VideoWidget::set_update_text(QString text, Shapes* shape) {
     update_overlay_settings([&](){
         o_settings.update_text = true;

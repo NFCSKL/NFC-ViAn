@@ -10,7 +10,7 @@ ArrowItem::~ArrowItem() {}
 
 void ArrowItem::remove() {}
 
-void ArrowItem::rename() {
+void ArrowItem::update_shape_name() {
     m_arrow->set_name(text(0));
 }
 

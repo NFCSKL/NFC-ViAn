@@ -9,7 +9,7 @@ class PenItem : public ShapeItem {
 public:
     PenItem(Pen* pen);
     Pen* get_shape();
-    void rename();
+    void update_shape_name();
     void remove();
     ~PenItem() override;
 };

@@ -11,7 +11,7 @@ CircleItem::~CircleItem() {}
 
 void CircleItem::remove() {}
 
-void CircleItem::rename() {
+void CircleItem::update_shape_name() {
     m_circle->set_name(text(0));
 }
 

@@ -69,8 +69,6 @@ struct overlay_settings {
     bool mouse_moved = false;
     bool mouse_scroll = false;
 
-    bool undo = false;
-    bool redo = false;
     bool update_text = false;
     bool clear_drawings = false;
     bool delete_drawing = false;
