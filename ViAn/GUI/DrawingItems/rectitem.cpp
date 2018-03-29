@@ -7,9 +7,7 @@ RectItem::RectItem(Rectangle* rect) : ShapeItem(RECT_ITEM) {
     setText(0, rect->get_name());
 }
 
-RectItem::~RectItem() {
-    delete m_rect;
-}
+RectItem::~RectItem() {}
 
 void RectItem::remove() {}
 
