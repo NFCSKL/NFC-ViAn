@@ -40,8 +40,6 @@ public slots:
     void remove_item();
     void item_changed(QTreeWidgetItem*);
 
-    void dropEvent(QDropEvent *event);
-
 signals:
     void jump_to_frame(VideoProject*, int);
     void set_current_drawing(Shapes* shape);

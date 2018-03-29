@@ -8,7 +8,6 @@
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
-    //setDragDropMode(QAbstractItemView::InternalMove);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 
@@ -241,6 +240,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     case FRAME_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
         emit jump_to_frame(m_vid_proj, frame_item->get_frame());
+        emit set_current_drawing(nullptr);
         break;
     }
     case RECT_ITEM:
@@ -308,6 +308,7 @@ void DrawingWidget::rename_item() {
 void DrawingWidget::item_changed(QTreeWidgetItem* item) {
     auto a_item = dynamic_cast<ShapeItem*>(item);
     a_item->update_shape_name();
+    m_overlay->set_overlay_changed();
     if (item->type() == TEXT_ITEM) {
         Text* text = dynamic_cast<TextItem*>(item)->get_shape();
         emit update_text(text->get_name(), text);
@@ -354,15 +355,4 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
     default:
         break;
     }
-}
-
-/**
- * @brief DrawingWidget::dropEvent
- * Handles drop events.
- * Calls upon standard dropEvent for TreeItems.
- * @param event
- */
-void DrawingWidget::dropEvent(QDropEvent *event) {
-    Q_UNUSED (event)
-    //QTreeWidget::dropEvent(event);
 }

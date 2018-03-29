@@ -146,7 +146,7 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
 }
 
 void Overlay::set_current_drawing(Shapes *shape) {
-    if (shape && shape->get_shape() == PEN) return;
+    //if (shape && shape->get_shape() == PEN) return;
     current_drawing = shape;
 }
 
@@ -269,10 +269,12 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
         double font_scale = dynamic_cast<Text*>(current_drawing)->get_font_scale();
         current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
         current_drawing->update_text_draw_end();
+        m_unsaved_changes = true;
         return;
     }
     if (current_drawing->get_frame() == frame_nr && show_overlay) {
         current_drawing->set_thickness(pos);
+        m_unsaved_changes = true;
     }
 }
 
@@ -293,12 +295,14 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
                 current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
                 current_drawing->update_text_draw_end();
                 prev_point = pos;
+                m_unsaved_changes = true;
                 return;
             }
             else if (m_right_click) {
                 QPoint diff_point = pos - prev_point;
                 current_drawing->edit_shape(diff_point);
                 prev_point = pos;
+                m_unsaved_changes = true;
                 return;
             }
             QPoint diff_point = pos - prev_point;
@@ -310,6 +314,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             // The last appended shape is the one we're currently drawing.
             overlays[frame_nr].back()->update_drawing_pos(pos);
         }
+        m_unsaved_changes = true;
     }
 }
 
@@ -319,6 +324,10 @@ std::map<int,std::vector<Shapes*>> Overlay::get_overlays() {
 
 void Overlay::set_overlays(std::map<int, std::vector<Shapes*>> new_overlays) {
     overlays = new_overlays;
+    m_unsaved_changes = true;
+}
+
+void Overlay::set_overlay_changed() {
     m_unsaved_changes = true;
 }
 
@@ -345,18 +354,21 @@ void Overlay::clear(int frame_nr) {
  */
 void Overlay::delete_drawing(Shapes* shape) {
     Shapes* drawing;
-    (shape != nullptr) ? (drawing = shape) : (drawing = current_drawing);
-
-    auto it = std::find(overlays[drawing->get_frame()].begin(), overlays[drawing->get_frame()].end(), shape);
-
-    if (shape == current_drawing) {
-        current_drawing = nullptr;
+    if (current_drawing == nullptr) return;
+    if (shape == nullptr) {
+        drawing = current_drawing;
+    } else {
+        drawing = shape;
     }
+    auto it = std::find(overlays[drawing->get_frame()].begin(), overlays[drawing->get_frame()].end(), drawing);
+
+    if (drawing == current_drawing) current_drawing = nullptr;
 
     if (it != overlays[drawing->get_frame()].end()) {
         overlays[drawing->get_frame()].erase(it);
     }
     delete drawing;
+    m_unsaved_changes = true;
 }
 
 /**

@@ -60,6 +60,7 @@ public:
     Shapes* get_current_drawing();
     bool get_show_overlay();
 
+    void set_overlay_changed();
     bool is_saved() const;
 
 private:
