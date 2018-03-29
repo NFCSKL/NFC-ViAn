@@ -18,6 +18,11 @@ class DrawingToolbar : public QToolBar
 public:
     DrawingToolbar();
 
+    QAction* no_tool_act;
+    QAction* analysis_tool_act;
+    QAction* zoom_in_tool_act;
+    QAction* zoom_out_tool_act;
+    QAction* zoom_tool_act;
     QAction* color_tool_act;
     QAction* pen_tool_act;
     QAction* arrow_tool_act;
@@ -36,6 +41,12 @@ public slots:
     void color_tool_clicked();
 
 private slots:
+    void no_tool_act_clicked();
+    void analysis_tool_act_clicked();
+    void zoom_in_tool_act_clicked();
+    void zoom_out_tool_act_clicked();
+    void zoom_tool_act_clicked();
+
     void pen_tool_clicked();
     void arrow_tool_clicked();
     void rectangle_tool_clicked();
@@ -47,6 +58,7 @@ signals:
     void set_status_bar(QString);
     void set_color(QColor);
     void set_overlay_tool(SHAPES);
+    void step_zoom(double);
     void undo(void);
     void clear(void);
 };

@@ -30,7 +30,7 @@ class FrameWidget : public QWidget
     std::vector<cv::Rect> ooi_rects;
     cv::Rect bounding_box;
 
-    SHAPES tool = NONE;
+    SHAPES m_tool = NONE;
     QColor overlay_color = Qt::red;
     cv::Mat current_frame;
     Analysis* m_analysis = nullptr;
@@ -42,9 +42,10 @@ class FrameWidget : public QWidget
     bool show_box = false;
 
     // Zoom
-    QPoint rect_start, rect_end, prev_pos;
+    QPoint rect_start, rect_end, prev_pos = QPoint(0,0);
     bool mark_rect = false;
     QPoint anchor = QPoint(0,0);
+    QPoint prev_point;
 
     bool do_zoom = false;
     bool do_zoom_out = false;
@@ -74,8 +75,8 @@ signals:
     void moved_xy(int x, int y);
     void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
-    void trigger_zoom_out();
-    void send_tool(SHAPES tool);
+    void trigger_zoom_out(double);
+    void send_tool(SHAPES m_tool);
     void send_tool_text(QString, float);
     void send_color(QColor color);
 
@@ -85,8 +86,6 @@ signals:
     void mouse_scroll(QPoint);
 public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
-    void toggle_zoom(bool value);
-    void set_analysis_tool(bool status);
     void show_bounding_box(bool b);
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
@@ -95,7 +94,7 @@ public slots:
     void set_detections_on_frame(int);
     void set_detections(bool);
     void set_show_detections(bool);
-    void set_tool(SHAPES tool);
+    void set_tool(SHAPES m_tool);
     void set_overlay_color(QColor color);
     void set_anchor(QPoint);
     void set_scale_factor(double scale_factor);
@@ -113,6 +112,7 @@ protected:
 
     void wheelEvent(QWheelEvent *event) override;
 private:
+    void set_cursor(SHAPES m_tool);
     void init_panning(QPoint pos);
     void set_rect_start(QPoint pos);
     void set_analysis_settings();
