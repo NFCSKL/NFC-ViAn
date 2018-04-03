@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QProgressDialog>
+#include <QTemporaryDir>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shapes.h"
@@ -111,12 +112,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
+    //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_current_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     connect(drawing_wgt, &DrawingWidget::set_tool_hand, draw_toolbar->hand_tool_act, &QAction::trigger);
+    connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
+    connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_drawing);
+    connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
+    draw_toolbar->zoom_tool_act->trigger();
 
     // Status bar
     status_bar = new StatusBar();
@@ -168,6 +174,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
+    project_wgt->add_default_project();
     // Recent projects menu
     RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);

@@ -14,7 +14,7 @@ class ProjectDialog : public QDialog
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
 public:
-    explicit ProjectDialog(QWidget *parent = nullptr);
+    explicit ProjectDialog(QWidget *parent = nullptr, QString name = "");
 
 signals:
     void project_path(QString name, QString path);
