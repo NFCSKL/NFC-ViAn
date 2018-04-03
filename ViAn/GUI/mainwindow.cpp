@@ -120,7 +120,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     connect(drawing_wgt, &DrawingWidget::set_tool_hand, draw_toolbar->hand_tool_act, &QAction::trigger);
     connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
-    connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     draw_toolbar->zoom_tool_act->trigger();
 
