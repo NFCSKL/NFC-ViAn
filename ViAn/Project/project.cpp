@@ -48,8 +48,16 @@ Project::Project(const std::string& name, const std::string& dir_path){
  * Clears contents of video map
  */
 Project::~Project(){
+    for (auto video_proj : m_videos) {
+        delete video_proj;
+    }
+
+    for (auto report : m_reports) {
+        //delete report;
+    }
     m_videos.clear();
     m_reports.clear();
+    qDebug() << "delete project";
 }
 
 /**
@@ -72,6 +80,7 @@ ID Project::add_video_project(VideoProject *vid_proj){
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
+    delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
 }

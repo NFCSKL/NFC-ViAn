@@ -61,6 +61,7 @@ public:
     void delete_bookmark(const int& id);
     void delete_artifacts();
 
+    // TODO, not used
     void remove_from_project();
 
     std::string get_index_path();

@@ -5,6 +5,8 @@ class Writeable
 {
 public:
     Writeable();
+    virtual ~Writeable();
+
     /**
      * @brief read
      * @param json

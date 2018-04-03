@@ -21,6 +21,7 @@ VideoProject::VideoProject(){
 VideoProject::~VideoProject(){
     delete m_overlay;
     delete video;
+    qDebug() << "delete vid proj";
 }
 
 /**
@@ -252,6 +253,7 @@ void VideoProject::delete_artifacts(){
     m_unsaved_changes = true;
 }
 
+// TODO, not used
 void VideoProject::remove_from_project() {
     m_project->remove_video_project(this);
     m_unsaved_changes = true;

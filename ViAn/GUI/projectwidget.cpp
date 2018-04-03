@@ -818,7 +818,7 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-    emit remove_overlay();
+    //emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
 }

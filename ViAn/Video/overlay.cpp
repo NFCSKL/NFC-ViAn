@@ -6,6 +6,11 @@
  */
 Overlay::Overlay() {}
 
+Overlay::~Overlay() {
+    // TODO Fix
+    //overlays.clear();
+}
+
 /**
  * @brief Overlay::draw_overlay
  * Draws an overlay on top of the specified frame.
