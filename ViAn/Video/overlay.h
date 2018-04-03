@@ -33,6 +33,7 @@ public slots:
     void set_tool(SHAPES s);
 public:
     Overlay();
+    ~Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void draw_overlay(cv::Mat &frame, int frame_nr);

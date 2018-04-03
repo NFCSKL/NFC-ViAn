@@ -1,9 +1,14 @@
 #include "poi.h"
+#include <QDebug>
 
 /**
  * @brief POI::POI
  */
 POI::POI(){
+}
+
+POI::~POI() {
+    qDebug() << "poi Delete";
 }
 
 /**

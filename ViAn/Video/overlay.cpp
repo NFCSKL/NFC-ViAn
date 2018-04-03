@@ -6,6 +6,13 @@
  */
 Overlay::Overlay() {}
 
+Overlay::~Overlay() {
+
+    // TODO Fix
+    //overlays.clear();
+    //std::map<int, std::vector<Shapes*>> overlays;
+}
+
 /**
  * @brief Overlay::draw_overlay
  * Draws an overlay on top of the specified frame.

@@ -25,7 +25,9 @@ Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     draw_end = qpoint_to_point(pos);
 }
 
-Shapes::~Shapes() {}
+Shapes::~Shapes() {
+    qDebug() << "Delete shape";
+}
 
 /**
  * @brief Shapes::set_anchor

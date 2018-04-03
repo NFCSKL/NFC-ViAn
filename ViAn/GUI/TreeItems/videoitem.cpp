@@ -12,12 +12,11 @@ VideoItem::VideoItem(): TreeItem(VIDEO_ITEM) {
 }
 
 VideoItem::~VideoItem(){
+    qDebug() << "vid item delete";
     delete m_vid_proj;
 }
 
 void VideoItem::remove(){
-    qDebug() << "Remove VideoItem";
-
 }
 
 void VideoItem::rename(){}

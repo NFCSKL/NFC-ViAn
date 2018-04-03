@@ -13,6 +13,17 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
     use_bounding_box(other.use_bounding_box){
 }
 
+BasicAnalysis::~BasicAnalysis() {
+    qDebug() << "basic analysis delete";
+    qDebug() << "size1" << m_intervals.size();
+    m_intervals.clear();
+    qDebug() << "size2" << m_intervals.size();
+//    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+//        m_intervals.erase(it);
+//        //delete *it;
+//    }
+}
+
 /**
  * @brief BasicAnalysis::add_POI
  * Adds a POI to the BasicAnalysis.
@@ -64,6 +75,14 @@ void BasicAnalysis::write(QJsonObject &json){
     }
     json["POI:s"] = json_ais;
     m_unsaved_changes = false;
+}
+
+ID BasicAnalysis::get_id() {
+    return id;
+}
+
+void BasicAnalysis::set_id(ID new_id) {
+    id = new_id;
 }
 
 std::string BasicAnalysis::get_name() const {
