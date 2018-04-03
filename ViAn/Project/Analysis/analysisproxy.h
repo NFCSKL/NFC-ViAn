@@ -7,7 +7,7 @@
 #include <iostream>
 
 /**
- * @brief The AnalysisMeta class
+ * @brief The AnalysisProxy class
  * This class is used to improve performance of basic
  * operations related to analyses. Full analysis is therefor
  * only fully loaded upon direct request.

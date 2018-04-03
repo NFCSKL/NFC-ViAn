@@ -4,7 +4,7 @@
 #include "utility.h"
 
 /**
- * @brief AnalysisMeta::AnalysisMeta
+ * @brief AnalysisProxy::AnalysisProxy
  */
 AnalysisProxy::AnalysisProxy() {}
 
@@ -29,7 +29,7 @@ AnalysisProxy::~AnalysisProxy() {
 }
 
 /**
- * @brief AnalysisMeta::get_analysis
+ * @brief AnalysisProxy::get_analysis
  * @return
  */
 Analysis* AnalysisProxy::load_analysis() {
@@ -39,19 +39,23 @@ Analysis* AnalysisProxy::load_analysis() {
     return analysis;
 }
 
-void AnalysisProxy::reset_root_dir(const std::string &dir)
-{
+void AnalysisProxy::reset_root_dir(const std::string &dir) {
     file_analysis = dir+Utility::name_from_path(file_analysis);
     m_unsaved_changes = true;
 }
 
 
 /**
- * @brief AnalysisMeta::read
+ * @brief AnalysisProxy::read
  * @param json
  */
 void AnalysisProxy::read(const QJsonObject &json) {
     m_name = json["name"].toString().toStdString();
+    int height = json["bounding box height"].toInt();
+    int width = json["bounding box width"].toInt();
+    int y = json["bounding box y"].toInt();
+    int x = json["bounding box x"].toInt();
+    this->bounding_box = cv::Rect(x, y, width, height);
     m_ana_interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
     file_analysis = json["full_path"].toString().toStdString();
     QJsonArray json_intervals = json["intervals"].toArray();
@@ -65,11 +69,15 @@ void AnalysisProxy::read(const QJsonObject &json) {
 }
 
 /**
- * @brief AnalysisMeta::write
+ * @brief AnalysisProxy::write
  * @param json
  */
 void AnalysisProxy::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
+    json["bounding box height"] = this->bounding_box.height;
+    json["bounding box width"] = this->bounding_box.width;
+    json["bounding box y"] = this->bounding_box.y;
+    json["bounding box x"] = this->bounding_box.x;
     json["interval start"] = this->m_ana_interval.first;
     json["interval end"] = this->m_ana_interval.second;
     json["full_path"] = QString::fromStdString(file_analysis);

@@ -1,16 +1,14 @@
 #include "detectionbox.h"
 
 /**
- * @brief OOI::OOI
+ * @brief DetectionBox::DetectionBox
  */
 DetectionBox::DetectionBox(){}
 
-DetectionBox::~DetectionBox(){
-    qDebug() << "Delete detection box";
-}
+DetectionBox::~DetectionBox(){}
 
 /**
- * @brief OOI::OOI
+ * @brief DetectionBox::DetectionBox
  * @param upper_left
  * @param down_right
  */
@@ -20,7 +18,7 @@ DetectionBox::DetectionBox(std::pair<int, int> upper_left, std::pair<int, int> d
 }
 
 /**
- * @brief OOI::OOI
+ * @brief DetectionBox::DetectionBox
  * @param upper_left
  * @param height
  * @param width
@@ -31,8 +29,8 @@ DetectionBox::DetectionBox(std::pair<int, int> upper_left, int height, int width
 }
 
 /**
- * @brief OOI::OOI
- * Creates an OOI from a cv::Rect.
+ * @brief DetectionBox::DetectionBox
+ * Creates a detectionbox from a cv::Rect.
  * @param rect
  */
 DetectionBox::DetectionBox(cv::Rect rect) {
@@ -41,8 +39,8 @@ DetectionBox::DetectionBox(cv::Rect rect) {
 }
 
 /**
- * @brief OOI::read
- * Reads OOI from json format.
+ * @brief DetectionBox::read
+ * Reads DetectionBox from json format.
  * @param json
  */
 void DetectionBox::read(const QJsonObject &json){
@@ -54,8 +52,8 @@ void DetectionBox::read(const QJsonObject &json){
 }
 
 /**
- * @brief OOI::write
- * Writes OOI to json format.
+ * @brief DetectionBox::write
+ * Writes DetectionBox to json format.
  * @param json
  */
 void DetectionBox::write(QJsonObject &json){
@@ -67,8 +65,8 @@ void DetectionBox::write(QJsonObject &json){
 }
 
 /**
- * @brief OOI::get_rect
- * Returns the rectangle specified by the OOI.
+ * @brief DetectionBox::get_rect
+ * Returns the rectangle specified by the DetectionBox.
  * @return
  */
 cv::Rect DetectionBox::get_rect() {
@@ -77,8 +75,8 @@ cv::Rect DetectionBox::get_rect() {
 }
 
 /**
- * @brief OOI::scale_coordinates
- * Scales the coordinates in the OOI according to the scale ratio parameter.
+ * @brief DetectionBox::scale_coordinates
+ * Scales the coordinates in the DetectionBox according to the scale ratio parameter.
  * @param scale_ratio
  */
 void DetectionBox::scale_coordinates(float scale_ratio) {

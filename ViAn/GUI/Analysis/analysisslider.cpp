@@ -114,18 +114,6 @@ void AnalysisSlider::update(){
 }
 
 /**
- * @brief AnalysisSlider::set_analysis
- * Set analysis
- * @param analysis
- *
- * TODO UNUSED
- */
-void AnalysisSlider::set_analysis(AnalysisProxy * analysis) {
-    m_analysis = analysis->load_analysis();
-    set_ana_interval();
-}
-
-/**
  * @brief AnalysisSlider::set_basic_analysis
  * Set tag
  * Adds all POIs to the slider
@@ -142,18 +130,6 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         }
     }
     repaint();
-}
-
-/**
- * @brief AnalysisSlider::set_ana_interval
- * @param analysis
- * Set interval to the interval the analysis was run on
- *
- * TODO UNUSED
- */
-void AnalysisSlider::set_ana_interval() {
-    qDebug() << "m_analysis" << m_analysis->get_ana_interval();
-    m_ana_interval = std::make_pair(m_analysis->get_ana_interval().first, m_analysis->get_ana_interval().second);
 }
 
 /**
