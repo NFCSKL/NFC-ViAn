@@ -15,7 +15,6 @@
 #include "Video/shapes/shape.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
-#include "Toolbars/maintoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
@@ -85,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_help_menu();
 
     // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
@@ -159,6 +158,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     project_wgt->add_default_project();
     // Recent projects menu
     RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
+    rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
@@ -175,6 +175,9 @@ MainWindow::~MainWindow() {
     delete project_wgt;
     delete analysis_wgt;
     delete bookmark_wgt;
+    delete status_bar;
+    delete draw_toolbar;
+    delete main_toolbar;
 }
 
 /**
@@ -560,6 +563,7 @@ void MainWindow::gen_report() {
 void MainWindow::cont_bri() {
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
+    man_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
     man_dialog->exec();
 }

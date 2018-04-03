@@ -121,6 +121,7 @@ void ProjectWidget::add_video() {
         QString vid_name = video_path.right(video_path.length() - index);
         // TODO Check if file is already added
         VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+        qDebug() << "added a new one";
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
     }
@@ -185,7 +186,16 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid_item = new VideoItem(vid_proj);
-    insertTopLevelItem(topLevelItemCount(), vid_item);
+
+    // If there only is one selected item and it's a folder,
+    // add the new video to that folder otherwise to the top level
+    QTreeWidgetItem* s_item = (!selectedItems().count()) ? invisibleRootItem() : currentItem();
+    if (s_item->type() == FOLDER_ITEM) {
+        s_item->addChild(vid_item);
+        s_item->setExpanded(true);
+    } else {
+        insertTopLevelItem(topLevelItemCount(), vid_item);
+    }
     vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
     emit set_status_bar("Video added: " + vid_name);
     // Add analysis and tag
@@ -468,7 +478,8 @@ bool ProjectWidget::prompt_save() {
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    get_index_path(item);
+    Q_UNUSED (col)
+    //get_index_path(item);
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -579,11 +590,13 @@ void ProjectWidget::context_menu(const QPoint &point) {
         switch (item->type()) {
             case TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Show details", this, SLOT(show_details()));
                 menu.addAction("Hide details", this, SLOT(hide_details()));
+                menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -631,26 +644,59 @@ void ProjectWidget::remove_item() {
     QString info_text = "Do you wish to continue?";
     if (message_box(text, info_text, true)) {
         for (auto item : selectedItems()) {
-            if (item->type() == FOLDER_ITEM) {
-                std::vector<VideoItem*> v_items;
-                get_video_items(item, v_items);
-                for (auto v_item : v_items) {
-                    emit item_removed(v_item->get_video_project());
-                }
-            }
-
-            else if (item->type() == VIDEO_ITEM) {
-                VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-                emit item_removed(vid_item->get_video_project());
-            }
-            // TODO Fix these cases
-//            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
-//
-//            }
-            delete item;
+            remove_tree_item(item);
         }
     }
     emit remove_overlay();
+}
+
+/**
+ * @brief ProjectWidget::remove_tree_item
+ * @param item
+ * Recursive function for removing item and all of its children
+ */
+void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
+    if (item->type() == FOLDER_ITEM) {
+        while (item->childCount() != 0) {
+            remove_tree_item(item->child(0));
+        }
+    }
+    else if (item->type() == VIDEO_ITEM) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+        VideoProject* v_proj = vid_item->get_video_project();
+
+        // Remove all children
+        while (item->childCount() != 0) {
+            remove_tree_item(item->child(0));
+        }
+        // Remove the video from the list of videos
+        auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
+        if (it != m_proj->get_videos().end()) {
+            m_proj->get_videos().erase(it);
+        }
+        emit item_removed(v_proj);
+    }
+    // TODO Add drawing tag
+    else if (item->type() == TAG_ITEM) {
+        emit set_tag_slider(false);
+        emit enable_tag_btn(false);
+
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+        Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
+        vid_item->get_video_project()->remove_analysis(tag);
+        emit update_frame();
+    }
+    else if (item->type() == ANALYSIS_ITEM) {
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit enable_poi_btns(false, false);
+
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+        AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
+        vid_item->get_video_project()->remove_analysis(analysis);
+        emit update_frame();
+    }
+    delete item;
 }
 
 /**
@@ -819,7 +865,7 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-    emit remove_overlay();
+    //emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
 

@@ -6,12 +6,22 @@
 /**
  * @brief AnalysisMeta::AnalysisMeta
  */
-AnalysisProxy::AnalysisProxy()
-{
-}
+AnalysisProxy::AnalysisProxy() {}
 
 AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
     file_analysis(file_analysis) {
+}
+
+AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
+    : BasicAnalysis(other),
+      file_analysis(file),
+      type(other.type) {
+}
+
+AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
+    BasicAnalysis(other),
+    file_analysis(other.file_analysis),
+    type(other.type) {
 }
 
 /**
@@ -19,23 +29,10 @@ AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
  * @return
  */
 Analysis* AnalysisProxy::load_analysis() {
-    Analysis* analysis = new Analysis();    
+    Analysis* analysis = new Analysis();
     analysis->load_saveable(file_analysis);
     m_unsaved_changes = false;
     return analysis;
-}
-AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
-    : BasicAnalysis(other),
-      file_analysis(file),
-      type(other.type) {
-
-}
-
-AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
-    BasicAnalysis(other),
-    file_analysis(other.file_analysis),
-    type(other.type)
-{
 }
 
 void AnalysisProxy::reset_root_dir(const std::string &dir)

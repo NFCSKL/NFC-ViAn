@@ -93,7 +93,7 @@ void VideoProjectTest::read_write_test(){
     VideoProject* vid_proj2 = new VideoProject();
     vid_proj2->read(json_vid_proj);
 
-    QCOMPARE(vid_proj->m_ana_cnt, vid_proj2->m_ana_cnt);
+    QCOMPARE(vid_proj->m_ana_id, vid_proj2->m_ana_id);
     QCOMPARE(vid_proj->m_bm_cnt, vid_proj2->m_bm_cnt);
     QCOMPARE(vid_proj->m_analyses.size(), vid_proj2->m_analyses.size());
     QCOMPARE(vid_proj->m_bookmarks.size(), vid_proj2->m_bookmarks.size());
@@ -123,7 +123,7 @@ void VideoProjectTest::save_load_delete_test(){
     VideoProject* vid_proj2 = new VideoProject();
     vid_proj2->load_saveable(file_path);
 
-    QCOMPARE(vid_proj->m_ana_cnt, vid_proj2->m_ana_cnt);
+    QCOMPARE(vid_proj->m_ana_id, vid_proj2->m_ana_id);
     QCOMPARE(vid_proj->m_bm_cnt, vid_proj2->m_bm_cnt);
     QCOMPARE(vid_proj->m_analyses.size(), vid_proj2->m_analyses.size());
     QCOMPARE(vid_proj->m_bookmarks.size(), vid_proj2->m_bookmarks.size());

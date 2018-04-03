@@ -19,9 +19,11 @@ struct interval_cmp {
     }
 };
 using interval_set = std::set<AnalysisInterval*, interval_cmp>;
+using ID = int;
 class BasicAnalysis : public Saveable
 {       
 public:
+    // TODO Should probably not all be public
     std::string m_name = "2";
     bool m_unsaved_changes = true;
     interval_set m_intervals;
@@ -30,6 +32,8 @@ public:
     bool use_interval = false;
     bool use_bounding_box = false;
 
+private:
+    ID id = 0;
 
 protected:
 
@@ -37,11 +41,15 @@ public:
 
     BasicAnalysis();
     BasicAnalysis(const BasicAnalysis& other);
+    ~BasicAnalysis();
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     virtual void add_interval(AnalysisInterval *ai);
     virtual SAVE_TYPE get_save_type() const;
     virtual ANALYSIS_TYPE get_type() const;
+
+    ID get_id();
+    void set_id(ID id);
 
     std::string get_name() const;
     interval_set get_intervals() const;
