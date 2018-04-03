@@ -7,10 +7,14 @@
 Overlay::Overlay() {}
 
 Overlay::~Overlay() {
-
-    // TODO Fix
-    //overlays.clear();
-    //std::map<int, std::vector<Shapes*>> overlays;
+    emit clean_overlay();
+    for (auto &vector : overlays) {
+        for (Shapes* shape : vector.second) {
+            delete shape;
+        }
+        vector.second.clear();
+    }
+    overlays.clear();
 }
 
 /**

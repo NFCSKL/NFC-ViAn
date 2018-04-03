@@ -5,6 +5,7 @@ class BasicAnalysis;
 
 class Tag : public BasicAnalysis {
 public:
+    ~Tag() override;
     void remove_interval(AnalysisInterval *rm_interval);
     void add_frame(int frame);
     void remove_frame(int frame);

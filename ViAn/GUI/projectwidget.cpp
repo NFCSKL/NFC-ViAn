@@ -669,10 +669,13 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
             remove_tree_item(item->child(0));
         }
         // Remove the video from the list of videos
+        qDebug() << m_proj->get_videos().size() << "size1";
         auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
         if (it != m_proj->get_videos().end()) {
             m_proj->get_videos().erase(it);
         }
+        qDebug() << m_proj->get_videos().size() << "size2";
+        delete v_proj;
         emit item_removed(v_proj);
     }
     // TODO Add drawing tag
@@ -824,6 +827,7 @@ bool ProjectWidget::open_project(QString project_path) {
  * Returns true if the project has been closed.
  */
 bool ProjectWidget::close_project() {
+    qDebug() << "Close project";
     if (m_proj == nullptr) return true;
 
     // Prompt user to save. If cancel keep the current project
@@ -840,10 +844,10 @@ bool ProjectWidget::close_project() {
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
-    this->clear();
+
     delete m_proj;
     m_proj = nullptr;
-
+    this->clear();
     add_default_project();
     return true;
 }

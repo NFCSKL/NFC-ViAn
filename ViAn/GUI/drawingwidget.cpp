@@ -26,12 +26,14 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     m_overlay = overlay;
     update_from_overlay();
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+    connect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
 }
 
 void DrawingWidget::clear_overlay() {
     if (m_overlay != nullptr) {
         save_item_data();
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+        disconnect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
         m_overlay = nullptr;
     }
     clear();

@@ -21,7 +21,7 @@ public:
     AnalysisProxy(const std::string file_analysis);
     AnalysisProxy(const Analysis &other, const std::string file);
     AnalysisProxy(const AnalysisProxy &other);
-
+    ~AnalysisProxy() override;
     Analysis *load_analysis(); // Only use this if all analysisinformation is needed
 
     void reset_root_dir(const std::string& dir);

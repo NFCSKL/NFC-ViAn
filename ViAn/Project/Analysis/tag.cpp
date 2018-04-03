@@ -1,4 +1,9 @@
 #include "tag.h"
+
+Tag::~Tag() {
+    qDebug() << "delete tag";
+}
+
 /**
  * @brief Tag::add_frame
  * @param frame

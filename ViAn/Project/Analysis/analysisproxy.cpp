@@ -24,6 +24,10 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
     type(other.type) {
 }
 
+AnalysisProxy::~AnalysisProxy() {
+    qDebug() << "delete proxy";
+}
+
 /**
  * @brief AnalysisMeta::get_analysis
  * @return

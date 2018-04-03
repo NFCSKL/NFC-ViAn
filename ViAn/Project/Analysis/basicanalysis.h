@@ -41,7 +41,7 @@ public:
 
     BasicAnalysis();
     BasicAnalysis(const BasicAnalysis& other);
-    ~BasicAnalysis();
+    virtual ~BasicAnalysis();
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     virtual void add_interval(AnalysisInterval *ai);

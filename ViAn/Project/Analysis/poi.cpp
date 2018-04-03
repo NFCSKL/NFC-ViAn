@@ -8,7 +8,7 @@ POI::POI(){
 }
 
 POI::~POI() {
-    qDebug() << "poi Delete";
+    qDebug() << "delete poi";
 }
 
 /**

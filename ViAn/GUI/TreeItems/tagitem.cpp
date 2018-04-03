@@ -8,7 +8,6 @@ TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
 
 TagItem::~TagItem() {
     qDebug() << "tag item delete";
-    delete m_tag;
 }
 
 void TagItem::remove(){}
