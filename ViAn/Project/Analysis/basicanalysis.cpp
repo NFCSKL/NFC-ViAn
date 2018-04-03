@@ -16,6 +16,8 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 BasicAnalysis::~BasicAnalysis() {
     qDebug() << "basic analysis delete";
     qDebug() << "size" << m_intervals.size();
+
+    // Todo fix, will delete when creating new analysis
     for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
         delete *it;
     }

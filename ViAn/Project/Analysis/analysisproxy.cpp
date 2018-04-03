@@ -52,6 +52,7 @@ void AnalysisProxy::reset_root_dir(const std::string &dir)
  */
 void AnalysisProxy::read(const QJsonObject &json) {
     m_name = json["name"].toString().toStdString();
+    m_ana_interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
     file_analysis = json["full_path"].toString().toStdString();
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
@@ -69,6 +70,8 @@ void AnalysisProxy::read(const QJsonObject &json) {
  */
 void AnalysisProxy::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
+    json["interval start"] = this->m_ana_interval.first;
+    json["interval end"] = this->m_ana_interval.second;
     json["full_path"] = QString::fromStdString(file_analysis);
     QJsonArray intervals;
     for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {

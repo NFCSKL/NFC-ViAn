@@ -144,7 +144,8 @@ void AnalysisMethod::run() {
         m_analysis.use_bounding_box = use_bounding_box;
         m_save_path = check_save_path(m_save_path);
         m_analysis.save_saveable(m_save_path);
-        AnalysisProxy proxy(m_analysis, m_analysis.full_path());       
+        //AnalysisProxy proxy(m_analysis, m_analysis.full_path());
+        AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
         emit finished_analysis(proxy);
     }
 }

@@ -5,6 +5,10 @@
  */
 DetectionBox::DetectionBox(){}
 
+DetectionBox::~DetectionBox(){
+    qDebug() << "Delete detection box";
+}
+
 /**
  * @brief OOI::OOI
  * @param upper_left
