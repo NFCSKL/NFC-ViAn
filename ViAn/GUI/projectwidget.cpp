@@ -695,8 +695,12 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
 
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
+
+        // TODO Add this line to remove the analysis from the folder
+        //analysis->delete_saveable(analysis->full_path());
         vid_item->get_video_project()->remove_analysis(analysis);
         emit update_frame();
+        emit clear_analysis();
     }
     delete item;
 }

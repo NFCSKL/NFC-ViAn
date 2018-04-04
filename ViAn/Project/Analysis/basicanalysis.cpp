@@ -15,19 +15,11 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 
 BasicAnalysis::~BasicAnalysis() {
     qDebug() << "basic analysis delete";
-    qDebug() << "size" << m_intervals.size();
-
-    // Todo fix, will delete when creating new analysis
-    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
-        delete *it;
-    }
-    m_intervals.clear();
-    qDebug() << "size after" << m_intervals.size();
 }
 
 /**
- * @brief BasicAnalysis::add_POI
- * Adds a POI to the BasicAnalysis.
+ * @brief BasicAnalysis::add_interval
+ * Adds an interval to the BasicAnalysis.
  * @param poi
  */
 void BasicAnalysis::add_interval(AnalysisInterval *ai){

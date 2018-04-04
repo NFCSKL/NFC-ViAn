@@ -107,7 +107,7 @@ signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
-
+    void clear_analysis();
 };
 
 #endif // PROJECTWIDGET_H

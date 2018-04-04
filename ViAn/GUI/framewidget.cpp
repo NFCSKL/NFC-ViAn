@@ -28,6 +28,8 @@ void FrameWidget::set_analysis(AnalysisProxy *analysis) {
  * Forgets the current analysis
  */
 void FrameWidget::clear_analysis() {
+    qDebug() << "clear analysis in framewidget";
+    delete m_analysis;
     m_analysis = nullptr;
     ooi_rects.clear();
 }
@@ -189,6 +191,7 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
  * @param event
  */
 void FrameWidget::paintEvent(QPaintEvent *event) {
+    Q_UNUSED (event)
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
 

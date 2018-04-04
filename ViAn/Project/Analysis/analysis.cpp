@@ -2,7 +2,13 @@
 #include <QDebug>
 
 Analysis::~Analysis() {
-    qDebug() << "analysis is kill";
+
+    // TODO Remove this to do analysis
+    qDebug() << "delete analysis";
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        delete *it;
+    }
+    m_intervals.clear();
 }
 
 /**

@@ -72,7 +72,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
     analysis->m_name = "Analysis";
     current_analysis_item->setText(0,"Analysis");
     analysis_queue.pop_front();
-    //qDebug() << "in done2" << analysis.m_intervals.size();
+    qDebug() << "in done2" << analysis->m_intervals.size();
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     //AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(analysis);

@@ -241,6 +241,7 @@ void VideoProject::remove_analysis(BasicAnalysis *analysis) {
 /**
  * @brief VideoProject::delete_artifacts
  * Delete bookmark files.
+ * TODO "UNUSED"
  */
 void VideoProject::delete_artifacts(){
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){

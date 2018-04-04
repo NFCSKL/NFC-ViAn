@@ -122,7 +122,7 @@ void AnalysisSlider::update(){
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        qDebug() << "b_analysis" << analysis->get_ana_interval();
+        qDebug() << "set b_analysis" << analysis->get_ana_interval();
         m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
 
         for (auto p : analysis->get_intervals()) {
@@ -191,6 +191,7 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
         pair = std::make_pair(start_frame, end_frame);
     }
     rects.push_back(pair);
+    qDebug() << "pair" << pair;
     last_poi_end = end_frame;
 }
 
@@ -314,6 +315,7 @@ void AnalysisSlider::set_show_interval(bool show) {
  * Clear the rects vector.
  */
 void AnalysisSlider::clear_slider() {
+    qDebug() << "clear slider";
     rects.clear();
     frames.clear();
 }
