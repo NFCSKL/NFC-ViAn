@@ -189,6 +189,7 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
  * @param event
  */
 void FrameWidget::paintEvent(QPaintEvent *event) {
+    Q_UNUSED (event)
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
 
@@ -244,8 +245,17 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
     if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame()) {
-        QPoint tl(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
-        QPoint br(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
+        QPoint tl;
+        QPoint br;
+        if (current_drawing->get_shape() == PEN) {
+            Pen* current = dynamic_cast<Pen*>(current_drawing);
+            cv::Rect bounding_rect = cv::boundingRect(current->get_points());
+            tl = QPoint(bounding_rect.tl().x, bounding_rect.tl().y);
+            br = QPoint(bounding_rect.br().x, bounding_rect.br().y);
+        } else {
+            tl = QPoint(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
+            br = QPoint(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
+        }
         QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.setPen(Qt::black);
         painter.drawRect(current_rect);

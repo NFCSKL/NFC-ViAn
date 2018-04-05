@@ -21,7 +21,7 @@ public:
     void update_drawing_pos(QPoint pos);
     void update_text_pos(QPoint pos);
     void update_text_draw_end();
-    void move_shape(QPoint p);
+    virtual void move_shape(QPoint p);
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
 

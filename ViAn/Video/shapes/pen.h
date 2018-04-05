@@ -10,12 +10,15 @@ public:
     ~Pen() override;
     cv::Mat draw(cv::Mat &frame) override;
     void handle_new_pos(QPoint pos) override;
+    void move_shape(QPoint p) override;
     void write(QJsonObject& json) override;
     void read(const QJsonObject& json) override;
     QString get_name() override;
     void set_name(QString name) override;
+    std::vector<cv::Point> get_points();
 private:
     std::vector<std::pair<cv::Point, cv::Point>> lines;
+    std::vector<cv::Point> points;
     QString m_name = "Pen";
 };
 
