@@ -86,13 +86,24 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["interval end"] = this->m_ana_interval.second;
     json["full_path"] = QString::fromStdString(file_analysis);
     QJsonArray intervals;
-    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {
+    for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;
-        POI* pair = dynamic_cast<POI*>(*it);
-        interval["start"] = pair->get_start();
-        interval["end"] = pair->get_end();
+        interval["start"] = (*it).first;
+        interval["end"] = (*it).second;
         intervals.push_back(interval);
     }
+
+
+//    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {
+//        QJsonObject interval;
+//        interval["start"] = (*it)->get_start();
+//        interval["end"] = (*it)->get_end();
+
+////        POI* pair = dynamic_cast<POI*>(*it);
+////        interval["start"] = pair->get_start();
+////        interval["end"] = pair->get_end();
+//        intervals.push_back(interval);
+//    }
     json["intervals"] = intervals;
     m_unsaved_changes = false;
 }

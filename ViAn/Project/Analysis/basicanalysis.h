@@ -28,6 +28,7 @@ public:
     bool m_unsaved_changes = true;
     interval_set m_intervals;
     std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
+    std::vector<std::pair<int, int>> m_slider_interval;
     cv::Rect bounding_box;
     bool use_interval = false;
     bool use_bounding_box = false;

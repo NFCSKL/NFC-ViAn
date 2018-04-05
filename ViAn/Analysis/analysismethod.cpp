@@ -146,6 +146,10 @@ void AnalysisMethod::run() {
         m_analysis.save_saveable(m_save_path);
         //AnalysisProxy proxy(m_analysis, m_analysis.full_path());
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
+        for (auto p : m_analysis.get_intervals()) {
+            std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
+            proxy->m_slider_interval.push_back(pair);
+        }
         emit finished_analysis(proxy);
     }
 }
