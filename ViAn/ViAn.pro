@@ -71,7 +71,8 @@ SOURCES += main.cpp \
     GUI/DrawingItems/shapeitem.cpp \
     GUI/DrawingItems/textitem.cpp \
     GUI/DrawingItems/penitem.cpp \
-    Project/Test/bookmarktest.cpp
+    Project/Test/bookmarktest.cpp \
+    GUI/textdialog.cpp
 
 #
 # TEST
@@ -132,7 +133,8 @@ HEADERS += reportgenerator.h\
     GUI/DrawingItems/shapeitem.h \
     GUI/DrawingItems/textitem.h \
     GUI/DrawingItems/penitem.h \
-    Project/Test/bookmarktest.h
+    Project/Test/bookmarktest.h \
+    GUI/textdialog.h
 
 #
 # LIBRARY

@@ -58,6 +58,7 @@ signals:
     void set_overlay_tool(SHAPES);
     void step_zoom(double);
     void clear(void);
+    void send_text(QString, float);
 };
 
 #endif // DRAWINGTOOLBAR_H

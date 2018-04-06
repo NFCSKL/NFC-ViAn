@@ -222,6 +222,10 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->delete_drawing) {
         m_o_settings->delete_drawing = false;
         m_overlay->delete_drawing(m_o_settings->shape);
+    // Create a new text drawing
+    } else if (m_o_settings->create_text) {
+        m_o_settings->create_text = false;
+        m_overlay->create_text(m_zoomer.get_anchor(), curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;

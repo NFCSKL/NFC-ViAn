@@ -127,7 +127,6 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
  * @param frame_nr
  */
 void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
-    QObject::blockSignals(true);
     FrameItem* frame_item;
     QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
 
@@ -166,6 +165,8 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
         frame_item->addChild(text_item);
         frame_item->setExpanded(true);
+        emit set_current_drawing(shape);
+        setCurrentItem(text_item);
         break;
     }
     case PEN: {
@@ -177,7 +178,6 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
     default:
         break;
     }
-    QObject::blockSignals(false);
 }
 
 /**
