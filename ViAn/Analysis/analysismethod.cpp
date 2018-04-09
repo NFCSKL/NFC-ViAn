@@ -146,37 +146,16 @@ void AnalysisMethod::run() {
         m_analysis.bounding_box = bounding_box;
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
+        std::string new_path = Utility::add_serial_number(m_tmp_save_path + m_ana_name, "");
+        int index = new_path.find_last_of('/') + 1;
+        m_ana_name = new_path.substr(index);
 
-        m_ana_name = ImageGenerator::add_serial_number(m_ana_name, "");
-        //m_ana_name = check_save_path(m_ana_name);
-
-        m_analysis.save_saveable(m_tmp_save_path + m_ana_name);
+        m_analysis.save_saveable(new_path);
 
         AnalysisProxy proxy(m_analysis, m_save_path + m_ana_name);
         emit finished_analysis(proxy);
         emit finito();
     }
-}
-
-/**
- * @brief AnalysisMethod::check_save_path
- * @param path
- * @param increment
- * @return new save path
- * Checks if path exists and if it does adds a number to the end to prevent
- * that path overwrites the old one
- */
-std::string AnalysisMethod::check_save_path(std::string name, int increment) {
-    std::string path = m_tmp_save_path + name;
-    std::string new_path = m_tmp_save_path + name + std::to_string(increment);
-    QFile file(QString::fromStdString(path));
-    QFile new_file(QString::fromStdString(new_path));
-    if (!file.exists()) {
-        return name;
-    } else if (!new_file.exists()) {
-        return name + std::to_string(increment);
-    }
-    return check_save_path(name, ++increment);
 }
 
 /**

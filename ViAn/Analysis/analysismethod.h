@@ -38,7 +38,6 @@ class AnalysisMethod : public QObject ,public QRunnable{
 
 protected:
     std::pair<int, int> interval;
-    //AnalysisInterval interval;
     cv::Rect bounding_box;
     bool use_interval = false;
     bool use_bounding_box = false;
@@ -98,8 +97,6 @@ public:
 
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
     void set_analysis_area(cv::Rect area);
-
-    std::string check_save_path(std::string name, int increment = 2);
 
     bool sample_current_frame(); // Check if current frame is to be sampled
 
