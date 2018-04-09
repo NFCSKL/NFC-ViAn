@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
 #include "Analysis/analysismethod.h"
+#include "imagegenerator.h"
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& tmp_save_path, const std::string& save_path)
 {
     m_source_file = video_path;
@@ -9,7 +10,7 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     std::string vid_name = video_path.substr(index);
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
-    m_ana_name = vid_name + "-motion_analysis";
+    m_ana_name = vid_name + DETECTION_STRING;
     m_tmp_save_path = tmp_save_path;
     m_save_path = save_path;
     add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
@@ -145,7 +146,10 @@ void AnalysisMethod::run() {
         m_analysis.bounding_box = bounding_box;
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
-        m_ana_name = check_save_path(m_ana_name);
+
+        m_ana_name = ImageGenerator::add_serial_number(m_ana_name, "");
+        //m_ana_name = check_save_path(m_ana_name);
+
         m_analysis.save_saveable(m_tmp_save_path + m_ana_name);
 
         AnalysisProxy proxy(m_analysis, m_save_path + m_ana_name);

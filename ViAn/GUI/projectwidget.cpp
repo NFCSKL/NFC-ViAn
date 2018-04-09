@@ -608,7 +608,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case DRAWING_TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Update", this, SLOT(update_tag_drawing()));
+                menu.addAction("Update", this, SLOT(drawing_tag()));
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -621,7 +621,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
-                menu.addAction("Tag drawings", this, SLOT(tag_drawings()));
+                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             default:
                 // VIDEO_ITEM
@@ -635,41 +635,39 @@ void ProjectWidget::context_menu(const QPoint &point) {
 }
 
 /**
- * @brief ProjectWidget::tag_drawings
- *  Creates a tag from all the drawings in the current video project
+ * @brief ProjectWidget::drawing_tag
+ * Creates the drawing tag or updates the current one depending
+ * on the current QTreeItem.
+ * The drawing tag will tag all frames which have a drawing on them.
  */
-void ProjectWidget::tag_drawings() {
-    VideoItem* vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
-    BasicAnalysis* basic_tag = new DrawingTag();
-    basic_tag->m_name = "Drawings tag";
-    VideoProject* vid_proj = vid_item->get_video_project();
-    DrawingTag* tag = dynamic_cast<DrawingTag*>(basic_tag);
-
-    for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
-        if (frame_overlay.second.overlay.size() > 0) {
-            tag->add_frame(frame_overlay.first);
-        }
+void ProjectWidget::drawing_tag() {
+    VideoItem* vid_item;
+    DrawingTag* tag;
+    if (selectedItems().front()->type() == VIDEO_ITEM) {
+        // tag drawing
+        vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
+        tag = new DrawingTag();
+        tag->m_name = "Drawing tag";
+    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        // Update tag drawing
+        DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
+        vid_item = dynamic_cast<VideoItem*>(item->parent());
+        tag = item->get_tag();
+        tag->clear_intervals();
     }
-    add_basic_analysis(vid_proj, basic_tag);
-}
 
-/**
- * @brief ProjectWidget::update_tag_drawing
- * Update the drawing tag so it matches with all the current drawings
- */
-void ProjectWidget::update_tag_drawing() {
-    DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
-    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     VideoProject* vid_proj = vid_item->get_video_project();
-    DrawingTag* tag = item->get_tag();
-    tag->clear_intervals();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.overlay.size() > 0) {
             tag->add_frame(frame_overlay.first);
         }
     }
 
-    tree_item_clicked(item);
+    if (selectedItems().front()->type() == VIDEO_ITEM) {
+        add_basic_analysis(vid_proj, tag);
+    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        tree_item_clicked(dynamic_cast<DrawingTagItem*>(selectedItems().front()));
+    }
 }
 
 /**

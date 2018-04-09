@@ -48,6 +48,7 @@ protected:
 
     const int FULL_HD_WIDTH = 1920;
     const int FULL_HD_HEIGHT = 1080;
+    const std::string DETECTION_STRING = "-motion_analysis";
 
     int num_frames = -1;            // Total number of video frames
     unsigned int sample_freq = 1;   // Sample frequency of analysis

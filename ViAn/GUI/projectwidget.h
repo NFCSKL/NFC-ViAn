@@ -85,8 +85,7 @@ private slots:
     void context_menu(const QPoint& point);
     void remove_item();
     void rename_item();
-    void tag_drawings();
-    void update_tag_drawing();
+    void drawing_tag();
     void show_details();
     void hide_details();
     void create_folder_item();
