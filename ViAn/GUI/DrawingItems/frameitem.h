@@ -11,6 +11,7 @@ public:
     int get_frame();
     void remove();
     void update_shape_name();
+    void update_shape_color();
     Shapes* get_shape();
     ~FrameItem() override;
 };

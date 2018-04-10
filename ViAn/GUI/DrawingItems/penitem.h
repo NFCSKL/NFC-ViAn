@@ -10,8 +10,10 @@ public:
     PenItem(Pen* pen);
     Pen* get_shape();
     void update_shape_name();
+    void update_shape_color();
     void remove();
     ~PenItem() override;
+    QPixmap map;
 };
 
 #endif // PENITEM_H

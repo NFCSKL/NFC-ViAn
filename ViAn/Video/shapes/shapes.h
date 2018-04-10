@@ -39,6 +39,8 @@ public:
     cv::Point get_draw_start();
     cv::Point get_draw_end();
     SHAPES get_shape();
+    QColor get_color();
+    void set_color(QColor);
     void set_text_size(cv::Size size);
     void invert_color();
     void set_thickness(QPoint pos);
@@ -50,6 +52,7 @@ public:
 protected:
     SHAPES shape = NONE;
     cv::Scalar color;
+    QColor q_color;
     int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;

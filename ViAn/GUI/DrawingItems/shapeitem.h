@@ -10,6 +10,7 @@ public:
     virtual ~ShapeItem();
     virtual void remove() = 0;
     virtual void update_shape_name() = 0;
+    virtual void update_shape_color() = 0;
     virtual Shapes* get_shape() = 0;
 };
 

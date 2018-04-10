@@ -12,6 +12,8 @@ void FrameItem::remove(){}
 
 void FrameItem::update_shape_name(){}
 
+void FrameItem::update_shape_color(){}
+
 Shapes* FrameItem::get_shape() {
     return nullptr;
 }
