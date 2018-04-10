@@ -121,6 +121,7 @@ void Overlay::add_drawing(Shapes* shape, int frame_nr) {
     shape->set_frame(frame_nr);
     overlays[frame_nr].push_back(shape);
     emit new_drawing(shape, frame_nr);
+    set_current_drawing(shape);
     m_unsaved_changes = true;
 }
 
@@ -354,7 +355,6 @@ void Overlay::clear(int frame_nr) {
  */
 void Overlay::delete_drawing(Shapes* shape) {
     Shapes* drawing;
-    if (current_drawing == nullptr) return;
     if (shape == nullptr) {
         drawing = current_drawing;
     } else {
