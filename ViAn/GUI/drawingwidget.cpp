@@ -13,7 +13,7 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
 
     // Widget only shortcut for creating a new folder
     QShortcut* delete_sc = new QShortcut(this);
-    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    //delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     delete_sc->setKey(QKeySequence(QKeySequence::Delete));
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::remove_item);
 
