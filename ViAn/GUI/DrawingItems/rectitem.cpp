@@ -21,7 +21,6 @@ void RectItem::update_shape_name() {
 }
 
 void RectItem::update_shape_color() {
-    qDebug() << "update text";
     map.fill(m_rect->get_color());
     setIcon(1, map);
 }
