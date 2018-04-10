@@ -30,7 +30,7 @@ Project::Project(const std::string& name, const std::string& dir_path){
     if (dir_path == "default") {
         is_default_proj = true;
     } else {
-        m_dir = dir_path + name + "/";
+        m_dir = dir_path + "/" + name + "/";
         m_file = m_dir + name + ".vian";
         m_unsaved_changes = true;
     }

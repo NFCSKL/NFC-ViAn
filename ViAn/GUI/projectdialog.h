@@ -1,11 +1,12 @@
-#ifndef CREATEPROJECTDIALOG_H
-#define CREATEPROJECTDIALOG_H
+#ifndef PROJECTDIALOG_H
+#define PROJECTDIALOG_H
 
 #include <QWidget>
 #include <QDialog>
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QString>
+#include "shlwapi.h"
 
 class ProjectDialog : public QDialog
 {
@@ -13,6 +14,7 @@ class ProjectDialog : public QDialog
     QLineEdit* path_text;
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
+    TCHAR my_documents[MAX_PATH];
 public:
     explicit ProjectDialog(QWidget *parent = nullptr, QString name = "");
 
@@ -28,4 +30,4 @@ private slots:
     void cancel_btn_clicked(void);
 };
 
-#endif // CREATEPROJECTDIALOG_H
+#endif // PROJECTDIALOG_H
