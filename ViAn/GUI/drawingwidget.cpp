@@ -258,6 +258,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();
+        qDebug() << "start end" << Utility::from_cvpoint(shape->get_draw_start()) << Utility::from_cvpoint(shape->get_draw_end());
         break;
     }
     default:
