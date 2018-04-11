@@ -27,7 +27,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
-    // Widget only shortcut for creating a new folder
+    // Widget only shortcut for creating a new folder TODO delete
     QShortcut* new_folder_sc = new QShortcut(this);
     new_folder_sc->setContext(Qt::WidgetWithChildrenShortcut);
     new_folder_sc->setKey(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
@@ -167,7 +167,7 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
 }
 
 /**
- * @brief ProjectWidget::set_tree_item_namebei
+ * @brief ProjectWidget::set_tree_item_name
  * @param item
  * @param name
  * Slot to set the name if an item in the project tree

@@ -119,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_current_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     connect(drawing_wgt, &DrawingWidget::set_tool_hand, draw_toolbar->hand_tool_act, &QAction::trigger);
+    connect(drawing_wgt, &DrawingWidget::set_tool_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     draw_toolbar->zoom_tool_act->trigger();
@@ -538,7 +539,7 @@ void MainWindow::delete_drawing(Shapes *shape) {
 }
 
 void MainWindow::delete_current_drawing() {
-    drawing_wgt->remove_item();
+    drawing_wgt->delete_item();
 }
 
 void MainWindow::zoom() {

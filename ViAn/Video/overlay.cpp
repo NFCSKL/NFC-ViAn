@@ -19,6 +19,7 @@ void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
             frame = (*it)->draw(frame);
         }
     }
+    current_frame = frame_nr;
 }
 
 /**
@@ -76,6 +77,10 @@ QColor Overlay::get_colour() {
  */
 SHAPES Overlay::get_tool() {
     return current_shape;
+}
+
+int Overlay::get_current_frame() {
+    return current_frame;
 }
 
 /**
@@ -199,38 +204,51 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
+        if (right_click && current_shape != HAND) {
+            set_current_drawing(nullptr);
+            change_tool = true;
+            return;
+        }
         switch (current_shape) {
-            case RECTANGLE:
-                add_drawing(new Rectangle(current_colour, pos), frame_nr);
-                break;
-            case CIRCLE:
-                add_drawing(new Circle(current_colour, pos), frame_nr);
-                break;
-            case LINE:
-                add_drawing(new Line(current_colour, pos), frame_nr);
-                break;
-            case ARROW:
-                add_drawing(new Arrow(current_colour, pos), frame_nr);
-                break;
-            case PEN:
-                add_drawing(new Pen(current_colour, pos), frame_nr);
-                break;
-            case TEXT:
-                add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
-                break;
-            case HAND:
-                prev_point = pos;
-                if (right_click) {
-                    m_right_click = right_click;
-                    if (current_drawing) current_drawing->set_anchor(pos);
-                    break;
+        case RECTANGLE:
+            add_drawing(new Rectangle(current_colour, pos), frame_nr);
+            break;
+        case CIRCLE:
+            add_drawing(new Circle(current_colour, pos), frame_nr);
+            break;
+        case LINE:
+            add_drawing(new Line(current_colour, pos), frame_nr);
+            break;
+        case ARROW:
+            add_drawing(new Arrow(current_colour, pos), frame_nr);
+            break;
+        case PEN:
+            add_drawing(new Pen(current_colour, pos), frame_nr);
+            break;
+        case TEXT:
+            add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
+            break;
+        case HAND:
+            prev_point = pos;
+            if (right_click) {
+                m_right_click = right_click;
+                if (current_drawing) {
+                    current_drawing->set_anchor(pos);
+                } else {
+                    change_tool = true;
                 }
                 break;
-            case SELECT:
-                get_drawing(pos, frame_nr);
-                break;
-            default:
-                break;
+            }
+            if (!current_drawing || !point_in_drawing(pos, current_drawing)) {
+                set_current_drawing(nullptr);
+                emit set_tool_zoom();
+            }
+            break;
+        case SELECT:
+            get_drawing(pos, frame_nr);
+            break;
+        default:
+            break;
         }
     }
 }
@@ -243,6 +261,11 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
+    if (change_tool) {
+        emit set_tool_zoom();
+        change_tool = false;
+        return;
+    }
     update_drawing_position(pos, frame_nr);
     m_right_click = right_click;
 }
@@ -255,6 +278,7 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_moved(QPoint pos, int frame_nr) {
+    if (change_tool) return;
     update_drawing_position(pos, frame_nr);
 }
 
@@ -266,6 +290,10 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
+    if (current_shape == SELECT) {
+        emit set_tool_hand();
+        return;
+    }
     if (!current_drawing) return;
     if (current_drawing->get_shape() == TEXT) {
         dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
@@ -313,6 +341,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             prev_point = pos;
         } else if (current_shape == TEXT) {
             overlays[frame_nr].back()->update_text_pos(pos);
+        } else if (current_shape == SELECT) {
         } else {
             // The last appended shape is the one we're currently drawing.
             overlays[frame_nr].back()->update_drawing_pos(pos);
@@ -395,6 +424,7 @@ void Overlay::read(const QJsonObject& json) {
             Shapes* shape = get_empty_shape(shape_t);
             shape->read(json_shape);
             add_drawing(shape, frame_nr);
+            set_current_drawing(nullptr);
         }
     }
     m_unsaved_changes = false;

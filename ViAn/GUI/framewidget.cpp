@@ -98,8 +98,10 @@ void FrameWidget::set_tool(SHAPES tool) {
         emit send_tool(tool);
     }
 
+    rect_end = rect_start;
     m_tool = tool;
     set_cursor(m_tool);
+    repaint();
 }
 
 /**
@@ -116,16 +118,14 @@ void FrameWidget::set_cursor(SHAPES tool) {
     case ANALYSIS_BOX:
     case RECTANGLE:
     case CIRCLE:
-        setCursor(Qt::CrossCursor);
-        break;
-    case MOVE:
-        setCursor(Qt::OpenHandCursor);
-        break;
     case PEN:
     case ARROW:
     case LINE:
     case TEXT:
-        setCursor(Qt::UpArrowCursor);
+        setCursor(Qt::CrossCursor);
+        break;
+    case MOVE:
+        setCursor(Qt::OpenHandCursor);
         break;
         //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
     case HAND:
@@ -320,9 +320,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case MOVE:
         init_panning(event->pos());
         break;
-    case SELECT:
-        emit mouse_pressed(scale_point(event->pos()), false);
-        break;
     default:
         bool right_click = (event->button() == Qt::RightButton);
         emit mouse_pressed(scale_point(event->pos()), right_click);
@@ -350,8 +347,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     case MOVE:
         end_panning();
-        break;
-    case SELECT:
         break;
     default:
         emit mouse_released(scale_point(event->pos()), false);
@@ -402,8 +397,6 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             panning(event->pos());
         }
         break;
-    case SELECT:
-        break;
     default:
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
             emit mouse_moved(scale_point(event->pos()));
@@ -421,6 +414,7 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
     case HAND:
+    case SELECT:
         emit mouse_scroll(num_steps);
         event->accept();
         break;
@@ -428,7 +422,7 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
     case ZOOM:
         if (event->modifiers() == Qt::ControlModifier) {
             if (num_steps.y() < 0) {
-                emit trigger_zoom_out(0.9);
+                emit trigger_zoom_out(1/1.1);
             } else {
                 emit trigger_zoom_out(1.1);
             }

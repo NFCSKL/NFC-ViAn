@@ -39,7 +39,7 @@ void DrawingToolbar::create_actions() {
     zoom_out_tool_act->setShortcut(QKeySequence(Qt::Key_Minus));
 
     tools = new QActionGroup(this);
-    tools->addAction(no_tool_act);
+    //tools->addAction(no_tool_act);
 
     tools->addAction(zoom_tool_act);
     tools->addAction(analysis_tool_act);
@@ -122,7 +122,7 @@ void DrawingToolbar::zoom_in_tool_act_clicked() {
 
 void DrawingToolbar::zoom_out_tool_act_clicked() {
     emit set_status_bar("Zoom out");
-    emit step_zoom(0.9);
+    emit step_zoom(1/1.1);
 }
 
 void DrawingToolbar::zoom_tool_act_clicked() {
