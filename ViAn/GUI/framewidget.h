@@ -48,6 +48,7 @@ class FrameWidget : public QWidget
     bool do_zoom_out = false;
     bool m_detections = false;
     bool show_detections = true;
+    bool pan_rect = false;
 
     int current_frame_nr = 0;
     double m_scale_factor = 1;

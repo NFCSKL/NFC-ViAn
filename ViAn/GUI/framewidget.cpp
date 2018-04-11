@@ -98,7 +98,7 @@ void FrameWidget::set_tool(SHAPES tool) {
         emit send_tool(tool);
     }
 
-    rect_end = rect_start;
+    mark_rect = false;
     m_tool = tool;
     set_cursor(m_tool);
     repaint();
@@ -209,12 +209,12 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             end = QPoint(end.x(), start.y() + height_mod);
 
             painter.setPen(QColor(255,0,0));
-            QRectF tmp(start, end);
-            painter.drawRect(tmp);
+            QRectF correct_dim_rect((start-anchor)*m_scale_factor, (end-anchor)*m_scale_factor);
+            painter.drawRect(correct_dim_rect);
         }
         // Draw the zoom box
         painter.setPen(QColor(0,255,0));
-        QRectF zoom(rect_start, rect_end);
+        QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
         painter.drawRect(zoom);
     }
 
@@ -294,12 +294,13 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     case ZOOM: {
-        prev_point = event->pos();
+        prev_point = scale_point(event->pos());
         QRect zoom_rect(rect_start, rect_end);
         if (event->button() == Qt::RightButton) {
-            if (zoom_rect.contains(event->pos())) {
-                //prev_point = event->pos();
+            if (zoom_rect.contains(scale_point(event->pos()))) {
+                pan_rect = true;
             } else {
+                pan_rect = false;
                 init_panning(event->pos());
             }
         } else if (event->button() == Qt::LeftButton) {
@@ -308,7 +309,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
                 mark_rect = false;
                 unsetCursor();
             } else {
-                rect_start = event->pos();
+                rect_start = scale_point(event->pos());
                 mark_rect = true;
             }
 
@@ -370,21 +371,21 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case ZOOM: {
         QRect zoom_rect(rect_start, rect_end);
         if (event->buttons() == Qt::RightButton){
-            if (zoom_rect.contains(event->pos()) && mark_rect) {
-                QPoint diff_point = event->pos() - prev_point;
+            if (pan_rect && mark_rect) {
+                QPoint diff_point = scale_point(event->pos()) - prev_point;
 
                 rect_start += diff_point;
                 rect_end += diff_point;
-                prev_point = event->pos();
+                prev_point = scale_point(event->pos());
                 repaint();
             } else {
                 panning(event->pos());
             }
         } else if (event->buttons() == Qt::LeftButton && mark_rect) {
-            rect_end = rect_update(event->pos());
+            rect_end = rect_update(scale_point(event->pos()));
             //mark_rect = true;
         } else {
-            if (zoom_rect.contains(event->pos()) && mark_rect) {
+            if (zoom_rect.contains(scale_point(event->pos())) && mark_rect) {
                 setCursor(QCursor(QPixmap("../ViAn/Icons/zoom_in.png")));
             } else {
                 unsetCursor();
