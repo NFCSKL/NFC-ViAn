@@ -320,6 +320,9 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case MOVE:
         init_panning(event->pos());
         break;
+    case SELECT:
+        emit mouse_pressed(scale_point(event->pos()), false);
+        break;
     default:
         bool right_click = (event->button() == Qt::RightButton);
         emit mouse_pressed(scale_point(event->pos()), right_click);
@@ -347,6 +350,8 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     case MOVE:
         end_panning();
+        break;
+    case SELECT:
         break;
     default:
         emit mouse_released(scale_point(event->pos()), false);
@@ -396,6 +401,8 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         if (event->buttons() == Qt::LeftButton) {
             panning(event->pos());
         }
+        break;
+    case SELECT:
         break;
     default:
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
