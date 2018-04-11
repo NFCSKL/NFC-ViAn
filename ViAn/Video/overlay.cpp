@@ -139,6 +139,7 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
             current_drawing = shape;
         }
     }
+    emit select_current(current_drawing, frame_nr);
 }
 
 void Overlay::set_current_drawing(Shapes *shape) {

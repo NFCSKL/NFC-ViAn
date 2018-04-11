@@ -26,12 +26,14 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     m_overlay = overlay;
     update_from_overlay();
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+    connect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
 }
 
 void DrawingWidget::clear_overlay() {
     if (m_overlay != nullptr) {
         save_item_data();
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+        disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
         m_overlay = nullptr;
     }
     clear();
@@ -231,6 +233,19 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
     }
 }
 
+void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
+    QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
+    if (list.empty()) return;
+    FrameItem* frame_item = dynamic_cast<FrameItem*>(list.at(0));
+    for (int i = 0; i != frame_item->childCount(); ++i) {
+        ShapeItem* shape_item = dynamic_cast<ShapeItem*>(frame_item->child(i));
+        if (shape_item->get_shape() == shape) {
+            setCurrentItem(shape_item);
+            return;
+        }
+    }
+}
+
 /**
  * @brief DrawingWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
@@ -258,7 +273,6 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();
-        qDebug() << "start end" << Utility::from_cvpoint(shape->get_draw_start()) << Utility::from_cvpoint(shape->get_draw_end());
         break;
     }
     default:
