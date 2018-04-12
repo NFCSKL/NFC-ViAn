@@ -44,7 +44,6 @@ public:
 
 public slots:
     void color_tool_clicked();
-    void color_tool_hovered();
 
 private slots:
     void no_tool_act_clicked();
