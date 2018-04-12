@@ -76,6 +76,7 @@ struct overlay_settings {
     bool overlay_removed = false;
     bool right_click = false;
     bool set_current_drawing = false;
+    bool create_text = false;
 
     SHAPES tool = NONE;
     QColor color = Qt::red;

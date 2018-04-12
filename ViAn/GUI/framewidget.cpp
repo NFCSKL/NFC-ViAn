@@ -73,32 +73,8 @@ void FrameWidget::update(){
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
-    if (tool == TEXT) {
-        QString current_string = "Enter text";
-        float current_font_scale = 1;
-        std::string input_string = current_string.toStdString();
-        float input_font_scale = current_font_scale;
-        CustomDialog dialog("Choose text", NULL);
-        dialog.addLabel("Enter values:");
-        dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
-        dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
-                              &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
-                              "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
-
-        // Show the dialog (execution will stop here until the dialog is finished)
-        dialog.exec();
-
-        if (!dialog.wasCancelled() && !input_string.empty()) {
-            // Not cancelled and not empty field.
-            current_string = QString::fromStdString(input_string);
-            current_font_scale = input_font_scale;
-        }
-        emit send_tool_text(current_string, current_font_scale);
-    } else {
-        emit send_tool(tool);
-    }
-
     mark_rect = false;
+    emit send_tool(tool);
     m_tool = tool;
     set_cursor(m_tool);
     repaint();

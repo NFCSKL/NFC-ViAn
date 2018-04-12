@@ -18,6 +18,9 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPE
     set_name(strng);
     font_scale = fnt_scl;
     text_size = cv::getTextSize(m_name.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
+    cv::Point bl = cv::Point(draw_start.x-text_size.width/2, draw_start.y + text_size.height/2);
+    draw_end = cv::Point(draw_start.x + text_size.width/2, draw_start.y-text_size.height/2);
+    draw_start = bl;
 }
 
 Text::~Text() {}
@@ -44,13 +47,14 @@ void Text::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
-void Text::set_font_scale(QPoint diff_point) {
+double Text::set_font_scale(QPoint diff_point) {
     int diff_sum = diff_point.x() + diff_point.y();
     if (diff_sum > 0 && font_scale < FONT_SCALE_MAX) {
         font_scale += FONT_SCALE_STEP;
     } else if (diff_sum < 0 && font_scale > FONT_SCALE_MIN) {
         font_scale += -FONT_SCALE_STEP;
     }
+    return font_scale;
 }
 
 double Text::get_font_scale() {
