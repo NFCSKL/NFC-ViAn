@@ -137,8 +137,7 @@ void FrameProcessor::process_frame() {
  */
 void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
-    if (m_z_settings->draw_area_size != m_zoomer.get_viewport_size()) {
-
+    if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
         m_zoomer.update_rect_size();
     }
@@ -175,8 +174,11 @@ void FrameProcessor::update_zoomer_settings() {
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
-    set_anchor(m_zoomer.get_anchor());
-    set_scale_factor(m_zoomer.get_scale_factor());
+    qDebug() << "anchor" << m_zoomer.get_anchor() << m_z_settings->zoom_tl;
+    emit set_anchor(m_zoomer.get_anchor());
+    emit set_anchor(m_z_settings->zoom_tl);
+    qDebug() << "scale factors" << m_zoomer.get_scale_factor();
+    emit set_scale_factor(m_zoomer.get_scale_factor());
 }
 
 /**

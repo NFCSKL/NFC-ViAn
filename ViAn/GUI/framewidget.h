@@ -42,7 +42,7 @@ class FrameWidget : public QWidget
     QPoint rect_start, rect_end, prev_pos = QPoint(0,0);
     bool mark_rect = false;
     QPoint anchor = QPoint(0,0);
-    QPoint prev_point;
+    QPoint prev_point, prev_point_scaled;
 
     bool do_zoom = false;
     bool do_zoom_out = false;

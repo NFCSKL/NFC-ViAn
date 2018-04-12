@@ -30,12 +30,14 @@ void Zoomer::set_scale_factor(double scale_factor) {
 void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
     cv::Rect _tmp = cv::Rect(cv::Point(anchor.x() + p1.x() / m_scale_factor, anchor.y() + p1.y() / m_scale_factor),
                   cv::Point(anchor.x() + p2.x() / m_scale_factor, anchor.y() + p2.y() / m_scale_factor));
-
-    if (_tmp.width > 1 && _tmp.height > 1) {
-        m_zoom_rect = _tmp;
+    cv::Rect _tmp2 = cv::Rect(cv::Point(p1.x(), p1.y()), cv::Point(p2.x(), p2.y()));
+    if (_tmp2.width > 1 && _tmp2.height > 1) {
+        m_zoom_rect = _tmp2;
         anchor = QPoint(m_zoom_rect.tl().x, m_zoom_rect.tl().y);
+        qDebug() << "anch" << anchor;
         update_scale();
         update_rect_size();
+        qDebug() << "anch2" << anchor;
     }
 }
 
@@ -141,15 +143,22 @@ void Zoomer::update_rect_size() {
     double height = m_viewport_size.height() / m_scale_factor;
     double width_diff = width - m_zoom_rect.width;
     double height_diff = height - m_zoom_rect.height;
-
+    qDebug() << "width height" << width << height;
+    qDebug() << "zoom width height" << m_zoom_rect.width << m_zoom_rect.height;
+    qDebug() << "br" << m_zoom_rect.br().x << m_zoom_rect.br().y;
 
     // Generate a new top-left and bottom-right corner for the rectangle
     // Makes sure the rectangle will not be bigger then the original frame
-    cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - int(width_diff / 2)),
+    cv::Point new_tl = cv::Point(std::max(0, int(m_zoom_rect.tl().x - width_diff / 2)),
                                  std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
     cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)),
                                  std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
 
+    //cv::Point new_new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x), std::max(0, m_zoom_rect.tl().y));
+    //cv::Point new_new_br = cv::Point(std::min(m_zoom_rect.br().x, m_viewport_size.width()),
+    //                                 std::min(m_zoom_rect.br().y, m_viewport_size.height()));
+    qDebug() << new_tl.x << new_tl.y;
+    qDebug() << new_br.x << new_br.y;
     cv::Rect _tmp = cv::Rect(new_tl, new_br);
     if (_tmp.area() > 1) {
         m_zoom_rect = _tmp;
