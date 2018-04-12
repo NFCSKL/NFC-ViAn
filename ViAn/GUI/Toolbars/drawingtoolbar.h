@@ -2,8 +2,12 @@
 #define DRAWINGTOOLBAR_H
 
 #include <QToolBar>
+#include <QPushButton>
+#include <QLabel>
 #include <QAction>
 #include <QActionGroup>
+#include <QIcon>
+#include <QColorDialog>
 #include "Video/shapes/shapes.h"
 
 /**
@@ -17,6 +21,9 @@ class DrawingToolbar : public QToolBar
     void create_buttons();
 public:
     DrawingToolbar();
+    QColor color = Qt::red;
+    QLabel* color_label;
+    QPixmap* pixmap;
 
     QAction* no_tool_act;
     QAction* analysis_tool_act;
@@ -38,6 +45,7 @@ public:
 
 public slots:
     void color_tool_clicked();
+    void color_tool_hovered();
 
 private slots:
     void no_tool_act_clicked();
