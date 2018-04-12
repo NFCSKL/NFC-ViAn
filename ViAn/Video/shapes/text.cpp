@@ -18,8 +18,8 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPE
     set_name(strng);
     font_scale = fnt_scl;
     text_size = cv::getTextSize(m_name.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
-    cv::Point bl = cv::Point(draw_start.x, draw_start.y + text_size.height);
-    draw_end = cv::Point(draw_start.x + text_size.width, draw_start.y);
+    cv::Point bl = cv::Point(draw_start.x-text_size.width/2, draw_start.y + text_size.height/2);
+    draw_end = cv::Point(draw_start.x + text_size.width/2, draw_start.y-text_size.height/2);
     draw_start = bl;
 }
 
