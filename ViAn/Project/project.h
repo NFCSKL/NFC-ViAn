@@ -78,7 +78,7 @@ public:
     void set_name(std::string);
     void set_dir(std::string);
     void set_file(std::string);
-    void update_tmp(std::string name);
+//    void update_tmp(std::string name);
 
 private:
     Project();

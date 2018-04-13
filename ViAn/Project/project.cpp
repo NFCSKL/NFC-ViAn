@@ -324,12 +324,12 @@ void Project::set_file(std::string file) {
  * Update the temporary files with the new name and path
  * @param name
  */
-void Project::update_tmp(string name) {
-    QFile::rename(QString::fromStdString(m_tmp_file), QString::fromStdString(m_tmp_dir + name + ".vian"));
-    QDir dir = QDir(QString::fromStdString(m_tmp_dir));
-    dir.rename(dir.path(), tmp_dir.path() + "/" + QString::fromStdString(name));
+//void Project::update_tmp(string name) {
+//    QFile::rename(QString::fromStdString(m_tmp_file), QString::fromStdString(m_tmp_dir + name + ".vian"));
+//    QDir dir = QDir(QString::fromStdString(m_tmp_dir));
+//    dir.rename(dir.path(), tmp_dir.path() + "/" + QString::fromStdString(name));
 
-    m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
-    m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
-    m_tmp_file = m_tmp_dir + name + ".vian";
-}
+//    m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
+//    m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
+//    m_tmp_file = m_tmp_dir + name + ".vian";
+//}

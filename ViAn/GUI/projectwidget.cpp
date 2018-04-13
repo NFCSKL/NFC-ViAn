@@ -752,8 +752,8 @@ void ProjectWidget::create_folder_item() {
  * @brief ProjectWidget::save_project
  * Slot function to save the open project
  */
-void ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return;
+bool ProjectWidget::save_project() {
+    if (m_proj == nullptr ) return false;
 
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
@@ -773,7 +773,7 @@ void ProjectWidget::save_project() {
             set_main_window_name(name);
         } else {
             // User aborted dialog, cancel save
-            return;
+            return false;
         }
 
     }
@@ -800,17 +800,16 @@ void ProjectWidget::save_project() {
  * @param project_name: new project name
  * @param project_path: new project path
  */
-void ProjectWidget::save_as_project(QString project_name, QString project_path) {
-    std::string name = project_name.toStdString();
-    std::string path = project_path.toStdString();
-    m_proj->set_name(name);
-    m_proj->set_dir(path + "/" + name + "/");
-    m_proj->set_file(m_proj->get_dir() + name + ".vian");
-    m_proj->update_tmp(name);
-    m_proj->is_default_proj = false;
-    set_main_window_name(project_name);
-    save_project();
-}
+//void ProjectWidget::save_as_project(QString project_name, QString project_path) {
+//    std::string name = project_name.toStdString();
+//    std::string path = project_path.toStdString();
+//    m_proj->set_name(name);
+//    m_proj->set_dir(path + "/" + name + "/");
+//    m_proj->set_file(m_proj->get_dir() + name + ".vian");
+//    m_proj->update_tmp(name);
+//    set_main_window_name(project_name);
+//    save_project();
+//}
 
 /**
  * @brief ProjectWidget::open_project
@@ -871,7 +870,6 @@ bool ProjectWidget::close_project() {
     delete m_proj;
     m_proj = nullptr;
 
-    add_default_project();
     return true;
 }
 
@@ -896,7 +894,6 @@ void ProjectWidget::remove_project() {
     emit project_closed();
     emit remove_overlay();
 
-    add_default_project();
 }
 
 void ProjectWidget::set_main_window_name(QString name) {
