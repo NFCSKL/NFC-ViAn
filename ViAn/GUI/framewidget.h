@@ -17,8 +17,6 @@
 #include "Analysis/analysissettings.h"
 #include "imagegenerator.h"
 
-//enum click_tool {NONE, ZOOM, MOVE,ANALYSIS_BOX};
-
 class FrameWidget : public QWidget
 {
 
@@ -35,7 +33,6 @@ class FrameWidget : public QWidget
     cv::Mat current_frame;
     Analysis* m_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
-    Overlay* video_overlay;
 
     // Analysis bounding box
     QPoint ana_rect_start, ana_rect_end;
@@ -62,9 +59,7 @@ public:
 
     cv::Mat get_modified_frame() const;
     cv::Mat get_org_frame() const;
-    void set_overlay(Overlay *overlay);
     void set_current_frame_nr(int);
-    Overlay* get_overlay();
 
 signals:
     void quick_analysis(AnalysisSettings* settings);

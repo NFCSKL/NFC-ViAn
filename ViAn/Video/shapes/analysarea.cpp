@@ -48,7 +48,7 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
 
             // Original frame with opacity.
             cv::Mat opacity_frame;
-            cv::addWeighted(white_frame, Shape::ALPHA, frame, 1.0 - Shape::ALPHA, 0.0, opacity_frame);
+            cv::addWeighted(white_frame, Shapes::ALPHA, frame, 1.0 - Shapes::ALPHA, 0.0, opacity_frame);
 
             cv::Mat original_cut, opacity_cut;
 
@@ -69,14 +69,14 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
             cv::fillPoly(area, ppt, npt, 1, cv::Scalar(255, 255, 255));
 
             // Add opacity and blend with the original frame.
-            cv::addWeighted(area, Shape::ALPHA, frame, 1.0 - Shape::ALPHA, 0.0, frame);
+            cv::addWeighted(area, Shapes::ALPHA, frame, 1.0 - Shapes::ALPHA, 0.0, frame);
         }
         // Draw contour of the polygon.
-        cv::polylines(frame, ppt, npt, 1, true, cv::Scalar(255, 0, 0), Shape::LINE_THICKNESS);
+        cv::polylines(frame, ppt, npt, 1, true, cv::Scalar(255, 0, 0), Shapes::LINE_THICKNESS);
 
         // Draw a circle indicating the last choosen point.
         int RADIUS = 8;
-        cv::circle(frame, points->back(), RADIUS, cv::Scalar(0, 255, 255), Shape::LINE_THICKNESS);
+        cv::circle(frame, points->back(), RADIUS, cv::Scalar(0, 255, 255), Shapes::LINE_THICKNESS);
     }
     return frame;
 }
@@ -87,7 +87,7 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
  * @param pos The new position to be added.
  */
 void AnalysArea::add_point(QPoint pos) {
-    points->push_back(Shape::qpoint_to_point(pos));
+    points->push_back(Shapes::qpoint_to_point(pos));
 }
 
 /**

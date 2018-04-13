@@ -90,10 +90,9 @@ public:
 
     int get_current_video_length();
     void set_overlay(Overlay* overlay);
-    void set_undo();
-    void set_redo();
-    void set_clear_drawings();
-    void set_delete_drawing();
+    void set_update_text(QString, Shapes*);
+    void set_clear_drawings(int frame);
+    void set_delete_drawing(Shapes* shape);
 
     int get_brightness();
     double get_contrast();
@@ -140,7 +139,7 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
 
-    void load_marked_video(VideoProject* vid_proj);
+    void load_marked_video(VideoProject* vid_proj, int load_frame = -1);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
@@ -166,6 +165,7 @@ public slots:
     void mouse_released(QPoint pos, bool right_click);
     void mouse_moved(QPoint pos);
     void mouse_scroll(QPoint pos);
+    void set_current_drawing(Shapes* shape);
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);

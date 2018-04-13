@@ -61,6 +61,16 @@ SOURCES += main.cpp \
     GUI/Analysis/analysisdialog.cpp \
     GUI/Analysis/videolistitem.cpp \
     GUI/Analysis/queuewidget.cpp \
+    GUI/DrawingItems/frameitem.cpp \
+    GUI/DrawingItems/rectitem.cpp \
+    GUI/drawingwidget.cpp \
+    Video/shapes/shapes.cpp \
+    GUI/DrawingItems/circleitem.cpp \
+    GUI/DrawingItems/lineitem.cpp \
+    GUI/DrawingItems/arrowitem.cpp \
+    GUI/DrawingItems/shapeitem.cpp \
+    GUI/DrawingItems/textitem.cpp \
+    GUI/DrawingItems/penitem.cpp \
     Project/Test/bookmarktest.cpp
 
 #
@@ -112,6 +122,16 @@ HEADERS += reportgenerator.h\
     GUI/Analysis/analysisdialog.h \
     GUI/Analysis/videolistitem.h \
     GUI/Analysis/queuewidget.h \
+    GUI/DrawingItems/frameitem.h \
+    GUI/DrawingItems/rectitem.h \
+    GUI/drawingwidget.h \
+    Video/shapes/shapes.h \
+    GUI/DrawingItems/circleitem.h \
+    GUI/DrawingItems/lineitem.h \
+    GUI/DrawingItems/arrowitem.h \
+    GUI/DrawingItems/shapeitem.h \
+    GUI/DrawingItems/textitem.h \
+    GUI/DrawingItems/penitem.h \
     Project/Test/bookmarktest.h
 
 #
@@ -147,7 +167,6 @@ SOURCES += \
     Video/shapes/line.cpp \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
-    Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
@@ -159,7 +178,6 @@ HEADERS += \
     Video/shapes/line.h \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
-    Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h \

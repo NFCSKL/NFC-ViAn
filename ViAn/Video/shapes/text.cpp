@@ -3,8 +3,7 @@
 /**
  * @brief Text::Text
  */
-Text::Text() : Shape(SHAPES::TEXT) {
-    string = QString();
+Text::Text() : Shapes(SHAPES::TEXT) {
     font_scale = 0;
 }
 
@@ -15,11 +14,13 @@ Text::Text() : Shape(SHAPES::TEXT) {
  * @param strng String to be displayed
  * @param fnt_scl Font scale of the string
  */
-Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES::TEXT, col, pos) {
-    string = strng;
+Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPES::TEXT, col, pos) {
+    set_name(strng);
     font_scale = fnt_scl;
-    text_size = cv::getTextSize(string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
+    text_size = cv::getTextSize(m_name.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
 }
+
+Text::~Text() {}
 
 /**
  * @brief Text::draw
@@ -28,7 +29,7 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES
  * @return Returns the frame with drawing.
  */
 cv::Mat Text::draw(cv::Mat &frame) {
-    cv::putText(frame, string.toStdString(), draw_start, cv::FONT_HERSHEY_SIMPLEX, font_scale,
+    cv::putText(frame, m_name.toStdString(), draw_start, cv::FONT_HERSHEY_SIMPLEX, font_scale,
                 color, thickness);
     return frame;
 }
@@ -43,6 +44,27 @@ void Text::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+void Text::set_font_scale(QPoint diff_point) {
+    int diff_sum = diff_point.x() + diff_point.y();
+    if (diff_sum > 0 && font_scale < FONT_SCALE_MAX) {
+        font_scale += FONT_SCALE_STEP;
+    } else if (diff_sum < 0 && font_scale > FONT_SCALE_MIN) {
+        font_scale += -FONT_SCALE_STEP;
+    }
+}
+
+double Text::get_font_scale() {
+    return font_scale;
+}
+
+QString Text::get_name() {
+    return m_name;
+}
+
+void Text::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Text::write
  * @param json
@@ -50,7 +72,7 @@ void Text::handle_new_pos(QPoint pos) {
  */
 void Text::write(QJsonObject& json) {
     write_shape(json);
-    json["text"] = string;
+    json["name"] = m_name;
     json["font"] = font_scale;
 }
 
@@ -61,6 +83,6 @@ void Text::write(QJsonObject& json) {
  */
 void Text::read(const QJsonObject& json) {
     read_shape(json);
-    this->string = json["text"].toString();
+    this->m_name = json["name"].toString();
     this->font_scale = json["font"].toDouble();
 }

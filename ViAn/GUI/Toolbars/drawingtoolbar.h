@@ -4,7 +4,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QActionGroup>
-#include "Video/shapes/shape.h"
+#include "Video/shapes/shapes.h"
 
 /**
  * @brief The DrawingToolbar class
@@ -31,8 +31,6 @@ public:
     QAction* line_tool_act;
     QAction* text_tool_act;
     QAction* hand_tool_act;
-    QAction* undo_tool_act;
-    QAction* redo_tool_act;
     QAction* delete_tool_act;
 
     QActionGroup* tools;
@@ -59,7 +57,6 @@ signals:
     void set_color(QColor);
     void set_overlay_tool(SHAPES);
     void step_zoom(double);
-    void undo(void);
     void clear(void);
 };
 

@@ -11,19 +11,23 @@
 
 enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, HAND, ZOOM, MOVE, ANALYSIS_BOX};
 
-class Shape {
+class Shapes {
 
 public:
-    Shape(SHAPES s);
-    Shape(SHAPES s, QColor col, QPoint pos);
+    Shapes(SHAPES s);
+    Shapes(SHAPES s, QColor col, QPoint pos);
+    void set_anchor(QPoint pos);
+    void edit_shape(QPoint diff_point);
     void update_drawing_pos(QPoint pos);
     void update_text_pos(QPoint pos);
-    void move_shape(QPoint p);
+    void update_text_draw_end();
+    virtual void move_shape(QPoint p);
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
 
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;
+    virtual ~Shapes();
 
     static cv::Scalar qcolor_to_scalar(QColor col);
     static cv::Point qpoint_to_point(QPoint pnt);
@@ -38,18 +42,22 @@ public:
     void set_text_size(cv::Size size);
     void invert_color();
     void set_thickness(QPoint pos);
-    void set_current_frame(int frame);
-    int get_current_frame();
+    void set_frame(int);
+    int get_frame();
+    virtual QString get_name() = 0;
+    virtual void set_name(QString name) = 0;
 
 protected:
-    SHAPES shape;
+    SHAPES shape = NONE;
     cv::Scalar color;
     int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;
+    bool anchor; // true = draw start -- false = draw end
     cv::Size text_size;
     bool inverted = false;
-    int current_frame;
+    int frame;
+    QString m_name = "Unknown shape";
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);

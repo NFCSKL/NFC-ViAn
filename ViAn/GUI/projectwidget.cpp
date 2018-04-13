@@ -463,7 +463,7 @@ bool ProjectWidget::prompt_save() {
 /**
  * @brief ProjectWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
- * Preforms different operations based on tree item type.
+ * Performs different operations based on tree item type.
  * @param item
  * @param col
  */
@@ -472,7 +472,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project());
+        emit marked_video(vid_item->get_video_project(), -1);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -592,7 +592,6 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
             default:
-                // VIDEO_ITEM
                 break;
         }
     } else if (item_count > 1) {
@@ -708,6 +707,8 @@ bool ProjectWidget::save_project() {
         return proj_dialog->exec();
     }
     save_item_data();
+    emit save_draw_wgt();
+
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
@@ -819,7 +820,6 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-    emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
 
