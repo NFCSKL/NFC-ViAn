@@ -7,7 +7,7 @@
 #include <QColorDialog>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
-    //header()->close();
+    header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
@@ -15,7 +15,6 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     setColumnCount(2);
     header()->resizeSection(0, 200);
     header()->resizeSection(1, 30);
-
 
     // Widget only shortcut for creating a new folder
     QShortcut* delete_sc = new QShortcut(this);

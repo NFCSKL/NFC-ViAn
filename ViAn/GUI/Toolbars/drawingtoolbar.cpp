@@ -1,7 +1,6 @@
 #include "drawingtoolbar.h"
 
-#include <QIcon>
-#include <QColorDialog>
+#include <QDebug>
 
 /**
  * @brief DrawingToolbar::DrawingToolbar
@@ -23,6 +22,10 @@ void DrawingToolbar::create_actions() {
     zoom_out_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_out.png"), tr("Zoom out tool"), this);
     zoom_tool_act = new QAction(QIcon("../ViAn/Icons/hand.png"), tr("Panning tool"), this);
 
+    color_label = new QLabel();
+    pixmap = new QPixmap(20, 20);
+    pixmap->fill(color);
+    color_label->setPixmap(*pixmap);
     color_tool_act = new QAction(QIcon("../ViAn/Icons/color.png"), tr("Color picker"), this);
     pen_tool_act = new QAction(QIcon("../ViAn/Icons/pen.png"), tr("Pen tool"), this);
     arrow_tool_act = new QAction(QIcon("../ViAn/Icons/arrow.png"), tr("Arrow tool"), this);
@@ -76,6 +79,7 @@ void DrawingToolbar::create_actions() {
  * Adds all actions to the toolbar
  */
 void DrawingToolbar::create_buttons() {
+    addWidget(color_label);
     addAction(color_tool_act);
     addAction(zoom_in_tool_act);
     addAction(zoom_out_tool_act);
@@ -89,10 +93,12 @@ void DrawingToolbar::create_buttons() {
  */
 void DrawingToolbar::color_tool_clicked() {
     emit set_status_bar("Choose a color");
-    QColor color = QColorDialog::getColor();
+    color = QColorDialog::getColor();
     if (color.isValid()) {
         emit set_status_bar("Color " + color.name() + " chosen");
         emit set_color(color);
+        pixmap->fill(color);
+        color_label->setPixmap(*pixmap);
     }
 }
 
