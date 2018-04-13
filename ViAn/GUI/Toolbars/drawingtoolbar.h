@@ -38,6 +38,7 @@ public:
     QAction* line_tool_act;
     QAction* text_tool_act;
     QAction* hand_tool_act;
+    QAction* select_tool_act;
     QAction* delete_tool_act;
 
     QActionGroup* tools;
@@ -59,6 +60,7 @@ private slots:
     void line_tool_clicked();
     void text_tool_clicked();
     void hand_tool_clicked();
+    void select_tool_clicked();
 signals:
     void set_status_bar(QString);
     void set_color(QColor);
