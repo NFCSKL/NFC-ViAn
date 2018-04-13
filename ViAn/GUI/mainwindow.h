@@ -24,6 +24,7 @@
 #include "projectwidget.h"
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
+#include "drawingwidget.h"
 #include "statusbar.h"
 #include "Toolbars/drawingtoolbar.h"
 
@@ -61,10 +62,11 @@ private slots:
     void arrow();
     void pen();
     void text();
-    void undo();
-    void redo();
-    void clear();
-    void delete_drawing();
+    void update_text(QString, Shapes*);
+    void clear(int frame);
+    void clear_current();
+    void delete_drawing(Shapes* shape);
+    void delete_current_drawing();
     void zoom();
     void move();
     void set_ana_details(bool);
@@ -85,10 +87,12 @@ private:
     ProjectWidget* project_wgt;
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
+    DrawingWidget* drawing_wgt;
     QueueWidget* queue_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
+    QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
 
     AnalysisWindow *analysis_window;

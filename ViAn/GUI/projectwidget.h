@@ -44,7 +44,7 @@ public:
 
 signals:
     void selected_media();
-    void marked_video(VideoProject* vid_proj);
+    void marked_video(VideoProject* vid_proj, int);
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
 
@@ -101,7 +101,6 @@ private:
     QStringList mimeTypes() const;
     void file_dropped(QString path);
     void folder_dropped(QString path);
-    void insert_dropped(VideoItem* item);
     std::stack<int> get_index_path(QTreeWidgetItem* item);
     VideoItem* get_video_item(VideoProject* v_proj, QTreeWidgetItem* s_item = nullptr);
     void get_video_items(QTreeWidgetItem* root, std::vector<VideoItem *> &items);
@@ -112,6 +111,7 @@ private:
 signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
+    void save_draw_wgt(QTreeWidgetItem* = nullptr);
 
 };
 

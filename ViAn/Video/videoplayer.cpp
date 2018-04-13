@@ -162,9 +162,7 @@ bool VideoPlayer::wait_load_read(){
     // Read new frame and notify processing thread
     {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
-        qDebug() << "wait done => load";
         load_video();
-        qDebug() << "load done => read frame";
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
             playback_stopped();

@@ -76,6 +76,8 @@ public:
     explicit VideoWidget(QWidget *parent = nullptr);
     ~VideoWidget();
 
+    QVBoxLayout* vertical_layout;
+
     // Lock and wait condition to sleep player when video is paused
     video_player* m_video_player;
     FrameWidget* frame_wgt;
@@ -88,10 +90,9 @@ public:
 
     int get_current_video_length();
     void set_overlay(Overlay* overlay);
-    void set_undo();
-    void set_redo();
-    void set_clear_drawings();
-    void set_delete_drawing();
+    void set_update_text(QString, Shapes*);
+    void set_clear_drawings(int frame);
+    void set_delete_drawing(Shapes* shape);
 
     int get_brightness();
     double get_contrast();
@@ -138,7 +139,7 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
 
-    void load_marked_video(VideoProject* vid_proj);
+    void load_marked_video(VideoProject* vid_proj, int load_frame = -1);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
@@ -164,11 +165,12 @@ public slots:
     void mouse_released(QPoint pos, bool right_click);
     void mouse_moved(QPoint pos);
     void mouse_scroll(QPoint pos);
+    void set_current_drawing(Shapes* shape);
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
-    void on_zoom_out();
+    void on_step_zoom(double step);
     void on_fit_screen(void);
     void on_original_size(void);
     void update_brightness_contrast(int c_val, double v_val);
@@ -179,7 +181,6 @@ public slots:
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
-    QVBoxLayout* vertical_layout;
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
     QLabel* current_time;
@@ -196,13 +197,10 @@ private:
     QPushButton* prev_frame_btn;
     QPushButton* next_poi_btn;
     DoubleClickButton* prev_poi_btn;
-    QPushButton* analysis_btn;
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;
     QPushButton* tag_btn;
     QPushButton* new_tag_btn;
-    QPushButton* zoom_in_btn;
-    QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
     QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;

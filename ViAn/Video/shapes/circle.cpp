@@ -1,6 +1,7 @@
 #include "circle.h"
+#include <QDebug>
 
-Circle::Circle() : Shape(SHAPES::CIRCLE) {
+Circle::Circle() : Shapes(SHAPES::CIRCLE) {
 }
 
 /**
@@ -8,8 +9,10 @@ Circle::Circle() : Shape(SHAPES::CIRCLE) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Circle::Circle(QColor col, QPoint pos) : Shape(SHAPES::CIRCLE, col, pos) {
+Circle::Circle(QColor col, QPoint pos) : Shapes(SHAPES::CIRCLE, col, pos) {
 }
+
+Circle::~Circle() {}
 
 /**
  * @brief Circle::draw
@@ -36,6 +39,14 @@ void Circle::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+QString Circle::get_name() {
+    return m_name;
+}
+
+void Circle::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Circle::write
  * @param json
@@ -43,6 +54,7 @@ void Circle::handle_new_pos(QPoint pos) {
  */
 void Circle::write(QJsonObject& json) {
     write_shape(json);
+    json["name"] = m_name;
 }
 
 /**
@@ -52,4 +64,5 @@ void Circle::write(QJsonObject& json) {
  */
 void Circle::read(const QJsonObject& json) {
     read_shape(json);
+    m_name = json["name"].toString();
 }
