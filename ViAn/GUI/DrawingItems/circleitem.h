@@ -9,7 +9,6 @@ class CircleItem : public ShapeItem {
 public:
     CircleItem(Circle *circle);
     Circle* get_shape();
-    void update_shape_name();
     void remove();
     ~CircleItem() override;
 };

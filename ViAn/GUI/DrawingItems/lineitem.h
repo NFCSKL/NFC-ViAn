@@ -9,7 +9,6 @@ class LineItem : public ShapeItem {
 public:
     LineItem(Line* line);
     Line* get_shape();
-    void update_shape_name();
     void remove();
     ~LineItem() override;
 };
