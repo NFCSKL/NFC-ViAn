@@ -1,5 +1,6 @@
 #include "overlay.h"
 #include <QDebug>
+#include "utility.h"
 
 /**
  * @brief Overlay::Overlay
@@ -134,20 +135,16 @@ void Overlay::add_drawing(Shapes* shape, int frame_nr) {
 
 // Unused
 void Overlay::get_drawing(QPoint pos, int frame_nr) {
-    if (current_drawing != nullptr) current_drawing->invert_color();
     current_drawing = nullptr;
     for (auto shape : overlays[frame_nr]) {
         if (point_in_drawing(pos, shape)) {
             current_drawing = shape;
         }
     }
-    if (current_drawing != nullptr) {
-        current_drawing->invert_color();
-    }
+    emit select_current(current_drawing, frame_nr);
 }
 
 void Overlay::set_current_drawing(Shapes *shape) {
-    //if (shape && shape->get_shape() == PEN) return;
     current_drawing = shape;
 }
 
@@ -174,10 +171,14 @@ void Overlay::update_text(QString text, Shapes* shape) {
  * @param shape
  * @return true if the point pos is in the hidden rect of drawing shape
  */
-
-// Unused
 bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
-    cv::Rect drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
+    cv::Rect drawing;
+    if (shape->get_shape() == PEN) {
+        Pen* current = dynamic_cast<Pen*>(shape);
+        drawing = cv::boundingRect(current->get_points());
+    } else {
+        drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
+    }
     return drawing.contains(qpoint_to_point(pos));
 }
 
@@ -226,6 +227,9 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                     if (current_drawing) current_drawing->set_anchor(pos);
                     break;
                 }
+                break;
+            case SELECT:
+                get_drawing(pos, frame_nr);
                 break;
             default:
                 break;

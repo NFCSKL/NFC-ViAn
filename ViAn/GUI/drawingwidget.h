@@ -34,6 +34,7 @@ public slots:
     void set_video_project(VideoProject* vid_proj);
     void add_drawing(Shapes* shape, int frame_nr);
     void save_item_data(QTreeWidgetItem* item = nullptr);
+    void set_current_selected(Shapes* shape, int frame_nr);
     void tree_item_clicked(QTreeWidgetItem* item, const int& col = 0);
     void context_menu(const QPoint& point);
     void rename_item();

@@ -86,6 +86,7 @@ private:
 
 signals:
     void new_drawing(Shapes* shape, int frame_nr);
+    void select_current(Shapes*, int);
 };
 
 #endif // OVERLAY_H
