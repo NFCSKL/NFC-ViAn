@@ -126,7 +126,7 @@ void Zoomer::flip() {
  */
 void Zoomer::update_scale() {
     if (m_zoom_rect.size() == cv::Size(0,0)) return;
-    m_scale_factor = std::min(m_viewport_size.width() / double(m_zoom_rect.width),
+    m_scale_factor = std::max(m_viewport_size.width() / double(m_zoom_rect.width),
                               m_viewport_size.height() / double(m_zoom_rect.height));
 }
 

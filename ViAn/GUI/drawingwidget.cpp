@@ -20,17 +20,18 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     headerItem()->setText(1, "Color");
 
 
-    // Widget only shortcut for deleteing item TODO delete
+    // Widget only shortcut for deleteing item
+    // TODO clean
     QShortcut* delete_sc = new QShortcut(this);
     //delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     delete_sc->setKey(QKeySequence(QKeySequence::Delete));
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::delete_item);
 
-    QShortcut* select_sc = new QShortcut(this);
-    select_sc->setContext(Qt::WidgetWithChildrenShortcut);
-    select_sc->setKey(QKeySequence(Qt::Key_Return)); // Enter
-    connect(select_sc, &QShortcut::activated, this, [this]{ tree_item_clicked(currentItem()); });
-
+    //QShortcut* select_sc = new QShortcut(this);
+    //select_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    //select_sc->setKey(QKeySequence(Qt::Key_Return)); // Enter
+    //connect(select_sc, &QShortcut::activated, this, [this]{ tree_item_clicked(currentItem()); });
+    connect(this, &DrawingWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(item_changed(QTreeWidgetItem*)));
 }
 
