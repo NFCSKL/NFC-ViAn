@@ -13,7 +13,7 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
 
     // Widget only shortcut for creating a new folder
     QShortcut* delete_sc = new QShortcut(this);
-    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    //delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     delete_sc->setKey(QKeySequence(QKeySequence::Delete));
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::remove_item);
 
@@ -141,31 +141,34 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
         frame_item->addChild(rect_item);
         frame_item->setExpanded(true);
+        setCurrentItem(rect_item);
         break;
     }
     case CIRCLE: {
         CircleItem* circle_item = new CircleItem(dynamic_cast<Circle*>(shape));
         frame_item->addChild(circle_item);
         frame_item->setExpanded(true);
+        setCurrentItem(circle_item);
         break;
     }
     case LINE: {
         LineItem* line_item = new LineItem(dynamic_cast<Line*>(shape));
         frame_item->addChild(line_item);
         frame_item->setExpanded(true);
+        setCurrentItem(line_item);
         break;
     }
     case ARROW: {
         ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
         frame_item->addChild(arrow_item);
         frame_item->setExpanded(true);
+        setCurrentItem(arrow_item);
         break;
     }
     case TEXT: {
         TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
         frame_item->addChild(text_item);
         frame_item->setExpanded(true);
-        emit set_current_drawing(shape);
         setCurrentItem(text_item);
         break;
     }
@@ -173,6 +176,7 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         PenItem* pen_item = new PenItem(dynamic_cast<Pen*>(shape));
         frame_item->addChild(pen_item);
         frame_item->setExpanded(true);
+        setCurrentItem(pen_item);
         break;
     }
     default:
@@ -274,7 +278,7 @@ void DrawingWidget::context_menu(const QPoint &point) {
     if (item == nullptr) return;
     switch (item->type()) {
     case FRAME_ITEM:
-        menu.addAction("Remove", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, SLOT(remove_item()));
         break;
     case RECT_ITEM:
     case CIRCLE_ITEM:
@@ -283,7 +287,7 @@ void DrawingWidget::context_menu(const QPoint &point) {
     case PEN_ITEM:
     case TEXT_ITEM:
         menu.addAction("Rename", this, SLOT(rename_item()));
-        menu.addAction("Remove", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, SLOT(remove_item()));
         break;
     default:
         break;
@@ -320,6 +324,7 @@ void DrawingWidget::item_changed(QTreeWidgetItem* item) {
  * Slot function for removing the current item from the tree
  */
 void DrawingWidget::remove_item() {
+    if (!currentItem()) return;
     remove_from_tree(currentItem());
 }
 

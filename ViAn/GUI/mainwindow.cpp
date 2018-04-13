@@ -539,7 +539,7 @@ void MainWindow::delete_drawing(Shapes *shape) {
 }
 
 void MainWindow::delete_current_drawing() {
-    video_wgt->set_delete_drawing(nullptr);
+    drawing_wgt->remove_item();
 }
 
 void MainWindow::zoom() {
