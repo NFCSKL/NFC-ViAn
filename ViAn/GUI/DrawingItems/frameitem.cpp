@@ -10,8 +10,6 @@ FrameItem::~FrameItem() {}
 
 void FrameItem::remove(){}
 
-void FrameItem::update_shape_name(){}
-
 Shapes* FrameItem::get_shape() {
     return nullptr;
 }

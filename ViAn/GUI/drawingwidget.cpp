@@ -4,12 +4,17 @@
 #include <QDebug>
 #include <QDropEvent>
 #include <QShortcut>
+#include <QColorDialog>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
+
+    setColumnCount(2);
+    header()->resizeSection(0, 200);
+    header()->resizeSection(1, 30);
 
     // Widget only shortcut for creating a new folder
     QShortcut* delete_sc = new QShortcut(this);
@@ -254,7 +259,6 @@ void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
  * @param col
  */
 void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
-    Q_UNUSED(col)
     switch (item->type()) {
     case FRAME_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
@@ -270,6 +274,13 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     case PEN_ITEM: {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(item);
         Shapes* shape = shape_item->get_shape();
+        if (col == 1) {
+            QColor color = QColorDialog::getColor();
+            if (color.isValid()) {
+                shape->set_color(color);
+                shape_item->update_shape_color();
+            }
+        }
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();

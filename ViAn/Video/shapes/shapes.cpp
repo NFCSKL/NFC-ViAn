@@ -9,6 +9,7 @@
 Shapes::Shapes(SHAPES s) {
     shape = s;
     color = cv::Scalar();
+    q_color = QColor();
     draw_start = cv::Point();
     draw_end = cv::Point();
 }
@@ -21,6 +22,7 @@ Shapes::Shapes(SHAPES s) {
 Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     shape = s;
     color = qcolor_to_scalar(col);
+    q_color = col;
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
 }
@@ -135,6 +137,15 @@ SHAPES Shapes::get_shape() {
     return shape;
 }
 
+QColor Shapes::get_color() {
+    return q_color;
+}
+
+void Shapes::set_color(QColor col) {
+    q_color = col;
+    color = qcolor_to_scalar(col);
+}
+
 cv::Size Shapes::get_text_size() {
     return text_size;
 }
@@ -183,6 +194,7 @@ void Shapes::read_shape(const QJsonObject& json){
     this->color[0] = json["b"].toInt();
     this->color[1] = json["g"].toInt();
     this->color[2] = json["r"].toInt();
+    q_color = QColor(color[2], color[1], color[0]);
     this->draw_start.x = json["p1x"].toInt();
     this->draw_start.y = json["p1y"].toInt();
     this->draw_end.x = json["p2x"].toInt();

@@ -10,7 +10,6 @@ public:
 
     int get_frame();
     void remove();
-    void update_shape_name();
     Shapes* get_shape();
     ~FrameItem() override;
 };
