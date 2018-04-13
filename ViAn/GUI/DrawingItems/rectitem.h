@@ -9,11 +9,8 @@ class RectItem : public ShapeItem {
 public:
     RectItem(Rectangle* rect);
     Rectangle* get_shape();
-    void update_shape_name();
-    void update_shape_color();
     void remove();
     ~RectItem() override;
-    QPixmap map;
 };
 
 #endif // RECTITEM_H

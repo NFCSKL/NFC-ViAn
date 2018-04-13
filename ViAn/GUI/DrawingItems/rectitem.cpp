@@ -16,15 +16,6 @@ RectItem::~RectItem() {}
 
 void RectItem::remove() {}
 
-void RectItem::update_shape_name() {
-    m_rect->set_name(text(0));
-}
-
-void RectItem::update_shape_color() {
-    map.fill(m_rect->get_color());
-    setIcon(1, map);
-}
-
 Rectangle* RectItem::get_shape() {
     return m_rect;
 }
