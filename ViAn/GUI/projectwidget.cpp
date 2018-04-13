@@ -657,7 +657,7 @@ void ProjectWidget::drawing_tag() {
 
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
-        if (frame_overlay.second.overlay.size() > 0) {
+        if (frame_overlay.second.size() > 0) {
             tag->add_frame(frame_overlay.first);
         }
     }

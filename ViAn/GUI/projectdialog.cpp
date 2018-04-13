@@ -1,14 +1,10 @@
 #include "projectdialog.h"
-#include "windows.h"
-#include "shlobj.h"
 #include <QSize>
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QFormLayout>
 #include <QFileDialog>
 #include <QMessageBox>
-
-#include "iostream"
 
 #include <QDebug>
 
@@ -41,17 +37,13 @@ ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
 
+    path_text->setText("C:/");
+
     QHBoxLayout* browse_layout = new QHBoxLayout;
     browse_layout->addWidget(path_text);
     browse_layout->addWidget(browse_btn);
 
     QFormLayout* text_btn_layout = new QFormLayout;
-    text_btn_layout->addRow("Name:", name_text);
-    text_btn_layout->addRow("Path:", browse_layout);
-
-    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, my_documents))) {
-        path_text->setText(QString::fromWCharArray(my_documents));
-    }
 
     vertical_layout->addLayout(text_btn_layout);
     vertical_layout->addWidget(btn_box);
@@ -72,12 +64,7 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
-    QString path = path_text->text();
-    if (path.isEmpty()) {
-        path += QString::fromWCharArray(my_documents);
-    }
-
-    QString m_path = path + "/" + name_text->text() + "/" + name_text->text() + ".vian";
+    QString m_path = path_text->text() + "/" + name_text->text() + "/" + name_text->text() + ".vian";
 
     QFile pathFile(m_path);
     if (pathFile.exists()) {
@@ -97,7 +84,7 @@ void ProjectDialog::ok_btn_clicked() {
         }
         if (reply != QMessageBox::Yes) return;
     }
-    emit project_path(name_text->text(), path);
+    emit project_path(name_text->text(), path_text->text());
     close();
 }
 
