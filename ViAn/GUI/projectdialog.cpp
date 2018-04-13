@@ -44,6 +44,8 @@ ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
     browse_layout->addWidget(browse_btn);
 
     QFormLayout* text_btn_layout = new QFormLayout;
+    text_btn_layout->addRow("Name:", name_text);
+    text_btn_layout->addRow("Path:", browse_layout);
 
     vertical_layout->addLayout(text_btn_layout);
     vertical_layout->addWidget(btn_box);
