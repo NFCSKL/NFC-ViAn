@@ -96,8 +96,13 @@ void Project::set_unsaved(const bool& changed) {
 void Project::set_name_and_path(const std::string& name, const std::string& path) {
     // TODO: Handle case where tmp directory is empty
     m_name = name;
-    if (!path.empty())
+    if (!path.empty()){
+        qDebug() << "Setting name and path";
         m_dir = path + "/" + name + "/";
+        for (auto it = begin(m_videos); it != end(m_videos); ++it) {
+            (*it)->reset_root_dir(m_dir);
+        }
+    }
     else
         m_dir = generate_tmp_directory() + "/";
     m_file = m_dir + m_name + ".vian";
@@ -318,18 +323,3 @@ void Project::set_dir(std::string dir) {
 void Project::set_file(std::string file) {
     m_file = file;
 }
-
-/**
- * @brief Project::update_tmp
- * Update the temporary files with the new name and path
- * @param name
- */
-//void Project::update_tmp(string name) {
-//    QFile::rename(QString::fromStdString(m_tmp_file), QString::fromStdString(m_tmp_dir + name + ".vian"));
-//    QDir dir = QDir(QString::fromStdString(m_tmp_dir));
-//    dir.rename(dir.path(), tmp_dir.path() + "/" + QString::fromStdString(name));
-
-//    m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
-//    m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
-//    m_tmp_file = m_tmp_dir + name + ".vian";
-//}

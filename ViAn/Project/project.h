@@ -31,7 +31,6 @@ class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
     std::string m_name = "";            // Simply the project name
-    std::string m_dir = "";             // Path to the project folder: choosen path + project name
     std::string m_dir_bookmarks = "";   // Project directory + /Bookmarks
     std::string m_file = "";            // Full path to the project file: project path + project name + .vian
 
@@ -45,6 +44,8 @@ public:
     static Project* fromFile(const std::string& file_name);
     Project(const std::string& name, const std::string& dir_path="");
     ~Project();
+
+    std::string m_dir = "";             // Path to the project folder: choosen path + project name
 
     ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
@@ -78,8 +79,6 @@ public:
     void set_name(std::string);
     void set_dir(std::string);
     void set_file(std::string);
-//    void update_tmp(std::string name);
-
 private:
     Project();
 };

@@ -66,13 +66,11 @@ signals:
 public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
-//    void add_default_project();
     void add_video();
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     bool save_project();
-//    void save_as_project(QString, QString);
     bool open_project(QString project_path="");
     bool close_project();
     void remove_project();

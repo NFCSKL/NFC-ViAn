@@ -112,7 +112,7 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_dir());
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir);
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->set_interval(settings->get_interval());
 
@@ -804,23 +804,6 @@ bool ProjectWidget::save_project() {
     set_status_bar("Project saved");
     return true;
 }
-
-/**
- * @brief ProjectWidget::save_as_project
- * Updates the project with a new name and path
- * @param project_name: new project name
- * @param project_path: new project path
- */
-//void ProjectWidget::save_as_project(QString project_name, QString project_path) {
-//    std::string name = project_name.toStdString();
-//    std::string path = project_path.toStdString();
-//    m_proj->set_name(name);
-//    m_proj->set_dir(path + "/" + name + "/");
-//    m_proj->set_file(m_proj->get_dir() + name + ".vian");
-//    m_proj->update_tmp(name);
-//    set_main_window_name(project_name);
-//    save_project();
-//}
 
 /**
  * @brief ProjectWidget::open_project
