@@ -45,7 +45,7 @@ ProjectWidget::~ProjectWidget() {
 
 /**
  * @brief ProjectWidget::new_project
- * Creates a create project dialog
+ * Creates a new empty project if current project is closed/user closes it
  */
 void ProjectWidget::new_project() {
 //    ProjectDialog* proj_dialog = new ProjectDialog();
@@ -63,11 +63,11 @@ void ProjectWidget::new_project() {
  * @param project_path
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
+    if (!close_project()) return;
+
     std::string name = project_name.toStdString();
     std::string path = project_path.toStdString();
     Project* new_proj = new Project(name, path);
-
-    close_project();
     set_main_window_name(project_name);
     m_proj = new_proj;
     path.append(name);
@@ -452,6 +452,17 @@ bool ProjectWidget::prompt_save() {
                 break;
     }
     return ok;
+}
+
+bool ProjectWidget::prompt_close() {
+    QMessageBox delete_box(this);
+    delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setText("Are you sure you wish to close the project?");
+    delete_box.setInformativeText("");
+    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    delete_box.setDefaultButton(QMessageBox::No);
+
+    return delete_box.exec() == QMessageBox::Yes;
 }
 
 
@@ -861,7 +872,12 @@ bool ProjectWidget::close_project() {
         }
     }
 
-    set_main_window_name(QString::fromStdString(""));
+    // Remove project if temporary
+    if (m_proj->is_temporary()) {
+        m_proj->remove_files();
+    }
+
+//    set_main_window_name(QString::fromStdString(""));
 
     emit set_status_bar("Closing project");
     emit project_closed();
@@ -882,7 +898,7 @@ void ProjectWidget::remove_project() {
     if (m_proj == nullptr) return;
     QString text = "Are you sure you want to remove the project?";
     QString info_text = "This will delete all project files (images, reports, etc).";
-    if (message_box(text, info_text)) return;
+    if (!message_box(text, info_text)) return;
   
     set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
@@ -893,11 +909,11 @@ void ProjectWidget::remove_project() {
     m_proj = nullptr;
     emit project_closed();
     emit remove_overlay();
-
+    new_project();
 }
 
 void ProjectWidget::set_main_window_name(QString name) {
-    parentWidget()->parentWidget()->setWindowTitle(name);
+    parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
 }
 
 /**

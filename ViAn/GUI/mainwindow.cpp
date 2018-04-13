@@ -175,7 +175,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
     // Recent projects menu
-    RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
+    rp_dialog = new RecentProjectDialog(this);
+
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
@@ -210,6 +211,7 @@ void MainWindow::init_file_menu() {
     QAction* close_project_act = new QAction(tr("&Close project"), this);
     QAction* remove_project_act = new QAction(tr("&Remove project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
+
 
     // Set icons
     //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));     //add if wanted
@@ -259,7 +261,7 @@ void MainWindow::init_file_menu() {
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
+    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(remove_project_act, &QAction::triggered, project_wgt, &ProjectWidget::remove_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
