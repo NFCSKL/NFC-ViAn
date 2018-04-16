@@ -264,8 +264,6 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     // Pos when the frame is at 100%
     QPoint scaled_pos = scale_point(event->pos());
-    qDebug() << "normal current - scaled to 100%" <<  event->pos() << scaled_pos;
-    qDebug() << "anchor - scale factor" << anchor << m_scale_factor;
     switch (m_tool) {
     case NONE:
         break;
@@ -289,14 +287,14 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         } else if (event->button() == Qt::LeftButton) {
             if (zoom_rect.contains(scaled_pos)) {
                 end_zoom();
-                //mark_rect = false;
+                mark_rect = false;
                 unsetCursor();
             } else {
                 rect_start = scaled_pos;
                 mark_rect = true;
             }
 
-            //rect_end = rect_start;
+            rect_end = rect_start;
             repaint();
         }
         break;
@@ -520,7 +518,6 @@ void FrameWidget::end_panning() {
  * Emits the points of the zooming rect
  */
 void FrameWidget::end_zoom() {
-    //mark_rect = false;
     repaint();
 
     // ROI rect points
@@ -532,7 +529,4 @@ void FrameWidget::end_zoom() {
     QPoint end = QPoint(rect_end.x(), rect_start.y() + height_mod);
 
     emit zoom_points(rect_start, end);
-    qDebug() << "anchor" << anchor;
-    qDebug() << "rect_start" << rect_start;
-    //emit zoom_points((rect_start-anchor)*m_scale_factor, (end-anchor)*m_scale_factor);
 }

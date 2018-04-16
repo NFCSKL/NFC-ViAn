@@ -378,7 +378,6 @@ void DrawingWidget::delete_item() {
     } else if (item->get_shape() != m_overlay->get_current_drawing()) {
         return;
     } else {
-        qDebug() << "in else";
         remove_from_tree(item);
         emit set_tool_zoom();
     }

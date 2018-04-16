@@ -174,10 +174,7 @@ void FrameProcessor::update_zoomer_settings() {
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
-    qDebug() << "anchor" << m_zoomer.get_anchor() << m_z_settings->zoom_tl;
     emit set_anchor(m_zoomer.get_anchor());
-    emit set_anchor(m_z_settings->zoom_tl);
-    qDebug() << "scale factors" << m_zoomer.get_scale_factor();
     emit set_scale_factor(m_zoomer.get_scale_factor());
 }
 
