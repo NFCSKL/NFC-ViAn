@@ -148,6 +148,7 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
  * @param frame_nr
  */
 void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
+    QObject::blockSignals(true);
     FrameItem* frame_item;
     QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
 
@@ -203,6 +204,7 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
     default:
         break;
     }
+    QObject::blockSignals(false);
 }
 
 /**
@@ -259,7 +261,9 @@ void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
     for (int i = 0; i != frame_item->childCount(); ++i) {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(frame_item->child(i));
         if (shape_item->get_shape() == shape) {
+            QObject::blockSignals(true);
             setCurrentItem(shape_item);
+            QObject::blockSignals(false);
             return;
         }
     }
