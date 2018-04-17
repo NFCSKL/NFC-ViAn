@@ -135,8 +135,7 @@ void VideoProject::read(const QJsonObject& json){
             analysis = new AnalysisProxy();
             break;
         default:
-            analysis = new BasicAnalysis();
-            qWarning("Undefined analysis, read as default basic analysis");
+            qWarning("Undefined analysis");
             break;
         }
         analysis->read(json_analysis);

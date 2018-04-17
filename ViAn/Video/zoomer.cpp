@@ -28,8 +28,6 @@ void Zoomer::set_scale_factor(double scale_factor) {
  * @param p2 end point
  */
 void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
-    cv::Rect _tmp = cv::Rect(cv::Point(anchor.x() + p1.x() / m_scale_factor, anchor.y() + p1.y() / m_scale_factor),
-                  cv::Point(anchor.x() + p2.x() / m_scale_factor, anchor.y() + p2.y() / m_scale_factor));
     cv::Rect _tmp2 = cv::Rect(cv::Point(p1.x(), p1.y()), cv::Point(p2.x(), p2.y()));
     if (_tmp2.width > 1 && _tmp2.height > 1) {
         m_zoom_rect = _tmp2;

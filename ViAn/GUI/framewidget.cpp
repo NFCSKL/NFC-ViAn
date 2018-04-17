@@ -185,14 +185,12 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             end = QPoint(end.x(), start.y() + height_mod);
 
             painter.setPen(QColor(255,0,0));
-            //QRectF correct_dim_rect(start, end);
             QRectF correct_dim_rect((start-anchor)*m_scale_factor, (end-anchor)*m_scale_factor);
             painter.drawRect(correct_dim_rect);
         }
         // Draw the zoom box
         painter.setPen(QColor(0,255,0));
         QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
-        //QRectF zoom(rect_start, rect_end);
         painter.drawRect(zoom);
     }
 
@@ -324,9 +322,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case ZOOM:
         if (event->button() == Qt::RightButton) {
             end_panning();
-        } else if (event->button() == Qt::LeftButton){
-
-        }
+        } else if (event->button() == Qt::LeftButton){}
         break;
     case MOVE:
         end_panning();
@@ -488,7 +484,6 @@ void FrameWidget::panning(QPoint pos) {
  * @brief FrameWidget::zoom
  * Updates and redraws the zooming rect
  * @param pos
- * TODO not use?
  */
 QPoint FrameWidget::rect_update(QPoint pos) {
     // Force image boundries
@@ -497,8 +492,7 @@ QPoint FrameWidget::rect_update(QPoint pos) {
     int tmpy = std::min(pos.y(), _qimage.height()-1);
     int ey = std::max(0,tmpy);
     repaint();
-    return pos;
-    //return QPoint(ex, ey);
+    return QPoint(ex, ey);
 }
 
 /**

@@ -27,7 +27,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
-    // Widget only shortcut for creating a new folder TODO delete
+    // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
     new_folder_sc->setContext(Qt::WidgetWithChildrenShortcut);
     new_folder_sc->setKey(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
