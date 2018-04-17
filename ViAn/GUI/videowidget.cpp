@@ -20,7 +20,8 @@
 
 
 
-VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
+VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scroll_area(new DrawScrollArea) {
+    m_floating = floating;
     // Init video controller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
                                        &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
@@ -194,7 +195,12 @@ void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
                                      &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
-    processing_thread = new QThread();
+    try {
+        processing_thread = new QThread();
+    } catch (const bad_alloc& e) {
+        std::cout << "a Thread No-No" << std::endl;
+    }
+
     f_processor->moveToThread(processing_thread);
     connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
     connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
@@ -214,6 +220,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+    connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
 
     processing_thread->start();
 }
@@ -928,6 +935,7 @@ void VideoWidget::clear_current_video() {
 }
 
 void VideoWidget::set_video_btns(bool b) {
+    qDebug() << "setting buttons";
     for (QPushButton* btn : btns) {
         btn->setEnabled(b);
     }
@@ -935,6 +943,11 @@ void VideoWidget::set_video_btns(bool b) {
     frame_line_edit->setEnabled(b);
     speed_slider->setEnabled(b);
     video_btns_enabled = b;
+    if (m_floating) {
+        bookmark_btn->setDisabled(true);
+        new_tag_btn->setDisabled(true);
+        tag_btn->setDisabled(true);
+    }
 }
 
 
@@ -1201,8 +1214,7 @@ void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
 }
 
-void VideoWidget::on_export_frame()
-{
+void VideoWidget::on_export_frame() {
     int frame = frame_index.load();
     emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
     emit set_status_bar(QString("Frame %1 exported").arg(frame));

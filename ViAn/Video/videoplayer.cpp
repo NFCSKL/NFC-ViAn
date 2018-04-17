@@ -41,7 +41,7 @@ VideoPlayer::~VideoPlayer() {
  * @param video_path    :   Path to the video
  */
 
-void VideoPlayer::load_video(){
+void VideoPlayer::load_video() {
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);

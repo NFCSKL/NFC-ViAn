@@ -350,7 +350,7 @@ void MainWindow::init_analysis_menu() {
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    VideoWidget* widget_video = new VideoWidget();
+    VideoWidget* widget_video = new VideoWidget(nullptr, true);
     widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
     widget_video->show();
 
@@ -358,9 +358,10 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
     // ---------------------------------------
     widget_video->setAttribute(Qt::WA_DeleteOnClose);
     widget_video->load_marked_video(vid_proj);
-    connect(widget_video, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
-    connect(widget_video, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
-    connect(widget_video, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
+
+    //connect(widget_video, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
+    //connect(widget_video, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
+    //connect(widget_video, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
 }
 
 void MainWindow::init_interval_menu() {

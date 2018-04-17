@@ -95,7 +95,16 @@ void FrameProcessor::check_events() {
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
             m_new_frame->store(false);
-            m_frame = m_v_sync->frame.clone();
+            try {
+                m_frame = m_v_sync->frame.clone();
+            } catch (cv::Exception& e) {
+                std::cout << "a FIRST No-No" << std::endl;
+                emit set_play_btn(false);
+                lk.unlock();
+                m_v_sync->con_var.notify_all();
+                continue;
+            }
+
             process_frame();
 
             lk.unlock();
@@ -115,7 +124,16 @@ void FrameProcessor::check_events() {
 void FrameProcessor::process_frame() {
 
     if (m_frame.empty()) return;
-    cv::Mat manipulated_frame = m_frame.clone();
+    cv::Mat manipulated_frame;
+    // TODO not needed?
+    try {
+        manipulated_frame = m_frame.clone();
+    } catch (std::bad_alloc& e) {
+        std::cout << "a BIG No-No" << std::endl;
+    } catch (cv::Exception& e) {
+        std::cout << "a BIGGER No-No" << std::endl;
+        return;
+    }
 
     // Rotates the frame, according to the choosen direction.
     if (ROTATE_MIN <= m_rotate_direction && m_rotate_direction <= ROTATE_MAX) {

@@ -144,8 +144,7 @@ cv::Mat FrameWidget::get_modified_frame() const {
     return _tmp_frame.clone();
 }
 
-cv::Mat FrameWidget::get_org_frame() const
-{
+cv::Mat FrameWidget::get_org_frame() const {
     cv::Mat tmp = m_org_image.clone();
     switch (tmp.type()) {
         case CV_8UC1:

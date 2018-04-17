@@ -74,7 +74,7 @@ private:
     FrameProcessor* f_processor;
     QThread* processing_thread;
 public:
-    explicit VideoWidget(QWidget *parent = nullptr);
+    explicit VideoWidget(QWidget *parent = nullptr, bool floating = false);
     ~VideoWidget();
 
     // Lock and wait condition to sleep player when video is paused
@@ -222,6 +222,7 @@ private:
     QString convert_time(int time);
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
+    bool m_floating = false;
 
     bool tag_clicked = false;
 
