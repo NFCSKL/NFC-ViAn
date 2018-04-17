@@ -126,13 +126,16 @@ void VideoProject::read(const QJsonObject& json){
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();        
         BasicAnalysis* analysis;
-        SAVE_TYPE save_type = (SAVE_TYPE)json_analysis["save_type"].toInt();
+        ANALYSIS_TYPE save_type = (ANALYSIS_TYPE)json_analysis["analysis_type"].toInt();
         switch(save_type){
-        case INTERVAL:
+        case TAG:
             analysis = new Tag();
             break;
-        case DETECTION:
+        case MOTION_DETECTION:
             analysis = new AnalysisProxy();
+            break;
+        case DRAWING_TAG:
+            analysis = new DrawingTag();
             break;
         default:
             qWarning("Undefined analysis");
@@ -166,7 +169,7 @@ void VideoProject::write(QJsonObject& json){
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
         BasicAnalysis* an = it2->second;
-        json_analysis["save_type"] = an->get_save_type(); // Check for type in read
+        json_analysis["analysis_type"] = an->get_type(); // Check for type in read
         an->write(json_analysis);
         json_analyses.append(json_analysis);
     }
@@ -203,12 +206,12 @@ void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
-void VideoProject::reset_root_dir(const string &dir){
+void VideoProject::reset_root_dir(const string &dir) {
     for(auto bm : m_bookmarks){
         bm.second->reset_root_dir(dir+"Bookmarks/");
     }
-    for(auto an : m_analyses){
-        if(an.second->get_save_type() == DETECTION){ ;
+    for(auto& an : m_analyses){
+        if(an.second->get_type() == MOTION_DETECTION){ ;
             dynamic_cast<AnalysisProxy*>(an.second)->reset_root_dir(dir);
         }
     }

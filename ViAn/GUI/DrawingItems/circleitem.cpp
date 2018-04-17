@@ -16,15 +16,6 @@ CircleItem::~CircleItem() {}
 
 void CircleItem::remove() {}
 
-void CircleItem::update_shape_name() {
-    m_circle->set_name(text(0));
-}
-
-void CircleItem::update_shape_color() {
-    map.fill(m_circle->get_color());
-    setIcon(1, map);
-}
-
 Circle* CircleItem::get_shape() {
     return m_circle;
 }

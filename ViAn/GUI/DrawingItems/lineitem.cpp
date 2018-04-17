@@ -15,15 +15,6 @@ LineItem::~LineItem() {}
 
 void LineItem::remove() {}
 
-void LineItem::update_shape_name() {
-    m_line->set_name(text(0));
-}
-
-void LineItem::update_shape_color() {
-    map.fill(m_line->get_color());
-    setIcon(1, map);
-}
-
 Line* LineItem::get_shape() {
     return m_line;
 }

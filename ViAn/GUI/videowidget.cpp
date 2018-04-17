@@ -588,9 +588,8 @@ void VideoWidget::play_btn_toggled(bool status) {
  */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr) {
-        Tag* tag = dynamic_cast<Tag*>(m_tag);
-        tag->add_frame(playback_slider->value());
-        playback_slider->set_basic_analysis(tag);
+        m_tag->add_frame(playback_slider->value());
+        playback_slider->set_basic_analysis(m_tag);
         emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
         return;
     }

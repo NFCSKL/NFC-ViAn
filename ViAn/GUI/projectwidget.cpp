@@ -1,6 +1,5 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
-#include "GUI/TreeItems/analysisitem.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -132,7 +131,7 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir());
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir(), m_proj->get_dir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->set_interval(settings->get_interval());
 
@@ -153,16 +152,26 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
  * Adds a tag 'tag' under vid_proj
  */
 void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* tag) {
-    TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(tag));
     vid_proj->add_analysis(tag);
-
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
         set_status_bar("Something went wrong when adding tag: " + QString::fromStdString(tag->get_name()));
         return;
     }
 
-    vid_item->addChild(tag_item);
+    if (tag->get_type() == DRAWING_TAG) {
+        DrawingTagItem* item = new DrawingTagItem(dynamic_cast<DrawingTag*>(tag));
+        vid_item->addChild(item);
+        clearSelection();
+        item->setSelected(true);
+        tree_item_clicked(item);
+    } else if (tag->get_type() == TAG) {
+        TagItem* item = new TagItem(dynamic_cast<Tag*>(tag));
+        vid_item->addChild(item);
+        clearSelection();
+        item->setSelected(true);
+        tree_item_clicked(item);
+    }
     vid_item->setExpanded(true);
 }
 
@@ -338,7 +347,7 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM) {
+        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM || child->type() == DRAWING_TAG_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
             r_item->rename();
         }
@@ -356,9 +365,14 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-        } else {
+        } else if (ana.second->get_type() == DRAWING_TAG) {
+            DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<DrawingTag*>(ana.second));
+            v_item->addChild(tag_item);
+        } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else {
+            qWarning() << "Something went wrong while adding analyses to items.";
         }
     }
 }
@@ -417,7 +431,7 @@ void ProjectWidget::advanced_analysis() {
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_tmp_dir());
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_tmp_dir(), m_proj->get_dir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }
@@ -468,7 +482,9 @@ bool ProjectWidget::prompt_save() {
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    get_index_path(item);
+    Q_UNUSED(col)
+    get_index_path(item); //Remove?
+
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -478,6 +494,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         emit enable_tag_btn(false);
+        emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());
@@ -488,6 +505,15 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_detections(true);
         emit set_poi_slider(true);
         emit enable_poi_btns(true, true);
+        emit update_frame();
+        break;
+    } case DRAWING_TAG_ITEM: {
+        tree_item_clicked(item->parent());
+        DrawingTagItem* tag_item = dynamic_cast<DrawingTagItem*>(item);
+        emit marked_basic_analysis(tag_item->get_tag());
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+        emit enable_tag_btn(true);
         emit update_frame();
         break;
     } case TAG_ITEM: {
@@ -580,6 +606,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 break;
+            case DRAWING_TAG_ITEM:
+                menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Update", this, SLOT(drawing_tag()));
+                break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Show details", this, SLOT(show_details()));
@@ -591,6 +621,8 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
+                break;
             default:
                 break;
         }
@@ -599,6 +631,42 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Remove", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
+}
+
+/**
+ * @brief ProjectWidget::drawing_tag
+ * Creates the drawing tag or updates the current one depending
+ * on the current QTreeItem.
+ * The drawing tag will tag all frames which have a drawing on them.
+ */
+void ProjectWidget::drawing_tag() {
+    VideoItem* vid_item;
+    DrawingTag* tag;
+    if (selectedItems().front()->type() == VIDEO_ITEM) {
+        // tag drawing
+        vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
+        tag = new DrawingTag();
+        tag->m_name = "Drawing tag";
+    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        // Update tag drawing
+        DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
+        vid_item = dynamic_cast<VideoItem*>(item->parent());
+        tag = item->get_tag();
+        tag->clear_intervals();
+    }
+
+    VideoProject* vid_proj = vid_item->get_video_project();
+    for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
+        if (frame_overlay.second.size() > 0) {
+            tag->add_frame(frame_overlay.first);
+        }
+    }
+
+    if (selectedItems().front()->type() == VIDEO_ITEM) {
+        add_basic_analysis(vid_proj, tag);
+    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        tree_item_clicked(dynamic_cast<DrawingTagItem*>(selectedItems().front()));
+    }
 }
 
 /**
@@ -678,6 +746,14 @@ void ProjectWidget::create_folder_item() {
         s_item->setExpanded(true);
     } else if (s_item->type() == VIDEO_ITEM) {
         QTreeWidgetItem* p_item =  s_item->parent();
+        if (p_item == nullptr) {
+            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
+        } else {
+            int index = p_item->indexOfChild(s_item);
+            p_item->insertChild(index + 1, item);
+        }
+    } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
+        QTreeWidgetItem* p_item = s_item->parent()->parent();
         if (p_item == nullptr) {
             insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
         } else {
