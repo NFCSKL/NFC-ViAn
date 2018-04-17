@@ -412,7 +412,7 @@ void ProjectWidget::advanced_analysis() {
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_dir());
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_dir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
 }

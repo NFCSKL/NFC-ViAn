@@ -18,12 +18,12 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
     setModal(true);
     m_name = name;
     m_path = path;
+
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
-    path_text = new QLineEdit(default_path, this);
+    path_text = new QLineEdit(DEFAULT_PATH, this);
     name_text = new QLineEdit(this);
-    path_text = new QLineEdit(this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
     btn_box = new QDialogButtonBox(Qt::Horizontal);
 
@@ -35,7 +35,6 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
 
-    path_text->setText("C:/");
 
     QHBoxLayout* browse_layout = new QHBoxLayout;
     browse_layout->addWidget(path_text);
@@ -56,9 +55,9 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
 
 void ProjectDialog::browse_btn_clicked() {
     QDir standard;
-    standard.mkpath(default_path);
+    standard.mkpath(DEFAULT_PATH);
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"),
-                                                    default_path);
+                                                    DEFAULT_PATH);
     if(!dir.isEmpty()) {
         path_text->setText(dir);
     }

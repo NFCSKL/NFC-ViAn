@@ -16,7 +16,7 @@ class ProjectDialog : public QDialog
     QLineEdit* path_text;
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
-    const QString default_path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ViAn Projects";
+    const QString DEFAULT_PATH = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ViAn Projects";
 public:
     explicit ProjectDialog(QString* name, QString* path, QWidget *parent = nullptr);
 

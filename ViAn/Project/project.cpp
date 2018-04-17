@@ -24,7 +24,6 @@ Project* Project::fromFile(const std::string &full_path){
 Project::Project(const std::string& name, const std::string& dir_path){
     set_name_and_path(name, dir_path);
     save_project();
-    m_unsaved_changes = true;
 }
 
 
