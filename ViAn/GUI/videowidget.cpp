@@ -953,7 +953,7 @@ void VideoWidget::set_tool(SHAPES tool) {
 
 void VideoWidget::set_tool_text(QString text, float font_scale) {
     update_overlay_settings([&](){
-        o_settings.tool = TEXT;
+        o_settings.create_text = true;
         o_settings.current_string = text;
         o_settings.current_font_scale = font_scale;
     });
