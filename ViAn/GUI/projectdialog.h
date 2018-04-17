@@ -17,6 +17,8 @@ class ProjectDialog : public QDialog
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
     const QString DEFAULT_PATH = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ViAn Projects";
+
+    void enable_ok_btn(const bool& enable);
 public:
     explicit ProjectDialog(QString* name, QString* path, QWidget *parent = nullptr);
 
@@ -30,6 +32,8 @@ private slots:
     void browse_btn_clicked(void);
     void ok_btn_clicked(void);
     void cancel_btn_clicked(void);
+
+    void on_name_text_edited(const QString& new_text);
 };
 
 #endif // PROJECTDIALOG_H

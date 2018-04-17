@@ -9,6 +9,14 @@
 #include <QDebug>
 
 /**
+ * @brief ProjectDialog::disable_ok_btn
+ * Disables the ok button in the button box
+ */
+void ProjectDialog::enable_ok_btn(const bool& enable) {
+    btn_box->button(QDialogButtonBox::Ok)->setEnabled(enable);
+}
+
+/**
  * @brief ProjectDialog::ProjectDialog
  * @param parent
  * Dialog usd to create new projects.
@@ -34,6 +42,7 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
     browse_btn->setFixedHeight(path_text->height());
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
+    enable_ok_btn(false);
 
 
     QHBoxLayout* browse_layout = new QHBoxLayout;
@@ -51,6 +60,9 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
     connect(browse_btn, &QPushButton::clicked, this, &ProjectDialog::browse_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ProjectDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &ProjectDialog::cancel_btn_clicked);
+
+    connect(name_text, &QLineEdit::textEdited, this, &ProjectDialog::on_name_text_edited);
+
 }
 
 void ProjectDialog::browse_btn_clicked() {
@@ -91,5 +103,14 @@ void ProjectDialog::ok_btn_clicked() {
 
 void ProjectDialog::cancel_btn_clicked() {
     reject();
+}
+
+/**
+ * @brief ProjectDialog::on_name_text_edited
+ * Slot function used to verify the name text content
+ * @param new_text
+ */
+void ProjectDialog::on_name_text_edited(const QString &new_text) {
+    enable_ok_btn(!new_text.isEmpty());
 }
 

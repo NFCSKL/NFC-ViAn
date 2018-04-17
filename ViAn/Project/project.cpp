@@ -1,5 +1,6 @@
 #include "project.h"
 #include <QDebug>
+
 /**
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
@@ -96,13 +97,17 @@ void Project::set_name_and_path(const std::string& name, const std::string& path
     // TODO: Handle case where tmp directory is empty
     m_name = name;
     if (!path.empty()){
+        // Update path for all VideoProjects
         m_dir = path + "/" + name + "/";
         for (auto it = begin(m_videos); it != end(m_videos); ++it) {
             (*it)->reset_root_dir(m_dir);
         }
+    } else {
+        // Attempts to generate a temporary path
+        // Use default path on failure
+        std::string tmp_dir = generate_tmp_directory();
+        m_dir = !tmp_dir.empty() ? (tmp_dir + "/") : (DEFAULT_PATH + "/temporary" + std::to_string(std::rand()) + "/");
     }
-    else
-        m_dir = generate_tmp_directory() + "/";
     m_file = m_dir + m_name + ".vian";
     m_dir_bookmarks = m_dir + "Bookmarks/";
 }
@@ -267,9 +272,8 @@ bool Project::remove_files() {
 std::string Project::generate_tmp_directory() {
     QTemporaryDir tmp_dir;
     tmp_dir.setAutoRemove(false);
-    if(tmp_dir.isValid()){
+    if(tmp_dir.isValid())
         return tmp_dir.path().toStdString();
-    }
     return "";
 }
 

@@ -19,7 +19,7 @@
 #include "Filehandler/saveable.h"
 #include "Project/projecttreestate.h"
 #include "Project/Analysis/analysisproxy.h"
-
+#include "utility.h"
 
 using ID = int;
 /**
@@ -30,6 +30,9 @@ using ID = int;
 class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
+
+    const std::string DEFAULT_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString();
+
     std::string m_name = "";            // Simply the project name
     std::string m_dir_bookmarks = "";   // Project directory + /Bookmarks
     std::string m_file = "";            // Full path to the project file: project path + project name + .vian
