@@ -84,7 +84,6 @@ void ProjectDialog::ok_btn_clicked() {
         }
         if (reply != QMessageBox::Yes) return;
     }
-//    emit project_path(name_text->text(), path_text->text());
     *m_name = name_text->text();
     *m_path = path_text->text() + "/";
     accept();

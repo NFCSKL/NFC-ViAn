@@ -96,7 +96,6 @@ void Project::set_name_and_path(const std::string& name, const std::string& path
     // TODO: Handle case where tmp directory is empty
     m_name = name;
     if (!path.empty()){
-        qDebug() << "Setting name and path";
         m_dir = path + "/" + name + "/";
         for (auto it = begin(m_videos); it != end(m_videos); ++it) {
             (*it)->reset_root_dir(m_dir);

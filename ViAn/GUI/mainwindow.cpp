@@ -632,7 +632,6 @@ void MainWindow::open_project_dialog(){
                 tr("Open project"),
                 QDir::homePath(),
                 "*.vian");
-    qDebug() << project_path;
     emit open_project(project_path);
 }
 

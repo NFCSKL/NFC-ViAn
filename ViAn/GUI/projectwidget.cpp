@@ -770,10 +770,12 @@ bool ProjectWidget::save_project() {
     // i.e. has not been saved yet
     if (m_proj->is_temporary()) {
         QString name{}, path{};
-        ProjectDialog project_dialog(&name, &path);
-        int status = project_dialog.exec();
+//        std::unique_ptr<ProjectDialog> project_dialog(new ProjectDialog(&name, &path));
+        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this);
+        connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
+        int status = project_dialog->exec();
 
-        if (status == project_dialog.Accepted) {
+        if (status == project_dialog->Accepted) {
             // User clicked ok, dialog checked for proper path & name
             // Update project path
             // TODO: Update window title to new project name
