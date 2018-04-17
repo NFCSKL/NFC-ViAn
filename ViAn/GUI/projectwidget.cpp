@@ -784,6 +784,9 @@ bool ProjectWidget::save_project() {
             m_proj->set_name_and_path(name.toStdString(), path.toStdString());
             m_proj->set_temporary(false);
             set_main_window_name(name);
+            emit proj_path(m_proj->get_dir());
+            QDir dir;
+            dir.mkpath(QString::fromStdString(m_proj->get_dir()));
         } else {
             // User aborted dialog, cancel save
             return false;
