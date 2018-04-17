@@ -14,7 +14,7 @@ public:
     void read(const QJsonObject& json) override;
     QString get_name() override;
     void set_name(QString name) override;
-    void set_font_scale(QPoint);
+    double set_font_scale(QPoint);
     double get_font_scale();
 
     // Constants describing the limit and precision of the font scale value.

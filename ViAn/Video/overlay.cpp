@@ -48,6 +48,17 @@ void Overlay::set_tool(SHAPES s) {
     current_shape = s;
 }
 
+/**
+ * @brief Overlay::create_text
+ * Create a new text drawing
+ * @param pos
+ * @param frame
+ */
+void Overlay::create_text(QPoint pos, int frame) {
+    Text* text = new Text(current_colour, pos, current_string, current_font_scale);
+    add_drawing(text, frame);
+}
+
 void Overlay::set_text_settings(QString text, float font_scale) {
     current_string = text;
     current_font_scale = font_scale;
@@ -217,9 +228,6 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
             case PEN:
                 add_drawing(new Pen(current_colour, pos), frame_nr);
                 break;
-            case TEXT:
-                add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
-                break;
             case HAND:
                 prev_point = pos;
                 if (right_click) {
@@ -270,8 +278,7 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
     if (!current_drawing) return;
     if (current_drawing->get_shape() == TEXT) {
-        dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
-        double font_scale = dynamic_cast<Text*>(current_drawing)->get_font_scale();
+        double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
         current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
         current_drawing->update_text_draw_end();
         m_unsaved_changes = true;
@@ -295,8 +302,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;
-                dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
-                double font_scale = dynamic_cast<Text*>(current_drawing)->get_font_scale();
+                double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
                 current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
                 current_drawing->update_text_draw_end();
                 prev_point = pos;

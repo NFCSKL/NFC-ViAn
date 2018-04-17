@@ -37,6 +37,7 @@ public:
     void set_showing_overlay(bool value);
     void draw_overlay(cv::Mat &frame, int frame_nr);
 
+    void create_text(QPoint, int);
     void set_text_settings(QString text, float font_scale);
     void set_colour(QColor col);
     QColor get_colour();

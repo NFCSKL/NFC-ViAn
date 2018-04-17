@@ -1,4 +1,5 @@
 #include "drawingtoolbar.h"
+#include "GUI/textdialog.h"
 
 #include <QDebug>
 
@@ -43,7 +44,6 @@ void DrawingToolbar::create_actions() {
 
     tools = new QActionGroup(this);
     tools->addAction(no_tool_act);
-
     tools->addAction(zoom_tool_act);
     tools->addAction(analysis_tool_act);
     tools->addAction(pen_tool_act);
@@ -51,7 +51,6 @@ void DrawingToolbar::create_actions() {
     tools->addAction(rectangle_tool_act);
     tools->addAction(circle_tool_act);
     tools->addAction(line_tool_act);
-    tools->addAction(text_tool_act);
     tools->addAction(hand_tool_act);
     tools->addAction(select_tool_act);
     for (QAction* act: tools->actions()) {
@@ -87,6 +86,7 @@ void DrawingToolbar::create_buttons() {
     addAction(zoom_in_tool_act);
     addAction(zoom_out_tool_act);
     addActions(tools->actions());
+    addAction(text_tool_act);
     addAction(delete_tool_act);
 }
 
@@ -163,7 +163,11 @@ void DrawingToolbar::line_tool_clicked() {
 
 void DrawingToolbar::text_tool_clicked() {
     emit set_status_bar("Text tool");
-    emit set_overlay_tool(TEXT);
+    TextDialog* text_dialog = new TextDialog;
+    text_dialog->deleteLater();
+    connect(text_dialog, &TextDialog::text, this, &DrawingToolbar::send_text);
+    text_dialog->exec();
+    hand_tool_act->trigger();
 }
 
 void DrawingToolbar::hand_tool_clicked() {

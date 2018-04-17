@@ -1,6 +1,7 @@
 #include "frameprocessor.h"
 #include <QDebug>
 #include <QTime>
+#include "utility.h"
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -222,6 +223,15 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->delete_drawing) {
         m_o_settings->delete_drawing = false;
         m_overlay->delete_drawing(m_o_settings->shape);
+    // Create a new text drawing
+    } else if (m_o_settings->create_text) {
+        int height = m_zoomer.get_zoom_rect().height;
+        int width = m_zoomer.get_zoom_rect().width;
+        int anchor_x = m_zoomer.get_anchor().x();
+        int anchor_y = m_zoomer.get_anchor().y();
+        QPoint text_point = QPoint(anchor_x+width/2, anchor_y+height/2);
+        m_o_settings->create_text = false;
+        m_overlay->create_text(text_point, curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
