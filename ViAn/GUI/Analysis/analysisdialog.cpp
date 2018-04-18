@@ -4,9 +4,10 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string t
     : m_save_dir(save_dir), m_tmp_save_dir(tmp_save_dir)
 {
     // Set title
-    setWindowTitle(QString::fromStdString("Vian - Advanced analysis"));
+    setWindowTitle("Vian - Advanced analysis");
     // Remove "?" button
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     // Box layout to store video projects
     QVBoxLayout* v_lay = new QVBoxLayout();
@@ -37,6 +38,10 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string t
 
     v_lay->addWidget(btn_box);
     setLayout(v_lay);
+}
+
+AnalysisDialog::~AnalysisDialog() {
+
 }
 
 /**
