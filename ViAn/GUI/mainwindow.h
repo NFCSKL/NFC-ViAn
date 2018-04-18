@@ -69,6 +69,7 @@ private slots:
     void move();
     void set_ana_details(bool);
     void open_widget(VideoProject *vid_proj);
+    void close_widget(VideoWidget*);
 
 public slots:
     void options(void);
@@ -93,6 +94,8 @@ private:
     QAction* toggle_queue_wgt;
 
     AnalysisWindow *analysis_window;
+
+    std::vector<VideoWidget*> video_widgets;
 
     void init_file_menu();
     void init_edit_menu();

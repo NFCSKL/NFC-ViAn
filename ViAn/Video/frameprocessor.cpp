@@ -27,7 +27,7 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 FrameProcessor::~FrameProcessor() {
     qDebug() << "in processor";
     loop = false;
-    m_v_sync->con_var.notify_one();
+    m_v_sync->con_var.notify_all();
 }
 
 /**
@@ -108,7 +108,7 @@ void FrameProcessor::check_events() {
             process_frame();
 
             lk.unlock();
-            m_v_sync->con_var.notify_one();
+            m_v_sync->con_var.notify_all();
             continue;
         }
     }
@@ -128,8 +128,6 @@ void FrameProcessor::process_frame() {
     // TODO not needed?
     try {
         manipulated_frame = m_frame.clone();
-    } catch (std::bad_alloc& e) {
-        std::cout << "a BIG No-No" << std::endl;
     } catch (cv::Exception& e) {
         std::cout << "a BIGGER No-No" << std::endl;
         return;
@@ -155,7 +153,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    done_processing(m_frame, manipulated_frame, m_frame_index->load());
+    emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
 /**

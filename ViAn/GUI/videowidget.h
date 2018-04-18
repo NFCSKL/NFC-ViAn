@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QShortcut>
+#include <QCloseEvent>
 
 #include <vector>
 #include <atomic>
@@ -97,6 +98,7 @@ public:
     double get_contrast();
 
 signals:
+    void close_video_widget(VideoWidget*);
     void first_frame(cv::Mat frame);
     void zoom_out(double zoom_factor);
     void set_zoom(double zoom_factor);
@@ -247,6 +249,8 @@ private:
     void add_btns_to_layouts();
     void connect_btns();
     void init_playback_slider();
+
+    void closeEvent(QCloseEvent *event) override;
 private slots:
     void stop_btn_clicked(void);
     void next_frame_clicked(void);

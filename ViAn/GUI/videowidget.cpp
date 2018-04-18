@@ -64,14 +64,15 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
 }
 
 VideoWidget::~VideoWidget(){
+    play_btn_toggled(false);
     qDebug() << "video widget before";
 
     delete f_processor;
-    qDebug() << "after delete";
+    //qDebug() << "after delete";
     processing_thread->quit();
-    qDebug() << "after quit";
+    //qDebug() << "after quit";
     processing_thread->wait();
-    qDebug() << "after wait";
+    //qDebug() << "after wait";
     delete processing_thread;
     qDebug() << "delete thread";
     
@@ -112,6 +113,11 @@ VideoWidget::~VideoWidget(){
     delete vertical_layout;
 
     qDebug() << "Im kill";
+}
+
+void VideoWidget::closeEvent(QCloseEvent *event) {
+    event->accept();
+    emit close_video_widget(this);
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -935,7 +941,6 @@ void VideoWidget::clear_current_video() {
 }
 
 void VideoWidget::set_video_btns(bool b) {
-    qDebug() << "setting buttons";
     for (QPushButton* btn : btns) {
         btn->setEnabled(b);
     }

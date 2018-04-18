@@ -168,11 +168,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
  * Destructor
  */
 MainWindow::~MainWindow() {
+    qDebug() << "main delete";
     delete video_wgt;
+    qDebug() << "video wgt deleted";
     delete project_wgt;
+    qDebug() << "project wgt deleted";
     delete analysis_wgt;
+    qDebug() << "analysis wgt deleted";
     delete bookmark_wgt;
+    qDebug() << "bookmark wgt deleted";
     delete queue_wgt;
+    qDebug() << "queue wgt deleted";
+    qDebug() << "done";
 }
 
 /**
@@ -353,15 +360,26 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
     VideoWidget* widget_video = new VideoWidget(nullptr, true);
     widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
     widget_video->show();
-
+    video_widgets.push_back(widget_video);
 
     // ---------------------------------------
     widget_video->setAttribute(Qt::WA_DeleteOnClose);
     widget_video->load_marked_video(vid_proj);
 
+    connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
+
     //connect(widget_video, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
     //connect(widget_video, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
     //connect(widget_video, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
+}
+
+void MainWindow::close_widget(VideoWidget *vid_wgt) {
+    auto p = std::find(video_widgets.begin(), video_widgets.end(), vid_wgt);
+    if (p != video_widgets.end()) {
+        qDebug() << video_widgets.size();
+        video_widgets.erase(p);
+        qDebug() << video_widgets.size();
+    }
 }
 
 void MainWindow::init_interval_menu() {
@@ -499,10 +517,16 @@ void MainWindow::init_help_menu() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (project_wgt->close_project())
+    if (project_wgt->close_project()) {
         event->accept();
-    else
+        for (auto widget : video_widgets) {
+            delete widget;
+        }
+        video_widgets.clear();
+    }
+    else {
         event->ignore();
+    }
 }
 
 void MainWindow::rectangle() {
