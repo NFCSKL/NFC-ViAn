@@ -108,10 +108,10 @@ void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
     double new_center_x = m_zoom_rect.x + percent_in_x_before*m_zoom_rect.width;
     double new_center_y = m_zoom_rect.y + percent_in_y_before*m_zoom_rect.height;
     qDebug() << "new center" << new_center_x << new_center_y;
-    int diff_x = center.x() - new_center_x;
-    int diff_y = center.y() - new_center_y;
+    double diff_x = center.x() - new_center_x;
+    double diff_y = center.y() - new_center_y;
     qDebug() << "diff" << diff_x << diff_y;
-    move_zoom_rect(diff_x, diff_y);
+    move_zoom_rect(round(diff_x), round(diff_y));
 
 //    qDebug() << "tl" << m_zoom_rect.tl().x << m_zoom_rect.tl().y;
 //    qDebug() << "size" << m_zoom_rect.size().width << m_zoom_rect.size().height;
