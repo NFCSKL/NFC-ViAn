@@ -38,6 +38,7 @@ class FrameWidget : public QWidget
     QPoint ana_rect_start, ana_rect_end;
     bool show_box = false;
 
+
     // Zoom
     QPoint rect_start, rect_end, prev_pos = QPoint(0,0);
     bool mark_rect = false;
