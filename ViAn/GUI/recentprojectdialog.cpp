@@ -45,7 +45,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
  */
 void RecentProjectDialog::on_item_double_clicked(QListWidgetItem* item) {
     accept();
-    emit open_project(item->toolTip());
+    open_project(item->toolTip());
 }
 
 /**

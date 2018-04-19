@@ -51,7 +51,13 @@ void Analysis::write(QJsonObject &json){
     m_unsaved_changes = false;
 }
 
-ANALYSIS_TYPE Analysis::get_type() const {
+SAVE_TYPE Analysis::get_save_type() const
+{
+    return DETECTION;
+}
+
+ANALYSIS_TYPE Analysis::get_type() const
+{
     return type;
 }
 

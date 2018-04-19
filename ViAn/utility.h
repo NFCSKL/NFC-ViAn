@@ -4,15 +4,12 @@
 #include <QSize>
 #include <QPoint>
 #include <QRect>
-#include <QDir>
-
 namespace Utility{
      std::pair<double, double> size_ratio(QSize s1, QSize s2);
      double min_size_ratio(QSize s1, QSize s2);
      int number_of_digits(int n);
      std::string zfill(std::string number, int length);
      std::string name_from_path(const std::string full_path);
-     std::string add_serial_number(std::string name, std::string file_end);
 
      cv::Rect scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor);
      QRect scale_rect(QRect rect, double scale_factor, QPoint anchor);

@@ -1,5 +1,5 @@
-#ifndef PROJECTDIALOG_H
-#define PROJECTDIALOG_H
+#ifndef CREATEPROJECTDIALOG_H
+#define CREATEPROJECTDIALOG_H
 
 #include <QWidget>
 #include <QDialog>
@@ -28,4 +28,4 @@ private slots:
     void cancel_btn_clicked(void);
 };
 
-#endif // PROJECTDIALOG_H
+#endif // CREATEPROJECTDIALOG_H

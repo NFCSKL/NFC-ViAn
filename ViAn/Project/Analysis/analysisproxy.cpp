@@ -28,6 +28,7 @@ AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
     : BasicAnalysis(other),
       file_analysis(file),
       type(other.type) {
+
 }
 
 AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
@@ -37,7 +38,8 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
 {
 }
 
-void AnalysisProxy::reset_root_dir(const std::string &dir) {
+void AnalysisProxy::reset_root_dir(const std::string &dir)
+{
     file_analysis = dir+Utility::name_from_path(file_analysis);
     m_unsaved_changes = true;
 }
@@ -79,10 +81,17 @@ void AnalysisProxy::write(QJsonObject &json) {
     m_unsaved_changes = false;
 }
 
-ANALYSIS_TYPE AnalysisProxy::get_type() const {
+SAVE_TYPE AnalysisProxy::get_save_type() const
+{
+    return DETECTION;
+}
+
+ANALYSIS_TYPE AnalysisProxy::get_type() const
+{
     return type;
 }
 
-std::string AnalysisProxy::full_path() const {
+std::string AnalysisProxy::full_path() const
+{
     return file_analysis;
 }

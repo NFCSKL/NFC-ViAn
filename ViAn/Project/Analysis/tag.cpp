@@ -99,6 +99,7 @@ std::pair<AnalysisInterval*, AnalysisInterval*> Tag::remove_overlap(AnalysisInte
     return pair;
 }
 
-ANALYSIS_TYPE Tag::get_type() const {
+ANALYSIS_TYPE Tag::get_type() const
+{
     return TAG;
 }
