@@ -10,10 +10,7 @@ public:
     ArrowItem(Arrow* arrow);
     ~ArrowItem() override;
     Arrow* get_shape();
-    void update_shape_name();
-    void update_shape_color();
     void remove();
-    QPixmap map;
 };
 
 #endif // ARROWITEM_H
