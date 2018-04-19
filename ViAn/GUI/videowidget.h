@@ -168,6 +168,7 @@ public slots:
     void set_current_drawing(Shapes* shape);
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
+    void center(QPoint, double);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
     void on_step_zoom(double step);

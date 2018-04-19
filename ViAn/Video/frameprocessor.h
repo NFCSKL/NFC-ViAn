@@ -29,8 +29,10 @@ struct zoomer_settings {
 
     QPoint zoom_tl = QPoint(0,0);
     QPoint zoom_br = QPoint(100,100);
+    QPoint center = QPoint(50,50);
 
     double zoom_factor = 1;
+    double zoom_step = 1;
 
     // Panning
     int x_movement = 0;
@@ -39,6 +41,7 @@ struct zoomer_settings {
     // Specific commands
     bool fit = false;
     bool original = false;
+    bool do_center = false;
 };
 
 /**

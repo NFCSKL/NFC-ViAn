@@ -154,6 +154,7 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+    connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
@@ -1026,6 +1027,20 @@ void VideoWidget::pan(int x, int y) {
     update_processing_settings([&](){
         z_settings.x_movement = x;
         z_settings.y_movement = y;
+    });
+}
+
+/**
+ * @brief VideoWidget::center
+ * Notifies the frame processor when the zoom rectangle should be centered
+ * @param center
+ * @param
+ */
+void VideoWidget::center(QPoint pos, double zoom_step) {
+    update_processing_settings([&](){
+        z_settings.center = pos;
+        z_settings.do_center = true;
+        z_settings.zoom_step = zoom_step;
     });
 }
 

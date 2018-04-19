@@ -141,6 +141,12 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
         m_zoomer.update_rect_size();
     }
+    // Center the zoom rect
+    else if (m_z_settings->do_center) {
+        m_z_settings->do_center = false;
+
+        m_zoomer.center_zoom_rect(m_z_settings->center, m_z_settings->zoom_step);
+    }
     // Scale/zoom factor has been changed
     else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
         m_zoomer.set_scale_factor(m_z_settings->zoom_factor);
