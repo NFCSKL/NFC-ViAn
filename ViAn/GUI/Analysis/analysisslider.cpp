@@ -126,6 +126,7 @@ void AnalysisSlider::set_analysis(AnalysisProxy * analysis) {
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
+
         for (auto p : analysis->get_intervals()) {
             add_slider_interval(p->get_start(), p->get_end());
         }

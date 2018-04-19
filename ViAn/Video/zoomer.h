@@ -28,10 +28,11 @@ public:
     void set_frame_size(cv::Size frame_size);
     void set_viewport_size(const QSize size);
     void move_zoom_rect(int x, int y);
+    void center_zoom_rect(QPoint, double zoom_step);
     void fit_viewport();
     void flip();
     void reset();
-    cv::Rect  m_zoom_rect;
+    cv::Rect m_zoom_rect;
 
     void scale_frame(cv::Mat& frame);
     cv::Rect get_zoom_rect() const;

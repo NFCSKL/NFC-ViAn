@@ -30,9 +30,9 @@ void Zoomer::set_scale_factor(double scale_factor) {
 void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
     cv::Rect _tmp = cv::Rect(cv::Point(anchor.x() + p1.x() / m_scale_factor, anchor.y() + p1.y() / m_scale_factor),
                   cv::Point(anchor.x() + p2.x() / m_scale_factor, anchor.y() + p2.y() / m_scale_factor));
-
-    if (_tmp.width > 1 && _tmp.height > 1) {
-        m_zoom_rect = _tmp;
+    cv::Rect _tmp2 = cv::Rect(cv::Point(p1.x(), p1.y()), cv::Point(p2.x(), p2.y()));
+    if (_tmp2.width > 1 && _tmp2.height > 1) {
+        m_zoom_rect = _tmp2;
         anchor = QPoint(m_zoom_rect.tl().x, m_zoom_rect.tl().y);
         update_scale();
         update_rect_size();
@@ -99,6 +99,17 @@ void Zoomer::move_zoom_rect(int x, int y){
     anchor = QPoint(tl_x, tl_y);
 }
 
+void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
+    double percent_in_x_before = (center.x() - m_zoom_rect.x) / (double)(m_zoom_rect.br().x - m_zoom_rect.x);
+    double percent_in_y_before = (center.y() - m_zoom_rect.y) / (double)(m_zoom_rect.br().y - m_zoom_rect.y);
+    set_scale_factor(m_scale_factor*zoom_step);
+    double new_center_x = m_zoom_rect.x + percent_in_x_before*m_zoom_rect.width;
+    double new_center_y = m_zoom_rect.y + percent_in_y_before*m_zoom_rect.height;
+    double diff_x = center.x() - new_center_x;
+    double diff_y = center.y() - new_center_y;
+    move_zoom_rect(round(diff_x), round(diff_y));
+}
+
 /**
  * @brief Zoomer::fit_viewport
  * Adjusts the scaling factor so the frame will fit the viewport
@@ -124,7 +135,7 @@ void Zoomer::flip() {
  */
 void Zoomer::update_scale() {
     if (m_zoom_rect.size() == cv::Size(0,0)) return;
-    m_scale_factor = std::min(m_viewport_size.width() / double(m_zoom_rect.width),
+    m_scale_factor = std::max(m_viewport_size.width() / double(m_zoom_rect.width),
                               m_viewport_size.height() / double(m_zoom_rect.height));
 }
 
@@ -142,10 +153,9 @@ void Zoomer::update_rect_size() {
     double width_diff = width - m_zoom_rect.width;
     double height_diff = height - m_zoom_rect.height;
 
-
     // Generate a new top-left and bottom-right corner for the rectangle
     // Makes sure the rectangle will not be bigger then the original frame
-    cv::Point new_tl = cv::Point(std::max(0, m_zoom_rect.tl().x - int(width_diff / 2)),
+    cv::Point new_tl = cv::Point(std::max(0, int(m_zoom_rect.tl().x - width_diff / 2)),
                                  std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
     cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)),
                                  std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));

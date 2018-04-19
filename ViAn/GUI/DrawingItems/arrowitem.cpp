@@ -15,6 +15,15 @@ ArrowItem::~ArrowItem() {}
 
 void ArrowItem::remove() {}
 
+void ArrowItem::update_shape_name() {
+    m_arrow->set_name(text(0));
+}
+
+void ArrowItem::update_shape_color() {
+    map.fill(m_arrow->get_color());
+    setIcon(1, map);
+}
+
 Arrow* ArrowItem::get_shape() {
     return m_arrow;
 }

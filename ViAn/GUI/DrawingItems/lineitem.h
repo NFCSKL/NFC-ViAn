@@ -9,8 +9,11 @@ class LineItem : public ShapeItem {
 public:
     LineItem(Line* line);
     Line* get_shape();
+    void update_shape_name();
+    void update_shape_color();
     void remove();
     ~LineItem() override;
+    QPixmap map;
 };
 
 #endif // LINEITEM_H

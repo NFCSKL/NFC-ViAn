@@ -73,9 +73,11 @@ void FrameWidget::update(){
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
+    mark_rect = false;
     emit send_tool(tool);
     m_tool = tool;
     set_cursor(m_tool);
+    repaint();
 }
 
 /**
@@ -92,16 +94,14 @@ void FrameWidget::set_cursor(SHAPES tool) {
     case ANALYSIS_BOX:
     case RECTANGLE:
     case CIRCLE:
-        setCursor(Qt::CrossCursor);
-        break;
-    case MOVE:
-        setCursor(Qt::OpenHandCursor);
-        break;
     case PEN:
     case ARROW:
     case LINE:
     case TEXT:
-        setCursor(Qt::UpArrowCursor);
+        setCursor(Qt::CrossCursor);
+        break;
+    case MOVE:
+        setCursor(Qt::OpenHandCursor);
         break;
         //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
     case HAND:
@@ -185,12 +185,14 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             end = QPoint(end.x(), start.y() + height_mod);
 
             painter.setPen(QColor(255,0,0));
-            QRectF tmp(start, end);
-            painter.drawRect(tmp);
+            //QRectF correct_dim_rect(start, end);
+            QRectF correct_dim_rect((start-anchor)*m_scale_factor, (end-anchor)*m_scale_factor);
+            painter.drawRect(correct_dim_rect);
         }
         // Draw the zoom box
         painter.setPen(QColor(0,255,0));
-        QRectF zoom(rect_start, rect_end);
+        QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
+        //QRectF zoom(rect_start, rect_end);
         painter.drawRect(zoom);
     }
 
@@ -260,6 +262,8 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
  * @param event
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
+    // Pos when the frame is at 100%
+    QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
     case NONE:
         break;
@@ -271,20 +275,22 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         break;
     case ZOOM: {
         prev_point = event->pos();
+        prev_point_scaled = scaled_pos;
         QRect zoom_rect(rect_start, rect_end);
         if (event->button() == Qt::RightButton) {
-            if (zoom_rect.contains(event->pos())) {
-                //prev_point = event->pos();
+            if (zoom_rect.contains(scaled_pos)) {
+                pan_rect = true;
             } else {
+                pan_rect = false;
                 init_panning(event->pos());
             }
         } else if (event->button() == Qt::LeftButton) {
-            if (zoom_rect.contains(event->pos())) {
+            if (zoom_rect.contains(scaled_pos)) {
                 end_zoom();
                 mark_rect = false;
                 unsetCursor();
             } else {
-                rect_start = event->pos();
+                rect_start = scaled_pos;
                 mark_rect = true;
             }
 
@@ -296,12 +302,9 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case MOVE:
         init_panning(event->pos());
         break;
-    case SELECT:
-        emit mouse_pressed(scale_point(event->pos()), false);
-        break;
     default:
         bool right_click = (event->button() == Qt::RightButton);
-        emit mouse_pressed(scale_point(event->pos()), right_click);
+        emit mouse_pressed(scaled_pos, right_click);
         break;
     }
 }
@@ -311,6 +314,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
     case NONE:
         break;
@@ -327,10 +331,8 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     case MOVE:
         end_panning();
         break;
-    case SELECT:
-        break;
     default:
-        emit mouse_released(scale_point(event->pos()), false);
+        emit mouse_released(scaled_pos, false);
         break;
     }
 }
@@ -340,6 +342,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
     case NONE:
         break;
@@ -351,21 +354,22 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     case ZOOM: {
         QRect zoom_rect(rect_start, rect_end);
         if (event->buttons() == Qt::RightButton){
-            if (zoom_rect.contains(event->pos()) && mark_rect) {
-                QPoint diff_point = event->pos() - prev_point;
+            if (pan_rect && mark_rect) {
+                QPoint diff_point = scaled_pos - prev_point_scaled;
 
                 rect_start += diff_point;
                 rect_end += diff_point;
-                prev_point = event->pos();
+                prev_point_scaled = scaled_pos;
                 repaint();
             } else {
                 panning(event->pos());
             }
         } else if (event->buttons() == Qt::LeftButton && mark_rect) {
-            rect_end = rect_update(event->pos());
-            //mark_rect = true;
+            //rect_end = rect_update(scale_point(event->pos()));
+            rect_end = scaled_pos;
+            repaint();
         } else {
-            if (zoom_rect.contains(event->pos()) && mark_rect) {
+            if (zoom_rect.contains(scaled_pos) && mark_rect) {
                 setCursor(QCursor(QPixmap("../ViAn/Icons/zoom_in.png")));
             } else {
                 unsetCursor();
@@ -378,11 +382,9 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             panning(event->pos());
         }
         break;
-    case SELECT:
-        break;
     default:
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
-            emit mouse_moved(scale_point(event->pos()));
+            emit mouse_moved(scaled_pos);
         }
         break;
     }
@@ -393,23 +395,40 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
     case HAND:
+    case SELECT:
         emit mouse_scroll(num_steps);
         event->accept();
         break;
     case MOVE:
+        break;
     case ZOOM:
-        if (event->modifiers() == Qt::ControlModifier) {
+        if (event->modifiers() == Qt::ShiftModifier) {
+            init_panning(event->pos());
             if (num_steps.y() < 0) {
-                emit trigger_zoom_out(0.9);
+                panning(event->pos()+QPoint(-PAN_FACTOR*m_scale_factor,0));
             } else {
-                emit trigger_zoom_out(1.1);
+                panning(event->pos()+QPoint(PAN_FACTOR*m_scale_factor,0));
             }
         }
-        break;
+        else if (event->modifiers() == Qt::ControlModifier) {
+            if (num_steps.y() < 0) {
+                emit center_zoom_rect(scaled_pos, 1/ZOOM_STEP);
+            } else {
+                emit center_zoom_rect(scaled_pos, ZOOM_STEP);
+            }
+        } else {
+            init_panning(event->pos());
+            if (num_steps.y() < 0) {
+                panning(event->pos()+QPoint(0,-PAN_FACTOR*m_scale_factor));
+            } else {
+                panning(event->pos()+QPoint(0,PAN_FACTOR*m_scale_factor));
+            }
+        }
     default:
         break;
     }
@@ -485,6 +504,7 @@ void FrameWidget::panning(QPoint pos) {
  * @brief FrameWidget::zoom
  * Updates and redraws the zooming rect
  * @param pos
+ * TODO not use?
  */
 QPoint FrameWidget::rect_update(QPoint pos) {
     // Force image boundries
@@ -493,7 +513,8 @@ QPoint FrameWidget::rect_update(QPoint pos) {
     int tmpy = std::min(pos.y(), _qimage.height()-1);
     int ey = std::max(0,tmpy);
     repaint();
-    return QPoint(ex, ey);
+    return pos;
+    //return QPoint(ex, ey);
 }
 
 /**
@@ -513,7 +534,6 @@ void FrameWidget::end_panning() {
  * Emits the points of the zooming rect
  */
 void FrameWidget::end_zoom() {
-    mark_rect = false;
     repaint();
 
     // ROI rect points

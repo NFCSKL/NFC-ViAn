@@ -9,10 +9,9 @@ public:
     ShapeItem(int type);
     virtual ~ShapeItem();
     virtual void remove() = 0;
-    void update_shape_name();
-    void update_shape_color();
+    virtual void update_shape_name() = 0;
+    virtual void update_shape_color() = 0;
     virtual Shapes* get_shape() = 0;
-    QPixmap map;
 };
 
 #endif // SHAPEITEM_H
