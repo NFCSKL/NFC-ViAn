@@ -416,13 +416,9 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
             }
         }
         else if (event->modifiers() == Qt::ControlModifier) {
-            qDebug() << "not scaled" << event->pos();
-            qDebug() << "scaled pos" << scaled_pos;
             if (num_steps.y() < 0) {
-                //emit trigger_zoom_out(1/1.1);
                 emit center_zoom_rect(scaled_pos, 1/ZOOM_STEP);
             } else {
-                //emit trigger_zoom_out(1.1);
                 emit center_zoom_rect(scaled_pos, ZOOM_STEP);
             }
         } else {

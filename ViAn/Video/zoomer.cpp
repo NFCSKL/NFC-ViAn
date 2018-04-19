@@ -65,7 +65,6 @@ void Zoomer::set_viewport_size(const QSize size) {
  * @param y movement on the y-axis
  */
 void Zoomer::move_zoom_rect(int x, int y){
-    qDebug() << "i get" << x << y;
     cv::Point tl = m_zoom_rect.tl(); // top-left corner
     cv::Point br = m_zoom_rect.br(); // bottom-right corner
 
@@ -103,49 +102,12 @@ void Zoomer::move_zoom_rect(int x, int y){
 void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
     double percent_in_x_before = (center.x() - m_zoom_rect.x) / (double)(m_zoom_rect.br().x - m_zoom_rect.x);
     double percent_in_y_before = (center.y() - m_zoom_rect.y) / (double)(m_zoom_rect.br().y - m_zoom_rect.y);
-    qDebug() << "percent_in before" << percent_in_x_before;
     set_scale_factor(m_scale_factor*zoom_step);
     double new_center_x = m_zoom_rect.x + percent_in_x_before*m_zoom_rect.width;
     double new_center_y = m_zoom_rect.y + percent_in_y_before*m_zoom_rect.height;
-    qDebug() << "new center" << new_center_x << new_center_y;
     double diff_x = center.x() - new_center_x;
     double diff_y = center.y() - new_center_y;
-    qDebug() << "diff" << diff_x << diff_y;
     move_zoom_rect(round(diff_x), round(diff_y));
-
-//    qDebug() << "tl" << m_zoom_rect.tl().x << m_zoom_rect.tl().y;
-//    qDebug() << "size" << m_zoom_rect.size().width << m_zoom_rect.size().height;
-//    double percent_in = (center.x() - m_zoom_rect.x) / (double)(m_zoom_rect.br().x - m_zoom_rect.x);
-//    qDebug() << "percent in" << percent_in;
-
-//    int dif_x = center.x() - m_zoom_rect.x;
-//    int dif_y = center.y() - m_zoom_rect.y;
-//    qDebug() << "The difs" << dif_x << dif_y;
-
-//    move_zoom_rect(m_zoom_rect.x, m_zoom_rect.y);
-
-
-//    int current_x = (m_zoom_rect.br().x + m_zoom_rect.tl().x)/2;
-//    int current_y = (m_zoom_rect.br().y + m_zoom_rect.tl().y)/2;
-//    qDebug() << "current center" << current_x << current_y;
-//    int x_dif = center.x() - current_x;
-//    int y_dif = center.y() - current_y;
-//    qDebug() << "diff" << x_dif << y_dif;
-//    move_zoom_rect(x_dif, y_dif);
-//    int current_x2 = (m_zoom_rect.br().x + m_zoom_rect.tl().x)/2;
-//    int current_y2 = (m_zoom_rect.br().y + m_zoom_rect.tl().y)/2;
-//    qDebug() << "number 2" << current_x2 << current_y2;
-//    //QPoint current_center = QPoint(current_x, current_y);
-
-//    int tl_x, tl_y, br_x, br_y;
-//    tl_x = std::max(0, center.x() - m_zoom_rect.size().width/2);
-//    tl_y = std::max(0, center.y() - m_zoom_rect.size().height/2);
-//    br_x = std::min(m_frame_rect.br().x, center.x() + m_zoom_rect.size().width/2);
-//    br_y = std::min(m_frame_rect.br().y, center.y() + m_zoom_rect.size().height/2);
-//    qDebug() << "center rect" << tl_x << tl_y << br_x << br_y;
-//    m_zoom_rect = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
-//    anchor = QPoint(tl_x, tl_y);
-//    //qDebug() << "frame_rect" << m_frame_rect.width << m_frame_rect.height;
 }
 
 /**
