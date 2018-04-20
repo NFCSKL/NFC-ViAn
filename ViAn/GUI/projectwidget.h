@@ -79,7 +79,6 @@ public slots:
     void advanced_analysis();
     void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
     bool prompt_save();
-    bool prompt_close();
 private slots:
     void context_menu(const QPoint& point);
     void remove_item();

@@ -454,18 +454,6 @@ bool ProjectWidget::prompt_save() {
     return ok;
 }
 
-bool ProjectWidget::prompt_close() {
-    QMessageBox delete_box(this);
-    delete_box.setIcon(QMessageBox::Warning);
-    delete_box.setText("Are you sure you wish to close the project?");
-    delete_box.setInformativeText("");
-    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    delete_box.setDefaultButton(QMessageBox::No);
-
-    return delete_box.exec() == QMessageBox::Yes;
-}
-
-
 /**
  * @brief ProjectWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
