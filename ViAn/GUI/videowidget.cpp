@@ -751,6 +751,7 @@ void VideoWidget::on_new_frame() {
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
+    m_vid_proj->get_video()->state.frame = frame_num;
 }
 
 /**
@@ -1081,8 +1082,6 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    brightness = b_val;
-    contrast = c_val;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1156,9 +1155,14 @@ void VideoWidget::frame_line_edit_finished() {
 }
 
 int VideoWidget::get_brightness() {
-    return brightness;
+    return m_vid_proj->get_video()->state.brightness;
 }
 
 double VideoWidget::get_contrast() {
-    return contrast;
+    return m_vid_proj->get_video()->state.contrast;
+}
+
+void VideoWidget::set_brightness_contrast(int b_val, double c_val) {
+    m_vid_proj->get_video()->state.brightness = b_val;
+    m_vid_proj->get_video()->state.contrast = c_val;
 }

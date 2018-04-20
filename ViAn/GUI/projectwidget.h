@@ -62,6 +62,7 @@ signals:
     void update_frame();
     void remove_overlay();
     void new_vid_proj(VideoProject*);
+    void update_brightness_contrast(int, double);
 
 public slots:
     void new_project(void);
