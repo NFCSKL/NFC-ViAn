@@ -5,8 +5,7 @@
  * @brief MotionDetection::MotionDetection
  * @param source_file
  */
-MotionDetection::MotionDetection(std::string source_file, std::string tmp_save_file, std::string save_file) : AnalysisMethod(source_file, tmp_save_file, save_file)
-{
+MotionDetection::MotionDetection(const std::string& source_file, const std::string& save_file) : AnalysisMethod(source_file, save_file) {
     m_analysis.type = MOTION_DETECTION;
     init_settings();    
 }

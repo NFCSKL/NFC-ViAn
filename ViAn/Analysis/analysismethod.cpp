@@ -3,7 +3,7 @@
 #include <opencv2/videoio/videoio.hpp>
 #include "Analysis/analysismethod.h"
 #include "imagegenerator.h"
-AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& tmp_save_path, const std::string& save_path)
+AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
 {
     m_source_file = video_path;
     std::size_t index = video_path.find_last_of('/') + 1;
@@ -11,7 +11,6 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
     m_ana_name = vid_name + DETECTION_STRING;
-    m_tmp_save_path = tmp_save_path;
     m_save_path = save_path;
     add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
 }
@@ -146,7 +145,7 @@ void AnalysisMethod::run() {
         m_analysis.bounding_box = bounding_box;
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
-        std::string new_path = Utility::add_serial_number(m_tmp_save_path + m_ana_name, "");
+        std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
         int index = new_path.find_last_of('/') + 1;
         m_ana_name = new_path.substr(index);
 
@@ -241,10 +240,6 @@ std::string AnalysisMethod::get_descr(const std::string& var)
 
 std::string AnalysisMethod::save_path() const {
     return m_save_path;
-}
-
-std::string AnalysisMethod::tmp_save_path() const {
-    return m_tmp_save_path;
 }
 
 void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
