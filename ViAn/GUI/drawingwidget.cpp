@@ -19,17 +19,11 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     headerItem()->setText(1, "Color");
 
 
-    // Widget only shortcut for deleteing item
-    // TODO clean
+    // Shortcut for deleteing item
     QShortcut* delete_sc = new QShortcut(this);
-    //delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     delete_sc->setKey(QKeySequence(QKeySequence::Delete));
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::delete_item);
 
-    //QShortcut* select_sc = new QShortcut(this);
-    //select_sc->setContext(Qt::WidgetWithChildrenShortcut);
-    //select_sc->setKey(QKeySequence(Qt::Key_Return)); // Enter
-    //connect(select_sc, &QShortcut::activated, this, [this]{ tree_item_clicked(currentItem()); });
     connect(this, &DrawingWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(item_changed(QTreeWidgetItem*)));
 }
@@ -54,7 +48,9 @@ void DrawingWidget::clear_overlay() {
         disconnect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
         m_overlay = nullptr;
     }
+    QObject::blockSignals(true);
     clear();
+    QObject::blockSignals(false);
 }
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
@@ -147,6 +143,7 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
  * @param frame_nr
  */
 void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
+    QObject::blockSignals(true);
     FrameItem* frame_item;
     QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
 
@@ -202,6 +199,7 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
     default:
         break;
     }
+    QObject::blockSignals(false);
 }
 
 /**
@@ -258,7 +256,9 @@ void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
     for (int i = 0; i != frame_item->childCount(); ++i) {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(frame_item->child(i));
         if (shape_item->get_shape() == shape) {
+            QObject::blockSignals(true);
             setCurrentItem(shape_item);
+            QObject::blockSignals(false);
             return;
         }
     }

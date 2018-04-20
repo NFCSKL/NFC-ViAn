@@ -1,6 +1,8 @@
+#include <QFileDialog>
 #include "recentprojectdialog.h"
 
 RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
+    this->setWindowTitle("ViAn - Recent projects");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint);
     h_layout = new QHBoxLayout();
     v_main_layout = new QVBoxLayout(this);
@@ -62,8 +64,16 @@ void RecentProjectDialog::on_new_btn_clicked(){
  * Accepts dialog and emits signal to open a project from file
  */
 void RecentProjectDialog::on_browse_btn_clicked(){
+    QString project_path = QFileDialog().getOpenFileName(
+                this,
+                tr("Open project"),
+                QDir::homePath(),
+                "*.vian");
+
+    if (project_path.isEmpty()) return;
+
     accept();
-    open_project_from_file();
+    open_project_from_file(project_path);
 }
 
 void RecentProjectDialog::on_open_btn_clicked() {

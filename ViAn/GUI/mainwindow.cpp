@@ -175,12 +175,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
-    project_wgt->add_default_project();
     // Recent projects menu
-    RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
-    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    rp_dialog = new RecentProjectDialog(this);
+
+    // Create a new project if user presses "new project" or if dialog is rejected
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
-    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
+    connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt,&ProjectWidget::new_project);
+
+    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
@@ -212,6 +215,7 @@ void MainWindow::init_file_menu() {
     QAction* close_project_act = new QAction(tr("&Close project"), this);
     QAction* remove_project_act = new QAction(tr("&Remove project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
+
 
     // Set icons
     //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));     //add if wanted
@@ -261,7 +265,7 @@ void MainWindow::init_file_menu() {
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
+    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(remove_project_act, &QAction::triggered, project_wgt, &ProjectWidget::remove_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
@@ -589,7 +593,7 @@ void MainWindow::export_images(){
         interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
-    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_tmp_dir(),
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_dir(),
                                         video_wgt->get_current_video_length() - 1,
                                         interval);
     if (!exporter_dialog.exec()){

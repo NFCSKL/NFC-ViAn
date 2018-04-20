@@ -1,21 +1,19 @@
 #include "project.h"
 #include <QDebug>
+
 /**
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
  */
-Project::Project(){
-}
+Project::Project(){}
 
 //TODO Fix all these function names
 Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
+    proj->m_temporary = false;
     proj->load_saveable(full_path);
-    if(proj->tmp_dir.isValid()){
-        proj->m_tmp_dir = proj->tmp_dir.path().toStdString() + "/" + proj->m_name + "/";
-        proj->m_tmp_file = proj->m_tmp_dir + proj->m_name + ".vian";
-        proj->save_project();
-    } else return nullptr;
+    // ensure changes to paths are saved
+    proj->save_saveable(full_path);
     return proj;
 }
 
@@ -23,25 +21,10 @@ Project* Project::fromFile(const std::string &full_path){
  * @brief Project::Project
  * @param name     := name of the project
  * @param dir_path := directory to save project in
- * @param vid_path := path for videos folder
  */
 Project::Project(const std::string& name, const std::string& dir_path){
-    m_name = name;
-    if (dir_path == "default") {
-        is_default_proj = true;
-    } else {
-        m_dir = dir_path + name + "/";
-        m_file = m_dir + name + ".vian";
-        m_unsaved_changes = true;
-    }
-
-    if(tmp_dir.isValid()){
-        m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
-        m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
-        m_tmp_file = m_tmp_dir + name + ".vian";  // full_path();
-        save_project();
-        tmp_dir_valid = true;
-    } else qWarning() << "Something went wrong while creating the temporary folder.";
+    set_name_and_path(name, dir_path);
+    save_project();
 }
 
 
@@ -100,18 +83,6 @@ void Project::remove_report(const int &id) {
     m_unsaved_changes = true;
 }
 
-
-/**
- * @brief Project::delete_artifacts
- * Delete all projects files.
- */
-void Project::delete_artifacts(){
-    QDir dir(QString::fromStdString(m_dir));
-    // Delete directory and all of its contents
-    // Including subdirectories and their contents.
-    dir.removeRecursively();
-}
-
 /**
  * @brief Project::set_saved_status
  * Set unsaved status
@@ -120,6 +91,34 @@ void Project::delete_artifacts(){
  */
 void Project::set_unsaved(const bool& changed) {
     m_unsaved_changes = changed;
+}
+
+void Project::set_name_and_path(const std::string& name, const std::string& path) {
+    // TODO: Handle case where tmp directory is empty
+    m_name = name;
+    if (!path.empty()){
+        // Update path for all VideoProjects
+        m_dir = path + "/" + name + "/";
+        for (auto it = begin(m_videos); it != end(m_videos); ++it) {
+            (*it)->reset_root_dir(m_dir);
+        }
+    } else {
+        // Attempts to generate a temporary path
+        // Use default path on failure
+        std::string tmp_dir = generate_tmp_directory();
+        m_dir = !tmp_dir.empty() ? (tmp_dir + "/") : (DEFAULT_PATH + "/temporary" + std::to_string(std::rand()) + "/");
+    }
+    m_file = m_dir + m_name + ".vian";
+    m_dir_bookmarks = m_dir + "Bookmarks/";
+}
+
+/**
+ * @brief Project::set_temporary
+ * Sets whether the project is temporary or not
+ * @param is_temporary
+ */
+void Project::set_temporary(const bool &is_temporary){
+    m_temporary = is_temporary;
 }
 
 /**
@@ -132,6 +131,10 @@ bool Project::is_saved() const {
     return !m_unsaved_changes && video_projects_saved;
 }
 
+bool Project::is_temporary() const {
+    return m_temporary;
+}
+
 /**
  * @brief Project::read
  * @param json
@@ -140,8 +143,7 @@ bool Project::is_saved() const {
 void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
     m_file = full_path();
-    std::string tmp = full_path();
-    m_dir = tmp.substr(0,tmp.find_last_of("/")+1);
+    m_dir = m_file.substr(0,m_file.find_last_of("/")+1);
     m_dir_bookmarks = m_dir + "Bookmarks/";
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
@@ -198,17 +200,9 @@ void Project::write(QJsonObject& json){
  */
 bool Project::save_project(){
     QDir directory;
-    directory.mkpath(QString::fromStdString(m_tmp_dir));
+    directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
-    return save_saveable(m_tmp_file);
-}
-
-/**
- * @brief Project::move_project_from_tmp
- * @return true if success
- */
-bool Project::move_project_from_tmp(){
-    return copy_directory_files(QString::fromStdString(m_tmp_dir), QString::fromStdString(m_dir), true);
+    return save_saveable(m_file);
 }
 
 /**
@@ -219,7 +213,7 @@ bool Project::move_project_from_tmp(){
  * @return
  * Iterates over from_dir and copies all files and sub-directories to to_dir
  */
-bool Project::copy_directory_files(const QString &from_dir, const QString &to_dir, bool coverFileIfExist){
+bool Project::copy_directory_files(const QString &from_dir, const QString &to_dir, const bool& coverFileIfExist, const std::vector<std::string>& exclude_suffix){
     QDir source_dir(from_dir);
     QDir target_dir(to_dir);
     if(!target_dir.exists()){    /* if directory don't exists, build it */
@@ -235,10 +229,13 @@ bool Project::copy_directory_files(const QString &from_dir, const QString &to_di
         if(fileInfo.isDir()){    /* if it is directory, copy recursively*/
             if(!copy_directory_files(fileInfo.filePath(),
                 target_dir.filePath(fileInfo.fileName()),
-                coverFileIfExist))
+                coverFileIfExist, exclude_suffix))
                 return false;
         }
         else {            /* if coverFileIfExist == true, remove old file first */
+            if (std::find(begin(exclude_suffix), end(exclude_suffix), fileInfo.suffix().toStdString()) != end(exclude_suffix))
+                continue;
+
             if(coverFileIfExist && target_dir.exists(fileInfo.fileName())){
                 target_dir.remove(fileInfo.fileName());
             }
@@ -252,6 +249,34 @@ bool Project::copy_directory_files(const QString &from_dir, const QString &to_di
     }
     return true;
 }
+
+/**
+ * @brief Project::remove_files
+ * Removes the project folder and all of its content
+ * @return
+ */
+bool Project::remove_files() {
+    QDir path(QString::fromStdString(m_dir));
+    bool success{false};
+
+    if (path.exists()) {
+        success = path.removeRecursively();
+    }
+    return success;
+}
+
+ /**
+ * @brief Project::generate_tmp_directory
+ * Tries to generates a temporary directory and returns the path if successful
+ */
+std::string Project::generate_tmp_directory() {
+    QTemporaryDir tmp_dir;
+    tmp_dir.setAutoRemove(false);
+    if(tmp_dir.isValid())
+        return tmp_dir.path().toStdString();
+    return "";
+}
+
 
 /**
  * @brief Project::get_videos
@@ -281,10 +306,6 @@ std::string Project::get_dir() const {
     return m_dir;
 }
 
-std::string Project::get_tmp_dir() const {
-    return m_tmp_dir;
-}
-
 std::string Project::get_name() const {
     return m_name;
 }
@@ -303,19 +324,4 @@ void Project::set_dir(std::string dir) {
 
 void Project::set_file(std::string file) {
     m_file = file;
-}
-
-/**
- * @brief Project::update_tmp
- * Update the temporary files with the new name and path
- * @param name
- */
-void Project::update_tmp(string name) {
-    QFile::rename(QString::fromStdString(m_tmp_file), QString::fromStdString(m_tmp_dir + name + ".vian"));
-    QDir dir = QDir(QString::fromStdString(m_tmp_dir));
-    dir.rename(dir.path(), tmp_dir.path() + "/" + QString::fromStdString(name));
-
-    m_tmp_dir = tmp_dir.path().toStdString() + "/" + name + "/";
-    m_dir_bookmarks = m_tmp_dir + "Bookmarks/";
-    m_tmp_file = m_tmp_dir + name + ".vian";
 }
