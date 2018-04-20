@@ -569,6 +569,7 @@ void MainWindow::gen_report() {
  * Creates a dialog for choosing contrast and brightness values.
  */
 void MainWindow::cont_bri() {
+    if (!video_wgt->get_current_video_project()) return;
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
