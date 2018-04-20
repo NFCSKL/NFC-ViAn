@@ -43,6 +43,8 @@ class FrameWidget : public QWidget
     bool mark_rect = false;
     QPoint anchor = QPoint(0,0);
     QPoint prev_point, prev_point_scaled;
+    const int PAN_FACTOR = 20;
+    const double ZOOM_STEP = 1.1;
 
     bool do_zoom = false;
     bool do_zoom_out = false;
@@ -72,6 +74,7 @@ signals:
     void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out(double);
+    void center_zoom_rect(QPoint, double);
     void send_tool(SHAPES m_tool);
     void send_tool_text(QString, float);
     void send_color(QColor color);

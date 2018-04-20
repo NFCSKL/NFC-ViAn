@@ -97,6 +97,17 @@ void Zoomer::move_zoom_rect(int x, int y){
     anchor = QPoint(tl_x, tl_y);
 }
 
+void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
+    double percent_in_x_before = (center.x() - m_zoom_rect.x) / (double)(m_zoom_rect.br().x - m_zoom_rect.x);
+    double percent_in_y_before = (center.y() - m_zoom_rect.y) / (double)(m_zoom_rect.br().y - m_zoom_rect.y);
+    set_scale_factor(m_scale_factor*zoom_step);
+    double new_center_x = m_zoom_rect.x + percent_in_x_before*m_zoom_rect.width;
+    double new_center_y = m_zoom_rect.y + percent_in_y_before*m_zoom_rect.height;
+    double diff_x = center.x() - new_center_x;
+    double diff_y = center.y() - new_center_y;
+    move_zoom_rect(round(diff_x), round(diff_y));
+}
+
 /**
  * @brief Zoomer::fit_viewport
  * Adjusts the scaling factor so the frame will fit the viewport

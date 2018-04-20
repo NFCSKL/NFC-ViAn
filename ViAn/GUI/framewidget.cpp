@@ -398,6 +398,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
@@ -407,15 +408,30 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
         event->accept();
         break;
     case MOVE:
+        break;
     case ZOOM:
-        if (event->modifiers() == Qt::ControlModifier) {
+        if (event->modifiers() == Qt::ShiftModifier) {
+            init_panning(event->pos());
             if (num_steps.y() < 0) {
-                emit trigger_zoom_out(1/1.1);
+                panning(event->pos()+QPoint(-PAN_FACTOR*m_scale_factor,0));
             } else {
-                emit trigger_zoom_out(1.1);
+                panning(event->pos()+QPoint(PAN_FACTOR*m_scale_factor,0));
             }
         }
-        break;
+        else if (event->modifiers() == Qt::ControlModifier) {
+            if (num_steps.y() < 0) {
+                emit center_zoom_rect(scaled_pos, 1/ZOOM_STEP);
+            } else {
+                emit center_zoom_rect(scaled_pos, ZOOM_STEP);
+            }
+        } else {
+            init_panning(event->pos());
+            if (num_steps.y() < 0) {
+                panning(event->pos()+QPoint(0,-PAN_FACTOR*m_scale_factor));
+            } else {
+                panning(event->pos()+QPoint(0,PAN_FACTOR*m_scale_factor));
+            }
+        }
     default:
         break;
     }
