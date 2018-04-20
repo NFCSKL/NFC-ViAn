@@ -38,8 +38,6 @@ private:
     int prev_frame_idx;
     int POI_end;
     double m_scale_factor = 1;
-    int brightness = 0;
-    double contrast = 1;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -174,11 +172,12 @@ public slots:
     void on_step_zoom(double step);
     void on_fit_screen(void);
     void on_original_size(void);
-    void update_brightness_contrast(int c_val, double v_val);
+    void update_brightness_contrast(int b_val, double c_val);
     void rotate_cw(void);
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);
     void update_playback_speed(int speed);
+    void set_brightness_contrast(int b_val, double c_val);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
