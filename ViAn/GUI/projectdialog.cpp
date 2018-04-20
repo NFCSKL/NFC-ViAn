@@ -24,8 +24,8 @@ ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QVBoxLayout* vertical_layout = new QVBoxLayout;
-    path_text = new QLineEdit(this);
     name_text = new QLineEdit(this);
+    path_text = new QLineEdit(this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
     btn_box = new QDialogButtonBox(Qt::Horizontal);
 
@@ -37,13 +37,15 @@ ProjectDialog::ProjectDialog(QWidget *parent, QString name) : QDialog(parent) {
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
 
+    path_text->setText("C:/");
+
     QHBoxLayout* browse_layout = new QHBoxLayout;
     browse_layout->addWidget(path_text);
     browse_layout->addWidget(browse_btn);
 
     QFormLayout* text_btn_layout = new QFormLayout;
-    text_btn_layout->addRow("Name", name_text);
-    text_btn_layout->addRow("Path", browse_layout);
+    text_btn_layout->addRow("Name:", name_text);
+    text_btn_layout->addRow("Path:", browse_layout);
 
     vertical_layout->addLayout(text_btn_layout);
     vertical_layout->addWidget(btn_box);

@@ -10,10 +10,7 @@ public:
     TextItem(Text* text);
     Text* get_shape();
     void remove();
-    void update_shape_name();
-    void update_shape_color();
     ~TextItem() override;
-    QPixmap map;
 };
 
 #endif // TEXTITEM_H

@@ -7,7 +7,6 @@
 #include <QColorDialog>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
-    //header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);

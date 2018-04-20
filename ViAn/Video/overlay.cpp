@@ -148,6 +148,8 @@ void Overlay::add_drawing(Shapes* shape, int frame_nr) {
  * @param pos
  * @param frame_nr
  */
+
+// Unused
 void Overlay::get_drawing(QPoint pos, int frame_nr) {
     current_drawing = nullptr;
     for (auto shape : overlays[frame_nr]) {
