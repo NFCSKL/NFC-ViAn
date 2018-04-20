@@ -193,7 +193,21 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
         Pen* current = dynamic_cast<Pen*>(shape);
         drawing = cv::boundingRect(current->get_points());
     } else {
-        drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
+        int tl_x = shape->get_draw_start().x;
+        int tl_y = shape->get_draw_start().y;
+        int br_x = shape->get_draw_end().x;
+        int br_y = shape->get_draw_end().y;
+
+        if (tl_y - br_y <= 10 && tl_y - br_y >= -10) {
+            tl_y += -7;
+            br_y += 7;
+        }
+
+        if (tl_x - br_x <= 10 && tl_x - br_x >= -10) {
+            tl_x += -7;
+            br_x += 7;
+        }
+        drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     }
     return drawing.contains(qpoint_to_point(pos));
 }
@@ -217,7 +231,7 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
-        if (right_click && current_shape != HAND) {
+        if (right_click && current_shape != EDIT) {
             set_current_drawing(nullptr);
             change_tool = true;
             return;
@@ -238,20 +252,23 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
         case PEN:
             add_drawing(new Pen(current_colour, pos), frame_nr);
             break;
-        case HAND:
+        case EDIT:
             prev_point = pos;
+
             if (right_click) {
                 m_right_click = right_click;
-                if (current_drawing) {
+                if (current_drawing && point_in_drawing(pos, current_drawing)) {
                     current_drawing->set_anchor(pos);
                 } else {
                     change_tool = true;
                 }
                 break;
             }
-            if (!current_drawing || !point_in_drawing(pos, current_drawing)) {
-                set_current_drawing(nullptr);
-                emit set_tool_zoom();
+
+            if (current_drawing && point_in_drawing(pos, current_drawing)) {
+                break;
+            } else {
+                get_drawing(pos, frame_nr);
             }
             break;
         case SELECT:
@@ -326,7 +343,7 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
  */
 void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
     if (show_overlay && !overlays[frame_nr].empty()) {
-        if (current_shape == HAND) {
+        if (current_shape == EDIT) {
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;

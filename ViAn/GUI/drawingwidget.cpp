@@ -367,7 +367,7 @@ void DrawingWidget::remove_item() {
 }
 
 void DrawingWidget::delete_item() {
-    if (!currentItem() || m_overlay->get_tool() != HAND) return;
+    if (!currentItem() || m_overlay->get_tool() != EDIT) return;
     ShapeItem* item = dynamic_cast<ShapeItem*>(currentItem());
 
     if (item->type() == FRAME_ITEM) {

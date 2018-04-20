@@ -104,7 +104,7 @@ void FrameWidget::set_cursor(SHAPES tool) {
         setCursor(Qt::OpenHandCursor);
         break;
         //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
-    case HAND:
+    case EDIT:
         setCursor(Qt::SizeAllCursor);
         break;
     default:
@@ -402,7 +402,7 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
-    case HAND:
+    case EDIT:
     case SELECT:
         emit mouse_scroll(num_steps);
         event->accept();
