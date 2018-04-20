@@ -42,6 +42,7 @@ public:
     void set_colour(QColor col);
     QColor get_colour();
     SHAPES get_tool();
+    int get_current_frame();
     void mouse_pressed(QPoint pos, int frame_nr, bool right_click);
     void mouse_released(QPoint pos, int frame_nr, bool right_click);
     void mouse_moved(QPoint pos, int frame_nr);
@@ -74,9 +75,11 @@ private:
     Shapes* current_drawing = nullptr;
     QPoint prev_point;
     bool m_right_click = false;
+    bool change_tool = false;
 
     bool show_overlay = true;
     int baseline = 0;
+    int current_frame = 0;
 
     SHAPES current_shape = NONE;
     QColor current_colour = Qt::red;
@@ -88,6 +91,8 @@ private:
 signals:
     void new_drawing(Shapes* shape, int frame_nr);
     void select_current(Shapes*, int);
+    void set_tool_zoom();
+    void set_tool_hand();
 };
 
 #endif // OVERLAY_H

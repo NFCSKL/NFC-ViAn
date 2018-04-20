@@ -15,7 +15,6 @@ PenItem::~PenItem() {}
 
 void PenItem::remove() {}
 
-
 Pen* PenItem::get_shape() {
     return m_pen;
 }
