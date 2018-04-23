@@ -145,9 +145,10 @@ void AnalysisMethod::run() {
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
+        qDebug() << "Analysis path" << QString::fromStdString(new_path);
         int index = new_path.find_last_of('/') + 1;
         m_ana_name = new_path.substr(index);
-        m_analysis.save_saveable(m_save_path);
+        m_analysis.save_saveable(new_path);
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
         for (auto p : m_analysis.get_intervals()) {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());

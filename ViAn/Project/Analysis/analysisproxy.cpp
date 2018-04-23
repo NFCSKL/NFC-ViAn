@@ -86,6 +86,7 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["interval end"] = this->m_ana_interval.second;
     json["full_path"] = QString::fromStdString(file_analysis);
     QJsonArray intervals;
+    qDebug() << ;
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;
         interval["start"] = (*it).first;

@@ -474,6 +474,7 @@ bool ProjectWidget::prompt_save() {
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     Q_UNUSED(col)
+    if (!item) return;
     //get_index_path(item); // Remove?
     switch(item->type()){
     case VIDEO_ITEM: {
@@ -603,6 +604,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case DRAWING_TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Update", this, SLOT(drawing_tag()));
+                menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -638,7 +640,7 @@ void ProjectWidget::drawing_tag() {
     VideoItem* vid_item;
     DrawingTag* tag;
     if (selectedItems().front()->type() == VIDEO_ITEM) {
-        // tag drawing
+        // Create tag drawing
         vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
         tag = new DrawingTag();
         tag->m_name = "Drawing tag";
@@ -653,11 +655,13 @@ void ProjectWidget::drawing_tag() {
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.size() > 0) {
+            qDebug() << "Tag frame" << frame_overlay.first;
             tag->add_frame(frame_overlay.first);
         }
     }
 
     if (selectedItems().front()->type() == VIDEO_ITEM) {
+        qDebug() << "Add the drawing tag";
         add_basic_analysis(vid_proj, tag);
     } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
         tree_item_clicked(dynamic_cast<DrawingTagItem*>(selectedItems().front()));
@@ -696,7 +700,6 @@ void ProjectWidget::remove_item() {
             remove_tree_item(item);
         }
     }
-    emit remove_overlay();
 }
 
 /**
@@ -735,6 +738,15 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
 
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
+        vid_item->get_video_project()->remove_analysis(tag);
+        emit update_frame();
+    }
+    else if (item->type() == DRAWING_TAG_ITEM) {
+        emit set_tag_slider(false);
+        emit enable_tag_btn(false);
+
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+        DrawingTag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
         vid_item->get_video_project()->remove_analysis(tag);
         emit update_frame();
     }

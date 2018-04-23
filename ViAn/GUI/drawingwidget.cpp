@@ -50,9 +50,7 @@ void DrawingWidget::clear_overlay() {
         disconnect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
         m_overlay = nullptr;
     }
-    QObject::blockSignals(true);
     clear();
-    QObject::blockSignals(false);
 }
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
@@ -274,6 +272,7 @@ void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
  * @param col
  */
 void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
+    if (!item) return;
     switch (item->type()) {
     case FRAME_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
