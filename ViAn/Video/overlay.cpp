@@ -16,7 +16,9 @@ Overlay::Overlay() {}
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
-            frame = (*it)->draw(frame);
+            if ((*it)->get_show()) {
+                frame = (*it)->draw(frame);
+            }
         }
     }
     current_frame = frame_nr;

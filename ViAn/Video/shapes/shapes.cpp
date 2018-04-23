@@ -183,6 +183,15 @@ QString Shapes::get_name() {
     return m_name;
 }
 
+bool Shapes::toggle_show() {
+    show = !show;
+    return show;
+}
+
+bool Shapes::get_show() {
+    return show;
+}
+
 /**
  * @brief Shape::read_shape
  * @param json

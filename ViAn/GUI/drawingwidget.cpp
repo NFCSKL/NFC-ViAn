@@ -11,13 +11,14 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 
-    setColumnCount(2);
-    header()->resizeSection(0, 200);
-    header()->resizeSection(1, 30);
+    setColumnCount(3);
+    header()->resizeSection(0, 170);
+    header()->resizeSection(1, 40);
+    header()->resizeSection(2, 35);
 
     headerItem()->setText(0, "Frame - Drawings");
     headerItem()->setText(1, "Color");
-
+    headerItem()->setText(2, "Hide");
 
     // Shortcut for deleteing item
     QShortcut* delete_sc = new QShortcut(this);
@@ -293,6 +294,8 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
                 shape->set_color(color);
                 shape_item->update_shape_color();
             }
+        } else if (col == 2) {
+            shape_item->update_show_icon(shape->toggle_show());
         }
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);

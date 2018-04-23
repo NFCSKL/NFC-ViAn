@@ -11,6 +11,7 @@ public:
     virtual void remove() = 0;
     void update_shape_name();
     void update_shape_color();
+    void update_show_icon(bool);
     virtual Shapes* get_shape() = 0;
     QPixmap map;
 };
