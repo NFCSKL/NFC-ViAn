@@ -157,7 +157,7 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
-    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint,bool,bool)), this, SLOT(mouse_moved(QPoint,bool,bool)));
     connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
     connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
     connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
@@ -982,9 +982,11 @@ void VideoWidget::mouse_released(QPoint pos, bool right_click) {
     });
 }
 
-void VideoWidget::mouse_moved(QPoint pos) {
+void VideoWidget::mouse_moved(QPoint pos, bool shift, bool ctrl) {
     update_overlay_settings([&](){
         o_settings.mouse_moved = true;
+        o_settings.shift_modifier = shift;
+        o_settings.ctrl_modifier = ctrl;
         o_settings.pos = pos;
     });
 }

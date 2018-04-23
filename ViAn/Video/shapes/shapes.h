@@ -19,6 +19,7 @@ public:
     void set_anchor(QPoint pos);
     void edit_shape(QPoint diff_point);
     void update_drawing_pos(QPoint pos);
+    void update_drawing_sym(int dx, int dy);
     void update_text_pos(QPoint pos);
     void update_text_draw_end();
     virtual void move_shape(QPoint p);

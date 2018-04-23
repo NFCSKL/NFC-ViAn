@@ -161,7 +161,7 @@ public slots:
     void set_color(QColor color);
     void mouse_pressed(QPoint pos, bool);
     void mouse_released(QPoint pos, bool right_click);
-    void mouse_moved(QPoint pos);
+    void mouse_moved(QPoint pos, bool shift, bool ctrl);
     void mouse_scroll(QPoint pos);
     void set_current_drawing(Shapes* shape);
     void update_overlay_settings(std::function<void ()> lambda);
