@@ -198,14 +198,14 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
         int br_x = shape->get_draw_end().x;
         int br_y = shape->get_draw_end().y;
 
-        if (tl_y - br_y <= 10 && tl_y - br_y >= -10) {
-            tl_y += -7;
-            br_y += 7;
+        if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
+            tl_y += -DRAW_RECT_MARGIN;
+            br_y += DRAW_RECT_MARGIN;
         }
 
-        if (tl_x - br_x <= 10 && tl_x - br_x >= -10) {
-            tl_x += -7;
-            br_x += 7;
+        if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
+            tl_x += -DRAW_RECT_MARGIN;
+            br_x += DRAW_RECT_MARGIN;
         }
         drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     }
@@ -254,9 +254,8 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
             break;
         case EDIT:
             prev_point = pos;
-
+            m_right_click = right_click;
             if (right_click) {
-                m_right_click = right_click;
                 if (current_drawing && point_in_drawing(pos, current_drawing)) {
                     current_drawing->set_anchor(pos);
                 } else {
