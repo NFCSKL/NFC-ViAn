@@ -11,8 +11,7 @@
  */
 class MotionDetection : public AnalysisMethod {
 public:
-
-    MotionDetection(std::string source_file, std::string save_file);
+    MotionDetection(const std::string& source_file, const std::string& save_file);
     ~MotionDetection();
 
 private:

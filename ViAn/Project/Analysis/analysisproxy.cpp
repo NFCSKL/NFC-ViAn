@@ -33,7 +33,7 @@ AnalysisProxy::~AnalysisProxy() {
 }
 
 /**
- * @brief AnalysisProxy::get_analysis
+ * @brief AnalysisProxy::load_analysis
  * @return
  */
 Analysis* AnalysisProxy::load_analysis() {
@@ -108,17 +108,10 @@ void AnalysisProxy::write(QJsonObject &json) {
     m_unsaved_changes = false;
 }
 
-SAVE_TYPE AnalysisProxy::get_save_type() const
-{
-    return DETECTION;
-}
-
-ANALYSIS_TYPE AnalysisProxy::get_type() const
-{
+ANALYSIS_TYPE AnalysisProxy::get_type() const {
     return type;
 }
 
-std::string AnalysisProxy::full_path() const
-{
+std::string AnalysisProxy::full_path() const {
     return file_analysis;
 }

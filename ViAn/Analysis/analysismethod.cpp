@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
 #include "Analysis/analysismethod.h"
+#include "imagegenerator.h"
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
 {
     m_source_file = video_path;
@@ -9,7 +10,8 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     std::string vid_name = video_path.substr(index);
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
-    m_save_path = save_path+vid_name +"-motion_analysis";
+    m_ana_name = vid_name + DETECTION_STRING;
+    m_save_path = save_path;
     add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
 }
 
@@ -142,9 +144,10 @@ void AnalysisMethod::run() {
         m_analysis.bounding_box = bounding_box;
         m_analysis.use_interval = use_interval;
         m_analysis.use_bounding_box = use_bounding_box;
-        m_save_path = check_save_path(m_save_path);
+        std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
+        int index = new_path.find_last_of('/') + 1;
+        m_ana_name = new_path.substr(index);
         m_analysis.save_saveable(m_save_path);
-        //AnalysisProxy proxy(m_analysis, m_analysis.full_path());
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
         for (auto p : m_analysis.get_intervals()) {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
@@ -152,26 +155,6 @@ void AnalysisMethod::run() {
         }
         emit finished_analysis(proxy);
     }
-}
-
-/**
- * @brief AnalysisMethod::check_save_path
- * @param path
- * @param increment
- * @return new save path
- * Checks if path exists and if it does adds a number to the end to prevent
- * that path overwrites the old one
- */
-std::string AnalysisMethod::check_save_path(std::string path, int increment) {
-    std::string new_path = path + std::to_string(increment);
-    QFile file(QString::fromStdString(path));
-    QFile new_file(QString::fromStdString(new_path));
-    if (!file.exists()) {
-        return path;
-    } else if (!new_file.exists()) {
-        return new_path;
-    }
-    return check_save_path(path, ++increment);
 }
 
 /**
@@ -255,10 +238,10 @@ std::string AnalysisMethod::get_descr(const std::string& var)
 }
 
 
-std::string AnalysisMethod::save_path() const
-{
+std::string AnalysisMethod::save_path() const {
     return m_save_path;
 }
+
 void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
 {
     m_settings[var] = value_default;

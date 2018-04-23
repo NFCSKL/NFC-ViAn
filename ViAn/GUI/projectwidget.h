@@ -9,14 +9,16 @@
 #include <vector>
 #include "Project/project.h"
 #include "GUI/TreeItems/tagitem.h"
+#include "GUI/TreeItems/analysisitem.h"
+#include "GUI/TreeItems/drawingtagitem.h"
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
+#include "Project/Analysis/drawingtag.h"
 #include "Project/videoproject.h"
 #include "Analysis/analysismethod.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysisdialog.h"
-#include "TreeItems/analysisitem.h"
 class Project;
 class VideoItem;
 class FolderItem;
@@ -57,17 +59,16 @@ signals:
     void update_frame();
     void remove_overlay();
     void new_vid_proj(VideoProject*);
+    void update_brightness_contrast(int, double);
 
 public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
-    void add_default_project();
     void add_video();
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     bool save_project();
-    void save_as_project(QString, QString);
     bool open_project(QString project_path="");
     bool close_project();
     void remove_project();
@@ -81,6 +82,7 @@ private slots:
     void context_menu(const QPoint& point);
     void remove_item();
     void rename_item();
+    void drawing_tag();
     void show_details();
     void hide_details();
     void create_folder_item();

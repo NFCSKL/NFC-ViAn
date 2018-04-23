@@ -115,9 +115,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
+    connect(draw_toolbar, SIGNAL(send_text(QString, float)), video_wgt, SLOT(set_tool_text(QString,float)));
     connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_current_drawing);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     connect(drawing_wgt, &DrawingWidget::set_tool_hand, draw_toolbar->hand_tool_act, &QAction::trigger);
+    connect(drawing_wgt, &DrawingWidget::set_tool_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     draw_toolbar->zoom_tool_act->trigger();
@@ -141,6 +143,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::marked_video, drawing_wgt, &DrawingWidget::set_video_project);
+    connect(project_wgt, &ProjectWidget::update_brightness_contrast, video_wgt, &VideoWidget::update_brightness_contrast);
 
     connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
@@ -172,13 +175,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
-    project_wgt->add_default_project();
     // Recent projects menu
-    RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
+    rp_dialog = new RecentProjectDialog(this);
     rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+
+    // Create a new project if user presses "new project" or if dialog is rejected
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
-    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
+    connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt,&ProjectWidget::new_project);
+
+    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
@@ -213,6 +220,7 @@ void MainWindow::init_file_menu() {
     QAction* close_project_act = new QAction(tr("&Close project"), this);
     QAction* remove_project_act = new QAction(tr("&Remove project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
+
 
     // Set icons
     //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));     //add if wanted
@@ -262,7 +270,7 @@ void MainWindow::init_file_menu() {
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
+    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(remove_project_act, &QAction::triggered, project_wgt, &ProjectWidget::remove_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
@@ -541,7 +549,7 @@ void MainWindow::delete_drawing(Shapes *shape) {
 }
 
 void MainWindow::delete_current_drawing() {
-    video_wgt->set_delete_drawing(nullptr);
+    drawing_wgt->delete_item();
 }
 
 void MainWindow::zoom() {
@@ -570,10 +578,12 @@ void MainWindow::gen_report() {
  * Creates a dialog for choosing contrast and brightness values.
  */
 void MainWindow::cont_bri() {
+    if (!video_wgt->get_current_video_project()) return;
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
     man_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
+    connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(set_brightness_contrast(int,double)));
     man_dialog->exec();
 }
 
@@ -591,7 +601,7 @@ void MainWindow::export_images(){
         interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
-    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_tmp_dir(),
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_dir(),
                                         video_wgt->get_current_video_length() - 1,
                                         interval);
     if (!exporter_dialog.exec()){

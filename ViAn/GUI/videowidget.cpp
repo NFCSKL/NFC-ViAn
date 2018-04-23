@@ -154,6 +154,7 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+    connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
@@ -588,9 +589,8 @@ void VideoWidget::play_btn_toggled(bool status) {
  */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr) {
-        Tag* tag = dynamic_cast<Tag*>(m_tag);
-        tag->add_frame(playback_slider->value());
-        playback_slider->set_basic_analysis(tag);
+        m_tag->add_frame(playback_slider->value());
+        playback_slider->set_basic_analysis(m_tag);
         emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
         return;
     }
@@ -754,6 +754,7 @@ void VideoWidget::on_new_frame() {
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
+    m_vid_proj->get_video()->state.frame = frame_num;
 }
 
 /**
@@ -955,7 +956,7 @@ void VideoWidget::set_tool(SHAPES tool) {
 
 void VideoWidget::set_tool_text(QString text, float font_scale) {
     update_overlay_settings([&](){
-        o_settings.tool = TEXT;
+        o_settings.create_text = true;
         o_settings.current_string = text;
         o_settings.current_font_scale = font_scale;
     });
@@ -1032,6 +1033,20 @@ void VideoWidget::pan(int x, int y) {
 }
 
 /**
+ * @brief VideoWidget::center
+ * Notifies the frame processor when the zoom rectangle should be centered
+ * @param center
+ * @param
+ */
+void VideoWidget::center(QPoint pos, double zoom_step) {
+    update_processing_settings([&](){
+        z_settings.center = pos;
+        z_settings.do_center = true;
+        z_settings.zoom_step = zoom_step;
+    });
+}
+
+/**
  * @brief VideoWidget::set_zoom_rectangle
  * Notifies the frame processor that a new zoom rectangle has been set
  * @param p1 tl point of the zoom rectangle
@@ -1084,8 +1099,6 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    brightness = b_val;
-    contrast = c_val;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1159,9 +1172,14 @@ void VideoWidget::frame_line_edit_finished() {
 }
 
 int VideoWidget::get_brightness() {
-    return brightness;
+    return m_vid_proj->get_video()->state.brightness;
 }
 
 double VideoWidget::get_contrast() {
-    return contrast;
+    return m_vid_proj->get_video()->state.contrast;
+}
+
+void VideoWidget::set_brightness_contrast(int b_val, double c_val) {
+    m_vid_proj->get_video()->state.brightness = b_val;
+    m_vid_proj->get_video()->state.contrast = c_val;
 }

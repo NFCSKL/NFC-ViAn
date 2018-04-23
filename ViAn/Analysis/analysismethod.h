@@ -28,6 +28,7 @@ class AnalysisMethod : public QObject, public QRunnable{
     SettingsDescr m_descriptions;       // Descriptions for settings constants
     std::string m_save_path;            // Save path for finished analysis
     std::string m_source_file;          // Source video file used by opencv capture
+    std::string m_ana_name;             // The name of the analysis
 
     bool m_scaling_done = false;        // Control states
     int prev_detection_frame = -1;
@@ -36,7 +37,6 @@ class AnalysisMethod : public QObject, public QRunnable{
 
 protected:
     std::pair<int, int> interval;
-    //AnalysisInterval interval;
     cv::Rect bounding_box;
     bool use_interval = false;
     bool use_bounding_box = false;
@@ -46,6 +46,7 @@ protected:
 
     const int FULL_HD_WIDTH = 1920;
     const int FULL_HD_HEIGHT = 1080;
+    const std::string DETECTION_STRING = "-motion_analysis";
 
     int num_frames = -1;            // Total number of video frames
     unsigned int sample_freq = 1;   // Sample frequency of analysis
@@ -94,8 +95,6 @@ public:
 
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
     void set_analysis_area(cv::Rect area);
-
-    std::string check_save_path(std::string path, int increment = 2);
 
     bool sample_current_frame(); // Check if current frame is to be sampled
 

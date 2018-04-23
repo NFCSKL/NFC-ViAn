@@ -45,7 +45,6 @@ TagDialog::~TagDialog() {
 void TagDialog::ok_btn_clicked() {
     emit tag_name(name->text());
     close();
-
 }
 
 /**

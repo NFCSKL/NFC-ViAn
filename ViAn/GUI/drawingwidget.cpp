@@ -4,19 +4,27 @@
 #include <QDebug>
 #include <QDropEvent>
 #include <QShortcut>
+#include <QColorDialog>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
-    header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 
-    // Widget only shortcut for creating a new folder
-    QShortcut* delete_sc = new QShortcut(this);
-    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
-    delete_sc->setKey(QKeySequence(QKeySequence::Delete));
-    connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::remove_item);
+    setColumnCount(2);
+    header()->resizeSection(0, 200);
+    header()->resizeSection(1, 30);
 
+    headerItem()->setText(0, "Frame - Drawings");
+    headerItem()->setText(1, "Color");
+
+
+    // Shortcut for deleteing item
+    QShortcut* delete_sc = new QShortcut(this);
+    delete_sc->setKey(QKeySequence(QKeySequence::Delete));
+    connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::delete_item);
+
+    connect(this, &DrawingWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(item_changed(QTreeWidgetItem*)));
 }
 
@@ -27,6 +35,9 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     update_from_overlay();
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
     connect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
+    connect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
+    connect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
+    connect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
 }
 
 void DrawingWidget::clear_overlay() {
@@ -34,9 +45,14 @@ void DrawingWidget::clear_overlay() {
         save_item_data();
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
         disconnect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
+        disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
+        disconnect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
+        disconnect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
         m_overlay = nullptr;
     }
+    QObject::blockSignals(true);
     clear();
+    QObject::blockSignals(false);
 }
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
@@ -144,36 +160,42 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
         RectItem* rect_item = new RectItem(dynamic_cast<Rectangle*>(shape));
         frame_item->addChild(rect_item);
         frame_item->setExpanded(true);
+        setCurrentItem(rect_item);
         break;
     }
     case CIRCLE: {
         CircleItem* circle_item = new CircleItem(dynamic_cast<Circle*>(shape));
         frame_item->addChild(circle_item);
         frame_item->setExpanded(true);
+        setCurrentItem(circle_item);
         break;
     }
     case LINE: {
         LineItem* line_item = new LineItem(dynamic_cast<Line*>(shape));
         frame_item->addChild(line_item);
         frame_item->setExpanded(true);
+        setCurrentItem(line_item);
         break;
     }
     case ARROW: {
         ArrowItem* arrow_item = new ArrowItem(dynamic_cast<Arrow*>(shape));
         frame_item->addChild(arrow_item);
         frame_item->setExpanded(true);
+        setCurrentItem(arrow_item);
         break;
     }
     case TEXT: {
         TextItem* text_item = new TextItem(dynamic_cast<Text*>(shape));
         frame_item->addChild(text_item);
         frame_item->setExpanded(true);
+        setCurrentItem(text_item);
         break;
     }
     case PEN: {
         PenItem* pen_item = new PenItem(dynamic_cast<Pen*>(shape));
         frame_item->addChild(pen_item);
         frame_item->setExpanded(true);
+        setCurrentItem(pen_item);
         break;
     }
     default:
@@ -217,7 +239,7 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
         case CIRCLE_ITEM:
         case LINE_ITEM:
         case ARROW_ITEM:
-        case PEN:
+        case PEN_ITEM:
         case TEXT_ITEM: {
             auto a_item = dynamic_cast<ShapeItem*>(child);
             a_item->update_shape_name();
@@ -225,6 +247,21 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
         }
         default:
             break;
+        }
+    }
+}
+
+void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
+    QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
+    if (list.empty()) return;
+    FrameItem* frame_item = dynamic_cast<FrameItem*>(list.at(0));
+    for (int i = 0; i != frame_item->childCount(); ++i) {
+        ShapeItem* shape_item = dynamic_cast<ShapeItem*>(frame_item->child(i));
+        if (shape_item->get_shape() == shape) {
+            QObject::blockSignals(true);
+            setCurrentItem(shape_item);
+            QObject::blockSignals(false);
+            return;
         }
     }
 }
@@ -237,7 +274,6 @@ void DrawingWidget::save_item_data(QTreeWidgetItem *item) {
  * @param col
  */
 void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
-    Q_UNUSED(col)
     switch (item->type()) {
     case FRAME_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
@@ -253,6 +289,13 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     case PEN_ITEM: {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(item);
         Shapes* shape = shape_item->get_shape();
+        if (col == 1) {
+            QColor color = QColorDialog::getColor();
+            if (color.isValid()) {
+                shape->set_color(color);
+                shape_item->update_shape_color();
+            }
+        }
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
         emit set_tool_hand();
@@ -276,7 +319,7 @@ void DrawingWidget::context_menu(const QPoint &point) {
     if (item == nullptr) return;
     switch (item->type()) {
     case FRAME_ITEM:
-        menu.addAction("Remove", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, SLOT(remove_item()));
         break;
     case RECT_ITEM:
     case CIRCLE_ITEM:
@@ -285,7 +328,7 @@ void DrawingWidget::context_menu(const QPoint &point) {
     case PEN_ITEM:
     case TEXT_ITEM:
         menu.addAction("Rename", this, SLOT(rename_item()));
-        menu.addAction("Remove", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, SLOT(remove_item()));
         break;
     default:
         break;
@@ -323,6 +366,22 @@ void DrawingWidget::item_changed(QTreeWidgetItem* item) {
  */
 void DrawingWidget::remove_item() {
     remove_from_tree(currentItem());
+}
+
+void DrawingWidget::delete_item() {
+    if (!currentItem() || m_overlay->get_tool() != HAND) return;
+    ShapeItem* item = dynamic_cast<ShapeItem*>(currentItem());
+
+    if (item->type() == FRAME_ITEM) {
+        FrameItem* f_item = dynamic_cast<FrameItem*>(item);
+        if (f_item->get_frame() == m_overlay->get_current_frame())
+            remove_from_tree(f_item);
+    } else if (item->get_shape() != m_overlay->get_current_drawing()) {
+        return;
+    } else {
+        remove_from_tree(item);
+        emit set_tool_zoom();
+    }
 }
 
 /**

@@ -15,7 +15,7 @@
 class AnalysisProxy : public BasicAnalysis
 {
     std::string file_analysis = "";  // m_analysis.full_path()
-    ANALYSIS_TYPE type;
+    ANALYSIS_TYPE type = MOTION_DETECTION;
 public:
     AnalysisProxy();
     AnalysisProxy(const std::string file_analysis);
@@ -26,7 +26,6 @@ public:
 
     void reset_root_dir(const std::string& dir);
     virtual ANALYSIS_TYPE get_type() const override;
-    virtual SAVE_TYPE get_save_type() const override;
     virtual std::string full_path() const override;
     virtual void read(const QJsonObject& json) override;
     virtual void write(QJsonObject& json) override;

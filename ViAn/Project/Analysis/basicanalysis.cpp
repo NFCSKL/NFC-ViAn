@@ -1,6 +1,7 @@
 #include "basicanalysis.h"
 #include "tag.h"
 #include "analysis.h"
+#include "drawingtag.h"
 
 BasicAnalysis::BasicAnalysis() {}
 
@@ -27,8 +28,8 @@ void BasicAnalysis::add_interval(AnalysisInterval *ai){
     m_unsaved_changes = true;
 }
 
-SAVE_TYPE BasicAnalysis::get_save_type() const {
-    return INTERVAL;
+void BasicAnalysis::clear_intervals() {
+    m_intervals.clear();
 }
 
 ANALYSIS_TYPE BasicAnalysis::get_type() const {
@@ -41,7 +42,7 @@ ANALYSIS_TYPE BasicAnalysis::get_type() const {
  * @param json
  */
 void BasicAnalysis::read(const QJsonObject &json){
-    this->m_name = json["name"].toString().toStdString();
+    m_name = json["name"].toString().toStdString();
     QJsonArray json_intervals = json["POI:s"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_interval = json_intervals[i].toObject();

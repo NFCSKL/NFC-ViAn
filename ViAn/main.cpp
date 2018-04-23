@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<std::string>();
     qRegisterMetaType<BasicAnalysis>();
     qRegisterMetaType<AnalysisProxy>();
-    bool unit_testing = true;
+    bool unit_testing = false;
     if(unit_testing){
         QTest::qExec(new ProjectTestsuite());
         QTest::qExec(new BookmarkTest());

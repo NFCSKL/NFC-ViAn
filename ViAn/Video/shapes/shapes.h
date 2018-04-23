@@ -9,7 +9,7 @@
 
 #include "opencv2/opencv.hpp"
 
-enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, HAND, ZOOM, MOVE, ANALYSIS_BOX};
+enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, HAND, ZOOM, MOVE, ANALYSIS_BOX, SELECT};
 
 class Shapes {
 
@@ -21,7 +21,7 @@ public:
     void update_drawing_pos(QPoint pos);
     void update_text_pos(QPoint pos);
     void update_text_draw_end();
-    void move_shape(QPoint p);
+    virtual void move_shape(QPoint p);
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
 
@@ -34,13 +34,14 @@ public:
 
     static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
     static constexpr double ALPHA = 0.6; // Costant used for the opacity.
-    static const int RGB_MAX = 255;      // Constant used for inverting colors.
 
     cv::Point get_draw_start();
     cv::Point get_draw_end();
     SHAPES get_shape();
+    QColor get_color();
+    void set_color(QColor);
+    cv::Size get_text_size();
     void set_text_size(cv::Size size);
-    void invert_color();
     void set_thickness(QPoint pos);
     void set_frame(int);
     int get_frame();
@@ -50,12 +51,12 @@ public:
 protected:
     SHAPES shape = NONE;
     cv::Scalar color;
+    QColor q_color;
     int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;
     bool anchor; // true = draw start -- false = draw end
     cv::Size text_size;
-    bool inverted = false;
     int frame;
     QString m_name = "Unknown shape";
 

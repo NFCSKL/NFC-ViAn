@@ -7,10 +7,11 @@
 #include <QString>
 #include "Filehandler/saveable.h"
 struct VideoState{
-    int frame = 0;
-    int contrast = 0;
+    int frame = -1;
+    double contrast = 1;
     int brightness = 0;
     int rotation = 0;
+
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;

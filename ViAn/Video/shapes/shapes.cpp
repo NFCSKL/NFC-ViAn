@@ -9,6 +9,7 @@
 Shapes::Shapes(SHAPES s) {
     shape = s;
     color = cv::Scalar();
+    q_color = QColor();
     draw_start = cv::Point();
     draw_end = cv::Point();
 }
@@ -21,6 +22,7 @@ Shapes::Shapes(SHAPES s) {
 Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     shape = s;
     color = qcolor_to_scalar(col);
+    q_color = col;
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
 }
@@ -137,17 +139,21 @@ SHAPES Shapes::get_shape() {
     return shape;
 }
 
-void Shapes::set_text_size(cv::Size size) {
-    text_size = size;
+QColor Shapes::get_color() {
+    return q_color;
 }
 
-/**
- * @brief Shape::invert_color
- * Inverts the color by subtracting its RGB value from 255
- */
-void Shapes::invert_color() {
-    color = cv::Scalar::all(RGB_MAX) - color;
-    inverted = !inverted;
+void Shapes::set_color(QColor col) {
+    q_color = col;
+    color = qcolor_to_scalar(col);
+}
+
+cv::Size Shapes::get_text_size() {
+    return text_size;
+}
+
+void Shapes::set_text_size(cv::Size size) {
+    text_size = size;
 }
 
 /**
@@ -190,6 +196,7 @@ void Shapes::read_shape(const QJsonObject& json){
     this->color[0] = json["b"].toInt();
     this->color[1] = json["g"].toInt();
     this->color[2] = json["r"].toInt();
+    q_color = QColor(color[2], color[1], color[0]);
     this->draw_start.x = json["p1x"].toInt();
     this->draw_start.y = json["p1y"].toInt();
     this->draw_end.x = json["p2x"].toInt();
@@ -201,19 +208,12 @@ void Shapes::read_shape(const QJsonObject& json){
  * @brief Shape::write_shape
  * @param json
  * Writes a shape to a Json object.
- * If the shape is the current_drawing, save its original color instead of the inverted
  */
 void Shapes::write_shape(QJsonObject& json){
     json["shape"] = this->shape;
-    if (inverted) {
-        json["b"] = RGB_MAX - this->color[0];
-        json["g"] = RGB_MAX - this->color[1];
-        json["r"] = RGB_MAX - this->color[2];
-    } else {
-        json["b"] = this->color[0];
-        json["g"] = this->color[1];
-        json["r"] = this->color[2];
-    }
+    json["b"] = this->color[0];
+    json["g"] = this->color[1];
+    json["r"] = this->color[2];
     json["p1x"] = this->draw_start.x;
     json["p1y"] = this->draw_start.y;
     json["p2x"] = this->draw_end.x;

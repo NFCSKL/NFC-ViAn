@@ -1,6 +1,7 @@
 #include "frameprocessor.h"
 #include <QDebug>
 #include <QTime>
+#include "utility.h"
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -136,10 +137,15 @@ void FrameProcessor::process_frame() {
  */
 void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
-    if (m_z_settings->draw_area_size != m_zoomer.get_viewport_size()) {
-
+    if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
         m_zoomer.update_rect_size();
+    }
+    // Center the zoom rect
+    else if (m_z_settings->do_center) {
+        m_z_settings->do_center = false;
+
+        m_zoomer.center_zoom_rect(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Scale/zoom factor has been changed
     else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
@@ -174,8 +180,8 @@ void FrameProcessor::update_zoomer_settings() {
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
-    set_anchor(m_zoomer.get_anchor());
-    set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_anchor(m_zoomer.get_anchor());
+    emit set_scale_factor(m_zoomer.get_scale_factor());
 }
 
 /**
@@ -222,6 +228,15 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->delete_drawing) {
         m_o_settings->delete_drawing = false;
         m_overlay->delete_drawing(m_o_settings->shape);
+    // Create a new text drawing
+    } else if (m_o_settings->create_text) {
+        int height = m_zoomer.get_zoom_rect().height;
+        int width = m_zoomer.get_zoom_rect().width;
+        int anchor_x = m_zoomer.get_anchor().x();
+        int anchor_y = m_zoomer.get_anchor().y();
+        QPoint text_point = QPoint(anchor_x+width/2, anchor_y+height/2);
+        m_o_settings->create_text = false;
+        m_overlay->create_text(text_point, curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
