@@ -209,6 +209,7 @@ void Shapes::read_shape(const QJsonObject& json){
     this->draw_end.x = json["p2x"].toInt();
     this->draw_end.y = json["p2y"].toInt();
     this->frame = json["frame"].toInt();
+    this->show = json["show"].toBool();
 }
 
 /**
@@ -226,5 +227,6 @@ void Shapes::write_shape(QJsonObject& json){
     json["p2x"] = this->draw_end.x;
     json["p2y"] = this->draw_end.y;
     json["frame"] = this->frame;
+    json["show"] = this->show;
 }
 
