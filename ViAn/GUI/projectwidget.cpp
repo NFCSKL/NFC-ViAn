@@ -23,7 +23,6 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDragEnabled(true);
     setDropIndicatorShown(true);
 
-    //connect(this, &ProjectWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
@@ -479,15 +478,12 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        VideoProject* proj = vid_item->get_video_project();
-        VideoState state = proj->get_video()->state;
-        emit marked_video(proj, state.frame);
+        emit marked_video(vid_item->get_video_project(), -1);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         emit enable_tag_btn(false);
-        emit update_brightness_contrast(state.brightness, state.contrast);
         emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
