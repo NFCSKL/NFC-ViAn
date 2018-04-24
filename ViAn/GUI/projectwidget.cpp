@@ -726,6 +726,7 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
         qDebug() << m_proj->get_videos().size() << "size2";
         delete v_proj;
         emit item_removed(v_proj);
+        emit remove_overlay();
     }
     // TODO Add drawing tag
     else if (item->type() == TAG_ITEM) {
