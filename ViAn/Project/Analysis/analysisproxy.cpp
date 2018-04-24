@@ -67,6 +67,8 @@ void AnalysisProxy::read(const QJsonObject &json) {
         QJsonObject json_poi = json_intervals[i].toObject();
         POI* poi = new POI();
         poi->read(json_poi);
+        std::pair<int, int> pair = std::make_pair(poi->get_start(), poi->get_end());
+        m_slider_interval.push_back(pair);
         m_intervals.insert(poi);
     }
     m_unsaved_changes = false;
@@ -86,7 +88,8 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["interval end"] = this->m_ana_interval.second;
     json["full_path"] = QString::fromStdString(file_analysis);
     QJsonArray intervals;
-    qDebug() << ;
+    qDebug() << "length" << m_slider_interval.size();
+    //qDebug() << "length" << m_intervals.size();
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;
         interval["start"] = (*it).first;
@@ -94,15 +97,18 @@ void AnalysisProxy::write(QJsonObject &json) {
         intervals.push_back(interval);
     }
 
+//    for (auto p : m_intervals) {
+//        QJsonObject interval;
+//        interval["start"] = p->get_start();
+//        interval["end"] = p->get_end();
+//        intervals.push_back(interval);
+//    }
+
 
 //    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {
 //        QJsonObject interval;
 //        interval["start"] = (*it)->get_start();
 //        interval["end"] = (*it)->get_end();
-
-////        POI* pair = dynamic_cast<POI*>(*it);
-////        interval["start"] = pair->get_start();
-////        interval["end"] = pair->get_end();
 //        intervals.push_back(interval);
 //    }
     json["intervals"] = intervals;

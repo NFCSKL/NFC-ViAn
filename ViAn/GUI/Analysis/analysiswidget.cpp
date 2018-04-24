@@ -73,6 +73,9 @@ void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
     current_analysis_item->setText(0,"Analysis");
     analysis_queue.pop_front();
     qDebug() << "in done2" << analysis->m_intervals.size();
+    for (auto p : analysis->m_intervals) {
+        qDebug() << "poi in widget" << p->get_start() << p->get_end();
+    }
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     //AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(analysis);

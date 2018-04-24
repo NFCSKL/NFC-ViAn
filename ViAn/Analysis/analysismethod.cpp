@@ -154,6 +154,12 @@ void AnalysisMethod::run() {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
             proxy->m_slider_interval.push_back(pair);
         }
+//        for (auto p : m_analysis.get_intervals()) {
+//            //std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
+//            //proxy->m_slider_interval.push_back(pair);
+//            proxy->m_intervals.insert(p);
+//            qDebug() << "poi" << p->get_start() << p->get_end();
+//        }
         emit finished_analysis(proxy);
     }
 }

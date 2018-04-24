@@ -23,7 +23,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDragEnabled(true);
     setDropIndicatorShown(true);
 
-    connect(this, &ProjectWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
+    //connect(this, &ProjectWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 

@@ -125,6 +125,10 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         qDebug() << "set b_analysis" << analysis->get_ana_interval();
         m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
 
+//        for (auto p : analysis->get_intervals()) {
+//            add_slider_interval(p->get_start(), p->get_end());
+//        }
+
         if (analysis->get_type() == TAG || analysis->get_type() == DRAWING_TAG) {
             for (auto p : analysis->get_intervals()) {
                 add_slider_interval(p->get_start(), p->get_end());
