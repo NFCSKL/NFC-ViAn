@@ -143,7 +143,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::marked_video, drawing_wgt, &DrawingWidget::set_video_project);
-    connect(project_wgt, &ProjectWidget::update_brightness_contrast, video_wgt, &VideoWidget::update_brightness_contrast);
 
     connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
@@ -574,11 +573,9 @@ void MainWindow::gen_report() {
  * Creates a dialog for choosing contrast and brightness values.
  */
 void MainWindow::cont_bri() {
-    if (!video_wgt->get_current_video_project()) return;
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
-    connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(set_brightness_contrast(int,double)));
     man_dialog->exec();
 }
 
