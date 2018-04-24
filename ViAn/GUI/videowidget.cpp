@@ -754,6 +754,7 @@ void VideoWidget::on_new_frame() {
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
+    qDebug() << "frame num" << frame_num;
     m_vid_proj->get_video()->state.frame = frame_num;
 }
 
@@ -847,7 +848,9 @@ void VideoWidget::clear_current_video() {
     player_lock.unlock();
     player_con.notify_all();
 
+    playback_slider->blockSignals(true);
     playback_slider->setValue(frame);
+    playback_slider->blockSignals(false);
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
     set_total_time(0);
