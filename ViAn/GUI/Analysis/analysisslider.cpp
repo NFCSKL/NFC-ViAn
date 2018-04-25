@@ -330,6 +330,7 @@ void AnalysisSlider::clear_slider() {
     qDebug() << "clear slider";
     rects.clear();
     frames.clear();
+    m_ana_interval = std::make_pair(-1, -1);
 }
 
 void AnalysisSlider::set_blocked(bool value) {
