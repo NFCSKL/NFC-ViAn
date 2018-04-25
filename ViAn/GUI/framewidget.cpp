@@ -170,7 +170,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (mark_rect) {
-
         // Draw the zoom box with correct dimension
         if(m_tool == ZOOM){
             QPoint start = rect_start;
@@ -193,7 +192,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
         painter.drawRect(zoom);
     }
-
 
     if(m_tool == ANALYSIS_BOX){
         painter.setPen(QColor(0,255,0));
@@ -220,7 +218,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
-    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame()) {
+    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame() && m_tool == EDIT) {
         QPoint tl;
         QPoint br;
         if (current_drawing->get_shape() == PEN) {

@@ -397,7 +397,9 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         while (item->childCount() != 0) {
             remove_from_tree(item->child(0));
         }
+        blockSignals(true);
         delete item;
+        blockSignals(false);
         break;
     case RECT_ITEM:
     case CIRCLE_ITEM:
@@ -409,7 +411,9 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;
+        blockSignals(true);
         if (parent->childCount() == 0) delete parent;
+        blockSignals(false);
         break;
     default:
         break;
