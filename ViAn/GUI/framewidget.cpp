@@ -47,13 +47,12 @@ void FrameWidget::copy() {
     }
     copied_item->set_name(current_drawing->get_name());
     copied_item->set_thickness(current_drawing->get_thickness());
-    //cv::Point new_end = cv::Point(current_drawing->draw_end.x + 10, current_drawing
     copied_item->set_draw_start(current_drawing->get_draw_start());
     copied_item->set_draw_end(current_drawing->get_draw_end());
-    //copied_item->move_shape(QPoint(20, 20));
 }
 
 void FrameWidget::paste() {
+    if (!copied_item) return;
     Shapes* new_item;
     switch (copied_item->get_shape()) {
     case RECTANGLE:
@@ -85,22 +84,8 @@ void FrameWidget::paste() {
     new_item->set_thickness(copied_item->get_thickness());
     new_item->set_draw_start(copied_item->get_draw_start());
     new_item->set_draw_end(copied_item->get_draw_end());
-    //new_item->move_shape(QPoint(20, 20));
-
-
-//    if (m_vid_proj->get_overlay()->get_current_drawing()) {
-//        cv::Point new_start = m_vid_proj->get_overlay()->get_current_drawing()->get_draw_start();
-//        cv::Point new_end = m_vid_proj->get_overlay()->get_current_drawing()->get_draw_end();
-//        new_item->set_draw_start(new_start+cv::Point(20,20));
-//        new_item->set_draw_end(new_end+cv::Point(20,20));
-//    } else {
-
-//    }
-
     m_vid_proj->get_overlay()->add_drawing(new_item, current_frame_nr);
     emit process_frame();
-    //emit send_tool(EDIT);
-
     update();
 }
 

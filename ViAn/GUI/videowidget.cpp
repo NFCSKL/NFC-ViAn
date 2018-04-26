@@ -806,18 +806,18 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
+        m_vid_proj = vid_proj;
+        set_overlay(m_vid_proj->get_overlay());
+
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();
 
-        m_vid_proj = vid_proj;
+
         playback_slider->setValue(frame);
-
         m_interval = make_pair(0,0);
-
-        set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);

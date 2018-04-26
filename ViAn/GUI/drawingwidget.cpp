@@ -41,6 +41,7 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
 
 void DrawingWidget::clear_overlay() {
     if (m_overlay != nullptr) {
+        m_overlay->set_current_drawing(nullptr);
         save_item_data();
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
         disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
@@ -129,11 +130,6 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
         default:
             break;
         }
-        blockSignals(true);
-        if (shape == m_overlay->get_current_drawing()) {
-            setCurrentItem(s_item);
-        }
-        blockSignals(false);
     }
 }
 
