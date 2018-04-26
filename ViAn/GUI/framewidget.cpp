@@ -16,8 +16,12 @@ FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
     connect(paste_sc, &QShortcut::activated, this, &FrameWidget::paste);
 }
 
+/**
+ * @brief FrameWidget::copy
+ * Saves a copy of the current item which can be used to later create new copies.
+ */
 void FrameWidget::copy() {
-    //if (copied_item) delete copied_item;
+    if (copied_item) delete copied_item;
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     if (!current_drawing) return;
     switch (current_drawing->get_shape()) {
@@ -51,6 +55,11 @@ void FrameWidget::copy() {
     copied_item->set_draw_end(current_drawing->get_draw_end());
 }
 
+/**
+ * @brief FrameWidget::paste
+ * Creates a new item which is a copy of the item in the copy clipboard
+ * and adds it to the overlay.
+ */
 void FrameWidget::paste() {
     if (!copied_item) return;
     Shapes* new_item;
