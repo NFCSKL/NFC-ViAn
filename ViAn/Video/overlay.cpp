@@ -222,6 +222,22 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
     return cv::Point(pnt.x(), pnt.y());
 }
 
+void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
+    switch (current_shape) {
+    case EDIT:
+        qDebug() << "Edit";
+        emit set_tool_zoom();
+        break;
+    case ZOOM:
+        qDebug() << "Zoom";
+        get_drawing(pos, frame_nr);
+        emit set_tool_edit();
+        break;
+    default:
+        break;
+    }
+}
+
 /**
  * @brief Overlay::mouse_pressed
  * Creates a drawing shape with the prechosen colour
@@ -231,35 +247,33 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
-        if (right_click && current_shape != EDIT) {
-            set_current_drawing(nullptr);
-            change_tool = true;
-            return;
-        }
         switch (current_shape) {
         case RECTANGLE:
             add_drawing(new Rectangle(current_colour, pos), frame_nr);
+            drawing = true;
             break;
         case CIRCLE:
             add_drawing(new Circle(current_colour, pos), frame_nr);
+            drawing = true;
             break;
         case LINE:
             add_drawing(new Line(current_colour, pos), frame_nr);
+            drawing = true;
             break;
         case ARROW:
             add_drawing(new Arrow(current_colour, pos), frame_nr);
+            drawing = true;
             break;
         case PEN:
             add_drawing(new Pen(current_colour, pos), frame_nr);
+            drawing = true;
             break;
         case EDIT:
             prev_point = pos;
             m_right_click = right_click;
             if (right_click) {
-                if (current_drawing && point_in_drawing(pos, current_drawing)) {
+                if (current_drawing) {
                     current_drawing->set_anchor(pos);
-                } else {
-                    change_tool = true;
                 }
                 break;
             }
@@ -292,7 +306,12 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
         change_tool = false;
         return;
     }
-    update_drawing_position(pos, frame_nr);
+    if (drawing) {
+        drawing = false;
+        emit set_tool_edit();
+        return;
+    }
+    //update_drawing_position(pos, frame_nr);
     m_right_click = right_click;
 }
 
@@ -317,7 +336,7 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
     if (current_shape == SELECT) {
-        emit set_tool_hand();
+        emit set_tool_edit();
         return;
     }
     if (!current_drawing) return;

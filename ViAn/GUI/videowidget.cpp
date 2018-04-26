@@ -155,6 +155,7 @@ void VideoWidget::init_frame_processor() {
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
     connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
+    connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
@@ -962,6 +963,13 @@ void VideoWidget::set_tool_text(QString text, float font_scale) {
 void VideoWidget::set_color(QColor color) {
     update_overlay_settings([&](){
         o_settings.color = color;
+    });
+}
+
+void VideoWidget::mouse_double_clicked(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_double_clicked = true;
+        o_settings.pos = pos;
     });
 }
 

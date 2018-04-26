@@ -161,6 +161,7 @@ public slots:
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);
+    void mouse_double_clicked(QPoint pos);
     void mouse_pressed(QPoint pos, bool);
     void mouse_released(QPoint pos, bool right_click);
     void mouse_moved(QPoint pos);

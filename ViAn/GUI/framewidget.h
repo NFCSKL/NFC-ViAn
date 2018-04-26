@@ -79,6 +79,7 @@ signals:
     void send_tool_text(QString, float);
     void send_color(QColor color);
 
+    void mouse_double_click(QPoint);
     void mouse_pressed(QPoint, bool);
     void mouse_released(QPoint, bool);
     void mouse_moved(QPoint);
@@ -105,6 +106,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

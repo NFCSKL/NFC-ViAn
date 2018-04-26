@@ -55,7 +55,7 @@ protected:
     int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;
-    bool anchor; // true = draw start -- false = draw end
+    bool anchor; // true = draw start -- false = draw end; TODO 4 corners
     cv::Size text_size;
     int frame;
     QString m_name = "Unknown shape";

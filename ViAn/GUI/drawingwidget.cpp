@@ -36,7 +36,7 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
     connect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
     connect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
-    connect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
+    connect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
 }
 
 void DrawingWidget::clear_overlay() {
@@ -45,7 +45,7 @@ void DrawingWidget::clear_overlay() {
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
         disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
         disconnect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
-        disconnect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
+        disconnect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
         m_overlay = nullptr;
     }
     QObject::blockSignals(true);
@@ -296,7 +296,7 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         }
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
-        emit set_tool_hand();
+        emit set_tool_edit();
         break;
     }
     default:

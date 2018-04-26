@@ -237,6 +237,10 @@ void FrameProcessor::update_overlay_settings() {
         QPoint text_point = QPoint(anchor_x+width/2, anchor_y+height/2);
         m_o_settings->create_text = false;
         m_overlay->create_text(text_point, curr_frame);
+    // Mouse double clicked action
+    } else if (m_o_settings->mouse_double_clicked) {
+        m_o_settings->mouse_double_clicked = false;
+        m_overlay->mouse_double_clicked(m_o_settings->pos, curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;

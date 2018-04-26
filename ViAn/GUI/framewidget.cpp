@@ -253,6 +253,11 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
     emit current_size(width(), height());
 }
 
+void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
+    emit mouse_double_click(scaled_pos);
+}
+
 /**
  * @brief FrameWidget::mousePressEvent
  * @param event

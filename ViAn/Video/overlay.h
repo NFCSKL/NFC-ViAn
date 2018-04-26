@@ -42,7 +42,9 @@ public:
     void set_colour(QColor col);
     QColor get_colour();
     SHAPES get_tool();
+    void add_drawing(Shapes *shape, int frame_nr);
     int get_current_frame();
+    void mouse_double_clicked(QPoint pos, int frame_nr);
     void mouse_pressed(QPoint pos, int frame_nr, bool right_click);
     void mouse_released(QPoint pos, int frame_nr, bool right_click);
     void mouse_moved(QPoint pos, int frame_nr);
@@ -67,7 +69,6 @@ public:
 
 private:
     Shapes* get_empty_shape(SHAPES shape_type);
-    void add_drawing(Shapes *shape, int frame_nr);
     void get_drawing(QPoint pos, int frame_nr);
     bool point_in_drawing(QPoint pos, Shapes* shape);
     cv::Point qpoint_to_point(QPoint pnt);
@@ -76,6 +77,7 @@ private:
     QPoint prev_point;
     bool m_right_click = false;
     bool change_tool = false;
+    bool drawing = false;
 
     bool show_overlay = true;
     int baseline = 0;
@@ -94,7 +96,7 @@ signals:
     void new_drawing(Shapes* shape, int frame_nr);
     void select_current(Shapes*, int);
     void set_tool_zoom();
-    void set_tool_hand();
+    void set_tool_edit();
 };
 
 #endif // OVERLAY_H
