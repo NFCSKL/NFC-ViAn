@@ -225,13 +225,12 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
 void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
     switch (current_shape) {
     case EDIT:
-        qDebug() << "Edit";
         emit set_tool_zoom();
         break;
     case ZOOM:
-        qDebug() << "Zoom";
         get_drawing(pos, frame_nr);
         emit set_tool_edit();
+        prev_point = pos;
         break;
     default:
         break;

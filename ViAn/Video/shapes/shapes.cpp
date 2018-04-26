@@ -129,6 +129,14 @@ cv::Point Shapes::get_draw_end() {
     return draw_end;
 }
 
+void Shapes::set_draw_end(cv::Point p) {
+    draw_end = p;
+}
+
+void Shapes::set_draw_start(cv::Point p) {
+    draw_start = p;
+}
+
 /**
  * @brief Shape::get_shape
  * @return shape
@@ -165,6 +173,14 @@ void Shapes::set_thickness(QPoint pos) {
     if ((shape == CIRCLE || shape == RECTANGLE) && new_thick <= -2) return;
     if (!(shape == CIRCLE || shape == RECTANGLE) && new_thick <= -1) return;
     thickness = new_thick;
+}
+
+void Shapes::set_thickness(int value) {
+    thickness = value;
+}
+
+int Shapes::get_thickness() {
+    return thickness;
 }
 
 void Shapes::set_frame(int frame_nr) {

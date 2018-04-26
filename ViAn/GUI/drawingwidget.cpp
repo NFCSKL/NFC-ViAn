@@ -129,9 +129,11 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
         default:
             break;
         }
+        blockSignals(true);
         if (shape == m_overlay->get_current_drawing()) {
             setCurrentItem(s_item);
         }
+        blockSignals(false);
     }
 }
 

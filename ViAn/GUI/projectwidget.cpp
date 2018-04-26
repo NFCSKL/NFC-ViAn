@@ -469,6 +469,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit marked_video(vid_item->get_video_project(), -1);
+
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);

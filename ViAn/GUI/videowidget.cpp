@@ -160,6 +160,7 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
     connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
+    connect(frame_wgt, SIGNAL(process_frame()), this, SLOT(process_frame()));
     connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
     connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
     connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
@@ -1008,6 +1009,10 @@ void VideoWidget::set_current_drawing(Shapes* shape) {
         o_settings.set_current_drawing = true;
         o_settings.shape = shape;
     });
+}
+
+void VideoWidget::process_frame() {
+    update_overlay_settings([&](){});
 }
 
 /**

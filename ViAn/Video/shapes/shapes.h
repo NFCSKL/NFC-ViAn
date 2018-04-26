@@ -37,12 +37,16 @@ public:
 
     cv::Point get_draw_start();
     cv::Point get_draw_end();
+    void set_draw_end(cv::Point);
+    void set_draw_start(cv::Point);
     SHAPES get_shape();
     QColor get_color();
     void set_color(QColor);
     cv::Size get_text_size();
     void set_text_size(cv::Size size);
     void set_thickness(QPoint pos);
+    void set_thickness(int value);
+    int get_thickness();
     void set_frame(int);
     int get_frame();
     virtual QString get_name() = 0;

@@ -31,6 +31,7 @@ class FrameWidget : public QWidget
     SHAPES m_tool = NONE;
     QColor overlay_color = Qt::red;
     cv::Mat current_frame;
+    Shapes* copied_item = nullptr;
     Analysis* m_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
 
@@ -84,7 +85,10 @@ signals:
     void mouse_released(QPoint, bool);
     void mouse_moved(QPoint);
     void mouse_scroll(QPoint);
+    void process_frame();
 public slots:
+    void copy();
+    void paste();
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
     void show_bounding_box(bool b);
     void set_scroll_area_size(QSize size);

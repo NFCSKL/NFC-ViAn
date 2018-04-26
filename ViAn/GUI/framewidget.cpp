@@ -3,10 +3,105 @@
 #include "Project/Analysis/analysis.h"
 #include <QTime>
 #include <QThread>
+#include <QShortcut>
 #include "utility.h"
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
+    QShortcut* copy_sc = new QShortcut(this);
+    QShortcut* paste_sc = new QShortcut(this);
+    copy_sc->setKey(QKeySequence::Copy);
+    paste_sc->setKey(QKeySequence::Paste);
+    connect(copy_sc, &QShortcut::activated, this, &FrameWidget::copy);
+    connect(paste_sc, &QShortcut::activated, this, &FrameWidget::paste);
+}
+
+void FrameWidget::copy() {
+    //if (copied_item) delete copied_item;
+    Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
+    if (!current_drawing) return;
+    switch (current_drawing->get_shape()) {
+    case RECTANGLE:
+        copied_item = new Rectangle(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case CIRCLE:
+        copied_item = new Circle(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case LINE:
+        copied_item = new Line(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case ARROW:
+        copied_item = new Arrow(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case PEN:
+        copied_item = new Pen(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case TEXT: {
+        Text* text = dynamic_cast<Text*>(current_drawing);
+        copied_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
+        copied_item->set_text_size(text->get_text_size());
+        break;
+    }
+    default:
+        break;
+    }
+    copied_item->set_name(current_drawing->get_name());
+    copied_item->set_thickness(current_drawing->get_thickness());
+    //cv::Point new_end = cv::Point(current_drawing->draw_end.x + 10, current_drawing
+    copied_item->set_draw_start(current_drawing->get_draw_start());
+    copied_item->set_draw_end(current_drawing->get_draw_end());
+    //copied_item->move_shape(QPoint(20, 20));
+}
+
+void FrameWidget::paste() {
+    Shapes* new_item;
+    switch (copied_item->get_shape()) {
+    case RECTANGLE:
+        new_item = new Rectangle(copied_item->get_color(), QPoint(0,0));
+        break;
+    case CIRCLE:
+        new_item = new Circle(copied_item->get_color(), QPoint(0,0));
+        break;
+    case LINE:
+        new_item = new Line(copied_item->get_color(), QPoint(0,0));
+        break;
+    case ARROW:
+        new_item = new Arrow(copied_item->get_color(), QPoint(0,0));
+        break;
+    case PEN:
+        new_item = new Pen(copied_item->get_color(), QPoint(0,0));
+        break;
+    case TEXT: {
+        Text* text = dynamic_cast<Text*>(copied_item);
+        new_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
+        new_item->set_text_size(text->get_text_size());
+        break;
+    }
+    default:
+        break;
+    }
+
+    new_item->set_name(copied_item->get_name());
+    new_item->set_thickness(copied_item->get_thickness());
+    new_item->set_draw_start(copied_item->get_draw_start());
+    new_item->set_draw_end(copied_item->get_draw_end());
+    //new_item->move_shape(QPoint(20, 20));
+
+
+//    if (m_vid_proj->get_overlay()->get_current_drawing()) {
+//        cv::Point new_start = m_vid_proj->get_overlay()->get_current_drawing()->get_draw_start();
+//        cv::Point new_end = m_vid_proj->get_overlay()->get_current_drawing()->get_draw_end();
+//        new_item->set_draw_start(new_start+cv::Point(20,20));
+//        new_item->set_draw_end(new_end+cv::Point(20,20));
+//    } else {
+
+//    }
+
+    m_vid_proj->get_overlay()->add_drawing(new_item, current_frame_nr);
+    emit process_frame();
+    //emit send_tool(EDIT);
+
+    update();
 }
 
 void FrameWidget::set_scroll_area_size(QSize size) {
