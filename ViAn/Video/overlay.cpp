@@ -148,8 +148,6 @@ void Overlay::add_drawing(Shapes* shape, int frame_nr) {
  * @param pos
  * @param frame_nr
  */
-
-// Unused
 void Overlay::get_drawing(QPoint pos, int frame_nr) {
     current_drawing = nullptr;
     for (auto shape : overlays[frame_nr]) {
@@ -225,12 +223,22 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
 void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
     switch (current_shape) {
     case EDIT:
+        for (auto shape : overlays[frame_nr]) {
+            if (point_in_drawing(pos, shape)) {
+                return;
+            }
+        }
         emit set_tool_zoom();
         break;
     case ZOOM:
-        get_drawing(pos, frame_nr);
-        emit set_tool_edit();
-        prev_point = pos;
+        for (auto shape : overlays[frame_nr]) {
+            if (point_in_drawing(pos, shape)) {
+                get_drawing(pos, frame_nr);
+                emit set_tool_edit();
+                prev_point = pos;
+                break;
+            }
+        }
         break;
     default:
         break;
