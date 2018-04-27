@@ -25,12 +25,7 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
 }
 
 AnalysisProxy::~AnalysisProxy() {
-//    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
-//        delete *it;
-//    }
-//    m_intervals.clear();
     m_slider_interval.clear();
-    qDebug() << "delete proxy";
 }
 
 /**
@@ -89,29 +84,12 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["interval end"] = this->m_ana_interval.second;
     json["full_path"] = QString::fromStdString(file_analysis);
     QJsonArray intervals;
-    qDebug() << "length" << m_slider_interval.size();
-    //qDebug() << "length" << m_intervals.size();
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;
         interval["start"] = (*it).first;
         interval["end"] = (*it).second;
         intervals.push_back(interval);
     }
-
-//    for (auto p : m_intervals) {
-//        QJsonObject interval;
-//        interval["start"] = p->get_start();
-//        interval["end"] = p->get_end();
-//        intervals.push_back(interval);
-//    }
-
-
-//    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {
-//        QJsonObject interval;
-//        interval["start"] = (*it)->get_start();
-//        interval["end"] = (*it)->get_end();
-//        intervals.push_back(interval);
-//    }
     json["intervals"] = intervals;
     m_unsaved_changes = false;
 }

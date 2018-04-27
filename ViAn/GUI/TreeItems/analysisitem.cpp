@@ -21,9 +21,7 @@ AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
 /**
  * @brief AnalysisItem::~AnalysisItem
  */
-AnalysisItem::~AnalysisItem() {
-    qDebug() << "analysisitem delete";
-}
+AnalysisItem::~AnalysisItem() {}
 
 /**
  * @brief AnalysisItem::set_analysis

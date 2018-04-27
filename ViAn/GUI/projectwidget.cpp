@@ -101,7 +101,6 @@ void ProjectWidget::add_video() {
         QString vid_name = video_path.right(video_path.length() - index);
         // TODO Check if file is already added
         VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
-        qDebug() << "added a new one";
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
     }
@@ -163,7 +162,6 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
  * @param name
  * Slot to set the name if an item in the project tree
  */
-
 void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
     item->setText(0, name);
 }
@@ -310,7 +308,8 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     if (elems.size() > 0) {
         // Follow index path
         QTreeWidgetItem* item = topLevelItem(std::stoi(elems[0]));
-        for (auto i = 1; i < elems.size(); ++i) {
+
+        for (size_t i = 1; i < elems.size(); ++i) {
             if (item->child(std::stoi(elems[i]))) item = item->child(std::stoi(elems[i]));
         }
 
@@ -474,7 +473,6 @@ bool ProjectWidget::prompt_save() {
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     Q_UNUSED(col)
     if (!item) return;
-    //get_index_path(item); // Remove?
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -651,13 +649,11 @@ void ProjectWidget::drawing_tag() {
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.size() > 0) {
-            qDebug() << "Tag frame" << frame_overlay.first;
             tag->add_frame(frame_overlay.first);
         }
     }
 
     if (selectedItems().front()->type() == VIDEO_ITEM) {
-        qDebug() << "Add the drawing tag";
         add_basic_analysis(vid_proj, tag);
     } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
         tree_item_clicked(dynamic_cast<DrawingTagItem*>(selectedItems().front()));
@@ -680,7 +676,6 @@ void ProjectWidget::show_details() {
 void ProjectWidget::hide_details() {
     emit show_analysis_details(false);
 }
-
 
 /**
  * @brief ProjectWidget::remove_item
@@ -718,12 +713,10 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
             remove_tree_item(item->child(0));
         }
         // Remove the video from the list of videos
-        qDebug() << m_proj->get_videos().size() << "size1";
         auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
         if (it != m_proj->get_videos().end()) {
             m_proj->get_videos().erase(it);
         }
-        qDebug() << m_proj->get_videos().size() << "size2";
         delete v_proj;
         emit item_removed(v_proj);
         emit remove_overlay();
@@ -754,7 +747,6 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
 
-        // TODO Add this line to remove the analysis from the folder
         analysis->delete_saveable(analysis->full_path());
         vid_item->get_video_project()->remove_analysis(analysis);
         emit update_frame();
@@ -842,7 +834,6 @@ bool ProjectWidget::save_project() {
             // User aborted dialog, cancel save
             return false;
         }
-
     }
 
     save_item_data();
@@ -900,7 +891,6 @@ bool ProjectWidget::open_project(QString project_path) {
  * Returns true if the project has been closed.
  */
 bool ProjectWidget::close_project() {
-    qDebug() << "Close project";
     if (m_proj == nullptr) return true;
 
     // Prompt user to save. If cancel keep the current project
@@ -945,7 +935,6 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-    //emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
     new_project();

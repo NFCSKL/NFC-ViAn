@@ -621,7 +621,6 @@ void VideoWidget::new_tag_clicked() {
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
     tag_dialog->exec();
-
 }
 
 /**

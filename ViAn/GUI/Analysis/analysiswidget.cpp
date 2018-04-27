@@ -67,26 +67,16 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Removes the current analysis from the queue and start the next one if there is one
  */
 void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
-    //qDebug() << "in done1" << analysis.m_intervals.size();
     emit show_progress(0);
     analysis->m_name = "Analysis";
     current_analysis_item->setText(0,"Analysis");
     analysis_queue.pop_front();
-//    qDebug() << "in done2" << analysis->m_intervals.size();
-//    for (auto p : analysis->m_intervals) {
-//        qDebug() << "poi in widget" << p->get_start() << p->get_end();
-//    }
-    for (auto p : analysis->m_slider_interval) {
-        qDebug() << "poi in widget slider" << p;
-    }
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
-    //AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(analysis);
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis_item->parent());
     vid->get_video_project()->add_analysis(analysis);
     current_analysis_item = nullptr;
     duration = 0;
-
 
     m_queue_wgt->next();
     if (!analysis_queue.empty()) {

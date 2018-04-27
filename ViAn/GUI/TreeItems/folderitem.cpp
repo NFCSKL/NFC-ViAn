@@ -1,5 +1,4 @@
 #include "folderitem.h"
-#include <QDebug>
 
 FolderItem::FolderItem() : TreeItem(FOLDER_ITEM) {
     setFlags(flags() | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
@@ -7,9 +6,7 @@ FolderItem::FolderItem() : TreeItem(FOLDER_ITEM) {
     setIcon(0, folder_icon);
 }
 
-FolderItem::~FolderItem() {
-    qDebug() << "Folder item delete";
-}
+FolderItem::~FolderItem() {}
 
 void FolderItem::remove() {}
 

@@ -8,9 +8,7 @@ AnalysisInterval::AnalysisInterval(int start, int end) {
 
 AnalysisInterval::AnalysisInterval() {}
 
-AnalysisInterval::~AnalysisInterval() {
-    qDebug() << "analysis interval delete";
-}
+AnalysisInterval::~AnalysisInterval() {}
 
 /**
  * @brief POI::read

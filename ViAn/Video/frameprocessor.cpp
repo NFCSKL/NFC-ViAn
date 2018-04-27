@@ -118,7 +118,6 @@ void FrameProcessor::process_frame() {
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
     // cv::imshow("test", tmp);
     // Draws the overlay
-    qDebug() << "frame index" << m_frame_index->load();
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
 
     // Scales the frame

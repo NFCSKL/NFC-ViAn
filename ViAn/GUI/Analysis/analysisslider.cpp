@@ -122,24 +122,20 @@ void AnalysisSlider::update(){
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        qDebug() << "set b_analysis" << analysis->get_ana_interval();
         m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
-
-//        for (auto p : analysis->get_intervals()) {
-//            add_slider_interval(p->get_start(), p->get_end());
-//        }
-
-        if (analysis->get_type() == TAG || analysis->get_type() == DRAWING_TAG) {
+        switch (analysis->get_type()) {
+        case TAG:
+        case DRAWING_TAG:
             for (auto p : analysis->get_intervals()) {
                 add_slider_interval(p->get_start(), p->get_end());
             }
-        } else {
+            break;
+        case MOTION_DETECTION: {
             AnalysisProxy* p_analysis = dynamic_cast<AnalysisProxy*>(analysis);
-            qDebug() << "Rects size" << p_analysis->m_slider_interval.size();
             rects = p_analysis->m_slider_interval;
         }
-        for (auto rect : rects) {
-            qDebug() << rect;
+        default:
+            break;
         }
     }
     repaint();
@@ -204,7 +200,6 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
         pair = std::make_pair(start_frame, end_frame);
     }
     rects.push_back(pair);
-    qDebug() << "pair" << pair;
     last_poi_end = end_frame;
 }
 
@@ -328,7 +323,6 @@ void AnalysisSlider::set_show_interval(bool show) {
  * Clear the rects vector.
  */
 void AnalysisSlider::clear_slider() {
-    qDebug() << "clear slider";
     rects.clear();
     frames.clear();
     m_ana_interval = std::make_pair(-1, -1);

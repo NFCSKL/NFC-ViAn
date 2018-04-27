@@ -5,7 +5,6 @@ Tag::~Tag() {
         delete *it;
     }
     m_intervals.clear();
-    qDebug() << "delete tag";
 }
 
 /**

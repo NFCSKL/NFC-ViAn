@@ -33,17 +33,16 @@ Project::Project(const std::string& name, const std::string& dir_path){
  * Clears contents of video map
  */
 Project::~Project(){
-    qDebug() << "delete project start";
     for (auto video_proj : m_videos) {
         delete video_proj;
     }
 
+    // TODO
     for (auto report : m_reports) {
         //delete report;
     }
     m_videos.clear();
     m_reports.clear();
-    qDebug() << "delete project end";
 }
 
 /**

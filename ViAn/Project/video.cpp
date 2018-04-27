@@ -18,9 +18,7 @@ Video::Video(std::string file_path){
     m_name = file_path.substr(index);
 }
 
-Video::~Video() {
-    qDebug() << "delete video";
-}
+Video::~Video() {}
 
 std::string Video::get_name() {
     return m_name;

@@ -19,10 +19,8 @@ VideoProject::VideoProject(){
 }
 
 VideoProject::~VideoProject(){
-    qDebug() << "delete vid proj start";
     delete m_overlay;
     delete video;
-    qDebug() << "delete vid proj end";
 }
 
 /**
@@ -233,7 +231,6 @@ ID VideoProject::add_analysis(BasicAnalysis *analysis){
 }
 
 void VideoProject::remove_analysis(BasicAnalysis *analysis) {
-    qDebug() << "remove analysis";
     m_analyses.erase(analysis->get_id());
     m_unsaved_changes = true;
     delete analysis;

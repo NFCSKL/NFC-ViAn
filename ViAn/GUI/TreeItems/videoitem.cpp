@@ -11,12 +11,9 @@ VideoItem::VideoItem(): TreeItem(VIDEO_ITEM) {
     setText(0,"placeholder");
 }
 
-VideoItem::~VideoItem(){
-    qDebug() << "vid item delete";
-}
+VideoItem::~VideoItem(){}
 
-void VideoItem::remove(){
-}
+void VideoItem::remove(){}
 
 void VideoItem::rename(){}
 
