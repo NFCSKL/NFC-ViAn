@@ -37,9 +37,13 @@ void FrameWidget::copy() {
     case ARROW:
         copied_item = new Arrow(current_drawing->get_color(), QPoint(0,0));
         break;
-    case PEN:
-        copied_item = new Pen(current_drawing->get_color(), QPoint(0,0));
+    case PEN: {
+        Pen* pen = dynamic_cast<Pen*>(current_drawing);
+        copied_item = new Pen(pen->get_color(), QPoint(0,0));
+        Pen* copied_item_pen = dynamic_cast<Pen*>(copied_item);
+        copied_item_pen->set_points(pen->get_points());
         break;
+    }
     case TEXT: {
         Text* text = dynamic_cast<Text*>(current_drawing);
         copied_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
@@ -76,9 +80,13 @@ void FrameWidget::paste() {
     case ARROW:
         new_item = new Arrow(copied_item->get_color(), QPoint(0,0));
         break;
-    case PEN:
-        new_item = new Pen(copied_item->get_color(), QPoint(0,0));
+    case PEN: {
+        Pen* pen = dynamic_cast<Pen*>(copied_item);
+        new_item = new Pen(pen->get_color(), QPoint(0,0));
+        Pen* new_pen = dynamic_cast<Pen*>(new_item);
+        new_pen->set_points(pen->get_points());
         break;
+    }
     case TEXT: {
         Text* text = dynamic_cast<Text*>(copied_item);
         new_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());

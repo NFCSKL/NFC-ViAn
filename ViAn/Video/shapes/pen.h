@@ -16,8 +16,8 @@ public:
     QString get_name() override;
     void set_name(QString name) override;
     std::vector<cv::Point> get_points();
+    void set_points(std::vector<cv::Point> new_Points);
 private:
-    std::vector<std::pair<cv::Point, cv::Point>> lines;
     std::vector<cv::Point> points;
     QString m_name = "Pen";
 };
