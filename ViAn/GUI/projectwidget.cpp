@@ -12,6 +12,7 @@
 #include <sstream>
 #include "Project/projecttreestate.h"
 #include "Project/recentproject.h"
+#include "Video/videoprobe.h"
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -96,14 +97,36 @@ void ProjectWidget::add_video() {
                 m_proj->get_dir().c_str(),
                 extensions);
 
-    for (auto video_path : video_paths){
-        int index = video_path.lastIndexOf('/') + 1;
-        QString vid_name = video_path.right(video_path.length() - index);
-        // TODO Check if file is already added
-        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
-        m_proj->add_video_project(vid_proj);
-        tree_add_video(vid_proj, vid_name);
-    }
+    //TODO check if any videos were selected in the dialog
+
+    // Create thread/threading pool that can be used to read through every video
+    // and thus fetch its information
+
+    VideoProbe* video_probe = new VideoProbe();
+
+    std::vector<std::string> paths{};
+    foreach (QString str, video_paths) {paths.push_back(str.toStdString());};
+    video_probe->set_paths(paths);
+
+    // Setup and start thread that will seek through each video file
+    QThread* probe_thread = new QThread();
+    video_probe->moveToThread(probe_thread);
+    connect(probe_thread, &QThread::started, video_probe, &VideoProbe::probe);
+    connect(video_probe, &VideoProbe::finished, probe_thread, &QThread::quit);
+    connect(video_probe, &VideoProbe::finished, video_probe, &VideoProbe::deleteLater);
+    connect(probe_thread, &QThread::finished, probe_thread, &QThread::deleteLater);
+    connect(video_probe, &VideoProbe::probe_info, this, &ProjectWidget::add_probed_video);
+    probe_thread->start();
+
+
+//    for (auto video_path : video_paths){
+//        int index = video_path.lastIndexOf('/') + 1;
+//        QString vid_name = video_path.right(video_path.length() - index);
+//        // TODO Check if file is already added
+//        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+//        m_proj->add_video_project(vid_proj);
+//        tree_add_video(vid_proj, vid_name);
+//    }
 }
 
 /**
@@ -452,6 +475,26 @@ bool ProjectWidget::prompt_save() {
                 break;
     }
     return ok;
+}
+
+/**
+ * @brief ProjectWidget::add_probed_video
+ * Slot function to be called after a VideoProbe has gathered infromation about a video.
+ * @param video_path
+ */
+void ProjectWidget::add_probed_video(const string &video_path, const int& frames) {
+//    int index = video_path.lastIndexOf('/') + 1;
+
+    VideoState v_state{};
+    v_state.total_frames = frames;
+    Video* video = new Video(video_path);
+    video->state = v_state;
+
+
+    VideoProject* vid_proj = new VideoProject(video);
+    m_proj->add_video_project(vid_proj);
+    tree_add_video(vid_proj, "video_path");
+
 }
 
 /**

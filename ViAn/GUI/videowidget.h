@@ -46,6 +46,8 @@ private:
     overlay_settings o_settings;
     video_sync v_sync;
 
+    Video* m_video{};    // Shared with videoplayer. Should only be changed by this class.
+
     std::string m_video_path;
 
     std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI

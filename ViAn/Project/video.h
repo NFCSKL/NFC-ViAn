@@ -7,7 +7,8 @@
 #include <QString>
 #include "Filehandler/saveable.h"
 struct VideoState{
-    int frame = 0;
+    int total_frames{}; // Total amount of frames in the video
+    int frame{};        // Frame where the playback is at
     int contrast = 0;
     int brightness = 0;
     int rotation = 0;

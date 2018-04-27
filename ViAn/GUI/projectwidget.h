@@ -79,6 +79,8 @@ public slots:
     void advanced_analysis();
     void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
     bool prompt_save();
+
+    void add_probed_video(const std::string& video_path, const int& frames);
 private slots:
     void context_menu(const QPoint& point);
     void remove_item();

@@ -22,7 +22,7 @@
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video controller
-    v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
+    v_controller = new VideoController(&frame_index, m_video, &is_playing, &new_frame,
                                        &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
                                        &m_speed_step);
@@ -805,6 +805,10 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
         player_lock.lock();
+        std::cout << "Loading new video" << std::endl;
+        m_video = vid_proj->get_video();
+        std::cout << (m_video == nullptr) << std::endl;
+        std::cout << m_video->state.total_frames << std::endl;
         m_video_path = vid_proj->get_video()->file_path;
         new_video.store(true);
         player_lock.unlock();

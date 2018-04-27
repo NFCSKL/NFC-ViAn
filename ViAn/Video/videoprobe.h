@@ -1,17 +1,27 @@
 #ifndef VIDEOPROBE_H
 #define VIDEOPROBE_H
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/videoio/videoio.hpp>
-#include <opencv2/video/video.hpp>
+#include <QObject>
 
+class VideoProbe : public QObject  {
+    Q_OBJECT
 
-class VideoProbe
-{
+private:
+    std::vector<std::string> m_video_paths;
+
 public:
-    VideoProbe();
+    explicit VideoProbe(QObject *parent = nullptr);
 
-    static run(const std::string& video_path);
+    void set_paths(const std::vector<std::string>& video_paths);
+
+signals:
+    void finished();
+    void current_video(std::string);
+    void current_frame(const int& frame);
+    void probe_info(std::string video_path, int frames);
+
+public slots:
+    void probe();
 };
 
 #endif // VIDEOPROBE_H
