@@ -24,6 +24,8 @@ public:
     ~AnalysisProxy() override;
     Analysis *load_analysis(); // Only use this if all analysisinformation is needed
 
+    std::vector<std::pair<int, int>> m_slider_interval;
+
     void reset_root_dir(const std::string& dir);
     virtual ANALYSIS_TYPE get_type() const override;
     virtual std::string full_path() const override;

@@ -501,10 +501,11 @@ void MainWindow::init_help_menu() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (project_wgt->close_project())
+    if (project_wgt->close_project()) {
         event->accept();
-    else
+    } else {
         event->ignore();
+    }
 }
 
 void MainWindow::rectangle() {

@@ -4,8 +4,9 @@
 Analysis::~Analysis() {
 
     // TODO Remove this to do analysis
-    qDebug() << "delete analysis";
+    qDebug() << "delete analysis" << m_intervals.size();
     for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        qDebug() << "start" << (*it)->get_start();
         delete *it;
     }
     m_intervals.clear();

@@ -134,8 +134,9 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
                 add_slider_interval(p->get_start(), p->get_end());
             }
         } else {
-            qDebug() << "Rects size" << analysis->m_slider_interval.size();
-            rects = analysis->m_slider_interval;
+            AnalysisProxy* p_analysis = dynamic_cast<AnalysisProxy*>(analysis);
+            qDebug() << "Rects size" << p_analysis->m_slider_interval.size();
+            rects = p_analysis->m_slider_interval;
         }
         for (auto rect : rects) {
             qDebug() << rect;

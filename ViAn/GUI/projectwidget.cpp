@@ -728,7 +728,6 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
         emit item_removed(v_proj);
         emit remove_overlay();
     }
-    // TODO Add drawing tag
     else if (item->type() == TAG_ITEM) {
         emit set_tag_slider(false);
         emit enable_tag_btn(false);
@@ -756,7 +755,7 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
         AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
 
         // TODO Add this line to remove the analysis from the folder
-        //analysis->delete_saveable(analysis->full_path());
+        analysis->delete_saveable(analysis->full_path());
         vid_item->get_video_project()->remove_analysis(analysis);
         emit update_frame();
         emit clear_analysis();
@@ -870,7 +869,7 @@ bool ProjectWidget::save_project() {
 bool ProjectWidget::open_project(QString project_path) {
     if (project_path.isEmpty()) return false;
 
-    if (m_proj != nullptr && !close_project())
+    if (m_proj && !close_project())
         return false;
 
     set_status_bar("Opening project");
@@ -918,15 +917,13 @@ bool ProjectWidget::close_project() {
         m_proj->remove_files();
     }
 
-//    set_main_window_name(QString::fromStdString(""));
-
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
 
     delete m_proj;
     m_proj = nullptr;
-    this->clear(); //TODOO Maybe remove
+    this->clear();
     return true;
 }
 
