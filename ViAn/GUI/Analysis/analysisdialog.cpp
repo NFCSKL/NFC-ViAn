@@ -1,8 +1,7 @@
 #include "analysisdialog.h"
 
-AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string tmp_save_dir, std::string save_dir)
-    : m_save_dir(save_dir), m_tmp_save_dir(tmp_save_dir)
-{
+AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string save_dir)
+    : m_save_dir(save_dir) {
     // Set title
     setWindowTitle("Vian - Advanced analysis");
     // Remove "?" button
@@ -26,7 +25,7 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string t
     v_lay->addLayout(form_lay);
     // Add analysis specific options
     VideoListItem* item  = dynamic_cast<VideoListItem*>(m_v_proj_list->itemAt(0,0));
-    method = new MotionDetection(item->m_vid_proj->get_video()->file_path, m_tmp_save_dir, m_save_dir);
+    method = new MotionDetection(item->m_vid_proj->get_video()->file_path, m_save_dir);
     add_settings(form_lay);
     // Add Buttons
     QDialogButtonBox* btn_box = new QDialogButtonBox;
@@ -51,7 +50,7 @@ AnalysisDialog::~AnalysisDialog() {
 void AnalysisDialog::ok_btn_clicked() {
     for(auto item : m_v_proj_list->selectedItems()){
         VideoProject* vid_proj = dynamic_cast<VideoListItem*>(item)->m_vid_proj;
-        method = new MotionDetection(vid_proj->get_video()->file_path, m_tmp_save_dir, m_save_dir);
+        method = new MotionDetection(vid_proj->get_video()->file_path, m_save_dir);
         set_settings(method);
         emit start_analysis(method, vid_proj);
     }

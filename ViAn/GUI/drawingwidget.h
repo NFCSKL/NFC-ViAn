@@ -39,12 +39,14 @@ public slots:
     void context_menu(const QPoint& point);
     void rename_item();
     void remove_item();
+    void delete_item();
     void item_changed(QTreeWidgetItem*);
 
 signals:
     void jump_to_frame(VideoProject*, int);
     void set_current_drawing(Shapes* shape);
     void set_tool_hand();
+    void set_tool_zoom();
     void delete_drawing(Shapes* shape);
     void clear_frame(int);
     void update_text(QString, Shapes*);

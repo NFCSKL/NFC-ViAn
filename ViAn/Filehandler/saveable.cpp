@@ -3,8 +3,7 @@
 const Saveable::SAVE_FORMAT Saveable::DEFAULT_SAVE_FORMAT;
 
 
-std::string Saveable::full_path() const
-{
+std::string Saveable::full_path() const {
     return m_full_path;
 }
 

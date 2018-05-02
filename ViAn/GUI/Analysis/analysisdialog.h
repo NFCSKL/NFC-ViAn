@@ -24,7 +24,6 @@ class AnalysisDialog : public QDialog
     std::map<std::string,QLineEdit*> m_settings;
     // Directory to save analysis
     std::string m_save_dir;
-    std::string m_tmp_save_dir;
 
     MotionDetection* method;
 public:
