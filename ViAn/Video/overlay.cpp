@@ -197,7 +197,7 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
     } else {
         drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
     }
-    return drawing.contains(qpoint_to_point(pos));
+    return shape->get_show() && drawing.contains(qpoint_to_point(pos));
 }
 
 /**
