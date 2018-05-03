@@ -56,12 +56,6 @@ private slots:
     void gen_report(void);
     void cont_bri(void);
     void export_images();
-    void rectangle();
-    void circle();
-    void line();
-    void arrow();
-    void pen();
-    void text();
     void update_text(QString, Shapes*);
     void clear(int frame);
     void clear_current();

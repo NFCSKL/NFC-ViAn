@@ -90,6 +90,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     bookmark_dock->setWidget(bookmark_wgt);
 
+    // Main toolbar
+    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar->setWindowTitle(tr("Main toolbar"));
+    addToolBar(main_toolbar);
+
+    // Draw toolbar
+    draw_toolbar = new DrawingToolbar();
+    draw_toolbar->setWindowTitle(tr("Draw toolbar"));
+    QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
+    addToolBar(draw_toolbar);
+
     //Initialize menu bar
     init_file_menu();
     init_edit_menu();
@@ -99,19 +110,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_tools_menu();
     init_help_menu();
 
-    // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
-    main_toolbar->setWindowTitle(tr("Main toolbar"));
-    addToolBar(main_toolbar);
+    // Toolbar connects
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
-
-    // Draw toolbar
-    draw_toolbar = new DrawingToolbar();
-    draw_toolbar->setWindowTitle(tr("Draw toolbar"));
-    QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
-    addToolBar(draw_toolbar);
     //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
@@ -122,7 +124,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(drawing_wgt, &DrawingWidget::set_tool_hand, draw_toolbar->hand_tool_act, &QAction::trigger);
     connect(drawing_wgt, &DrawingWidget::set_tool_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
-    connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
+    connect(video_wgt->frame_wgt, &FrameWidget::set_toolbar_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
+
     draw_toolbar->zoom_tool_act->trigger();
 
     // Status bar
@@ -187,7 +190,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
-
 /**
  * @brief MainWindow::~MainWindow
  * Destructor
@@ -218,7 +220,7 @@ void MainWindow::init_file_menu() {
 
 
     // Set icons
-    //new_project_act->setIcon(QIcon("../ViAn/Icons/....png"));     //add if wanted
+    new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
@@ -367,11 +369,23 @@ void MainWindow::init_view_menu() {
 void MainWindow::init_analysis_menu() {
     QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
 
-    QAction* analysis_act = new QAction(tr("&Perform analysis"), this);
-    analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
-    analysis_act->setStatusTip(tr("Perform analysis"));
-    analysis_menu->addAction(analysis_act);
-    connect(analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
+    QAction* advanced_analysis_act = new QAction(tr("&Advanced analysis"), this);
+    QAction* quick_analysis_act = new QAction(tr("&Quick analysis"), this);
+    QAction* settings_act = new QAction(tr("&Settings"), this);
+
+    advanced_analysis_act->setIcon(QIcon("../ViAn/Icons/advanced_analysis.png"));
+    quick_analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
+    settings_act->setIcon(QIcon("../ViAn/Icons/cog.png"));
+
+    advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
+    quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
+    settings_act->setStatusTip(tr("Change the settings for analyses."));
+
+    analysis_menu->addAction(quick_analysis_act);
+    analysis_menu->addAction(advanced_analysis_act);
+    analysis_menu->addAction(settings_act);
+    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
+    connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
 }
 
 void MainWindow::init_interval_menu() {
@@ -415,7 +429,8 @@ void MainWindow::init_tools_menu() {
 
     QAction* export_act = new QAction(tr("&Export interval"), this);
     export_act->setShortcut(tr("Shift+E"));
-    QAction* clear_act = new QAction(tr("C&lear"), this);
+    QAction* clear_frame_act = new QAction(tr("C&lear"), this);
+    QAction* delete_drawing_act = new QAction(tr("&Delete drawing"), this);
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
@@ -428,7 +443,8 @@ void MainWindow::init_tools_menu() {
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
-    clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
+    clear_frame_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
+    delete_drawing_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
 
     // Export submenu
     QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
@@ -445,14 +461,15 @@ void MainWindow::init_tools_menu() {
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
 
-    tool_menu->addAction(clear_act);
+    tool_menu->addAction(delete_drawing_act);
+    tool_menu->addAction(clear_frame_act);
     tool_menu->addSeparator();
     tool_menu->addAction(zoom_in_act);
     tool_menu->addAction(zoom_out_act);
     tool_menu->addAction(fit_screen_act);
     tool_menu->addAction(reset_zoom_act);
 
-    clear_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Delete));
+    clear_frame_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Delete));
 
     color_act->setStatusTip(tr("Color picker"));
     zoom_in_act->setStatusTip(tr("Zoom in"));
@@ -465,20 +482,23 @@ void MainWindow::init_tools_menu() {
     arrow_act->setStatusTip(tr("Arrow tool"));
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
-    clear_act->setStatusTip(tr("Clear all drawings"));
+    clear_frame_act->setStatusTip(tr("Clear all drawings on the current frame"));
+    delete_drawing_act->setStatusTip(tr("Delete the current drawing"));
 
     //Connect
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
     connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
-    connect(rectangle_act, &QAction::triggered, this, &MainWindow::rectangle);
-    connect(circle_act, &QAction::triggered, this, &MainWindow::circle);
-    connect(line_act, &QAction::triggered, this, &MainWindow::line);
-    connect(arrow_act, &QAction::triggered, this, &MainWindow::arrow);
-    connect(pen_act, &QAction::triggered, this, &MainWindow::pen);
-    connect(text_act, &QAction::triggered, this, &MainWindow::text);
-    connect(clear_act, &QAction::triggered, this, &MainWindow::clear_current);
-    connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
+    connect(rectangle_act, &QAction::triggered, draw_toolbar->rectangle_tool_act, &QAction::trigger);
+    connect(circle_act, &QAction::triggered, draw_toolbar->circle_tool_act, &QAction::trigger);
+    connect(line_act, &QAction::triggered, draw_toolbar->line_tool_act, &QAction::trigger);
+    connect(arrow_act, &QAction::triggered, draw_toolbar->arrow_tool_act, &QAction::trigger);
+    connect(pen_act, &QAction::triggered, draw_toolbar->pen_tool_act, &QAction::trigger);
+    connect(text_act, &QAction::triggered, draw_toolbar->text_tool_act, &QAction::trigger);
+    connect(clear_frame_act, &QAction::triggered, this, &MainWindow::clear_current);
+    connect(delete_drawing_act, &QAction::triggered, draw_toolbar->delete_tool_act, &QAction::trigger);
+    connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);
+    connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
 }
 
 /**
@@ -501,30 +521,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         event->accept();
     else
         event->ignore();
-}
-
-void MainWindow::rectangle() {
-    draw_toolbar->rectangle_tool_act->trigger();
-}
-
-void MainWindow::circle() {
-    draw_toolbar->circle_tool_act->trigger();
-}
-
-void MainWindow::line() {
-    draw_toolbar->line_tool_act->trigger();
-}
-
-void MainWindow::arrow() {
-    draw_toolbar->arrow_tool_act->trigger();
-}
-
-void MainWindow::pen() {
-    draw_toolbar->pen_tool_act->trigger();
-}
-
-void MainWindow::text() {
-    draw_toolbar->text_tool_act->trigger();
 }
 
 void MainWindow::update_text(QString text, Shapes* shape) {
