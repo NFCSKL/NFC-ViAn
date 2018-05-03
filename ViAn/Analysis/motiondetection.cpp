@@ -17,11 +17,11 @@ MotionDetection::~MotionDetection() {
 
 void MotionDetection::init_settings()
 {
-    add_setting("OPEN_DEGREE", 4, "Noise filtering, higher=> less noise");
+    add_setting("OPEN_DEGREE", 4, "Noise filtering, higher -> less noise");
     add_setting("SMALLEST_OBJECT_SIZE", 100, "Smallest detected object");
     add_setting("BACKGROUND_HISTORY", 500, "Number of frames in background model");
-    add_setting("MOG2_THRESHOLD", 10, "MOG2");
-    add_setting("IGNORE_SHADOWS", 0, "Ignore reflections");
+    add_setting("MOG2_THRESHOLD", 10, "MOG2. Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model.");
+    add_setting("DETECT_SHADOWS", 0, "Detect shadows");
 }
 
 
@@ -32,14 +32,14 @@ void MotionDetection::init_settings()
 void MotionDetection::setup_analysis(){   
     background_subtractor = cv::createBackgroundSubtractorMOG2(get_setting("BACKGROUND_HISTORY"),
                                                                get_setting("MOG2_THRESHOLD"),
-                                                               get_setting("IGNORE_SHADOWS"));
+                                                               get_setting("DETECT_SHADOWS"));
     dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(get_setting("OPEN_DEGREE"),
                                                                          get_setting("OPEN_DEGREE")));
 }
 
 
 /**
- * @brief MotionDetection::do_analysis
+ * @brief MotionDetection::analyse_frame
  * This method detects motion in a frame, partly by comparing it to the previous frame
  * and partly by using a background subtraction algorithm that detects things that are
  * not part of the background. Rectangles that mark the detected areas are saved for use
@@ -53,10 +53,6 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     cv::threshold(temp, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
     cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 
-    //This code excludes the area of the frame that has been given by exclude_frame.
-    if (do_exclusion) {
-        cv::bitwise_and(result, exclude_frame, result);
-    }
     // Creates OOIs from the detected countours.
     cv::findContours(result, contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
@@ -64,7 +60,7 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
             cv::Rect rect = cv::boundingRect(contour);
             if(use_bounding_box){
                 cv::Rect slice_rect = bounding_box;
-                cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl() + rect.br());
+                cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl()+rect.br());
                 rect = rect_to_original;
             }
             if(scaling_needed) rect = Utility::scale_rect(rect, scaling_ratio, cv::Point(0,0));

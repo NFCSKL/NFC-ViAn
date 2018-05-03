@@ -28,12 +28,14 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string s
     method = new MotionDetection(item->m_vid_proj->get_video()->file_path, m_save_dir);
     add_settings(form_lay);
     // Add Buttons
-    QDialogButtonBox* btn_box = new QDialogButtonBox;
+    btn_box = new QDialogButtonBox;
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
+    btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
 
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &AnalysisDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &AnalysisDialog::cancel_btn_clicked);
+    connect(m_v_proj_list, &QListWidget::itemSelectionChanged, this, &AnalysisDialog::item_changed);
 
     v_lay->addWidget(btn_box);
     setLayout(v_lay);
@@ -65,6 +67,14 @@ void AnalysisDialog::cancel_btn_clicked() {
     close();
 }
 
+void AnalysisDialog::item_changed() {
+    if (m_v_proj_list->selectedItems().length() > 0) {
+        btn_box->button(QDialogButtonBox::Ok)->setEnabled(true);
+    } else {
+        btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
+    }
+}
+
 /**
  * @brief AnalysisDialog::add_settings
  * @param form
@@ -72,11 +82,11 @@ void AnalysisDialog::cancel_btn_clicked() {
  */
 void AnalysisDialog::add_settings(QFormLayout *form) {
     std::vector<std::string> vars = method->get_var_names();
-    for(std::string name : vars){
-        QLineEdit* var_line = new QLineEdit(QString::fromStdString(std::to_string(method->get_setting(name))));
+    for(std::string name : vars) {
+        QLineEdit* var_line = new QLineEdit(QString::number(method->get_setting(name)));
         var_line->setToolTip(QString::fromStdString(method->get_descr(name)));
         form->addRow(QString::fromStdString(name), var_line);
-        m_settings.insert(std::make_pair(name,var_line));
+        m_settings.insert(std::make_pair(name, var_line));
     }
 }
 
@@ -86,9 +96,8 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
  * Set form layout settings to method
  */
 void AnalysisDialog::set_settings(AnalysisMethod *method) {
-    for(auto line: m_settings){
-        QLineEdit* setting = line.second;
-        int val = std::stoi(setting->text().toStdString());
-        method->set_setting(line.first,val);
+    for(auto line : m_settings) {
+        int val = line.second->text().toInt();
+        method->set_setting(line.first, val);
     }
 }

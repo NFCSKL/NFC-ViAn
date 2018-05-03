@@ -3,6 +3,8 @@
 #include <opencv2/videoio/videoio.hpp>
 #include "Analysis/analysismethod.h"
 #include "imagegenerator.h"
+#include <QDebug>
+
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
 {
     m_source_file = video_path;
@@ -13,34 +15,6 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     m_ana_name = vid_name + DETECTION_STRING;
     m_save_path = save_path;
     add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
-}
-
-/**
- * @brief AnalysisMethod::set_include_exclude_area
- * Sets an exlusion frame that will be used to exclude detections in a specific area of each frame.
- * @param points for the polygon that defines the exclusion area.
- */
-void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon) {
-
-    if (!capture.isOpened())
-        return;
-
-    do_exclusion = true;
-    cv::Scalar poly_scalar = cv::Scalar(255);
-    cv::Scalar background_scalar = cv::Scalar(0);
-
-    if (exclude_polygon) {
-        poly_scalar = cv::Scalar(0);
-        background_scalar = cv::Scalar(255);
-    }
-
-    cv::Mat img(int(capture.get(cv::CAP_PROP_FRAME_HEIGHT)),int(capture.get(cv::CAP_PROP_FRAME_WIDTH)),CV_8UC1,background_scalar);
-    cv::Point* rook_points[1];
-    rook_points[0] = &points[0];
-    const cv::Point* ppt[1] = {rook_points[0]};
-    int npt[1] = {points.size()};
-    cv::fillPoly(img, ppt, npt, 1, poly_scalar);
-    exclude_frame = img;
 }
 
 /**
@@ -94,7 +68,6 @@ void AnalysisMethod::run() {
             // If scaling is needed, i.e if video is high resolution
             // calculate scaling factor and scale frame
             if(!m_scaling_done){
-
                 calculate_scaling_factor();
             }
             if (scaling_needed){
@@ -214,7 +187,7 @@ cv::Rect AnalysisMethod::get_bounding_box() const {
     return bounding_box;
 }
 
-void AnalysisMethod::setBounding_box(const cv::Rect &value) {
+void AnalysisMethod::set_bounding_box(const cv::Rect &value) {
     bounding_box = value;
     use_bounding_box = true;
 }
@@ -228,11 +201,11 @@ void AnalysisMethod::set_interval(const std::pair<int, int> &value) {
     use_interval = true;
 }
 
-std::string AnalysisMethod::get_descr(const std::string& var)
-{
+std::string AnalysisMethod::get_descr(const std::string& var) {
     auto val_pair = m_settings.find(var);
-    if(val_pair != m_settings.end())
-        return val_pair->first;
+    if(val_pair != m_settings.end()) {
+        return m_descriptions[val_pair->first];
+    }
     qWarning("No variable \"%s found",var.c_str());
     return "";
 }
@@ -242,14 +215,12 @@ std::string AnalysisMethod::save_path() const {
     return m_save_path;
 }
 
-void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
-{
+void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr) {
     m_settings[var] = value_default;
     m_descriptions[var] = descr;
 }
 
-int AnalysisMethod::get_setting(const std::string &var)
-{
+int AnalysisMethod::get_setting(const std::string &var) {
     auto val_pair = m_settings.find(var);
     if(val_pair != m_settings.end())
         return val_pair->second;
@@ -257,13 +228,11 @@ int AnalysisMethod::get_setting(const std::string &var)
     return -1;
 }
 
-void AnalysisMethod::set_setting(const std::string &var, int value)
-{
+void AnalysisMethod::set_setting(const std::string &var, int value) {
     m_settings[var] = value;
 }
 
-std::vector<std::string> AnalysisMethod::get_var_names()
-{
+std::vector<std::string> AnalysisMethod::get_var_names() {
     std::vector<std::string> res;
     for(auto pair : m_settings){
         res.push_back(pair.first);

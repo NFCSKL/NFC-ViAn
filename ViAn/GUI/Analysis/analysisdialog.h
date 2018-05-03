@@ -20,6 +20,8 @@ class AnalysisDialog : public QDialog
     Q_OBJECT
     // Lists of videoprojects to potentially analyse
     QListWidget* m_v_proj_list;
+    // Button box
+    QDialogButtonBox* btn_box;
     // Variable settings fields
     std::map<std::string,QLineEdit*> m_settings;
     // Directory to save analysis
@@ -27,11 +29,12 @@ class AnalysisDialog : public QDialog
 
     MotionDetection* method;
 public:
-    AnalysisDialog(std::vector<VideoItem*> vid_projs, string tmp_save_dir, string save_dir);
+    AnalysisDialog(std::vector<VideoItem*> vid_projs, string save_dir);
     ~AnalysisDialog();
 public slots:
     void ok_btn_clicked();
     void cancel_btn_clicked();
+    void item_changed();
 signals:
     // Send to start analysis
     void start_analysis(AnalysisMethod* method, VideoProject* vid_proj);

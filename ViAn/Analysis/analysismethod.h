@@ -22,7 +22,7 @@ using SettingsDescr = std::map<std::string,std::string>;
  * It's implementation is limited to saving rectangles and time intervals for
  * detection.
  */
-class AnalysisMethod : public QObject ,public QRunnable{
+class AnalysisMethod : public QObject, public QRunnable{
     Q_OBJECT    
     Settings m_settings;                // Custom integer settings for constants
     SettingsDescr m_descriptions;       // Descriptions for settings constants
@@ -41,7 +41,6 @@ protected:
     bool use_interval = false;
     bool use_bounding_box = false;
 
-    bool do_exclusion = false;
     bool scaling_needed = false;
 
     const int FULL_HD_WIDTH = 1920;
@@ -58,12 +57,8 @@ protected:
 
     cv::VideoCapture capture;       // Video source
 
-    cv::Mat analysis_frame, exclude_frame, original_frame;
+    cv::Mat analysis_frame, original_frame;
     Analysis m_analysis;
-
-
-    bool m_exclude_polygon;
-    std::vector<cv::Point> include_exclude_poly;
 protected:
     // Implement this in subclass,
     // using set_setting(Var,value) for all desired settings
@@ -75,7 +70,6 @@ protected:
 
     void calculate_scaling_factor();
     void scale_frame();
-
 public:
      AnalysisMethod(const std::string &video_path, const std::string& save_path);
 
@@ -88,17 +82,14 @@ public:
 
     int get_progress(int start_frame);  // Returns progress of analysis 1-100%
     cv::Rect get_bounding_box() const;
-    void setBounding_box(const cv::Rect &value); // Sets bounding box to analyse in video
+    void set_bounding_box(const cv::Rect &value); // Sets bounding box to analyse in video
     std::pair<int, int> get_interval() const;
     void set_interval(const std::pair<int, int> &value);
     std::string save_path() const;
 
-    void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
     void set_analysis_area(cv::Rect area);
 
     bool sample_current_frame(); // Check if current frame is to be sampled
-
-
     bool* aborted = nullptr;    // Bool checked if analysis should be aborted
 
 public slots:

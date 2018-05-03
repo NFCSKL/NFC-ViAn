@@ -113,7 +113,7 @@ void ProjectWidget::add_video() {
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
     AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir);
-    if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
+    if(settings->use_bounding_box) method->set_bounding_box(settings->bounding_box);
     if(settings->use_interval) method->set_interval(settings->get_interval());
 
     if (vid_proj == nullptr) return;
@@ -418,7 +418,7 @@ void ProjectWidget::advanced_analysis() {
 }
 
 
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj) {
+void ProjectWidget::advanced_analysis_setup(AnalysisMethod* method, VideoProject* vid_proj) {
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
     AnalysisItem* ana = new AnalysisItem();
