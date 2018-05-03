@@ -83,7 +83,12 @@ void AnalysisDialog::item_changed() {
 void AnalysisDialog::add_settings(QFormLayout *form) {
     std::vector<std::string> vars = method->get_var_names();
     for(std::string name : vars) {
-        QLineEdit* var_line = new QLineEdit(QString::number(method->get_setting(name)));
+        QWidget* var_line;
+        if (name == "DETECT_SHADOWS") {
+            var_line = new QCheckBox();
+        } else {
+            var_line = new QLineEdit(QString::number(method->get_setting(name)));
+        }
         var_line->setToolTip(QString::fromStdString(method->get_descr(name)));
         form->addRow(QString::fromStdString(name), var_line);
         m_settings.insert(std::make_pair(name, var_line));
@@ -97,7 +102,15 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
  */
 void AnalysisDialog::set_settings(AnalysisMethod *method) {
     for(auto line : m_settings) {
-        int val = line.second->text().toInt();
+        int val;
+        if (line.first == "DETECT_SHADOWS") {
+            QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
+            val = settings->isChecked();
+        } else {
+            QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
+            val = settings->text().toInt();
+        }
+        qDebug() << QString::fromStdString(line.first) << val;
         method->set_setting(line.first, val);
     }
 }

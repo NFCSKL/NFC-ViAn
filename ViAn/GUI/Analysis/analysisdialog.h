@@ -23,7 +23,7 @@ class AnalysisDialog : public QDialog
     // Button box
     QDialogButtonBox* btn_box;
     // Variable settings fields
-    std::map<std::string,QLineEdit*> m_settings;
+    std::map<std::string,QWidget*> m_settings;
     // Directory to save analysis
     std::string m_save_dir;
 
