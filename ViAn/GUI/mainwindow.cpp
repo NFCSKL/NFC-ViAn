@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget(); //mianwindow->eemit from frame_wgt to videoplayer/overlay
+    project_wgt = new ProjectWidget();
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
@@ -386,6 +386,9 @@ void MainWindow::init_analysis_menu() {
     analysis_menu->addAction(settings_act);
     connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
+    connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
+
+    // TODO Connect settings
 }
 
 void MainWindow::init_interval_menu() {

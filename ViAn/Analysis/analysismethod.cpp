@@ -232,6 +232,10 @@ void AnalysisMethod::set_setting(const std::string &var, int value) {
     m_settings[var] = value;
 }
 
+void AnalysisMethod::set_full_settings(Settings settings) {
+    m_settings = settings;
+}
+
 std::vector<std::string> AnalysisMethod::get_var_names() {
     std::vector<std::string> res;
     for(auto pair : m_settings){

@@ -447,6 +447,7 @@ void FrameWidget::set_analysis_settings() {
 
     if (reply == QMessageBox::Yes) {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
+        settings->quick_analysis = true;
 
         cv::Point end = cv::Point(ana_rect_end.x(), ana_rect_end.y());
         cv::Point start (ana_rect_start.x(), ana_rect_start.y());

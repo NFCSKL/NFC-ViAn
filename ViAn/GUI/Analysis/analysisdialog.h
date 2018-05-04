@@ -24,12 +24,12 @@ class AnalysisDialog : public QDialog
     QDialogButtonBox* btn_box;
     // Variable settings fields
     std::map<std::string,QWidget*> m_settings;
-    // Directory to save analysis
-    std::string m_save_dir;
+    bool do_analysis = true;
 
     MotionDetection* method;
+    AnalysisSettings* m_analysis_settings;
 public:
-    AnalysisDialog(std::vector<VideoItem*> vid_projs, string save_dir);
+    AnalysisDialog(std::vector<VideoItem*> vid_projs, AnalysisSettings* analysis_settings);
     ~AnalysisDialog();
 public slots:
     void ok_btn_clicked();
@@ -37,12 +37,12 @@ public slots:
     void item_changed();
 signals:
     // Send to start analysis
-    void start_analysis(AnalysisMethod* method, VideoProject* vid_proj);
+    void start_analysis(VideoProject* vid_proj, AnalysisSettings* do_analysis);
 private:
     // Add settings to form layout
     void add_settings(QFormLayout* form);
     // Set setting sn form layout to method
-    void set_settings(AnalysisMethod* method);
+    void set_settings();
 };
 
 #endif // ANALYSISDIALOG_H

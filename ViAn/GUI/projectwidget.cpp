@@ -115,6 +115,13 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir);
     if(settings->use_bounding_box) method->set_bounding_box(settings->bounding_box);
     if(settings->use_interval) method->set_interval(settings->get_interval());
+    if (settings->quick_analysis) {
+        method->set_full_settings(analysis_settings->get_full_settings());
+        delete settings;
+    } else {
+        method->set_full_settings(settings->get_full_settings());
+    }
+
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -407,17 +414,25 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
+void ProjectWidget::update_analysis_settings() {
+    std::vector<VideoItem*> v_items;
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
+    dialog->show();
+}
+
 void ProjectWidget::advanced_analysis() {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_dir());
-    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    AnalysisSettings* new_settings = new AnalysisSettings(analysis_settings);
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
+    //connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
 }
 
-
+// TODO remove
 void ProjectWidget::advanced_analysis_setup(AnalysisMethod* method, VideoProject* vid_proj) {
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);

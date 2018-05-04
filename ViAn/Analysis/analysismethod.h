@@ -76,6 +76,7 @@ public:
     std::string get_descr(const std::string& var_name);          // Get variable description
     virtual int get_setting(const std::string& var);             // Get integer value for variable
     virtual void set_setting(const std::string& var, int value); // Set singled variable
+    virtual void set_full_settings(Settings settings);           // Set all variables
     virtual std::vector<std::string> get_var_names();            // Get all variable names
     virtual void setup_analysis() = 0;
     virtual std::vector<DetectionBox> analyse_frame() = 0;

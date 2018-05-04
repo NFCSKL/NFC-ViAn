@@ -41,6 +41,7 @@ public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     ~ProjectWidget();
     Project* m_proj = nullptr;
+    AnalysisSettings* analysis_settings = new AnalysisSettings();
 
 signals:
     void selected_media();
@@ -76,6 +77,7 @@ public slots:
     void remove_project();
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+    void update_analysis_settings();
     void advanced_analysis();
     void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
     bool prompt_save();
