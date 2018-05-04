@@ -45,8 +45,7 @@ private:
     manipulation_settings m_settings;
     overlay_settings o_settings;
     video_sync v_sync;
-
-    Video* m_video{};    // Shared with videoplayer. Should only be changed by this class.
+    video_information v_info;
 
     std::string m_video_path;
 
@@ -54,6 +53,7 @@ private:
     std::atomic_int video_width{0};
     std::atomic_int video_height{0};
     std::atomic_int m_speed_step{0};            // Playback speed
+    std::atomic_int video_frames{0};            // Total amount of frames in the video TODO remove
 
     std::atomic_bool is_playing{false};         // True when the video player is playing
     std::atomic_bool settings_changed{false};   // True when the user changed something. Zoom, brightness etc.

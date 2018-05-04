@@ -26,6 +26,16 @@ struct video_sync {
     // Frame to lock
     cv::Mat frame;
 };
+
+/**
+ * @brief The video_info struct
+ * Information about the video
+ */
+struct video_information {
+    std::atomic_int total_frames{0};
+    std::atomic_int total_time{0};
+};
+
 /**
  * @brief The VideoPlayer class
  * operates on an opencv capture object. Videoplayer handles reading
@@ -47,7 +57,8 @@ class VideoPlayer : public QObject{
     std::atomic_bool* m_video_loaded;
 
     video_sync* m_v_sync;
-    Video* m_video;
+    video_information* m_v_info;
+    std::atomic_int* m_video_frames;
 
     // Delay time to reach the right frame rate
     int m_delay = 1;
@@ -65,7 +76,7 @@ class VideoPlayer : public QObject{
     int m_frame_rate = 0;
     int m_last_frame = 0;
 public:
-    explicit VideoPlayer(std::atomic<int>* frame_index, Video* video, std::atomic_bool* is_playing,
+    explicit VideoPlayer(std::atomic<int>* frame_index, video_information* v_info, std::atomic_bool* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool* new_frame_video, std::atomic_bool* video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,

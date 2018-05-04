@@ -102,6 +102,7 @@ void ProjectWidget::add_video() {
     // Create thread/threading pool that can be used to read through every video
     // and thus fetch its information
 
+    std::cout << "Loading videos" << std::endl;
     VideoProbe* video_probe = new VideoProbe();
 
     std::vector<std::string> paths{};
@@ -482,19 +483,11 @@ bool ProjectWidget::prompt_save() {
  * Slot function to be called after a VideoProbe has gathered infromation about a video.
  * @param video_path
  */
-void ProjectWidget::add_probed_video(const string &video_path, const int& frames) {
-//    int index = video_path.lastIndexOf('/') + 1;
-
-    VideoState v_state{};
-    v_state.total_frames = frames;
-    Video* video = new Video(video_path);
-    video->state = v_state;
-
-
+void ProjectWidget::add_probed_video(const string &video_path, const int& frames, const int& video_length) {
+    Video* video = new Video(video_path, frames, video_length);
     VideoProject* vid_proj = new VideoProject(video);
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "video_path");
-
 }
 
 /**
@@ -607,6 +600,23 @@ void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
 }
 
 /**
+ * @brief ProjectWidget::display_video_info
+ * Display stored information about video item
+ */
+void ProjectWidget::display_video_info() {
+    if (selectedItems().front()->type() != VIDEO_ITEM) return;
+
+    QMessageBox delete_box(this);
+    delete_box.setIcon(QMessageBox::Information);
+    delete_box.setText("Video Information");
+    delete_box.setInformativeText("This will contain video infromation");
+    delete_box.setStandardButtons(QMessageBox::Close);
+    delete_box.setDefaultButton(QMessageBox::Close);
+    delete_box.exec();
+
+}
+
+/**
  * @brief ProjectWidget::context_menu
  * Slot function triggered by customContextMenuRequested
  * Creates a context menu
@@ -645,6 +655,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
+                menu.addAction("Show video info", this, SLOT(display_video_info()));
                 break;
             default:
                 break;

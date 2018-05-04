@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QTime>
 
-VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, Video* video, std::atomic_bool *is_playing,
+VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, video_information* v_info, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool *new_frame_video, std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
@@ -11,7 +11,6 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, Video* video, std::atomi
 
 
     m_frame = frame_index;
-    m_video = video;
     m_is_playing = is_playing;
     m_new_frame = new_frame;
 
@@ -20,6 +19,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, Video* video, std::atomi
     m_new_video = new_video;
     m_new_frame_video = new_frame_video;
     m_video_loaded = video_loaded;
+    m_v_info = v_info;
     m_v_sync = v_sync;
     m_player_con = player_con;
     m_player_lock = player_lock;
@@ -37,7 +37,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, Video* video, std::atomi
  */
 
 void VideoPlayer::load_video(){
-    std::cout << (m_video == nullptr) << std::endl;
+
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
@@ -45,6 +45,15 @@ void VideoPlayer::load_video(){
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
+    int frames = m_v_info->total_frames.load();
+    int time = m_v_info->total_time.load();
+    if (frames) {
+        m_last_frame = frames;
+        if (time) {
+            m_frame_rate = (frames * 1000) / time;
+        }
+    }
+    std::cout << "FRAMES: " << m_v_info->total_frames.load() << " TIME: " << m_v_info->total_time.load() << " FPS " << m_frame_rate << std::endl;
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
@@ -128,6 +137,8 @@ void VideoPlayer::load_video_info() {
     m_video_width->store(m_capture.get(CV_CAP_PROP_FRAME_WIDTH));
     m_video_height->store(m_capture.get(CV_CAP_PROP_FRAME_HEIGHT));
     m_frame_rate = m_capture.get(CV_CAP_PROP_FPS);
+
+
     m_last_frame = m_capture.get(CV_CAP_PROP_FRAME_COUNT) - 1;
 }
 
@@ -142,7 +153,6 @@ bool VideoPlayer::synced_read(){
             return false;
         }
         m_new_frame->store(true);
-        std::cout << (m_video == nullptr) << std::endl;
     }
     m_v_sync->con_var.notify_one();
 

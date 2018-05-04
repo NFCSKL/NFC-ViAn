@@ -80,7 +80,7 @@ public slots:
     void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
     bool prompt_save();
 
-    void add_probed_video(const std::string& video_path, const int& frames);
+    void add_probed_video(const std::string& video_path, const int& frames, const int& video_length);
 private slots:
     void context_menu(const QPoint& point);
     void remove_item();
@@ -94,6 +94,7 @@ private slots:
     void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 
     void update_item_data(QTreeWidgetItem *item, int column);
+    void display_video_info();
 private:
     void set_main_window_name(QString name);
     void tree_add_video();

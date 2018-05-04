@@ -17,14 +17,14 @@ VideoProbe::VideoProbe(QObject *parent) : QObject(parent) {}
  */
 void VideoProbe::probe() {
     std::ostringstream out;
-    int frames{1};
+    int frames{0};
     cv::VideoCapture capture;
     for (auto& path : m_video_paths) {
         std::cout << path << std::endl;
-        capture.open(path, cv::CAP_FFMPEG);
+        capture.open(path);
+
 
         if (!capture.isOpened()) continue;
-        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
         emit current_video(path);
 
         while (capture.grab()) {
@@ -32,14 +32,23 @@ void VideoProbe::probe() {
             frames++;
         }
 
-        int cv_frames = capture.get(cv::CAP_PROP_POS_FRAMES);
-        double cv_time = capture.get(cv::CAP_PROP_POS_MSEC);
-        auto end = std::chrono::steady_clock::now();
-        std::string elapsed = std::to_string(std::chrono::duration<double>(end - start).count());
-        std::cout << "TotalFrames::" << frames << " ProbeTime::" << elapsed << " CVFrames::" << cv_frames << " CVTime::" << cv_time << std::endl;
-        std::cout << path << " had " << frames << " frames";
+        // Assumes that the ratio between fps and frame count is correct
+        int cv_frames = capture.get(cv::CAP_PROP_FRAME_COUNT);
+        int cv_fps = capture.get(cv::CAP_PROP_FPS);
+        int cv_time = capture.get(cv::CAP_PROP_POS_MSEC);
+
+        double calc_time = ((double)cv_frames / capture.get(cv::CAP_PROP_FPS)) * 1000; // ms
+
+        std::cout << "OpenCV frame count : " << cv_frames << std::endl;
+        std::cout << "OpenCV FPS: " << cv_fps << std::endl;
+        std::cout << "OpenCV duration: " << cv_time << std::endl;
+        std::cout << "Calculated frame count: " << frames << std::endl;
+        std::cout << "Calculated FPS: " << frames / (calc_time / 1000) << std::endl;
+        std::cout << "Calculated duration: " << calc_time << std::endl;
+
+
         capture.release();
-        emit probe_info(path, frames);
+        emit probe_info(path, frames, (int)calc_time);
         frames = 0;
     }
 }

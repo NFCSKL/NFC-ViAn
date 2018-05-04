@@ -75,7 +75,8 @@ SOURCES += main.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
     Project/Test/bookmarktest.cpp \
     GUI/textdialog.cpp \
-    Video/videoprobe.cpp
+    Video/videoprobe.cpp \
+    GUI/Dialogs/videoinfodialog.cpp
 
 #
 # TEST
@@ -140,7 +141,8 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/drawingtagitem.h \
     Project/Test/bookmarktest.h \
     GUI/textdialog.h \
-    Video/videoprobe.h
+    Video/videoprobe.h \
+    GUI/Dialogs/videoinfodialog.h
 
 #
 # LIBRARY

@@ -18,7 +18,7 @@ signals:
     void finished();
     void current_video(std::string);
     void current_frame(const int& frame);
-    void probe_info(std::string video_path, int frames);
+    void probe_info(std::string video_path, int frames, int time);
 
 public slots:
     void probe();
