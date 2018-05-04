@@ -43,6 +43,8 @@ private:
     void add_settings(QFormLayout* form);
     // Set setting sn form layout to method
     void set_settings();
+    // Reset the settings in default
+    void reset_settings();
 };
 
 #endif // ANALYSISDIALOG_H

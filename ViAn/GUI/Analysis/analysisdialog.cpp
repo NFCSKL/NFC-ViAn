@@ -37,10 +37,12 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
     btn_box = new QDialogButtonBox;
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
+    btn_box->addButton(QDialogButtonBox::Reset);
     if (do_analysis) btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
 
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &AnalysisDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &AnalysisDialog::cancel_btn_clicked);
+    connect(btn_box->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &AnalysisDialog::reset_settings);
 
     v_lay->addWidget(btn_box);
     setLayout(v_lay);
@@ -126,5 +128,18 @@ void AnalysisDialog::set_settings() {
         qDebug() << QString::fromStdString(line.first) << val;
         //method->set_setting(line.first, val);
         m_analysis_settings->set_setting(line.first, val);
+    }
+}
+
+void AnalysisDialog::reset_settings() {
+    m_analysis_settings->reset_settings();
+    for (auto line : m_settings) {
+        if (line.first == "DETECT_SHADOWS") {
+            QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
+            settings->setChecked(m_analysis_settings->get_setting(line.first));
+        } else {
+            QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
+            settings->setText(QString::number(m_analysis_settings->get_setting(line.first)));
+        }
     }
 }
