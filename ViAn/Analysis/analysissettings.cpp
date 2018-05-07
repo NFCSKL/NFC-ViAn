@@ -89,6 +89,19 @@ std::string AnalysisSettings::get_descr(const std::string& var_name) {
     return "";
 }
 
+std::string AnalysisSettings::get_type_string() {
+    // Extend this switch when adding more types of analyses
+    // for the correct string ending
+    switch (type) {
+    case MOTION_DETECTION:
+        return MOTION_DET_STR;
+        break;
+    default:
+        return "";
+        break;
+    }
+}
+
 cv::Rect AnalysisSettings::getBounding_box() const {
     return bounding_box;
 }

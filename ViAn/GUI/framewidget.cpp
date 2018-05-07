@@ -203,7 +203,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     if (show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
 
-        auto box = m_analysis->get_bounding_box();
+        auto box = m_analysis->settings->bounding_box;
         QPoint tl = Utility::from_cvpoint(box.tl());
         QPoint br = Utility::from_cvpoint(box.br());
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);

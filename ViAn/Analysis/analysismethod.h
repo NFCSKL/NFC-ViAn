@@ -13,6 +13,7 @@
 #include "Filehandler/saveable.h"
 #include <atomic>
 #include "utility.h"
+
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
 
@@ -24,6 +25,8 @@ using SettingsDescr = std::map<std::string,std::string>;
  */
 class AnalysisMethod : public QObject, public QRunnable{
     Q_OBJECT    
+    AnalysisSettings* analysis_settings = nullptr;
+    
     Settings m_settings;                // Custom integer settings for constants
     SettingsDescr m_descriptions;       // Descriptions for settings constants
     std::string m_save_path;            // Save path for finished analysis
@@ -45,14 +48,13 @@ protected:
 
     const int FULL_HD_WIDTH = 1920;
     const int FULL_HD_HEIGHT = 1080;
-    const std::string DETECTION_STRING = "-motion_analysis";
 
     int num_frames = -1;            // Total number of video frames
     unsigned int sample_freq = 1;   // Sample frequency of analysis
     int current_frame_index = 0;    // The current frame number
 
     int scaled_width = -1;          // Width after scaling
-    int scaled_height = -1;         // Height -----
+    int scaled_height = -1;         // Height after scaling
     float scaling_ratio = 1.0;      // Scaling factor
 
     cv::VideoCapture capture;       // Video source
@@ -62,22 +64,22 @@ protected:
 protected:
     // Implement this in subclass,
     // using set_setting(Var,value) for all desired settings
-    virtual void init_settings() = 0;
+    //virtual void init_settings() = 0;
     // Implement this, return constant names, default value and descriptions
     // like so std::vector<std::tuple<name,int value, description>>
 
-    virtual void add_setting(const std::string& var, int value_default, const std::string& descr);
+    //virtual void add_setting(const std::string& var, int value_default, const std::string& descr);
 
     void calculate_scaling_factor();
     void scale_frame();
 public:
-     AnalysisMethod(const std::string &video_path, const std::string& save_path);
+    AnalysisMethod(const std::string &video_path, const std::string& save_path, AnalysisSettings *settings);
 
-    std::string get_descr(const std::string& var_name);          // Get variable description
-    virtual int get_setting(const std::string& var);             // Get integer value for variable
-    virtual void set_setting(const std::string& var, int value); // Set singled variable
-    virtual void set_full_settings(Settings settings);           // Set all variables
-    virtual std::vector<std::string> get_var_names();            // Get all variable names
+    //std::string get_descr(const std::string& var_name);          // Get variable description
+    int get_setting(const std::string& var);             // Get integer value for variable
+    //virtual void set_setting(const std::string& var, int value); // Set singled variable
+    //virtual void set_full_settings(Settings settings);           // Set all variables
+    //virtual std::vector<std::string> get_var_names();            // Get all variable names
     virtual void setup_analysis() = 0;
     virtual std::vector<DetectionBox> analyse_frame() = 0;
 

@@ -24,6 +24,7 @@ Analysis* AnalysisProxy::load_analysis() {
     m_unsaved_changes = false;
     return analysis;
 }
+
 AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
     : BasicAnalysis(other),
       file_analysis(file),
@@ -35,6 +36,10 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
     file_analysis(other.file_analysis),
     type(other.type)
 {
+}
+
+AnalysisSettings* AnalysisProxy::get_settings() {
+    return settings;
 }
 
 void AnalysisProxy::reset_root_dir(const std::string &dir) {

@@ -139,7 +139,8 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
  * Set interval to the interval the analysis was run on
  */
 void AnalysisSlider::set_ana_interval() {
-    m_ana_interval = std::make_pair(m_analysis->get_ana_interval().first, m_analysis->get_ana_interval().second);
+    qDebug() << m_analysis->settings->interval.first << m_analysis->settings->interval.second;
+    m_ana_interval = std::make_pair(m_analysis->settings->interval.first, m_analysis->settings->interval.second);
 }
 
 /**

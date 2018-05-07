@@ -11,7 +11,7 @@
  */
 class MotionDetection : public AnalysisMethod {
 public:
-    MotionDetection(const std::string& source_file, const std::string& save_file);
+    MotionDetection(const std::string& source_file, const std::string& save_file, AnalysisSettings *settings);
     ~MotionDetection();
 
 private:
@@ -24,7 +24,7 @@ private:
      */
     cv::Ptr<cv::BackgroundSubtractor> background_subtractor;
 
-    void init_settings() override;
+    //void init_settings() override;
     void setup_analysis() override;
     std::vector<DetectionBox> analyse_frame() override;
 

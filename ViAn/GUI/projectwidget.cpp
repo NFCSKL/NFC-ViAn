@@ -112,14 +112,22 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir);
-    if(settings->use_bounding_box) method->set_bounding_box(settings->bounding_box);
-    if(settings->use_interval) method->set_interval(settings->get_interval());
+    AnalysisMethod* method;
+    switch (settings->getType()) {
+    case MOTION_DETECTION:
+        method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
+        break;
+    default:
+        break;
+    }
+    //if(settings->use_bounding_box) method->set_bounding_box(settings->bounding_box);
+    //if(settings->use_interval) method->set_interval(settings->get_interval());
     if (settings->quick_analysis) {
-        method->set_full_settings(analysis_settings->get_full_settings());
-        delete settings;
+        settings->set_full_settings(analysis_settings->get_full_settings());
+        //method->set_full_settings(analysis_settings->get_full_settings());
+        //delete settings;
     } else {
-        method->set_full_settings(settings->get_full_settings());
+        //method->set_full_settings(settings->get_full_settings());
     }
 
 
@@ -501,6 +509,9 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_poi_slider(true);
         emit enable_poi_btns(true, true);
         emit update_frame();
+        std::vector<VideoItem*> v_items;
+        AnalysisDialog* dialog = new AnalysisDialog(v_items, ana_item->get_analysis()->get_settings());
+        dialog->show();
         break;
     } case DRAWING_TAG_ITEM: {
         tree_item_clicked(item->parent());
