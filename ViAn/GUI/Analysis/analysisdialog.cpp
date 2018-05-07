@@ -20,6 +20,10 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
         for(VideoItem* v : vid_projs) {
             VideoListItem* item = new VideoListItem(v->get_video_project());
             m_v_proj_list->addItem(item);
+            if (v->get_video_project()->is_current()) {
+                item->setSelected(true);
+                m_v_proj_list->setCurrentItem(item);
+            }
         }
         v_lay->addWidget(m_v_proj_list);
 
@@ -38,7 +42,7 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
     btn_box->addButton(QDialogButtonBox::Reset);
-    if (do_analysis) btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
+    if (do_analysis && m_v_proj_list->selectedItems().size() <= 0) btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
 
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &AnalysisDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &AnalysisDialog::cancel_btn_clicked);

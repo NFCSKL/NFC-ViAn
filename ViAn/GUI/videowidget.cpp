@@ -804,6 +804,8 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
+        if (m_vid_proj) m_vid_proj->set_current(false);
+        vid_proj->set_current(true);
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
         new_video.store(true);
