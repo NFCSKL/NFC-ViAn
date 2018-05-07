@@ -370,13 +370,16 @@ void DrawingWidget::delete_item() {
 
     if (item->type() == FRAME_ITEM) {
         FrameItem* f_item = dynamic_cast<FrameItem*>(item);
-        if (f_item->get_frame() == m_overlay->get_current_frame())
+        if (f_item->get_frame() == m_overlay->get_current_frame()) {
             remove_from_tree(f_item);
+            clearSelection();
+        }
     } else if (item->get_shape() != m_overlay->get_current_drawing()) {
         return;
     } else {
         remove_from_tree(item);
-        emit set_tool_zoom();
+        clearSelection();
+        emit set_current_drawing(nullptr);
     }
 }
 
