@@ -83,14 +83,24 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
     if (frame_index >= 0 && frame_index <= m_last_frame) {
-        std::cout << "SET FRAME: " << frame_index << std::endl;
-        std::cout << "SET TIME (ms):" << 1000 * (double)frame_index / m_frame_rate << std::endl;
+        int set_frame = frame_index;
+        double set_time = 1000 * (double)frame_index / m_frame_rate;
+//        std::cout << "SET FRAME: " << frame_index << std::endl;
+//        std::cout << "SET TIME (ms):" << set_time << std::endl;
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
+        int cv_frame = m_capture.get(CV_CAP_PROP_POS_FRAMES);
+        double cv_time = m_capture.get(CV_CAP_PROP_POS_MSEC);
         int time = std::round((double)frame_index / m_frame_rate);
-        std::cout << "CV FRAME " << m_capture.get(CV_CAP_PROP_POS_FRAMES) << std::endl;
-        std::cout << "CV TIME (ms)" << m_capture.get(CV_CAP_PROP_POS_MSEC) << std::endl;
-        std::cout << "------------------------------------" << std::endl;
-        current_frame = frame_index;
+//        std::cout << "CV FRAME " << cv_frame << std::endl;
+//        std::cout << "CV TIME (ms)" << cv_time << std::endl;
+        if (set_frame != cv_frame) {
+            qWarning() << "----------------------------------------------------";
+            qWarning() << "!! Did not manage to set the correct frame number !!";
+            qWarning() << "Set index: " << set_frame << " actual index " << cv_frame;
+            qWarning() << "----------------------------------------------------";
+        }
+
+        current_frame = cv_frame;
         synced_read();
     }
 }
