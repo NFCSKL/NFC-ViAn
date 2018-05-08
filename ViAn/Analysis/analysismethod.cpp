@@ -14,7 +14,6 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     vid_name = vid_name.substr(0,index);
     m_ana_name = vid_name + settings->get_type_string();
     m_save_path = save_path;
-    //add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
 }
 
 /**
@@ -45,21 +44,21 @@ void AnalysisMethod::run() {
     int end_frame = num_frames -1;
     int start_frame = 0;
     // If Interval should be used, use interval frames
-    if(use_interval){
-        start_frame = interval.first;
+    if(analysis_settings->use_interval){
+        start_frame = analysis_settings->interval.first;
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
-        end_frame = interval.second;
+        end_frame = analysis_settings->interval.second;
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame;
     }
 
     while(!(*aborted) && capture.read(original_frame) &&
-          !(use_interval && (current_frame_index >= end_frame))) {
+          !(analysis_settings->use_interval && (current_frame_index >= end_frame))) {
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
             // Slice frame if bounding box should be used
-            if(use_bounding_box){
-                cv::Mat temp (original_frame, bounding_box);
+            if(analysis_settings->use_bounding_box){
+                cv::Mat temp (original_frame, analysis_settings->bounding_box);
                 analysis_frame = temp;
             }
             else{
@@ -114,10 +113,6 @@ void AnalysisMethod::run() {
             m_analysis.add_interval(m_POI);
         }
         capture.release();
-//        m_analysis.m_ana_interval = interval;
-//        m_analysis.bounding_box = bounding_box;
-//        m_analysis.use_interval = use_interval;
-//        m_analysis.use_bounding_box = use_bounding_box;
         m_analysis.settings = analysis_settings;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
         int index = new_path.find_last_of('/') + 1;
@@ -183,65 +178,10 @@ void AnalysisMethod::scale_frame() {
 /**
  *  Getters and setters
  */
-
-//cv::Rect AnalysisMethod::get_bounding_box() const {
-//    return bounding_box;
-//}
-
-//void AnalysisMethod::set_bounding_box(const cv::Rect &value) {
-//    bounding_box = value;
-//    use_bounding_box = true;
-//}
-
-//std::pair<int, int> AnalysisMethod::get_interval() const {
-//    return interval;
-//}
-
-//void AnalysisMethod::set_interval(const std::pair<int, int> &value) {
-//    interval = value;
-//    use_interval = true;
-//}
-
-//std::string AnalysisMethod::get_descr(const std::string& var) {
-//    auto val_pair = m_settings.find(var);
-//    if(val_pair != m_settings.end()) {
-//        return m_descriptions[val_pair->first];
-//    }
-//    qWarning("No variable \"%s found",var.c_str());
-//    return "";
-//}
-
-
 std::string AnalysisMethod::save_path() const {
     return m_save_path;
 }
 
-//void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr) {
-//    m_settings[var] = value_default;
-//    m_descriptions[var] = descr;
-//}
-
 int AnalysisMethod::get_setting(const std::string &var) {
     return analysis_settings->get_setting(var);
-//    auto val_pair = m_settings.find(var);
-//    if(val_pair != m_settings.end())
-//        return val_pair->second;
-//    qWarning("No variable \"%s found",var.c_str());
-//    return -1;
 }
-
-//void AnalysisMethod::set_setting(const std::string &var, int value) {
-//    m_settings[var] = value;
-//}
-
-//void AnalysisMethod::set_full_settings(Settings settings) {
-//    m_settings = settings;
-//}
-
-//std::vector<std::string> AnalysisMethod::get_var_names() {
-//    std::vector<std::string> res;
-//    for(auto pair : m_settings){
-//        res.push_back(pair.first);
-//    }
-//    return res;
-//}

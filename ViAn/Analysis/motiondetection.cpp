@@ -57,8 +57,8 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {            
             cv::Rect rect = cv::boundingRect(contour);
-            if(use_bounding_box){
-                cv::Rect slice_rect = bounding_box;
+            if(analysis_settings->use_bounding_box) {
+                cv::Rect slice_rect = analysis_settings->bounding_box;
                 cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl()+rect.br());
                 rect = rect_to_original;
             }

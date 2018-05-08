@@ -120,16 +120,9 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     default:
         break;
     }
-    //if(settings->use_bounding_box) method->set_bounding_box(settings->bounding_box);
-    //if(settings->use_interval) method->set_interval(settings->get_interval());
     if (settings->quick_analysis) {
         settings->set_full_settings(analysis_settings->get_full_settings());
-        //method->set_full_settings(analysis_settings->get_full_settings());
-        //delete settings;
-    } else {
-        //method->set_full_settings(settings->get_full_settings());
-    }
-
+    } else {}
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);

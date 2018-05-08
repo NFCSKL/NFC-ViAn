@@ -25,10 +25,6 @@ using SettingsDescr = std::map<std::string,std::string>;
  */
 class AnalysisMethod : public QObject, public QRunnable{
     Q_OBJECT    
-    AnalysisSettings* analysis_settings = nullptr;
-    
-    Settings m_settings;                // Custom integer settings for constants
-    SettingsDescr m_descriptions;       // Descriptions for settings constants
     std::string m_save_path;            // Save path for finished analysis
     std::string m_source_file;          // Source video file used by opencv capture
     std::string m_ana_name;             // The name of the analysis
@@ -39,11 +35,6 @@ class AnalysisMethod : public QObject, public QRunnable{
     bool paused = false;
 
 protected:
-    std::pair<int, int> interval;
-    cv::Rect bounding_box;
-    bool use_interval = false;
-    bool use_bounding_box = false;
-
     bool scaling_needed = false;
 
     const int FULL_HD_WIDTH = 1920;
@@ -74,6 +65,8 @@ protected:
     void scale_frame();
 public:
     AnalysisMethod(const std::string &video_path, const std::string& save_path, AnalysisSettings *settings);
+
+    AnalysisSettings* analysis_settings = nullptr;
 
     //std::string get_descr(const std::string& var_name);          // Get variable description
     int get_setting(const std::string& var);             // Get integer value for variable

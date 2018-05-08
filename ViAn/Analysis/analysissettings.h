@@ -19,17 +19,16 @@ public:
     ANALYSIS_TYPE type;
     cv::Rect bounding_box;
     std::pair<int, int> interval;
-    bool default_settings;  //Remove
     bool use_bounding_box = false;
     bool use_interval = false;
     bool quick_analysis = false;
+
     AnalysisSettings(ANALYSIS_TYPE type, std::pair<int, int> interval, cv::Rect bounding_box);
     AnalysisSettings(ANALYSIS_TYPE type);
     AnalysisSettings();
-
     AnalysisSettings(AnalysisSettings *as);
-
     virtual ~AnalysisSettings();
+
     void reset_settings();
     cv::Rect getBounding_box() const;
     void setBounding_box(const cv::Rect &value);

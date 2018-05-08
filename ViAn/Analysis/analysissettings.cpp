@@ -10,12 +10,10 @@ AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
 }
 
 AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type) : type(type) {
-    default_settings = true;
     reset_settings();
 }
 
 AnalysisSettings::AnalysisSettings() {
-    default_settings = true;
     reset_settings();
 }
 
