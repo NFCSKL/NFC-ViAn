@@ -83,7 +83,13 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
     if (frame_index >= 0 && frame_index <= m_last_frame) {
+        std::cout << "SET FRAME: " << frame_index << std::endl;
+        std::cout << "SET TIME (ms):" << 1000 * (double)frame_index / m_frame_rate << std::endl;
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
+        int time = std::round((double)frame_index / m_frame_rate);
+        std::cout << "CV FRAME " << m_capture.get(CV_CAP_PROP_POS_FRAMES) << std::endl;
+        std::cout << "CV TIME (ms)" << m_capture.get(CV_CAP_PROP_POS_MSEC) << std::endl;
+        std::cout << "------------------------------------" << std::endl;
         current_frame = frame_index;
         synced_read();
     }
