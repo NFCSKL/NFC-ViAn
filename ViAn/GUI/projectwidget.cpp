@@ -511,9 +511,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_poi_slider(true);
         emit enable_poi_btns(true, true);
         emit update_frame();
-        std::vector<VideoItem*> v_items;
-        AnalysisDialog* dialog = new AnalysisDialog(v_items, ana_item->get_analysis()->get_settings());
-        dialog->show();
         break;
     } case DRAWING_TAG_ITEM: {
         tree_item_clicked(item->parent());
@@ -622,6 +619,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Show details", this, SLOT(show_details()));
                 menu.addAction("Hide details", this, SLOT(hide_details()));
+                menu.addAction("Show settings", this, SLOT(update_settings()));
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -694,6 +692,21 @@ void ProjectWidget::hide_details() {
     emit show_analysis_details(false);
 }
 
+/**
+ * @brief ProjectWidget::update_settings
+ * Updates the analysis settings dock window with the settings
+ * from the clicked analysis
+ */
+void ProjectWidget::update_settings() {
+    QTreeWidgetItem* item = selectedItems().front();
+    if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* a_item = dynamic_cast<AnalysisItem*>(item);
+        if (!a_item->is_finished()) return;
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(a_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
+        emit show_analysis_settings(true);
+    }
+}
 
 /**
  * @brief ProjectWidget::remove_item

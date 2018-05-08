@@ -29,14 +29,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
+    ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_drawing_wgt = drawing_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
+    toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -89,6 +92,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*, int)));
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     bookmark_dock->setWidget(bookmark_wgt);
+
+    // Initialize analysis settings widget
+    ana_settings_wgt = new AnaSettingWidget(project_wgt->analysis_settings);
+    ana_settings_dock->setWidget(ana_settings_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, ana_settings_dock);
+    ana_settings_dock->setFloating(true);
+    ana_settings_dock->close();
+
+    connect(project_wgt, &ProjectWidget::update_settings_wgt, ana_settings_wgt, &AnaSettingWidget::set_ana_settings);
+    connect(project_wgt, &ProjectWidget::show_analysis_settings, this, &MainWindow::show_ana_settings_dock);
 
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
@@ -334,6 +347,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addAction(toggle_queue_wgt);
+    view_menu->addAction(toggle_ana_settings_wgt);
     view_menu->addSeparator();
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
@@ -344,6 +358,7 @@ void MainWindow::init_view_menu() {
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
+    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis settings widget"));
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
@@ -640,5 +655,11 @@ void MainWindow::show_analysis_dock(bool show) {
         queue_dock->show();
     } else if (queue_dock->isFloating()) {
         queue_dock->close();
+    }
+}
+
+void MainWindow::show_ana_settings_dock(bool show) {
+    if (show) {
+        ana_settings_dock->show();
     }
 }

@@ -44,7 +44,7 @@ void AnalysisSettings::reset_settings() {
     add_setting("BACKGROUND_HISTORY", 500, "Number of frames in background model");
     add_setting("MOG2_THRESHOLD", 10, "MOG2. Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model.");
     add_setting("DETECT_SHADOWS", 0, "Detect shadows");
-    add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
+    add_setting("SAMPLE_FREQUENCY", 1, "How often analysis will use frame from video");
 }
 
 void AnalysisSettings::add_setting(const std::string &var, int value_default, const std::string& descr) {

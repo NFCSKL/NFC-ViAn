@@ -25,6 +25,7 @@
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "drawingwidget.h"
+#include "Analysis/anasettingwidget.h"
 #include "statusbar.h"
 #include "Toolbars/drawingtoolbar.h"
 
@@ -69,6 +70,7 @@ public slots:
     void options(void);
     void open_project_dialog();
     void show_analysis_dock(bool);
+    void show_ana_settings_dock(bool);
 
 signals:
     void set_status_bar(QString);
@@ -76,6 +78,7 @@ signals:
 
 private:
     QDockWidget* queue_dock;
+    QDockWidget* ana_settings_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
@@ -83,11 +86,13 @@ private:
     BookmarkWidget* bookmark_wgt;
     DrawingWidget* drawing_wgt;
     QueueWidget* queue_wgt;
+    AnaSettingWidget* ana_settings_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
     QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
+    QAction* toggle_ana_settings_wgt;
 
     AnalysisWindow *analysis_window;
 

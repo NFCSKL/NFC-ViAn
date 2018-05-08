@@ -19,6 +19,8 @@
 #include "Analysis/analysismethod.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysisdialog.h"
+#include "Analysis/anasettingwidget.h"
+
 class Project;
 class VideoItem;
 class FolderItem;
@@ -52,6 +54,8 @@ signals:
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
     void show_analysis_details(bool);
+    void update_settings_wgt(AnalysisSettings*);
+    void show_analysis_settings(bool);
 
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
@@ -88,6 +92,7 @@ private slots:
     void drawing_tag();
     void show_details();
     void hide_details();
+    void update_settings();
     void create_folder_item();
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
     void check_selection();

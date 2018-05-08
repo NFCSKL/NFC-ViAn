@@ -74,7 +74,8 @@ SOURCES += main.cpp \
     Project/Analysis/drawingtag.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
     Project/Test/bookmarktest.cpp \
-    GUI/textdialog.cpp
+    GUI/textdialog.cpp \
+    GUI/Analysis/anasettingwidget.cpp
 
 #
 # TEST
@@ -138,7 +139,8 @@ HEADERS += reportgenerator.h\
     Project/Analysis/drawingtag.h \
     GUI/TreeItems/drawingtagitem.h \
     Project/Test/bookmarktest.h \
-    GUI/textdialog.h
+    GUI/textdialog.h \
+    GUI/Analysis/anasettingwidget.h
 
 #
 # LIBRARY
