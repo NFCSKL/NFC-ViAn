@@ -699,60 +699,100 @@ void ProjectWidget::remove_item() {
  * Recursive function for removing item and all of its children
  */
 void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
-    if (item->type() == FOLDER_ITEM) {
+    switch (item->type()) {
+    case FOLDER_ITEM:
         while (item->childCount() != 0) {
             remove_tree_item(item->child(0));
         }
-    }
-    else if (item->type() == VIDEO_ITEM) {
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        VideoProject* v_proj = vid_item->get_video_project();
-
-        // Remove all children
-        while (item->childCount() != 0) {
-            remove_tree_item(item->child(0));
-        }
-        // Remove the video from the list of videos
-        auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
-        if (it != m_proj->get_videos().end()) {
-            m_proj->get_videos().erase(it);
-        }
-        delete v_proj;
-        emit item_removed(v_proj);
-        emit remove_overlay();
-    }
-    else if (item->type() == TAG_ITEM) {
-        emit set_tag_slider(false);
-        emit enable_tag_btn(false);
-
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
-        Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-        vid_item->get_video_project()->remove_analysis(tag);
-        emit update_frame();
-    }
-    else if (item->type() == DRAWING_TAG_ITEM) {
-        emit set_tag_slider(false);
-        emit enable_tag_btn(false);
-
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
-        DrawingTag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
-        vid_item->get_video_project()->remove_analysis(tag);
-        emit update_frame();
-    }
-    else if (item->type() == ANALYSIS_ITEM) {
-        emit set_detections(false);
-        emit set_poi_slider(false);
-        emit enable_poi_btns(false, false);
-
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
-        AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
-
-        analysis->delete_saveable(analysis->full_path());
-        vid_item->get_video_project()->remove_analysis(analysis);
-        emit update_frame();
-        emit clear_analysis();
+        break;
+    case VIDEO_ITEM:
+        remove_video_item(item);
+        break;
+    case TAG_ITEM:
+        remove_tag_item(item);
+        break;
+    case DRAWING_TAG_ITEM:
+        remove_drawing_tag_item(item);
+        break;
+    case ANALYSIS_ITEM:
+        remove_analysis_item(item);
+        break;
+    default:
+        break;
     }
     delete item;
+}
+
+/**
+ * @brief ProjectWidget::remove_video_item
+ * Remove and clean video item
+ * @param item
+ */
+void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+    VideoProject* v_proj = vid_item->get_video_project();
+
+    // Remove all children
+    while (item->childCount() != 0) {
+        remove_tree_item(item->child(0));
+    }
+    // Remove the video from the list of videos
+    auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
+    if (it != m_proj->get_videos().end()) {
+        m_proj->get_videos().erase(it);
+    }
+    delete v_proj;
+    emit item_removed(v_proj);
+    emit remove_overlay();
+}
+
+/**
+ * @brief ProjectWidget::remove_tag_item
+ * Remove and clean tag item
+ * @param item
+ */
+void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
+    emit set_tag_slider(false);
+    emit enable_tag_btn(false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
+    vid_item->get_video_project()->remove_analysis(tag);
+    emit update_frame();
+}
+
+/**
+ * @brief ProjectWidget::remove_drawing_item
+ * Remove and clean drawing tag item
+ * @param item
+ */
+void ProjectWidget::remove_drawing_item(QTreeWidgetItem* item) {
+    emit set_tag_slider(false);
+    emit enable_tag_btn(false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    DrawingTag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+    vid_item->get_video_project()->remove_analysis(tag);
+    emit update_frame();
+}
+
+/**
+ * @brief ProjectWidget::remove_analysis_item
+ * Remove and clean analysis item
+ * @param item
+ */
+void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
+    emit set_detections(false);
+    emit set_poi_slider(false);
+    emit enable_poi_btns(false, false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
+
+    analysis->delete_saveable(analysis->full_path());
+    vid_item->get_video_project()->remove_analysis(analysis);
+    emit update_frame();
+    emit clear_analysis();
 }
 
 /**
