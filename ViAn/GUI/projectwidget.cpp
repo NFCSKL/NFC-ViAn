@@ -766,7 +766,7 @@ void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
  * Remove and clean drawing tag item
  * @param item
  */
-void ProjectWidget::remove_drawing_item(QTreeWidgetItem* item) {
+void ProjectWidget::remove_drawing_tag_item(QTreeWidgetItem* item) {
     emit set_tag_slider(false);
     emit enable_tag_btn(false);
 

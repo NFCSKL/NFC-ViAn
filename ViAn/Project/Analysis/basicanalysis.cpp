@@ -15,7 +15,6 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 }
 
 BasicAnalysis::~BasicAnalysis() {
-    qDebug() << "basic analysis delete";
 }
 
 /**

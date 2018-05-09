@@ -8,7 +8,6 @@
 Project::Project(){}
 
 Project* Project::fromFile(const std::string &full_path){
-    qDebug() << "full path" << QString::fromStdString(full_path);
     Project* proj = new Project();
     proj->m_temporary = false;
     proj->load_saveable(full_path);
