@@ -11,6 +11,7 @@
 #include "GUI/TreeItems/tagitem.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/TreeItems/drawingtagitem.h"
+#include "GUI/TreeItems/tagframeitem.h"
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
@@ -27,10 +28,7 @@ class VideoProject;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    QTreeWidgetItem* clicked_item = nullptr;
-    QPoint* clicked_point = nullptr;
     QTreeWidgetItem* selection_parent = nullptr;
-    bool selecting = false;
     std::set<std::string> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
                                 "264", "263", "mjpeg", "avc", "m2ts",
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",
@@ -41,6 +39,7 @@ public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     ~ProjectWidget();
     Project* m_proj = nullptr;
+    TagItem* m_tag_item = nullptr;
 
 signals:
     void selected_media();
@@ -69,6 +68,8 @@ public slots:
     void add_video();
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
+    void add_frames_to_tag(TagItem* item);
+    void add_new_frame_to_tag(int frame);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     bool save_project();
     bool open_project(QString project_path="");

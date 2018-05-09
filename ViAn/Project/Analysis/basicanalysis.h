@@ -34,7 +34,6 @@ public:
 protected:
 
 public:
-
     BasicAnalysis();
     BasicAnalysis(const BasicAnalysis& other);
     virtual void read(const QJsonObject& json);

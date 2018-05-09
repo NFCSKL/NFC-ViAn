@@ -588,9 +588,12 @@ void VideoWidget::play_btn_toggled(bool status) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
+    qDebug() << "in tag frame";
     if (m_tag != nullptr) {
         m_tag->add_frame(playback_slider->value());
+        //TODO should not need
         playback_slider->set_basic_analysis(m_tag);
+        emit tag_new_frame(playback_slider->value());
         emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
         return;
     }

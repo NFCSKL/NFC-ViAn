@@ -149,11 +149,39 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
     } else if (tag->get_type() == TAG) {
         TagItem* item = new TagItem(dynamic_cast<Tag*>(tag));
         vid_item->addChild(item);
+        add_frames_to_tag(item);
         clearSelection();
         item->setSelected(true);
         tree_item_clicked(item);
     }
     vid_item->setExpanded(true);
+}
+
+void ProjectWidget::add_frames_to_tag(TagItem* item) {
+    Tag* tag = item->get_tag();
+    for (auto p : tag->get_intervals()) {
+
+        // TODO maybe change tags to frames and not intervals
+        TagFrameItem* tf_item = new TagFrameItem(p->get_start());
+        item->addChild(tf_item);
+    }
+}
+
+void ProjectWidget::add_new_frame_to_tag(int frame) {
+    TagFrameItem* tf_item = new TagFrameItem(frame);
+    m_tag_item->setExpanded(true);
+    qDebug() << "count" << m_tag_item->childCount();
+    for (int i = 0; i < m_tag_item->childCount(); ++i) {
+        TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
+        qDebug() << "temp frame" << temp->get_frame();
+        if (frame < temp->get_frame()) {
+            qDebug() << "frame" << frame;
+            m_tag_item->insertChild(i, tf_item);
+            return;
+        }
+    }
+    qDebug() << "outside";
+    m_tag_item->addChild(tf_item);
 }
 
 /**
@@ -346,6 +374,7 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
+            add_frames_to_tag(tag_item);
         } else if (ana.second->get_type() == DRAWING_TAG) {
             DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<DrawingTag*>(ana.second));
             v_item->addChild(tag_item);
@@ -499,6 +528,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     } case TAG_ITEM: {
         tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
+        m_tag_item = tag_item;
         emit marked_basic_analysis(tag_item->get_tag());
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
