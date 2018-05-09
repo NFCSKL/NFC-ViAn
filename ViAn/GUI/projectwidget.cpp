@@ -149,7 +149,6 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
     } else if (tag->get_type() == TAG) {
         TagItem* item = new TagItem(dynamic_cast<Tag*>(tag));
         vid_item->addChild(item);
-        add_frames_to_tag(item);
         clearSelection();
         item->setSelected(true);
         tree_item_clicked(item);
@@ -170,18 +169,23 @@ void ProjectWidget::add_frames_to_tag(TagItem* item) {
 void ProjectWidget::add_new_frame_to_tag(int frame) {
     TagFrameItem* tf_item = new TagFrameItem(frame);
     m_tag_item->setExpanded(true);
-    qDebug() << "count" << m_tag_item->childCount();
     for (int i = 0; i < m_tag_item->childCount(); ++i) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
-        qDebug() << "temp frame" << temp->get_frame();
         if (frame < temp->get_frame()) {
-            qDebug() << "frame" << frame;
             m_tag_item->insertChild(i, tf_item);
             return;
         }
     }
-    qDebug() << "outside";
     m_tag_item->addChild(tf_item);
+}
+
+void ProjectWidget::remove_frame_from_tag(int frame) {
+    for (QTreeWidgetItem* item : m_tag_item->takeChildren()) {
+        TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+        if (tf_item->get_frame() == frame) {
+            m_tag_item->removeChild(tf_item);
+        }
+    }
 }
 
 /**
@@ -502,7 +506,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
-        emit enable_tag_btn(false);
+        //emit enable_tag_btn(false);
         emit update_frame();
         break;
     } case ANALYSIS_ITEM: {

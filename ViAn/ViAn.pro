@@ -75,7 +75,8 @@ SOURCES += main.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
     Project/Test/bookmarktest.cpp \
     GUI/textdialog.cpp \
-    GUI/TreeItems/tagframeitem.cpp
+    GUI/TreeItems/tagframeitem.cpp \
+    Project/Analysis/interval.cpp
 
 #
 # TEST
@@ -140,7 +141,8 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/drawingtagitem.h \
     Project/Test/bookmarktest.h \
     GUI/textdialog.h \
-    GUI/TreeItems/tagframeitem.h
+    GUI/TreeItems/tagframeitem.h \
+    Project/Analysis/interval.h
 
 #
 # LIBRARY

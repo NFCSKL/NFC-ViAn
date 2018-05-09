@@ -33,6 +33,7 @@ public:
     int last_poi_end = -1;
 
     Analysis* m_analysis = nullptr;
+    Tag* m_tag = nullptr;
 
     std::pair<int, int> m_interval = std::make_pair(-1, -1);
     std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);

@@ -169,6 +169,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(video_wgt, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
     connect(video_wgt, &VideoWidget::tag_new_frame, project_wgt, &ProjectWidget::add_new_frame_to_tag);
+    connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
 

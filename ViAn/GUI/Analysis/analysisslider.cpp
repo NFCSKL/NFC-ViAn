@@ -37,6 +37,12 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     if ((m_show_pois||m_show_tags)&& show_on_slider) {
         if(m_show_tags) brush = Qt::red;
 
+        for (int frame : m_tag->get_frames()) {
+            double first = (double)(groove_rect.left() + (frame) * c);
+            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, brush);
+        }
+
         for (auto it = rects.begin(); it != rects.end(); ++it) {
             double first_frame = (double)(*it).first;
             double second_frame = (double)(*it).second;
@@ -129,6 +135,12 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         for (auto p : analysis->get_intervals()) {
             add_slider_interval(p->get_start(), p->get_end());
         }
+    }
+
+
+
+    if (analysis->get_type() == TAG) {
+        m_tag = dynamic_cast<Tag*>(analysis);
     }
     repaint();
 }

@@ -588,28 +588,33 @@ void VideoWidget::play_btn_toggled(bool status) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
-    qDebug() << "in tag frame";
     if (m_tag != nullptr) {
-        m_tag->add_frame(playback_slider->value());
-        //TODO should not need
-        playback_slider->set_basic_analysis(m_tag);
-        emit tag_new_frame(playback_slider->value());
-        emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
+        if (m_tag->add_frame(playback_slider->value())) {
+            emit tag_new_frame(playback_slider->value());
+            emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
+            playback_slider->update();
+        } else {
+            emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " already tagged");
+        }
         return;
+    } else {
+        new_tag_clicked();
     }
-    emit set_status_bar("Select a tag");
 }
 
 /**
  * @brief VideoWidget::remove_tag_frame
- * Un-tags the current frarm
+ * Un-tags the current frame
  */
 void VideoWidget::remove_tag_frame() {
     if (m_tag != nullptr) {
-        Tag* tag = dynamic_cast<Tag*>(m_tag);
-        tag->remove_frame(playback_slider->value());
-        playback_slider->set_basic_analysis(tag);
-        emit set_status_bar("Frame untagged");
+        if (m_tag->remove_frame(playback_slider->value())) {
+            emit tag_remove_frame(playback_slider->value());
+            emit set_status_bar("Untagged frame number: " + QString::number(playback_slider->value()));
+            playback_slider->update();
+        } else {
+            emit set_status_bar("Frame untagged");
+        }
         return;
     }
     emit set_status_bar("Select a tag");
@@ -620,6 +625,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
+    if (!m_vid_proj) return;
     TagDialog* tag_dialog = new TagDialog();
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
     tag_dialog->exec();
@@ -655,12 +661,14 @@ void VideoWidget::tag_interval() {
  * @brief VideoWidget::remove_tag_interval
  * For each frame in the interval, un-tag it
  */
+
+// TODO Remove/change
 void VideoWidget::remove_tag_interval() {
     if (m_tag != nullptr) {
-        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-            m_tag->remove_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-            playback_slider->set_basic_analysis(m_tag);
-        }
+//        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
+//            m_tag->remove_interval(new AnalysisInterval(m_interval.first, m_interval.second));
+//            playback_slider->set_basic_analysis(m_tag);
+//        }
     } else {
         emit set_status_bar("No tag selected");
     }
