@@ -79,7 +79,9 @@ SOURCES += main.cpp \
     Project/Analysis/interval.cpp \
     Project/Analysis/tagframe.cpp \
     GUI/Bookmark/myinputdialog.cpp \
-    GUI/Analysis/anasettingwidget.cpp
+    GUI/Analysis/anasettingwidget.cpp \
+    Project/imagesequence.cpp \
+    GUI/TreeItems/sequenceitem.cpp
 
 #
 # TEST
@@ -148,7 +150,10 @@ HEADERS += reportgenerator.h\
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
     GUI/Bookmark/myinputdialog.h \
-    GUI/Analysis/anasettingwidget.h
+    GUI/Analysis/anasettingwidget.h \
+    Project/imagesequence.h \
+    Project/video.h \
+    GUI/TreeItems/sequenceitem.h
 
 #
 # LIBRARY

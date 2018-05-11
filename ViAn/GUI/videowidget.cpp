@@ -875,6 +875,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         set_overlay(m_vid_proj->get_overlay());
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
+
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();

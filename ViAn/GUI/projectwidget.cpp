@@ -118,6 +118,54 @@ void ProjectWidget::add_video() {
 }
 
 /**
+ * @brief ProjectWidget::add_images
+ * Slot function for adding images
+ * Each loaded image will be linked to a secondary folder and given ordered names in the form of image_0001.ext
+ */
+void ProjectWidget::add_images() {
+    qDebug() << "Adding images";
+    if (m_proj == nullptr)  return;
+
+
+
+    // Create actual dialog
+    QStringList image_paths = QFileDialog().getOpenFileNames(
+                this,
+                tr("Add images"),
+                m_proj->get_dir().c_str());
+
+    bool ok;
+    std::string seq_name{"sequence"};
+    QString text = QInputDialog::getText(this, tr("TEMPORARY DIALOG"),
+                                         tr("Sequence name:"), QLineEdit::Normal,
+                                         "Sequence", &ok);
+    if (ok && !text.isEmpty())
+        seq_name = text.toStdString();
+
+    // Generate links for each image file
+    int num_images = image_paths.size();
+    int num_digits = Utility::number_of_digits(num_images);
+    qDebug() << QString::fromStdString(m_proj->get_dir());
+    qDebug() << "Loading " << num_images << " images";
+    std::string path = m_proj->get_dir() + "/Sequences/" + seq_name;
+    QDir().mkpath(QString::fromStdString(path)); // fix proper path
+    std::vector<std::string> images;
+    for (int i =1; i < num_images; ++i){
+        images.push_back(image_paths[i].toStdString());
+        QFileInfo file_info(image_paths[i]);
+        std::string padded_num = Utility::zfill(std::to_string(i), num_digits);
+        qDebug() << QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + "." + file_info.suffix();
+        QFile().copy(image_paths[i],
+                     QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + "." + file_info.suffix());
+
+    }
+    // TODO Check if file is already added
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
+    m_proj->add_video_project(vid_proj);
+    tree_add_video(vid_proj, "test");
+}
+
+/**
  * @brief ProjectWidget::start_analysis
  * @param vid_proj
  * Start analysis on the selected video
@@ -398,6 +446,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
+            v_item->load_sequence_items();
         }
     }
 }
@@ -552,7 +601,19 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     Q_UNUSED(col)
     if (!item) return;
     switch(item->type()){
-    case VIDEO_ITEM: {
+    case SEQUENCE_ITEM: {
+        auto seq_item = dynamic_cast<SequenceItem*>(item);
+        // Parent will always be a VideoItem
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+        emit marked_video(vid_item->get_video_project(), seq_item->get_index());
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(false);
+        emit enable_poi_btns(false,false);
+        emit enable_tag_btn(false);
+        emit update_frame();
+        break;
+    } case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit set_video_project(vid_item->get_video_project());
         VideoState state;

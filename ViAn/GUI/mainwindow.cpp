@@ -124,6 +124,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Toolbar connects
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    connect(main_toolbar->add_img_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
