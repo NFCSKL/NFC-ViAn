@@ -516,7 +516,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case VIDEO_ITEM: {
         qDebug() << "Video item";
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project(), -1);
+        emit marked_video(vid_item->get_video_project(), 30);
         emit clear_tag();
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -563,16 +563,17 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         break;
     } case TAG_FRAME_ITEM: {
         qDebug() << "Tf item";
-        //tree_item_clicked(item->parent());  // call with tag item
+        tree_item_clicked(item->parent());  // call with tag item
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
-        emit set_detections(false);
-        emit set_poi_slider(false);
-        emit set_tag_slider(true);
-        emit enable_poi_btns(true, false);
-        emit enable_tag_btn(true);
-        emit update_frame();
+//        //emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
+        //emit marked_video(vid_item->get_video_project(), -1);
+//        emit set_detections(false);
+//        emit set_poi_slider(false);
+//        emit set_tag_slider(true);
+//        emit enable_poi_btns(true, false);
+//        emit enable_tag_btn(true);
+//        emit update_frame();
     } case FOLDER_ITEM: {
         break;
     } default:
