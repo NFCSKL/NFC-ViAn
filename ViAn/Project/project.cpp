@@ -12,8 +12,11 @@ Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->m_temporary = false;
     proj->load_saveable(full_path);
+    // TODO
+
     // ensure changes to paths are saved
-    proj->save_saveable(full_path);
+    //proj->save_saveable(full_path); // will overwrite existing save file with wrong
+    // values when failing to load the correct data.
     return proj;
 }
 

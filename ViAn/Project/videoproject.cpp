@@ -135,7 +135,7 @@ void VideoProject::read(const QJsonObject& json){
             analysis = new AnalysisProxy();
             break;
         case DRAWING_TAG:
-            analysis = new DrawingTag();
+            analysis = new Tag();
             break;
         default:
             qWarning("Undefined analysis");

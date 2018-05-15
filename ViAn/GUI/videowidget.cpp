@@ -588,7 +588,7 @@ void VideoWidget::play_btn_toggled(bool status) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
-    if (m_tag != nullptr) {
+    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
         if (m_tag->add_frame(playback_slider->value())) {
             emit tag_new_frame(playback_slider->value());
             emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
@@ -637,7 +637,7 @@ void VideoWidget::new_tag_clicked() {
  * @param name
  */
 void VideoWidget::new_tag(QString name) {
-    BasicAnalysis* tag = new Tag();
+    Tag* tag = new Tag();
     tag->m_name = name.toStdString();
     emit add_basic_analysis(m_vid_proj, tag);
 }
@@ -822,6 +822,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         player_con.notify_all();
 
         m_vid_proj = vid_proj;
+        qDebug() << "in load marked";
         playback_slider->setValue(frame);
 
         m_interval = make_pair(0,0);

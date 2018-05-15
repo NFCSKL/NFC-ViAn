@@ -132,7 +132,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* tag) {
+void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
     vid_proj->add_analysis(tag);
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
@@ -140,14 +140,19 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
         return;
     }
 
-    if (tag->get_type() == DRAWING_TAG) {
-        DrawingTagItem* item = new DrawingTagItem(dynamic_cast<DrawingTag*>(tag));
+    if (tag->is_drawing_tag()) {
+        DrawingTagItem* item = new DrawingTagItem(tag);
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
+        for (int frame : tag->get_frames()) {
+            TagFrameItem* tf_item = new TagFrameItem(frame);
+            item->addChild(tf_item);
+        }
+        item->setExpanded(true);
         tree_item_clicked(item);
-    } else if (tag->get_type() == TAG) {
-        TagItem* item = new TagItem(dynamic_cast<Tag*>(tag));
+    } else if (!tag->is_drawing_tag()) {
+        TagItem* item = new TagItem(tag);
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
@@ -156,13 +161,19 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
     vid_item->setExpanded(true);
 }
 
-void ProjectWidget::add_frames_to_tag(TagItem* item) {
-    Tag* tag = item->get_tag();
-    for (auto p : tag->get_intervals()) {
-
-        // TODO maybe change tags to frames and not intervals
-        TagFrameItem* tf_item = new TagFrameItem(p->get_start());
-        item->addChild(tf_item);
+void ProjectWidget::add_frames_to_tag(TreeItem* item) {
+    if (item->type() == TAG_ITEM) {
+        Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
+        for (int frame : tag->get_frames() ) {
+            TagFrameItem* tf_item = new TagFrameItem(frame);
+            item->addChild(tf_item);
+        }
+    } else if (item->type() == DRAWING_TAG_ITEM) {
+        Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+        for (int frame : tag->get_frames() ) {
+            TagFrameItem* tf_item = new TagFrameItem(frame);
+            item->addChild(tf_item);
+        }
     }
 }
 
@@ -180,10 +191,11 @@ void ProjectWidget::add_new_frame_to_tag(int frame) {
 }
 
 void ProjectWidget::remove_frame_from_tag(int frame) {
-    for (QTreeWidgetItem* item : m_tag_item->takeChildren()) {
-        TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+    for (int i = 0; i < m_tag_item->childCount(); ++i) {
+        TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (tf_item->get_frame() == frame) {
             m_tag_item->removeChild(tf_item);
+            return;
         }
     }
 }
@@ -380,8 +392,10 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
             v_item->addChild(tag_item);
             add_frames_to_tag(tag_item);
         } else if (ana.second->get_type() == DRAWING_TAG) {
-            DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<DrawingTag*>(ana.second));
+            qDebug() << QString::fromStdString(ana.second->get_name());
+            DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
+            add_frames_to_tag(tag_item);
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
@@ -500,16 +514,19 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
 
     switch(item->type()){
     case VIDEO_ITEM: {
+        qDebug() << "Video item";
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit marked_video(vid_item->get_video_project(), -1);
+        emit clear_tag();
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
-        //emit enable_tag_btn(false);
+        emit enable_tag_btn(false);
         emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
+        qDebug() << "ana item item";
         tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         if(!ana_item->is_finished()) break;
@@ -521,17 +538,22 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit update_frame();
         break;
     } case DRAWING_TAG_ITEM: {
+        qDebug() << "Drawing tag item";
         tree_item_clicked(item->parent());
         DrawingTagItem* tag_item = dynamic_cast<DrawingTagItem*>(item);
+        qDebug() << tag_item->get_tag()->get_frames().size();
+        //m_tag_item = tag_item;
         emit marked_basic_analysis(tag_item->get_tag());
-        emit set_tag_slider(true);
+        emit set_tag_slider(true);  // make a drawing tag slider maybe
         emit enable_poi_btns(true, false);
         emit enable_tag_btn(true);
         emit update_frame();
         break;
     } case TAG_ITEM: {
+        qDebug() << "tag item";
         tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
+        qDebug() << "size" << tag_item->get_tag()->get_frames().size();
         m_tag_item = tag_item;
         emit marked_basic_analysis(tag_item->get_tag());
         emit set_tag_slider(true);
@@ -539,6 +561,18 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit enable_tag_btn(true);
         emit update_frame();
         break;
+    } case TAG_FRAME_ITEM: {
+        qDebug() << "Tf item";
+        //tree_item_clicked(item->parent());  // call with tag item
+        TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+        emit enable_tag_btn(true);
+        emit update_frame();
     } case FOLDER_ITEM: {
         break;
     } default:
@@ -655,17 +689,19 @@ void ProjectWidget::context_menu(const QPoint &point) {
  */
 void ProjectWidget::drawing_tag() {
     VideoItem* vid_item;
-    DrawingTag* tag;
+    Tag* tag;
     if (selectedItems().front()->type() == VIDEO_ITEM) {
         // tag drawing
         vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
-        tag = new DrawingTag();
+        tag = new Tag();
         tag->m_name = "Drawing tag";
+        tag->set_drawing_tag(true);
     } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
         // Update tag drawing
         DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
         vid_item = dynamic_cast<VideoItem*>(item->parent());
         tag = item->get_tag();
+        item->takeChildren();
         tag->clear_intervals();
     }
 
@@ -679,7 +715,8 @@ void ProjectWidget::drawing_tag() {
     if (selectedItems().front()->type() == VIDEO_ITEM) {
         add_basic_analysis(vid_proj, tag);
     } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
-        tree_item_clicked(dynamic_cast<DrawingTagItem*>(selectedItems().front()));
+        add_basic_analysis(vid_proj, tag);
+        //tree_item_clicked(dynamic_cast<DrawingTagItem*>(selectedItems().front()));
     }
 }
 

@@ -34,7 +34,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     QBrush brush = Qt::yellow;
 
     // Draws the detections on slider and the tags
-    if ((m_show_pois||m_show_tags)&& show_on_slider) {
+    if ((m_show_pois||m_show_tags)&& show_on_slider && m_tag) {
         if(m_show_tags) brush = Qt::red;
 
         for (int frame : m_tag->get_frames()) {
@@ -139,7 +139,7 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
 
 
 
-    if (analysis->get_type() == TAG) {
+    if (analysis->get_type() == TAG || analysis->get_type() == DRAWING_TAG) {
         m_tag = dynamic_cast<Tag*>(analysis);
     }
     repaint();

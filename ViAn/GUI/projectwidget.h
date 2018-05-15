@@ -56,6 +56,7 @@ signals:
     void enable_tag_btn(bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
+    void clear_tag();
     void set_status_bar(QString);
     void begin_analysis(QTreeWidgetItem*, AnalysisMethod*);
     void update_frame();
@@ -67,8 +68,8 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
-    void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
-    void add_frames_to_tag(TagItem* item);
+    void add_basic_analysis(VideoProject*, Tag *tag);
+    void add_frames_to_tag(TreeItem *item);
     void add_new_frame_to_tag(int frame);
     void remove_frame_from_tag(int frame);
     void set_tree_item_name(QTreeWidgetItem *item, QString);

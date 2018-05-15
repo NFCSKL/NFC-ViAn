@@ -110,11 +110,11 @@ signals:
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
-    void add_basic_analysis(VideoProject*, BasicAnalysis*);
+    void add_basic_analysis(VideoProject*, Tag*);
     void tag_new_frame(int);
     void tag_remove_frame(int);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(std::string video_path); // TODO Not used?
     void export_original_frame(VideoProject* ,const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
