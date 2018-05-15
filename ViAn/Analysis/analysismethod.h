@@ -22,7 +22,7 @@ using SettingsDescr = std::map<std::string,std::string>;
  * It's implementation is limited to saving rectangles and time intervals for
  * detection.
  */
-class AnalysisMethod : public QObject ,public QRunnable{
+class AnalysisMethod : public QObject, public QRunnable{
     Q_OBJECT    
     Settings m_settings;                // Custom integer settings for constants
     SettingsDescr m_descriptions;       // Descriptions for settings constants
@@ -106,8 +106,7 @@ public slots:
 signals:
     void analysis_aborted();
     void send_progress(int progress);
-    void finito(void);
-    void finished_analysis(AnalysisProxy);
+    void finished_analysis(AnalysisProxy*);
 };
 
 #endif // ANALYSISMETHOD_H

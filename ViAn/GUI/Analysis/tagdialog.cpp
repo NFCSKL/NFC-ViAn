@@ -15,12 +15,14 @@ TagDialog::TagDialog(QWidget *parent) : QDialog(parent) {
 
     // Setup widget layout
     QVBoxLayout* vertical_layout = new QVBoxLayout;
+    vertical_layout->deleteLater();
     name = new QLineEdit(this);
     btn_box = new QDialogButtonBox(Qt::Horizontal);
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
 
     QFormLayout* tag_name_layout = new QFormLayout;
+    tag_name_layout->deleteLater();
     tag_name_layout->addRow("Tag name: ", name);
     vertical_layout->addLayout(tag_name_layout);
     vertical_layout->addWidget(btn_box);
@@ -30,6 +32,12 @@ TagDialog::TagDialog(QWidget *parent) : QDialog(parent) {
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &TagDialog::cancel_btn_clicked);
     setLayout(vertical_layout);
 }
+
+TagDialog::~TagDialog() {
+    delete name;
+    delete btn_box;
+}
+
 /**
  * @brief TagDialog::ok_btn_clicked
  * Send tag name and close widget

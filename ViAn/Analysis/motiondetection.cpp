@@ -15,8 +15,7 @@ MotionDetection::~MotionDetection() {
     dilation_kernel.release();
 }
 
-void MotionDetection::init_settings()
-{
+void MotionDetection::init_settings() {
     add_setting("OPEN_DEGREE", 4, "Noise filtering, higher=> less noise");
     add_setting("SMALLEST_OBJECT_SIZE", 100, "Smallest detected object");
     add_setting("BACKGROUND_HISTORY", 500, "Number of frames in background model");

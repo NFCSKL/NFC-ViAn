@@ -131,7 +131,6 @@ void AnalysisMethod::run() {
     if(*aborted){
         capture.release();
         emit analysis_aborted();
-        emit finito();
         return;
     }else{
         // Makes sure that a POI that stretches to the end of the
@@ -148,12 +147,13 @@ void AnalysisMethod::run() {
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
         int index = new_path.find_last_of('/') + 1;
         m_ana_name = new_path.substr(index);
-
         m_analysis.save_saveable(new_path);
-
-        AnalysisProxy proxy(m_analysis, m_save_path + m_ana_name);
+        AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
+        for (auto p : m_analysis.get_intervals()) {
+            std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
+            proxy->m_slider_interval.push_back(pair);
+        }
         emit finished_analysis(proxy);
-        emit finito();
     }
 }
 

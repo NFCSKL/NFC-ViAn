@@ -618,6 +618,7 @@ void VideoWidget::remove_tag_frame() {
  */
 void VideoWidget::new_tag_clicked() {
     TagDialog* tag_dialog = new TagDialog();
+    tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
     tag_dialog->exec();
 }
@@ -844,7 +845,9 @@ void VideoWidget::clear_current_video() {
     player_lock.unlock();
     player_con.notify_all();
 
+    playback_slider->blockSignals(true);
     playback_slider->setValue(frame);
+    playback_slider->blockSignals(false);
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
     set_total_time(0);
