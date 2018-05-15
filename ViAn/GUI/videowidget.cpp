@@ -822,7 +822,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         player_con.notify_all();
 
         m_vid_proj = vid_proj;
-        qDebug() << "in load marked";
+        qDebug() << "in load marked" << frame;
         playback_slider->setValue(frame);
 
         m_interval = make_pair(0,0);
@@ -834,6 +834,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
     }
 
     if (frame > -1) {
+        qDebug() << "set frame" << frame;
         frame_index.store(frame);
         on_new_frame();
     }
@@ -899,6 +900,7 @@ void VideoWidget::enable_tag_btn(bool b) {
  * notified of new settings when videoplayer has loaded a new video
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
+    qDebug() << "in set video info";
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;
