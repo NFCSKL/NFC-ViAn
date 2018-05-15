@@ -77,6 +77,11 @@ public slots:
     bool open_project(QString project_path="");
     bool close_project();
     void remove_project();
+    void remove_tree_item(QTreeWidgetItem* item);
+    void remove_video_item(QTreeWidgetItem* item);
+    void remove_tag_item(QTreeWidgetItem* item);
+    void remove_drawing_tag_item(QTreeWidgetItem* item);
+    void remove_analysis_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void advanced_analysis();
@@ -113,7 +118,7 @@ signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
-
+    void clear_analysis();
 };
 
 #endif // PROJECTWIDGET_H

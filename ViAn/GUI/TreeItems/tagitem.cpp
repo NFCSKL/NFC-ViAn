@@ -6,6 +6,8 @@ TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     setIcon(0, folder_icon);
 }
 
+TagItem::~TagItem() {}
+
 void TagItem::remove(){}
 
 void TagItem::rename() {

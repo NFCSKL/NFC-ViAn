@@ -15,7 +15,6 @@
 #include "Video/shapes/shapes.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
-#include "Toolbars/maintoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
@@ -100,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_help_menu();
 
     // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
@@ -136,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
     connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
 
+    connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
     connect(video_wgt,   &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
@@ -151,7 +151,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
     connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisProxy*)));
-    connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->playback_slider, SLOT(set_analysis(AnalysisProxy*)));
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
     connect(project_wgt, SIGNAL(show_analysis_details(bool)), video_wgt->playback_slider, SLOT(set_show_ana_interval(bool)));
     connect(project_wgt, SIGNAL(show_analysis_details(bool)), video_wgt->frame_wgt, SLOT(show_bounding_box(bool)));
@@ -166,19 +165,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
 
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt, SLOT(set_basic_analysis(BasicAnalysis*)));
-
     connect(video_wgt, SIGNAL(add_basic_analysis(VideoProject*, Tag*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, Tag*)));
     connect(video_wgt, &VideoWidget::tag_new_frame, project_wgt, &ProjectWidget::add_new_frame_to_tag);
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
-
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
     // Recent projects menu
     rp_dialog = new RecentProjectDialog(this);
+    rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     // Create a new project if user presses "new project" or if dialog is rejected
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
@@ -199,6 +197,9 @@ MainWindow::~MainWindow() {
     delete project_wgt;
     delete analysis_wgt;
     delete bookmark_wgt;
+    delete status_bar;
+    delete draw_toolbar;
+    delete main_toolbar;
 }
 
 /**
@@ -499,10 +500,11 @@ void MainWindow::init_help_menu() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (project_wgt->close_project())
+    if (project_wgt->close_project()) {
         event->accept();
-    else
+    } else {
         event->ignore();
+    }
 }
 
 void MainWindow::rectangle() {
@@ -577,6 +579,7 @@ void MainWindow::gen_report() {
 void MainWindow::cont_bri() {
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
+    man_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
     man_dialog->exec();
 }

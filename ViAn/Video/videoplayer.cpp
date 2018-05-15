@@ -91,6 +91,7 @@ void VideoPlayer::check_events() {
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
+                qDebug() << "in check events in video player";
                 wait_load_read();
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 set_frame();
@@ -163,6 +164,7 @@ bool VideoPlayer::wait_load_read(){
     {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
         load_video();
+        qDebug() << "after load";
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
             playback_stopped();

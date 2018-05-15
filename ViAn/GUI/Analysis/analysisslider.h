@@ -64,16 +64,10 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *ev);
-public slots:    
-
-    // Set analysis to be used when displaying analysis interval
-    void set_analysis(AnalysisProxy*analysis);
+public slots:
 
     // Set analysis to be used when displaying slider pois
     void set_basic_analysis(BasicAnalysis *analysis);
-
-    // Set interval to the interval the analysis was run on
-    void set_ana_interval();
 
     // Wrapped repaint
     void update();

@@ -8,6 +8,7 @@ class Tag : public BasicAnalysis {
     bool drawing_tag = false;
 
 public:
+    ~Tag() override;
     virtual ANALYSIS_TYPE get_type() const override;
     virtual void read(const QJsonObject& json) override;
     virtual void write(QJsonObject &json) override;

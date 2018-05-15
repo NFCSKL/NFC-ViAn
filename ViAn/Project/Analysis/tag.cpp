@@ -1,5 +1,10 @@
 #include "tag.h"
 
+Tag::~Tag() {
+    m_frames.clear();
+}
+
+
 bool Tag::add_frame(int frame) {
     return m_frames.insert(frame).second;
 }

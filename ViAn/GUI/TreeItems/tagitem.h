@@ -9,6 +9,7 @@ public:
     Tag *get_tag();
     void remove();
     void rename();
+    ~TagItem();
 };
 
 #endif // TAGITEM_H

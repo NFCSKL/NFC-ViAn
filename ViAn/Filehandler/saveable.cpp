@@ -68,6 +68,13 @@ bool Saveable::delete_saveable() {
     return false;
 }
 
+bool Saveable::delete_saveable(const std::string &full_path) {
+    QFile file(QString::fromStdString(full_path));
+    if(file.exists()) return file.remove();
+    qWarning() << "Couldn't delete file: " + QString::fromStdString(full_path);
+    return false;
+}
+
 /**
  * @brief Saveable::load_savable
  * @param full savable path

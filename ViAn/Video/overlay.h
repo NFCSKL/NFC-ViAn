@@ -33,6 +33,7 @@ public slots:
     void set_tool(SHAPES s);
 public:
     Overlay();
+    ~Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void draw_overlay(cv::Mat &frame, int frame_nr);
@@ -90,6 +91,7 @@ private:
 
 signals:
     void new_drawing(Shapes* shape, int frame_nr);
+    void clean_overlay();
     void select_current(Shapes*, int);
     void set_tool_zoom();
     void set_tool_hand();
