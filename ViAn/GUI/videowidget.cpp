@@ -678,7 +678,6 @@ void VideoWidget::remove_tag_interval() {
 }
 
 void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
-    // TODO should not work with analyses
     m_tag = dynamic_cast<Tag*>(basic_analysis);
 }
 

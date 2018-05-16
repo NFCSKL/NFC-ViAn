@@ -56,7 +56,9 @@ signals:
     void enable_tag_btn(bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
+    void set_video_project(VideoProject*);
     void clear_tag();
+    void clear_slider();
     void set_status_bar(QString);
     void begin_analysis(QTreeWidgetItem*, AnalysisMethod*);
     void update_frame();
@@ -114,6 +116,7 @@ private:
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
+    void update_current_tag(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void project_closed();

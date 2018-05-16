@@ -68,6 +68,7 @@ public slots:
 
     // Set analysis to be used when displaying slider pois
     void set_basic_analysis(BasicAnalysis *analysis);
+    void set_analysis_proxy(AnalysisProxy* analysis);
 
     // Wrapped repaint
     void update();

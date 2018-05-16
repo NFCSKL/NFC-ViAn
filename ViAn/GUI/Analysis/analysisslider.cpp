@@ -31,17 +31,19 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     //Get one frame's width of the slider
     double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
 
-    QBrush brush = Qt::yellow;
+    QBrush brush = Qt::red;
 
-    // Draws the detections on slider and the tags
-    if ((m_show_pois||m_show_tags)&& show_on_slider && m_tag) {
-        if(m_show_tags) brush = Qt::red;
-
+    // Draws the tags
+    if (m_show_tags && show_on_slider && m_tag) {
         for (int frame : m_tag->get_frames()) {
             double first = (double)(groove_rect.left() + (frame) * c);
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);
         }
+    }
+    // Draws the detections on the slider
+    if (m_show_pois && show_on_slider) {
+        brush = Qt::yellow;
 
         for (auto it = rects.begin(); it != rects.end(); ++it) {
             double first_frame = (double)(*it).first;
@@ -126,33 +128,33 @@ void AnalysisSlider::update(){
  * @param analysis
  */
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
-    rects.clear();
+    // TODO Maybe remove
+    //rects.clear();
+
     if (analysis != nullptr) {
-        m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
         switch (analysis->get_type()) {
         case TAG:
         case DRAWING_TAG:
-            for (auto p : analysis->get_intervals()) {
-                add_slider_interval(p->get_start(), p->get_end());
-            }
+            m_tag = dynamic_cast<Tag*>(analysis);
+            repaint();
             break;
-        case MOTION_DETECTION: {
-            AnalysisProxy* p_analysis = dynamic_cast<AnalysisProxy*>(analysis);
-            rects = p_analysis->m_slider_interval;
-        }
         default:
             break;
         }
-    } else {
-        return;
     }
+}
 
-
-
-    if (analysis->get_type() == TAG || analysis->get_type() == DRAWING_TAG) {
-        m_tag = dynamic_cast<Tag*>(analysis);
+/**
+ * @brief AnalysisSlider::set_analysis_proxy
+ * Set the analysis intervals to draw on the slider
+ * @param analysis
+ */
+void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
+    rects.clear();
+    if (analysis) {
+        m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
+        rects = analysis->m_slider_interval;
     }
-    repaint();
 }
 
 /**

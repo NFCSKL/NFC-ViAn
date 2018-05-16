@@ -32,6 +32,7 @@ class FrameWidget : public QWidget
     QColor overlay_color = Qt::red;
     cv::Mat current_frame;
     Analysis* m_analysis = nullptr;
+    AnalysisProxy* current_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
 
     // Analysis bounding box
