@@ -619,12 +619,11 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
 
-        update_current_tag(vid_item);
-
         if (item->parent()->type() == TAG_ITEM) {
             TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
             emit marked_basic_analysis(tag_item->get_tag());
 
+            if (m_tag_item && m_tag_item != tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             tag_item->setCheckState(0, Qt::Checked);
             m_tag_item = tag_item;
         } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
