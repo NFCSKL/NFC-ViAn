@@ -4,16 +4,15 @@ Tag::~Tag() {
     m_frames.clear();
 }
 
-
 bool Tag::add_frame(int frame) {
-    return m_frames.insert(frame).second;
+    return m_unsaved_changes = m_frames.insert(frame).second;
 }
 
 bool Tag::remove_frame(int frame) {
     auto it = m_frames.find(frame);
     if (it != m_frames.end()) {
         m_frames.erase(it);
-        return true;
+        return m_unsaved_changes = true;
     }
     return false;
 }

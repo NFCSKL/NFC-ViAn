@@ -143,6 +143,8 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         default:
             break;
         }
+    } else {
+        return;
     }
 
 

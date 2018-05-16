@@ -234,7 +234,6 @@ void VideoProject::remove_analysis(BasicAnalysis *analysis) {
     m_analyses.erase(analysis->get_id());
     m_unsaved_changes = true;
     delete analysis;
-
 }
 
 /**

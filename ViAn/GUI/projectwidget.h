@@ -82,6 +82,7 @@ public slots:
     void remove_tag_item(QTreeWidgetItem* item);
     void remove_drawing_tag_item(QTreeWidgetItem* item);
     void remove_analysis_item(QTreeWidgetItem* item);
+    void remove_tag_frame_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void advanced_analysis();

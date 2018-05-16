@@ -589,6 +589,7 @@ void VideoWidget::play_btn_toggled(bool status) {
  */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
+        qDebug() << "in tag";
         if (m_tag->add_frame(playback_slider->value())) {
             emit tag_new_frame(playback_slider->value());
             emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
@@ -598,6 +599,7 @@ void VideoWidget::tag_frame() {
         }
         return;
     } else {
+        qDebug() << "else";
         new_tag_clicked();
     }
 }
@@ -676,6 +678,7 @@ void VideoWidget::remove_tag_interval() {
 }
 
 void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
+    // TODO should not work with analyses
     m_tag = dynamic_cast<Tag*>(basic_analysis);
 }
 
@@ -824,7 +827,10 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
 
         m_vid_proj = vid_proj;
         qDebug() << "in load marked" << frame;
-        playback_slider->setValue(frame);
+        // TODO not the best fix
+        // Will not jump to correct frame before a video is chosen.
+        // Video load and set frame is not synced correctly
+        //playback_slider->setValue(frame);
 
         m_interval = make_pair(0,0);
 
@@ -834,7 +840,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         playback_slider->set_interval(-1, -1);
     }
 
-    if (frame > -1) {
+    if (frame > -2) {
         qDebug() << "set frame" << frame;
         frame_index.store(frame);
         on_new_frame();

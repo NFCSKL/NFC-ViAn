@@ -40,8 +40,10 @@ void VideoPlayer::load_video(){
     current_frame = -1;
     m_is_playing->store(false);
     m_frame->store(0);
+    qDebug() << "before open capture";
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
+    qDebug() << "after capture open";
     load_video_info();
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
@@ -154,15 +156,17 @@ bool VideoPlayer::synced_read(){
 
 
 bool VideoPlayer::wait_load_read(){
-
+    qDebug() << "before wait";
     // Wait for processing thread to finish processing new frame
     {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
     }
+    qDebug() << "after wait";
     // Read new frame and notify processing thread
     {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        qDebug() << "before load";
         load_video();
         qDebug() << "after load";
         if (!m_capture.read(m_v_sync->frame)) {

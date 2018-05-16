@@ -524,13 +524,18 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case VIDEO_ITEM: {
         qDebug() << "Video item";
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+
+        if (m_tag_item && dynamic_cast<VideoItem*>(m_tag_item->parent()) != vid_item) {
+            m_tag_item->setCheckState(0, Qt::Unchecked);
+            emit marked_basic_analysis(nullptr);
+            m_tag_item = nullptr;
+        }
+
         emit marked_video(vid_item->get_video_project(), -1);
-        emit clear_tag();
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
-        emit enable_tag_btn(false);
         emit update_frame();
         break;
     } case ANALYSIS_ITEM: {
@@ -558,12 +563,20 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit update_frame();
         break;
     } case TAG_ITEM: {
+        if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
         qDebug() << "tag item";
         tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
         qDebug() << "size" << tag_item->get_tag()->get_frames().size();
-        m_tag_item = tag_item;
-        emit marked_basic_analysis(tag_item->get_tag());
+        if (m_tag_item == tag_item) {
+            m_tag_item->setCheckState(0, Qt::Unchecked);
+            m_tag_item = nullptr;
+            emit marked_basic_analysis(nullptr);
+        } else {
+            item->setCheckState(0, Qt::Checked);
+            m_tag_item = tag_item;
+            emit marked_basic_analysis(tag_item->get_tag());
+        }
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
         emit enable_tag_btn(true);
@@ -575,13 +588,12 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
-//        emit marked_video(vid_item->get_video_project(), 30);
-//        emit set_detections(false);
-//        emit set_poi_slider(false);
-//        emit set_tag_slider(true);
-//        emit enable_poi_btns(true, false);
-//        emit enable_tag_btn(true);
-//        emit update_frame();
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+        emit enable_tag_btn(true);
+        emit update_frame();
     } case FOLDER_ITEM: {
         break;
     } default:
@@ -683,6 +695,8 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
+        case TAG_FRAME_ITEM:
+                menu.addAction("Remove", this, SLOT(remove_item()));
             default:
                 break;
         }
@@ -789,6 +803,8 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     case ANALYSIS_ITEM:
         remove_analysis_item(item);
         break;
+    case TAG_FRAME_ITEM:
+        remove_tag_frame_item(item);
     default:
         break;
     }
@@ -825,11 +841,13 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
  */
 void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
     emit set_tag_slider(false);
-    emit enable_tag_btn(false);
+    //emit enable_tag_btn(false);
 
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
     vid_item->get_video_project()->remove_analysis(tag);
+    m_tag_item = nullptr;
+    emit marked_basic_analysis(nullptr);
     emit update_frame();
 }
 
@@ -840,7 +858,7 @@ void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
  */
 void ProjectWidget::remove_drawing_tag_item(QTreeWidgetItem* item) {
     emit set_tag_slider(false);
-    emit enable_tag_btn(false);
+    //emit enable_tag_btn(false);
 
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
@@ -865,6 +883,13 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
     vid_item->get_video_project()->remove_analysis(analysis);
     emit update_frame();
     emit clear_analysis();
+}
+
+void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
+    TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
+    TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+    int frame = tf_item->get_frame();
+    tag_item->get_tag()->remove_frame(frame);
 }
 
 /**
