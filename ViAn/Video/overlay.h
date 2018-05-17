@@ -48,9 +48,9 @@ public:
     void mouse_double_clicked(QPoint pos, int frame_nr);
     void mouse_pressed(QPoint pos, int frame_nr, bool right_click);
     void mouse_released(QPoint pos, int frame_nr, bool right_click);
-    void mouse_moved(QPoint pos, int frame_nr);
+    void mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl);
     void mouse_scroll(QPoint pos, int frame_nr);
-    void update_drawing_position(QPoint pos, int frame_nr);
+    void update_drawing_position(QPoint pos, int frame_nr, bool shift = false, bool ctrl = false);
     void update_text(QString, Shapes*shape);
     void clear(int frame_nr);
     void delete_drawing(Shapes *shape);

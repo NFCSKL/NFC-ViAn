@@ -83,7 +83,7 @@ signals:
     void mouse_double_click(QPoint);
     void mouse_pressed(QPoint, bool);
     void mouse_released(QPoint, bool);
-    void mouse_moved(QPoint);
+    void mouse_moved(QPoint, bool, bool);
     void mouse_scroll(QPoint);
     void process_frame();
 public slots:

@@ -252,7 +252,7 @@ void FrameProcessor::update_overlay_settings() {
     // Mouse moved action
     } else if (m_o_settings->mouse_moved) {
         m_o_settings->mouse_moved = false;
-        m_overlay->mouse_moved(m_o_settings->pos, curr_frame);
+        m_overlay->mouse_moved(m_o_settings->pos, curr_frame, m_o_settings->shift_modifier, m_o_settings->ctrl_modifier);
     // Mouse scroll wheel action
     } else if (m_o_settings->mouse_scroll) {
         m_o_settings->mouse_scroll = false;

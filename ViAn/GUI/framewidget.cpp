@@ -488,7 +488,9 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         break;
     default:
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
-            emit mouse_moved(scaled_pos);
+            bool shift = (event->modifiers() == Qt::ShiftModifier);
+            bool ctrl = (event->modifiers() == Qt::ControlModifier);
+            emit mouse_moved(scaled_pos, shift, ctrl);
         }
         break;
     }

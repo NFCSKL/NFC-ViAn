@@ -65,6 +65,10 @@ void Shapes::update_drawing_pos(QPoint pos) {
     draw_end = qpoint_to_point(pos);
 }
 
+void Shapes::update_drawing_sym(int dx, int dy) {
+    draw_end = cv::Point(draw_start.x + dx, draw_start.y + dy);
+}
+
 /**
  * @brief Shape::update_text_pos
  * Updates the start and end point of the text-drawing
