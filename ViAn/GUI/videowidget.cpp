@@ -589,7 +589,6 @@ void VideoWidget::play_btn_toggled(bool status) {
  */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
-        qDebug() << "in tag";
         if (m_tag->add_frame(playback_slider->value())) {
             emit tag_new_frame(playback_slider->value());
             emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
@@ -599,7 +598,6 @@ void VideoWidget::tag_frame() {
         }
         return;
     } else {
-        qDebug() << "else";
         new_tag_clicked();
     }
 }
@@ -839,7 +837,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         playback_slider->set_interval(-1, -1);
     }
 
-    if (frame > -2) {
+    if (true) {
         qDebug() << "set frame" << frame;
         frame_index.store(frame);
         on_new_frame();

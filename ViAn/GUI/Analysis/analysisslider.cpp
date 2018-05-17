@@ -226,38 +226,38 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
  * @return
  */
 int AnalysisSlider::get_next_poi_start(int curr_frame) {
-    if (!rects.empty()) {
+    if (!show_on_slider) return curr_frame;
+
+    // If tags on slider get next frame after current
+    if (m_show_tags) {
+        return m_tag->next_frame(curr_frame);
+    }
+
+    // If analysis pois on slider get next start of next poi after current
+    if (m_show_pois) {
         for (std::pair<int, int> rect : rects) {
-            if ( rect.first > curr_frame) {
+            if (rect.first > curr_frame) {
                 return rect.first;
             }
         }
-    } else if (!frames.empty()) {
-        int edge_frame = curr_frame;
-        for (int frame : frames) {
-            if (frame > edge_frame+JUMP_INTERVAL+1) {
-                return frame;
-            } else if (frame > edge_frame+JUMP_INTERVAL){
-                edge_frame = frame;
-            }
-        }
     }
-    return curr_frame;
-}
 
-/**
- * @brief AnalysisSlider::get_next_poi_end
- * Return the end frame of the POI after frame
- * @param frame     : current frame
- * @return
- */
-int AnalysisSlider::get_next_poi_end(int frame) {
-    for (std::pair<int, int> rect : rects) {
-        if ( rect.first > frame) {
-            return rect.second;
-        }
-    }
-    return frame;
+    return curr_frame;
+
+
+
+//      TODO Might need for when adding interval
+//    } else if (!frames.empty()) {
+//        int edge_frame = curr_frame;
+//        for (int frame : frames) {
+//            if (frame > edge_frame+JUMP_INTERVAL+1) {
+//                return frame;
+//            } else if (frame > edge_frame+JUMP_INTERVAL){
+//                edge_frame = frame;
+//            }
+//        }
+//    }
+//    return curr_frame;
 }
 
 /**
@@ -267,25 +267,42 @@ int AnalysisSlider::get_next_poi_end(int frame) {
  * @return
  */
 int AnalysisSlider::get_prev_poi_start(int curr_frame) {
-    int new_frame = curr_frame;
-    if (!rects.empty()) {
+    if (!show_on_slider) return curr_frame;
+
+    // If tags on slider get next frame after current
+    if (m_show_tags) {
+        return m_tag->previous_frame(curr_frame);
+    }
+
+    // If analysis pois on slider get next start of next poi after current
+    if (m_show_pois) {
+        int new_frame = curr_frame;
         for (std::pair<int, int> rect : rects) {
-            if ( rect.second >= curr_frame) {
+            if (rect.second >= curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
-    } else if (!frames.empty()) {
-        int edge_frame = curr_frame;
-        for (int i = frames.size()-1; i >= 0; i--) {
-            int frame = frames[i];
-            if (frame < edge_frame-JUMP_INTERVAL-1) {
-                return frame;
-            } else if (frame < edge_frame-JUMP_INTERVAL){
-                edge_frame = frame;
-            }
-        }
+        return new_frame;
     }
-    return new_frame;
+
+    return curr_frame;
+
+
+
+
+//      TODO Might need for when adding interval
+//    } else if (!frames.empty()) {
+//        int edge_frame = curr_frame;
+//        for (int i = frames.size()-1; i >= 0; i--) {
+//            int frame = frames[i];
+//            if (frame < edge_frame-JUMP_INTERVAL-1) {
+//                return frame;
+//            } else if (frame < edge_frame-JUMP_INTERVAL){
+//                edge_frame = frame;
+//            }
+//        }
+//    }
+//    return new_frame;
 }
 
 /**
@@ -340,7 +357,6 @@ void AnalysisSlider::set_show_interval(bool show) {
  */
 void AnalysisSlider::clear_slider() {
     rects.clear();
-    frames.clear();
     m_ana_interval = std::make_pair(-1, -1);
 }
 

@@ -1,7 +1,9 @@
 #ifndef TAG_H
 #define TAG_H
 #include "basicanalysis.h"
+#include "Project/video.h"
 class BasicAnalysis;
+class Video;
 
 class Tag : public BasicAnalysis {
     std::set<int> m_frames;
@@ -14,6 +16,8 @@ public:
     virtual void write(QJsonObject &json) override;
     bool add_frame(int);
     bool remove_frame(int);
+    int next_frame(int);
+    int previous_frame(int);
     std::set<int> get_frames();
     bool is_drawing_tag();
     void set_drawing_tag(bool);

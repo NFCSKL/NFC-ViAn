@@ -5,7 +5,8 @@ Tag::~Tag() {
 }
 
 bool Tag::add_frame(int frame) {
-    return m_unsaved_changes = m_frames.insert(frame).second;
+    m_unsaved_changes = true;
+    return m_frames.insert(frame).second;
 }
 
 bool Tag::remove_frame(int frame) {
@@ -15,6 +16,25 @@ bool Tag::remove_frame(int frame) {
         return m_unsaved_changes = true;
     }
     return false;
+}
+
+int Tag::next_frame(int frame) {
+    auto it = m_frames.upper_bound(frame);
+    if (it != m_frames.end()) {
+        return *it;
+    } else {
+        return frame;
+    }
+}
+
+int Tag::previous_frame(int frame) {
+    qDebug() << m_frames.size();
+    auto it = m_frames.lower_bound(frame);
+    if (it != m_frames.end() && it != m_frames.begin()) {
+        return *(std::prev(it));
+    } else {
+        return frame;
+    }
 }
 
 std::set<int> Tag::get_frames() {
