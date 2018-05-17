@@ -221,7 +221,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
-    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame()) {
+    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame() && current_drawing->get_show()) {
         QPoint tl;
         QPoint br;
         if (current_drawing->get_shape() == PEN) {

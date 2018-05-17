@@ -27,7 +27,9 @@ Overlay::~Overlay() {
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
-            frame = (*it)->draw(frame);
+            if ((*it)->get_show()) {
+                frame = (*it)->draw(frame);
+            }
         }
     }
     current_frame = frame_nr;
@@ -206,7 +208,7 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
     } else {
         drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
     }
-    return drawing.contains(qpoint_to_point(pos));
+    return shape->get_show() && drawing.contains(qpoint_to_point(pos));
 }
 
 /**
