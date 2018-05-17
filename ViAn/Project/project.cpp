@@ -7,7 +7,6 @@
  */
 Project::Project(){}
 
-//TODO Fix all these function names
 Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->m_temporary = false;
@@ -33,6 +32,14 @@ Project::Project(const std::string& name, const std::string& dir_path){
  * Clears contents of video map
  */
 Project::~Project(){
+    for (auto video_proj : m_videos) {
+        delete video_proj;
+    }
+
+    // TODO
+    for (auto report : m_reports) {
+        //delete report;
+    }
     m_videos.clear();
     m_reports.clear();
 }
@@ -57,6 +64,7 @@ ID Project::add_video_project(VideoProject *vid_proj){
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
+    delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
 }
@@ -290,6 +298,8 @@ std::vector<VideoProject*> &Project::get_videos(){
  * @brief Project::get_video
  * @param id
  * @return Returns the video with the specified id.
+ *
+ * TODO Unused
  */
 VideoProject* Project::get_video(const int& v_pos) {
     return m_videos.at(v_pos);

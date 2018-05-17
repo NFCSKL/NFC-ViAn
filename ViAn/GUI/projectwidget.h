@@ -27,10 +27,7 @@ class VideoProject;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    QTreeWidgetItem* clicked_item = nullptr;
-    QPoint* clicked_point = nullptr;
     QTreeWidgetItem* selection_parent = nullptr;
-    bool selecting = false;
     std::set<std::string> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
                                 "264", "263", "mjpeg", "avc", "m2ts",
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",
@@ -62,7 +59,6 @@ signals:
     void update_frame();
     void remove_overlay();
     void new_vid_proj(VideoProject*);
-    void update_brightness_contrast(int, double);
 
 public slots:
     void new_project(void);
@@ -75,6 +71,11 @@ public slots:
     bool open_project(QString project_path="");
     bool close_project();
     void remove_project();
+    void remove_tree_item(QTreeWidgetItem* item);
+    void remove_video_item(QTreeWidgetItem* item);
+    void remove_tag_item(QTreeWidgetItem* item);
+    void remove_drawing_tag_item(QTreeWidgetItem* item);
+    void remove_analysis_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void advanced_analysis();
@@ -111,7 +112,7 @@ signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
-
+    void clear_analysis();
 };
 
 #endif // PROJECTWIDGET_H

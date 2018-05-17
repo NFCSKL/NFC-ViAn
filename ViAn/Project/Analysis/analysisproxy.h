@@ -7,7 +7,7 @@
 #include <iostream>
 
 /**
- * @brief The AnalysisMeta class
+ * @brief The AnalysisProxy class
  * This class is used to improve performance of basic
  * operations related to analyses. Full analysis is therefor
  * only fully loaded upon direct request.
@@ -19,9 +19,12 @@ class AnalysisProxy : public BasicAnalysis
 public:
     AnalysisProxy();
     AnalysisProxy(const std::string file_analysis);
-    Analysis *load_analysis(); // Only use this if all analysisinformation is needed
     AnalysisProxy(const Analysis &other, const std::string file);
     AnalysisProxy(const AnalysisProxy &other);
+    ~AnalysisProxy() override;
+    Analysis *load_analysis(); // Only use this if all analysisinformation is needed
+
+    std::vector<std::pair<int, int>> m_slider_interval;
 
     void reset_root_dir(const std::string& dir);
     virtual ANALYSIS_TYPE get_type() const override;

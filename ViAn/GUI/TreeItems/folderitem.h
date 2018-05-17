@@ -4,6 +4,7 @@
 class FolderItem : public TreeItem {
 public:
     FolderItem();
+    ~FolderItem();
     void remove();
     void rename();
 };

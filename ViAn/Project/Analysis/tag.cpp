@@ -1,4 +1,12 @@
 #include "tag.h"
+
+Tag::~Tag() {
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        delete *it;
+    }
+    m_intervals.clear();
+}
+
 /**
  * @brief Tag::add_frame
  * @param frame
