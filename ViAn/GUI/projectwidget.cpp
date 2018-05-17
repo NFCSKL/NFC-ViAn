@@ -464,8 +464,6 @@ bool ProjectWidget::prompt_save() {
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     Q_UNUSED(col)
-    //get_index_path(item); //Remove?
-
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
