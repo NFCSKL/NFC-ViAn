@@ -6,16 +6,11 @@
 #include <QJsonObject>
 #include <QString>
 #include "Filehandler/saveable.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-
 struct VideoState{
     int frame = 0;
     int contrast = 0;
     int brightness = 0;
     int rotation = 0;
-    double scale_factor = 1;
-    cv::Rect zoom_rect;
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;
@@ -24,7 +19,6 @@ struct VideoState{
         rotation = rh.rotation;
     }
 };
-
 typedef int ID;
 class Video : Writeable{
     std::string m_name;

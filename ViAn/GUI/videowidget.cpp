@@ -590,8 +590,6 @@ void VideoWidget::play_btn_toggled(bool status) {
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
         if (m_tag->add_frame(playback_slider->value())) {
-            VideoState state = m_vid_proj->get_video()->state;
-            m_tag->add_frame_state(playback_slider->value(), state);
             emit tag_new_frame(playback_slider->value());
             emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
             playback_slider->update();

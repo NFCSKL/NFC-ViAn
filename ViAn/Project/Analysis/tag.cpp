@@ -9,10 +9,6 @@ bool Tag::add_frame(int frame) {
     return m_frames.insert(frame).second;
 }
 
-void Tag::add_frame_state(int frame, VideoState state) {
-    new_tags.insert(frame, state);
-}
-
 bool Tag::remove_frame(int frame) {
     auto it = m_frames.find(frame);
     if (it != m_frames.end()) {
