@@ -45,7 +45,7 @@ public slots:
 signals:
     void jump_to_frame(VideoProject*, int);
     void set_current_drawing(Shapes* shape);
-    void set_tool_hand();
+    void set_tool_edit();
     void set_tool_zoom();
     void delete_drawing(Shapes* shape);
     void clear_frame(int);

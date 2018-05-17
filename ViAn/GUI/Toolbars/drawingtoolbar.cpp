@@ -34,7 +34,7 @@ void DrawingToolbar::create_actions() {
     circle_tool_act = new QAction(QIcon("../ViAn/Icons/circle.png"), tr("Circle tool"), this);
     line_tool_act = new QAction(QIcon("../ViAn/Icons/line.png"), tr("Line tool"), this);
     text_tool_act = new QAction(QIcon("../ViAn/Icons/text.png"), tr("Text tool"), this);
-    hand_tool_act = new QAction(QIcon("../ViAn/Icons/edit.png"), tr("Edit tool"), this);
+    edit_tool_act = new QAction(QIcon("../ViAn/Icons/edit.png"), tr("Edit tool"), this);
     select_tool_act = new QAction(QIcon("../ViAn/Icons/select.png"), tr("Select tool"), this);
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
 
@@ -42,6 +42,7 @@ void DrawingToolbar::create_actions() {
     zoom_in_tool_act->setShortcut(QKeySequence(Qt::Key_Plus));
     zoom_out_tool_act->setShortcut(QKeySequence(Qt::Key_Minus));
 
+    // TODO remove no tool and select tool
     tools = new QActionGroup(this);
     //tools->addAction(no_tool_act);
     tools->addAction(zoom_tool_act);
@@ -51,8 +52,8 @@ void DrawingToolbar::create_actions() {
     tools->addAction(rectangle_tool_act);
     tools->addAction(circle_tool_act);
     tools->addAction(line_tool_act);
-    tools->addAction(hand_tool_act);
-    tools->addAction(select_tool_act);
+    tools->addAction(edit_tool_act);
+    //tools->addAction(select_tool_act);
     for (QAction* act: tools->actions()) {
         act->setCheckable(true);
     }
@@ -72,7 +73,7 @@ void DrawingToolbar::create_actions() {
     connect(circle_tool_act, &QAction::triggered, this, &DrawingToolbar::circle_tool_clicked);
     connect(line_tool_act, &QAction::triggered, this, &DrawingToolbar::line_tool_clicked);
     connect(text_tool_act, &QAction::triggered, this, &DrawingToolbar::text_tool_clicked);
-    connect(hand_tool_act, &QAction::triggered, this, &DrawingToolbar::hand_tool_clicked);
+    connect(edit_tool_act, &QAction::triggered, this, &DrawingToolbar::edit_tool_clicked);
     connect(select_tool_act, &QAction::triggered, this, &DrawingToolbar::select_tool_clicked);
 }
 
@@ -167,12 +168,12 @@ void DrawingToolbar::text_tool_clicked() {
     text_dialog->deleteLater();
     connect(text_dialog, &TextDialog::text, this, &DrawingToolbar::send_text);
     text_dialog->exec();
-    hand_tool_act->trigger();
+    edit_tool_act->trigger();
 }
 
-void DrawingToolbar::hand_tool_clicked() {
+void DrawingToolbar::edit_tool_clicked() {
     emit set_status_bar("Hand tool");
-    emit set_overlay_tool(HAND);
+    emit set_overlay_tool(EDIT);
 }
 
 void DrawingToolbar::select_tool_clicked() {

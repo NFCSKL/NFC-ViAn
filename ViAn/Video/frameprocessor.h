@@ -67,6 +67,7 @@ struct overlay_settings {
 
     QPoint pos = QPoint(0,0);
     int frame = 0;
+    bool mouse_double_clicked = false;
     bool mouse_clicked = false;
     bool mouse_released = false;
     bool mouse_moved = false;
