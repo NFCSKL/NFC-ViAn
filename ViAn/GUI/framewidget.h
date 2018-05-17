@@ -81,7 +81,7 @@ signals:
 
     void mouse_pressed(QPoint, bool);
     void mouse_released(QPoint, bool);
-    void mouse_moved(QPoint);
+    void mouse_moved(QPoint, bool, bool);
     void mouse_scroll(QPoint);
 public slots:
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);

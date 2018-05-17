@@ -289,7 +289,7 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
         change_tool = false;
         return;
     }
-    update_drawing_position(pos, frame_nr);
+    //update_drawing_position(pos, frame_nr);
     m_right_click = right_click;
 }
 
@@ -300,9 +300,9 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::mouse_moved(QPoint pos, int frame_nr) {
+void Overlay::mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl) {
     if (change_tool) return;
-    update_drawing_position(pos, frame_nr);
+    update_drawing_position(pos, frame_nr, shift, ctrl);
 }
 
 /**
@@ -337,7 +337,7 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
+void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool ctrl) {
     if (show_overlay && !overlays[frame_nr].empty()) {
         if (current_shape == HAND) {
             if (current_drawing == nullptr) return;
@@ -364,6 +364,41 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
             overlays[frame_nr].back()->update_text_pos(pos);
         } else if (current_shape == SELECT) {
         } else {
+            if (current_shape != PEN && shift) {
+                // When the shift modifier is used draw a symmetric drawing
+                // It's not possible with the pen tool.
+                int x = pos.x() - overlays[frame_nr].back()->get_draw_start().x;
+                int y = pos.y() - overlays[frame_nr].back()->get_draw_start().y;
+
+                if (x >= 0 && y >= 0) {
+                    overlays[frame_nr].back()->update_drawing_sym(std::max(x, y), std::max(x, y));
+                } else if (x <= 0 && y <= 0) {
+                    overlays[frame_nr].back()->update_drawing_sym(std::min(x, y), std::min(x, y));
+                } else if (x >= 0 && y <= 0) {
+                    int change = std::max(abs(x), abs(y));
+                    overlays[frame_nr].back()->update_drawing_sym(change, -change);
+                } else if (x <= 0 && y >= 0) {
+                    int change = std::max(abs(x), abs(y));
+                    overlays[frame_nr].back()->update_drawing_sym(-change, change);
+                }
+                m_unsaved_changes = true;
+                return;
+            } else if (ctrl && (current_shape == LINE || current_shape == ARROW)) {
+                int x = pos.x() - overlays[frame_nr].back()->get_draw_start().x;
+                int y = pos.y() - overlays[frame_nr].back()->get_draw_start().y;
+
+                if (x >= abs(y)) {
+                    overlays[frame_nr].back()->update_drawing_sym(x, 0);
+                } else if (-x >= abs(y)) {
+                    overlays[frame_nr].back()->update_drawing_sym(x, 0);
+                } else if (y >= abs(x)) {
+                    overlays[frame_nr].back()->update_drawing_sym(0, y);
+                } else if (-y >= abs(x)) {
+                    overlays[frame_nr].back()->update_drawing_sym(0, y);
+                }
+                m_unsaved_changes = true;
+                return;
+            }
             // The last appended shape is the one we're currently drawing.
             overlays[frame_nr].back()->update_drawing_pos(pos);
         }
