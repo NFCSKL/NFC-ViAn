@@ -125,6 +125,7 @@ void FrameWidget::set_analysis(AnalysisProxy *analysis) {
  * Forgets the current analysis
  */
 void FrameWidget::clear_analysis() {
+    delete m_analysis;
     m_analysis = nullptr;
     ooi_rects.clear();
 }

@@ -9,6 +9,7 @@ LineItem::LineItem(Line* line) : ShapeItem(LINE_ITEM) {
 
     map = QPixmap(16,16);
     update_shape_color();
+    update_show_icon(m_line->get_show());
 }
 
 LineItem::~LineItem() {}

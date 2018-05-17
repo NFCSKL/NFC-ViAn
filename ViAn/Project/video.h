@@ -27,6 +27,7 @@ public:
 public:
     Video();
     Video(std::string file_path);
+    ~Video();
     std::string file_path;
     std::string get_name();
     void read(const QJsonObject& json);

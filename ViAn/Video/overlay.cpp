@@ -7,6 +7,17 @@
  */
 Overlay::Overlay() {}
 
+Overlay::~Overlay() {
+    emit clean_overlay();
+    for (auto &vector : overlays) {
+        for (Shapes* shape : vector.second) {
+            delete shape;
+        }
+        vector.second.clear();
+    }
+    overlays.clear();
+}
+
 /**
  * @brief Overlay::draw_overlay
  * Draws an overlay on top of the specified frame.
@@ -16,7 +27,9 @@ Overlay::Overlay() {}
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
-            frame = (*it)->draw(frame);
+            if ((*it)->get_show()) {
+                frame = (*it)->draw(frame);
+            }
         }
     }
     current_frame = frame_nr;
@@ -207,7 +220,7 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
         }
         drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     }
-    return drawing.contains(qpoint_to_point(pos));
+    return shape->get_show() && drawing.contains(qpoint_to_point(pos));
 }
 
 /**
@@ -488,16 +501,18 @@ void Overlay::read(const QJsonObject& json) {
 void Overlay::write(QJsonObject& json) {
     QJsonArray json_overlays;
     for (auto const& map_entry : overlays) {
-        QJsonObject json_overlay;
-        QJsonArray json_drawings;
-        for (auto it = map_entry.second.begin(); it != map_entry.second.end(); it ++) {  // Second member is the value, i.e. the drawings.
-            QJsonObject json_shape;
-            (*it)->write(json_shape);
-            json_drawings.append(json_shape);
+        if (!map_entry.second.empty()) {
+            QJsonObject json_overlay;
+            QJsonArray json_drawings;
+            for (auto it = map_entry.second.begin(); it != map_entry.second.end(); it ++) {  // Second member is the value, i.e. the drawings.
+                QJsonObject json_shape;
+                (*it)->write(json_shape);
+                json_drawings.append(json_shape);
+            }
+            json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
+            json_overlay["drawings"] = json_drawings;
+            json_overlays.push_back(json_overlay);
         }
-        json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
-        json_overlay["drawings"] = json_drawings;
-        json_overlays.push_back(json_overlay);
     }
     json["overlays"] = json_overlays;
     m_unsaved_changes = false;

@@ -1,9 +1,10 @@
 #include <QFileDialog>
 #include "recentprojectdialog.h"
+#include <QDebug>
 
 RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
+    setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint));
     this->setWindowTitle("ViAn - Recent projects");
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint);
     h_layout = new QHBoxLayout();
     v_main_layout = new QVBoxLayout(this);
     v_btn_layout = new QVBoxLayout();
@@ -38,6 +39,12 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     connect(new_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_new_btn_clicked);
     connect(browse_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_browse_btn_clicked);
     connect(open_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_open_btn_clicked);
+}
+
+RecentProjectDialog::~RecentProjectDialog() {
+    delete h_layout;
+    recent_list->clear();
+    delete recent_list;
 }
 
 /**

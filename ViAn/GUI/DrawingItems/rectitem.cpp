@@ -10,6 +10,7 @@ RectItem::RectItem(Rectangle* rect) : ShapeItem(RECT_ITEM) {
 
     map = QPixmap(16,16);
     update_shape_color();
+    update_show_icon(m_rect->get_show());
 }
 
 RectItem::~RectItem() {}

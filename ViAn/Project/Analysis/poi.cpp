@@ -6,6 +6,8 @@
 POI::POI(){
 }
 
+POI::~POI() {}
+
 /**
  * @brief POI::add_detections
  * Adds OOIs for a specific frame in a POI.

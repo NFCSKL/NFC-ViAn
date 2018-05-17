@@ -62,7 +62,7 @@ public slots:
     void send_progress(int);
 
     // Analysis has finished executing
-    void analysis_done(AnalysisProxy);
+    void analysis_done(AnalysisProxy *);
 
     // Answer request for aborting analysis
     void abort_analysis();

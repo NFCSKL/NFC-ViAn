@@ -10,6 +10,7 @@ class MainToolbar : public QToolBar
     void create_buttons();
 public:
     MainToolbar();
+    ~MainToolbar();
     QAction* add_video_act;
     QAction* save_act;
     QAction* open_act;

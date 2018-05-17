@@ -42,6 +42,7 @@ void DrawingToolbar::create_actions() {
     zoom_in_tool_act->setShortcut(QKeySequence(Qt::Key_Plus));
     zoom_out_tool_act->setShortcut(QKeySequence(Qt::Key_Minus));
 
+    // TODO remove no tool and select tool
     tools = new QActionGroup(this);
     //tools->addAction(no_tool_act);
     tools->addAction(zoom_tool_act);

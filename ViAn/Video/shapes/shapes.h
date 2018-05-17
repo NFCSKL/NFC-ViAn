@@ -51,6 +51,8 @@ public:
     int get_frame();
     virtual QString get_name() = 0;
     virtual void set_name(QString name) = 0;
+    bool toggle_show();
+    bool get_show();
 
 protected:
     SHAPES shape = NONE;
@@ -63,6 +65,7 @@ protected:
     cv::Size text_size;
     int frame;
     QString m_name = "Unknown shape";
+    bool show = true;
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);

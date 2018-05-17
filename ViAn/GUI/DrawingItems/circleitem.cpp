@@ -10,6 +10,7 @@ CircleItem::CircleItem(Circle* circle) : ShapeItem(CIRCLE_ITEM) {
 
     map = QPixmap(16,16);
     update_shape_color();
+    update_show_icon(m_circle->get_show());
 }
 
 CircleItem::~CircleItem() {}

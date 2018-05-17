@@ -66,19 +66,17 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Slot function to be called when an analysis is completed
  * Removes the current analysis from the queue and start the next one if there is one
  */
-void AnalysisWidget::analysis_done(AnalysisProxy analysis) {     
+void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
     emit show_progress(0);
-    analysis.m_name = "Analysis";
+    analysis->m_name = "Analysis";
     current_analysis_item->setText(0,"Analysis");
     analysis_queue.pop_front();
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
-    AnalysisProxy* am = new AnalysisProxy(analysis);
-    ana_item->set_analysis(am);
+    ana_item->set_analysis(analysis);
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis_item->parent());
-    vid->get_video_project()->add_analysis(am);
+    vid->get_video_project()->add_analysis(analysis);
     current_analysis_item = nullptr;
     duration = 0;
-
 
     m_queue_wgt->next();
     if (!analysis_queue.empty()) {

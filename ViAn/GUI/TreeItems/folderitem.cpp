@@ -6,6 +6,8 @@ FolderItem::FolderItem() : TreeItem(FOLDER_ITEM) {
     setIcon(0, folder_icon);
 }
 
+FolderItem::~FolderItem() {}
+
 void FolderItem::remove() {}
 
 void FolderItem::rename(){}

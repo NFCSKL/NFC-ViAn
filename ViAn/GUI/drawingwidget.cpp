@@ -11,13 +11,14 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 
-    setColumnCount(2);
-    header()->resizeSection(0, 200);
-    header()->resizeSection(1, 30);
+    setColumnCount(3);
+    header()->resizeSection(0, 170);
+    header()->resizeSection(1, 40);
+    header()->resizeSection(2, 35);
 
     headerItem()->setText(0, "Frame - Drawings");
     headerItem()->setText(1, "Color");
-
+    headerItem()->setText(2, "Hide");
 
     // Shortcut for deleteing item
     QShortcut* delete_sc = new QShortcut(this);
@@ -34,6 +35,7 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     m_overlay = overlay;
     update_from_overlay();
     connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+    connect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
     connect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
     connect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
     connect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
@@ -44,14 +46,13 @@ void DrawingWidget::clear_overlay() {
         m_overlay->set_current_drawing(nullptr);
         save_item_data();
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
+        disconnect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
         disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
         disconnect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
         disconnect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
         m_overlay = nullptr;
     }
-    QObject::blockSignals(true);
     clear();
-    QObject::blockSignals(false);
 }
 
 void DrawingWidget::set_video_project(VideoProject *vid_proj) {
@@ -270,6 +271,7 @@ void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
  * @param col
  */
 void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
+    if (!item) return;
     switch (item->type()) {
     case FRAME_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
@@ -291,6 +293,8 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
                 shape->set_color(color);
                 shape_item->update_shape_color();
             }
+        } else if (col == 2) {
+            shape_item->update_show_icon(shape->toggle_show());
         }
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
