@@ -9,6 +9,7 @@ ArrowItem::ArrowItem(Arrow* arrow) : ShapeItem(ARROW_ITEM) {
 
     map = QPixmap(16,16);
     update_shape_color();
+    update_show_icon(m_arrow->get_show());
 }
 
 ArrowItem::~ArrowItem() {}

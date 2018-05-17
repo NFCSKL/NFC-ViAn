@@ -9,6 +9,7 @@ TextItem::TextItem(Text* text) : ShapeItem(TEXT_ITEM) {
 
     map = QPixmap(16,16);
     update_shape_color();
+    update_show_icon(m_text->get_show());
 }
 
 TextItem::~TextItem() {}

@@ -65,6 +65,10 @@ void Shapes::update_drawing_pos(QPoint pos) {
     draw_end = qpoint_to_point(pos);
 }
 
+void Shapes::update_drawing_sym(int dx, int dy) {
+    draw_end = cv::Point(draw_start.x + dx, draw_start.y + dy);
+}
+
 /**
  * @brief Shape::update_text_pos
  * Updates the start and end point of the text-drawing
@@ -129,6 +133,14 @@ cv::Point Shapes::get_draw_end() {
     return draw_end;
 }
 
+void Shapes::set_draw_end(cv::Point p) {
+    draw_end = p;
+}
+
+void Shapes::set_draw_start(cv::Point p) {
+    draw_start = p;
+}
+
 /**
  * @brief Shape::get_shape
  * @return shape
@@ -167,6 +179,14 @@ void Shapes::set_thickness(QPoint pos) {
     thickness = new_thick;
 }
 
+void Shapes::set_thickness(int value) {
+    thickness = value;
+}
+
+int Shapes::get_thickness() {
+    return thickness;
+}
+
 void Shapes::set_frame(int frame_nr) {
     frame = frame_nr;
 }
@@ -181,6 +201,15 @@ void Shapes::set_name(QString name) {
 
 QString Shapes::get_name() {
     return m_name;
+}
+
+bool Shapes::toggle_show() {
+    show = !show;
+    return show;
+}
+
+bool Shapes::get_show() {
+    return show;
 }
 
 /**
@@ -200,6 +229,7 @@ void Shapes::read_shape(const QJsonObject& json){
     this->draw_end.x = json["p2x"].toInt();
     this->draw_end.y = json["p2y"].toInt();
     this->frame = json["frame"].toInt();
+    this->show = json["show"].toBool();
 }
 
 /**
@@ -217,5 +247,6 @@ void Shapes::write_shape(QJsonObject& json){
     json["p2x"] = this->draw_end.x;
     json["p2y"] = this->draw_end.y;
     json["frame"] = this->frame;
+    json["show"] = this->show;
 }
 

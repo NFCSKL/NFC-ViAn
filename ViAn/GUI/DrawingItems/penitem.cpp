@@ -9,6 +9,7 @@ PenItem::PenItem(Pen* pen) : ShapeItem(PEN_ITEM) {
 
     map = QPixmap(16,16);
     update_shape_color();
+    update_show_icon(m_pen->get_show());
 }
 
 PenItem::~PenItem() {}

@@ -155,10 +155,12 @@ void VideoWidget::init_frame_processor() {
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
     connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
+    connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
-    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint,bool,bool)), this, SLOT(mouse_moved(QPoint,bool,bool)));
     connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
+    connect(frame_wgt, SIGNAL(process_frame()), this, SLOT(process_frame()));
     connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
     connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
     connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
@@ -816,6 +818,9 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
+        m_vid_proj = vid_proj;
+        set_overlay(m_vid_proj->get_overlay());
+
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
         new_video.store(true);
@@ -829,9 +834,8 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         // Video load and set frame is not synced correctly
         //playback_slider->setValue(frame);
 
+        playback_slider->setValue(frame);
         m_interval = make_pair(0,0);
-
-        set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);
@@ -985,6 +989,13 @@ void VideoWidget::set_color(QColor color) {
     });
 }
 
+void VideoWidget::mouse_double_clicked(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_double_clicked = true;
+        o_settings.pos = pos;
+    });
+}
+
 void VideoWidget::mouse_pressed(QPoint pos, bool right_click) {
     update_overlay_settings([&](){
         o_settings.mouse_clicked = true;
@@ -1001,9 +1012,11 @@ void VideoWidget::mouse_released(QPoint pos, bool right_click) {
     });
 }
 
-void VideoWidget::mouse_moved(QPoint pos) {
+void VideoWidget::mouse_moved(QPoint pos, bool shift, bool ctrl) {
     update_overlay_settings([&](){
         o_settings.mouse_moved = true;
+        o_settings.shift_modifier = shift;
+        o_settings.ctrl_modifier = ctrl;
         o_settings.pos = pos;
     });
 }
@@ -1020,6 +1033,10 @@ void VideoWidget::set_current_drawing(Shapes* shape) {
         o_settings.set_current_drawing = true;
         o_settings.shape = shape;
     });
+}
+
+void VideoWidget::process_frame() {
+    update_overlay_settings([&](){});
 }
 
 /**

@@ -9,7 +9,7 @@
 
 #include "opencv2/opencv.hpp"
 
-enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, HAND, ZOOM, MOVE, ANALYSIS_BOX, SELECT};
+enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, EDIT, ZOOM, MOVE, ANALYSIS_BOX, SELECT};
 
 class Shapes {
 
@@ -19,6 +19,7 @@ public:
     void set_anchor(QPoint pos);
     void edit_shape(QPoint diff_point);
     void update_drawing_pos(QPoint pos);
+    void update_drawing_sym(int dx, int dy);
     void update_text_pos(QPoint pos);
     void update_text_draw_end();
     virtual void move_shape(QPoint p);
@@ -37,16 +38,22 @@ public:
 
     cv::Point get_draw_start();
     cv::Point get_draw_end();
+    void set_draw_end(cv::Point);
+    void set_draw_start(cv::Point);
     SHAPES get_shape();
     QColor get_color();
     void set_color(QColor);
     cv::Size get_text_size();
     void set_text_size(cv::Size size);
     void set_thickness(QPoint pos);
+    void set_thickness(int value);
+    int get_thickness();
     void set_frame(int);
     int get_frame();
     virtual QString get_name() = 0;
     virtual void set_name(QString name) = 0;
+    bool toggle_show();
+    bool get_show();
 
 protected:
     SHAPES shape = NONE;
@@ -55,10 +62,11 @@ protected:
     int thickness = 2;
     cv::Point draw_start;
     cv::Point draw_end;
-    bool anchor; // true = draw start -- false = draw end
+    bool anchor; // true = draw start -- false = draw end; TODO 4 corners
     cv::Size text_size;
     int frame;
     QString m_name = "Unknown shape";
+    bool show = true;
 
     void write_shape(QJsonObject& json);
     void read_shape(const QJsonObject& json);

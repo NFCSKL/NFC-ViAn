@@ -11,13 +11,14 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
     connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 
-    setColumnCount(2);
-    header()->resizeSection(0, 200);
-    header()->resizeSection(1, 30);
+    setColumnCount(3);
+    header()->resizeSection(0, 170);
+    header()->resizeSection(1, 40);
+    header()->resizeSection(2, 35);
 
     headerItem()->setText(0, "Frame - Drawings");
     headerItem()->setText(1, "Color");
-
+    headerItem()->setText(2, "Hide");
 
     // Shortcut for deleteing item
     QShortcut* delete_sc = new QShortcut(this);
@@ -37,17 +38,18 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
     connect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
     connect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
     connect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
-    connect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
+    connect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
 }
 
 void DrawingWidget::clear_overlay() {
     if (m_overlay != nullptr) {
+        m_overlay->set_current_drawing(nullptr);
         save_item_data();
         disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
         disconnect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
         disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
         disconnect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
-        disconnect(m_overlay, SIGNAL(set_tool_hand()), this, SIGNAL(set_tool_hand()));
+        disconnect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
         m_overlay = nullptr;
     }
     clear();
@@ -128,9 +130,6 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
         }
         default:
             break;
-        }
-        if (shape == m_overlay->get_current_drawing()) {
-            setCurrentItem(s_item);
         }
     }
 }
@@ -294,10 +293,12 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
                 shape->set_color(color);
                 shape_item->update_shape_color();
             }
+        } else if (col == 2) {
+            shape_item->update_show_icon(shape->toggle_show());
         }
         emit jump_to_frame(m_vid_proj, shape->get_frame());
         emit set_current_drawing(shape);
-        emit set_tool_hand();
+        emit set_tool_edit();
         break;
     }
     default:
@@ -368,18 +369,21 @@ void DrawingWidget::remove_item() {
 }
 
 void DrawingWidget::delete_item() {
-    if (!currentItem() || m_overlay->get_tool() != HAND) return;
+    if (!currentItem() || m_overlay->get_tool() != EDIT) return;
     ShapeItem* item = dynamic_cast<ShapeItem*>(currentItem());
 
     if (item->type() == FRAME_ITEM) {
         FrameItem* f_item = dynamic_cast<FrameItem*>(item);
-        if (f_item->get_frame() == m_overlay->get_current_frame())
+        if (f_item->get_frame() == m_overlay->get_current_frame()) {
             remove_from_tree(f_item);
+            clearSelection();
+        }
     } else if (item->get_shape() != m_overlay->get_current_drawing()) {
         return;
     } else {
         remove_from_tree(item);
-        emit set_tool_zoom();
+        clearSelection();
+        emit set_current_drawing(nullptr);
     }
 }
 
@@ -398,7 +402,9 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         while (item->childCount() != 0) {
             remove_from_tree(item->child(0));
         }
+        blockSignals(true);
         delete item;
+        blockSignals(false);
         break;
     case RECT_ITEM:
     case CIRCLE_ITEM:
@@ -410,7 +416,9 @@ void DrawingWidget::remove_from_tree(QTreeWidgetItem *item) {
         emit delete_drawing(shape);
         parent = item->parent();
         delete item;
+        blockSignals(true);
         if (parent->childCount() == 0) delete parent;
+        blockSignals(false);
         break;
     default:
         break;
