@@ -18,7 +18,7 @@ DrawingToolbar::DrawingToolbar() {
  */
 void DrawingToolbar::create_actions() {
     no_tool_act = new QAction(QIcon("../ViAn/Icons/cursor.png"), tr("No tool"), this);
-    analysis_tool_act = new QAction(QIcon("../ViAn/Icons/analysis.png"), tr("Analysis tool"), this);
+    analysis_tool_act = new QAction(QIcon("../ViAn/Icons/analysis.png"), tr("ROI analysis"), this);
     zoom_in_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_in.png"), tr("Zoom in tool"), this);
     zoom_out_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_out.png"), tr("Zoom out tool"), this);
     zoom_tool_act = new QAction(QIcon("../ViAn/Icons/hand.png"), tr("Panning tool"), this);

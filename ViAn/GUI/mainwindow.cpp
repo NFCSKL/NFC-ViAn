@@ -329,40 +329,33 @@ void MainWindow::init_view_menu() {
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
     interval_act = new QAction(tr("&Interval"), this);
-    ana_details_act = new QAction(tr("Analysis &Details"), this);
     drawing_act = new QAction(tr("&Paintings"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
     interval_act->setCheckable(true);
-    ana_details_act->setCheckable(true);
     drawing_act->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
     interval_act->setChecked(true);
-    ana_details_act->setChecked(false);
     drawing_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addAction(toggle_queue_wgt);
-    view_menu->addAction(toggle_ana_settings_wgt);
     view_menu->addSeparator();
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
     view_menu->addAction(interval_act);
-    view_menu->addAction(ana_details_act);
     view_menu->addAction(drawing_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
-    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis settings widget"));
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
-    ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
@@ -371,9 +364,6 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
-    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
 }
 
@@ -384,9 +374,14 @@ void MainWindow::init_view_menu() {
 void MainWindow::init_analysis_menu() {
     QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
 
-    QAction* advanced_analysis_act = new QAction(tr("&Advanced analysis"), this);
-    QAction* quick_analysis_act = new QAction(tr("&Quick analysis"), this);
+    QAction* advanced_analysis_act = new QAction(tr("&Full analysis"), this);
+    QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
     QAction* settings_act = new QAction(tr("&Settings"), this);
+
+    ana_details_act = new QAction(tr("Analysis &Details"), this);
+    ana_details_act->setCheckable(true);
+    ana_details_act->setChecked(false);
+
 
     advanced_analysis_act->setIcon(QIcon("../ViAn/Icons/advanced_analysis.png"));
     quick_analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
@@ -395,15 +390,22 @@ void MainWindow::init_analysis_menu() {
     advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
     quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
     settings_act->setStatusTip(tr("Change the settings for analyses."));
+    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis settings widget"));
+    ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);
     analysis_menu->addAction(settings_act);
+    analysis_menu->addSeparator();
+    analysis_menu->addAction(toggle_ana_settings_wgt);
+    analysis_menu->addAction(ana_details_act);
+
     connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
     connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
-
-    // TODO Connect settings
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
+    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 void MainWindow::init_interval_menu() {

@@ -17,6 +17,6 @@ public:
     void rename();
     void set_not_new();
 
-    const QString NEW_STR = " - NEW!";
+    const QString NEW_STR = " (NEW!)";
 };
 #endif // ANALYSISITEM_H
