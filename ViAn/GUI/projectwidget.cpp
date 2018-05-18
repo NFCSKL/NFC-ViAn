@@ -505,12 +505,16 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         if(!ana_item->is_finished()) break;
         ana_item->set_not_new();
-        //emit marked_analysis(ana_item->get_analysis());
-        //emit marked_basic_analysis(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
+        emit marked_analysis(ana_item->get_analysis());
+        emit marked_basic_analysis(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
         emit set_detections(true);
         emit set_poi_slider(true);
         emit enable_poi_btns(true, true);
         emit update_frame();
+
+
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
         break;
     } case DRAWING_TAG_ITEM: {
         tree_item_clicked(item->parent());

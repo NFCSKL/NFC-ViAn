@@ -123,8 +123,8 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
         //m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
-        qDebug() << m_analysis->settings->interval.first << m_analysis->settings->interval.second;
-        m_ana_interval = std::make_pair(m_analysis->settings->interval.first, m_analysis->settings->interval.second);
+        //qDebug() << m_analysis->settings->interval.first << m_analysis->settings->interval.second;
+        m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
         switch (analysis->get_type()) {
         case TAG:
         case DRAWING_TAG:

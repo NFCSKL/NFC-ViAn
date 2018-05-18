@@ -12,7 +12,8 @@ Project* Project::fromFile(const std::string &full_path){
     proj->m_temporary = false;
     proj->load_saveable(full_path);
     // ensure changes to paths are saved
-    proj->save_saveable(full_path);
+    // Screw this line
+    //proj->save_saveable(full_path);
     return proj;
 }
 

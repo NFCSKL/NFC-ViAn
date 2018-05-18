@@ -33,6 +33,9 @@ public:
     interval_set m_intervals;
     AnalysisSettings* settings = nullptr;
 
+private:
+    ID id = 0;
+
 protected:
 
 public:

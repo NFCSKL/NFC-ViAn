@@ -116,6 +116,7 @@ void FrameWidget::set_scroll_area_size(QSize size) {
  * Set the analysis and the pois on the current frame
  */
 void FrameWidget::set_analysis(AnalysisProxy *analysis) {
+    // TODO Fix settings.bounding_box on show details.
     m_analysis = analysis->load_analysis();
     set_detections_on_frame(current_frame_nr);
 }
@@ -299,7 +300,9 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     if (show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
 
-        auto box = m_analysis->settings->bounding_box;
+        qDebug() << bounding_box.x << bounding_box.y;
+        //auto box = m_analysis->settings->bounding_box;
+        auto box = bounding_box;
         QPoint tl = Utility::from_cvpoint(box.tl());
         QPoint br = Utility::from_cvpoint(box.br());
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
