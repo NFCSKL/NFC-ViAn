@@ -3,10 +3,107 @@
 #include "Project/Analysis/analysis.h"
 #include <QTime>
 #include <QThread>
+#include <QShortcut>
 #include "utility.h"
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
+    QShortcut* copy_sc = new QShortcut(this);
+    QShortcut* paste_sc = new QShortcut(this);
+    copy_sc->setKey(QKeySequence::Copy);
+    paste_sc->setKey(QKeySequence::Paste);
+    connect(copy_sc, &QShortcut::activated, this, &FrameWidget::copy);
+    connect(paste_sc, &QShortcut::activated, this, &FrameWidget::paste);
+}
+
+/**
+ * @brief FrameWidget::copy
+ * Saves a copy of the current item which can be used to later create new copies.
+ */
+void FrameWidget::copy() {
+    if (copied_item) delete copied_item;
+    Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
+    if (!current_drawing) return;
+    switch (current_drawing->get_shape()) {
+    case RECTANGLE:
+        copied_item = new Rectangle(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case CIRCLE:
+        copied_item = new Circle(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case LINE:
+        copied_item = new Line(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case ARROW:
+        copied_item = new Arrow(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case PEN: {
+        Pen* pen = dynamic_cast<Pen*>(current_drawing);
+        copied_item = new Pen(pen->get_color(), QPoint(0,0));
+        Pen* copied_item_pen = dynamic_cast<Pen*>(copied_item);
+        copied_item_pen->set_points(pen->get_points());
+        break;
+    }
+    case TEXT: {
+        Text* text = dynamic_cast<Text*>(current_drawing);
+        copied_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
+        copied_item->set_text_size(text->get_text_size());
+        break;
+    }
+    default:
+        break;
+    }
+    copied_item->set_name(current_drawing->get_name());
+    copied_item->set_thickness(current_drawing->get_thickness());
+    copied_item->set_draw_start(current_drawing->get_draw_start());
+    copied_item->set_draw_end(current_drawing->get_draw_end());
+}
+
+/**
+ * @brief FrameWidget::paste
+ * Creates a new item which is a copy of the item in the copy clipboard
+ * and adds it to the overlay.
+ */
+void FrameWidget::paste() {
+    if (!copied_item) return;
+    Shapes* new_item;
+    switch (copied_item->get_shape()) {
+    case RECTANGLE:
+        new_item = new Rectangle(copied_item->get_color(), QPoint(0,0));
+        break;
+    case CIRCLE:
+        new_item = new Circle(copied_item->get_color(), QPoint(0,0));
+        break;
+    case LINE:
+        new_item = new Line(copied_item->get_color(), QPoint(0,0));
+        break;
+    case ARROW:
+        new_item = new Arrow(copied_item->get_color(), QPoint(0,0));
+        break;
+    case PEN: {
+        Pen* pen = dynamic_cast<Pen*>(copied_item);
+        new_item = new Pen(pen->get_color(), QPoint(0,0));
+        Pen* new_pen = dynamic_cast<Pen*>(new_item);
+        new_pen->set_points(pen->get_points());
+        break;
+    }
+    case TEXT: {
+        Text* text = dynamic_cast<Text*>(copied_item);
+        new_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
+        new_item->set_text_size(text->get_text_size());
+        break;
+    }
+    default:
+        break;
+    }
+
+    new_item->set_name(copied_item->get_name());
+    new_item->set_thickness(copied_item->get_thickness());
+    new_item->set_draw_start(copied_item->get_draw_start());
+    new_item->set_draw_end(copied_item->get_draw_end());
+    m_vid_proj->get_overlay()->add_drawing(new_item, current_frame_nr);
+    emit process_frame();
+    update();
 }
 
 void FrameWidget::set_scroll_area_size(QSize size) {
@@ -28,6 +125,7 @@ void FrameWidget::set_analysis(AnalysisProxy *analysis) {
  * Forgets the current analysis
  */
 void FrameWidget::clear_analysis() {
+    delete m_analysis;
     m_analysis = nullptr;
     ooi_rects.clear();
 }
@@ -104,7 +202,7 @@ void FrameWidget::set_cursor(SHAPES tool) {
         setCursor(Qt::OpenHandCursor);
         break;
         //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
-    case HAND:
+    case EDIT:
         setCursor(Qt::SizeAllCursor);
         break;
     default:
@@ -170,7 +268,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (mark_rect) {
-
         // Draw the zoom box with correct dimension
         if(m_tool == ZOOM){
             QPoint start = rect_start;
@@ -193,7 +290,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
         painter.drawRect(zoom);
     }
-
 
     if(m_tool == ANALYSIS_BOX){
         painter.setPen(QColor(0,255,0));
@@ -220,7 +316,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
-    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame()) {
+    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame() && m_tool == EDIT) {
         QPoint tl;
         QPoint br;
         if (current_drawing->get_shape() == PEN) {
@@ -253,6 +349,11 @@ QPoint FrameWidget::scale_point(QPoint pos) {
 void FrameWidget::resizeEvent(QResizeEvent *event) {
     Q_UNUSED (event)
     emit current_size(width(), height());
+}
+
+void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
+    emit mouse_double_click(scaled_pos);
 }
 
 /**
@@ -387,7 +488,9 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         break;
     default:
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
-            emit mouse_moved(scaled_pos);
+            bool shift = (event->modifiers() == Qt::ShiftModifier);
+            bool ctrl = (event->modifiers() == Qt::ControlModifier);
+            emit mouse_moved(scaled_pos, shift, ctrl);
         }
         break;
     }
@@ -402,7 +505,7 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
-    case HAND:
+    case EDIT:
     case SELECT:
         emit mouse_scroll(num_steps);
         event->accept();

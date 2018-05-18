@@ -15,15 +15,6 @@ MotionDetection::~MotionDetection() {
     dilation_kernel.release();
 }
 
-//void MotionDetection::init_settings() {
-//    add_setting("OPEN_DEGREE", 4, "Noise filtering, higher -> less noise");
-//    add_setting("SMALLEST_OBJECT_SIZE", 100, "Smallest detected object");
-//    add_setting("BACKGROUND_HISTORY", 500, "Number of frames in background model");
-//    add_setting("MOG2_THRESHOLD", 10, "MOG2. Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model.");
-//    add_setting("DETECT_SHADOWS", 0, "Detect shadows");
-//}
-
-
 /**
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis

@@ -16,9 +16,12 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 {
 }
 
+BasicAnalysis::~BasicAnalysis() {
+}
+
 /**
- * @brief BasicAnalysis::add_POI
- * Adds a POI to the BasicAnalysis.
+ * @brief BasicAnalysis::add_interval
+ * Adds an interval to the BasicAnalysis.
  * @param poi
  */
 void BasicAnalysis::add_interval(AnalysisInterval *ai){
@@ -67,6 +70,14 @@ void BasicAnalysis::write(QJsonObject &json){
     }
     json["POI:s"] = json_ais;
     m_unsaved_changes = false;
+}
+
+ID BasicAnalysis::get_id() {
+    return id;
+}
+
+void BasicAnalysis::set_id(ID new_id) {
+    id = new_id;
 }
 
 std::string BasicAnalysis::get_name() const {

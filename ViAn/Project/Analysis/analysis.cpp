@@ -1,4 +1,13 @@
 #include "analysis.h"
+#include <QDebug>
+
+Analysis::~Analysis() {
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        delete *it;
+    }
+    m_intervals.clear();
+}
+
 /**
  * @brief Analysis::read
  * Reads analysis from json format.

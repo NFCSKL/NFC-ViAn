@@ -15,3 +15,13 @@ void ShapeItem::update_shape_color() {
     map.fill(get_shape()->get_color());
     setIcon(1, map);
 }
+
+void ShapeItem::update_show_icon(bool show) {
+    if (show) {
+        const QIcon show_icon("../ViAn/Icons/show.png");
+        setIcon(2, show_icon);
+    } else {
+        const QIcon hide_icon("../ViAn/Icons/hide.png");
+        setIcon(2, hide_icon);
+    }
+}

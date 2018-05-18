@@ -28,6 +28,7 @@
 #include "Analysis/anasettingwidget.h"
 #include "statusbar.h"
 #include "Toolbars/drawingtoolbar.h"
+#include "Toolbars/maintoolbar.h"
 
 using namespace std;
 class AnalysisWindow;
@@ -43,6 +44,7 @@ public:
 
     StatusBar* status_bar;
     DrawingToolbar* draw_toolbar;
+    MainToolbar* main_toolbar;
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;

@@ -93,8 +93,7 @@ public slots:
 signals:
     void analysis_aborted();
     void send_progress(int progress);
-    void finito(void);
-    void finished_analysis(AnalysisProxy);
+    void finished_analysis(AnalysisProxy*);
 };
 
 #endif // ANALYSISMETHOD_H

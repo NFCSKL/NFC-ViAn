@@ -13,7 +13,8 @@
 class POI : public AnalysisInterval{    
     std::map<int,std::vector<DetectionBox>> OOIs = {};
 public:
-    POI();    
+    POI();
+    ~POI() override;
     void read(const QJsonObject& json) override;
     void write(QJsonObject& json) override;
 

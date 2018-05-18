@@ -113,34 +113,34 @@ void AnalysisSlider::update(){
     repaint();
 }
 
-void AnalysisSlider::set_analysis(AnalysisProxy * analysis) {
-    m_analysis = analysis->load_analysis();
-    set_ana_interval();
-}
-
 /**
- * @brief AnalysisSlider::set_analysis
+ * @brief AnalysisSlider::set_basic_analysis
+ * Set tag
  * Adds all POIs to the slider
  * @param analysis
  */
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        for (auto p : analysis->get_intervals()) {
-            add_slider_interval(p->get_start(), p->get_end());
+        //m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
+        qDebug() << m_analysis->settings->interval.first << m_analysis->settings->interval.second;
+        m_ana_interval = std::make_pair(m_analysis->settings->interval.first, m_analysis->settings->interval.second);
+        switch (analysis->get_type()) {
+        case TAG:
+        case DRAWING_TAG:
+            for (auto p : analysis->get_intervals()) {
+                add_slider_interval(p->get_start(), p->get_end());
+            }
+            break;
+        case MOTION_DETECTION: {
+            AnalysisProxy* p_analysis = dynamic_cast<AnalysisProxy*>(analysis);
+            rects = p_analysis->m_slider_interval;
+        }
+        default:
+            break;
         }
     }
     repaint();
-}
-
-/**
- * @brief AnalysisSlider::set_ana_interval
- * @param analysis
- * Set interval to the interval the analysis was run on
- */
-void AnalysisSlider::set_ana_interval() {
-    qDebug() << m_analysis->settings->interval.first << m_analysis->settings->interval.second;
-    m_ana_interval = std::make_pair(m_analysis->settings->interval.first, m_analysis->settings->interval.second);
 }
 
 /**
@@ -327,6 +327,7 @@ void AnalysisSlider::set_show_interval(bool show) {
 void AnalysisSlider::clear_slider() {
     rects.clear();
     frames.clear();
+    m_ana_interval = std::make_pair(-1, -1);
 }
 
 void AnalysisSlider::set_blocked(bool value) {

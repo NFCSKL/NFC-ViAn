@@ -21,6 +21,7 @@ class Analysis : public BasicAnalysis {
 public:
     ANALYSIS_TYPE type;
 public:
+    ~Analysis() override;
     virtual void read(const QJsonObject& json) override;
     virtual void write(QJsonObject& json) override;
     virtual ANALYSIS_TYPE get_type() const override;
