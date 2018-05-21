@@ -168,9 +168,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisProxy*)));
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
-    connect(project_wgt, SIGNAL(show_analysis_details(bool)), video_wgt->playback_slider, SLOT(set_show_ana_interval(bool)));
-    connect(project_wgt, SIGNAL(show_analysis_details(bool)), video_wgt->frame_wgt, SLOT(show_bounding_box(bool)));
-    connect(project_wgt, SIGNAL(show_analysis_details(bool)), this, SLOT(set_ana_details(bool)));
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
+    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
+    connect(ana_details_act, SIGNAL(toggled(bool)), project_wgt, SLOT(toggle_details(bool)));
+    connect(toggle_ana_settings_wgt, SIGNAL(toggled(bool)), project_wgt, SLOT(toggle_settings(bool)));
+    connect(project_wgt, &ProjectWidget::toggle_analysis_details, ana_details_act, &QAction::toggle);
+    connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
 
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
 
@@ -383,7 +386,6 @@ void MainWindow::init_analysis_menu() {
     ana_details_act->setCheckable(true);
     ana_details_act->setChecked(false);
 
-
     advanced_analysis_act->setIcon(QIcon("../ViAn/Icons/advanced_analysis.png"));
     quick_analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     settings_act->setIcon(QIcon("../ViAn/Icons/cog.png"));
@@ -404,9 +406,6 @@ void MainWindow::init_analysis_menu() {
     connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
     connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
-    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 void MainWindow::init_interval_menu() {
@@ -571,10 +570,6 @@ void MainWindow::zoom() {
 
 void MainWindow::move() {
     video_wgt->frame_wgt->set_tool(MOVE);
-}
-
-void MainWindow::set_ana_details(bool b) {
-    ana_details_act->setChecked(b);
 }
 
 /**

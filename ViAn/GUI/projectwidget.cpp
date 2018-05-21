@@ -23,6 +23,16 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDragEnabled(true);
     setDropIndicatorShown(true);
 
+    // Create togglable action in the context menu for analysis details
+    show_details_act = new QAction("Show/hide details", this);
+    show_details_act->setCheckable(true);
+    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+
+    // Create togglable action in the context menu for analysis settings
+    show_settings_act = new QAction("Show/hide analysis settings", this);
+    show_settings_act->setCheckable(true);
+    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
@@ -623,9 +633,8 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Show details", this, SLOT(show_details()));
-                menu.addAction("Hide details", this, SLOT(hide_details()));
-                menu.addAction("Show settings", this, SLOT(update_settings()));
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
@@ -683,20 +692,21 @@ void ProjectWidget::drawing_tag() {
 }
 
 /**
- * @brief ProjectWidget::show_details
- * @param ana_item
- * Show the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_details
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::show_details() {
-    emit show_analysis_details(true);
+void ProjectWidget::toggle_details(bool b) {
+    show_details_act->setChecked(b);
 }
 
 /**
- * @brief ProjectWidget::hide_details
- * Hide the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_settings
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::hide_details() {
-    emit show_analysis_details(false);
+void ProjectWidget::toggle_settings(bool b) {
+    show_settings_act->setChecked(b);
 }
 
 /**

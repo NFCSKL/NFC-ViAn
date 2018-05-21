@@ -66,7 +66,6 @@ private slots:
     void delete_current_drawing();
     void zoom();
     void move();
-    void set_ana_details(bool);
 
 public slots:
     void options(void);

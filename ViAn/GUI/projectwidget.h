@@ -41,6 +41,8 @@ public:
     ~ProjectWidget();
     Project* m_proj = nullptr;
     AnalysisSettings* analysis_settings = new AnalysisSettings();
+    QPointer<QAction> show_details_act = nullptr;
+    QPointer<QAction> show_settings_act = nullptr;
 
 signals:
     void selected_media();
@@ -50,7 +52,8 @@ signals:
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
-    void show_analysis_details(bool);
+    void toggle_analysis_details();
+    void toggle_settings_details();
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
@@ -92,8 +95,8 @@ private slots:
     void remove_item();
     void rename_item();
     void drawing_tag();
-    void show_details();
-    void hide_details();
+    void toggle_details(bool b);
+    void toggle_settings(bool b);
     void update_settings();
     void create_folder_item();
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
