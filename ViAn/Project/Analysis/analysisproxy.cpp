@@ -65,8 +65,6 @@ void AnalysisProxy::read(const QJsonObject &json) {
 
     std::vector<std::string> vars = new_settings->get_var_names();
     for (std::string name : vars) {
-        qDebug() << QString::fromStdString(name) << json[QString::fromStdString(name)].toInt();
-        //json[QString::fromStdString(name)] = QString::number(settings->get_setting(name));
         new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
     }
 
