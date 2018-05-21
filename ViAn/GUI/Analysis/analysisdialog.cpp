@@ -3,7 +3,7 @@
 AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSettings *analysis_settings)
     : m_analysis_settings(analysis_settings) {
     // Set title
-    setWindowTitle("Vian - Advanced analysis");
+    setWindowTitle("Vian - Edit analysis settings");
     // Remove "?" button
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -13,6 +13,7 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
     if (vid_projs.empty()) do_analysis = false;
 
     if (do_analysis) {
+        setWindowTitle("Vian - Full analysis");
         m_v_proj_list = new QListWidget(this);
 
         // Windows-like file selection
