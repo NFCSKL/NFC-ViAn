@@ -67,9 +67,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
     for (std::string name : vars) {
         new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
     }
-
     settings = new_settings;
-
 
     file_analysis = json["full_path"].toString().toStdString();
     QJsonArray json_intervals = json["intervals"].toArray();

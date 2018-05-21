@@ -33,9 +33,6 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
     // Add analysis form
     QFormLayout* form_lay = new QFormLayout();
     v_lay->addLayout(form_lay);
-    // Add analysis specific options
-    //VideoListItem* item  = dynamic_cast<VideoListItem*>(m_v_proj_list->itemAt(0,0));
-    //method = new MotionDetection(item->m_vid_proj->get_video()->file_path, m_save_dir);
     add_settings(form_lay);
     // Add Buttons
     btn_box = new QDialogButtonBox;
@@ -64,10 +61,7 @@ void AnalysisDialog::ok_btn_clicked() {
     if (do_analysis) {
         for(auto item : m_v_proj_list->selectedItems()){
             VideoProject* vid_proj = dynamic_cast<VideoListItem*>(item)->m_vid_proj;
-            //method = new MotionDetection(vid_proj->get_video()->file_path, m_save_dir);
-            //set_settings(method);
             set_settings();
-            //emit start_analysis(method, vid_proj);
             emit start_analysis(vid_proj, m_analysis_settings);
             close();
             return;
@@ -99,7 +93,6 @@ void AnalysisDialog::item_changed() {
  * Add Settings to form layout
  */
 void AnalysisDialog::add_settings(QFormLayout *form) {
-    //std::vector<std::string> vars = method->get_var_names();
     std::vector<std::string> vars = m_analysis_settings->get_var_names();
     for(std::string name : vars) {
         QWidget* var_line;
@@ -129,8 +122,6 @@ void AnalysisDialog::set_settings() {
             QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
             val = settings->text().toInt();
         }
-        qDebug() << QString::fromStdString(line.first) << val;
-        //method->set_setting(line.first, val);
         m_analysis_settings->set_setting(line.first, val);
     }
 }

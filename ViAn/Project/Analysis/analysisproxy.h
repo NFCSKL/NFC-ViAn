@@ -7,7 +7,6 @@
 #include "Analysis/analysissettings.h"
 #include <iostream>
 
-
 /**
  * @brief The AnalysisProxy class
  * This class is used to improve performance of basic

@@ -5,8 +5,8 @@ AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
                                    cv::Rect bounding_box)
     : type(type)
 {
-    setInterval(interval);
-    setBounding_box(bounding_box);
+    set_interval(interval);
+    set_bounding_box(bounding_box);
 }
 
 AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type) : type(type) {
@@ -30,7 +30,7 @@ AnalysisSettings::AnalysisSettings(AnalysisSettings* as) {
 
 
 AnalysisSettings::~AnalysisSettings() {
-    qDebug() << "Settings delete";
+
 }
 
 void AnalysisSettings::reset_settings() {
@@ -100,16 +100,16 @@ std::string AnalysisSettings::get_type_string() {
     }
 }
 
-cv::Rect AnalysisSettings::getBounding_box() const {
+cv::Rect AnalysisSettings::get_bounding_box() const {
     return bounding_box;
 }
 
-void AnalysisSettings::setBounding_box(const cv::Rect &value) {
+void AnalysisSettings::set_bounding_box(const cv::Rect &value) {
     bounding_box = value;
     use_bounding_box = true;
 }
 
-ANALYSIS_TYPE AnalysisSettings::getType() const {
+ANALYSIS_TYPE AnalysisSettings::get_type() const {
     return type;
 }
 
@@ -117,7 +117,7 @@ std::pair<int, int> AnalysisSettings::get_interval() const {
     return interval;
 }
 
-void AnalysisSettings::setInterval(const std::pair<int, int> &value) {
+void AnalysisSettings::set_interval(const std::pair<int, int> &value) {
     interval = value;
     use_interval = true;
 }

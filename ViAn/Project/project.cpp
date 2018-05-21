@@ -12,7 +12,8 @@ Project* Project::fromFile(const std::string &full_path){
     proj->m_temporary = false;
     proj->load_saveable(full_path);
     // ensure changes to paths are saved
-    // Screw this line
+    // TODO Needed?
+    // Will overwrite saved data which causes problems when failing to load the correct data.
     //proj->save_saveable(full_path);
     return proj;
 }

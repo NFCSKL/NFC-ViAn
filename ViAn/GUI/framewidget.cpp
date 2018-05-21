@@ -116,7 +116,6 @@ void FrameWidget::set_scroll_area_size(QSize size) {
  * Set the analysis and the pois on the current frame
  */
 void FrameWidget::set_analysis(AnalysisProxy *analysis) {
-    // TODO Fix settings.bounding_box on show details.
     m_analysis = analysis->load_analysis();
     set_detections_on_frame(current_frame_nr);
 }
@@ -557,7 +556,7 @@ void FrameWidget::set_analysis_settings() {
         cv::Point start (ana_rect_start.x(), ana_rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x/m_scale_factor, anchor.y()/m_scale_factor + start.y/m_scale_factor),
                       cv::Point(anchor.x()/m_scale_factor + end.x/m_scale_factor, anchor.y()/m_scale_factor + end.y/m_scale_factor));
-        settings->setBounding_box(scaled);
+        settings->set_bounding_box(scaled);
 
         emit quick_analysis(settings);
         emit set_toolbar_zoom();

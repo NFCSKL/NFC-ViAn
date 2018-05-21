@@ -123,7 +123,7 @@ void ProjectWidget::add_video() {
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
     AnalysisMethod* method;
-    switch (settings->getType()) {
+    switch (settings->get_type()) {
     case MOTION_DETECTION:
         method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
         break;
@@ -447,20 +447,8 @@ void ProjectWidget::advanced_analysis() {
     if(v_items.empty()) return;
     AnalysisSettings* new_settings = new AnalysisSettings(analysis_settings);
     AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
-    //connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
-}
-
-// TODO remove
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod* method, VideoProject* vid_proj) {
-    if (vid_proj == nullptr) return;
-    VideoItem* v_item = get_video_item(vid_proj);
-    AnalysisItem* ana = new AnalysisItem();
-    v_item->addChild(ana);
-    ana->setText(0, "Loading");
-    v_item->setExpanded(true);
-    emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
 }
 
 /**

@@ -43,8 +43,6 @@ void Analysis::read(const QJsonObject &json){
  * @param json
  */
 void Analysis::write(QJsonObject &json){
-
-    // TODO Fix save it in the analysis file
     json["bounding box height"] = settings->bounding_box.height;
     json["bounding box width"] = settings->bounding_box.width;
     json["bounding box y"] = settings->bounding_box.y;

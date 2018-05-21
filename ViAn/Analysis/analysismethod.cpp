@@ -3,7 +3,6 @@
 #include <opencv2/videoio/videoio.hpp>
 #include "Analysis/analysismethod.h"
 #include "imagegenerator.h"
-#include <QDebug>
 
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path, AnalysisSettings* settings) {
     analysis_settings = settings;

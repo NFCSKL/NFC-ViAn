@@ -6,8 +6,7 @@
  * @param source_file
  */
 MotionDetection::MotionDetection(const std::string& source_file, const std::string& save_file, AnalysisSettings* settings) : AnalysisMethod(source_file, save_file, settings) {
-    m_analysis.type = MOTION_DETECTION;
-    //init_settings();    
+    m_analysis.type = MOTION_DETECTION; 
 }
 
 MotionDetection::~MotionDetection() {  

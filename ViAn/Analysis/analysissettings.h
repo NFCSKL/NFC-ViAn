@@ -17,8 +17,8 @@ class AnalysisSettings {
 
 public:
     ANALYSIS_TYPE type;
-    cv::Rect bounding_box = cv::Rect(0,0,0,0);
-    std::pair<int, int> interval = std::make_pair(-1,-1);
+    cv::Rect bounding_box;
+    std::pair<int, int> interval;
     bool use_bounding_box = false;
     bool use_interval = false;
     bool quick_analysis = false;
@@ -30,11 +30,11 @@ public:
     virtual ~AnalysisSettings();
 
     void reset_settings();
-    cv::Rect getBounding_box() const;
-    void setBounding_box(const cv::Rect &value);
-    ANALYSIS_TYPE getType() const;
+    cv::Rect get_bounding_box() const;
+    void set_bounding_box(const cv::Rect &value);
+    ANALYSIS_TYPE get_type() const;
     std::pair<int, int> get_interval() const;
-    void setInterval(const std::pair<int, int> &value);
+    void set_interval(const std::pair<int, int> &value);
 
     std::vector<std::string> get_var_names();
     void set_setting(const std::string &var, int value);

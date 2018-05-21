@@ -5,7 +5,6 @@
 #include <utility>
 #include <set>
 #include "analysisinterval.h"
-//#include "Analysis/analysissettings.h"
 #include "opencv2/core/core.hpp"
 #include <typeinfo>
 #include <QPoint>
@@ -15,6 +14,7 @@ class AnalysisSettings;
 
 enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG = 2, BASIC_ANALYSIS = 3, DRAWING_TAG = 4};
 
+// TODO remove?
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
                                                                      std::make_pair("Tag",TAG)};
 struct interval_cmp {

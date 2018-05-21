@@ -9,10 +9,6 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
     m_name(other.m_name),
     m_intervals(other.m_intervals),
     settings(other.settings)
-//    m_ana_interval(other.m_ana_interval),
-//    bounding_box(other.bounding_box),
-//    use_interval(other.use_interval),
-//    use_bounding_box(other.use_bounding_box)
 {
 }
 

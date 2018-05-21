@@ -24,7 +24,6 @@ private:
      */
     cv::Ptr<cv::BackgroundSubtractor> background_subtractor;
 
-    //void init_settings() override;
     void setup_analysis() override;
     std::vector<DetectionBox> analyse_frame() override;
 

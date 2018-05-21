@@ -52,27 +52,16 @@ protected:
 
     cv::Mat analysis_frame, original_frame;
     Analysis m_analysis;
-protected:
-    // Implement this in subclass,
-    // using set_setting(Var,value) for all desired settings
-    //virtual void init_settings() = 0;
-    // Implement this, return constant names, default value and descriptions
-    // like so std::vector<std::tuple<name,int value, description>>
-
-    //virtual void add_setting(const std::string& var, int value_default, const std::string& descr);
 
     void calculate_scaling_factor();
     void scale_frame();
+
 public:
     AnalysisMethod(const std::string &video_path, const std::string& save_path, AnalysisSettings *settings);
 
     AnalysisSettings* analysis_settings = nullptr;
 
-    //std::string get_descr(const std::string& var_name);          // Get variable description
     int get_setting(const std::string& var);             // Get integer value for variable
-    //virtual void set_setting(const std::string& var, int value); // Set singled variable
-    //virtual void set_full_settings(Settings settings);           // Set all variables
-    //virtual std::vector<std::string> get_var_names();            // Get all variable names
     virtual void setup_analysis() = 0;
     virtual std::vector<DetectionBox> analyse_frame() = 0;
 
