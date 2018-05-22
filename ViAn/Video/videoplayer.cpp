@@ -39,11 +39,8 @@ void VideoPlayer::load_video(){
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
-    m_frame->store(0);
-    qDebug() << "before open capture";
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
-    qDebug() << "after capture open";
     load_video_info();
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
