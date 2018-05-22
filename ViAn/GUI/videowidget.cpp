@@ -591,8 +591,16 @@ void VideoWidget::play_btn_toggled(bool status) {
  */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
-        if (m_tag->add_frame(playback_slider->value())) {
-            emit tag_new_frame(playback_slider->value());
+        qDebug() << "in tag";
+        if (!m_tag->find_frame(playback_slider->value())) {
+
+            VideoState state = m_vid_proj->get_video()->state;
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+            m_tag->add_frame(playback_slider->value(), t_frame);
+
+            emit tag_new_frame(playback_slider->value(), t_frame);
+
+            // TODO send state and save in tf_item
             emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
             playback_slider->update();
         } else {
@@ -610,7 +618,8 @@ void VideoWidget::tag_frame() {
  */
 void VideoWidget::remove_tag_frame() {
     if (m_tag != nullptr) {
-        if (m_tag->remove_frame(playback_slider->value())) {
+        if (m_tag->find_frame(playback_slider->value())) {
+            m_tag->remove_frame(playback_slider->value());
             emit tag_remove_frame(playback_slider->value());
             emit set_status_bar("Untagged frame number: " + QString::number(playback_slider->value()));
             playback_slider->update();
@@ -830,11 +839,6 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         player_con.notify_all();
 
         m_vid_proj = vid_proj;
-        qDebug() << "in load marked" << frame;
-        // TODO not the best fix
-        // Will not jump to correct frame before a video is chosen.
-        // Video load and set frame is not synced correctly
-        //playback_slider->setValue(frame);
 
         playback_slider->setValue(frame);
         m_interval = make_pair(0,0);
@@ -843,8 +847,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         playback_slider->set_interval(-1, -1);
     }
 
-    if (true) {
-        qDebug() << "set frame" << frame;
+    if (frame > -1) {
         frame_index.store(frame);
         on_new_frame();
     }
@@ -912,7 +915,6 @@ void VideoWidget::enable_tag_btn(bool b) {
  * notified of new settings when videoplayer has loaded a new video
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
-    qDebug() << "in set video info";
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;

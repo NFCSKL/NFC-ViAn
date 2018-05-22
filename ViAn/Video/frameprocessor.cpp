@@ -44,10 +44,8 @@ void FrameProcessor::check_events() {
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
         // A new video has been loaded. Reset processing settings    
         if (m_new_video->load()) {
-            qDebug() << "load";
             reset_settings();
             m_overlay = m_o_settings->overlay;
-            qDebug() << "overlay set";
             m_o_settings->overlay_removed = false;
 
             lk.unlock();

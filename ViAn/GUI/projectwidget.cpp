@@ -145,7 +145,8 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
-        for (int frame : tag->get_frames()) {
+        for (auto pair : tag->get_frames()) {
+            int frame = pair.first;
             TagFrameItem* tf_item = new TagFrameItem(frame);
             item->addChild(tf_item);
         }
@@ -164,21 +165,24 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
 void ProjectWidget::add_frames_to_tag(TreeItem* item) {
     if (item->type() == TAG_ITEM) {
         Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-        for (int frame : tag->get_frames() ) {
+        for (auto pair : tag->get_frames() ) {
+            int frame = pair.first;
             TagFrameItem* tf_item = new TagFrameItem(frame);
             item->addChild(tf_item);
         }
     } else if (item->type() == DRAWING_TAG_ITEM) {
         Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
-        for (int frame : tag->get_frames() ) {
+        for (auto pair : tag->get_frames() ) {
+            int frame = pair.first;
             TagFrameItem* tf_item = new TagFrameItem(frame);
             item->addChild(tf_item);
         }
     }
 }
 
-void ProjectWidget::add_new_frame_to_tag(int frame) {
+void ProjectWidget::add_new_frame_to_tag(int frame, TagFrame* t_frame) {
     TagFrameItem* tf_item = new TagFrameItem(frame);
+    tf_item->set_state(t_frame);
     m_tag_item->setExpanded(true);
     for (int i = 0; i < m_tag_item->childCount(); ++i) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
@@ -401,7 +405,6 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
             v_item->addChild(tag_item);
             add_frames_to_tag(tag_item);
         } else if (ana.second->get_type() == DRAWING_TAG) {
-            qDebug() << QString::fromStdString(ana.second->get_name());
             DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
             add_frames_to_tag(tag_item);
@@ -618,6 +621,9 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_video_project(vid_item->get_video_project());
         emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
 
+        // TODO set froms state
+        // set zoom rect, scale factor, brightness, rotation
+
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
@@ -795,7 +801,8 @@ void ProjectWidget::drawing_tag() {
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.size() > 0) {
-            tag->add_frame(frame_overlay.first);
+            TagFrame* t_frame = new TagFrame(frame_overlay.first);
+            tag->add_frame(frame_overlay.first, t_frame);
         }
     }
 

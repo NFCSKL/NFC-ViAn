@@ -35,7 +35,8 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
 
     // Draws the tags
     if (m_show_tags && show_on_slider && m_tag) {
-        for (int frame : m_tag->get_frames()) {
+        for (auto pair : m_tag->get_frames()) {
+            int frame = pair.first;
             double first = (double)(groove_rect.left() + (frame) * c);
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);

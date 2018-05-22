@@ -76,7 +76,8 @@ SOURCES += main.cpp \
     Project/Test/bookmarktest.cpp \
     GUI/textdialog.cpp \
     GUI/TreeItems/tagframeitem.cpp \
-    Project/Analysis/interval.cpp
+    Project/Analysis/interval.cpp \
+    Project/Analysis/tagframe.cpp
 
 #
 # TEST
@@ -142,7 +143,8 @@ HEADERS += reportgenerator.h\
     Project/Test/bookmarktest.h \
     GUI/textdialog.h \
     GUI/TreeItems/tagframeitem.h \
-    Project/Analysis/interval.h
+    Project/Analysis/interval.h \
+    Project/Analysis/tagframe.h
 
 #
 # LIBRARY

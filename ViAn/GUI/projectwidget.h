@@ -72,7 +72,7 @@ public slots:
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, Tag *tag);
     void add_frames_to_tag(TreeItem *item);
-    void add_new_frame_to_tag(int frame);
+    void add_new_frame_to_tag(int frame, TagFrame *t_frame);
     void remove_frame_from_tag(int frame);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     bool save_project();

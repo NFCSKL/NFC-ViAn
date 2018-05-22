@@ -1,44 +1,50 @@
 #include "tag.h"
 
 Tag::~Tag() {
-    m_frames.clear();
-}
-
-bool Tag::add_frame(int frame) {
-    m_unsaved_changes = true;
-    return m_frames.insert(frame).second;
-}
-
-bool Tag::remove_frame(int frame) {
-    auto it = m_frames.find(frame);
-    if (it != m_frames.end()) {
-        m_frames.erase(it);
-        return m_unsaved_changes = true;
+    for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
+        delete (*it).second;
     }
-    return false;
+    tag_map.clear();
+}
+
+void Tag::add_frame(int frame, TagFrame* t_frame) {
+    m_unsaved_changes = true;
+    tag_map.insert(std::pair<int,TagFrame*>(frame, t_frame));
+}
+
+bool Tag::find_frame(int frame) {
+    return tag_map.count(frame);
+}
+
+void Tag::remove_frame(int frame) {
+    auto it = tag_map.find(frame);
+    if (it != tag_map.end()) {
+        tag_map.erase(it);
+        delete (*it).second;
+        m_unsaved_changes = true;
+    }
 }
 
 int Tag::next_frame(int frame) {
-    auto it = m_frames.upper_bound(frame);
-    if (it != m_frames.end()) {
-        return *it;
+    auto it = tag_map.upper_bound(frame);
+    if (it != tag_map.end()) {
+        return (*it).first;
     } else {
         return frame;
     }
 }
 
 int Tag::previous_frame(int frame) {
-    qDebug() << m_frames.size();
-    auto it = m_frames.lower_bound(frame);
-    if (it != m_frames.end() && it != m_frames.begin()) {
-        return *(std::prev(it));
+    auto it = tag_map.lower_bound(frame);
+    if (it != tag_map.end() && it != tag_map.begin()) {
+        return (*(std::prev(it))).first;
     } else {
         return frame;
     }
 }
 
-std::set<int> Tag::get_frames() {
-    return m_frames;
+std::map<int,TagFrame*> Tag::get_frames() {
+    return tag_map;
 }
 
 bool Tag::is_drawing_tag() {
@@ -58,7 +64,8 @@ void Tag::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
     json["drawing_tag"] = drawing_tag;
     QJsonArray frames;
-    for (int frame : m_frames) {
+    for (auto pair : tag_map) {
+        int frame = pair.first;
         QJsonObject f_num;
         f_num["frame"] = frame;
         frames.push_back(f_num);
@@ -74,7 +81,8 @@ void Tag::read(const QJsonObject &json) {
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_frame = json_intervals[i].toObject();
         int frame = json_frame["frame"].toInt();
-        m_frames.insert(frame);
+        TagFrame* t_frame = new TagFrame(frame);
+        tag_map.insert(std::pair<int,TagFrame*>(frame, t_frame));
     }
     m_unsaved_changes = false;
 }
