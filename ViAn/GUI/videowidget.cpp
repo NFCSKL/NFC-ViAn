@@ -750,8 +750,10 @@ void VideoWidget::on_new_frame() {
         playback_slider->blockSignals(false);
     }
 
-    set_current_time(frame_num / m_frame_rate);
+    if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
     frame_line_edit->setText(QString::number(frame_index.load()));
+
+    m_vid_proj->get_video()->state.frame = frame_num;
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
@@ -900,6 +902,7 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     current_frame_size = QSize(video_width, video_height);
     playback_slider->setMaximum(last_frame);
     set_total_time((last_frame + 1) / frame_rate);
+    set_current_time(frame_index.load() / m_frame_rate);
 }
 
 void VideoWidget::on_playback_stopped(){

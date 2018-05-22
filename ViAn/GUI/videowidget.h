@@ -112,7 +112,7 @@ signals:
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(std::string video_path); // Unused
     void export_original_frame(VideoProject* ,const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
