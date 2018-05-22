@@ -2,6 +2,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QTime>
+#include "utility.h"
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
@@ -39,11 +40,14 @@ void VideoPlayer::load_video(){
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
+    m_frame->store(0);
+
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
+
 
     m_new_video->store(false);
     m_new_frame_video->store(true);
@@ -70,6 +74,9 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
  */
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
+
+//    if (frame_index == 2) {std::cout<<"CHANGING"<<std::endl;m_capture.set(CV_CAP_PROP_FOURCC, CV_FOURCC('T', 'I', 'F', 'F'));}
+
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
         current_frame = frame_index;

@@ -258,6 +258,12 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
         case CV_8UC3:
             cvtColor(mod_image, _tmp_frame, CV_BGR2RGB);
             break;
+        case CV_8UC4:
+            cvtColor(mod_image, _tmp_frame, CV_BGRA2RGB);
+            break;
+        default:
+            qWarning() << "Mat was of unknown type [" << mod_image.type() << "]";
+        break;
     }
 
     // QImage needs the data to be stored continuously in memory

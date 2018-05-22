@@ -54,7 +54,7 @@ std::vector<std::string> ImageSequence::get_image_names() {
  */
 std::string ImageSequence::get_pattern_name() {
     int digits = Utility::number_of_digits(length());
-    return "%0" + std::to_string(digits) + "d.jpg";
+    return "%0" + std::to_string(digits) + "d";
 }
 
 /**
@@ -87,5 +87,20 @@ void ImageSequence::write(QJsonObject &json) {
 }
 
 void ImageSequence::add_image(const std::string &image_path, const int& index) {
-    if (index == -1) {m_images.push_back(image_path);}
+    if (index == -1)
+        m_images.push_back(image_path);
+    else
+        m_images.insert(m_images.begin() + index, image_path);
 }
+
+void ImageSequence::reorder_elem(const int &from, const int to) {
+    if (!(from >= 0 && to >= 0 && from < m_images.size() && to <= m_images.size())) return;
+    auto tmp = m_images.at(from);
+    m_images.insert(m_images.begin() + to, tmp);
+    if (to < from)
+        m_images.erase(m_images.begin() + from + 1);
+    else
+        m_images.erase(m_images.begin() + from);
+}
+
+

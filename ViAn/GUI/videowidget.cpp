@@ -798,7 +798,11 @@ void VideoWidget::on_new_frame() {
         playback_slider->blockSignals(false);
     }
 
+<<<<<<< c744da7999a75c505c0d57e934a3af4c8665514c
     if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
+=======
+//    set_current_time(frame_num / m_frame_rate);
+>>>>>>> Managed to get sequences working when using a mix of formats
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     m_vid_proj->get_video()->state.frame = frame_num;

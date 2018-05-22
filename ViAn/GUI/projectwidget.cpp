@@ -147,16 +147,17 @@ void ProjectWidget::add_images() {
     int num_digits = Utility::number_of_digits(num_images);
     qDebug() << QString::fromStdString(m_proj->get_dir());
     qDebug() << "Loading " << num_images << " images";
-    std::string path = m_proj->get_dir() + "/Sequences/" + seq_name;
+    std::string path = m_proj->get_dir() + "Sequences/" + seq_name;
     QDir().mkpath(QString::fromStdString(path)); // fix proper path
     std::vector<std::string> images;
-    for (int i =1; i < num_images; ++i){
+    for (int i = 0; i < num_images; ++i){
         images.push_back(image_paths[i].toStdString());
         QFileInfo file_info(image_paths[i]);
         std::string padded_num = Utility::zfill(std::to_string(i), num_digits);
-        qDebug() << QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + "." + file_info.suffix();
+//        qDebug() << QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + "." + file_info.suffix();
         QFile().copy(image_paths[i],
-                     QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + "." + file_info.suffix());
+                     QString::fromStdString(path) + "/" + QString::fromStdString(padded_num));//  + "." +file_info.suffix());
+        qDebug() << QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + ".jpg";
 
     }
     // TODO Check if file is already added
@@ -504,14 +505,19 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
  * @param event
  */
 void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
+    qDebug() << event->mimeData()->formats();
     if (event->mimeData()->hasUrls() && m_proj != nullptr) {
         // Files
         event->acceptProposedAction();
     } else if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")){
         // TreeItem
+        auto index = currentIndex();
+        qDebug() << index.parent().data();
+
         event->setDropAction(Qt::MoveAction);
         event->accept();
     }
+
 }
 
 /**
@@ -533,7 +539,10 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
             }
         }
     } else {
+        qDebug() << event->source()->objectName();
         QList<QTreeWidgetItem*> items = selectedItems();
+        DropIndicatorPosition pos = dropIndicatorPosition();
+        qDebug() << currentItem()->type();
         QTreeWidget::dropEvent(event);
         // Update index paths
         for (auto item : items) {
@@ -542,6 +551,8 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
                 vid_item->get_video_project()->set_tree_index(get_index_path(item));
             } else if (item->type() == FOLDER_ITEM) {
                 m_proj->set_unsaved(true);
+            } else if (item->type() == SEQUENCE_ITEM) {
+                qDebug() << "Dropping sequence item";
             }
         }
     }

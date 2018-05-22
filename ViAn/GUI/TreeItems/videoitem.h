@@ -17,5 +17,6 @@ public:
 
     void remove();
     void rename();
+
 };
 #endif // VIDEOITEM_H

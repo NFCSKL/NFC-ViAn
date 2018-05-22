@@ -2,7 +2,7 @@
 
 VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     m_vid_proj = video_project;
-    setFlags(flags() | Qt::ItemIsDragEnabled);
+    setFlags(flags() | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
     setText(0, QString::fromStdString(video_project->get_video()->get_name()));
     load_sequence_items();
 }
