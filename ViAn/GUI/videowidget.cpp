@@ -255,7 +255,7 @@ void VideoWidget::set_btn_size() {
     tag_btn->setFixedSize(BTN_SIZE);
     analysis_play_btn->setFixedSize(BTN_SIZE);
     enable_poi_btns(false,false);
-    enable_tag_btn(false);
+    tag_btn->setEnabled(false);
 }
 
 /**
