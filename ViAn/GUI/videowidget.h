@@ -154,7 +154,6 @@ public slots:
     void delete_interval(void);
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
-    void enable_tag_btn(bool);
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 

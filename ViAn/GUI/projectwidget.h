@@ -53,7 +53,6 @@ signals:
 
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
-    void enable_tag_btn(bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
     void set_video_project(VideoProject*);

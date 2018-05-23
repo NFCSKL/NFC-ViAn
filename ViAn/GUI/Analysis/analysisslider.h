@@ -88,7 +88,6 @@ public slots:
     void clear_slider();
 
 private:
-    //std::vector<int> frames;
     std::vector<std::pair<int, int>> rects; // Analysis poi
     std::vector<QRect> interval_rects;  // Intervals
 };

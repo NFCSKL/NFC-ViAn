@@ -591,16 +591,11 @@ void VideoWidget::play_btn_toggled(bool status) {
  */
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
-        qDebug() << "in tag";
         if (!m_tag->find_frame(playback_slider->value())) {
-
             VideoState state = m_vid_proj->get_video()->state;
             TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
             m_tag->add_frame(playback_slider->value(), t_frame);
-
             emit tag_new_frame(playback_slider->value(), t_frame);
-
-            // TODO send state and save in tf_item
             emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
             playback_slider->update();
         } else {
@@ -673,8 +668,8 @@ void VideoWidget::tag_interval() {
  * @brief VideoWidget::remove_tag_interval
  * For each frame in the interval, un-tag it
  */
-
 // TODO Remove/change
+// Update for intervals
 void VideoWidget::remove_tag_interval() {
     if (m_tag != nullptr) {
 //        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
@@ -887,6 +882,7 @@ void VideoWidget::set_video_btns(bool b) {
     playback_slider->setEnabled(b);
     frame_line_edit->setEnabled(b);
     speed_slider->setEnabled(b);
+    tag_btn->setEnabled(b);
     video_btns_enabled = b;
 }
 
@@ -900,10 +896,6 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
         analysis_play_btn->setChecked(b);
         analysis_only = b;
     }
-}
-
-void VideoWidget::enable_tag_btn(bool b) {
-    tag_btn->setEnabled(b);
 }
 
 /**

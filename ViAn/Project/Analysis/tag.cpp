@@ -43,8 +43,12 @@ int Tag::previous_frame(int frame) {
     }
 }
 
-std::map<int,TagFrame*> Tag::get_frames() {
-    return tag_map;
+std::vector<int> Tag::get_frames() {
+    std::vector<int> frames;
+    for (auto pair : tag_map) {
+        frames.push_back(pair.first);
+    }
+    return frames;
 }
 
 bool Tag::is_drawing_tag() {
@@ -64,8 +68,7 @@ void Tag::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
     json["drawing_tag"] = drawing_tag;
     QJsonArray frames;
-    for (auto pair : tag_map) {
-        int frame = pair.first;
+    for (int frame : get_frames()) {
         QJsonObject f_num;
         f_num["frame"] = frame;
         frames.push_back(f_num);

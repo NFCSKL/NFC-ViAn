@@ -23,7 +23,7 @@ public:
     void remove_frame(int);
     int next_frame(int);
     int previous_frame(int);
-    std::map<int, TagFrame *> get_frames();
+    std::vector<int> get_frames();
     bool is_drawing_tag();
     void set_drawing_tag(bool);
 };

@@ -35,8 +35,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
 
     // Draws the tags
     if (m_show_tags && show_on_slider && m_tag) {
-        for (auto pair : m_tag->get_frames()) {
-            int frame = pair.first;
+        for (int frame : m_tag->get_frames()) {
             double first = (double)(groove_rect.left() + (frame) * c);
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);
@@ -129,9 +128,6 @@ void AnalysisSlider::update(){
  * @param analysis
  */
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
-    // TODO Maybe remove
-    //rects.clear();
-
     if (analysis != nullptr) {
         switch (analysis->get_type()) {
         case TAG:
@@ -242,7 +238,6 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
             }
         }
     }
-
     return curr_frame;
 
 
@@ -285,7 +280,6 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
         }
         return new_frame;
     }
-
     return curr_frame;
 
 
