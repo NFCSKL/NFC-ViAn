@@ -9,6 +9,10 @@ void TagFrameItem::set_state(TagFrame* t_frame) {
     m_t_frame = t_frame;
 }
 
+VideoState TagFrameItem::get_state() {
+    return m_t_frame->m_state;
+}
+
 void TagFrameItem::remove(){}
 
 void TagFrameItem::rename() {

@@ -166,6 +166,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, &VideoWidget::tag_new_frame, project_wgt, &ProjectWidget::add_new_frame_to_tag);
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag);
 
+    connect(project_wgt, &ProjectWidget::zoom_rect, video_wgt, &VideoWidget::set_zoom_rectangle);
+    connect(project_wgt, &ProjectWidget::set_scale_factor, video_wgt, &VideoWidget::set_zoom_factor);
+    //connect(project_wgt, &ProjectWidget::set_scale_factor, video_wgt->frame_wgt, &FrameWidget::set_scale_factor);
+    connect(project_wgt, &ProjectWidget::set_state, video_wgt, &VideoWidget::set_state);
+
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);

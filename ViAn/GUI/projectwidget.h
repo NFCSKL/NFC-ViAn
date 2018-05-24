@@ -50,7 +50,13 @@ signals:
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
     void show_analysis_details(bool);
+    void zoom_rect(QPoint, QPoint);
 
+    // TODO remove
+    void set_scale_factor(double scale_factor);
+    void set_anchor(QPoint anchor);
+
+    void set_state(QPoint anchor, double scale_factor);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
     void set_poi_slider(bool);

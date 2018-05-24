@@ -24,6 +24,11 @@ std::string Video::get_name() {
     return m_name;
 }
 
+void Video::set_zoom_rect(QPoint start, QPoint end) {
+    state.zoom_start = start;
+    state.zoom_end = end;
+}
+
 /**
  * @brief operator ==
  * @param v1

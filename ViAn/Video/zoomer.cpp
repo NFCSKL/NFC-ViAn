@@ -65,6 +65,7 @@ void Zoomer::set_viewport_size(const QSize size) {
 void Zoomer::move_zoom_rect(int x, int y){
     cv::Point tl = m_zoom_rect.tl(); // top-left corner
     cv::Point br = m_zoom_rect.br(); // bottom-right corner
+    qDebug() << tl.x << tl.y << br.x << br.y;
 
     int tl_x, tl_y, br_x, br_y;
     if (x < 0) {
@@ -108,6 +109,13 @@ void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
     move_zoom_rect(round(diff_x), round(diff_y));
 }
 
+void Zoomer::set_state(QPoint anchor, double scale_factor) {
+    set_scale_factor(scale_factor);
+    int x = anchor.x() - m_zoom_rect.x;
+    int y = anchor.y() - m_zoom_rect.y;
+    move_zoom_rect(x,y);
+}
+
 /**
  * @brief Zoomer::fit_viewport
  * Adjusts the scaling factor so the frame will fit the viewport
@@ -115,6 +123,7 @@ void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
 void Zoomer::fit_viewport() {
     // TODO update anchor point correctly
     m_zoom_rect = m_frame_rect;
+    qDebug() << "fit" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     anchor = QPoint(0,0);
     m_scale_factor = std::min(m_viewport_size.width() / double(m_frame_size.width),
                               m_viewport_size.height() / double(m_frame_size.height));
@@ -170,9 +179,11 @@ void Zoomer::update_rect_size() {
  * Resets the zoom to original size
  */
 void Zoomer::reset() {
-    m_scale_factor = 1;
-    anchor = QPoint(0,0);
-    m_zoom_rect = m_frame_rect;
+    set_state(QPoint(0,0), 1);
+//    m_scale_factor = 1;
+//    anchor = QPoint(0,0);
+//    m_zoom_rect = m_frame_rect;
+//    qDebug() << "reset" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
 }
 
 /**

@@ -7,6 +7,8 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QSize>
+#include <mutex>
+#include <condition_variable>
 
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
@@ -102,7 +104,9 @@ public slots:
     void set_tool(SHAPES m_tool);
     void set_overlay_color(QColor color);
     void set_anchor(QPoint);
+    void set_zoom_rect(QPoint, QPoint);
     void set_scale_factor(double scale_factor);
+    void move_to_anchor(QPoint new_anchor);
     void update();
 protected:
     QImage _qimage;

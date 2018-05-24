@@ -168,6 +168,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+    connect(f_processor, &FrameProcessor::set_zoom_rect, frame_wgt, &FrameWidget::set_zoom_rect);
 
     processing_thread->start();
 }
@@ -593,6 +594,7 @@ void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
         if (!m_tag->find_frame(playback_slider->value())) {
             VideoState state = m_vid_proj->get_video()->state;
+            qDebug() << state.zoom_start << state.zoom_end;
             TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
             m_tag->add_frame(playback_slider->value(), t_frame);
             emit tag_new_frame(playback_slider->value(), t_frame);
@@ -835,7 +837,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
 
         m_vid_proj = vid_proj;
 
-        playback_slider->setValue(frame);
+        //playback_slider->setValue(frame);
         m_interval = make_pair(0,0);
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
@@ -1084,6 +1086,7 @@ void VideoWidget::center(QPoint pos, double zoom_step) {
  * @param p2 br point of the zoom rectangle
  */
 void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
+    qDebug() << p1 << p2;
     update_processing_settings([&](){
         z_settings.zoom_tl = p1;
         z_settings.zoom_br = p2;
@@ -1101,10 +1104,32 @@ void VideoWidget::set_draw_area_size(QSize s) {
 
 /**
  * @brief VideoWidget::on_zoom_out
- * Tells the frame processor to decrease zoom
+ * Tells the frame processor to change the zoom with a constant
  */
 void VideoWidget::on_step_zoom(double step){
     update_processing_settings([&](){z_settings.zoom_factor *= step;});
+}
+
+/**
+ * @brief VideoWidget::set_zoom_factor
+ * Tells the frame processot to change the zoom to a new value
+ * @param scale_factor
+ */
+void VideoWidget::set_zoom_factor(double scale_factor) {
+    update_processing_settings([&](){z_settings.zoom_factor = scale_factor;});
+}
+
+/**
+ * @brief VideoWidget::set_anchor
+ * Tells the frame processos to set a new anchor
+ * @param p
+ */
+void VideoWidget::set_state(QPoint anchor, double scale_factor) {
+    update_processing_settings([&](){
+        z_settings.set_state = true;
+        z_settings.anchor = anchor;
+        z_settings.zoom_factor = scale_factor;
+    });
 }
 
 /**

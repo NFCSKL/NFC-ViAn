@@ -30,6 +30,9 @@ struct zoomer_settings {
     QPoint zoom_tl = QPoint(0,0);
     QPoint zoom_br = QPoint(100,100);
     QPoint center = QPoint(50,50);
+    QPoint anchor = QPoint(0,0);
+
+    bool set_state = false;
 
     double zoom_factor = 1;
     double zoom_step = 1;
@@ -162,6 +165,7 @@ public:
 public slots:
     void check_events(void);
 signals:
+    void set_zoom_rect(QPoint, QPoint);
     void set_scale_factor(double);
     void set_anchor(QPoint);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);

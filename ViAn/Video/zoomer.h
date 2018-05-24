@@ -29,6 +29,7 @@ public:
     void set_viewport_size(const QSize size);
     void move_zoom_rect(int x, int y);
     void center_zoom_rect(QPoint, double zoom_step);
+    void set_state(QPoint anchor, double scale_factor);
     void fit_viewport();
     void flip();
     void reset();

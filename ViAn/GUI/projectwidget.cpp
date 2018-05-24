@@ -620,10 +620,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit set_video_project(vid_item->get_video_project());
         emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
-
         // TODO set from state
         // set zoom rect, scale factor, brightness/contrast, rotation
-
+        double scale_factor = tf_item->get_state().scale_factor;
+        emit set_state(tf_item->get_state().zoom_start, scale_factor);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);

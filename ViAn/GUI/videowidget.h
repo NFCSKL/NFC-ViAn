@@ -175,6 +175,8 @@ public slots:
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
     void on_step_zoom(double step);
+    void set_zoom_factor(double scale_factor);
+    void set_state(QPoint anchor, double scale_factor);
     void on_fit_screen(void);
     void on_original_size(void);
     void update_brightness_contrast(int c_val, double v_val);
