@@ -168,7 +168,6 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
-    connect(f_processor, &FrameProcessor::set_zoom_rect, frame_wgt, &FrameWidget::set_zoom_rect);
 
     processing_thread->start();
 }
@@ -594,7 +593,6 @@ void VideoWidget::tag_frame() {
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
         if (!m_tag->find_frame(playback_slider->value())) {
             VideoState state = m_vid_proj->get_video()->state;
-            qDebug() << state.zoom_start << state.zoom_end;
             TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
             m_tag->add_frame(playback_slider->value(), t_frame);
             emit tag_new_frame(playback_slider->value(), t_frame);

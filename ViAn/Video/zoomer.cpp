@@ -179,11 +179,9 @@ void Zoomer::update_rect_size() {
  * Resets the zoom to original size
  */
 void Zoomer::reset() {
+    // Set the video state to default
+    // Anchor (0,0) and scale_factor 1
     set_state(QPoint(0,0), 1);
-//    m_scale_factor = 1;
-//    anchor = QPoint(0,0);
-//    m_zoom_rect = m_frame_rect;
-//    qDebug() << "reset" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
 }
 
 /**

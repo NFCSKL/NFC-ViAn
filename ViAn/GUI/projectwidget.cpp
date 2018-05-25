@@ -169,16 +169,30 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
 void ProjectWidget::add_frames_to_tag(TreeItem* item) {
     if (item->type() == TAG_ITEM) {
         Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-        for (int frame : tag->get_frames() ) {
-            TagFrameItem* tf_item = new TagFrameItem(frame);
+        for (auto t_frame : tag->tag_map) {
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+            tf_item->set_state(t_frame.second);
             item->addChild(tf_item);
         }
+        
+        
+//        for (int frame : tag->get_frames() ) {
+//            TagFrameItem* tf_item = new TagFrameItem(frame);
+//            item->addChild(tf_item);
+//        }
     } else if (item->type() == DRAWING_TAG_ITEM) {
         Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
-        for (int frame : tag->get_frames() ) {
-            TagFrameItem* tf_item = new TagFrameItem(frame);
+        for (auto t_frame : tag->tag_map) {
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+            tf_item->set_state(t_frame.second);
             item->addChild(tf_item);
         }
+
+
+//        for (int frame : tag->get_frames() ) {
+//            TagFrameItem* tf_item = new TagFrameItem(frame);
+//            item->addChild(tf_item);
+//        }
     }
 }
 

@@ -169,13 +169,6 @@ void FrameWidget::set_anchor(QPoint p) {
     if (m_vid_proj) m_vid_proj->get_video()->state.zoom_start = p;
 }
 
-// TODO remove
-void FrameWidget::set_zoom_rect(QPoint start, QPoint end) {
-    QPoint scale_start = scale_point(start);
-    QPoint scale_end = scale_point(end);
-    if (m_vid_proj) m_vid_proj->get_video()->set_zoom_rect(scale_start, scale_end);
-}
-
 void FrameWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
 

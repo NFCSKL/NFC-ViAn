@@ -15,7 +15,7 @@ struct VideoState{
     int brightness = 0;
     int rotation = 0;
     double scale_factor = 1;
-    QPoint zoom_start, zoom_end;
+    QPoint zoom_start;
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;
@@ -24,7 +24,6 @@ struct VideoState{
         rotation = rh.rotation;
         scale_factor = rh.scale_factor;
         zoom_start = rh.zoom_start;
-        zoom_end = rh.zoom_end;
     }
 };
 
@@ -39,7 +38,6 @@ public:
     ~Video();
     std::string file_path;
     std::string get_name();
-    void set_zoom_rect(QPoint start, QPoint end);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

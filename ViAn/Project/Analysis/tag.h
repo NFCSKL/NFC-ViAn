@@ -10,7 +10,6 @@ class Video;
 
 class Tag : public BasicAnalysis {
     bool drawing_tag = false;
-    std::map<int, TagFrame*> tag_map;
 
 
 public:
@@ -26,6 +25,8 @@ public:
     std::vector<int> get_frames();
     bool is_drawing_tag();
     void set_drawing_tag(bool);
+
+    std::map<int, TagFrame*> tag_map;
 };
 
 #endif // TAG_H
