@@ -106,8 +106,9 @@ void FrameWidget::paste() {
     update();
 }
 
+// TODO Not need?
 void FrameWidget::set_scroll_area_size(QSize size) {
-    m_scroll_area_size = size;
+    m_scroll_area_size = size; //Unused
 }
 
 /**
@@ -164,7 +165,6 @@ void FrameWidget::set_show_detections(bool show) {
 
 void FrameWidget::set_anchor(QPoint p) {
     qDebug() << "settings anchor" << p;
-    //prev_point = anchor;
     anchor = p;
     if (m_vid_proj) m_vid_proj->get_video()->state.zoom_start = p;
 }
@@ -373,6 +373,8 @@ QPoint FrameWidget::scale_point(QPoint pos) {
 void FrameWidget::resizeEvent(QResizeEvent *event) {
     Q_UNUSED (event)
     // TODO unused
+    qDebug() << "HIGHT AND WIDTH" << width() << height();
+    //emit current_frame_size(size());
     emit current_size(width(), height());
 }
 

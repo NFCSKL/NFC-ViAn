@@ -1,6 +1,6 @@
 #include "zoomer.h"
 #include <math.h>
-#include <QtDebug>
+#include <QDebug>
 
 Zoomer::Zoomer() {
     anchor = QPoint(0,0);
@@ -155,10 +155,13 @@ QSize Zoomer::get_viewport_size() const {
  * Calculates a new size for the zooming rectangle based on the scale factor
  */
 void Zoomer::update_rect_size() {
+    qDebug() << "viewport" << m_viewport_size;
+    qDebug() << "zoom rect" << m_zoom_rect.tl().x << m_zoom_rect.tl().y << m_zoom_rect.br().x << m_zoom_rect.br().y;
     double width = m_viewport_size.width() / m_scale_factor;
     double height = m_viewport_size.height() / m_scale_factor;
     double width_diff = width - m_zoom_rect.width;
     double height_diff = height - m_zoom_rect.height;
+    qDebug() << "widths" << width << height << width_diff << height_diff;
 
     // Generate a new top-left and bottom-right corner for the rectangle
     // Makes sure the rectangle will not be bigger then the original frame
@@ -167,8 +170,10 @@ void Zoomer::update_rect_size() {
     cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)),
                                  std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
 
+    qDebug() << "FRAME RECT" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     cv::Rect _tmp = cv::Rect(new_tl, new_br);
     if (_tmp.area() > 1) {
+        qDebug() << "set zoom rect" << _tmp.tl().x << _tmp.tl().y << _tmp.br().x << _tmp.br().y;
         m_zoom_rect = _tmp;
         anchor = QPoint(new_tl.x, new_tl.y);
     }

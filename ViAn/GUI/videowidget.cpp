@@ -153,6 +153,7 @@ void VideoWidget::init_frame_processor() {
 
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
+    connect(frame_wgt, &FrameWidget::current_frame_size, this, &VideoWidget::set_draw_area_size);
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
     connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
     connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));

@@ -15,7 +15,7 @@ struct VideoState{
     int brightness = 0;
     int rotation = 0;
     double scale_factor = 1;
-    QPoint zoom_start;
+    QPoint zoom_start = QPoint(0,0);
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;

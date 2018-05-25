@@ -145,10 +145,16 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
-        for (int frame : tag->get_frames()) {
-            TagFrameItem* tf_item = new TagFrameItem(frame);
+        for (auto t_frame : tag->tag_map) {
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+            tf_item->set_state(t_frame.second);
             item->addChild(tf_item);
         }
+
+//        for (int frame : tag->get_frames()) {
+//            TagFrameItem* tf_item = new TagFrameItem(frame);
+//            item->addChild(tf_item);
+//        }
         item->setExpanded(true);
         tree_item_clicked(item);
     } else if (!tag->is_drawing_tag()) {
@@ -636,14 +642,16 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
         // TODO set from state
         // set zoom rect, scale factor, brightness/contrast, rotation
-        double scale_factor = tf_item->get_state().scale_factor;
-        emit set_state(tf_item->get_state().zoom_start, scale_factor);
+
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
 
         if (item->parent()->type() == TAG_ITEM) {
+            double scale_factor = tf_item->get_state().scale_factor;
+            emit set_state(tf_item->get_state().zoom_start, scale_factor);
+
             TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
             emit marked_basic_analysis(tag_item->get_tag());
 
@@ -812,16 +820,19 @@ void ProjectWidget::drawing_tag() {
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.size() > 0) {
-            TagFrame* t_frame = new TagFrame(frame_overlay.first);
+            VideoState state;
+            TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }
 
-    if (selectedItems().front()->type() == VIDEO_ITEM) {
-        add_basic_analysis(vid_proj, tag);
-    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
-        add_basic_analysis(vid_proj, tag);
-    }
+    add_basic_analysis(vid_proj, tag);
+
+//    if (selectedItems().front()->type() == VIDEO_ITEM) {
+//        add_basic_analysis(vid_proj, tag);
+//    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+//        add_basic_analysis(vid_proj, tag);
+//    }
 }
 
 /**
