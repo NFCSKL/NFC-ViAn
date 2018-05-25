@@ -7,12 +7,19 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QShortcut>
+<<<<<<< 584e0ada05883284c2ce8d9086c13e8a7b0503cf
 #include <QMessageBox>
+=======
+#include <QtConcurrent/QtConcurrent>
+#include <QThread>
+#include <QProgressDialog>
+>>>>>>> Moved image copying to separate thread
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include "Project/projecttreestate.h"
 #include "Project/recentproject.h"
+#include "imageimporter.h"
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -128,7 +135,7 @@ void ProjectWidget::add_images() {
 
 
 
-    // Create actual dialog
+    // TODO Create actual dialog with name and browse options
     QStringList image_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add images"),
@@ -136,31 +143,37 @@ void ProjectWidget::add_images() {
 
     bool ok;
     std::string seq_name{"sequence"};
-    QString text = QInputDialog::getText(this, tr("TEMPORARY DIALOG"),
+    QString text = QInputDialog::getText(this, tr("Create sequence"),
                                          tr("Sequence name:"), QLineEdit::Normal,
                                          "Sequence", &ok);
     if (ok && !text.isEmpty())
         seq_name = text.toStdString();
+    else
+        return;
 
-    // Generate links for each image file
-    int num_images = image_paths.size();
-    int num_digits = Utility::number_of_digits(num_images);
-    qDebug() << QString::fromStdString(m_proj->get_dir());
-    qDebug() << "Loading " << num_images << " images";
     std::string path = m_proj->get_dir() + "Sequences/" + seq_name;
-    QDir().mkpath(QString::fromStdString(path)); // fix proper path
-    std::vector<std::string> images;
-    for (int i = 0; i < num_images; ++i){
-        images.push_back(image_paths[i].toStdString());
-        QFileInfo file_info(image_paths[i]);
-        std::string padded_num = Utility::zfill(std::to_string(i), num_digits);
-//        qDebug() << QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + "." + file_info.suffix();
-        QFile().copy(image_paths[i],
-                     QString::fromStdString(path) + "/" + QString::fromStdString(padded_num));//  + "." +file_info.suffix());
-        qDebug() << QString::fromStdString(path) + "/" + QString::fromStdString(padded_num) + ".jpg";
 
-    }
-    // TODO Check if file is already added
+    QProgressDialog* progress = new QProgressDialog(
+                "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
+    ImageImporter* importer = new ImageImporter(image_paths, QString::fromStdString(path));
+    QThread* copy_thread = new QThread();
+    importer->moveToThread(copy_thread);
+
+    connect(progress, &QProgressDialog::canceled, importer, &ImageImporter::abort);
+    connect(importer, &ImageImporter::update_progress, progress, &QProgressDialog::setValue);
+
+    connect(copy_thread, &QThread::started, importer, &ImageImporter::import_images);
+    connect(importer, &ImageImporter::finished, copy_thread, &QThread::quit);
+    connect(importer, &ImageImporter::finished, importer, &ImageImporter::deleteLater);
+    connect(copy_thread, &QThread::finished, copy_thread, &QThread::deleteLater);
+    connect(importer, &ImageImporter::imported_sequence, this, &ProjectWidget::create_sequence);
+    progress->show();
+    copy_thread->start();
+}
+
+void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
+    std::vector<std::string> images;
+    for (auto image : image_paths) {images.push_back(image.toStdString());}
     VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
@@ -505,15 +518,11 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
  * @param event
  */
 void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
-    qDebug() << event->mimeData()->formats();
     if (event->mimeData()->hasUrls() && m_proj != nullptr) {
         // Files
         event->acceptProposedAction();
     } else if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")){
         // TreeItem
-        auto index = currentIndex();
-        qDebug() << index.parent().data();
-
         event->setDropAction(Qt::MoveAction);
         event->accept();
     }
@@ -539,10 +548,7 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
             }
         }
     } else {
-        qDebug() << event->source()->objectName();
         QList<QTreeWidgetItem*> items = selectedItems();
-        DropIndicatorPosition pos = dropIndicatorPosition();
-        qDebug() << currentItem()->type();
         QTreeWidget::dropEvent(event);
         // Update index paths
         for (auto item : items) {
@@ -551,8 +557,6 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
                 vid_item->get_video_project()->set_tree_index(get_index_path(item));
             } else if (item->type() == FOLDER_ITEM) {
                 m_proj->set_unsaved(true);
-            } else if (item->type() == SEQUENCE_ITEM) {
-                qDebug() << "Dropping sequence item";
             }
         }
     }

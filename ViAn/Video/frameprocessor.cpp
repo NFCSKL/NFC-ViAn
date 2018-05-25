@@ -123,6 +123,21 @@ void FrameProcessor::process_frame() {
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
 
     // Scales the frame
+    cv::Rect prev_rect = m_zoomer.get_frame_rect();
+    if (prev_rect.width != m_width->load() || prev_rect.height != m_height->load()) {
+        // Source size has changed (image sequence)
+        m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
+        m_zoomer.fit_viewport();
+
+        // Store changes made
+        m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
+        cv::Rect tmp = m_zoomer.get_zoom_rect();
+        m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
+        m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
+
+        emit set_anchor(m_zoomer.get_anchor());
+        emit set_scale_factor(m_zoomer.get_scale_factor());
+    }
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
