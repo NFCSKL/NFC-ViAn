@@ -473,7 +473,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_point(event->pos());
-    qDebug() << "mouse scaled" << scaled_pos << "anchor" << anchor;
+    //qDebug() << "mouse scaled" << scaled_pos << "anchor" << anchor;
     switch (m_tool) {
     case NONE:
         break;

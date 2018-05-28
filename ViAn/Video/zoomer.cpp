@@ -66,7 +66,6 @@ void Zoomer::set_viewport_size(const QSize size) {
 void Zoomer::move_zoom_rect(int x, int y){
     cv::Point tl = m_zoom_rect.tl(); // top-left corner
     cv::Point br = m_zoom_rect.br(); // bottom-right corner
-    qDebug() << tl.x << tl.y << br.x << br.y;
 
     int tl_x, tl_y, br_x, br_y;
     if (x < 0) {
@@ -124,7 +123,7 @@ void Zoomer::set_state(QPoint anchor, double scale_factor) {
 void Zoomer::fit_viewport() {
     // TODO update anchor point correctly
     m_zoom_rect = m_frame_rect;
-    qDebug() << "fit" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
+    qDebug() << "fit, frame rect" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     anchor = QPoint(0,0);
     m_scale_factor = std::min(m_viewport_size.width() / double(m_frame_size.width),
                               m_viewport_size.height() / double(m_frame_size.height));
@@ -199,6 +198,8 @@ void Zoomer::reset() {
  */
 void Zoomer::scale_frame(cv::Mat &frame) {
     if (m_frame_size.width < m_zoom_rect.width || m_frame_size.height < m_zoom_rect.height) {
+        qDebug() << "frame size" << m_frame_size.width << m_frame_size.height;
+        qDebug() << "in scale, zoom rect" << m_zoom_rect.tl().x << m_zoom_rect.tl().y << m_zoom_rect.br().x << m_zoom_rect.br().y;
         qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
         fit_viewport();
     }

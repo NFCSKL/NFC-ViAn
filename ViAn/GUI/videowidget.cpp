@@ -841,6 +841,8 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);
+    } else {
+        z_settings.set_state = false;
     }
 
     if (frame > -1) {
