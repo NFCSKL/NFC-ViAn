@@ -17,6 +17,7 @@ Zoomer::Zoomer(cv::Size frame_size) {
  * @param scale_factor
  */
 void Zoomer::set_scale_factor(double scale_factor) {
+    qDebug() << "zoomer scale factor" << scale_factor;
     m_scale_factor = scale_factor;
     update_rect_size();
 }
@@ -169,6 +170,8 @@ void Zoomer::update_rect_size() {
                                  std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
     cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)),
                                  std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
+    qDebug() << "CALCX" << int(m_zoom_rect.br().x + width_diff / 2);
+    qDebug() << "CALCY" << int(m_zoom_rect.br().y + height_diff / 2);
 
     qDebug() << "FRAME RECT" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     cv::Rect _tmp = cv::Rect(new_tl, new_br);

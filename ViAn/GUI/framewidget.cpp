@@ -170,6 +170,7 @@ void FrameWidget::set_anchor(QPoint p) {
 }
 
 void FrameWidget::set_scale_factor(double scale_factor) {
+    qDebug() << "settings scale factor" << scale_factor;
     m_scale_factor = scale_factor;
 
     // TODO maybe not

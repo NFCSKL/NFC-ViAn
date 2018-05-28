@@ -639,7 +639,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
+
         // TODO set from state
         // set zoom rect, scale factor, brightness/contrast, rotation
 
@@ -664,6 +664,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }
+        emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
     } case FOLDER_ITEM: {
         break;
     } default:
