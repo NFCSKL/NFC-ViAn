@@ -7,8 +7,6 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QSize>
-#include <mutex>
-#include <condition_variable>
 
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
@@ -75,7 +73,6 @@ signals:
     void video_moved(QPoint pos);
     void current_size(int width, int height);
     void moved_xy(int x, int y);
-    void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out(double);
     void center_zoom_rect(QPoint, double);
@@ -105,7 +102,6 @@ public slots:
     void set_overlay_color(QColor color);
     void set_anchor(QPoint);
     void set_scale_factor(double scale_factor);
-    void move_to_anchor(QPoint new_anchor);
     void update();
 protected:
     QImage _qimage;

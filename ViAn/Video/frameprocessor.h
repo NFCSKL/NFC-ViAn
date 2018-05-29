@@ -45,7 +45,6 @@ struct zoomer_settings {
     bool fit = false;
     bool original = false;
     bool do_center = false;
-    bool do_reset = true;
 };
 
 /**
@@ -168,14 +167,12 @@ public:
 public slots:
     void check_events(void);
 signals:
-    void set_zoom_rect(QPoint, QPoint);
     void set_scale_factor(double);
     void set_anchor(QPoint);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
 private:
     void process_frame();
     void update_zoomer_settings();
-    void update_state_settings();
     void update_manipulator_settings();
     void update_overlay_settings();
 

@@ -43,21 +43,14 @@ public:
 
 signals:
     void selected_media();
-    void marked_video(VideoProject* vid_proj, int);
-    void marked_video_state(VideoProject *vid_proj, VideoState state, bool use_state = true);
+    void marked_video_state(VideoProject *vid_proj, VideoState state);
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
     void show_analysis_details(bool);
-    void zoom_rect(QPoint, QPoint);
 
-    // TODO remove
-    void set_scale_factor(double scale_factor);
-    void set_anchor(QPoint anchor);
-
-    void set_state(QPoint anchor, double scale_factor);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
     void set_poi_slider(bool);

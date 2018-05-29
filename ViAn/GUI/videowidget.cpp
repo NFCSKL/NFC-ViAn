@@ -153,7 +153,6 @@ void VideoWidget::init_frame_processor() {
 
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
-    connect(frame_wgt, &FrameWidget::current_frame_size, this, &VideoWidget::set_draw_area_size);
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
     connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
     connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
@@ -815,69 +814,38 @@ void VideoWidget::on_playback_slider_moved() {
     on_new_frame();
 }
 
+void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
+    VideoState state;
+    state = vid_proj->get_video()->state;
+    state.frame =  frame;
+    load_marked_video_state(vid_proj, state);
+}
+
 /**
- * @brief VideoWidget::load_marked_video
+ * @brief VideoWidget::load_marked_video_state
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
-    int frame = load_frame;
+void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
+    set_state(state);
+
     if (m_vid_proj != vid_proj) {
         m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());
-        z_settings.set_state = false;
-
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();
-
-        m_interval = make_pair(0,0);
-        set_status_bar("Video loaded");
-        play_btn->setChecked(false);
-        playback_slider->set_interval(-1, -1);
-    } else {
-        z_settings.set_state = false;
     }
+    m_interval = make_pair(0,0);
+    set_status_bar("Video loaded");
+    play_btn->setChecked(false);
+    playback_slider->set_interval(-1, -1);
 
-    if (frame > -1) {
-        frame_index.store(frame);
-        on_new_frame();
-    }
-}
-
-void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state, bool use_state) {
-    int frame = state.frame;
-    if (!frame_wgt->isVisible()) frame_wgt->show();
-    if (!video_btns_enabled) set_video_btns(true);
-    if (true) {
-
-        if (use_state) {
-            set_state(state);
-        }
-
-        if (m_vid_proj != vid_proj) {
-            z_settings.do_reset = !use_state;
-            m_vid_proj = vid_proj;
-            set_overlay(m_vid_proj->get_overlay());
-            player_lock.lock();
-            m_video_path = vid_proj->get_video()->file_path;
-            new_video.store(true);
-            player_lock.unlock();
-            player_con.notify_all();
-        }
-
-        m_interval = make_pair(0,0);
-        set_status_bar("Video loaded");
-        play_btn->setChecked(false);
-        playback_slider->set_interval(-1, -1);
-    }
-
-    if (frame > -1) {
-        //frame_index.store(frame);
+    if (state.frame > -1) {
         on_new_frame();
     }
 }
@@ -1118,7 +1086,6 @@ void VideoWidget::center(QPoint pos, double zoom_step) {
  * @param p2 br point of the zoom rectangle
  */
 void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
-    qDebug() << p1 << p2;
     update_processing_settings([&](){
         z_settings.zoom_tl = p1;
         z_settings.zoom_br = p2;
@@ -1143,15 +1110,6 @@ void VideoWidget::on_step_zoom(double step){
 }
 
 /**
- * @brief VideoWidget::set_zoom_factor
- * Tells the frame processot to change the zoom to a new value
- * @param scale_factor
- */
-void VideoWidget::set_zoom_factor(double scale_factor) {
-    update_processing_settings([&](){z_settings.zoom_factor = scale_factor;});
-}
-
-/**
  * @brief VideoWidget::set_anchor
  * Tells the frame processos to set a new anchor
  * @param p
@@ -1159,7 +1117,7 @@ void VideoWidget::set_zoom_factor(double scale_factor) {
 void VideoWidget::set_state(VideoState state) {
     update_processing_settings([&](){
         z_settings.set_state = true;
-        z_settings.anchor = state.zoom_start;
+        z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
         frame_index.store(state.frame);
     });

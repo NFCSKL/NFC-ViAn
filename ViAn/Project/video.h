@@ -16,7 +16,7 @@ struct VideoState{
     int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
     int rotation = 0;
     double scale_factor = 1;
-    QPoint zoom_start = QPoint(0,0);
+    QPoint anchor = QPoint(0,0);
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;
@@ -24,7 +24,7 @@ struct VideoState{
         brightness = rh.brightness;
         rotation = rh.rotation;
         scale_factor = rh.scale_factor;
-        zoom_start = rh.zoom_start;
+        anchor = rh.anchor;
     }
 };
 

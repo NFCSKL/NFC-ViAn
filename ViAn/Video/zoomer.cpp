@@ -17,7 +17,6 @@ Zoomer::Zoomer(cv::Size frame_size) {
  * @param scale_factor
  */
 void Zoomer::set_scale_factor(double scale_factor) {
-    qDebug() << "zoomer scale factor" << scale_factor;
     m_scale_factor = scale_factor;
     update_rect_size();
 }
@@ -47,7 +46,6 @@ void Zoomer::set_frame_size(cv::Size frame_size) {
     m_frame_size = frame_size;
     m_frame_rect = cv::Rect(cv::Point(0,0), cv::Point(m_frame_size.width, m_frame_size.height));
     m_zoom_rect = m_frame_rect;
-    qDebug() << "Frame rect set" << m_frame_rect.width << m_frame_rect.height;
 }
 
 /**
@@ -111,6 +109,12 @@ void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
     move_zoom_rect(round(diff_x), round(diff_y));
 }
 
+/**
+ * @brief Zoomer::set_state
+ * Set the zoomers state, which means set the scale factor and the zoom rect
+ * @param anchor
+ * @param scale_factor
+ */
 void Zoomer::set_state(QPoint anchor, double scale_factor) {
     set_scale_factor(scale_factor);
     int x = anchor.x() - m_zoom_rect.x;
@@ -125,7 +129,6 @@ void Zoomer::set_state(QPoint anchor, double scale_factor) {
 void Zoomer::fit_viewport() {
     // TODO update anchor point correctly
     m_zoom_rect = m_frame_rect;
-    qDebug() << "fit, frame rect" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     anchor = QPoint(0,0);
     m_scale_factor = std::min(m_viewport_size.width() / double(m_frame_size.width),
                               m_viewport_size.height() / double(m_frame_size.height));
@@ -157,13 +160,10 @@ QSize Zoomer::get_viewport_size() const {
  * Calculates a new size for the zooming rectangle based on the scale factor
  */
 void Zoomer::update_rect_size() {
-    qDebug() << "viewport" << m_viewport_size;
-    qDebug() << "zoom rect" << m_zoom_rect.tl().x << m_zoom_rect.tl().y << m_zoom_rect.br().x << m_zoom_rect.br().y;
     double width = m_viewport_size.width() / m_scale_factor;
     double height = m_viewport_size.height() / m_scale_factor;
     double width_diff = width - m_zoom_rect.width;
     double height_diff = height - m_zoom_rect.height;
-    qDebug() << "widths" << width << height << width_diff << height_diff;
 
     // Generate a new top-left and bottom-right corner for the rectangle
     // Makes sure the rectangle will not be bigger then the original frame
@@ -171,14 +171,9 @@ void Zoomer::update_rect_size() {
                                  std::max(0, int(m_zoom_rect.tl().y - height_diff / 2)));
     cv::Point new_br = cv::Point(std::min(m_frame_rect.br().x, int(m_zoom_rect.br().x + width_diff / 2)),
                                  std::min(m_frame_rect.br().y, int(m_zoom_rect.br().y + height_diff / 2)));
-    qDebug() << "CALCX" << int(m_zoom_rect.br().x + width_diff / 2);
-    qDebug() << "CALCY" << int(m_zoom_rect.br().y + height_diff / 2);
 
-    // Frame rect is not yet updated to the new video
-    qDebug() << "FRAME RECT" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     cv::Rect _tmp = cv::Rect(new_tl, new_br);
     if (_tmp.area() > 1) {
-        qDebug() << "set zoom rect" << _tmp.tl().x << _tmp.tl().y << _tmp.br().x << _tmp.br().y;
         m_zoom_rect = _tmp;
         anchor = QPoint(new_tl.x, new_tl.y);
     }
@@ -201,13 +196,9 @@ void Zoomer::reset() {
  */
 void Zoomer::scale_frame(cv::Mat &frame) {
     if (m_frame_size.width < m_zoom_rect.width || m_frame_size.height < m_zoom_rect.height) {
-        qDebug() << "frame size" << m_frame_size.width << m_frame_size.height;
-        qDebug() << "in scale, zoom rect" << m_zoom_rect.tl().x << m_zoom_rect.tl().y << m_zoom_rect.br().x << m_zoom_rect.br().y;
         qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
 
-        // TODO This is a work around
         m_zoom_rect = m_frame_rect;
-        //fit_viewport();
     }
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;

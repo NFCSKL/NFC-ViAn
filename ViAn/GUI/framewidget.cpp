@@ -164,27 +164,14 @@ void FrameWidget::set_show_detections(bool show) {
 }
 
 void FrameWidget::set_anchor(QPoint p) {
-    qDebug() << "settings anchor" << p;
     anchor = p;
-    if (m_vid_proj) m_vid_proj->get_video()->state.zoom_start = p;
+    if (m_vid_proj) m_vid_proj->get_video()->state.anchor = p;
 }
 
 void FrameWidget::set_scale_factor(double scale_factor) {
-    qDebug() << "settings scale factor" << scale_factor;
     m_scale_factor = scale_factor;
 
-    // TODO maybe not
     if (m_vid_proj) m_vid_proj->get_video()->state.scale_factor = scale_factor;
-}
-
-void FrameWidget::move_to_anchor(QPoint new_anchor) {
-    qDebug() << "anchors" << anchor << new_anchor;
-    QPoint old_anchor = anchor;
-
-    int x = new_anchor.x() - old_anchor.x();
-    int y = new_anchor.y() - old_anchor.y();
-
-    emit moved_xy(x, y);
 }
 
 void FrameWidget::set_current_frame_nr(int nr) {
@@ -374,8 +361,6 @@ QPoint FrameWidget::scale_point(QPoint pos) {
 void FrameWidget::resizeEvent(QResizeEvent *event) {
     Q_UNUSED (event)
     // TODO unused
-    qDebug() << "HIGHT AND WIDTH" << width() << height();
-    //emit current_frame_size(size());
     emit current_size(width(), height());
 }
 
@@ -473,7 +458,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_point(event->pos());
-    //qDebug() << "mouse scaled" << scaled_pos << "anchor" << anchor;
     switch (m_tool) {
     case NONE:
         break;
