@@ -44,6 +44,7 @@ public:
 signals:
     void selected_media();
     void marked_video(VideoProject* vid_proj, int);
+    void marked_video_state(VideoProject *vid_proj, VideoState state, bool use_state = true);
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
 

@@ -45,6 +45,7 @@ struct zoomer_settings {
     bool fit = false;
     bool original = false;
     bool do_center = false;
+    bool do_reset = true;
 };
 
 /**
@@ -156,6 +157,8 @@ class FrameProcessor : public QObject {
     FrameManipulator m_manipulator;
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
+
+    bool skip_process = false;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -172,6 +175,7 @@ signals:
 private:
     void process_frame();
     void update_zoomer_settings();
+    void update_state_settings();
     void update_manipulator_settings();
     void update_overlay_settings();
 

@@ -46,6 +46,7 @@ void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
 void Zoomer::set_frame_size(cv::Size frame_size) {
     m_frame_size = frame_size;
     m_frame_rect = cv::Rect(cv::Point(0,0), cv::Point(m_frame_size.width, m_frame_size.height));
+    qDebug() << "Frame rect set" << m_frame_rect.width << m_frame_rect.height;
 }
 
 /**
@@ -172,6 +173,7 @@ void Zoomer::update_rect_size() {
     qDebug() << "CALCX" << int(m_zoom_rect.br().x + width_diff / 2);
     qDebug() << "CALCY" << int(m_zoom_rect.br().y + height_diff / 2);
 
+    // Frame rect is not yet updated to the new video
     qDebug() << "FRAME RECT" << m_frame_rect.tl().x << m_frame_rect.tl().y << m_frame_rect.br().x << m_frame_rect.br().y;
     cv::Rect _tmp = cv::Rect(new_tl, new_br);
     if (_tmp.area() > 1) {
@@ -201,7 +203,10 @@ void Zoomer::scale_frame(cv::Mat &frame) {
         qDebug() << "frame size" << m_frame_size.width << m_frame_size.height;
         qDebug() << "in scale, zoom rect" << m_zoom_rect.tl().x << m_zoom_rect.tl().y << m_zoom_rect.br().x << m_zoom_rect.br().y;
         qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
-        fit_viewport();
+
+        // TODO This is a work around
+        m_zoom_rect = m_frame_rect;
+        //fit_viewport();
     }
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;
