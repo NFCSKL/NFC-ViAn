@@ -76,8 +76,10 @@ void FrameProcessor::check_events() {
 
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load() && !skip_process) {
+                qDebug() << "Processing";
                 process_frame();
                 lk.unlock();
+                skip_process = false;
                 continue;
             }
             skip_process = false;
@@ -330,6 +332,7 @@ void FrameProcessor::reset_settings() {
         // Make a new set state function
         m_z_settings->set_state = true;
         update_zoomer_settings();
+        skip_process = false;
     }
 
     emit set_anchor(m_zoomer.get_anchor());

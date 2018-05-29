@@ -579,7 +579,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_analysis(ana_item->get_analysis());
 
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        //emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(true);
         emit set_poi_slider(true);
@@ -594,7 +597,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_basic_analysis(tag_item->get_tag());
 
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        //emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -633,7 +639,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         }
 
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        //emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(false);
         emit set_poi_slider(false);
