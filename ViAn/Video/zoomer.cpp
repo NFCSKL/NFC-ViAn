@@ -46,6 +46,7 @@ void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
 void Zoomer::set_frame_size(cv::Size frame_size) {
     m_frame_size = frame_size;
     m_frame_rect = cv::Rect(cv::Point(0,0), cv::Point(m_frame_size.width, m_frame_size.height));
+    m_zoom_rect = m_frame_rect;
     qDebug() << "Frame rect set" << m_frame_rect.width << m_frame_rect.height;
 }
 

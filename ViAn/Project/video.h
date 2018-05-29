@@ -7,12 +7,13 @@
 #include <QString>
 #include <QPoint>
 #include "Filehandler/saveable.h"
+#include "Video/framemanipulator.h"
 #include <opencv2/opencv.hpp>
 
 struct VideoState{
-    int frame = -1;
-    int contrast = 0;
-    int brightness = 0;
+    int frame = 0;
+    int contrast = FrameManipulator().CONTRAST_DEFAULT;
+    int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
     int rotation = 0;
     double scale_factor = 1;
     QPoint zoom_start = QPoint(0,0);

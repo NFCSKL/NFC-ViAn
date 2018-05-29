@@ -145,10 +145,10 @@ void FrameProcessor::update_zoomer_settings() {
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
     else if (m_z_settings->set_state) {
+        m_zoomer.fit_viewport();
         // wait for frame rect to be set?
-        qDebug() << "set state";
         m_z_settings->set_state = false;
-        //skip_process = true;
+        skip_process = true;
         m_zoomer.set_state(m_z_settings->anchor, m_z_settings->zoom_factor);
     }
     // Center the zoom rect
@@ -316,7 +316,6 @@ void FrameProcessor::reset_settings() {
         // The video state should already have been set elsewhere
         //m_z_settings->set_state = false;
     if (m_z_settings->do_reset) {
-        qDebug() << "if";
         m_zoomer.reset();
         // Centers zoom rectangle and displays the frame without zoom
         m_zoomer.fit_viewport();
