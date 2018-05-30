@@ -699,12 +699,15 @@ void VideoWidget::analysis_play_btn_toggled(bool value) {
  */
 void VideoWidget::next_poi_btn_clicked() {
     int new_frame = playback_slider->get_next_poi_start(frame_index.load());
-    if (new_frame == frame_index.load()) {
-        emit set_status_bar("Already at last POI");
-    } else {
+    if (new_frame != frame_index.load()) {
+        VideoState state;
+        state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+        load_marked_video_state(m_vid_proj, state);
         frame_index.store(new_frame);
         on_new_frame();
         emit set_status_bar("Jumped to next POI");
+    } else {
+        emit set_status_bar("Already at last POI");
     }
 }
 
@@ -713,14 +716,16 @@ void VideoWidget::next_poi_btn_clicked() {
  * * Jump to orevious detection aren on the slider
  */
 void VideoWidget::prev_poi_btn_clicked() {
-    int current_frame_index = frame_index.load();
-    int new_frame = playback_slider->get_prev_poi_start(current_frame_index);
-    if (new_frame == current_frame_index) {
-        emit set_status_bar("Already at first POI");
-    } else {
+    int new_frame = playback_slider->get_prev_poi_start(frame_index.load());
+    if (new_frame != frame_index.load()) {
+        VideoState state;
+        state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+        load_marked_video_state(m_vid_proj, state);
         frame_index.store(new_frame);
         on_new_frame();
         emit set_status_bar("Jumped to previous POI");
+    } else {
+        emit set_status_bar("Already at first POI");
     }
 }
 
