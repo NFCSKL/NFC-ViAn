@@ -814,6 +814,9 @@ void VideoWidget::on_playback_slider_moved() {
     on_new_frame();
 }
 
+// TODO Remove
+// All calls should go the load_marked_video_state
+// This is a temporary function until the other end is fixed
 void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
     VideoState state;
     state = vid_proj->get_video()->state;
