@@ -700,9 +700,11 @@ void VideoWidget::analysis_play_btn_toggled(bool value) {
 void VideoWidget::next_poi_btn_clicked() {
     int new_frame = playback_slider->get_next_poi_start(frame_index.load());
     if (new_frame != frame_index.load()) {
-        VideoState state;
-        state = playback_slider->m_tag->tag_map[new_frame]->m_state;
-        load_marked_video_state(m_vid_proj, state);
+        if (playback_slider->get_show_tags()) {
+            VideoState state;
+            state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+            load_marked_video_state(m_vid_proj, state);
+        }
         frame_index.store(new_frame);
         on_new_frame();
         emit set_status_bar("Jumped to next POI");
@@ -718,9 +720,11 @@ void VideoWidget::next_poi_btn_clicked() {
 void VideoWidget::prev_poi_btn_clicked() {
     int new_frame = playback_slider->get_prev_poi_start(frame_index.load());
     if (new_frame != frame_index.load()) {
-        VideoState state;
-        state = playback_slider->m_tag->tag_map[new_frame]->m_state;
-        load_marked_video_state(m_vid_proj, state);
+        if (playback_slider->get_show_tags()) {
+            VideoState state;
+            state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+            load_marked_video_state(m_vid_proj, state);
+        }
         frame_index.store(new_frame);
         on_new_frame();
         emit set_status_bar("Jumped to previous POI");

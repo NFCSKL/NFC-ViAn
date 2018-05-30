@@ -44,6 +44,7 @@ public:
     bool is_blocked();
     bool get_was_paused();
     void set_was_paused(bool value);
+    bool get_show_tags();
 
     // Interval settings
     void add_slider_interval(int start_frame, int end_frame);
