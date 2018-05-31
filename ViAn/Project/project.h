@@ -13,6 +13,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTemporaryDir>
+#include <QStandardPaths>
 // vian
 #include "videoproject.h"
 #include "video.h"

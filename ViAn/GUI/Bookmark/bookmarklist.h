@@ -6,7 +6,6 @@
 #include <QMouseEvent>
 #include <QDropEvent>
 #include <QPoint>
-#include <QPlainTextEdit>
 
 #include "Project/bookmark.h"
 
@@ -30,14 +29,12 @@ public:
 public slots:
     void on_parent_name_edited(QString name);
 private:
-    void item_left_clicked();
     void item_right_clicked(const QPoint pos);
     void bookmark_drop(BookmarkList* source, QDropEvent *event);
     void container_drop(BookmarkList* source, QDropEvent *event);
 private slots:
     void rename_item();
     void remove_item();
-    //void on_double_clicked(QListWidgetItem* item);
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent* event) override;

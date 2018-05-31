@@ -1,19 +1,15 @@
 #include "bookmarkwidget.h"
 #include "myinputdialog.h"
-#include "Library/customdialog.h"
 #include <imagegenerator.h>
 #include <QString>
 #include <QMenu>
 
-BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
+BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
     QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
 
-    // (Re)move?
     bm_list = new BookmarkList(this);
-    bm_list_layout = new QVBoxLayout();
-
     scroll_area = new QScrollArea();
 
     scroll_area->setWidget(bm_list);
@@ -40,12 +36,11 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
 }
 
 
-// TODO Move to List
+// TODO Move to List?
 void BookmarkWidget::add_new_folder() {
     BookmarkCategory* f2 = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), bm_list, CONTAINER);
     bm_list->addItem(f2);
     connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
-
 }
 
 void BookmarkWidget::generate_report() {
@@ -68,7 +63,7 @@ void BookmarkWidget::generate_report() {
     rp_gen->create_report();
 }
 
-BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, string> *container) {
+BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, std::string> *container) {
     BookmarkCategory* bm_cat = nullptr;
     for (int i = 0; i < bm_list->count(); i++) {
         QListWidgetItem* item = bm_list->item(i);
@@ -101,10 +96,6 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     if(!ok) return;
     export_original_frame(vid_proj, frame_nbr, org_frame);
     std::string file_name = vid_proj->get_video()->get_name();
-
-//    std::string file_name = vid_proj->get_video()->file_path;
-//    int index = file_name.find_last_of('/') + 1;
-//    file_name = file_name.substr(index);
     file_name += "_" + std::to_string(frame_nbr);
 
     ImageGenerator im_gen(bookmark_frame, m_path);
@@ -148,7 +139,7 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     }
 }
 
-void BookmarkWidget::set_path(string path) {
+void BookmarkWidget::set_path(std::string path) {
     m_path = path;
 }
 
@@ -173,27 +164,9 @@ QString BookmarkWidget::get_input_text(QString text, bool* ok) {
     *ok = dialog.exec();
 
     QString description = dialog.textValue();
-    qDebug() << "description" << description;
 
     if (ok) {
         return description;
     }
     return "";
-
-
-//    CustomDialog dialog("Bookmark description", NULL);
-//    dialog.setWindowFlags(windowFlags() & Qt::WindowCloseButtonHint & ~Qt::WindowContextHelpButtonHint);
-//    dialog.addLabel("Write a description of the bookmark:");
-//    dialog.addTextEdit(&text, false, false, TEXT_EDIT_MIN_HEIGHT,
-//                          "Write a description of the bookmark. This will be used when creating a report.");
-
-//    // Show the dialog (execution will stop here until the dialog is finished)
-//    dialog.exec();
-
-//    if (dialog.wasCancelled()) {
-//        *ok = false;
-//        return "";
-//    }
-//    *ok = true;
-//    return QString::fromStdString(text);
 }

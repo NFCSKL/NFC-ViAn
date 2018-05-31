@@ -6,6 +6,7 @@
 #include <QMenu>
 #include <QMimeData>
 #include <QDrag>
+#include <QApplication>
 #include <algorithm>
 
 // remove
@@ -20,12 +21,7 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setDragDropMode(QAbstractItemView::DragDrop);
     setAcceptDrops(true);
     setDropIndicatorShown(true);
-
     setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
-
-    // Doesn't work?
-
-    //connect(this, &BookmarkList::itemDoubleClicked, this, &BookmarkList::on_double_clicked);
 
     clear();
 }
@@ -43,7 +39,7 @@ QListWidgetItem *BookmarkList::get_clicked_item() {
  * Stores the name of the parent container that the widget resides in
  * @param name : name of parent container
  */
-void BookmarkList::set_parent_name(string name) {
+void BookmarkList::set_parent_name(std::string name) {
     m_par_cont_name = name;
 }
 
@@ -65,12 +61,9 @@ void BookmarkList::on_parent_name_edited(QString name) {
     m_par_cont_name = name.toStdString();
 }
 
-void BookmarkList::item_left_clicked() {
-}
-
 void BookmarkList::item_right_clicked(const QPoint pos) {
     QMenu* menu = new QMenu;
-    QString rename = (clicked_item->type() == 0) ? "Change description" : "Change title";
+    QString rename = (clicked_item->type() == BOOKMARK) ? "Change description" : "Change title";
     menu->addAction(rename, this, SLOT(rename_item()));
     menu->addAction("Delete", this, SLOT(remove_item()));
     menu->exec(mapToGlobal(pos));
@@ -112,8 +105,7 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
 void BookmarkList::rename_item(){
     bool ok;
     switch (clicked_item->type()) {
-    case 0: {
-        // Bookmark
+    case BOOKMARK: {
         auto item = dynamic_cast<BookmarkItem*>(clicked_item);
         MyInputDialog dialog;
 
@@ -122,19 +114,12 @@ void BookmarkList::rename_item(){
         dialog.setWindowTitle("Change description");
         ok = dialog.exec();
         QString new_text = dialog.textValue();
-        qDebug() << "new text" << new_text;
-
         if (ok) {
             item->update_description(new_text);
         }
-
-//        QString text = QInputDialog::getMultiLineText(nullptr, "Change description",
-//                                                      "Enter a new discription", QString::fromStdString(item->get_bookmark()->get_description()), &ok);
-//        item->update_description(text);
         break;
     }
-    case 1:{
-        // Container
+    case CONTAINER: {
         auto item = dynamic_cast<BookmarkCategory*>(clicked_item);
         QString text = QInputDialog::getText(nullptr, "Change title", "Enter a new title", QLineEdit::Normal, QString::fromStdString(item->get_name()), &ok);
         item->update_title(text);
@@ -153,14 +138,6 @@ void BookmarkList::remove_item() {
     delete currentItem();
 }
 
-//void BookmarkList::on_double_clicked(QListWidgetItem *item) {
-//    if (item->type() != 0) return;
-//    auto b_item = dynamic_cast<BookmarkItem*>(item);
-//    // Start video at correct frame
-
-//    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
-//}
-
 /**
  * @brief BookmarkList::mousePressEvent
  * Triggers when the widget is clicked.
@@ -171,7 +148,6 @@ void BookmarkList::remove_item() {
 void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     clicked_item = itemAt(event->pos());
-    //on_double_clicked(clicked_item);
     setCurrentItem(clicked_item);
     switch (event->button()) {
         case Qt::RightButton:
@@ -180,7 +156,6 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
             break;
         case Qt::LeftButton:
             // Drag and drop event
-            //item_left_clicked();  // Does nothing
             drag_start_pos = event->pos();
             break;
         default:
@@ -191,13 +166,10 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
 void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     auto item = itemAt(event->pos());
-    //if (clicked_item == nullptr) return;
-    qDebug() << "doubleclicked 1";
     if (item->type() != BOOKMARK) return;
-    qDebug() << "doubleclicked 2";
     auto b_item = dynamic_cast<BookmarkItem*>(item);
-    // Start video at correct frame
 
+    // Start video at correct frame
     emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
 }
 
@@ -273,10 +245,9 @@ void BookmarkList::dropEvent(QDropEvent *event) {
 
     // Get origin widget of drag item
     BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
-    auto item = list->currentItem();
-    if (type == 0) {
+    if (type == BOOKMARK) {
         bookmark_drop(list, event);
-    } else if (type == 1 ) {
+    } else if (type == CONTAINER) {
         container_drop(list, event);
     }
 }

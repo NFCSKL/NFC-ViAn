@@ -18,7 +18,6 @@
 #include "shapes/text.h"
 #include "shapes/zoomrectangle.h"
 #include "shapes/analysarea.h"
-#include "Library/customdialog.h"
 #include "opencv2/opencv.hpp"
 #include "Filehandler/writeable.h"
 

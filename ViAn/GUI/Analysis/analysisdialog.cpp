@@ -1,4 +1,5 @@
 #include "analysisdialog.h"
+#include <QPushButton>
 
 AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string save_dir)
     : m_save_dir(save_dir) {

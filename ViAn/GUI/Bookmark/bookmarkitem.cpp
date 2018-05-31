@@ -21,7 +21,6 @@ BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) : QListWidgetItem(QStrin
     } else {
         setToolTip(hover_text);
     }
-    //this->setText(frame + "@" + v_name);
     this->bookmark = bookmark;
 }
 

@@ -27,7 +27,7 @@ class AnalysisDialog : public QDialog
 
     MotionDetection* method;
 public:
-    AnalysisDialog(std::vector<VideoItem*> vid_projs, string save_dir);
+    AnalysisDialog(std::vector<VideoItem*> vid_projs, std::string save_dir);
 public slots:
     void ok_btn_clicked();
     void cancel_btn_clicked();

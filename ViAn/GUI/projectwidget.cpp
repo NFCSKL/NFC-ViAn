@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QShortcut>
+#include <QMessageBox>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
