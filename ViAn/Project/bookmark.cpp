@@ -11,11 +11,24 @@
 Bookmark::Bookmark(VideoProject *vid_proj, const std::string file_name, const std::string &text, const int &frame_nbr, const QString time){
     this->m_vid_proj = vid_proj;
     this->m_file = file_name;
-    this->description = text;
-    this->frame_number = frame_nbr;
-    this->time = time;
+    this->m_description = text;
+    this->m_frame_nbr = frame_nbr;
+    this->m_time = time;
     std::pair<int, std::string> _tmp(UNSORTED, "");
     m_containers.push_back(_tmp);
+}
+
+/**
+ * @brief Bookmark::Bookmark
+ * Copy constructor
+ * @param bookmark
+ */
+Bookmark::Bookmark(const Bookmark &bookmark) {
+    m_vid_proj = bookmark.m_vid_proj;
+    m_file = bookmark.m_file;
+    m_description = bookmark.m_description;
+    m_frame_nbr = bookmark.m_frame_nbr;
+    m_time = bookmark.m_time;
 }
 
 /**
@@ -35,7 +48,7 @@ void Bookmark::reset_root_dir(const std::string &dir){
  * @return Returns the time in the video where the bookmark points to (format "mm:ss").
  */
 QString Bookmark::get_time() {
-    return time;
+    return m_time;
 }
 
 /**
@@ -43,7 +56,7 @@ QString Bookmark::get_time() {
  * @return Returns the frame number that the bookmark points to.
  */
 int Bookmark::get_frame_number() {
-    return frame_number;
+    return m_frame_nbr;
 }
 
 std::vector<std::pair<int, std::string>> Bookmark::get_containers(){
@@ -59,7 +72,7 @@ VideoProject *Bookmark::get_video_project() {
  * @return Returns the description associated with the bookmark.
  */
 std::string Bookmark::get_description() {
-    return description;
+    return m_description;
 }
 
 /**
@@ -68,7 +81,7 @@ std::string Bookmark::get_description() {
  * @param text
  */
 void Bookmark::set_description(const std::string& text) {
-    description = text;
+    m_description = text;
     m_unsaved_changes = true;
 }
 
@@ -123,10 +136,10 @@ bool Bookmark::remove() {
  * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
-    this->time = json["time"].toInt();
-    this->frame_number = json["frame"].toInt();
+    this->m_time = json["time"].toInt();
+    this->m_frame_nbr = json["frame"].toInt();
     m_file = json["path"].toString().toStdString();
-    this->description = json["description"].toString().toStdString();
+    this->m_description = json["description"].toString().toStdString();
 
     QJsonArray containers = json["containers"].toArray();
     for (int i = 0; i < containers.size(); ++i) {
@@ -144,10 +157,10 @@ void Bookmark::read(const QJsonObject& json){
  */
 void Bookmark::write(QJsonObject& json){
     // Exports the frame and updates file_path.
-    json["time"] = this->time;
-    json["frame"] = this->frame_number;
+    json["time"] = this->m_time;
+    json["frame"] = this->m_frame_nbr;
     json["path"] = QString::fromStdString(m_file);
-    json["description"] = QString::fromStdString(description);
+    json["description"] = QString::fromStdString(m_description);
 
     QJsonArray containers;
     for (auto it = m_containers.begin(); it != m_containers.end(); ++it) {

@@ -2,6 +2,7 @@
 #include <QDebug>
 
 BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int type) : QListWidgetItem(parent, type) {
+    qDebug() << "Bookmark category" << type;
     m_name = name;
     // Setup layout
     QWidget* folder = new QWidget();

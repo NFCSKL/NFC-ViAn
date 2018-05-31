@@ -25,14 +25,15 @@ class Bookmark : public Writeable{
 //    std::string m_container_name = "";
     std::vector<std::pair<int, std::string>> m_containers;  // Keeps track of all containers the bookmark resides in
 
-    int frame_number = -1;           // Frame at which the bookmark was taken
-    QString time = "";               // Time of the bookmark (format "mm:ss")
-    std::string description = "";    // Description for the bookmark, given by user
+    int m_frame_nbr = -1;           // Frame at which the bookmark was taken
+    QString m_time = "";               // Time of the bookmark (format "mm:ss")
+    std::string m_description = "";    // Description for the bookmark, given by user
 
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
 public:
     std::string m_file;
-    Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const int& frame_nbr, const QString time);
+    Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const int& frame_nbr, const QString m_time);
+    Bookmark(const Bookmark& bookmark);
     Bookmark();
     void reset_root_dir(const std::string& dir);
     QString get_time();

@@ -20,7 +20,7 @@ public:
 
 private:
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
-    Bookmark* bookmark = nullptr;
+    Bookmark* m_bookmark = nullptr;
 };
 
 #endif // BOOKMARKITEM_H

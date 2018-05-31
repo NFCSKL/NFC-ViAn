@@ -93,6 +93,7 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
     }
 
     auto cast_item = dynamic_cast<BookmarkCategory*>(item);
+    //insertItem(0, cast_item->copy(this)); // TODO should use
     addItem(cast_item->copy(this));
     event->acceptProposedAction();
 }
