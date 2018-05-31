@@ -1,6 +1,7 @@
 #include "bookmarkwidget.h"
 #include "bookmarklist.h"
 #include "imagegenerator.h"
+#include "myinputdialog.h"
 #include <QAction>
 #include <QMenu>
 #include <QMimeData>
@@ -21,7 +22,11 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setDropIndicatorShown(true);
 
     setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
-    connect(this, &BookmarkList::itemDoubleClicked, this, &BookmarkList::on_double_clicked);
+
+    // Doesn't work?
+
+    //connect(this, &BookmarkList::itemDoubleClicked, this, &BookmarkList::on_double_clicked);
+
     clear();
 }
 
@@ -49,7 +54,7 @@ void BookmarkList::set_parent_name(string name) {
  */
 void BookmarkList::on_parent_name_edited(QString name) {
     if (m_par_cont_name.empty()) return;
-    for (size_t i = 0; i < this->count(); ++i) {
+    for (auto i = 0; i < this->count(); ++i) {
         auto item = this->item(i);
         if (item->type() == 0) {
             // BookmarkItem. Update container name
@@ -110,9 +115,22 @@ void BookmarkList::rename_item(){
     case 0: {
         // Bookmark
         auto item = dynamic_cast<BookmarkItem*>(clicked_item);
-        QString text = QInputDialog::getMultiLineText(nullptr, "Change description",
-                                                      "Enter a new discription", QString::fromStdString(item->get_bookmark()->get_description()), &ok);
-        item->update_description(text);
+        MyInputDialog dialog;
+
+        dialog.setTextValue(QString::fromStdString(item->get_bookmark()->get_description()));
+        dialog.setLabelText("Enter a new description");
+        dialog.setWindowTitle("Change description");
+        ok = dialog.exec();
+        QString new_text = dialog.textValue();
+        qDebug() << "new text" << new_text;
+
+        if (ok) {
+            item->update_description(new_text);
+        }
+
+//        QString text = QInputDialog::getMultiLineText(nullptr, "Change description",
+//                                                      "Enter a new discription", QString::fromStdString(item->get_bookmark()->get_description()), &ok);
+//        item->update_description(text);
         break;
     }
     case 1:{
@@ -135,13 +153,13 @@ void BookmarkList::remove_item() {
     delete currentItem();
 }
 
-void BookmarkList::on_double_clicked(QListWidgetItem *item) {
-    if (item->type() != 0) return;
-    auto b_item = dynamic_cast<BookmarkItem*>(item);
-    // Start video at correct frame
+//void BookmarkList::on_double_clicked(QListWidgetItem *item) {
+//    if (item->type() != 0) return;
+//    auto b_item = dynamic_cast<BookmarkItem*>(item);
+//    // Start video at correct frame
 
-    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
-}
+//    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
+//}
 
 /**
  * @brief BookmarkList::mousePressEvent
@@ -153,7 +171,7 @@ void BookmarkList::on_double_clicked(QListWidgetItem *item) {
 void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     clicked_item = itemAt(event->pos());
-    on_double_clicked(clicked_item);
+    //on_double_clicked(clicked_item);
     setCurrentItem(clicked_item);
     switch (event->button()) {
         case Qt::RightButton:
@@ -162,12 +180,25 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
             break;
         case Qt::LeftButton:
             // Drag and drop event
-            item_left_clicked();
+            //item_left_clicked();  // Does nothing
             drag_start_pos = event->pos();
             break;
         default:
         break;
     }
+}
+
+void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
+    if (!itemAt(event->pos())) return;
+    auto item = itemAt(event->pos());
+    //if (clicked_item == nullptr) return;
+    qDebug() << "doubleclicked 1";
+    if (item->type() != BOOKMARK) return;
+    qDebug() << "doubleclicked 2";
+    auto b_item = dynamic_cast<BookmarkItem*>(item);
+    // Start video at correct frame
+
+    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
 }
 
 /**

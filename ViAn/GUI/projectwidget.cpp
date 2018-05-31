@@ -24,7 +24,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDropIndicatorShown(true);
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
