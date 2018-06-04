@@ -10,13 +10,13 @@
  * @param time The time in the video associated with the bookmark (format "mm:ss").
  */
 Bookmark::Bookmark(VideoProject *vid_proj, const std::string file_name, const std::string &text, const int &frame_nbr, const QString time){
-    this->m_vid_proj = vid_proj;
-    this->m_file = file_name;
-    this->m_description = text;
-    this->m_frame_nbr = frame_nbr;
-    this->m_time = time;
+    m_vid_proj = vid_proj;
+    m_file = file_name;
+    m_description = text;
+    m_frame_nbr = frame_nbr;
+    m_time = time;
     std::pair<int, std::string> _tmp(UNSORTED, "");
-    m_containers.push_back(_tmp);
+    m_container = _tmp;
 }
 
 /**
@@ -30,10 +30,7 @@ Bookmark::Bookmark(const Bookmark &bookmark) {
     m_description = bookmark.m_description;
     m_frame_nbr = bookmark.m_frame_nbr;
     m_time = bookmark.m_time;
-    for (auto container : bookmark.m_containers) {
-        std::pair<int,std::string> pair(container.first, container.second);
-        m_containers.push_back(pair);
-    }
+    m_container == bookmark.m_container;
 }
 
 /**
@@ -43,8 +40,15 @@ Bookmark::Bookmark(const Bookmark &bookmark) {
 Bookmark::Bookmark() {
 }
 
+/**
+ * @brief Bookmark::~Bookmark
+ * Destructor
+ */
+Bookmark::~Bookmark(){}
+
+
 void Bookmark::reset_root_dir(const std::string &dir){    
-    m_file = dir+Utility::name_from_path(m_file);
+    m_file = dir + Utility::name_from_path(m_file);
     m_unsaved_changes = true;
 }
 
@@ -64,8 +68,8 @@ int Bookmark::get_frame_number() {
     return m_frame_nbr;
 }
 
-std::vector<std::pair<int, std::string>> Bookmark::get_containers(){
-    return m_containers;
+std::pair<int, std::string> Bookmark::get_container(){
+    return m_container;
 }
 
 VideoProject *Bookmark::get_video_project() {
@@ -90,19 +94,10 @@ void Bookmark::set_description(const std::string& text) {
     m_unsaved_changes = true;
 }
 
-void Bookmark::add_container(std::string name, int type) {
+void Bookmark::set_container(std::string name, int type) {
     std::pair<int, std::string> container(type, name);
-    m_containers.push_back(container);
+    m_container = container;
     m_unsaved_changes = true;
-}
-
-void Bookmark::remove_container(std::string name, int type) {
-    std::pair<int, std::string> container(type, name);
-    auto cont = std::find(m_containers.begin(), m_containers.end(), container);
-    if (cont != m_containers.end()) {
-        m_containers.erase(cont);
-        m_unsaved_changes = true;
-    }
 }
 
 /**
@@ -112,8 +107,9 @@ void Bookmark::remove_container(std::string name, int type) {
  * @param new_name
  */
 void Bookmark::rename_container(std::string old_name, std::string new_name) {
-    std::for_each(m_containers.begin(), m_containers.end(),
-                  [&old_name, &new_name](std::pair<int, std::string> &c){if (c.second == old_name) c.second = new_name;});
+    if (m_container.second == old_name) {
+        m_container.second = new_name;
+    }
     m_unsaved_changes = true;
 }
 
@@ -136,7 +132,8 @@ void Bookmark::add_to_video_project() {
  * @return
  */
 bool Bookmark::remove() {
-    return (m_containers.empty());
+    return false;
+    //return (m_containers.empty());
 }
 
 /**
@@ -145,41 +142,29 @@ bool Bookmark::remove() {
  * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
-    this->m_time = json["time"].toString();
-    this->m_frame_nbr = json["frame"].toInt();
+    m_time = json["time"].toString();
+    m_frame_nbr = json["frame"].toInt();
     m_file = json["path"].toString().toStdString();
-    this->m_description = json["description"].toString().toStdString();
-
-    QJsonArray containers = json["containers"].toArray();
-    for (int i = 0; i < containers.size(); ++i) {
-        QJsonObject container = containers[i].toObject();
-        std::pair<int,std::string> _tmp(container["type"].toInt(), container["container"].toString().toStdString());
-        m_containers.push_back(_tmp);
-    }
+    m_description = json["description"].toString().toStdString();
+    std::pair<int, std::string> pair(json["type"].toInt(), json["container"].toString().toStdString());
+    m_container = pair;
+    
     m_unsaved_changes = false;
 }
 
 /**
  * @brief Bookmark::write
  * @param json
- * Writes a bookmark to a Json object, and exports the frame.
+ * Writes a bookmark to a Json object.
  */
 void Bookmark::write(QJsonObject& json){
-    // Exports the frame and updates file_path.
     json["time"] = this->m_time;
     json["frame"] = this->m_frame_nbr;
     json["path"] = QString::fromStdString(m_file);
     json["description"] = QString::fromStdString(m_description);
+    json["container"] =QString::fromStdString( m_container.second);
+    json["type"] = m_container.first;
 
-    QJsonArray containers;
-    for (auto it = m_containers.begin(); it != m_containers.end(); ++it) {
-        QJsonObject container;
-        std::pair<int,std::string> pair = *it;
-        container["container"] = QString::fromStdString(pair.second);
-        container["type"] = pair.first;
-        containers.push_back(container);
-    }
-    json["containers"] = containers;
     m_unsaved_changes = false;
 }
 

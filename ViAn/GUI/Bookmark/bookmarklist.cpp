@@ -76,14 +76,10 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
     auto cast_item = dynamic_cast<BookmarkItem*>(item);
 
     BookmarkItem* bm_item = cast_item->copy();
-    bm_item->get_bookmark()->add_container(m_par_cont_name, m_container_type);
+    bm_item->get_bookmark()->set_container(m_par_cont_name, m_container_type);
     addItem(bm_item);
     if (event->proposedAction() == Qt::MoveAction) {
         qDebug() << "moving";
-        // Remove the bookmark from the old container
-        bm_item->get_bookmark()->remove_container(source->m_par_cont_name, source->m_container_type);
-    } else if (event->proposedAction() == Qt::CopyAction) {
-        qDebug() << "copying in move";
     }
     event->acceptProposedAction();
 }
@@ -109,8 +105,7 @@ void BookmarkList::bookmark_copy(BookmarkList *source, QDropEvent *event) {
     Bookmark* new_bookmark = new Bookmark(*(cast_item->get_bookmark()));
     BookmarkItem* new_bm_item = new BookmarkItem(new_bookmark, 0);
     new_bm_item->setIcon(cast_item->icon());
-    new_bookmark->add_container(m_par_cont_name, m_container_type);
-    new_bookmark->remove_container(source->m_par_cont_name, source->m_container_type);
+    new_bookmark->set_container(m_par_cont_name, m_container_type);
     addItem(new_bm_item);
     new_bookmark->add_to_video_project();
     event->acceptProposedAction();

@@ -123,18 +123,14 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
         Bookmark* bm = bm_map.second;
         // Load thumbnail TODO add check for file
         std::string t_path = m_path + "_thumbnails/" + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
-        auto containers = bm->get_containers();
-        for (auto it = containers.begin(); it != containers.end(); ++it) {
-            // Add bookmark to all its containers
-            std::pair<int, std::string> _container = *it;
-            BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
-            bm_item->set_thumbnail(t_path);
-            if (_container.second.empty()) {
-                // No container name. Add it to the main list
-                bm_list->addItem(bm_item);
-            } else {
-                add_to_container(bm_item, &_container);
-            }
+        std::pair<int, std::string> new_container = bm->get_container();
+        BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
+        bm_item->set_thumbnail(t_path);
+        if (new_container.second.empty()) {
+            // No container name. Add it to the main list
+            bm_list->addItem(bm_item);
+        } else {
+            add_to_container(bm_item, &new_container);
         }
     }
 }

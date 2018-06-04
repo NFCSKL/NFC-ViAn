@@ -44,9 +44,6 @@ void BookmarkItem::set_thumbnail(std::string thum_path) {
  * @return
  */
 BookmarkItem *BookmarkItem::copy() {
-    //Bookmark new_bookmark(*m_bookmark);
-    //Bookmark* new_bookmark = new Bookmark(*m_bookmark);
-    //BookmarkItem* new_bm_item = new BookmarkItem(new_bookmark, 0);
     BookmarkItem* new_bm_item = new BookmarkItem(m_bookmark, 0);
     new_bm_item->setIcon(icon());
     return new_bm_item;

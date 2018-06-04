@@ -23,7 +23,7 @@ class Bookmark : public Writeable{
     VideoProject* m_vid_proj;
 //    int m_type = UNSORTED;
 //    std::string m_container_name = "";
-    std::vector<std::pair<int, std::string>> m_containers;  // Keeps track of all containers the bookmark resides in
+    std::pair<int, std::string> m_container;
 
     int m_frame_nbr = -1;           // Frame at which the bookmark was taken
     QString m_time = "";               // Time of the bookmark (format "mm:ss")
@@ -35,16 +35,15 @@ public:
     Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const int& frame_nbr, const QString m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
+    ~Bookmark();
     void reset_root_dir(const std::string& dir);
     QString get_time();
     int get_frame_number();
-    std::vector<std::pair<int, std::string>> get_containers();
+    std::pair<int, std::string> get_container();
     VideoProject* get_video_project();
     std::string get_description();
     void set_description(const std::string &text);
-    void set_type(const int type);
-    void add_container(std::string name, int type);
-    void remove_container(std::string name, int type);
+    void set_container(std::string name, int type);
     void rename_container(std::string old_name, std::string new_name);
     void set_video_project(VideoProject* vid_proj);
     void add_to_video_project();
