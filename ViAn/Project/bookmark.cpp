@@ -1,4 +1,5 @@
 #include "bookmark.h"
+#include "utility.h"
 
 /**
  * @brief Bookmark::Bookmark
@@ -29,6 +30,10 @@ Bookmark::Bookmark(const Bookmark &bookmark) {
     m_description = bookmark.m_description;
     m_frame_nbr = bookmark.m_frame_nbr;
     m_time = bookmark.m_time;
+    for (auto container : bookmark.m_containers) {
+        std::pair<int,std::string> pair(container.first, container.second);
+        m_containers.push_back(pair);
+    }
 }
 
 /**
@@ -121,6 +126,10 @@ void Bookmark::set_video_project(VideoProject *vid_proj){
     m_vid_proj = vid_proj;
 }
 
+void Bookmark::add_to_video_project() {
+    m_vid_proj->add_bookmark(this);
+}
+
 /**
  * @brief Bookmark::remove
  * Returns a bool specifying if the bookmark should be deleted or not
@@ -136,7 +145,7 @@ bool Bookmark::remove() {
  * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
-    this->m_time = json["time"].toInt();
+    this->m_time = json["time"].toString();
     this->m_frame_nbr = json["frame"].toInt();
     m_file = json["path"].toString().toStdString();
     this->m_description = json["description"].toString().toStdString();

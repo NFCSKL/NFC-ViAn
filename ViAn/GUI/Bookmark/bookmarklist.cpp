@@ -74,12 +74,16 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
     // BookmarkItem. Copy and add
     auto item = source->currentItem();
     auto cast_item = dynamic_cast<BookmarkItem*>(item);
+
     BookmarkItem* bm_item = cast_item->copy();
     bm_item->get_bookmark()->add_container(m_par_cont_name, m_container_type);
     addItem(bm_item);
     if (event->proposedAction() == Qt::MoveAction) {
+        qDebug() << "moving";
         // Remove the bookmark from the old container
         bm_item->get_bookmark()->remove_container(source->m_par_cont_name, source->m_container_type);
+    } else if (event->proposedAction() == Qt::CopyAction) {
+        qDebug() << "copying in move";
     }
     event->acceptProposedAction();
 }
@@ -98,6 +102,19 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
     event->acceptProposedAction();
 }
 
+void BookmarkList::bookmark_copy(BookmarkList *source, QDropEvent *event) {
+    auto item = source->currentItem();
+    auto cast_item = dynamic_cast<BookmarkItem*>(item);
+
+    Bookmark* new_bookmark = new Bookmark(*(cast_item->get_bookmark()));
+    BookmarkItem* new_bm_item = new BookmarkItem(new_bookmark, 0);
+    new_bm_item->setIcon(cast_item->icon());
+    new_bookmark->add_container(m_par_cont_name, m_container_type);
+    new_bookmark->remove_container(source->m_par_cont_name, source->m_container_type);
+    addItem(new_bm_item);
+    new_bookmark->add_to_video_project();
+    event->acceptProposedAction();
+}
 
 /**
  * @brief BookmarkList::rename_item
@@ -247,7 +264,12 @@ void BookmarkList::dropEvent(QDropEvent *event) {
     // Get origin widget of drag item
     BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
     if (type == BOOKMARK) {
-        bookmark_drop(list, event);
+        if (event->proposedAction() == Qt::MoveAction) {
+            bookmark_drop(list, event);
+        } else if (event->proposedAction() == Qt::CopyAction) {
+            bookmark_copy(list, event);
+            qDebug() << "copying";
+        }
     } else if (type == CONTAINER) {
         container_drop(list, event);
     }

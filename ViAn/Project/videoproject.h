@@ -10,7 +10,7 @@
 #include "bookmark.h"
 #include "video.h"
 #include "project.h"
-#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/analysisproxy.h" // TODO Include basic instead
 #include "Project/report.h"
 #include <stack>
 

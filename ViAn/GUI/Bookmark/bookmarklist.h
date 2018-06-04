@@ -32,6 +32,7 @@ private:
     void item_right_clicked(const QPoint pos);
     void bookmark_drop(BookmarkList* source, QDropEvent *event);
     void container_drop(BookmarkList* source, QDropEvent *event);
+    void bookmark_copy(BookmarkList* source, QDropEvent* event);
 private slots:
     void rename_item();
     void remove_item();

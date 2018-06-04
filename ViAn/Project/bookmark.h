@@ -47,6 +47,7 @@ public:
     void remove_container(std::string name, int type);
     void rename_container(std::string old_name, std::string new_name);
     void set_video_project(VideoProject* vid_proj);
+    void add_to_video_project();
     bool remove();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
