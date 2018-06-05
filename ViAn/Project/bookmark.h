@@ -12,7 +12,7 @@
 #include "video.h"
 
 enum BOOKMARK_TYPE {UNSORTED, DISPUTED, REFERENCE};
-
+using ID = int;
 /**
  * @brief The Bookmark class
  * Bookmark class is used for storing bookmarks, i.e. user
@@ -31,12 +31,15 @@ class Bookmark : public Writeable{
     VideoState m_state;                 // Contains the state of the video, eg frame, zoom rect and scale factor
 
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
+    ID id = 0;
 public:
     std::string m_file;
     Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const VideoState& state, const QString m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
     ~Bookmark();
+    ID get_id();
+    void set_id(ID id);
     void reset_root_dir(const std::string& dir);
     QString get_time();
     int get_frame_number();

@@ -50,6 +50,7 @@ public:
     ID add_bookmark(Bookmark* bookmark);
 
     void remove_analysis(BasicAnalysis* analysis);
+    void remove_bookmark(Bookmark* bookmark);
 
     void set_tree_index(std::stack<int> tree_index);
     void set_project(Project* proj);

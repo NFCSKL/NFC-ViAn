@@ -40,6 +40,11 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
 }
 
 BookmarkCategory::~BookmarkCategory() {
+    qDebug() << "Category is kill";
+    //disp_list->clear();
+    //ref_list->clear();
+    delete disp_list;
+    delete ref_list;
 }
 
 std::string BookmarkCategory::get_name() {

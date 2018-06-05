@@ -26,6 +26,7 @@ BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(QStri
  * Destructor, no memory allocated.
  */
 BookmarkItem::~BookmarkItem() {
+    qDebug() << "Bookmarksitem is kill";
 }
 
 /**

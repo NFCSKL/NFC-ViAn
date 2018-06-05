@@ -180,18 +180,6 @@ void VideoProject::write(QJsonObject& json){
     m_unsaved_changes = false;
 }
 
-/**
- * @brief VideoProject::add_bookmark
- * @param bookmark
- * Add new bookmark.
- */
-ID VideoProject::add_bookmark(Bookmark *bookmark){
-    this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
-    bookmark->set_video_project(this);
-    m_unsaved_changes = true;
-    return m_bm_cnt++;
-}
-
 void VideoProject::set_tree_index(std::stack<int> tree_index) {
     m_tree_index.clear();
     while (!tree_index.empty()) {
@@ -234,6 +222,25 @@ void VideoProject::remove_analysis(BasicAnalysis *analysis) {
     m_analyses.erase(analysis->get_id());
     m_unsaved_changes = true;
     delete analysis;
+}
+
+/**
+ * @brief VideoProject::add_bookmark
+ * @param bookmark
+ * Add new bookmark.
+ */
+ID VideoProject::add_bookmark(Bookmark *bookmark){
+    m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
+    bookmark->set_id(m_bm_cnt);
+    bookmark->set_video_project(this);
+    m_unsaved_changes = true;
+    return m_bm_cnt++;
+}
+
+void VideoProject::remove_bookmark(Bookmark *bookmark) {
+    m_bookmarks.erase(bookmark->get_id());
+    m_unsaved_changes = true;
+    delete bookmark;
 }
 
 /**

@@ -22,6 +22,7 @@ class BookmarkList : public QListWidget{
     bool m_accept_container = true;
 public:
     BookmarkList(bool accept_container = true, int container_type = UNSORTED, QWidget* parent = nullptr);
+    ~BookmarkList();
 
     QListWidgetItem* get_clicked_item();
 

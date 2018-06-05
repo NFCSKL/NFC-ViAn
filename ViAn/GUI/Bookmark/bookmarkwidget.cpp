@@ -21,8 +21,8 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(new_folder_btn);
     layout->addWidget(scroll_area);
     layout->addWidget(generate_btn);   
-    layout->setMargin(10);
-    layout->setSpacing(10);
+    layout->setMargin(5);
+    layout->setSpacing(5);
     setMinimumWidth(bm_list->sizeHint().width()*2); // Should be 2*thumbnail + margin
     setLayout(layout);
 

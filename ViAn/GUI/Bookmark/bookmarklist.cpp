@@ -26,6 +26,26 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     clear();
 }
 
+BookmarkList::~BookmarkList() {
+    qDebug() << "List is kill";
+
+    for (int i = 0; i < count(); ++i) {
+        qDebug() << i;
+        if (item(i)->type() == BOOKMARK) {
+            qDebug() << "type: BOOKMARK";
+            BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(item(i));
+            Bookmark* b_mark = bm_item->get_bookmark();
+            b_mark->get_video_project()->remove_bookmark(b_mark);
+            delete bm_item;
+        } else if (item(i)->type() == CONTAINER) {
+            qDebug() << "type: CONTAINER";
+            BookmarkCategory* bm_cat_item = dynamic_cast<BookmarkCategory*>(item(i));
+            delete bm_cat_item;
+        }
+    }
+    clear();
+}
+
 /**
  * @brief BookmarkList::get_clicked_item
  * @return last clicked item
@@ -148,7 +168,15 @@ void BookmarkList::rename_item(){
  * Removes the clicked list item
  */
 void BookmarkList::remove_item() {
-    delete currentItem();
+    if (currentItem()->type() == BOOKMARK) {
+        BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
+        Bookmark* b_mark = bm_item->get_bookmark();
+        b_mark->get_video_project()->remove_bookmark(b_mark);
+        //delete bm_item->get_bookmark();
+        delete bm_item;
+    } else {
+        delete currentItem();
+    }
 }
 
 /**
@@ -159,20 +187,23 @@ void BookmarkList::remove_item() {
  * @param event
  */
 void BookmarkList::mousePressEvent(QMouseEvent *event) {
-    if (!itemAt(event->pos())) return;
-    clicked_item = itemAt(event->pos());
-    setCurrentItem(clicked_item);
-    switch (event->button()) {
-        case Qt::RightButton:
-            // Create context menu
-            item_right_clicked(event->pos());
+    if (itemAt(event->pos())) {
+        clicked_item = itemAt(event->pos());
+        setCurrentItem(clicked_item);
+        switch (event->button()) {
+            case Qt::RightButton:
+                // Create context menu
+                item_right_clicked(event->pos());
+                break;
+            case Qt::LeftButton:
+                // Drag and drop event
+                drag_start_pos = event->pos();
+                break;
+            default:
             break;
-        case Qt::LeftButton:
-            // Drag and drop event
-            drag_start_pos = event->pos();
-            break;
-        default:
-        break;
+        }
+    } else {
+
     }
 }
 

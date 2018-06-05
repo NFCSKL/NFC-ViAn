@@ -44,8 +44,17 @@ Bookmark::Bookmark() {
  * @brief Bookmark::~Bookmark
  * Destructor
  */
-Bookmark::~Bookmark(){}
+Bookmark::~Bookmark(){
+    qDebug() << "Bookmark is kill";
+}
 
+ID Bookmark::get_id() {
+    return id;
+}
+
+void Bookmark::set_id(ID new_id) {
+    id = new_id;
+}
 
 void Bookmark::reset_root_dir(const std::string &dir){    
     m_file = dir + Utility::name_from_path(m_file);
