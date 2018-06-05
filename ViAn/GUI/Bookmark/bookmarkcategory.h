@@ -3,12 +3,11 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QListWidget>
-#include <QPushButton>
 #include <QDebug>
 #include <QScrollArea>
 #include <QCommonStyle>
 #include <QMenu>
-#include "bookmarkwidget.h"
+#include "bookmarkitem.h"
 #include "bookmarklist.h"
 /**
  * @brief The BookmarkCategory class
@@ -49,7 +48,7 @@ private:
 private slots:
     void on_text_edited(QString name);
 signals:
-    void set_bookmark_video(VideoProject* vid_proj, int frame_idx);
+    void set_bookmark_video(VideoProject* vid_proj, VideoState state);
 };
 
 #endif // BOOKMARKFOLDER_H

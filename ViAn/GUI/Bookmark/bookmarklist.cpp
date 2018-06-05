@@ -183,7 +183,9 @@ void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
     auto b_item = dynamic_cast<BookmarkItem*>(item);
 
     // Start video at correct frame
-    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), b_item->get_frame_number());
+    VideoState state;
+    state = b_item->get_bookmark()->get_state();
+    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), state);
 }
 
 /**

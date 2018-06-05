@@ -43,7 +43,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
 signals:
-    void set_bookmark_video(VideoProject* vid_proj, int frame_idx);
+    void set_bookmark_video(VideoProject* vid_proj, VideoState state);
 };
 
 #endif // BOOKMARKLIST_H

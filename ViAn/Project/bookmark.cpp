@@ -9,11 +9,11 @@
  * @param frame_nbr Frame number associated with the bookmark.
  * @param time The time in the video associated with the bookmark (format "mm:ss").
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const std::string file_name, const std::string &text, const int &frame_nbr, const QString time){
+Bookmark::Bookmark(VideoProject *vid_proj, const std::string file_name, const std::string &text, const VideoState &state, const QString time){
     m_vid_proj = vid_proj;
     m_file = file_name;
     m_description = text;
-    m_frame_nbr = frame_nbr;
+    m_state = state;
     m_time = time;
     std::pair<int, std::string> _tmp(UNSORTED, "");
     m_container = _tmp;
@@ -28,9 +28,9 @@ Bookmark::Bookmark(const Bookmark &bookmark) {
     m_vid_proj = bookmark.m_vid_proj;
     m_file = bookmark.m_file;
     m_description = bookmark.m_description;
-    m_frame_nbr = bookmark.m_frame_nbr;
     m_time = bookmark.m_time;
     m_container == bookmark.m_container;
+    m_state = bookmark.m_state;
 }
 
 /**
@@ -65,7 +65,11 @@ QString Bookmark::get_time() {
  * @return Returns the frame number that the bookmark points to.
  */
 int Bookmark::get_frame_number() {
-    return m_frame_nbr;
+    return m_state.frame;
+}
+
+VideoState Bookmark::get_state() {
+    return m_state;
 }
 
 std::pair<int, std::string> Bookmark::get_container(){
@@ -143,11 +147,19 @@ bool Bookmark::remove() {
  */
 void Bookmark::read(const QJsonObject& json){
     m_time = json["time"].toString();
-    m_frame_nbr = json["frame"].toInt();
+    //m_frame_nbr = json["frame"].toInt();
     m_file = json["path"].toString().toStdString();
     m_description = json["description"].toString().toStdString();
     std::pair<int, std::string> pair(json["type"].toInt(), json["container"].toString().toStdString());
     m_container = pair;
+
+    VideoState state;
+    state.frame = json["frame"].toInt();
+    state.scale_factor = json["scale_factor"].toDouble();
+    int x = json["anchor x"].toInt();
+    int y = json["anchor y"].toInt();
+    state.anchor = QPoint(x, y);
+    m_state = state;
     
     m_unsaved_changes = false;
 }
@@ -158,12 +170,16 @@ void Bookmark::read(const QJsonObject& json){
  * Writes a bookmark to a Json object.
  */
 void Bookmark::write(QJsonObject& json){
-    json["time"] = this->m_time;
-    json["frame"] = this->m_frame_nbr;
+    json["time"] = m_time;
+    json["frame"] = m_state.frame;
     json["path"] = QString::fromStdString(m_file);
     json["description"] = QString::fromStdString(m_description);
     json["container"] =QString::fromStdString( m_container.second);
     json["type"] = m_container.first;
+
+    json["scale_factor"] = m_state.scale_factor;
+    json["anchor x"] = m_state.anchor.x();
+    json["anchor y"] = m_state.anchor.y();
 
     m_unsaved_changes = false;
 }

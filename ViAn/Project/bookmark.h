@@ -9,6 +9,7 @@
 #include <iostream>
 #include "Filehandler/saveable.h"
 #include "videoproject.h"
+#include "video.h"
 
 enum BOOKMARK_TYPE {UNSORTED, DISPUTED, REFERENCE};
 
@@ -25,20 +26,21 @@ class Bookmark : public Writeable{
 //    std::string m_container_name = "";
     std::pair<int, std::string> m_container;
 
-    int m_frame_nbr = -1;           // Frame at which the bookmark was taken
     QString m_time = "";               // Time of the bookmark (format "mm:ss")
     std::string m_description = "";    // Description for the bookmark, given by user
+    VideoState m_state;                 // Contains the state of the video, eg frame, zoom rect and scale factor
 
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
 public:
     std::string m_file;
-    Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const int& frame_nbr, const QString m_time);
+    Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const VideoState& state, const QString m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
     ~Bookmark();
     void reset_root_dir(const std::string& dir);
     QString get_time();
     int get_frame_number();
+    VideoState get_state();
     std::pair<int, std::string> get_container();
     VideoProject* get_video_project();
     std::string get_description();
