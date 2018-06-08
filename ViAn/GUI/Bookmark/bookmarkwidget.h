@@ -17,7 +17,7 @@
 #include <QThread>
 
 class BookmarkCategory;
-enum list_types {BOOKMARK, CONTAINER};
+enum list_types {BOOKMARK = 3000, CONTAINER};
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT

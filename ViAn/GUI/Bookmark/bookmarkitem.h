@@ -7,8 +7,10 @@
 
 class BookmarkItem : public QListWidgetItem {
     QString hover_text;
+    Bookmark* m_bookmark = nullptr;
+
 public:
-    BookmarkItem(Bookmark *bookmark, int type = 1);
+    BookmarkItem(Bookmark *bookmark, int type = 3000);
     ~BookmarkItem();
     Bookmark* get_bookmark();
     int get_frame_number();
@@ -20,7 +22,6 @@ public:
 
 private:
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
-    Bookmark* m_bookmark = nullptr;
 };
 
 #endif // BOOKMARKITEM_H

@@ -19,6 +19,9 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     // Enable drag and drop
     setSelectionMode(QAbstractItemView::SingleSelection);
     setDragDropMode(QAbstractItemView::DragDrop);
+    setDefaultDropAction(Qt::CopyAction);
+
+    //setDragDropMode(QAbstractItemView::InternalMove);
     setAcceptDrops(true);
     setDropIndicatorShown(true);
     setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
@@ -98,6 +101,7 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
     BookmarkItem* bm_item = cast_item->copy();
     bm_item->get_bookmark()->set_container(m_par_cont_name, m_container_type);
     addItem(bm_item);
+    //insertItem(0, bm_item);
     if (event->proposedAction() == Qt::MoveAction) {
         qDebug() << "moving";
     }
@@ -119,6 +123,7 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
 }
 
 void BookmarkList::bookmark_copy(BookmarkList *source, QDropEvent *event) {
+    qDebug() << "copyinf";
     auto item = source->currentItem();
     auto cast_item = dynamic_cast<BookmarkItem*>(item);
 
@@ -172,7 +177,6 @@ void BookmarkList::remove_item() {
         BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
         Bookmark* b_mark = bm_item->get_bookmark();
         b_mark->get_video_project()->remove_bookmark(b_mark);
-        //delete bm_item->get_bookmark();
         delete bm_item;
     } else {
         delete currentItem();
@@ -187,6 +191,23 @@ void BookmarkList::remove_item() {
  * @param event
  */
 void BookmarkList::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::RightButton) {
+        BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
+        if (bm_item->get_bookmark() == nullptr) qDebug() << "null";
+        //item_right_clicked(event->pos());
+        qDebug() << "right";
+        return;
+    } else if (event->button() == Qt::LeftButton) {
+        if (itemAt(event->pos())) {
+            clicked_item = itemAt(event->pos());
+            drag_start_pos = event->pos();
+        }
+    }
+    qDebug() << itemAt(event->pos())->type();
+    QListWidget::mousePressEvent(event);
+    return;
+
+
     if (itemAt(event->pos())) {
         clicked_item = itemAt(event->pos());
         setCurrentItem(clicked_item);
@@ -203,11 +224,32 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
             break;
         }
     } else {
-
+        switch (event->button()) {
+        case Qt::RightButton:
+            qDebug() << "Right";
+            break;
+        case Qt::LeftButton:
+            qDebug() << "Left";
+            if (currentItem())  currentItem()->setSelected(false);
+            break;
+        default:
+            break;
+        }
     }
 }
 
 void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
+    QListWidget::mouseDoubleClickEvent(event);
+    // Start video at correct frame
+    if (currentItem()->type() == BOOKMARK) {
+        BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
+        VideoState state;
+        state = bm_item->get_bookmark()->get_state();
+        emit set_bookmark_video(bm_item->get_bookmark()->get_video_project(), state);
+    } else if (currentItem()->type() == 0) {
+        qDebug() << "Wrong";
+    }
+    return;
     if (!itemAt(event->pos())) return;
     auto item = itemAt(event->pos());
     if (item->type() != BOOKMARK) return;
@@ -226,6 +268,10 @@ void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
  * @param event
  */
 void BookmarkList::mouseMoveEvent(QMouseEvent *event) {
+    QListWidget::mouseMoveEvent(event);
+    return;
+
+
     if (clicked_item == nullptr) return;
     if (!(event->buttons() & Qt::LeftButton)) return;
     if ((event->pos() - drag_start_pos).manhattanLength()
@@ -260,7 +306,13 @@ void BookmarkList::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {
-    // Only accpt the event if the drop item is of the correct type
+    qDebug() << "Drag enter";
+    QListWidget::dragEnterEvent(event);
+    return;
+
+
+
+    // Only accept the event if the drop item is of the correct type
     if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")) {
         if (event->keyboardModifiers() == Qt::ControlModifier) {
             event->setDropAction(Qt::CopyAction);
@@ -273,6 +325,10 @@ void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {
     }
 }
 
+void BookmarkList::dragMoveEvent(QDragMoveEvent *event) {
+    QListWidget::dragMoveEvent(event);
+}
+
 /**
  * @brief BookmarkList::dropEvent
  * This function is triggered when a listwidgetitem is dropped.
@@ -282,6 +338,18 @@ void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {
  * TODO split into functions
  */
 void BookmarkList::dropEvent(QDropEvent *event) {
+    if (event->proposedAction() == Qt::MoveAction) {
+        qDebug() << "MOVE";
+        //event->source();
+    } else if (event->proposedAction() == Qt::CopyAction) {
+        qDebug() << "COPY";
+        qDebug() << event->source();
+        //event->setDropAction(Qt::CopyAction);
+    }
+    QListWidget::dropEvent(event);
+    return;
+
+
     // Get subclass type from mimedata
     const QMimeData* mime_data = event->mimeData();
     QByteArray encoded = mime_data->data("application/x-qabstractitemmodeldatalist");

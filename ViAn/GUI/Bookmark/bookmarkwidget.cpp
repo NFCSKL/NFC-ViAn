@@ -5,7 +5,6 @@
 #include <QMenu>
 
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
-
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
     QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
 
@@ -20,10 +19,11 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     layout->setAlignment(Qt::AlignBottom);    
     layout->addWidget(new_folder_btn);
     layout->addWidget(scroll_area);
+    //layout->addWidget(bm_list);
     layout->addWidget(generate_btn);   
     layout->setMargin(5);
     layout->setSpacing(5);
-    setMinimumWidth(bm_list->sizeHint().width()*2); // Should be 2*thumbnail + margin
+    setMinimumWidth(bm_list->sizeHint().width()*2 +41); // Should be 2*thumbnail + margin
     setLayout(layout);
 
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
@@ -64,6 +64,7 @@ void BookmarkWidget::generate_report() {
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, std::string> *container) {
+    qDebug() << "add to container";
     BookmarkCategory* bm_cat = nullptr;
     for (int i = 0; i < bm_list->count(); i++) {
         QListWidgetItem* item = bm_list->item(i);
@@ -107,6 +108,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
     bm_list->addItem(bm_item);
+    //bm_list->insertItem(0, bm_item);
 }
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {

@@ -11,7 +11,7 @@
 #include "videoproject.h"
 #include "video.h"
 
-enum BOOKMARK_TYPE {UNSORTED, DISPUTED, REFERENCE};
+enum BOOKMARK_TYPE {UNSORTED = 3010, DISPUTED, REFERENCE};
 using ID = int;
 /**
  * @brief The Bookmark class

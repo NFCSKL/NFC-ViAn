@@ -12,7 +12,7 @@
 /**
  * @brief The BookmarkList class
  */
-class BookmarkList : public QListWidget{
+class BookmarkList : public QListWidget {
     Q_OBJECT
     QPoint drag_start_pos;
     QListWidgetItem* clicked_item = nullptr;
@@ -42,6 +42,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
+    void dragMoveEvent(QDragMoveEvent* event) override;
     void dropEvent(QDropEvent* event) override;
 signals:
     void set_bookmark_video(VideoProject* vid_proj, VideoState state);

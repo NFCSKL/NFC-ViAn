@@ -41,8 +41,6 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
 
 BookmarkCategory::~BookmarkCategory() {
     qDebug() << "Category is kill";
-    //disp_list->clear();
-    //ref_list->clear();
     delete disp_list;
     delete ref_list;
 }
@@ -77,6 +75,7 @@ void BookmarkCategory::update_title(const QString &title){
  * @return
  */
 BookmarkCategory *BookmarkCategory::copy(QListWidget* new_parent) {
+    qDebug() << "copycat";
     BookmarkCategory* new_bm_cat = new BookmarkCategory(m_name, new_parent, type());
     // Copy disputed bookmarks
     std::vector<BookmarkItem*> items = get_disputed();

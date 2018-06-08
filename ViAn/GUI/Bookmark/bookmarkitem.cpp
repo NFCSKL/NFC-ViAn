@@ -8,7 +8,8 @@
  * @param type Type of bookmark item.
  */
 BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
-    //qDebug() << "Bookmark item" << type;
+    qDebug() << "Bookmark item" << type;
+    m_type = type;
     QString frame = QString::number(bookmark->get_frame_number());
     QString v_name = QString::fromStdString(bookmark->get_video_project()->get_video()->get_name());
     hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + bookmark->get_time();
@@ -45,6 +46,7 @@ void BookmarkItem::set_thumbnail(std::string thum_path) {
  * @return
  */
 BookmarkItem *BookmarkItem::copy() {
+    qDebug() << "item copy";
     BookmarkItem* new_bm_item = new BookmarkItem(m_bookmark, 0);
     new_bm_item->setIcon(icon());
     return new_bm_item;
