@@ -23,6 +23,16 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDragEnabled(true);
     setDropIndicatorShown(true);
 
+    // Create togglable action in the context menu for analysis details
+    show_details_act = new QAction("Show/hide details", this);
+    show_details_act->setCheckable(true);
+    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+
+    // Create togglable action in the context menu for analysis settings
+    show_settings_act = new QAction("Show/hide analysis settings", this);
+    show_settings_act->setCheckable(true);
+    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
@@ -112,9 +122,17 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir);
-    if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
-    if(settings->use_interval) method->set_interval(settings->get_interval());
+    AnalysisMethod* method;
+    switch (settings->get_type()) {
+    case MOTION_DETECTION:
+        method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
+        break;
+    default:
+        break;
+    }
+    if (settings->quick_analysis) {
+        settings->set_full_settings(analysis_settings->get_full_settings());
+    } else {}
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -416,25 +434,21 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
+void ProjectWidget::update_analysis_settings() {
+    std::vector<VideoItem*> v_items;
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
+    dialog->show();
+}
+
 void ProjectWidget::advanced_analysis() {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_dir());
-    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    AnalysisSettings* new_settings = new AnalysisSettings(analysis_settings);
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
+    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
-}
-
-
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj) {
-    if (vid_proj == nullptr) return;
-    VideoItem* v_item = get_video_item(vid_proj);
-    AnalysisItem* ana = new AnalysisItem();
-    v_item->addChild(ana);
-    ana->setText(0, "Loading");
-    v_item->setExpanded(true);
-    emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
 }
 
 /**
@@ -477,7 +491,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit marked_video(vid_item->get_video_project(), -1);
-
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -489,12 +502,17 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         if(!ana_item->is_finished()) break;
+        ana_item->set_not_new();
         emit marked_analysis(ana_item->get_analysis());
         emit marked_basic_analysis(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
         emit set_detections(true);
         emit set_poi_slider(true);
         emit enable_poi_btns(true, true);
         emit update_frame();
+
+
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
         break;
     } case DRAWING_TAG_ITEM: {
         tree_item_clicked(item->parent());
@@ -603,8 +621,8 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Show details", this, SLOT(show_details()));
-                menu.addAction("Hide details", this, SLOT(hide_details()));
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
@@ -662,20 +680,37 @@ void ProjectWidget::drawing_tag() {
 }
 
 /**
- * @brief ProjectWidget::show_details
- * @param ana_item
- * Show the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_details
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::show_details() {
-    emit show_analysis_details(true);
+void ProjectWidget::toggle_details(bool b) {
+    show_details_act->setChecked(b);
 }
 
 /**
- * @brief ProjectWidget::hide_details
- * Hide the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_settings
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::hide_details() {
-    emit show_analysis_details(false);
+void ProjectWidget::toggle_settings(bool b) {
+    show_settings_act->setChecked(b);
+}
+
+/**
+ * @brief ProjectWidget::update_settings
+ * Updates the analysis settings dock window with the settings
+ * from the clicked analysis
+ */
+void ProjectWidget::update_settings() {
+    QTreeWidgetItem* item = selectedItems().front();
+    if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* a_item = dynamic_cast<AnalysisItem*>(item);
+        if (!a_item->is_finished()) return;
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(a_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
+        emit show_analysis_settings(true);
+    }
 }
 
 /**

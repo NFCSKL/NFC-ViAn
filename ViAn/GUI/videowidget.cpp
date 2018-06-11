@@ -82,7 +82,7 @@ int VideoWidget::get_current_video_length(){
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
-        settings->setInterval(m_interval);
+        settings->set_interval(m_interval);
         delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);
@@ -807,6 +807,9 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (m_vid_proj != vid_proj) {
+        if (m_vid_proj) m_vid_proj->set_current(false);
+        vid_proj->set_current(true);
+
         m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());
 

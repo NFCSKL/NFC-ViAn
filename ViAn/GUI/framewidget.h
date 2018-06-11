@@ -79,6 +79,7 @@ signals:
     void send_tool(SHAPES m_tool);
     void send_tool_text(QString, float);
     void send_color(QColor color);
+    void set_toolbar_zoom();
 
     void mouse_double_click(QPoint);
     void mouse_pressed(QPoint, bool);

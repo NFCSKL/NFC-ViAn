@@ -122,7 +122,6 @@ void AnalysisSlider::update(){
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
         switch (analysis->get_type()) {
         case TAG:
         case DRAWING_TAG:
@@ -133,6 +132,7 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         case MOTION_DETECTION: {
             AnalysisProxy* p_analysis = dynamic_cast<AnalysisProxy*>(analysis);
             rects = p_analysis->m_slider_interval;
+            m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
         }
         default:
             break;
