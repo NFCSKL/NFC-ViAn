@@ -262,3 +262,11 @@ void VideoProject::remove_from_project() {
 std::string VideoProject::get_index_path() {
     return m_tree_index;
 }
+
+bool VideoProject::is_current() {
+    return current;
+}
+
+void VideoProject::set_current(bool value) {
+    current = value;
+}
