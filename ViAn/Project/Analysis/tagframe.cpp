@@ -11,5 +11,4 @@ TagFrame::TagFrame(int frame, VideoState state) {
 }
 
 TagFrame::~TagFrame() {
-    qDebug() << "tagframe is kill";
 }

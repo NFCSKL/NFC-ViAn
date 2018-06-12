@@ -1,5 +1,6 @@
 #ifndef BASICANALYSIS_H
 #define BASICANALYSIS_H
+
 #include <string>
 #include <utility>
 #include <set>
@@ -9,8 +10,11 @@
 #include <QPoint>
 #include <QJsonArray>
 
+class AnalysisSettings;
+
 enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG = 2, BASIC_ANALYSIS = 3, DRAWING_TAG = 4};
 
+// TODO remove?
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
                                                                      std::make_pair("Tag",TAG)};
 struct interval_cmp {
@@ -27,10 +31,7 @@ public:
     std::string m_name = "2";
     bool m_unsaved_changes = true;
     interval_set m_intervals;
-    std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
-    cv::Rect bounding_box;
-    bool use_interval = false;
-    bool use_bounding_box = false;
+    AnalysisSettings* settings = nullptr;
 
 private:
     ID id = 0;
@@ -56,8 +57,6 @@ public:
     void set_name(const std::string& new_name);
 
     bool is_saved() const;
-    std::pair<int, int> get_ana_interval() const;
-    cv::Rect get_bounding_box() const;
 };
 
 Q_DECLARE_METATYPE(BasicAnalysis)

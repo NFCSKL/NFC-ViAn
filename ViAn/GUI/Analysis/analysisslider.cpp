@@ -151,7 +151,7 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
 void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
     rects.clear();
     if (analysis) {
-        m_ana_interval = std::make_pair(analysis->get_ana_interval().first, analysis->get_ana_interval().second);
+        m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
         rects = analysis->m_slider_interval;
     }
 }
