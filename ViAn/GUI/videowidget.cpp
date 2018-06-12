@@ -814,39 +814,44 @@ void VideoWidget::on_playback_slider_moved() {
     on_new_frame();
 }
 
+// TODO Remove
+// All calls should go the load_marked_video_state
+// This is a temporary function until the other end is fixed
+void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
+    VideoState state;
+    state = vid_proj->get_video()->state;
+    state.frame =  frame;
+    load_marked_video_state(vid_proj, state);
+}
+
 /**
- * @brief VideoWidget::load_marked_video
+ * @brief VideoWidget::load_marked_video_state
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
-    int frame = load_frame;
+void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
+    set_state(state);
+
     if (m_vid_proj != vid_proj) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
 
         m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());
-
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();
-
-        m_vid_proj = vid_proj;
-
-        playback_slider->setValue(frame);
-        m_interval = make_pair(0,0);
-        set_status_bar("Video loaded");
-        play_btn->setChecked(false);
-        playback_slider->set_interval(-1, -1);
     }
+    m_interval = make_pair(0,0);
+    set_status_bar("Video loaded");
+    play_btn->setChecked(false);
+    playback_slider->set_interval(-1, -1);
 
-    if (frame > -1) {
-        frame_index.store(frame);
+    if (state.frame > -1) {
         on_new_frame();
     }
 }
@@ -1104,10 +1109,25 @@ void VideoWidget::set_draw_area_size(QSize s) {
 
 /**
  * @brief VideoWidget::on_zoom_out
- * Tells the frame processor to decrease zoom
+ * Tells the frame processor to change the zoom with a constant
  */
 void VideoWidget::on_step_zoom(double step){
     update_processing_settings([&](){z_settings.zoom_factor *= step;});
+}
+
+/**
+ * @brief VideoWidget::set_anchor
+ * Tells the frame processor to set the state of the video.
+ * Anchor, scale factor and frame number
+ * @param state
+ */
+void VideoWidget::set_state(VideoState state) {
+    update_processing_settings([&](){
+        z_settings.set_state = true;
+        z_settings.anchor = state.anchor;
+        z_settings.zoom_factor = state.scale_factor;
+        frame_index.store(state.frame);
+    });
 }
 
 /**

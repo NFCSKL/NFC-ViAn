@@ -29,7 +29,7 @@ VideoProject::~VideoProject(){
  * Return associated video.
  */
 Video* VideoProject::get_video(){
-    return this->video;
+    return video;
 }
 
 /**

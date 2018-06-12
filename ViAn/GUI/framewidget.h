@@ -73,7 +73,6 @@ signals:
     void video_moved(QPoint pos);
     void current_size(int width, int height);
     void moved_xy(int x, int y);
-    void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out(double);
     void center_zoom_rect(QPoint, double);

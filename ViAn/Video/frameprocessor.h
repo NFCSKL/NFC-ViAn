@@ -30,6 +30,9 @@ struct zoomer_settings {
     QPoint zoom_tl = QPoint(0,0);
     QPoint zoom_br = QPoint(100,100);
     QPoint center = QPoint(50,50);
+    QPoint anchor = QPoint(0,0);
+
+    bool set_state = false;
 
     double zoom_factor = 1;
     double zoom_step = 1;
@@ -153,6 +156,8 @@ class FrameProcessor : public QObject {
     FrameManipulator m_manipulator;
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
+
+    bool skip_process = false;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,

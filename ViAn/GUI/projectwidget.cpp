@@ -163,8 +163,9 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
-        for (int frame : tag->get_frames()) {
-            TagFrameItem* tf_item = new TagFrameItem(frame);
+        for (auto t_frame : tag->tag_map) {
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+            tf_item->set_state(t_frame.second);
             item->addChild(tf_item);
         }
         item->setExpanded(true);
@@ -179,24 +180,23 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_item->setExpanded(true);
 }
 
+
 /**
  * @brief ProjectWidget::add_frames_to_tag_item
  * Create the TagFrameItems from all the frames. Used when opening a project
  * @param item
  */
 void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
+    Tag* tag;
     if (item->type() == TAG_ITEM) {
-        Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-        for (int frame : tag->get_frames() ) {
-            TagFrameItem* tf_item = new TagFrameItem(frame);
-            item->addChild(tf_item);
-        }
+        tag = dynamic_cast<TagItem*>(item)->get_tag();
     } else if (item->type() == DRAWING_TAG_ITEM) {
-        Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
-        for (int frame : tag->get_frames() ) {
-            TagFrameItem* tf_item = new TagFrameItem(frame);
-            item->addChild(tf_item);
-        }
+        tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+    }
+    for (auto t_frame : tag->tag_map) {
+        TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+        tf_item->set_state(t_frame.second);
+        item->addChild(tf_item);
     }
 }
 
@@ -554,7 +554,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
+
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -570,7 +573,9 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_analysis(ana_item->get_analysis());
 
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(true);
         emit set_poi_slider(true);
@@ -588,7 +593,9 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_basic_analysis(tag_item->get_tag());
 
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -605,6 +612,8 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     } case TAG_ITEM: {
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+
+        // TODO remove ?, double
         emit marked_basic_analysis(tag_item->get_tag());
 
         if (!m_tag_item) {
@@ -625,7 +634,9 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         }
 
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), 0);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -636,17 +647,20 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video(vid_item->get_video_project(), tf_item->get_frame());
 
         // TODO set from state
-        // set zoom rect, scale factor, brightness/contrast, rotation
+        // set brightness/contrast, rotation
 
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
 
+        VideoState state;
+        state = tf_item->get_state();
         if (item->parent()->type() == TAG_ITEM) {
+            emit marked_video_state(vid_item->get_video_project(), state);
+
             TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
             emit marked_basic_analysis(tag_item->get_tag());
 
@@ -654,6 +668,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
             tag_item->setCheckState(0, Qt::Checked);
             m_tag_item = tag_item;
         } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
+            emit marked_video_state(vid_item->get_video_project(), state);
             DrawingTagItem* dt_item = dynamic_cast<DrawingTagItem*>(item->parent());
             emit marked_basic_analysis(dt_item->get_tag());
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
@@ -815,7 +830,8 @@ void ProjectWidget::drawing_tag() {
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.size() > 0) {
-            TagFrame* t_frame = new TagFrame(frame_overlay.first);
+            VideoState state;
+            TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }

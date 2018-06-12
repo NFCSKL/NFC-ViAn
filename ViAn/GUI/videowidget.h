@@ -141,7 +141,8 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
 
-    void load_marked_video(VideoProject* vid_proj, int load_frame = -1);
+    void load_marked_video(VideoProject *vid_proj, int frame);
+    void load_marked_video_state(VideoProject *vid_proj, VideoState state);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
@@ -175,6 +176,7 @@ public slots:
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
     void on_step_zoom(double step);
+    void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
     void update_brightness_contrast(int c_val, double v_val);

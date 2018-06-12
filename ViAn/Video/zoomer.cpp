@@ -1,6 +1,6 @@
 #include "zoomer.h"
 #include <math.h>
-#include <QtDebug>
+#include <QDebug>
 
 Zoomer::Zoomer() {
     anchor = QPoint(0,0);
@@ -45,6 +45,7 @@ void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
 void Zoomer::set_frame_size(cv::Size frame_size) {
     m_frame_size = frame_size;
     m_frame_rect = cv::Rect(cv::Point(0,0), cv::Point(m_frame_size.width, m_frame_size.height));
+    m_zoom_rect = m_frame_rect;
 }
 
 /**
@@ -109,6 +110,19 @@ void Zoomer::center_zoom_rect(QPoint center, double zoom_step) {
 }
 
 /**
+ * @brief Zoomer::set_state
+ * Set the zoomers state, which means set the scale factor and the zoom rect
+ * @param anchor
+ * @param scale_factor
+ */
+void Zoomer::set_state(QPoint anchor, double scale_factor) {
+    set_scale_factor(scale_factor);
+    int x = anchor.x() - m_zoom_rect.x;
+    int y = anchor.y() - m_zoom_rect.y;
+    move_zoom_rect(x,y);
+}
+
+/**
  * @brief Zoomer::fit_viewport
  * Adjusts the scaling factor so the frame will fit the viewport
  */
@@ -170,9 +184,9 @@ void Zoomer::update_rect_size() {
  * Resets the zoom to original size
  */
 void Zoomer::reset() {
-    m_scale_factor = 1;
-    anchor = QPoint(0,0);
-    m_zoom_rect = m_frame_rect;
+    // Set the video state to default
+    // Anchor (0,0) and scale_factor 1
+    set_state(QPoint(0,0), 1);
 }
 
 /**
@@ -183,7 +197,8 @@ void Zoomer::reset() {
 void Zoomer::scale_frame(cv::Mat &frame) {
     if (m_frame_size.width < m_zoom_rect.width || m_frame_size.height < m_zoom_rect.height) {
         qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
-        fit_viewport();
+
+        m_zoom_rect = m_frame_rect;
     }
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;

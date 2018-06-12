@@ -106,8 +106,9 @@ void FrameWidget::paste() {
     update();
 }
 
+// TODO Not need?
 void FrameWidget::set_scroll_area_size(QSize size) {
-    m_scroll_area_size = size;
+    m_scroll_area_size = size; //Unused
 }
 
 /**
@@ -164,6 +165,13 @@ void FrameWidget::set_show_detections(bool show) {
 
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
+    if (m_vid_proj) m_vid_proj->get_video()->state.anchor = p;
+}
+
+void FrameWidget::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+
+    if (m_vid_proj) m_vid_proj->get_video()->state.scale_factor = scale_factor;
 }
 
 void FrameWidget::set_current_frame_nr(int nr) {
@@ -352,6 +360,7 @@ QPoint FrameWidget::scale_point(QPoint pos) {
  */
 void FrameWidget::resizeEvent(QResizeEvent *event) {
     Q_UNUSED (event)
+    // TODO unused
     emit current_size(width(), height());
 }
 
@@ -567,10 +576,6 @@ void FrameWidget::set_analysis_settings() {
     }
     ana_rect_end = ana_rect_start;
     repaint();
-}
-
-void FrameWidget::set_scale_factor(double scale_factor) {
-    m_scale_factor = scale_factor;
 }
 
 /**

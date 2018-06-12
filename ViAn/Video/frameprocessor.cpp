@@ -75,11 +75,13 @@ void FrameProcessor::check_events() {
             update_zoomer_settings();
 
             // Skip reprocessing of old frame if there is a new
-            if (!m_new_frame->load()) {
+            if (!m_new_frame->load() && !skip_process) {
                 process_frame();
                 lk.unlock();
+                skip_process = false;
                 continue;
             }
+            skip_process = false;
         }
 
         // A new frame has been loaded by the VideoPlayer
@@ -127,7 +129,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    done_processing(m_frame, manipulated_frame, m_frame_index->load());
+    emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
 /**
@@ -141,10 +143,16 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
         m_zoomer.update_rect_size();
     }
+    // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
+    else if (m_z_settings->set_state) {
+        m_zoomer.fit_viewport();
+        m_z_settings->set_state = false;
+        skip_process = true;
+        m_zoomer.set_state(m_z_settings->anchor, m_z_settings->zoom_factor);
+    }
     // Center the zoom rect
     else if (m_z_settings->do_center) {
         m_z_settings->do_center = false;
-
         m_zoomer.center_zoom_rect(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Scale/zoom factor has been changed
@@ -279,17 +287,12 @@ void FrameProcessor::reset_settings() {
     m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
     m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
-    m_zoomer.reset();
-    // Centers zoom rectangle and displays the frame without zoom
-    m_zoomer.fit_viewport();
 
-    // Store current zoomer settings to shared structure
-    m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
-    cv::Rect tmp = m_zoomer.get_zoom_rect();
-    m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
-    m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
+    m_z_settings->set_state = true;
+    update_zoomer_settings();
+    skip_process = false;
 
-    set_anchor(m_zoomer.get_anchor());
-    set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_anchor(m_zoomer.get_anchor());
+    emit set_scale_factor(m_zoomer.get_scale_factor());
 
 }

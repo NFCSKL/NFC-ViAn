@@ -68,9 +68,9 @@ void Tag::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
     json["drawing_tag"] = drawing_tag;
     QJsonArray frames;
-    for (int frame : get_frames()) {
+    for (auto tag_frame : tag_map) {
         QJsonObject f_num;
-        f_num["frame"] = frame;
+        tag_frame.second->write(f_num);
         frames.push_back(f_num);
     }
     json["frames"] = frames;
@@ -85,6 +85,7 @@ void Tag::read(const QJsonObject &json) {
         QJsonObject json_frame = json_intervals[i].toObject();
         int frame = json_frame["frame"].toInt();
         TagFrame* t_frame = new TagFrame(frame);
+        t_frame->read(json_frame);
         tag_map.insert(std::pair<int,TagFrame*>(frame, t_frame));
     }
     m_unsaved_changes = false;
