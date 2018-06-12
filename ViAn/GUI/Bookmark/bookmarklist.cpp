@@ -19,7 +19,7 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     // Enable drag and drop
     setSelectionMode(QAbstractItemView::SingleSelection);
     setDragDropMode(QAbstractItemView::DragDrop);
-    setDefaultDropAction(Qt::CopyAction);
+    setDefaultDropAction(Qt::MoveAction);
 
     //setDragDropMode(QAbstractItemView::InternalMove);
     setAcceptDrops(true);
@@ -268,6 +268,17 @@ void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
  * @param event
  */
 void BookmarkList::mouseMoveEvent(QMouseEvent *event) {
+    // Add the clicked item type to the mime object
+    QDrag *drag = new QDrag(this);
+    //QList<QListWidgetItem*> items = {clicked_item};
+    QByteArray mdata;
+    QDataStream stream(&mdata, QIODevice::WriteOnly);
+    stream << clicked_item->type();
+
+    QMimeData* mime_data = new QMimeData();
+    mime_data->setData(QString("application/x-qabstractitemmodeldatalist"), mdata);
+    drag->setMimeData(mime_data);
+
     QListWidget::mouseMoveEvent(event);
     return;
 
@@ -279,15 +290,15 @@ void BookmarkList::mouseMoveEvent(QMouseEvent *event) {
         return;
 
     // Add the clicked item type to the mime object
-    QDrag *drag = new QDrag(this);
-    QList<QListWidgetItem*> items = {clicked_item};
-    QByteArray mdata;
-    QDataStream stream(&mdata, QIODevice::WriteOnly);
-    stream << clicked_item->type();
+//    QDrag *drag = new QDrag(this);
+//    QList<QListWidgetItem*> items = {clicked_item};
+//    QByteArray mdata;
+//    QDataStream stream(&mdata, QIODevice::WriteOnly);
+//    stream << clicked_item->type();
 
-    QMimeData* mime_data = new QMimeData();
-    mime_data->setData(QString("application/x-qabstractitemmodeldatalist"), mdata);
-    drag->setMimeData(mime_data);
+//    QMimeData* mime_data = new QMimeData();
+//    mime_data->setData(QString("application/x-qabstractitemmodeldatalist"), mdata);
+//    drag->setMimeData(mime_data);
 
     // Starts the drop. Will remove the original item if Qt::MoveAction is recieved
     Qt::DropAction drop_action;
@@ -338,6 +349,15 @@ void BookmarkList::dragMoveEvent(QDragMoveEvent *event) {
  * TODO split into functions
  */
 void BookmarkList::dropEvent(QDropEvent *event) {
+    // Get subclass type from mimedata
+    const QMimeData* mime_data = event->mimeData();
+    QByteArray encoded = mime_data->data("application/x-qabstractitemmodeldatalist");
+    QDataStream stream(&encoded, QIODevice::ReadOnly);
+    int type;
+    stream >> type;
+
+    // Add type to the item
+
     if (event->proposedAction() == Qt::MoveAction) {
         qDebug() << "MOVE";
         //event->source();
@@ -347,15 +367,16 @@ void BookmarkList::dropEvent(QDropEvent *event) {
         //event->setDropAction(Qt::CopyAction);
     }
     QListWidget::dropEvent(event);
+
     return;
 
 
     // Get subclass type from mimedata
-    const QMimeData* mime_data = event->mimeData();
-    QByteArray encoded = mime_data->data("application/x-qabstractitemmodeldatalist");
-    QDataStream stream(&encoded, QIODevice::ReadOnly);
-    int type;
-    stream >> type;
+//    const QMimeData* mime_data = event->mimeData();
+//    QByteArray encoded = mime_data->data("application/x-qabstractitemmodeldatalist");
+//    QDataStream stream(&encoded, QIODevice::ReadOnly);
+//    int type;
+//    stream >> type;
 
     // Get origin widget of drag item
     BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
