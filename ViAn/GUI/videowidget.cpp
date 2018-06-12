@@ -1117,8 +1117,9 @@ void VideoWidget::on_step_zoom(double step){
 
 /**
  * @brief VideoWidget::set_anchor
- * Tells the frame processos to set a new anchor
- * @param p
+ * Tells the frame processor to set the state of the video.
+ * Anchor, scale factor and frame number
+ * @param state
  */
 void VideoWidget::set_state(VideoState state) {
     update_processing_settings([&](){

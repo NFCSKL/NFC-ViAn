@@ -187,20 +187,16 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
  * @param item
  */
 void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
+    Tag* tag;
     if (item->type() == TAG_ITEM) {
-        Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-        for (auto t_frame : tag->tag_map) {
-            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-            tf_item->set_state(t_frame.second);
-            item->addChild(tf_item);
-        }
+        tag = dynamic_cast<TagItem*>(item)->get_tag();
     } else if (item->type() == DRAWING_TAG_ITEM) {
-        Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
-        for (auto t_frame : tag->tag_map) {
-            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-            tf_item->set_state(t_frame.second);
-            item->addChild(tf_item);
-        }
+        tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+    }
+    for (auto t_frame : tag->tag_map) {
+        TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+        tf_item->set_state(t_frame.second);
+        item->addChild(tf_item);
     }
 }
 
