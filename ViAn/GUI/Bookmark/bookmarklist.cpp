@@ -1,4 +1,5 @@
 #include "bookmarkwidget.h"
+#include "bookmarkitem.h"
 #include "bookmarklist.h"
 #include "imagegenerator.h"
 #include "myinputdialog.h"
@@ -30,12 +31,11 @@ BookmarkList::~BookmarkList() {
     qDebug() << "List is kill";
 
     for (int i = 0; i < count(); ++i) {
-        qDebug() << i;
         if (item(i)->type() == BOOKMARK) {
             qDebug() << "type: BOOKMARK";
             BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(item(i));
-            Bookmark* b_mark = bm_item->get_bookmark();
-            b_mark->get_video_project()->remove_bookmark(b_mark);
+            //Bookmark* b_mark = bm_item->get_bookmark();
+            //b_mark->get_video_project()->remove_bookmark(b_mark);
             delete bm_item;
         } else if (item(i)->type() == CONTAINER) {
             qDebug() << "type: CONTAINER";
@@ -61,6 +61,15 @@ QListWidgetItem *BookmarkList::get_clicked_item() {
  */
 void BookmarkList::set_parent_name(std::string name) {
     m_par_cont_name = name;
+}
+
+/**
+ * @brief BookmarkList::get_parent_name
+ * Returns the name of the parent container that the widget resides in.
+ * @return m_par_cont_name : name of parent container
+ */
+std::string BookmarkList::get_parent_name() {
+    return m_par_cont_name;
 }
 
 /**
@@ -97,7 +106,15 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
 
     BookmarkItem* bm_item = cast_item->copy();
     bm_item->get_bookmark()->set_container(m_par_cont_name, m_container_type);
-    addItem(bm_item);
+    int index = row(itemAt(event->pos()+QPoint(0, BookmarkItem::BOOKMARK_THUMBNAIL_HEIGHT/2)));
+    qDebug() << index;
+    if (index == -1) {
+        addItem(bm_item);
+    } else {
+        insertItem(index, bm_item);
+    }
+
+    //addItem(bm_item);
     if (event->proposedAction() == Qt::MoveAction) {
         qDebug() << "moving";
     }
@@ -105,6 +122,8 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
 }
 
 void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
+    qDebug() << "COUNT" << count();
+
     // BookmarkCategory
     auto item = source->currentItem();
     if (!m_accept_container) {
@@ -112,9 +131,23 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
         return;
     }
 
+    //auto cat_item = dynamic_cast<BookmarkCategory*>(takeItem(row(item)));
     auto cast_item = dynamic_cast<BookmarkCategory*>(item);
-    //insertItem(0, cast_item->copy(this)); // TODO should use
-    addItem(cast_item->copy(this));
+    //addItem(cast_item->copy(this));
+
+
+    //BookmarkCategory* cat_item = takeItem(row(cast_item));
+
+    BookmarkCategory* cat_item = cast_item->copy(this);
+//    //addItem(cat_item);
+
+    int index = row(itemAt(event->pos()+QPoint(0, BookmarkItem::BOOKMARK_THUMBNAIL_HEIGHT/2)));
+    if (index == -1) {
+        addItem(cat_item);
+    } else {
+        qDebug() << index << count();
+        insertItem(index, cat_item);
+    }
     event->acceptProposedAction();
 }
 
@@ -194,6 +227,7 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
             case Qt::RightButton:
                 // Create context menu
                 item_right_clicked(event->pos());
+                qDebug() << row(itemAt(event->pos()));
                 break;
             case Qt::LeftButton:
                 // Drag and drop event
@@ -268,6 +302,7 @@ void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {
             event->setDropAction(Qt::MoveAction);
         }
         event->accept();
+        QListWidget::dragEnterEvent(event);
     } else {
         event->ignore();
     }

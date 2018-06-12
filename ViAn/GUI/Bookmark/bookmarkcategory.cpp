@@ -2,7 +2,6 @@
 #include <QDebug>
 
 BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int type) : QListWidgetItem(parent, type) {
-    qDebug() << "Bookmark category" << type;
     m_name = name;
     // Setup layout
     QWidget* folder = new QWidget();
@@ -77,15 +76,24 @@ void BookmarkCategory::update_title(const QString &title){
  * @return
  */
 BookmarkCategory *BookmarkCategory::copy(QListWidget* new_parent) {
+    qDebug() << "Copy cat";
+    BookmarkList* bm_list = dynamic_cast<BookmarkList*>(new_parent);
+
     BookmarkCategory* new_bm_cat = new BookmarkCategory(m_name, new_parent, type());
     // Copy disputed bookmarks
     std::vector<BookmarkItem*> items = get_disputed();
     std::for_each(items.begin(), items.end(),
-                  [new_bm_cat](BookmarkItem* bi){new_bm_cat->add_disp_item(bi->copy());});
+                  [new_bm_cat, bm_list](BookmarkItem* bi){
+        new_bm_cat->add_disp_item(bi->copy());
+        bi->get_bookmark()->set_container(bm_list->get_parent_name(), DISPUTED);
+    });
     // Copy reference bookmarks
     items = get_references();
     std::for_each(items.begin(), items.end(),
-                  [new_bm_cat](BookmarkItem* bi){new_bm_cat->add_ref_item(bi->copy());});
+                  [new_bm_cat, bm_list](BookmarkItem* bi){
+        new_bm_cat->add_ref_item(bi->copy());
+        bi->get_bookmark()->set_container(bm_list->get_parent_name(), REFERENCE);
+    });
     return new_bm_cat;
 
 }

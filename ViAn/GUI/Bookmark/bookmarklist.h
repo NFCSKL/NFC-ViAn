@@ -27,6 +27,7 @@ public:
     QListWidgetItem* get_clicked_item();
 
     void set_parent_name(std::string name);
+    std::string get_parent_name();
 public slots:
     void on_parent_name_edited(QString name);
 private:
