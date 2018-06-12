@@ -11,6 +11,7 @@
 #include "GUI/TreeItems/tagitem.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/TreeItems/drawingtagitem.h"
+#include "GUI/TreeItems/tagframeitem.h"
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
@@ -40,6 +41,7 @@ public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     ~ProjectWidget();
     Project* m_proj = nullptr;
+    TagItem* m_tag_item = nullptr;
     AnalysisSettings* analysis_settings = new AnalysisSettings();
     QPointer<QAction> show_details_act = nullptr;
     QPointer<QAction> show_settings_act = nullptr;
@@ -59,9 +61,11 @@ signals:
 
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
-    void enable_tag_btn(bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
+    void set_video_project(VideoProject*);
+    void clear_tag();
+    void clear_slider();
     void set_status_bar(QString);
     void begin_analysis(QTreeWidgetItem*, AnalysisMethod*);
     void update_frame();
@@ -73,7 +77,10 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
-    void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
+    void add_tag(VideoProject*, Tag *tag);
+    void add_frames_to_tag_item(TreeItem *item);
+    void add_new_frame_to_tag_item(int frame, TagFrame *t_frame);
+    void remove_frame_from_tag_item(int frame);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     bool save_project();
     bool open_project(QString project_path="");
@@ -84,6 +91,7 @@ public slots:
     void remove_tag_item(QTreeWidgetItem* item);
     void remove_drawing_tag_item(QTreeWidgetItem* item);
     void remove_analysis_item(QTreeWidgetItem* item);
+    void remove_tag_frame_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void update_analysis_settings();
@@ -116,6 +124,7 @@ private:
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
+    void update_current_tag(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void project_closed();

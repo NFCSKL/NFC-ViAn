@@ -110,9 +110,11 @@ signals:
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
-    void add_basic_analysis(VideoProject*, BasicAnalysis*);
+    void add_tag(VideoProject*, Tag*);
+    void tag_new_frame(int, TagFrame*);
+    void tag_remove_frame(int);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(std::string video_path); // TODO Not used?
     void export_original_frame(VideoProject* ,const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
@@ -152,7 +154,6 @@ public slots:
     void delete_interval(void);
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
-    void enable_tag_btn(bool);
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 

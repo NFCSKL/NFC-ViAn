@@ -4,15 +4,14 @@
 #include "basicanalysis.h"
 
 class BasicAnalysis;
-class DrawingTag : public BasicAnalysis
-{
+class DrawingTag : public BasicAnalysis {
+    std::set<int> m_frames;
 
 public:
+    virtual ANALYSIS_TYPE get_type() const override;
     void add_frame(int frame);
     void remove_frame(int frame);
-    virtual ANALYSIS_TYPE get_type() const override;
-private:
-
+    std::set<int> get_frames();
 };
 
 #endif // DRAWINGTAG_H

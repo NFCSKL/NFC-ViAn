@@ -152,13 +152,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
 
     connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
-    connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
     connect(video_wgt,   &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
-    connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
+    connect(project_wgt, &ProjectWidget::clear_slider, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
-    connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
-    connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
-    connect(project_wgt, &ProjectWidget::marked_video, drawing_wgt, &DrawingWidget::set_video_project);
+    connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
+    connect(project_wgt, &ProjectWidget::set_video_project, video_wgt->frame_wgt, &FrameWidget::set_video_project);
+    connect(project_wgt, &ProjectWidget::set_video_project, drawing_wgt, &DrawingWidget::set_video_project);
 
     connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
@@ -166,7 +165,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
-    connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisProxy*)));
+    connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->frame_wgt, &FrameWidget::set_analysis);
+    connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->playback_slider, &AnalysisSlider::set_analysis_proxy);
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
     connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
     connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
@@ -176,15 +176,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
 
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
-
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
-    connect(project_wgt, SIGNAL(enable_tag_btn(bool)), video_wgt, SLOT(enable_tag_btn(bool)));
-
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
 
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt, SLOT(set_basic_analysis(BasicAnalysis*)));
-    connect(video_wgt, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
+    connect(video_wgt, &VideoWidget::add_tag, project_wgt, &ProjectWidget::add_tag);
+    connect(video_wgt, &VideoWidget::tag_new_frame, project_wgt, &ProjectWidget::add_new_frame_to_tag_item);
+    connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);

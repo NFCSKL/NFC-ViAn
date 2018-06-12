@@ -75,6 +75,9 @@ SOURCES += main.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
     Project/Test/bookmarktest.cpp \
     GUI/textdialog.cpp \
+    GUI/TreeItems/tagframeitem.cpp \
+    Project/Analysis/interval.cpp \
+    Project/Analysis/tagframe.cpp \
     GUI/Analysis/anasettingwidget.cpp
 
 #
@@ -140,6 +143,9 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/drawingtagitem.h \
     Project/Test/bookmarktest.h \
     GUI/textdialog.h \
+    GUI/TreeItems/tagframeitem.h \
+    Project/Analysis/interval.h \
+    Project/Analysis/tagframe.h \
     GUI/Analysis/anasettingwidget.h
 
 #

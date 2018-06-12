@@ -33,6 +33,7 @@ class FrameWidget : public QWidget
     cv::Mat current_frame;
     Shapes* copied_item = nullptr;
     Analysis* m_analysis = nullptr;
+    AnalysisProxy* current_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
 
     // Analysis bounding box

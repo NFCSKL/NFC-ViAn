@@ -116,8 +116,12 @@ void FrameWidget::set_scroll_area_size(QSize size) {
  * Set the analysis and the pois on the current frame
  */
 void FrameWidget::set_analysis(AnalysisProxy *analysis) {
-    m_analysis = analysis->load_analysis();
-    set_detections_on_frame(current_frame_nr);
+    if (current_analysis != analysis) {
+        clear_analysis();
+        m_analysis = analysis->load_analysis();
+        set_detections_on_frame(current_frame_nr);
+        current_analysis = analysis;
+    }
 }
 
 /**

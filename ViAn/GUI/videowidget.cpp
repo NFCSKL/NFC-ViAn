@@ -255,7 +255,7 @@ void VideoWidget::set_btn_size() {
     tag_btn->setFixedSize(BTN_SIZE);
     analysis_play_btn->setFixedSize(BTN_SIZE);
     enable_poi_btns(false,false);
-    enable_tag_btn(false);
+    tag_btn->setEnabled(false);
 }
 
 /**
@@ -590,25 +590,37 @@ void VideoWidget::play_btn_toggled(bool status) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
-    if (m_tag != nullptr) {
-        m_tag->add_frame(playback_slider->value());
-        playback_slider->set_basic_analysis(m_tag);
-        emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
+    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
+        if (!m_tag->find_frame(playback_slider->value())) {
+            VideoState state = m_vid_proj->get_video()->state;
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+            m_tag->add_frame(playback_slider->value(), t_frame);
+            emit tag_new_frame(playback_slider->value(), t_frame);
+            emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
+            playback_slider->update();
+        } else {
+            emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " already tagged");
+        }
         return;
+    } else {
+        new_tag_clicked();
     }
-    emit set_status_bar("Select a tag");
 }
 
 /**
  * @brief VideoWidget::remove_tag_frame
- * Un-tags the current frarm
+ * Un-tags the current frame
  */
 void VideoWidget::remove_tag_frame() {
     if (m_tag != nullptr) {
-        Tag* tag = dynamic_cast<Tag*>(m_tag);
-        tag->remove_frame(playback_slider->value());
-        playback_slider->set_basic_analysis(tag);
-        emit set_status_bar("Frame untagged");
+        if (m_tag->find_frame(playback_slider->value())) {
+            m_tag->remove_frame(playback_slider->value());
+            emit tag_remove_frame(playback_slider->value());
+            emit set_status_bar("Untagged frame number: " + QString::number(playback_slider->value()));
+            playback_slider->update();
+        } else {
+            emit set_status_bar("Frame untagged");
+        }
         return;
     }
     emit set_status_bar("Select a tag");
@@ -619,6 +631,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
+    if (!m_vid_proj) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
@@ -631,9 +644,9 @@ void VideoWidget::new_tag_clicked() {
  * @param name
  */
 void VideoWidget::new_tag(QString name) {
-    BasicAnalysis* tag = new Tag();
+    Tag* tag = new Tag();
     tag->m_name = name.toStdString();
-    emit add_basic_analysis(m_vid_proj, tag);
+    emit add_tag(m_vid_proj, tag);
 }
 
 /**
@@ -655,12 +668,14 @@ void VideoWidget::tag_interval() {
  * @brief VideoWidget::remove_tag_interval
  * For each frame in the interval, un-tag it
  */
+// TODO Remove/change
+// Update for intervals
 void VideoWidget::remove_tag_interval() {
     if (m_tag != nullptr) {
-        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-            m_tag->remove_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-            playback_slider->set_basic_analysis(m_tag);
-        }
+//        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
+//            m_tag->remove_interval(new AnalysisInterval(m_interval.first, m_interval.second));
+//            playback_slider->set_basic_analysis(m_tag);
+//        }
     } else {
         emit set_status_bar("No tag selected");
     }
@@ -750,8 +765,10 @@ void VideoWidget::on_new_frame() {
         playback_slider->blockSignals(false);
     }
 
-    set_current_time(frame_num / m_frame_rate);
+    if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
     frame_line_edit->setText(QString::number(frame_index.load()));
+
+    m_vid_proj->get_video()->state.frame = frame_num;
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
@@ -819,6 +836,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int load_frame) {
         player_lock.unlock();
         player_con.notify_all();
 
+        m_vid_proj = vid_proj;
 
         playback_slider->setValue(frame);
         m_interval = make_pair(0,0);
@@ -867,6 +885,7 @@ void VideoWidget::set_video_btns(bool b) {
     playback_slider->setEnabled(b);
     frame_line_edit->setEnabled(b);
     speed_slider->setEnabled(b);
+    tag_btn->setEnabled(b);
     video_btns_enabled = b;
 }
 
@@ -880,10 +899,6 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
         analysis_play_btn->setChecked(b);
         analysis_only = b;
     }
-}
-
-void VideoWidget::enable_tag_btn(bool b) {
-    tag_btn->setEnabled(b);
 }
 
 /**
@@ -903,6 +918,7 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     current_frame_size = QSize(video_width, video_height);
     playback_slider->setMaximum(last_frame);
     set_total_time((last_frame + 1) / frame_rate);
+    set_current_time(frame_index.load() / m_frame_rate);
 }
 
 void VideoWidget::on_playback_stopped(){

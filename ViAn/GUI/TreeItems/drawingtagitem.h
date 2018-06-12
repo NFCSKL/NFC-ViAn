@@ -1,14 +1,14 @@
 #ifndef DRAWINGTAGITEM_H
 #define DRAWINGTAGITEM_H
 #include "treeitem.h"
-#include"Project/Analysis/drawingtag.h"
+#include"Project/Analysis/tag.h"
 
 class DrawingTagItem : public TreeItem {
-    DrawingTag* m_tag;
+    Tag* m_tag;
 
 public:
-    DrawingTagItem(DrawingTag *tag);
-    DrawingTag *get_tag();
+    DrawingTagItem(Tag *tag);
+    Tag *get_tag();
     void remove();
     void rename();
     //void update();

@@ -39,7 +39,6 @@ private:
 protected:
 
 public:
-
     BasicAnalysis();
     BasicAnalysis(const BasicAnalysis& other);
     virtual ~BasicAnalysis();
