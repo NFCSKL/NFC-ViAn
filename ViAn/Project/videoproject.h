@@ -33,7 +33,7 @@ class VideoProject : public Saveable{
     ID m_ana_id = 0; // Analysis id counter
 
     bool m_unsaved_changes = true;
-
+    bool current = false;
 
 public:
 
@@ -72,6 +72,8 @@ public:
     BasicAnalysis *get_analysis(const int &id);
 
     bool is_saved();
+    bool is_current();
+    void set_current(bool);
 
 };
 

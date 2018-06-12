@@ -82,7 +82,7 @@ int VideoWidget::get_current_video_length(){
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
-        settings->setInterval(m_interval);
+        settings->set_interval(m_interval);
         delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);
@@ -646,7 +646,7 @@ void VideoWidget::new_tag_clicked() {
 void VideoWidget::new_tag(QString name) {
     Tag* tag = new Tag();
     tag->m_name = name.toStdString();
-    emit add_basic_analysis(m_vid_proj, tag);
+    emit add_tag(m_vid_proj, tag);
 }
 
 /**
@@ -844,6 +844,9 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_state(state);
 
     if (m_vid_proj != vid_proj) {
+        if (m_vid_proj) m_vid_proj->set_current(false);
+        vid_proj->set_current(true);
+
         m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());
         player_lock.lock();
