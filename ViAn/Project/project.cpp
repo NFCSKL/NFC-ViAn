@@ -14,8 +14,9 @@ Project* Project::fromFile(const std::string &full_path){
     // TODO
 
     // ensure changes to paths are saved
-    //proj->save_saveable(full_path); // will overwrite existing save file with wrong
-    // values when failing to load the correct data.
+    // TODO Needed?
+    // Will overwrite saved data which causes problems when failing to load the correct data.
+    //proj->save_saveable(full_path);
     return proj;
 }
 

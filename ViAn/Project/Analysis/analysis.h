@@ -11,6 +11,7 @@
 #include "poi.h"
 #include "detectionbox.h"
 #include "basicanalysis.h"
+#include "Analysis/analysissettings.h"
 
 /**
  * @brief The Analysis class
