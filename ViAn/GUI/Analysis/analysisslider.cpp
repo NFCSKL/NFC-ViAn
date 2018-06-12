@@ -29,19 +29,21 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
     //Get one frame's width of the slider
-    double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+    double frame_width = (double)(groove_rect.right()-groove_rect.left())/maximum();
 
     QBrush brush = Qt::red;
 
     // Draws the tags
+    // Checks if tag is a nullptr and if the tag should be shown on the slider
     if (m_show_tags && show_on_slider && m_tag) {
         for (int frame : m_tag->get_frames()) {
-            double first = (double)(groove_rect.left() + (frame) * c);
+            double first = (double)(groove_rect.left() + (frame) * frame_width);
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);
         }
     }
     // Draws the detections on the slider
+    // Checks if the detection should be shown on the slider
     if (m_show_pois && show_on_slider) {
         brush = Qt::yellow;
 
@@ -50,8 +52,8 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             double second_frame = (double)(*it).second;
 
             //Walk first/second_frame number of frames in on the slider
-            double first = (groove_rect.left()+first_frame*c);
-            double second = (groove_rect.left()+second_frame*c);
+            double first = (groove_rect.left()+first_frame*frame_width);
+            double second = (groove_rect.left()+second_frame*frame_width);
 
             //Draw the rects, +1 so it's not too small
             //QRect(int x, int y, int width, int height)
@@ -63,7 +65,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Draws the analysis interval
     if (show_ana_interval) {
         brush = Qt::darkMagenta;
-        draw_interval(m_ana_interval, groove_rect, c);
+        draw_interval(m_ana_interval, groove_rect, frame_width);
         for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }
@@ -71,7 +73,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Draws the interval
     if (show_interval) {
         brush = Qt::black;
-        draw_interval(m_interval, groove_rect, c);
+        draw_interval(m_interval, groove_rect, frame_width);
         for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }

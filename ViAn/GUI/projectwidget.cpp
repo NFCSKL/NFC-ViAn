@@ -132,7 +132,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
+void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_proj->add_analysis(tag);
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
@@ -162,11 +162,11 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
 }
 
 /**
- * @brief ProjectWidget::add_frames_to_tag
+ * @brief ProjectWidget::add_frames_to_tag_item
  * Create the TagFrameItems from all the frames. Used when opening a project
  * @param item
  */
-void ProjectWidget::add_frames_to_tag(TreeItem* item) {
+void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
     if (item->type() == TAG_ITEM) {
         Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
         for (int frame : tag->get_frames() ) {
@@ -183,12 +183,12 @@ void ProjectWidget::add_frames_to_tag(TreeItem* item) {
 }
 
 /**
- * @brief ProjectWidget::add_new_frame_to_tag
+ * @brief ProjectWidget::add_new_frame_to_tag_item
  * Create a new TagFrameItem for the newly tagged frame
  * @param frame
  * @param t_frame
  */
-void ProjectWidget::add_new_frame_to_tag(int frame, TagFrame* t_frame) {
+void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
     TagFrameItem* tf_item = new TagFrameItem(frame);
     tf_item->set_state(t_frame);
     m_tag_item->setExpanded(true);
@@ -203,11 +203,11 @@ void ProjectWidget::add_new_frame_to_tag(int frame, TagFrame* t_frame) {
 }
 
 /**
- * @brief ProjectWidget::remove_frame_from_tag
+ * @brief ProjectWidget::remove_frame_from_tag_item
  * Remove the frame from the current tag
  * @param frame
  */
-void ProjectWidget::remove_frame_from_tag(int frame) {
+void ProjectWidget::remove_frame_from_tag_item(int frame) {
     for (int i = 0; i < m_tag_item->childCount(); ++i) {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (tf_item->get_frame() == frame) {
@@ -416,11 +416,11 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-            add_frames_to_tag(tag_item);
+            add_frames_to_tag_item(tag_item);
         } else if (ana.second->get_type() == DRAWING_TAG) {
             DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-            add_frames_to_tag(tag_item);
+            add_frames_to_tag_item(tag_item);
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
@@ -804,9 +804,9 @@ void ProjectWidget::drawing_tag() {
     }
 
     if (selectedItems().front()->type() == VIDEO_ITEM) {
-        add_basic_analysis(vid_proj, tag);
+        add_tag(vid_proj, tag);
     } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
-        add_basic_analysis(vid_proj, tag);
+        add_tag(vid_proj, tag);
     }
 }
 
