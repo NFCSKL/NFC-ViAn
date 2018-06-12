@@ -1117,6 +1117,17 @@ void VideoWidget::set_draw_area_size(QSize s) {
 }
 
 /**
+ * @brief VideoWidget::set_interpolation_method
+ * Notifies the frame processor that the interpolation method has been changed
+ * @param method - valid opencv interpolation constant
+ */
+void VideoWidget::set_interpolation_method(int method) {
+    update_processing_settings([&](){
+        z_settings.interpolation = method;
+    });
+}
+
+/**
  * @brief VideoWidget::on_zoom_out
  * Tells the frame processor to change the zoom with a constant
  */

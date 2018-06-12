@@ -175,6 +175,7 @@ public slots:
     void center(QPoint, double);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
+    void set_interpolation_method(int method);
     void on_step_zoom(double step);
     void set_state(VideoState state);
     void on_fit_screen(void);
