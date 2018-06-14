@@ -5,9 +5,8 @@
 #include <QMenu>
 
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
-
-    QPushButton* generate_btn = new QPushButton(tr("Generate"));
-    QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
+    QPushButton* generate_btn = new QPushButton(tr("Generate report"));
+    QPushButton* new_folder_btn = new QPushButton(tr("Create new category"));
 
     bm_list = new BookmarkList(this);
     scroll_area = new QScrollArea();
@@ -29,6 +28,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
     connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
     connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
+    connect(bm_list, &BookmarkList::new_folder, this, &BookmarkWidget::add_new_folder);
 
     //Context menu for list items
 //    bm_list->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -38,10 +38,10 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 
 // TODO Move to List?
 void BookmarkWidget::add_new_folder() {
-    BookmarkCategory* f2 = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), bm_list, CONTAINER);
-    bm_list->addItem(f2);
-    bm_list->setItemWidget(f2, f2->get_folder());
-    connect(f2, &BookmarkCategory::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
+    BookmarkCategory* new_category = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), CONTAINER);
+    bm_list->addItem(new_category);
+    bm_list->setItemWidget(new_category, new_category->get_folder());
+    connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
 }
 
 void BookmarkWidget::generate_report() {
@@ -52,8 +52,8 @@ void BookmarkWidget::generate_report() {
             BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
             QString cat_name = QString::fromStdString(_tmp_cat->get_name());
 
-            std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references_vector();
-            std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed_vector();
+            std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
+            std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
 
             RefDisp ref_disp = std::make_pair(_temp_disp, _temp_ref);
             rp_cont.push_back(std::make_pair(cat_name, ref_disp));
@@ -79,7 +79,7 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
 
     if (bm_cat == nullptr) {
         // Container does not exist. Create and add it
-        bm_cat = new BookmarkCategory(container->second, bm_list, CONTAINER);
+        bm_cat = new BookmarkCategory(container->second, CONTAINER);
         bm_list->addItem(bm_cat);
         bm_list->setItemWidget(bm_cat, bm_cat->get_folder());
         connect(bm_cat, &BookmarkCategory::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);

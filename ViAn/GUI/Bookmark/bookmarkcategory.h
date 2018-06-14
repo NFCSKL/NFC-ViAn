@@ -14,8 +14,7 @@
  * This class is inteded to store two scrollable lists
  * containing bookmarks or images.
  */
-class BookmarkCategory : public QObject, public QListWidgetItem
-{
+class BookmarkCategory : public QObject, public QListWidgetItem {
     Q_OBJECT
     // Title line
     QLineEdit* m_title = nullptr;
@@ -31,8 +30,9 @@ class BookmarkCategory : public QObject, public QListWidgetItem
     BookmarkList* ref_list = nullptr;
 
     QWidget* folder = new QWidget();
+
 public:
-    explicit BookmarkCategory(std::string name, QListWidget *parent = nullptr, int type = 0);
+    explicit BookmarkCategory(std::string name, int type = 0);
     ~BookmarkCategory();
     // Add item to disp list
     void add_disp_item(BookmarkItem* bm);
@@ -40,18 +40,19 @@ public:
     void add_ref_item(BookmarkItem* bm);
 
     std::string get_name();
-    std::vector<BookmarkItem*> get_disputed_vector();
-    std::vector<BookmarkItem*> get_references_vector();
-    BookmarkList* get_disputed();
-    BookmarkList* get_references();
+    std::vector<BookmarkItem*> get_disputed();
+    std::vector<BookmarkItem*> get_references();
     QWidget* get_folder();
 
     void update_title(const QString &title);
-    BookmarkCategory* copy(QListWidget* new_parent);
+    BookmarkCategory* copy();
+
 private:  
     QScrollArea* make_scrollable_container(BookmarkList* cont);
+
 private slots:
     void on_text_edited(QString name);
+
 signals:
     void set_bookmark_video(VideoProject* vid_proj, VideoState state);
 };

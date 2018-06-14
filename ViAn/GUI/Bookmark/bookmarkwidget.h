@@ -40,10 +40,10 @@ public slots:
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
     void clear_bookmarks();
+    void add_new_folder();
 private slots:
 //    void item_context_menu(QPoint pos);
 private:
-    void add_new_folder();
     void generate_report();
     BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
     QString get_input_text(QString text, bool* ok);

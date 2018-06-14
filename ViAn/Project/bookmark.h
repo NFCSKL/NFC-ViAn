@@ -19,7 +19,7 @@ using ID = int;
  * marked points in a video and an associated frame.
  */
 class VideoProject;
-class Bookmark : public Writeable{
+class Bookmark : public Writeable {
     friend class BookmarkTest;
     VideoProject* m_vid_proj;
 //    int m_type = UNSORTED;

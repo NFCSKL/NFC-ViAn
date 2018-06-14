@@ -45,7 +45,6 @@ Bookmark::Bookmark() {
  * Destructor
  */
 Bookmark::~Bookmark(){
-    qDebug() << "Bookmark is kill";
 }
 
 ID Bookmark::get_id() {
@@ -111,7 +110,6 @@ void Bookmark::set_container(std::string name, int type) {
     std::pair<int, std::string> container(type, name);
     m_container = container;
     m_unsaved_changes = true;
-    qDebug() << "in set container" << QString::fromStdString(name);
 }
 
 /**
@@ -145,9 +143,10 @@ void Bookmark::add_to_video_project() {
  * Returns a bool specifying if the bookmark should be deleted or not
  * @return
  */
+//TODO remove. Only used in functions only used in old tests
 bool Bookmark::remove() {
     return false;
-    //return (m_containers.empty());
+
 }
 
 /**
@@ -157,7 +156,6 @@ bool Bookmark::remove() {
  */
 void Bookmark::read(const QJsonObject& json){
     m_time = json["time"].toString();
-    //m_frame_nbr = json["frame"].toInt();
     m_file = json["path"].toString().toStdString();
     m_description = json["description"].toString().toStdString();
     std::pair<int, std::string> pair(json["type"].toInt(), json["container"].toString().toStdString());
@@ -202,7 +200,7 @@ bool Bookmark::is_saved() const{
  * @brief Bookmark::remove_exported_image
  * Removes the exported image, if there is one.
  */
-
 // TODO update, currently empty
 void Bookmark::remove_exported_image() {
+
 }
