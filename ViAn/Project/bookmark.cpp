@@ -111,6 +111,7 @@ void Bookmark::set_container(std::string name, int type) {
     std::pair<int, std::string> container(type, name);
     m_container = container;
     m_unsaved_changes = true;
+    qDebug() << "in set container" << QString::fromStdString(name);
 }
 
 /**

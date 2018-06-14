@@ -20,7 +20,7 @@ class BookmarkCategory : public QObject, public QListWidgetItem
     // Title line
     QLineEdit* m_title = nullptr;
     // Category name
-    std::string m_name;
+    std::string m_name = "";
     // Widget layout
     QVBoxLayout*  layout = nullptr;
     // Scroll areas for disp_ref
@@ -29,6 +29,8 @@ class BookmarkCategory : public QObject, public QListWidgetItem
     // Disp ref lists
     BookmarkList* disp_list = nullptr;
     BookmarkList* ref_list = nullptr;
+
+    QWidget* folder = new QWidget();
 public:
     explicit BookmarkCategory(std::string name, QListWidget *parent = nullptr, int type = 0);
     ~BookmarkCategory();
@@ -38,8 +40,11 @@ public:
     void add_ref_item(BookmarkItem* bm);
 
     std::string get_name();
-    std::vector<BookmarkItem*> get_disputed();
-    std::vector<BookmarkItem*> get_references();
+    std::vector<BookmarkItem*> get_disputed_vector();
+    std::vector<BookmarkItem*> get_references_vector();
+    BookmarkList* get_disputed();
+    BookmarkList* get_references();
+    QWidget* get_folder();
 
     void update_title(const QString &title);
     BookmarkCategory* copy(QListWidget* new_parent);

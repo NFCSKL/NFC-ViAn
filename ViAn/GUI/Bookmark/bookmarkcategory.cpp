@@ -1,10 +1,9 @@
 #include "bookmarkcategory.h"
 #include <QDebug>
 
-BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int type) : QListWidgetItem(parent, type) {
+BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int type) : QListWidgetItem(nullptr, type) {
     m_name = name;
     // Setup layout
-    QWidget* folder = new QWidget();
     layout = new QVBoxLayout();
     layout->setAlignment(Qt::AlignTop);
     layout->setMargin(5);
@@ -33,7 +32,8 @@ BookmarkCategory::BookmarkCategory(std::string name, QListWidget *parent, int ty
     container->addWidget(reference);
 
     folder->setLayout(layout);
-    parent->setItemWidget(this, folder);
+    //parent->setItemWidget(this, folder);
+
 
     setSizeHint(folder->sizeHint());
 }
@@ -44,13 +44,14 @@ BookmarkCategory::~BookmarkCategory() {
     //ref_list->clear();
     delete disp_list;
     delete ref_list;
+    qDebug() << "List cleared";
 }
 
 std::string BookmarkCategory::get_name() {
     return m_name;
 }
 
-std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
+std::vector<BookmarkItem *> BookmarkCategory::get_disputed_vector() {
     std::vector<BookmarkItem *> items;
     for (auto i = 0; i < disp_list->count(); ++i) {
         items.push_back(dynamic_cast<BookmarkItem*>(disp_list->item(i)));
@@ -58,12 +59,24 @@ std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
     return items;
 }
 
-std::vector<BookmarkItem *> BookmarkCategory::get_references() {
+std::vector<BookmarkItem *> BookmarkCategory::get_references_vector() {
     std::vector<BookmarkItem *> items;
     for (auto i = 0; i < ref_list->count(); ++i) {
         items.push_back(dynamic_cast<BookmarkItem*>(ref_list->item(i)));
     }
     return items;
+}
+
+BookmarkList* BookmarkCategory::get_disputed() {
+    return disp_list;
+}
+
+BookmarkList* BookmarkCategory::get_references() {
+    return ref_list;
+}
+
+QWidget* BookmarkCategory::get_folder() {
+    return folder;
 }
 
 void BookmarkCategory::update_title(const QString &title){
@@ -78,22 +91,25 @@ void BookmarkCategory::update_title(const QString &title){
 BookmarkCategory *BookmarkCategory::copy(QListWidget* new_parent) {
     qDebug() << "Copy cat";
     BookmarkList* bm_list = dynamic_cast<BookmarkList*>(new_parent);
+    qDebug() <<  "name" << QString::fromStdString(m_name);
 
     BookmarkCategory* new_bm_cat = new BookmarkCategory(m_name, new_parent, type());
     // Copy disputed bookmarks
-    std::vector<BookmarkItem*> items = get_disputed();
+    std::vector<BookmarkItem*> items = get_disputed_vector();
     std::for_each(items.begin(), items.end(),
-                  [new_bm_cat, bm_list](BookmarkItem* bi){
+                  [new_bm_cat, this](BookmarkItem* bi){
         new_bm_cat->add_disp_item(bi->copy());
-        bi->get_bookmark()->set_container(bm_list->get_parent_name(), DISPUTED);
+        bi->get_bookmark()->set_container(m_name, DISPUTED);
     });
+//    bm_list->setItemWidget(new_bm_cat, new_bm_cat->get_folder());
     // Copy reference bookmarks
-    items = get_references();
+    items = get_references_vector();
     std::for_each(items.begin(), items.end(),
-                  [new_bm_cat, bm_list](BookmarkItem* bi){
+                  [new_bm_cat, this](BookmarkItem* bi){
         new_bm_cat->add_ref_item(bi->copy());
-        bi->get_bookmark()->set_container(bm_list->get_parent_name(), REFERENCE);
+        bi->get_bookmark()->set_container(m_name, REFERENCE);
     });
+    qDebug() << "list copied";
     return new_bm_cat;
 
 }

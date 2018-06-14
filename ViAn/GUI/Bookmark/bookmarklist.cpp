@@ -32,13 +32,11 @@ BookmarkList::~BookmarkList() {
 
     for (int i = 0; i < count(); ++i) {
         if (item(i)->type() == BOOKMARK) {
-            qDebug() << "type: BOOKMARK";
             BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(item(i));
             //Bookmark* b_mark = bm_item->get_bookmark();
             //b_mark->get_video_project()->remove_bookmark(b_mark);
             delete bm_item;
         } else if (item(i)->type() == CONTAINER) {
-            qDebug() << "type: CONTAINER";
             BookmarkCategory* bm_cat_item = dynamic_cast<BookmarkCategory*>(item(i));
             delete bm_cat_item;
         }
@@ -60,6 +58,7 @@ QListWidgetItem *BookmarkList::get_clicked_item() {
  * @param name : name of parent container
  */
 void BookmarkList::set_parent_name(std::string name) {
+    qDebug() << "in set name" << QString::fromStdString(name) << QString::fromStdString(m_par_cont_name);
     m_par_cont_name = name;
 }
 
@@ -78,7 +77,8 @@ std::string BookmarkList::get_parent_name() {
  * @param name
  */
 void BookmarkList::on_parent_name_edited(QString name) {
-    if (m_par_cont_name.empty()) return;
+    qDebug() << "in name edit" << name << QString::fromStdString(m_par_cont_name);
+    //if (m_par_cont_name.empty()) return;
     for (auto i = 0; i < this->count(); ++i) {
         auto item = this->item(i);
         if (item->type() == 0) {
@@ -122,7 +122,6 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
 }
 
 void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
-    qDebug() << "COUNT" << count();
 
     // BookmarkCategory
     auto item = source->currentItem();
@@ -148,6 +147,8 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
         qDebug() << index << count();
         insertItem(index, cat_item);
     }
+    setItemWidget(cat_item, cat_item->get_folder());
+    connect(cat_item, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
     event->acceptProposedAction();
 }
 
@@ -222,6 +223,11 @@ void BookmarkList::remove_item() {
 void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (itemAt(event->pos())) {
         clicked_item = itemAt(event->pos());
+        if (clicked_item->type() == CONTAINER) {
+            BookmarkCategory* cat_item = dynamic_cast<BookmarkCategory*>(clicked_item);
+
+
+        }
         setCurrentItem(clicked_item);
         switch (event->button()) {
             case Qt::RightButton:
@@ -250,6 +256,7 @@ void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
     // Start video at correct frame
     VideoState state;
     state = b_item->get_bookmark()->get_state();
+    qDebug() << "state" << state.frame << state.scale_factor;
     emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), state);
 }
 
