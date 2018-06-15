@@ -10,7 +10,7 @@
 #include "Video/framemanipulator.h"
 #include <opencv2/opencv.hpp>
 
-struct VideoState{
+struct VideoState {
     int frame = 0;
     int contrast = FrameManipulator().CONTRAST_DEFAULT;
     int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
