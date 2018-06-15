@@ -110,7 +110,7 @@ signals:
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
-    void add_basic_analysis(VideoProject*, Tag*);
+    void add_tag(VideoProject*, Tag*);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);

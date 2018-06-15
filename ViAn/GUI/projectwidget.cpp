@@ -24,6 +24,16 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDragEnabled(true);
     setDropIndicatorShown(true);
 
+    // Create togglable action in the context menu for analysis details
+    show_details_act = new QAction("Show/hide details", this);
+    show_details_act->setCheckable(true);
+    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+
+    // Create togglable action in the context menu for analysis settings
+    show_settings_act = new QAction("Show/hide analysis settings", this);
+    show_settings_act->setCheckable(true);
+    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
@@ -113,9 +123,17 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir);
-    if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
-    if(settings->use_interval) method->set_interval(settings->get_interval());
+    AnalysisMethod* method;
+    switch (settings->get_type()) {
+    case MOTION_DETECTION:
+        method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
+        break;
+    default:
+        break;
+    }
+    if (settings->quick_analysis) {
+        settings->set_full_settings(analysis_settings->get_full_settings());
+    } else {}
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -133,7 +151,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
+void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_proj->add_analysis(tag);
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
@@ -163,36 +181,33 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, Tag* tag) {
     vid_item->setExpanded(true);
 }
 
+
 /**
- * @brief ProjectWidget::add_frames_to_tag
+ * @brief ProjectWidget::add_frames_to_tag_item
  * Create the TagFrameItems from all the frames. Used when opening a project
  * @param item
  */
-void ProjectWidget::add_frames_to_tag(TreeItem* item) {
+void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
+    Tag* tag;
     if (item->type() == TAG_ITEM) {
-        Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-        for (auto t_frame : tag->tag_map) {
-            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-            tf_item->set_state(t_frame.second);
-            item->addChild(tf_item);
-        }
+        tag = dynamic_cast<TagItem*>(item)->get_tag();
     } else if (item->type() == DRAWING_TAG_ITEM) {
-        Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
-        for (auto t_frame : tag->tag_map) {
-            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-            tf_item->set_state(t_frame.second);
-            item->addChild(tf_item);
-        }
+        tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+    }
+    for (auto t_frame : tag->tag_map) {
+        TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+        tf_item->set_state(t_frame.second);
+        item->addChild(tf_item);
     }
 }
 
 /**
- * @brief ProjectWidget::add_new_frame_to_tag
+ * @brief ProjectWidget::add_new_frame_to_tag_item
  * Create a new TagFrameItem for the newly tagged frame
  * @param frame
  * @param t_frame
  */
-void ProjectWidget::add_new_frame_to_tag(int frame, TagFrame* t_frame) {
+void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
     TagFrameItem* tf_item = new TagFrameItem(frame);
     tf_item->set_state(t_frame);
     m_tag_item->setExpanded(true);
@@ -207,11 +222,11 @@ void ProjectWidget::add_new_frame_to_tag(int frame, TagFrame* t_frame) {
 }
 
 /**
- * @brief ProjectWidget::remove_frame_from_tag
+ * @brief ProjectWidget::remove_frame_from_tag_item
  * Remove the frame from the current tag
  * @param frame
  */
-void ProjectWidget::remove_frame_from_tag(int frame) {
+void ProjectWidget::remove_frame_from_tag_item(int frame) {
     for (int i = 0; i < m_tag_item->childCount(); ++i) {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (tf_item->get_frame() == frame) {
@@ -420,11 +435,11 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-            add_frames_to_tag(tag_item);
+            add_frames_to_tag_item(tag_item);
         } else if (ana.second->get_type() == DRAWING_TAG) {
             DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-            add_frames_to_tag(tag_item);
+            add_frames_to_tag_item(tag_item);
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
@@ -483,25 +498,21 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
+void ProjectWidget::update_analysis_settings() {
+    std::vector<VideoItem*> v_items;
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
+    dialog->show();
+}
+
 void ProjectWidget::advanced_analysis() {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items, m_proj->get_dir());
-    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    AnalysisSettings* new_settings = new AnalysisSettings(analysis_settings);
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
+    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
-}
-
-
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj) {
-    if (vid_proj == nullptr) return;
-    VideoItem* v_item = get_video_item(vid_proj);
-    AnalysisItem* ana = new AnalysisItem();
-    v_item->addChild(ana);
-    ana->setText(0, "Loading");
-    v_item->setExpanded(true);
-    emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
 }
 
 /**
@@ -559,6 +570,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         if(!ana_item->is_finished()) break;
+        ana_item->set_not_new();
         emit marked_analysis(ana_item->get_analysis());
 
         emit set_video_project(vid_item->get_video_project());
@@ -572,6 +584,9 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit enable_poi_btns(true, true);
 
         update_current_tag(vid_item);
+
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
         break;
     } case DRAWING_TAG_ITEM: {
         DrawingTagItem* tag_item = dynamic_cast<DrawingTagItem*>(item);
@@ -756,8 +771,8 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Show details", this, SLOT(show_details()));
-                menu.addAction("Hide details", this, SLOT(hide_details()));
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
@@ -814,24 +829,46 @@ void ProjectWidget::drawing_tag() {
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }
-    add_basic_analysis(vid_proj, tag);
+
+    if (selectedItems().front()->type() == VIDEO_ITEM) {
+        add_tag(vid_proj, tag);
+    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        add_tag(vid_proj, tag);
+    }
 }
 
 /**
- * @brief ProjectWidget::show_details
- * @param ana_item
- * Show the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_details
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::show_details() {
-    emit show_analysis_details(true);
+void ProjectWidget::toggle_details(bool b) {
+    show_details_act->setChecked(b);
 }
 
 /**
- * @brief ProjectWidget::hide_details
- * Hide the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_settings
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::hide_details() {
-    emit show_analysis_details(false);
+void ProjectWidget::toggle_settings(bool b) {
+    show_settings_act->setChecked(b);
+}
+
+/**
+ * @brief ProjectWidget::update_settings
+ * Updates the analysis settings dock window with the settings
+ * from the clicked analysis
+ */
+void ProjectWidget::update_settings() {
+    QTreeWidgetItem* item = selectedItems().front();
+    if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* a_item = dynamic_cast<AnalysisItem*>(item);
+        if (!a_item->is_finished()) return;
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(a_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
+        emit show_analysis_settings(true);
+    }
 }
 
 /**

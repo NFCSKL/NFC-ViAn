@@ -241,6 +241,8 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
         menu->addAction("New category", this, SIGNAL(new_folder()));
         menu->exec(mapToGlobal(event->pos()));
         delete menu;
+    } else {
+        setCurrentItem(nullptr);
     }
 }
 

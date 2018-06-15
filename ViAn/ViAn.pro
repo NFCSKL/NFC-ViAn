@@ -78,7 +78,8 @@ SOURCES += main.cpp \
     GUI/TreeItems/tagframeitem.cpp \
     Project/Analysis/interval.cpp \
     Project/Analysis/tagframe.cpp \
-    GUI/Bookmark/myinputdialog.cpp
+    GUI/Bookmark/myinputdialog.cpp \
+    GUI/Analysis/anasettingwidget.cpp
 
 #
 # TEST
@@ -146,7 +147,8 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/tagframeitem.h \
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
-    GUI/Bookmark/myinputdialog.h
+    GUI/Bookmark/myinputdialog.h \
+    GUI/Analysis/anasettingwidget.h
 
 #
 # LIBRARY
