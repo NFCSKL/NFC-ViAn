@@ -39,7 +39,7 @@ QListWidgetItem *BookmarkList::get_clicked_item() {
  * Stores the name of the parent container that the widget resides in
  * @param name : name of parent container
  */
-void BookmarkList::set_parent_name(std::string name) {
+void BookmarkList::set_parent_name(std::string& name) {
     m_par_cont_name = name;
 }
 
