@@ -181,6 +181,10 @@ std::string AnalysisMethod::save_path() const {
     return m_save_path;
 }
 
+std::string AnalysisMethod::analysis_name() const {
+    return m_ana_name;
+}
+
 int AnalysisMethod::get_setting(const std::string &var) {
     return analysis_settings->get_setting(var);
 }

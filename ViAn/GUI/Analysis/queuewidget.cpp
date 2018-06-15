@@ -62,13 +62,7 @@ void QueueWidget::enqueue(AnalysisMethod *method) {
     abort_btn->show();
     progressbar->show();
     AnalysisListItem* item = new AnalysisListItem(method);
-    std::string path = method->save_path();
-    std::size_t index = path.find_last_of('/') + 1;
-    std::string analysis_name = path.substr(index);
-    index = analysis_name.find_last_of('.');
-    analysis_name = analysis_name.substr(0,index);
-
-    item->setText(QString::fromStdString(analysis_name));
+    item->setText(QString::fromStdString(method->analysis_name()));
     m_queue->addItem(item);
 }
 

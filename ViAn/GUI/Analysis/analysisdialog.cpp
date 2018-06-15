@@ -65,8 +65,8 @@ void AnalysisDialog::ok_btn_clicked() {
             set_settings();
             emit start_analysis(vid_proj, m_analysis_settings);
             close();
-            return;
         }
+        return;
     }
     set_settings();
     close();
