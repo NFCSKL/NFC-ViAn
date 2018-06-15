@@ -34,7 +34,7 @@ public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
 
     // Internal queue for analyses
-    std::deque<tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
+    std::deque<std::tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
 
     // Widget representing the current analysis queue
     QueueWidget* m_queue_wgt;
@@ -47,7 +47,7 @@ public:
     AnalysisMethod* current_method;
 private:
     // Execute analysis
-    void perform_analysis(tuple<AnalysisMethod *, QTreeWidgetItem *> analys);
+    void perform_analysis(std::tuple<AnalysisMethod *, QTreeWidgetItem *> analys);
 
     // Moves the queue forward
     void move_queue();

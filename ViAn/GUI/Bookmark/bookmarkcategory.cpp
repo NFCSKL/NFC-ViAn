@@ -46,7 +46,7 @@ std::string BookmarkCategory::get_name() {
 }
 
 std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
-    vector<BookmarkItem *> items;
+    std::vector<BookmarkItem *> items;
     for (auto i = 0; i < disp_list->count(); ++i) {
         items.push_back(dynamic_cast<BookmarkItem*>(disp_list->item(i)));
     }
@@ -54,7 +54,7 @@ std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
 }
 
 std::vector<BookmarkItem *> BookmarkCategory::get_references() {
-    vector<BookmarkItem *> items;
+    std::vector<BookmarkItem *> items;
     for (auto i = 0; i < ref_list->count(); ++i) {
         items.push_back(dynamic_cast<BookmarkItem*>(ref_list->item(i)));
     }
@@ -73,7 +73,7 @@ void BookmarkCategory::update_title(const QString &title){
 BookmarkCategory *BookmarkCategory::copy(QListWidget* new_parent) {
     BookmarkCategory* new_bm_cat = new BookmarkCategory(m_name, new_parent, type());
     // Copy disputed bookmarks
-    vector<BookmarkItem*> items = get_disputed();
+    std::vector<BookmarkItem*> items = get_disputed();
     std::for_each(items.begin(), items.end(),
                   [new_bm_cat](BookmarkItem* bi){new_bm_cat->add_disp_item(bi->copy());});
     // Copy reference bookmarks

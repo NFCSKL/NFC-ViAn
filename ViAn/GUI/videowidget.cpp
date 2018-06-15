@@ -517,9 +517,9 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
     cv::Mat org_frame = frame_wgt->get_org_frame();
-    int frame = frame_index.load();
-    emit new_bookmark(m_vid_proj, frame , bookmark_frame);
-    emit export_original_frame(m_vid_proj, frame, org_frame);
+    int frame_nr = get_current_frame();
+    QString time = current_time->text();
+    emit new_bookmark(m_vid_proj, frame_nr, bookmark_frame, org_frame, time);
 }
 
 /**
@@ -855,7 +855,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         player_lock.unlock();
         player_con.notify_all();
     }
-    m_interval = make_pair(0,0);
+    m_interval = std::make_pair(0,0);
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);

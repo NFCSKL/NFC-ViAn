@@ -1,4 +1,6 @@
 #include "analysisdialog.h"
+#include <QPushButton>
+#include <QCheckBox>
 
 AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSettings *analysis_settings)
     : m_analysis_settings(analysis_settings) {

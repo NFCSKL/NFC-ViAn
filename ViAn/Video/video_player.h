@@ -71,7 +71,7 @@ class video_player : public QThread {
 public:
     video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent = 0);
     ~video_player();
-    bool load_video(string filename, Overlay* o);
+    bool load_video(std::string filename, Overlay* o);
     bool is_paused();
     bool is_stopped();
     bool is_playing();

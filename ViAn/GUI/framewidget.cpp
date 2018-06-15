@@ -4,6 +4,7 @@
 #include <QTime>
 #include <QThread>
 #include <QShortcut>
+#include <QMessageBox>
 #include "utility.h"
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {

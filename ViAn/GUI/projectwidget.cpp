@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QShortcut>
+#include <QMessageBox>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -34,7 +35,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);

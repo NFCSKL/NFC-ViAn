@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QLayout>
 #include <QProgressBar>
+#include <QLabel>
 #include "videolistitem.h"
 
 /**

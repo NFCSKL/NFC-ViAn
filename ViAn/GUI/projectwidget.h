@@ -6,6 +6,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QAction>
 #include <vector>
 #include "Project/project.h"
 #include "GUI/TreeItems/tagitem.h"

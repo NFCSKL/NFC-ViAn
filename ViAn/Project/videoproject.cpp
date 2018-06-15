@@ -206,7 +206,7 @@ void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
-void VideoProject::reset_root_dir(const string &dir) {
+void VideoProject::reset_root_dir(const std::string &dir) {
     for(auto bm : m_bookmarks){
         bm.second->reset_root_dir(dir+"Bookmarks/");
     }
@@ -259,7 +259,7 @@ void VideoProject::remove_from_project() {
     m_unsaved_changes = true;
 }
 
-string VideoProject::get_index_path() {
+std::string VideoProject::get_index_path() {
     return m_tree_index;
 }
 

@@ -22,13 +22,13 @@ void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
  * Puts the analysis in the queue and if the was empty starts the analysis directly
  */
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
-    tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
+    std::tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     // Add the analysis to the queue in the queue widget
     m_queue_wgt->enqueue(method);
     emit show_analysis_queue(true);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
-        std::string name = "Queued #"+to_string(analysis_queue.size()-1);
+        std::string name = "Queued #"+std::to_string(analysis_queue.size()-1);
         emit name_in_tree(item, QString::fromStdString(name));
     } else {
         m_queue_wgt->next();
@@ -44,8 +44,8 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
  * Actually starts the analysis
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
-void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> analys) {
-    AnalysisMethod* method = get<0>(analys);
+void AnalysisWidget::perform_analysis(std::tuple<AnalysisMethod*, QTreeWidgetItem*> analys) {
+    AnalysisMethod* method = std::get<0>(analys);
     bool* abort_bool = new bool(false);
     method->aborted = abort_bool;
     abort_map.insert(std::make_pair(method,abort_bool));    
@@ -80,7 +80,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
 
     m_queue_wgt->next();
     if (!analysis_queue.empty()) {
-        current_analysis_item = get<1>(analysis_queue.front());
+        current_analysis_item = std::get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
     }else{
@@ -102,7 +102,7 @@ void AnalysisWidget::on_analysis_aborted() {
 
     m_queue_wgt->next();
     if (!analysis_queue.empty()) {        
-        current_analysis_item = get<1>(analysis_queue.front());
+        current_analysis_item = std::get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
         return;
@@ -118,8 +118,8 @@ void AnalysisWidget::on_analysis_aborted() {
  */
 void AnalysisWidget::move_queue() {
     for (unsigned int i = 0; i < analysis_queue.size(); i++) {
-        std::string name = "Queued #"+to_string(i);
-        emit name_in_tree(get<1>(analysis_queue.at(i)), QString::fromStdString(name));
+        std::string name = "Queued #"+std::to_string(i);
+        emit name_in_tree(std::get<1>(analysis_queue.at(i)), QString::fromStdString(name));
     }
 }
 
@@ -139,7 +139,7 @@ void AnalysisWidget::send_progress(int progress) {
         }
     }
     m_queue_wgt->update_progress(progress);
-    std::string name = "Loading " + to_string(progress) + "%" + dots;
+    std::string name = "Loading " + std::to_string(progress) + "%" + dots;
     emit name_in_tree(current_analysis_item, QString::fromStdString(name));
     emit show_progress(progress);
 }

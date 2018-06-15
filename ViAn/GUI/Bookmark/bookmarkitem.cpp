@@ -7,18 +7,20 @@
  * @param bookmrk Bookmark containing relevant.
  * @param view Parent widget of the bookmark.
  */
-QString BookmarkItem::getDescription() const
-{
+QString BookmarkItem::get_description() const {
     return QString::fromStdString(bookmark->get_description());
 }
 
 BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
     QString frame = QString::number(bookmark->get_frame_number());
     QString v_name = QString::fromStdString(bookmark->get_video_project()->get_video()->get_name());
-    hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + QString::number(bookmark->get_time()) + "\nDescription: ";
+    hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + bookmark->get_time();
     QString description = QString::fromStdString(bookmark->get_description());
-    setToolTip(hover_text + description);
-    //this->setText(frame + "@" + v_name);
+    if (description != "") {
+        setToolTip(hover_text + "\nDescription: " + description);
+    } else {
+        setToolTip(hover_text);
+    }
     this->bookmark = bookmark;
 }
 
@@ -66,8 +68,7 @@ int BookmarkItem::get_frame_number() {
     return bookmark->get_frame_number();
 }
 
-QString BookmarkItem::get_file_path()
-{
+QString BookmarkItem::get_file_path() {
     return QString::fromStdString(bookmark->m_file);
 }
 
@@ -80,5 +81,9 @@ QString BookmarkItem::get_file_path()
 void BookmarkItem::update_description(const QString& text) {
     this->bookmark->set_description(text.toStdString());
     setText(text);
-    setToolTip(hover_text + text);
+    if (text != "") {
+        setToolTip(hover_text + "\nDescription: " + text);
+    } else {
+        setToolTip(hover_text);
+    }
 }

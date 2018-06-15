@@ -13,12 +13,10 @@
 
 #include <string>
 
-#include "Library/customdialog.h"
 #include "reportgenerator.h"
 
 #include "GUI/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"
-
 
 #include "videowidget.h"
 #include "projectwidget.h"
@@ -30,7 +28,6 @@
 #include "Toolbars/drawingtoolbar.h"
 #include "Toolbars/maintoolbar.h"
 
-using namespace std;
 class AnalysisWindow;
 class MainWindow : public QMainWindow
 {

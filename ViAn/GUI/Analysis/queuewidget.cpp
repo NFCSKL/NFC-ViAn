@@ -1,4 +1,5 @@
 #include "queuewidget.h"
+#include <QPushButton>
 
 /**
  * @brief QueueWidget::QueueWidget
