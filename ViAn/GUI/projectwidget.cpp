@@ -804,36 +804,33 @@ void ProjectWidget::context_menu(const QPoint &point) {
  */
 void ProjectWidget::drawing_tag() {
     VideoItem* vid_item;
-    Tag* tag;
-    if (selectedItems().front()->type() == VIDEO_ITEM) {
-        // Create tag drawing
-        vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
-        tag = new Tag();
-        tag->m_name = "Drawing tag";
-        tag->set_drawing_tag(true);
-    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+    // Remove the old drawing tag if update was selected
+    if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        vid_item = dynamic_cast<VideoItem*>(selectedItems().front()->parent());
         // Update tag drawing
         DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
-        vid_item = dynamic_cast<VideoItem*>(item->parent());
-        tag = item->get_tag();
-        item->takeChildren();
-        tag->clear_intervals();
+        vid_item->get_video_project()->remove_analysis(item->get_tag());
+        delete selectedItems().front();
+    } else if (selectedItems().front()->type() == VIDEO_ITEM) {
+        vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
     }
+    // Create tag drawing
+    Tag* tag = new Tag();
+    tag->m_name = "Drawing tag";
+    tag->set_drawing_tag(true);
 
+    // Add all drawings to tag frame items.
     VideoProject* vid_proj = vid_item->get_video_project();
     for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
         if (frame_overlay.second.size() > 0) {
             VideoState state;
+            state.frame = frame_overlay.first;
             TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }
-
-    if (selectedItems().front()->type() == VIDEO_ITEM) {
-        add_tag(vid_proj, tag);
-    } else if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
-        add_tag(vid_proj, tag);
-    }
+    // Add tag to tree
+    add_tag(vid_proj, tag);
 }
 
 /**
