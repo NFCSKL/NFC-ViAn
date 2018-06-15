@@ -618,7 +618,7 @@ void FrameWidget::panning(QPoint pos) {
 }
 
 /**
- * @brief FrameWidget::zoom
+ * @brief FrameWidget::rect_update
  * Updates and redraws the zooming rect
  * @param pos
  */

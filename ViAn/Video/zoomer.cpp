@@ -186,6 +186,7 @@ void Zoomer::update_rect_size() {
 void Zoomer::reset() {
     // Set the video state to default
     // Anchor (0,0) and scale_factor 1
+    m_zoom_rect = m_frame_rect;
     set_state(QPoint(0,0), 1);
 }
 
@@ -225,6 +226,7 @@ QPoint Zoomer::get_anchor() const {
     return anchor;
 }
 
+// TODO unused
 void Zoomer::force_bounds() {
     m_zoom_rect.height = std::min(m_frame_size.height, m_zoom_rect.height);
     m_zoom_rect.width = std::min(m_frame_size.width, m_zoom_rect.width);

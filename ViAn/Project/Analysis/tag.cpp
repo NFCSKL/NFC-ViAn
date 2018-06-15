@@ -38,6 +38,8 @@ int Tag::previous_frame(int frame) {
     auto it = tag_map.lower_bound(frame);
     if (it != tag_map.end() && it != tag_map.begin()) {
         return (*(std::prev(it))).first;
+    } else if (it == tag_map.end() && tag_map.size() >= 1) {
+        return (*(std::prev(it))).first;
     } else {
         return frame;
     }

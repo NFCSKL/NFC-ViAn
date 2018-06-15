@@ -602,30 +602,23 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
 
-        // TODO maybe change, depends on if the drawing tag should count as a tag
-        //update_current_tag(vid_item);
-        //m_tag_item = tag_item;
         if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
-        emit marked_basic_analysis(nullptr);
         m_tag_item = nullptr;
         break;
     } case TAG_ITEM: {
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
 
-        // TODO remove ?, double
         emit marked_basic_analysis(tag_item->get_tag());
 
         if (!m_tag_item) {
             item->setCheckState(0, Qt::Checked);
-            emit marked_basic_analysis(tag_item->get_tag());
             m_tag_item = tag_item;
         }
         // Deselect the old current tag and select the new one
         else if (m_tag_item != tag_item) {
             m_tag_item->setCheckState(0, Qt::Unchecked);
             item->setCheckState(0, Qt::Checked);
-            emit marked_basic_analysis(tag_item->get_tag());
             m_tag_item = tag_item;
         }
         // If the current selected tag already is the current tag, deselect it

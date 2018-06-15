@@ -384,3 +384,11 @@ bool AnalysisSlider::get_was_paused() {
 void AnalysisSlider::set_was_paused(bool value) {
     m_was_paused = value;
 }
+
+/**
+ * @brief AnalysisSlider::get_show_tags
+ * @return
+ */
+bool AnalysisSlider::get_show_tags() {
+    return m_show_tags;
+}
