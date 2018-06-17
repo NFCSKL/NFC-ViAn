@@ -71,6 +71,7 @@ public:
     std::pair<int, int> get_interval() const;
     void set_interval(const std::pair<int, int> &value);
     std::string save_path() const;
+    std::string analysis_name() const;
 
     void set_analysis_area(cv::Rect area);
 
