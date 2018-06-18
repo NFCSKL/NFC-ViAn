@@ -605,20 +605,30 @@ void VideoWidget::play_btn_toggled(bool status) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
-    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
-        if (!m_tag->find_frame(playback_slider->value())) {
-            VideoState state = m_vid_proj->get_video()->state;
-            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
-            m_tag->add_frame(playback_slider->value(), t_frame);
-            emit tag_new_frame(playback_slider->value(), t_frame);
-            emit set_status_bar("Tagged frame number: " + QString::number(playback_slider->value()));
-            playback_slider->update();
-        } else {
-            emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " already tagged");
-        }
-        return;
-    } else {
+    // If no tag is selected show the new tag dialog
+    if (m_tag == nullptr || m_tag->is_drawing_tag()) {
         new_tag_clicked();
+    }
+
+    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
+        QString text = " tagged";
+        if (m_tag->find_frame(playback_slider->value())) {
+            QMessageBox msg_box;
+            msg_box.setText("Do you wanna overwrite the tag?");
+            msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msg_box.setDefaultButton(QMessageBox::No);
+            int reply = msg_box.exec();
+            if (reply == QMessageBox::No) return;
+            remove_tag_frame();
+            text = " updated";
+        }
+        // Add frame to tag
+        VideoState state = m_vid_proj->get_video()->state;
+        TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+        m_tag->add_frame(playback_slider->value(), t_frame);
+        emit tag_new_frame(playback_slider->value(), t_frame);
+        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + text);
+        playback_slider->update();
     }
 }
 
