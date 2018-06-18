@@ -7,6 +7,9 @@ DrawingTagItem::DrawingTagItem(Tag *tag) : TreeItem(DRAWING_TAG_ITEM) {
     setIcon(0, folder_icon);
 }
 
+DrawingTagItem::~DrawingTagItem() {
+}
+
 void DrawingTagItem::remove() {}
 
 void DrawingTagItem::rename() {
