@@ -644,8 +644,7 @@ void VideoWidget::new_tag_clicked() {
  * @param name
  */
 void VideoWidget::new_tag(QString name) {
-    Tag* tag = new Tag();
-    tag->m_name = name.toStdString();
+    Tag* tag = new Tag(name.toStdString());
     emit add_tag(m_vid_proj, tag);
 }
 

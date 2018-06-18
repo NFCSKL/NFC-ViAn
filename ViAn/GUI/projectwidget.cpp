@@ -815,9 +815,7 @@ void ProjectWidget::drawing_tag() {
         vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
     }
     // Create tag drawing
-    Tag* tag = new Tag();
-    tag->m_name = "Drawing tag";
-    tag->set_drawing_tag(true);
+    Tag* tag = new Tag("Drawing tag", true);
 
     // Add all drawings to tag frame items.
     VideoProject* vid_proj = vid_item->get_video_project();
