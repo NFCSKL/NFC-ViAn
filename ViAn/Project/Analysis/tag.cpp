@@ -1,5 +1,10 @@
 #include "tag.h"
 
+Tag::Tag(std::string name, bool drawing_tag) {
+    m_name = name;
+    m_drawing_tag = drawing_tag;
+}
+
 Tag::~Tag() {
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
         delete (*it).second;
@@ -54,21 +59,21 @@ std::vector<int> Tag::get_frames() {
 }
 
 bool Tag::is_drawing_tag() {
-    return drawing_tag;
+    return m_drawing_tag;
 }
 
 void Tag::set_drawing_tag(bool value) {
-    drawing_tag = value;
+    m_drawing_tag = value;
 }
 
 ANALYSIS_TYPE Tag::get_type() const {
-    if (drawing_tag) return DRAWING_TAG;
+    if (m_drawing_tag) return DRAWING_TAG;
     return TAG;
 }
 
 void Tag::write(QJsonObject &json) {
     json["name"] = QString::fromStdString(m_name);
-    json["drawing_tag"] = drawing_tag;
+    json["drawing_tag"] = m_drawing_tag;
     QJsonArray frames;
     for (auto tag_frame : tag_map) {
         QJsonObject f_num;
@@ -81,7 +86,7 @@ void Tag::write(QJsonObject &json) {
 
 void Tag::read(const QJsonObject &json) {
     m_name = json["name"].toString().toStdString();
-    drawing_tag = json["drawing_tag"].toBool();
+    m_drawing_tag = json["drawing_tag"].toBool();
     QJsonArray json_intervals = json["frames"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_frame = json_intervals[i].toObject();

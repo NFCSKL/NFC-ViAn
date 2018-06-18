@@ -37,6 +37,8 @@ struct zoomer_settings {
     double zoom_factor = 1;
     double zoom_step = 1;
 
+    int interpolation = cv::INTER_NEAREST;
+
     // Panning
     int x_movement = 0;
     int y_movement = 0;

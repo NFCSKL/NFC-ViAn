@@ -8,6 +8,7 @@ class DrawingTagItem : public TreeItem {
 
 public:
     DrawingTagItem(Tag *tag);
+    ~DrawingTagItem();
     Tag *get_tag();
     void remove();
     void rename();

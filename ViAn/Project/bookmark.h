@@ -34,7 +34,7 @@ class Bookmark : public Writeable {
     ID id = 0;
 public:
     std::string m_file;
-    Bookmark(VideoProject* vid_proj, const std::string file_name, const std::string& text, const VideoState& state, const QString m_time);
+    Bookmark(VideoProject* vid_proj, const std::string &file_name, const std::string& text, const VideoState& state, const QString &m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
     ~Bookmark();

@@ -9,7 +9,7 @@
  * @param frame_nbr Frame number associated with the bookmark.
  * @param time The time in the video associated with the bookmark (format "mm:ss").
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const std::string file_name, const std::string &text, const VideoState &state, const QString time){
+Bookmark::Bookmark(VideoProject *vid_proj, const std::string &file_name, const std::string &text, const VideoState &state, const QString &time){
     m_vid_proj = vid_proj;
     m_file = file_name;
     m_description = text;

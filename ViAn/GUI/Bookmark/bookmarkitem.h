@@ -19,8 +19,8 @@ public:
     QString get_description() const;
 
    static const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
-private:
 
+private:
     Bookmark* m_bookmark = nullptr;
 };
 
