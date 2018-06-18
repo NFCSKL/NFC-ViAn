@@ -191,6 +191,7 @@ void VideoWidget::set_btn_icons() {
     new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
     tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
 
+    interpolate_check = new QCheckBox("Interpolate", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
 
@@ -225,6 +226,8 @@ void VideoWidget::set_btn_tool_tip() {
 
     fit_btn->setToolTip(tr("Scale the video to screen: Ctrl + F"));
     original_size_btn->setToolTip(tr("Reset zoom: Ctrl + R"));
+    interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation");
+
     set_start_interval_btn->setToolTip("Set left interval point: Shift + Left");
     set_end_interval_btn->setToolTip("Set right interval point: Shift + Right");
 
@@ -256,6 +259,7 @@ void VideoWidget::set_btn_size() {
     analysis_play_btn->setFixedSize(BTN_SIZE);
     enable_poi_btns(false,false);
     tag_btn->setEnabled(false);
+    interpolate_check->setEnabled(false);
 }
 
 /**
@@ -354,7 +358,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(original_size_btn);
-
+    zoom_btns->addWidget(interpolate_check);
     zoom_btns->addWidget(zoom_label);
 
     control_row->addLayout(zoom_btns);
@@ -393,6 +397,7 @@ void VideoWidget::connect_btns() {
     connect(frame_wgt, &FrameWidget::trigger_zoom_out, this, &VideoWidget::on_step_zoom);
     connect(fit_btn, &QPushButton::clicked, this, &VideoWidget::on_fit_screen);
     connect(original_size_btn, &QPushButton::clicked, this, &VideoWidget::on_original_size);
+    connect(interpolate_check, &QCheckBox::toggled, this, &VideoWidget::on_interpolate_toggled);
 
     // Other
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
@@ -463,6 +468,16 @@ void VideoWidget::prev_frame_clicked(){
     } else {
         set_status_bar("Already at the first frame");
     }
+}
+
+/**
+ * @brief VideoWidget::on_interpolate_toggled
+ * Toggles between bicubic (true) or nearest neighbor interpolation (false)
+ * @param checked
+ */
+void VideoWidget::on_interpolate_toggled(bool checked) {
+    int method = cv::INTER_CUBIC ? checked : cv::INTER_NEAREST;
+    set_interpolation_method(method);
 }
 
 /**
@@ -896,6 +911,7 @@ void VideoWidget::set_video_btns(bool b) {
     for (QPushButton* btn : btns) {
         btn->setEnabled(b);
     }
+    interpolate_check->setEnabled(b);
     playback_slider->setEnabled(b);
     frame_line_edit->setEnabled(b);
     speed_slider->setEnabled(b);
@@ -1114,6 +1130,17 @@ void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
  */
 void VideoWidget::set_draw_area_size(QSize s) {
     update_processing_settings([&](){z_settings.draw_area_size = s;});
+}
+
+/**
+ * @brief VideoWidget::set_interpolation_method
+ * Notifies the frame processor that the interpolation method has been changed
+ * @param method - valid opencv interpolation constant
+ */
+void VideoWidget::set_interpolation_method(int method) {
+    update_processing_settings([&](){
+        z_settings.interpolation = method;
+    });
 }
 
 /**

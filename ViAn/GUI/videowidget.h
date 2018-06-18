@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QSize>
 #include <QBoxLayout>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QSlider>
 #include <QShortcut>
@@ -175,6 +176,7 @@ public slots:
     void center(QPoint, double);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
+    void set_interpolation_method(int method);
     void on_step_zoom(double step);
     void set_state(VideoState state);
     void on_fit_screen(void);
@@ -193,6 +195,7 @@ private:
     QLabel* total_time;
     QLineEdit* frame_line_edit;
     QLabel* zoom_label;
+    QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
 
     QShortcut* remove_frame_act;
 
@@ -212,6 +215,7 @@ private:
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
+
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
     QHBoxLayout* video_btns;      // Play, pause etc
@@ -254,6 +258,8 @@ private slots:
     void stop_btn_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+
+    void on_interpolate_toggled(bool checked);
 };
 
 #endif // VIDEOWIDGET_H

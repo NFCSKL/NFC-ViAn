@@ -181,6 +181,10 @@ void FrameProcessor::update_zoomer_settings() {
         m_z_settings->original = false;
         m_zoomer.reset();
     }
+    // Set interpolation method
+    else if (m_zoomer.get_interpolation_method() != m_z_settings->interpolation){
+        m_zoomer.set_interpolation_method(m_z_settings->interpolation);
+    }
 
     // Store changes made
     m_z_settings->zoom_factor = m_zoomer.get_scale_factor();

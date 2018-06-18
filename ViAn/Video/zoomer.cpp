@@ -58,6 +58,15 @@ void Zoomer::set_viewport_size(const QSize size) {
 }
 
 /**
+ * @brief Zoomer::set_interpolation_method
+ * Sets the interpolation method to be used
+ * @param method
+ */
+void Zoomer::set_interpolation_method(const int &method) {
+    m_interpol_method = method;
+}
+
+/**
  * @brief Zoomer::move_zoom_rect
  * Updates the position of the zoom rectangle relative to the frame
  * @param x movement on the x-axis
@@ -153,6 +162,14 @@ void Zoomer::update_scale() {
 
 QSize Zoomer::get_viewport_size() const {
     return m_viewport_size;
+}
+
+/**
+ * @brief Zoomer::get_interpolation_method
+ * @return current interpolation method
+ */
+int Zoomer::get_interpolation_method() const {
+    return m_interpol_method;
 }
 
 /**
