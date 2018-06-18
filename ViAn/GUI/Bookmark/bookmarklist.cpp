@@ -26,15 +26,18 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
 
 BookmarkList::~BookmarkList() {
     for (int i = 0; i < count(); ++i) {
-        if (item(i)->type() == BOOKMARK) {
-            BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(item(i));
-            delete bm_item;
-        } else if (item(i)->type() == CONTAINER) {
-            BookmarkCategory* bm_cat_item = dynamic_cast<BookmarkCategory*>(item(i));
-            delete bm_cat_item;
+        if (item(i)->type() == BOOKMARK || item(i)->type() == CONTAINER) {
+            delete item(i);
         }
     }
     clear();
+}
+
+void BookmarkList::add_new_folder() {
+    BookmarkCategory* new_category = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), CONTAINER);
+    addItem(new_category);
+    setItemWidget(new_category, new_category->get_folder());
+    connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
 }
 
 /**
@@ -91,7 +94,7 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
     menu->addAction(rename, this, SLOT(rename_item()));
     menu->addAction("Delete", this, SLOT(remove_item()));
     menu->addSeparator();
-    menu->addAction("New category", this, SIGNAL(new_folder()));
+    menu->addAction("New category", this, SLOT(add_new_folder()));
     menu->exec(mapToGlobal(pos));
     delete menu;
 }
@@ -238,7 +241,7 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
 //        delete menu;
     } else if (event->button() == Qt::RightButton) {
         QMenu* menu = new QMenu;
-        menu->addAction("New category", this, SIGNAL(new_folder()));
+        menu->addAction("New category", this, SLOT(add_new_folder()));
         menu->exec(mapToGlobal(event->pos()));
         delete menu;
     } else {

@@ -26,22 +26,12 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
-    connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
+    connect(new_folder_btn, &QPushButton::clicked, bm_list, &BookmarkList::add_new_folder);
     connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
-    connect(bm_list, &BookmarkList::new_folder, this, &BookmarkWidget::add_new_folder);
 
     //Context menu for list items
 //    bm_list->setContextMenuPolicy(Qt::CustomContextMenu);
 //    connect(bm_list, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(item_context_menu(QPoint)));
-}
-
-
-// TODO Move to List?
-void BookmarkWidget::add_new_folder() {
-    BookmarkCategory* new_category = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), CONTAINER);
-    bm_list->addItem(new_category);
-    bm_list->setItemWidget(new_category, new_category->get_folder());
-    connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
 }
 
 void BookmarkWidget::generate_report() {

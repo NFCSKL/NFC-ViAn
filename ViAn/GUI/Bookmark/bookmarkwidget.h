@@ -29,7 +29,7 @@ class BookmarkWidget : public QWidget
     QDockWidget* folder_dock;
     QThread* processing_thread;
     const int TEXT_EDIT_MIN_HEIGHT = 64;
-    int category_cnt = 1;
+
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
 signals:
@@ -40,7 +40,6 @@ public slots:
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
     void clear_bookmarks();
-    void add_new_folder();
 private slots:
 //    void item_context_menu(QPoint pos);
 private:
