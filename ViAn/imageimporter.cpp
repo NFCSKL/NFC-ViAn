@@ -2,8 +2,9 @@
 #include <QDebug>
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
-    m_images(images), m_dest(dest), QObject(parent) {
-}
+    m_images(images),
+    m_dest(QString::fromStdString(Utility::add_serial_number(dest.toStdString(), ""))),
+    QObject(parent) {}
 
 void ImageImporter::import_images() {
     int num_images = m_images.size();
