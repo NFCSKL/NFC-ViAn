@@ -10,7 +10,7 @@
 #include "bookmark.h"
 #include "video.h"
 #include "project.h"
-#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/analysisproxy.h" // TODO Include basic instead
 #include "Project/report.h"
 #include <stack>
 
@@ -27,7 +27,7 @@ class VideoProject : public Saveable{
     std::string m_tree_index = "";
     std::map<ID,BasicAnalysis*> m_analyses;
     Overlay* m_overlay = new Overlay();
-    Video* video = nullptr;
+    Video* m_video = nullptr;
     Project* m_project = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_id = 0; // Analysis id counter
@@ -50,6 +50,7 @@ public:
     ID add_bookmark(Bookmark* bookmark);
 
     void remove_analysis(BasicAnalysis* analysis);
+    void remove_bookmark(Bookmark* bookmark);
 
     void set_tree_index(std::stack<int> tree_index);
     void set_project(Project* proj);

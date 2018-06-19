@@ -534,7 +534,7 @@ void VideoWidget::on_bookmark_clicked() {
     cv::Mat org_frame = frame_wgt->get_org_frame();
     int frame_nr = get_current_frame();
     QString time = current_time->text();
-    emit new_bookmark(m_vid_proj, frame_nr, bookmark_frame, org_frame, time);
+    emit new_bookmark(m_vid_proj, m_vid_proj->get_video()->state, bookmark_frame, org_frame, time);
 }
 
 /**

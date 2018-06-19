@@ -9,6 +9,7 @@
 #include <QAbstractItemView>
 #include "GUI/TreeItems/videoitem.h"
 #include "GUI/TreeItems/analysisitem.h"
+#include "Analysis/motiondetection.h"
 #include "videolistitem.h"
 class VideoItem;
 /**
