@@ -109,9 +109,11 @@ void FrameProcessor::process_frame() {
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame = m_frame.clone();
 
+    bool rotated{false};
     // Rotates the frame, according to the choosen direction.
     if (ROTATE_MIN <= m_rotate_direction && m_rotate_direction <= ROTATE_MAX) {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
+        rotated = true;
     }
 
     // Displays the zoom rectangle on the original frame in a new windows.
@@ -124,7 +126,7 @@ void FrameProcessor::process_frame() {
 
     // Scales the frame
     cv::Rect prev_rect = m_zoomer.get_frame_rect();
-    if (prev_rect.width != m_width->load() || prev_rect.height != m_height->load()) {
+    if (!rotated && (prev_rect.width != m_width->load() || prev_rect.height != m_height->load())) {
         // Source size has changed (image sequence)
         m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
         m_zoomer.fit_viewport();

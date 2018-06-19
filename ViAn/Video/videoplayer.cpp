@@ -184,7 +184,6 @@ bool VideoPlayer::synced_read(){
             }
 
         }
-        std::cout << std::endl;
     }
     m_v_sync->con_var.notify_one();
 

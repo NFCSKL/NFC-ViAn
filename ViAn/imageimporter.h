@@ -15,8 +15,6 @@ class ImageImporter : public QObject
     bool m_abort{false};
 public:
     explicit ImageImporter(const QStringList& images, const QString& dest, QObject *parent = nullptr);
-    bool getAbort() const;
-    void setAbort(bool value);
 
 public slots:
     void import_images();
