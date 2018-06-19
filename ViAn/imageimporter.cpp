@@ -2,9 +2,21 @@
 #include <QDebug>
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
-    m_images(images), m_dest(dest), QObject(parent) {
-}
+    m_images(images),
+    m_dest(QString::fromStdString(Utility::add_serial_number(dest.toStdString(), ""))),
+    QObject(parent) {}
 
+/**
+ * @brief ImageImporter::import_images
+ * Copies all images given from the m_images paths to the m_dest destination.
+ * Each copied image is named with a continous zero padded index so it can be played by
+ * OpenCV.
+ *
+ * The following signals are emitted during work:
+ * update_progress:    single int indicating the progress of the thread
+ * imported_sequence:  all original image paths and the destination path
+ * finished:           empty signal upon completion
+ */
 void ImageImporter::import_images() {
     int num_images = m_images.size();
     int num_digits = Utility::number_of_digits(num_images);

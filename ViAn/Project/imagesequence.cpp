@@ -22,7 +22,6 @@ ImageSequence::ImageSequence(const std::string& path, const std::vector<std::str
     m_name = path.substr(index);
     m_images = images;
     file_path = seq_path + "/" + get_pattern_name();
-    std::cout << file_path << std::endl;
 }
 
 /**
@@ -71,14 +70,12 @@ void ImageSequence::read(const QJsonObject &json) {
     QJsonArray images = json["images"].toArray();
     for(auto item : images){
         m_images.push_back(item.toString().toStdString());
-        std::cout << item.toString().toStdString() << std::endl;
     }
 }
 
 void ImageSequence::write(QJsonObject &json) {
     Video::write(json);
     json["seq_path"] = QString::fromStdString(seq_path);
-    std::cout << "NAME" << m_name << std::endl;
     QJsonArray images;
     for (auto image_path : m_images){
         images.append(QString::fromStdString(image_path));
@@ -87,20 +84,22 @@ void ImageSequence::write(QJsonObject &json) {
 }
 
 void ImageSequence::add_image(const std::string &image_path, const int& index) {
-    if (index == -1)
+    if (index == -1) {
         m_images.push_back(image_path);
-    else
+    } else {
         m_images.insert(m_images.begin() + index, image_path);
+    }
 }
 
-void ImageSequence::reorder_elem(const int &from, const int to) {
+void ImageSequence::reorder_elem(const int &from, const int &to) {
     if (!(from >= 0 && to >= 0 && from < m_images.size() && to <= m_images.size())) return;
     auto tmp = m_images.at(from);
     m_images.insert(m_images.begin() + to, tmp);
-    if (to < from)
+    if (to < from) {
         m_images.erase(m_images.begin() + from + 1);
-    else
+    } else {
         m_images.erase(m_images.begin() + from);
+    }
 }
 
 

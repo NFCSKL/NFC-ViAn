@@ -136,9 +136,6 @@ void ProjectWidget::add_images() {
 
     // Assert that user selected files
     if (!image_paths.size()){
-        QMessageBox::warning(this,
-                             tr("No images selected"),
-                             tr("No images were selected. Aborting import."));
         return;
     }
 
@@ -464,7 +461,10 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
-            v_item->load_sequence_items();
+            auto vid = vid_proj->get_video();
+            if (vid && vid->is_sequence()) {
+                v_item->load_sequence_items();
+            }
         }
     }
 }
@@ -530,7 +530,6 @@ void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
         event->setDropAction(Qt::MoveAction);
         event->accept();
     }
-
 }
 
 /**

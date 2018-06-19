@@ -2,7 +2,6 @@
 #define SEQUENCEITEM_H
 
 #include "treeitem.h"
-#include "Project/videoproject.h"
 class SequenceItem : public TreeItem {
 private:
     int m_index{};

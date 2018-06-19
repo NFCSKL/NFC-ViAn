@@ -2,7 +2,6 @@
 #include <QThread>
 #include <QDebug>
 #include <QTime>
-#include "utility.h"
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,

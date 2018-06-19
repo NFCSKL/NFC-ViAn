@@ -169,19 +169,6 @@ cv::Rect Zoomer::get_frame_rect() const {
 }
 
 /**
- * @brief Zoomer::get_info_string
- * @return easy to read formatted string with the current settings. used for debugging purposes
- */
-std::string Zoomer::get_info_string() const {
-    return "Scale: " + std::to_string(m_scale_factor) + "\n" +
-           "Zoom rect: " + std::to_string(m_zoom_rect.width) + "x" + std::to_string(m_zoom_rect.height) + "\n" +
-           "Frame rect: " + std::to_string(m_frame_rect.width) + "x" + std::to_string(m_frame_rect.height) + "\n" +
-           "Frame size: " + std::to_string(m_frame_size.width) + "x" + std::to_string(m_frame_size.height) + "\n" +
-           "Anchor: " + std::to_string(anchor.x()) + "::" + std::to_string(anchor.y()) + "\n" +
-           "Viewport size: " + std::to_string(m_viewport_size.width()) + "x" + std::to_string(m_viewport_size.height()) + "\n";
-}
-
-/**
  * @brief Zoomer::get_interpolation_method
  * @return current interpolation method
  */

@@ -114,7 +114,6 @@ void VideoProject::read(const QJsonObject& json){
     Video* vid = new Video();
     vid->read(json);
     if (vid->is_sequence()) {
-        // Need
         ImageSequence* seq = new ImageSequence("");
         seq->read(json);
         this->m_video = seq;
