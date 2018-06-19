@@ -2,7 +2,7 @@
 
 VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     m_vid_proj = video_project;
-    setFlags(flags() | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, QString::fromStdString(video_project->get_video()->get_name()));
     load_sequence_items();
 }
@@ -27,13 +27,16 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
     setText(0, QString::fromStdString(vid_proj->get_video()->get_name()));
 }
 
+/**
+ * @brief VideoItem::load_sequence_items
+ * Adds each image from the sequence as a child to the list item.
+ */
 void VideoItem::load_sequence_items() {
     if (m_vid_proj == nullptr ) return;
     Video* vid = m_vid_proj->get_video();
     if (vid->is_sequence()) {
         auto seq = dynamic_cast<ImageSequence*>(vid);
         int i{};
-        qDebug() << QString::fromStdString(seq->get_pattern_name());
         for (auto img_name : seq->get_image_names()) {
             this->addChild(new SequenceItem(img_name, i++));
         }

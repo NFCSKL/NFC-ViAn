@@ -622,7 +622,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);
-        // Parent will always be a VideoItem
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         vid_item->get_video_project()->get_video()->state.frame = seq_item->get_index();
         emit marked_video_state(vid_item->get_video_project(),
@@ -634,7 +633,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit enable_poi_btns(false,false);
 
         update_current_tag(vid_item);
-        qDebug() << "Done with item";
         break;
     } case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);

@@ -242,7 +242,6 @@ void Zoomer::scale_frame(cv::Mat &frame) {
         cv::resize(frame(m_zoom_rect), frame, cv::Size(), m_scale_factor, m_scale_factor, interpol);
     } catch (cv::Exception& e) {
         const char* err_msg = e.what();
-        qDebug() << "Failed to scale frame";
         qCritical() << "Exception: " << err_msg;
     }
 }

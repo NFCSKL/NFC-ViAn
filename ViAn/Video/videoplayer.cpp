@@ -75,25 +75,11 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
 
-
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
         current_frame = frame_index;
         synced_read();
     }
-//    m_capture.grab();
-
-//    int ccols = m_v_sync->frame.cols;
-//    int crows = m_v_sync->frame.rows;
-//    int ncols = m_capture.get(CV_CAP_PROP_FRAME_WIDTH);
-//    int nrows = m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-//    std::cout << "CURRECT: " << ccols << "x" << crows << std::endl;
-//    std::cout << "NEXT: " << ncols << "x" << nrows << std::endl;
-//    if (ncols && nrows && (ncols < ccols || nrows < crows && nrows)) {
-//        cv::Mat tmp;
-//        std::cout << "Resizing" << std::endl;
-//        cv::resize(m_v_sync->frame, m_v_sync->frame, cv::Size(ncols,nrows));
-//    }
 }
 
 /**
@@ -162,6 +148,7 @@ bool VideoPlayer::synced_read(){
         int ncols = m_capture.get(CV_CAP_PROP_FRAME_WIDTH);
         int nrows = m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
         if (ncols != ccols || nrows != crows) {
+            // New frame is not equal in size to the previous one
             try {
                 m_v_sync->frame.release();
                 m_capture.retrieve(m_v_sync->frame);
