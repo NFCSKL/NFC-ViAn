@@ -7,7 +7,7 @@
  * Set video.
  */
 VideoProject::VideoProject(Video* v){
-    this->video = v;    
+    m_video = v;
 }
 
 /**
@@ -15,12 +15,12 @@ VideoProject::VideoProject(Video* v){
  * Create empty video.
  */
 VideoProject::VideoProject(){
-    this->video = new Video();
+    m_video = new Video();
 }
 
 VideoProject::~VideoProject(){
     delete m_overlay;
-    delete video;
+    delete m_video;
 }
 
 /**
@@ -29,7 +29,7 @@ VideoProject::~VideoProject(){
  * Return associated video.
  */
 Video* VideoProject::get_video(){
-    return video;
+    return m_video;
 }
 
 /**
@@ -47,7 +47,7 @@ Overlay* VideoProject::get_overlay() {
  * Return all bookmarks.
  */
 std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
-    return this->m_bookmarks;
+    return m_bookmarks;
 }
 
 /**
@@ -71,6 +71,7 @@ bool VideoProject::is_saved() {
  * @brief VideoProject::delete_analysis
  * @param id of the analysis
  */
+//TODO only used in tests, remove?
 void VideoProject::delete_analysis(const int& id) {
     BasicAnalysis* am = m_analyses.at(id);
     m_analyses.erase(id);
@@ -83,6 +84,7 @@ void VideoProject::delete_analysis(const int& id) {
  * @brief VideoProject::delete_bookmark
  * @param id
  */
+//TODO only used in tests, remove?
 void VideoProject::delete_bookmark(const int &id) {
     Bookmark* bm = m_bookmarks.at(id);
     bool remove = bm->remove(); // the bookmark should only be deleted if this return true
@@ -109,7 +111,7 @@ std::map<ID, BasicAnalysis*> VideoProject::get_analyses() {
  */
 void VideoProject::read(const QJsonObject& json){
     m_tree_index = json["tree_index"].toString().toStdString();
-    this->video->read(json);
+    this->m_video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     // Read bookmarks from json
     for(int i = 0; i != json_bookmarks.size(); i++){
@@ -154,7 +156,7 @@ void VideoProject::read(const QJsonObject& json){
  */
 void VideoProject::write(QJsonObject& json){
     json["tree_index"] = QString::fromStdString(m_tree_index);
-    this->video->write(json);
+    this->m_video->write(json);
     // Write bookmarks to json
     QJsonArray json_bookmarks;
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
@@ -178,18 +180,6 @@ void VideoProject::write(QJsonObject& json){
     this->m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
     m_unsaved_changes = false;
-}
-
-/**
- * @brief VideoProject::add_bookmark
- * @param bookmark
- * Add new bookmark.
- */
-ID VideoProject::add_bookmark(Bookmark *bookmark){
-    this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
-    bookmark->set_video_project(this);
-    m_unsaved_changes = true;
-    return m_bm_cnt++;
 }
 
 void VideoProject::set_tree_index(std::stack<int> tree_index) {
@@ -237,9 +227,29 @@ void VideoProject::remove_analysis(BasicAnalysis *analysis) {
 }
 
 /**
+ * @brief VideoProject::add_bookmark
+ * @param bookmark
+ * Add new bookmark.
+ */
+ID VideoProject::add_bookmark(Bookmark *bookmark){
+    m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
+    bookmark->set_id(m_bm_cnt);
+    bookmark->set_video_project(this);
+    m_unsaved_changes = true;
+    return m_bm_cnt++;
+}
+
+void VideoProject::remove_bookmark(Bookmark *bookmark) {
+    m_bookmarks.erase(bookmark->get_id());
+    m_unsaved_changes = true;
+    bookmark->remove_exported_image();
+    delete bookmark;
+}
+
+/**
  * @brief VideoProject::delete_artifacts
  * Delete bookmark files.
- * TODO "UNUSED"
+ * TODO "UNUSED" only used in tests
  */
 void VideoProject::delete_artifacts(){
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
@@ -253,7 +263,7 @@ void VideoProject::delete_artifacts(){
     m_unsaved_changes = true;
 }
 
-// TODO, not used
+// TODO, only used in tests
 void VideoProject::remove_from_project() {
     m_project->remove_video_project(this);
     m_unsaved_changes = true;

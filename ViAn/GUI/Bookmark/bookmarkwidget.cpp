@@ -5,9 +5,8 @@
 #include <QMenu>
 
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
-
-    QPushButton* generate_btn = new QPushButton(tr("Generate"));
-    QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
+    QPushButton* generate_btn = new QPushButton(tr("Generate report"));
+    QPushButton* new_folder_btn = new QPushButton(tr("Create new category"));
 
     bm_list = new BookmarkList(this);
     scroll_area = new QScrollArea();
@@ -21,26 +20,18 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(new_folder_btn);
     layout->addWidget(scroll_area);
     layout->addWidget(generate_btn);   
-    layout->setMargin(10);
-    layout->setSpacing(10);
+    layout->setMargin(5);
+    layout->setSpacing(5);
     setMinimumWidth(bm_list->sizeHint().width()*2); // Should be 2*thumbnail + margin
     setLayout(layout);
 
-    connect(bm_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
-    connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
+    connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
+    connect(new_folder_btn, &QPushButton::clicked, bm_list, &BookmarkList::add_new_folder);
     connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
 
     //Context menu for list items
 //    bm_list->setContextMenuPolicy(Qt::CustomContextMenu);
 //    connect(bm_list, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(item_context_menu(QPoint)));
-}
-
-
-// TODO Move to List?
-void BookmarkWidget::add_new_folder() {
-    BookmarkCategory* f2 = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), bm_list, CONTAINER);
-    bm_list->addItem(f2);
-    connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
 }
 
 void BookmarkWidget::generate_report() {
@@ -78,8 +69,10 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
 
     if (bm_cat == nullptr) {
         // Container does not exist. Create and add it
-        bm_cat = new BookmarkCategory(container->second, bm_list, CONTAINER);
-        connect(bm_cat, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
+        bm_cat = new BookmarkCategory(container->second, CONTAINER);
+        bm_list->addItem(bm_cat);
+        bm_list->setItemWidget(bm_cat, bm_cat->get_folder());
+        connect(bm_cat, &BookmarkCategory::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
     }
 
     if (container->first == DISPUTED) {
@@ -90,18 +83,18 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
     return bm_cat;
 }
 
-void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr, cv::Mat bookmark_frame, cv::Mat org_frame, QString time) {
+void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time) {
     bool ok;
     QString text = get_input_text("", &ok);
     if(!ok) return;
-    export_original_frame(vid_proj, frame_nbr, org_frame);
+    export_original_frame(vid_proj, state.frame, org_frame);
     std::string file_name = vid_proj->get_video()->get_name();
-    file_name += "_" + std::to_string(frame_nbr);
+    file_name += "_" + std::to_string(state.frame);
 
     ImageGenerator im_gen(bookmark_frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
     std::string bm_file = im_gen.create_bookmark(file_name);
-    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString(), frame_nbr, time);
+    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString(), state, time);
     vid_proj->add_bookmark(bookmark);
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
@@ -123,18 +116,14 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
         Bookmark* bm = bm_map.second;
         // Load thumbnail TODO add check for file
         std::string t_path = m_path + "_thumbnails/" + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
-        auto containers = bm->get_containers();
-        for (auto it = containers.begin(); it != containers.end(); ++it) {
-            // Add bookmark to all its containers
-            std::pair<int, std::string> _container = *it;
-            BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
-            bm_item->set_thumbnail(t_path);
-            if (_container.second.empty()) {
-                // No container name. Add it to the main list
-                bm_list->addItem(bm_item);
-            } else {
-                add_to_container(bm_item, &_container);
-            }
+        std::pair<int, std::string> new_container = bm->get_container();
+        BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
+        bm_item->set_thumbnail(t_path);
+        if (new_container.second.empty()) {
+            // No container name. Add it to the main list
+            bm_list->addItem(bm_item);
+        } else {
+            add_to_container(bm_item, &new_container);
         }
     }
 }

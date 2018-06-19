@@ -4,14 +4,10 @@
 
 /**
  * @brief BookmarkItem::BookmarkItem
- * @param bookmrk Bookmark containing relevant.
- * @param view Parent widget of the bookmark.
+ * @param bookmark Bookmark to be saved in the item.
+ * @param type Type of bookmark item.
  */
-QString BookmarkItem::get_description() const {
-    return QString::fromStdString(bookmark->get_description());
-}
-
-BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
+BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
     QString frame = QString::number(bookmark->get_frame_number());
     QString v_name = QString::fromStdString(bookmark->get_video_project()->get_video()->get_name());
     hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + bookmark->get_time();
@@ -21,7 +17,7 @@ BookmarkItem::BookmarkItem(Bookmark* bookmark,int type) : QListWidgetItem(QStrin
     } else {
         setToolTip(hover_text);
     }
-    this->bookmark = bookmark;
+    m_bookmark = bookmark;
 }
 
 /**
@@ -47,7 +43,7 @@ void BookmarkItem::set_thumbnail(std::string thum_path) {
  * @return
  */
 BookmarkItem *BookmarkItem::copy() {
-    BookmarkItem* new_bm_item = new BookmarkItem(bookmark, 0);
+    BookmarkItem* new_bm_item = new BookmarkItem(m_bookmark, 0);
     new_bm_item->setIcon(icon());
     return new_bm_item;
 }
@@ -57,7 +53,7 @@ BookmarkItem *BookmarkItem::copy() {
  * @return Returns the bookmark representation.
  */
 Bookmark* BookmarkItem::get_bookmark() {
-    return bookmark;
+    return m_bookmark;
 }
 
 /**
@@ -65,11 +61,15 @@ Bookmark* BookmarkItem::get_bookmark() {
  * @return Returns the frame number that the bookmark points to.
  */
 int BookmarkItem::get_frame_number() {
-    return bookmark->get_frame_number();
+    return m_bookmark->get_frame_number();
 }
 
 QString BookmarkItem::get_file_path() {
-    return QString::fromStdString(bookmark->m_file);
+    return QString::fromStdString(m_bookmark->m_file);
+}
+
+QString BookmarkItem::get_description() const {
+    return QString::fromStdString(m_bookmark->get_description());
 }
 
 /**
@@ -79,7 +79,7 @@ QString BookmarkItem::get_file_path() {
  * @param text
  */
 void BookmarkItem::update_description(const QString& text) {
-    this->bookmark->set_description(text.toStdString());
+    m_bookmark->set_description(text.toStdString());
     setText(text);
     if (text != "") {
         setToolTip(hover_text + "\nDescription: " + text);
