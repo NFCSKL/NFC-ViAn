@@ -16,11 +16,11 @@ public:
     void update_description(const QString &text);    
     void set_thumbnail(std::string thum_path);
     BookmarkItem* copy();
-    QString getDescription() const;
+    QString get_description() const;
 
 private:
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
-    Bookmark* bookmark;
+    Bookmark* bookmark = nullptr;
 };
 
 #endif // BOOKMARKITEM_H

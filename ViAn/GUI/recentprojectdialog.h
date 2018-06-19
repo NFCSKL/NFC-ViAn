@@ -28,9 +28,10 @@ class RecentProjectDialog : public QDialog {
     QListWidget* recent_list;
 public:
     RecentProjectDialog(QWidget* parent = nullptr);
+    ~RecentProjectDialog();
 signals:
     void open_project(QString project_path);
-    void open_project_from_file(void);
+    void open_project_from_file(QString);
     void new_project(void);
 private slots:
     void on_item_double_clicked(QListWidgetItem* item);

@@ -3,7 +3,7 @@
 /**
  * @brief Rectangle::Rectangle
  */
-Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
+Rectangle::Rectangle() : Shapes(SHAPES::RECTANGLE) {
 }
 
 /**
@@ -11,8 +11,10 @@ Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Rectangle::Rectangle(QColor col, QPoint pos) : Shape(SHAPES::RECTANGLE, col, pos) {
+Rectangle::Rectangle(QColor col, QPoint pos) : Shapes(SHAPES::RECTANGLE, col, pos) {
 }
+
+Rectangle::~Rectangle() {}
 
 /**
  * @brief Rectangle::draw
@@ -36,6 +38,14 @@ void Rectangle::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+QString Rectangle::get_name() {
+    return m_name;
+}
+
+void Rectangle::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Rectangle::write
  * @param json
@@ -43,6 +53,7 @@ void Rectangle::handle_new_pos(QPoint pos) {
  */
 void Rectangle::write(QJsonObject& json) {
     write_shape(json);
+    json["name"] = m_name;
 }
 
 /**
@@ -52,4 +63,5 @@ void Rectangle::write(QJsonObject& json) {
  */
 void Rectangle::read(const QJsonObject& json) {
     read_shape(json);
+    m_name = json["name"].toString();
 }

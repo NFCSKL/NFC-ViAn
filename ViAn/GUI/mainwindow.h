@@ -13,21 +13,21 @@
 
 #include <string>
 
-#include "Library/customdialog.h"
 #include "reportgenerator.h"
 
 #include "GUI/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"
 
-
 #include "videowidget.h"
 #include "projectwidget.h"
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
+#include "drawingwidget.h"
+#include "Analysis/anasettingwidget.h"
 #include "statusbar.h"
 #include "Toolbars/drawingtoolbar.h"
+#include "Toolbars/maintoolbar.h"
 
-using namespace std;
 class AnalysisWindow;
 class MainWindow : public QMainWindow
 {
@@ -41,6 +41,7 @@ public:
 
     StatusBar* status_bar;
     DrawingToolbar* draw_toolbar;
+    MainToolbar* main_toolbar;
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;
@@ -55,19 +56,13 @@ private slots:
     void gen_report(void);
     void cont_bri(void);
     void export_images();
-    void rectangle();
-    void circle();
-    void line();
-    void arrow();
-    void pen();
-    void text();
-    void undo();
-    void redo();
-    void clear();
-    void delete_drawing();
+    void update_text(QString, Shapes*);
+    void clear(int frame);
+    void clear_current();
+    void delete_drawing(Shapes* shape);
+    void delete_current_drawing();
     void zoom();
     void move();
-    void set_ana_details(bool);
     void open_widget(VideoProject *vid_proj);
     void close_widget(VideoWidget*);
 
@@ -75,6 +70,7 @@ public slots:
     void options(void);
     void open_project_dialog();
     void show_analysis_dock(bool);
+    void show_ana_settings_dock(bool);
 
 signals:
     void set_status_bar(QString);
@@ -82,16 +78,21 @@ signals:
 
 private:
     QDockWidget* queue_dock;
+    QDockWidget* ana_settings_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
+    DrawingWidget* drawing_wgt;
     QueueWidget* queue_wgt;
+    AnaSettingWidget* ana_settings_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
+    QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
+    QAction* toggle_ana_settings_wgt;
 
     AnalysisWindow *analysis_window;
 

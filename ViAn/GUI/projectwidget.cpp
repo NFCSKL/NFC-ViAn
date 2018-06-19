@@ -1,6 +1,5 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
-#include "GUI/TreeItems/analysisitem.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -8,6 +7,7 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QShortcut>
+#include <QMessageBox>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -24,8 +24,18 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDragEnabled(true);
     setDropIndicatorShown(true);
 
+    // Create togglable action in the context menu for analysis details
+    show_details_act = new QAction("Show/hide details", this);
+    show_details_act->setCheckable(true);
+    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+
+    // Create togglable action in the context menu for analysis settings
+    show_settings_act = new QAction("Show/hide analysis settings", this);
+    show_settings_act->setCheckable(true);
+    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
@@ -46,12 +56,14 @@ ProjectWidget::~ProjectWidget() {
 
 /**
  * @brief ProjectWidget::new_project
- * Creates a create project dialog
+ * Creates a new empty project if current project is closed/user closes it
  */
 void ProjectWidget::new_project() {
-    ProjectDialog* proj_dialog = new ProjectDialog();
-    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
-    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
+//    ProjectDialog* proj_dialog = new ProjectDialog();
+//    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
+//    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
+    add_project("New project", "");
+
 }
 
 /**
@@ -62,19 +74,15 @@ void ProjectWidget::new_project() {
  * @param project_path
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
+    if (!close_project()) return;
+
     std::string name = project_name.toStdString();
     std::string path = project_path.toStdString();
     Project* new_proj = new Project(name, path);
-    if (!new_proj->tmp_dir_valid) {
-        delete m_proj;
-        m_proj = nullptr;
-        return;
-    }
-    close_project();
     set_main_window_name(project_name);
     m_proj = new_proj;
     path.append(name);
-    emit proj_path(m_proj->get_tmp_dir());
+    emit proj_path(m_proj->get_dir());
 }
 
 /**
@@ -96,7 +104,7 @@ void ProjectWidget::add_video() {
     QStringList video_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add video"),
-                m_proj->get_tmp_dir().c_str(),
+                m_proj->get_dir().c_str(),
                 extensions);
 
     for (auto video_path : video_paths){
@@ -115,9 +123,17 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->get_tmp_dir());
-    if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
-    if(settings->use_interval) method->set_interval(settings->get_interval());
+    AnalysisMethod* method;
+    switch (settings->get_type()) {
+    case MOTION_DETECTION:
+        method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
+        break;
+    default:
+        break;
+    }
+    if (settings->quick_analysis) {
+        settings->set_full_settings(analysis_settings->get_full_settings());
+    } else {}
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
@@ -135,27 +151,97 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* tag) {
-    TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(tag));
+void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_proj->add_analysis(tag);
-
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
         set_status_bar("Something went wrong when adding tag: " + QString::fromStdString(tag->get_name()));
         return;
     }
 
-    vid_item->addChild(tag_item);
+    if (tag->is_drawing_tag()) {
+        DrawingTagItem* item = new DrawingTagItem(tag);
+        vid_item->addChild(item);
+        clearSelection();
+        item->setSelected(true);
+        for (auto t_frame : tag->tag_map) {
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+            tf_item->set_state(t_frame.second);
+            item->addChild(tf_item);
+        }
+        item->setExpanded(true);
+        tree_item_clicked(item);
+    } else if (!tag->is_drawing_tag()) {
+        TagItem* item = new TagItem(tag);
+        vid_item->addChild(item);
+        clearSelection();
+        item->setSelected(true);
+        tree_item_clicked(item);
+    }
     vid_item->setExpanded(true);
 }
 
+
 /**
- * @brief ProjectWidget::set_tree_item_namebei
+ * @brief ProjectWidget::add_frames_to_tag_item
+ * Create the TagFrameItems from all the frames. Used when opening a project
+ * @param item
+ */
+void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
+    Tag* tag;
+    if (item->type() == TAG_ITEM) {
+        tag = dynamic_cast<TagItem*>(item)->get_tag();
+    } else if (item->type() == DRAWING_TAG_ITEM) {
+        tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+    }
+    for (auto t_frame : tag->tag_map) {
+        TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
+        tf_item->set_state(t_frame.second);
+        item->addChild(tf_item);
+    }
+}
+
+/**
+ * @brief ProjectWidget::add_new_frame_to_tag_item
+ * Create a new TagFrameItem for the newly tagged frame
+ * @param frame
+ * @param t_frame
+ */
+void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
+    TagFrameItem* tf_item = new TagFrameItem(frame);
+    tf_item->set_state(t_frame);
+    m_tag_item->setExpanded(true);
+    for (int i = 0; i < m_tag_item->childCount(); ++i) {
+        TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
+        if (frame < temp->get_frame()) {
+            m_tag_item->insertChild(i, tf_item);
+            return;
+        }
+    }
+    m_tag_item->addChild(tf_item);
+}
+
+/**
+ * @brief ProjectWidget::remove_frame_from_tag_item
+ * Remove the frame from the current tag
+ * @param frame
+ */
+void ProjectWidget::remove_frame_from_tag_item(int frame) {
+    for (int i = 0; i < m_tag_item->childCount(); ++i) {
+        TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
+        if (tf_item->get_frame() == frame) {
+            m_tag_item->removeChild(tf_item);
+            return;
+        }
+    }
+}
+
+/**
+ * @brief ProjectWidget::set_tree_item_name
  * @param item
  * @param name
  * Slot to set the name if an item in the project tree
  */
-
 void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
     item->setText(0, name);
 }
@@ -168,7 +254,16 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid_item = new VideoItem(vid_proj);
-    insertTopLevelItem(topLevelItemCount(), vid_item);
+
+    // If there only is one selected item and it's a folder,
+    // add the new video to that folder otherwise to the top level
+    QTreeWidgetItem* s_item = (!selectedItems().count()) ? invisibleRootItem() : currentItem();
+    if (s_item->type() == FOLDER_ITEM) {
+        s_item->addChild(vid_item);
+        s_item->setExpanded(true);
+    } else {
+        insertTopLevelItem(topLevelItemCount(), vid_item);
+    }
     vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
     emit set_status_bar("Video added: " + vid_name);
     // Add analysis and tag
@@ -293,7 +388,8 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     if (elems.size() > 0) {
         // Follow index path
         QTreeWidgetItem* item = topLevelItem(std::stoi(elems[0]));
-        for (auto i = 1; i < elems.size(); ++i) {
+
+        for (size_t i = 1; i < elems.size(); ++i) {
             if (item->child(std::stoi(elems[i]))) item = item->child(std::stoi(elems[i]));
         }
 
@@ -321,7 +417,7 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM) {
+        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM || child->type() == DRAWING_TAG_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
             r_item->rename();
         }
@@ -339,9 +435,16 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
-        } else {
+            add_frames_to_tag_item(tag_item);
+        } else if (ana.second->get_type() == DRAWING_TAG) {
+            DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<Tag*>(ana.second));
+            v_item->addChild(tag_item);
+            add_frames_to_tag_item(tag_item);
+        } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else {
+            qWarning() << "Something went wrong while adding analyses to items.";
         }
     }
 }
@@ -395,25 +498,21 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
+void ProjectWidget::update_analysis_settings() {
+    std::vector<VideoItem*> v_items;
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
+    dialog->show();
+}
+
 void ProjectWidget::advanced_analysis() {
     std::vector<VideoItem*> v_items;
     QTreeWidgetItem* s_item = invisibleRootItem();
     get_video_items(s_item, v_items);
     if(v_items.empty()) return;
-    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->get_tmp_dir());
-    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    AnalysisSettings* new_settings = new AnalysisSettings(analysis_settings);
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
+    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
-}
-
-
-void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj) {
-    if (vid_proj == nullptr) return;
-    VideoItem* v_item = get_video_item(vid_proj);
-    AnalysisItem* ana = new AnalysisItem();
-    v_item->addChild(ana);
-    ana->setText(0, "Loading");
-    v_item->setExpanded(true);
-    emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
 }
 
 /**
@@ -433,7 +532,7 @@ bool ProjectWidget::prompt_save() {
 
     switch (delete_box.exec()){
         case QMessageBox::Yes:
-                save_project();
+                ok = save_project();
                 break;
         case QMessageBox::Cancel:
                 ok = false;
@@ -442,50 +541,151 @@ bool ProjectWidget::prompt_save() {
     return ok;
 }
 
-
 /**
  * @brief ProjectWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
- * Preforms different operations based on tree item type.
+ * Performs different operations based on tree item type.
  * @param item
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    get_index_path(item);
+    Q_UNUSED(col)
+    if (!item) return;
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project());
+        emit set_video_project(vid_item->get_video_project());
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
+
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
-        emit enable_tag_btn(false);
+
+        update_current_tag(vid_item);
         break;
     } case ANALYSIS_ITEM: {
-        tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         if(!ana_item->is_finished()) break;
+        ana_item->set_not_new();
         emit marked_analysis(ana_item->get_analysis());
-        emit marked_basic_analysis(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
+
+        emit set_video_project(vid_item->get_video_project());
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
+
         emit set_detections(true);
         emit set_poi_slider(true);
+        emit set_tag_slider(false);
         emit enable_poi_btns(true, true);
-        emit update_frame();
+
+        update_current_tag(vid_item);
+
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
         break;
-    } case TAG_ITEM: {
-        tree_item_clicked(item->parent());
-        TagItem* tag_item = dynamic_cast<TagItem*>(item);
+    } case DRAWING_TAG_ITEM: {
+        DrawingTagItem* tag_item = dynamic_cast<DrawingTagItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         emit marked_basic_analysis(tag_item->get_tag());
+
+        emit set_video_project(vid_item->get_video_project());
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
+
+        emit set_detections(false);
+        emit set_poi_slider(false);
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
-        emit enable_tag_btn(true);
-        emit update_frame();
+
+        if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
+        m_tag_item = nullptr;
         break;
+    } case TAG_ITEM: {
+        TagItem* tag_item = dynamic_cast<TagItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+
+        emit marked_basic_analysis(tag_item->get_tag());
+
+        if (!m_tag_item) {
+            item->setCheckState(0, Qt::Checked);
+            m_tag_item = tag_item;
+        }
+        // Deselect the old current tag and select the new one
+        else if (m_tag_item != tag_item) {
+            m_tag_item->setCheckState(0, Qt::Unchecked);
+            item->setCheckState(0, Qt::Checked);
+            m_tag_item = tag_item;
+        }
+        // If the current selected tag already is the current tag, deselect it
+        else if (m_tag_item == tag_item) {
+            update_current_tag(nullptr);
+        }
+
+        emit set_video_project(vid_item->get_video_project());
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
+
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+        break;
+    } case TAG_FRAME_ITEM: {
+        TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        emit set_video_project(vid_item->get_video_project());
+
+        // TODO set from state
+        // set brightness/contrast, rotation
+
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+
+        VideoState state;
+        state = tf_item->get_state();
+        if (item->parent()->type() == TAG_ITEM) {
+            emit marked_video_state(vid_item->get_video_project(), state);
+
+            TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
+            emit marked_basic_analysis(tag_item->get_tag());
+
+            if (m_tag_item && m_tag_item != tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
+            tag_item->setCheckState(0, Qt::Checked);
+            m_tag_item = tag_item;
+        } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
+            emit marked_video_state(vid_item->get_video_project(), state);
+            DrawingTagItem* dt_item = dynamic_cast<DrawingTagItem*>(item->parent());
+            emit marked_basic_analysis(dt_item->get_tag());
+            if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
+            m_tag_item = nullptr;
+        }
     } case FOLDER_ITEM: {
         break;
     } default:
         break;
+    }
+    emit update_frame();
+}
+
+/**
+ * @brief ProjectWidget::update_current_tag
+ * Deselect the current tag if an item under a different video project is chosen
+ * @param v_item
+ */
+void ProjectWidget::update_current_tag(VideoItem *v_item) {
+    if (m_tag_item && dynamic_cast<VideoItem*>(m_tag_item->parent()) != v_item) {
+        m_tag_item->setCheckState(0, Qt::Unchecked);
+        emit marked_basic_analysis(nullptr);
+        m_tag_item = nullptr;
     }
 }
 
@@ -562,11 +762,18 @@ void ProjectWidget::context_menu(const QPoint &point) {
         switch (item->type()) {
             case TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Remove", this, SLOT(remove_item()));
+                break;
+            case DRAWING_TAG_ITEM:
+                menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Update", this, SLOT(drawing_tag()));
+                menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Show details", this, SLOT(show_details()));
-                menu.addAction("Hide details", this, SLOT(hide_details()));
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
+                menu.addAction("Remove", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -575,8 +782,13 @@ void ProjectWidget::context_menu(const QPoint &point) {
             case VIDEO_ITEM:
                 menu.addAction("Remove", this, SLOT(remove_item()));
                 menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
+                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
+                break;
+            case TAG_FRAME_ITEM:
+                if (item->parent()->type() == TAG_ITEM) {
+                    menu.addAction("Remove", this, SLOT(remove_item()));
+                }
             default:
-                // VIDEO_ITEM
                 break;
         }
     } else if (item_count > 1) {
@@ -592,22 +804,73 @@ void ProjectWidget::open_video_in_widget() {
 }
 
 /**
- * @brief ProjectWidget::show_details
- * @param ana_item
- * Show the analysis' details; interval and bounding box
+ * @brief ProjectWidget::drawing_tag
+ * Creates the drawing tag or updates the current one depending
+ * on the current QTreeItem.
+ * The drawing tag will tag all frames which have a drawing on them.
  */
-void ProjectWidget::show_details() {
-    emit show_analysis_details(true);
+void ProjectWidget::drawing_tag() {
+    VideoItem* vid_item;
+    // Remove the old drawing tag if update was selected
+    if (selectedItems().front()->type() == DRAWING_TAG_ITEM) {
+        vid_item = dynamic_cast<VideoItem*>(selectedItems().front()->parent());
+        // Update tag drawing
+        DrawingTagItem* item = dynamic_cast<DrawingTagItem*>(selectedItems().front());
+        vid_item->get_video_project()->remove_analysis(item->get_tag());
+        delete selectedItems().front();
+    } else if (selectedItems().front()->type() == VIDEO_ITEM) {
+        vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
+    }
+    // Create tag drawing
+    Tag* tag = new Tag("Drawing tag", true);
+
+    // Add all drawings to tag frame items.
+    VideoProject* vid_proj = vid_item->get_video_project();
+    for (auto const& frame_overlay : vid_proj->get_overlay()->get_overlays()) {
+        if (frame_overlay.second.size() > 0) {
+            VideoState state;
+            state.frame = frame_overlay.first;
+            TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
+            tag->add_frame(frame_overlay.first, t_frame);
+        }
+    }
+    // Add tag to tree
+    add_tag(vid_proj, tag);
 }
 
 /**
- * @brief ProjectWidget::hide_details
- * Hide the analysis' details; interval and bounding box
+ * @brief ProjectWidget::toggle_details
+ * Slot function for settings the action's checkbox
+ * @param b
  */
-void ProjectWidget::hide_details() {
-    emit show_analysis_details(false);
+void ProjectWidget::toggle_details(bool b) {
+    show_details_act->setChecked(b);
 }
 
+/**
+ * @brief ProjectWidget::toggle_settings
+ * Slot function for settings the action's checkbox
+ * @param b
+ */
+void ProjectWidget::toggle_settings(bool b) {
+    show_settings_act->setChecked(b);
+}
+
+/**
+ * @brief ProjectWidget::update_settings
+ * Updates the analysis settings dock window with the settings
+ * from the clicked analysis
+ */
+void ProjectWidget::update_settings() {
+    QTreeWidgetItem* item = selectedItems().front();
+    if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* a_item = dynamic_cast<AnalysisItem*>(item);
+        if (!a_item->is_finished()) return;
+        AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(a_item->get_analysis())->settings;
+        emit update_settings_wgt(settings);
+        emit show_analysis_settings(true);
+    }
+}
 
 /**
  * @brief ProjectWidget::remove_item
@@ -620,26 +883,120 @@ void ProjectWidget::remove_item() {
     QString info_text = "Do you wish to continue?";
     if (message_box(text, info_text, true)) {
         for (auto item : selectedItems()) {
-            if (item->type() == FOLDER_ITEM) {
-                std::vector<VideoItem*> v_items;
-                get_video_items(item, v_items);
-                for (auto v_item : v_items) {
-                    emit item_removed(v_item->get_video_project());
-                }
-            }
-
-            else if (item->type() == VIDEO_ITEM) {
-                VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-                emit item_removed(vid_item->get_video_project());
-            }
-            // TODO Fix these cases
-//            else if (item->type() == TAG_ITEM || item->type() == ANALYSIS_ITEM) {
-//
-//            }
-            delete item;
+            remove_tree_item(item);
         }
     }
+}
+
+/**
+ * @brief ProjectWidget::remove_tree_item
+ * @param item
+ * Recursive function for removing item and all of its children
+ */
+void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
+    switch (item->type()) {
+    case FOLDER_ITEM:
+        while (item->childCount() != 0) {
+            remove_tree_item(item->child(0));
+        }
+        break;
+    case VIDEO_ITEM:
+        remove_video_item(item);
+        break;
+    case TAG_ITEM:
+        remove_tag_item(item);
+        break;
+    case DRAWING_TAG_ITEM:
+        remove_drawing_tag_item(item);
+        break;
+    case ANALYSIS_ITEM:
+        remove_analysis_item(item);
+        break;
+    case TAG_FRAME_ITEM:
+        remove_tag_frame_item(item);
+    default:
+        break;
+    }
+    delete item;
+}
+
+/**
+ * @brief ProjectWidget::remove_video_item
+ * Remove and clean video item
+ * @param item
+ */
+void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+    VideoProject* v_proj = vid_item->get_video_project();
+
+    // Remove all children
+    while (item->childCount() != 0) {
+        remove_tree_item(item->child(0));
+    }
+    // Remove the video from the list of videos
+    auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
+    if (it != m_proj->get_videos().end()) {
+        m_proj->get_videos().erase(it);
+    }
+    delete v_proj;
+    emit item_removed(v_proj);
     emit remove_overlay();
+}
+
+/**
+ * @brief ProjectWidget::remove_tag_item
+ * Remove and clean tag item
+ * @param item
+ */
+void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
+    emit set_tag_slider(false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
+    vid_item->get_video_project()->remove_analysis(tag);
+    m_tag_item = nullptr;
+    emit marked_basic_analysis(nullptr);
+    emit update_frame();
+}
+
+/**
+ * @brief ProjectWidget::remove_drawing_item
+ * Remove and clean drawing tag item
+ * @param item
+ */
+void ProjectWidget::remove_drawing_tag_item(QTreeWidgetItem* item) {
+    emit set_tag_slider(false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
+    vid_item->get_video_project()->remove_analysis(tag);
+    emit update_frame();
+}
+
+/**
+ * @brief ProjectWidget::remove_analysis_item
+ * Remove and clean analysis item
+ * @param item
+ */
+void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
+    emit set_detections(false);
+    emit set_poi_slider(false);
+    emit enable_poi_btns(false, false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
+
+    analysis->delete_saveable(analysis->full_path());
+    vid_item->get_video_project()->remove_analysis(analysis);
+    emit update_frame();
+    emit clear_analysis();
+}
+
+void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
+    TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
+    TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+    int frame = tf_item->get_frame();
+    tag_item->get_tag()->remove_frame(frame);
 }
 
 /**
@@ -674,6 +1031,14 @@ void ProjectWidget::create_folder_item() {
             int index = p_item->indexOfChild(s_item);
             p_item->insertChild(index + 1, item);
         }
+    } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
+        QTreeWidgetItem* p_item = s_item->parent()->parent();
+        if (p_item == nullptr) {
+            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
+        } else {
+            int index = p_item->indexOfChild(s_item);
+            p_item->insertChild(index + 1, item);
+        }
     }
     editItem(item);
     clearSelection();
@@ -685,18 +1050,50 @@ void ProjectWidget::create_folder_item() {
  * @brief ProjectWidget::save_project
  * Slot function to save the open project
  */
-void ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return;
+bool ProjectWidget::save_project() {
+    if (m_proj == nullptr ) return false;
+
+    // Move all project files if the current project is temporary
+    // i.e. has not been saved yet
+    if (m_proj->is_temporary()) {
+        QString name{}, path{};
+//        std::unique_ptr<ProjectDialog> project_dialog(new ProjectDialog(&name, &path));
+        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this);
+        connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
+        int status = project_dialog->exec();
+
+        if (status == project_dialog->Accepted) {
+            // User clicked ok, dialog checked for proper path & name
+            // Update project path
+            // TODO: Update window title to new project name
+            m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
+            m_proj->remove_files();
+            m_proj->set_name_and_path(name.toStdString(), path.toStdString());
+            m_proj->set_temporary(false);
+            set_main_window_name(name);
+            emit proj_path(m_proj->get_dir());
+            QDir dir;
+            dir.mkpath(QString::fromStdString(m_proj->get_dir()));
+        } else {
+            // User aborted dialog, cancel save
+            return false;
+        }
+    }
+
     save_item_data();
+    emit save_draw_wgt();
+
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.save_state(m_proj->get_tmp_dir() + "treestate");
+    tree_state.save_state(m_proj->get_dir() + "treestate");
+
     m_proj->save_project();
-    m_proj->move_project_from_tmp();
+
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file());
     set_status_bar("Project saved");
+    return true;
 }
 
 /**
@@ -707,7 +1104,7 @@ void ProjectWidget::save_project() {
 bool ProjectWidget::open_project(QString project_path) {
     if (project_path.isEmpty()) return false;
 
-    if (m_proj != nullptr && !close_project())
+    if (m_proj && !close_project())
         return false;
 
     set_status_bar("Opening project");
@@ -724,7 +1121,7 @@ bool ProjectWidget::open_project(QString project_path) {
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
     set_main_window_name(QString::fromStdString(m_proj->get_name()));
-    emit proj_path(m_proj->get_tmp_dir());
+    emit proj_path(m_proj->get_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
@@ -749,14 +1146,18 @@ bool ProjectWidget::close_project() {
         }
     }
 
-    set_main_window_name(QString::fromStdString(""));
+    // Remove project if temporary
+    if (m_proj->is_temporary()) {
+        m_proj->remove_files();
+    }
 
     emit set_status_bar("Closing project");
     emit project_closed();
     emit remove_overlay();
-    this->clear();
+
     delete m_proj;
     m_proj = nullptr;
+    this->clear();
     return true;
 }
 
@@ -769,22 +1170,22 @@ void ProjectWidget::remove_project() {
     if (m_proj == nullptr) return;
     QString text = "Are you sure you want to remove the project?";
     QString info_text = "This will delete all project files (images, reports, etc).";
-    if (message_box(text, info_text)) return;
+    if (!message_box(text, info_text)) return;
   
     set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
-    m_proj->delete_artifacts();
+    m_proj->remove_files();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-    emit remove_overlay();
     emit project_closed();
     emit remove_overlay();
+    new_project();
 }
 
 void ProjectWidget::set_main_window_name(QString name) {
-    parentWidget()->parentWidget()->setWindowTitle(name);
+    parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
 }
 
 /**

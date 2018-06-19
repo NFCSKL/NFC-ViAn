@@ -3,35 +3,113 @@
 #include "Project/Analysis/analysis.h"
 #include <QTime>
 #include <QThread>
+#include <QShortcut>
+#include <QMessageBox>
 #include "utility.h"
 
-FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {}
-
-void FrameWidget::toggle_zoom(bool value) {
-    if (value) {
-        tool = ZOOM;
-        emit send_tool(ZOOM);
-        setCursor(Qt::CrossCursor);
-    } else {
-        unsetCursor();
-        tool = NONE;
-        emit send_tool(NONE);
-    }
+FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
+    setMouseTracking(true);
+    QShortcut* copy_sc = new QShortcut(this);
+    QShortcut* paste_sc = new QShortcut(this);
+    copy_sc->setKey(QKeySequence::Copy);
+    paste_sc->setKey(QKeySequence::Paste);
+    connect(copy_sc, &QShortcut::activated, this, &FrameWidget::copy);
+    connect(paste_sc, &QShortcut::activated, this, &FrameWidget::paste);
 }
 
-void FrameWidget::set_analysis_tool(bool status) {
-    if (status) {
-        tool = ANALYSIS_BOX;
-        setCursor(Qt::CrossCursor);
-    } else {
-        tool = NONE;
-        unsetCursor();
+/**
+ * @brief FrameWidget::copy
+ * Saves a copy of the current item which can be used to later create new copies.
+ */
+void FrameWidget::copy() {
+    if (copied_item) delete copied_item;
+    Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
+    if (!current_drawing) return;
+    switch (current_drawing->get_shape()) {
+    case RECTANGLE:
+        copied_item = new Rectangle(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case CIRCLE:
+        copied_item = new Circle(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case LINE:
+        copied_item = new Line(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case ARROW:
+        copied_item = new Arrow(current_drawing->get_color(), QPoint(0,0));
+        break;
+    case PEN: {
+        Pen* pen = dynamic_cast<Pen*>(current_drawing);
+        copied_item = new Pen(pen->get_color(), QPoint(0,0));
+        Pen* copied_item_pen = dynamic_cast<Pen*>(copied_item);
+        copied_item_pen->set_points(pen->get_points());
+        break;
     }
+    case TEXT: {
+        Text* text = dynamic_cast<Text*>(current_drawing);
+        copied_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
+        copied_item->set_text_size(text->get_text_size());
+        break;
+    }
+    default:
+        break;
+    }
+    copied_item->set_name(current_drawing->get_name());
+    copied_item->set_thickness(current_drawing->get_thickness());
+    copied_item->set_draw_start(current_drawing->get_draw_start());
+    copied_item->set_draw_end(current_drawing->get_draw_end());
 }
 
+/**
+ * @brief FrameWidget::paste
+ * Creates a new item which is a copy of the item in the copy clipboard
+ * and adds it to the overlay.
+ */
+void FrameWidget::paste() {
+    if (!copied_item) return;
+    Shapes* new_item;
+    switch (copied_item->get_shape()) {
+    case RECTANGLE:
+        new_item = new Rectangle(copied_item->get_color(), QPoint(0,0));
+        break;
+    case CIRCLE:
+        new_item = new Circle(copied_item->get_color(), QPoint(0,0));
+        break;
+    case LINE:
+        new_item = new Line(copied_item->get_color(), QPoint(0,0));
+        break;
+    case ARROW:
+        new_item = new Arrow(copied_item->get_color(), QPoint(0,0));
+        break;
+    case PEN: {
+        Pen* pen = dynamic_cast<Pen*>(copied_item);
+        new_item = new Pen(pen->get_color(), QPoint(0,0));
+        Pen* new_pen = dynamic_cast<Pen*>(new_item);
+        new_pen->set_points(pen->get_points());
+        break;
+    }
+    case TEXT: {
+        Text* text = dynamic_cast<Text*>(copied_item);
+        new_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
+        new_item->set_text_size(text->get_text_size());
+        break;
+    }
+    default:
+        break;
+    }
 
+    new_item->set_name(copied_item->get_name());
+    new_item->set_thickness(copied_item->get_thickness());
+    new_item->set_draw_start(copied_item->get_draw_start());
+    new_item->set_draw_end(copied_item->get_draw_end());
+    m_vid_proj->get_overlay()->add_drawing(new_item, current_frame_nr);
+    emit process_frame();
+    update();
+}
+
+// TODO Not need?
 void FrameWidget::set_scroll_area_size(QSize size) {
-    m_scroll_area_size = size;
+    m_scroll_area_size = size; //Unused
 }
 
 /**
@@ -40,8 +118,12 @@ void FrameWidget::set_scroll_area_size(QSize size) {
  * Set the analysis and the pois on the current frame
  */
 void FrameWidget::set_analysis(AnalysisProxy *analysis) {
-    m_analysis = analysis->load_analysis();
-    set_detections_on_frame(current_frame_nr);
+    if (current_analysis != analysis) {
+        clear_analysis();
+        m_analysis = analysis->load_analysis();
+        set_detections_on_frame(current_frame_nr);
+        current_analysis = analysis;
+    }
 }
 
 /**
@@ -49,6 +131,7 @@ void FrameWidget::set_analysis(AnalysisProxy *analysis) {
  * Forgets the current analysis
  */
 void FrameWidget::clear_analysis() {
+    delete m_analysis;
     m_analysis = nullptr;
     ooi_rects.clear();
 }
@@ -81,16 +164,15 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
-void FrameWidget::set_overlay(Overlay* overlay) {
-    video_overlay = overlay;
-}
-
-Overlay* FrameWidget::get_overlay() {
-    return video_overlay;
-}
-
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
+    if (m_vid_proj) m_vid_proj->get_video()->state.anchor = p;
+}
+
+void FrameWidget::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+
+    if (m_vid_proj) m_vid_proj->get_video()->state.scale_factor = scale_factor;
 }
 
 void FrameWidget::set_current_frame_nr(int nr) {
@@ -102,34 +184,43 @@ void FrameWidget::update(){
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
-    if (m_vid_proj != nullptr) {
+    mark_rect = false;
+    emit send_tool(tool);
+    m_tool = tool;
+    set_cursor(m_tool);
+    repaint();
+}
 
-        if (tool == TEXT) {
-            QString current_string = "Enter text";
-            float current_font_scale = 1;
-            std::string input_string = current_string.toStdString();
-            float input_font_scale = current_font_scale;
-            CustomDialog dialog("Choose text", NULL);
-            dialog.addLabel("Enter values:");
-            dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
-            dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
-                                  &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
-                                  "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
-
-            // Show the dialog (execution will stop here until the dialog is finished)
-            dialog.exec();
-
-            if (!dialog.wasCancelled() && !input_string.empty()) {
-                // Not cancelled and not empty field.
-                current_string = QString::fromStdString(input_string);
-                current_font_scale = input_font_scale;
-            }
-            emit send_tool_text(current_string, current_font_scale);
-        } else {
-            emit send_tool(tool);
-        }
-
-        this->tool = tool;
+/**
+ * @brief FrameWidget::set_cursor
+ * @param tool
+ * Set the cursor depending on the current tool
+ */
+void FrameWidget::set_cursor(SHAPES tool) {
+    switch (tool) {
+    case NONE:
+    case ZOOM:
+        unsetCursor();
+        break;
+    case ANALYSIS_BOX:
+    case RECTANGLE:
+    case CIRCLE:
+    case PEN:
+    case ARROW:
+    case LINE:
+    case TEXT:
+        setCursor(Qt::CrossCursor);
+        break;
+    case MOVE:
+        setCursor(Qt::OpenHandCursor);
+        break;
+        //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
+    case EDIT:
+        setCursor(Qt::SizeAllCursor);
+        break;
+    default:
+        unsetCursor();
+        break;
     }
 }
 
@@ -185,12 +276,13 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
  * @param event
  */
 void FrameWidget::paintEvent(QPaintEvent *event) {
+    Q_UNUSED (event)
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (mark_rect) {
         // Draw the zoom box with correct dimension
-        if(tool == ZOOM){
+        if(m_tool == ZOOM){
             QPoint start = rect_start;
             QPoint end = rect_end;
 
@@ -203,17 +295,16 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             end = QPoint(end.x(), start.y() + height_mod);
 
             painter.setPen(QColor(255,0,0));
-            QRectF tmp(start, end);
-            painter.drawRect(tmp);
+            QRectF correct_dim_rect((start-anchor)*m_scale_factor, (end-anchor)*m_scale_factor);
+            painter.drawRect(correct_dim_rect);
         }
         // Draw the zoom box
         painter.setPen(QColor(0,255,0));
-        QRectF zoom(rect_start, rect_end);
+        QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
         painter.drawRect(zoom);
     }
 
-
-    if(tool == ANALYSIS_BOX){
+    if(m_tool == ANALYSIS_BOX){
         painter.setPen(QColor(0,255,0));
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
@@ -221,7 +312,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     if (show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
 
-        auto box = m_analysis->get_bounding_box();
+        auto box = m_analysis->settings->bounding_box;
         QPoint tl = Utility::from_cvpoint(box.tl());
         QPoint br = Utility::from_cvpoint(box.br());
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
@@ -236,6 +327,33 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             painter.drawRect(detect_rect);
         }
     }
+    // TODO This is to prevent crash when clicking bookmark before loading video
+    // This should get a better fix later
+    if (!m_vid_proj) {
+        painter.end();
+        return;
+    }
+    Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
+    bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
+    if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame() && m_tool == EDIT) {
+        QPoint tl;
+        QPoint br;
+        if (current_drawing->get_shape() == PEN) {
+            Pen* current = dynamic_cast<Pen*>(current_drawing);
+            cv::Rect bounding_rect = cv::boundingRect(current->get_points());
+            tl = QPoint(bounding_rect.tl().x, bounding_rect.tl().y);
+            br = QPoint(bounding_rect.br().x, bounding_rect.br().y);
+        } else {
+            tl = QPoint(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
+            br = QPoint(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
+        }
+        QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+        painter.setPen(Qt::black);
+        painter.drawRect(current_rect);
+        QPen pen(Qt::white, 1, Qt::DashLine);
+        painter.setPen(pen);
+        painter.drawRect(current_rect);
+    }
     painter.end();
 }
 
@@ -248,7 +366,14 @@ QPoint FrameWidget::scale_point(QPoint pos) {
  * @param event
  */
 void FrameWidget::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED (event)
+    // TODO unused
     emit current_size(width(), height());
+}
+
+void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
+    emit mouse_double_click(scaled_pos);
 }
 
 /**
@@ -256,7 +381,9 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
  * @param event
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
-    switch (tool) {
+    // Pos when the frame is at 100%
+    QPoint scaled_pos = scale_point(event->pos());
+    switch (m_tool) {
     case NONE:
         break;
     case ANALYSIS_BOX:
@@ -265,20 +392,41 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             ana_rect_end = event->pos();
         }
         break;
-    case ZOOM:
+    case ZOOM: {
+        prev_point = event->pos();
+        prev_point_scaled = scaled_pos;
+        QRect zoom_rect(rect_start, rect_end);
         if (event->button() == Qt::RightButton) {
-            init_panning(event->pos());
-        } else if (event->button() == Qt::LeftButton) {
-            if (event->modifiers() == Qt::ControlModifier) {
-                do_zoom_out = true;
+            if (zoom_rect.contains(scaled_pos)) {
+                pan_rect = true;
             } else {
-                rect_start = event->pos();
+                pan_rect = false;
+                init_panning(event->pos());
             }
+        } else if (event->button() == Qt::LeftButton) {
+            if (zoom_rect.contains(scaled_pos)) {
+                end_zoom();
+                mark_rect = false;
+                unsetCursor();
+            } else {
+                rect_start = scaled_pos;
+                mark_rect = true;
+            }
+
+            rect_end = rect_start;
+            repaint();
         }
+        break;
+    }
+    case MOVE:
+        init_panning(event->pos());
+        break;
+    case SELECT:
+        emit mouse_pressed(scale_point(event->pos()), false);
         break;
     default:
         bool right_click = (event->button() == Qt::RightButton);
-        emit mouse_pressed(scale_point(event->pos()), right_click);
+        emit mouse_pressed(scaled_pos, right_click);
         break;
     }
 }
@@ -288,30 +436,25 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
-    switch (tool) {
+    QPoint scaled_pos = scale_point(event->pos());
+    switch (m_tool) {
     case NONE:
         break;
-    case ZOOM:
-    {
-        if (event->button() == Qt::RightButton) {
-            end_panning();
-        } else if (event->button() == Qt::LeftButton){
-            if (do_zoom_out) {
-                emit trigger_zoom_out();
-                do_zoom_out = false;
-            }else {
-                end_zoom();
-            }
-        }
-        break;
-    }
     case ANALYSIS_BOX:
-    {
         set_analysis_settings();
         break;
-    }
+    case ZOOM:
+        if (event->button() == Qt::RightButton) {
+            end_panning();
+        } else if (event->button() == Qt::LeftButton){}
+        break;
+    case MOVE:
+        end_panning();
+        break;
+    case SELECT:
+        break;
     default:
-        emit mouse_released(scale_point(event->pos()), false);
+        emit mouse_released(scaled_pos, false);
         break;
     }
 }
@@ -321,7 +464,8 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
-    switch (tool) {
+    QPoint scaled_pos = scale_point(event->pos());
+    switch (m_tool) {
     case NONE:
         break;
     case ANALYSIS_BOX:
@@ -329,16 +473,45 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             ana_rect_end = rect_update(event->pos());
         }
         break;
-    case ZOOM:
+    case ZOOM: {
+        QRect zoom_rect(rect_start, rect_end);
         if (event->buttons() == Qt::RightButton){
-            panning(event->pos());
-        } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
-            rect_end = rect_update(event->pos());
-            mark_rect = true;
+            if (pan_rect && mark_rect) {
+                QPoint diff_point = scaled_pos - prev_point_scaled;
+
+                rect_start += diff_point;
+                rect_end += diff_point;
+                prev_point_scaled = scaled_pos;
+                repaint();
+            } else {
+                panning(event->pos());
+            }
+        } else if (event->buttons() == Qt::LeftButton && mark_rect) {
+            //rect_end = rect_update(scale_point(event->pos()));
+            rect_end = scaled_pos;
+            repaint();
+        } else {
+            if (zoom_rect.contains(scaled_pos) && mark_rect) {
+                setCursor(QCursor(QPixmap("../ViAn/Icons/zoom_in.png")));
+            } else {
+                unsetCursor();
+            }
         }
         break;
+    }
+    case MOVE:
+        if (event->buttons() == Qt::LeftButton) {
+            panning(event->pos());
+        }
+        break;
+    case SELECT:
+        break;
     default:
-        emit mouse_moved(scale_point(event->pos()));
+        if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
+            bool shift = (event->modifiers() == Qt::ShiftModifier);
+            bool ctrl = (event->modifiers() == Qt::ControlModifier);
+            emit mouse_moved(scaled_pos, shift, ctrl);
+        }
         break;
     }
 }
@@ -348,10 +521,44 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
+    QPoint scaled_pos = scale_point(event->pos());
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
-    emit mouse_scroll(num_steps);
-    event->accept();
+    switch (m_tool) {
+    case EDIT:
+    case SELECT:
+        emit mouse_scroll(num_steps);
+        event->accept();
+        break;
+    case MOVE:
+        break;
+    case ZOOM:
+        if (event->modifiers() == Qt::ShiftModifier) {
+            init_panning(event->pos());
+            if (num_steps.y() < 0) {
+                panning(event->pos()+QPoint(-PAN_FACTOR*m_scale_factor,0));
+            } else {
+                panning(event->pos()+QPoint(PAN_FACTOR*m_scale_factor,0));
+            }
+        }
+        else if (event->modifiers() == Qt::ControlModifier) {
+            if (num_steps.y() < 0) {
+                emit center_zoom_rect(scaled_pos, 1/ZOOM_STEP);
+            } else {
+                emit center_zoom_rect(scaled_pos, ZOOM_STEP);
+            }
+        } else {
+            init_panning(event->pos());
+            if (num_steps.y() < 0) {
+                panning(event->pos()+QPoint(0,-PAN_FACTOR*m_scale_factor));
+            } else {
+                panning(event->pos()+QPoint(0,PAN_FACTOR*m_scale_factor));
+            }
+        }
+    default:
+        break;
+    }
+
 }
 
 void FrameWidget::set_analysis_settings() {
@@ -363,21 +570,19 @@ void FrameWidget::set_analysis_settings() {
 
     if (reply == QMessageBox::Yes) {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
+        settings->quick_analysis = true;
 
         cv::Point end = cv::Point(ana_rect_end.x(), ana_rect_end.y());
         cv::Point start (ana_rect_start.x(), ana_rect_start.y());
-        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x / m_scale_factor, anchor.y()/m_scale_factor + start.y / m_scale_factor),
-                      cv::Point(anchor.x()/m_scale_factor + end.x / m_scale_factor, anchor.y()/m_scale_factor + end.y / m_scale_factor));
-        settings->setBounding_box(scaled);
+        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x/m_scale_factor, anchor.y()/m_scale_factor + start.y/m_scale_factor),
+                      cv::Point(anchor.x()/m_scale_factor + end.x/m_scale_factor, anchor.y()/m_scale_factor + end.y/m_scale_factor));
+        settings->set_bounding_box(scaled);
 
         emit quick_analysis(settings);
+        emit set_toolbar_zoom();
     }
     ana_rect_end = ana_rect_start;
     repaint();
-}
-
-void FrameWidget::set_scale_factor(double scale_factor) {
-    m_scale_factor = scale_factor;
 }
 
 /**
@@ -397,13 +602,30 @@ void FrameWidget::init_panning(QPoint pos) {
  */
 void FrameWidget::panning(QPoint pos) {
     // Using panning
-    QPoint _tmp = prev_pos - pos;
-    emit moved_xy(_tmp.x(), _tmp.y());
+    int dx {prev_pos.x() - pos.x()};
+    int dy {prev_pos.y() - pos.y()};
+
+    panning_tracker.first += dx / m_scale_factor;
+    panning_tracker.second += dy/ m_scale_factor;
+
+    auto scale_panning = [] (double& actual, int& scaled) {
+        if (std::abs(actual) >= 1) {
+            scaled = std::floor(actual);
+            actual -= scaled;
+        }
+    };
+
+    int x{}, y{};
+    scale_panning(panning_tracker.first, x);
+    scale_panning(panning_tracker.second, y);
+
+
+    emit moved_xy(x, y);
     prev_pos = pos;
 }
 
 /**
- * @brief FrameWidget::zoom
+ * @brief FrameWidget::rect_update
  * Updates and redraws the zooming rect
  * @param pos
  */
@@ -422,7 +644,11 @@ QPoint FrameWidget::rect_update(QPoint pos) {
  * Panning stopped
  */
 void FrameWidget::end_panning() {
-    setCursor(Qt::CrossCursor);
+    if (m_tool == ZOOM) {
+        unsetCursor();
+    } else if (m_tool == MOVE){
+        setCursor(Qt::OpenHandCursor);
+    }
 }
 
 /**
@@ -430,7 +656,6 @@ void FrameWidget::end_panning() {
  * Emits the points of the zooming rect
  */
 void FrameWidget::end_zoom() {
-    mark_rect = false;
     repaint();
 
     // ROI rect points

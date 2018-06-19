@@ -1,6 +1,7 @@
 #include "frameprocessor.h"
 #include <QDebug>
 #include <QTime>
+#include "utility.h"
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -85,15 +86,17 @@ void FrameProcessor::check_events() {
             update_zoomer_settings();
 
             // Skip reprocessing of old frame if there is a new
-            if (!m_new_frame->load()) {
+            if (!m_new_frame->load() && !skip_process) {
                 process_frame();
                 lk.unlock();
+                skip_process = false;
                 continue;
             }
+            skip_process = false;
         }
 
         // A new frame has been loaded by the VideoPlayer
-        if (m_new_frame->load()) {
+        if (m_new_frame->load() && m_overlay) {
             m_new_frame->store(false);
             try {
                 m_frame = m_v_sync->frame.clone();
@@ -163,10 +166,21 @@ void FrameProcessor::process_frame() {
  */
 void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
-    if (m_z_settings->draw_area_size != m_zoomer.get_viewport_size()) {
-
+    if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
         m_zoomer.update_rect_size();
+    }
+    // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
+    else if (m_z_settings->set_state) {
+        m_zoomer.fit_viewport();
+        m_z_settings->set_state = false;
+        skip_process = true;
+        m_zoomer.set_state(m_z_settings->anchor, m_z_settings->zoom_factor);
+    }
+    // Center the zoom rect
+    else if (m_z_settings->do_center) {
+        m_z_settings->do_center = false;
+        m_zoomer.center_zoom_rect(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Scale/zoom factor has been changed
     else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
@@ -194,6 +208,10 @@ void FrameProcessor::update_zoomer_settings() {
         m_z_settings->original = false;
         m_zoomer.reset();
     }
+    // Set interpolation method
+    else if (m_zoomer.get_interpolation_method() != m_z_settings->interpolation){
+        m_zoomer.set_interpolation_method(m_z_settings->interpolation);
+    }
 
     // Store changes made
     m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
@@ -201,8 +219,8 @@ void FrameProcessor::update_zoomer_settings() {
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
-    set_anchor(m_zoomer.get_anchor());
-    set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_anchor(m_zoomer.get_anchor());
+    emit set_scale_factor(m_zoomer.get_scale_factor());
 }
 
 /**
@@ -236,22 +254,32 @@ void FrameProcessor::update_overlay_settings() {
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
 
-    // Undo action
-    if (m_o_settings->undo) {
-        m_o_settings->undo = false;
-        m_overlay->undo(curr_frame);
-    // Redo action
-    } else if (m_o_settings->redo) {
-        m_o_settings->redo = false;
-        m_overlay->redo(curr_frame);
+
+    // Update text action
+    if (m_o_settings->update_text) {
+        m_o_settings->update_text = false;
+        m_overlay->update_text(m_o_settings->text, m_o_settings->shape);
     // Clear drawings action
     } else if (m_o_settings->clear_drawings) {
         m_o_settings->clear_drawings = false;
-        m_overlay->clear(curr_frame);
+        m_overlay->clear(m_o_settings->frame);
     // Delete the current drawing
     } else if (m_o_settings->delete_drawing) {
         m_o_settings->delete_drawing = false;
-        m_overlay->delete_drawing(curr_frame);
+        m_overlay->delete_drawing(m_o_settings->shape);
+    // Create a new text drawing
+    } else if (m_o_settings->create_text) {
+        int height = m_zoomer.get_zoom_rect().height;
+        int width = m_zoomer.get_zoom_rect().width;
+        int anchor_x = m_zoomer.get_anchor().x();
+        int anchor_y = m_zoomer.get_anchor().y();
+        QPoint text_point = QPoint(anchor_x+width/2, anchor_y+height/2);
+        m_o_settings->create_text = false;
+        m_overlay->create_text(text_point, curr_frame);
+    // Mouse double clicked action
+    } else if (m_o_settings->mouse_double_clicked) {
+        m_o_settings->mouse_double_clicked = false;
+        m_overlay->mouse_double_clicked(m_o_settings->pos, curr_frame);
     // Mouse pressed action
     } else if (m_o_settings->mouse_clicked) {
         m_o_settings->mouse_clicked = false;
@@ -263,11 +291,15 @@ void FrameProcessor::update_overlay_settings() {
     // Mouse moved action
     } else if (m_o_settings->mouse_moved) {
         m_o_settings->mouse_moved = false;
-        m_overlay->mouse_moved(m_o_settings->pos, curr_frame);
+        m_overlay->mouse_moved(m_o_settings->pos, curr_frame, m_o_settings->shift_modifier, m_o_settings->ctrl_modifier);
     // Mouse scroll wheel action
     } else if (m_o_settings->mouse_scroll) {
         m_o_settings->mouse_scroll = false;
         m_overlay->mouse_scroll(m_o_settings->pos, curr_frame);
+    // Set current drawing action
+    } else if (m_o_settings->set_current_drawing) {
+        m_o_settings->set_current_drawing = false;
+        m_overlay->set_current_drawing(m_o_settings->shape);
     }
 }
 
@@ -286,17 +318,12 @@ void FrameProcessor::reset_settings() {
     m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
     m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
-    m_zoomer.reset();
-    // Centers zoom rectangle and displays the frame without zoom
-    m_zoomer.fit_viewport();
 
-    // Store current zoomer settings to shared structure
-    m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
-    cv::Rect tmp = m_zoomer.get_zoom_rect();
-    m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
-    m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
+    m_z_settings->set_state = true;
+    update_zoomer_settings();
+    skip_process = false;
 
-    set_anchor(m_zoomer.get_anchor());
-    set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_anchor(m_zoomer.get_anchor());
+    emit set_scale_factor(m_zoomer.get_scale_factor());
 
 }

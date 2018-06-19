@@ -11,6 +11,7 @@
 #include "poi.h"
 #include "detectionbox.h"
 #include "basicanalysis.h"
+#include "Analysis/analysissettings.h"
 
 /**
  * @brief The Analysis class
@@ -21,9 +22,9 @@ class Analysis : public BasicAnalysis {
 public:
     ANALYSIS_TYPE type;
 public:
+    ~Analysis() override;
     virtual void read(const QJsonObject& json) override;
     virtual void write(QJsonObject& json) override;
-    virtual SAVE_TYPE get_save_type() const override;
     virtual ANALYSIS_TYPE get_type() const override;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     std::string get_name() const;

@@ -2,7 +2,7 @@
 #define ANALYSAREA_H
 
 #include "opencv2/opencv.hpp"
-#include "shape.h"
+#include "shapes.h"
 
 class AnalysArea {
 public:

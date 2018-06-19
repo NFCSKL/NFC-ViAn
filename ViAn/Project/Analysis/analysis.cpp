@@ -1,17 +1,28 @@
 #include "analysis.h"
+#include <QDebug>
+
+Analysis::~Analysis() {
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        delete *it;
+    }
+    m_intervals.clear();
+}
+
 /**
  * @brief Analysis::read
  * Reads analysis from json format.
  * @param json
  */
 void Analysis::read(const QJsonObject &json){
+    AnalysisSettings* new_settings = new AnalysisSettings();
     int height = json["bounding box height"].toInt();
     int width = json["bounding box width"].toInt();
     int y = json["bounding box y"].toInt();
     int x = json["bounding box x"].toInt();
-    this->bounding_box = cv::Rect(x, y, width, height);
+    new_settings->bounding_box = cv::Rect(x, y, width, height);
 
-    this->m_ana_interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
+    new_settings->interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
+    settings = new_settings;
 
 
     this->type = (ANALYSIS_TYPE)json["type"].toInt();
@@ -32,12 +43,12 @@ void Analysis::read(const QJsonObject &json){
  * @param json
  */
 void Analysis::write(QJsonObject &json){
-    json["bounding box height"] = this->bounding_box.height;
-    json["bounding box width"] = this->bounding_box.width;
-    json["bounding box y"] = this->bounding_box.y;
-    json["bounding box x"] = this->bounding_box.x;
-    json["interval start"] = this->m_ana_interval.first;
-    json["interval end"] = this->m_ana_interval.second;
+    json["bounding box height"] = settings->bounding_box.height;
+    json["bounding box width"] = settings->bounding_box.width;
+    json["bounding box y"] = settings->bounding_box.y;
+    json["bounding box x"] = settings->bounding_box.x;
+    json["interval start"] = settings->interval.first;
+    json["interval end"] = settings->interval.second;
     json["type"] = this->type;
     json["name"] = QString::fromStdString(this->m_name);
     QJsonArray json_POIs;
@@ -51,13 +62,7 @@ void Analysis::write(QJsonObject &json){
     m_unsaved_changes = false;
 }
 
-SAVE_TYPE Analysis::get_save_type() const
-{
-    return DETECTION;
-}
-
-ANALYSIS_TYPE Analysis::get_type() const
-{
+ANALYSIS_TYPE Analysis::get_type() const {
     return type;
 }
 

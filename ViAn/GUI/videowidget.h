@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QSize>
 #include <QBoxLayout>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QSlider>
 #include <QShortcut>
@@ -78,6 +79,8 @@ public:
     explicit VideoWidget(QWidget *parent = nullptr, bool floating = false);
     ~VideoWidget();
 
+    QVBoxLayout* vertical_layout;
+
     // Lock and wait condition to sleep player when video is paused
     FrameWidget* frame_wgt;
     AnalysisSlider* playback_slider;
@@ -89,10 +92,9 @@ public:
 
     int get_current_video_length();
     void set_overlay(Overlay* overlay);
-    void set_undo();
-    void set_redo();
-    void set_clear_drawings();
-    void set_delete_drawing();
+    void set_update_text(QString, Shapes*);
+    void set_clear_drawings(int frame);
+    void set_delete_drawing(Shapes* shape);
 
     int get_brightness();
     double get_contrast();
@@ -108,12 +110,14 @@ signals:
     void next_video_frame(void);
     void prev_video_frame(void);
     void ret_first_frame(void);
-    void new_bookmark(VideoProject*, int, cv::Mat);
+    void new_bookmark(VideoProject*, int, cv::Mat, cv::Mat, QString);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
-    void add_basic_analysis(VideoProject*, BasicAnalysis*);
+    void add_tag(VideoProject*, Tag*);
+    void tag_new_frame(int, TagFrame*);
+    void tag_remove_frame(int);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(std::string video_path); // TODO Not used?
     void export_original_frame(VideoProject* ,const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
@@ -140,7 +144,8 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
 
-    void load_marked_video(VideoProject* vid_proj);
+    void load_marked_video(VideoProject *vid_proj, int frame);
+    void load_marked_video_state(VideoProject *vid_proj, VideoState state);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
@@ -153,7 +158,6 @@ public slots:
     void delete_interval(void);
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
-    void enable_tag_btn(bool);
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
@@ -162,15 +166,21 @@ public slots:
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);
+    void mouse_double_clicked(QPoint pos);
     void mouse_pressed(QPoint pos, bool);
     void mouse_released(QPoint pos, bool right_click);
-    void mouse_moved(QPoint pos);
+    void mouse_moved(QPoint pos, bool shift, bool ctrl);
     void mouse_scroll(QPoint pos);
+    void set_current_drawing(Shapes* shape);
+    void process_frame();
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
+    void center(QPoint, double);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
-    void on_zoom_out();
+    void set_interpolation_method(int method);
+    void on_step_zoom(double step);
+    void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
     void update_brightness_contrast(int c_val, double v_val);
@@ -181,13 +191,13 @@ public slots:
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
-    QVBoxLayout* vertical_layout;
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
     QLabel* current_time;
     QLabel* total_time;
     QLineEdit* frame_line_edit;
     QLabel* zoom_label;
+    QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
 
     QShortcut* remove_frame_act;
 
@@ -198,18 +208,16 @@ private:
     QPushButton* prev_frame_btn;
     QPushButton* next_poi_btn;
     DoubleClickButton* prev_poi_btn;
-    QPushButton* analysis_btn;
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;
     QPushButton* tag_btn;
     QPushButton* new_tag_btn;
-    QPushButton* zoom_in_btn;
-    QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
     QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
+
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
     QHBoxLayout* video_btns;      // Play, pause etc
@@ -255,6 +263,8 @@ private slots:
     void stop_btn_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+
+    void on_interpolate_toggled(bool checked);
 };
 
 #endif // VIDEOWIDGET_H

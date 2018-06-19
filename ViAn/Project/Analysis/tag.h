@@ -1,20 +1,32 @@
 #ifndef TAG_H
 #define TAG_H
 #include "basicanalysis.h"
+#include "Project/video.h"
+#include "tagframe.h"
+#include <map>
+
 class BasicAnalysis;
+class Video;
 
 class Tag : public BasicAnalysis {
+    bool m_drawing_tag = false;
+
 public:
-    void remove_interval(AnalysisInterval *rm_interval);
-    void add_frame(int frame);
-    void remove_frame(int frame);
-    void add_interval(AnalysisInterval *an_interval) override;
+    Tag(std::string name = "", bool drawing_tag = false);
+    ~Tag() override;
     virtual ANALYSIS_TYPE get_type() const override;
-private:
-    void merge_intervals();
-    bool is_interval(int start, int end);
-    std::pair<int, int> get_overlap(AnalysisInterval *intval1, AnalysisInterval *intval2);
-    std::pair<AnalysisInterval *, AnalysisInterval *> remove_overlap(AnalysisInterval *interval, std::pair<int, int> overlap);
+    virtual void read(const QJsonObject& json) override;
+    virtual void write(QJsonObject &json) override;
+    void add_frame(int frame, TagFrame *t_frame);
+    bool find_frame(int);
+    void remove_frame(int);
+    int next_frame(int);
+    int previous_frame(int);
+    std::vector<int> get_frames();
+    bool is_drawing_tag();
+    void set_drawing_tag(bool);
+
+    std::map<int, TagFrame*> tag_map;
 };
 
 #endif // TAG_H

@@ -34,7 +34,7 @@ public:
 signals:
     void play_bookmark_video(VideoProject* vid_proj, int frame_idx);
 public slots:
-    void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
+    void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat bookmark_frame, cv::Mat org_frame, QString time);
     void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
@@ -45,7 +45,7 @@ private:
     void add_new_folder();
     void generate_report();
     BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
-    QString get_input_text(std::string text, bool* ok);
+    QString get_input_text(QString text, bool* ok);
 };
 
 #endif // BOOKMARKWIDGET_H

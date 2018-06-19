@@ -45,7 +45,6 @@ void VideoPlayer::load_video() {
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
-    m_frame->store(0);
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
@@ -99,17 +98,15 @@ void VideoPlayer::check_events() {
             qDebug() << "in vid_play";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
-                qDebug() << "wait load read video";
+                qDebug() << "new vid load";
                 wait_load_read();
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
-                qDebug() << "curr: ";
-                qDebug() << current_frame;
-                qDebug() << m_frame->load();
+                qDebug() << "set frame";
                 set_frame();
             }
         } else {
             if (!loop) {
-
+                qDebug() << "no loop";
             }
 
             // Timer condition triggered. Update playback speed if nessecary and read new frame
@@ -146,6 +143,7 @@ void VideoPlayer::load_video_info() {
 }
 
 bool VideoPlayer::synced_read(){
+    try {
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
@@ -164,12 +162,15 @@ bool VideoPlayer::synced_read(){
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
     }
+    } catch (cv::Exception &e) {
+        qDebug() << "BAAAD";
+    }
+
     return true;
 }
 
 
 bool VideoPlayer::wait_load_read(){
-
     // Wait for processing thread to finish processing new frame
     {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
@@ -178,9 +179,7 @@ bool VideoPlayer::wait_load_read(){
     // Read new frame and notify processing thread
     {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
-        qDebug() << "wait done => load";
         load_video();
-        qDebug() << "load done => read frame";
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
             playback_stopped();

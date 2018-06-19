@@ -7,6 +7,7 @@
 #include <set>
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/tag.h"
+#include "Project/Analysis/drawingtag.h"
 /**
  * @brief The AnalysisSlider class
  * This class represents a conventional slider
@@ -33,6 +34,7 @@ public:
     int last_poi_end = -1;
 
     Analysis* m_analysis = nullptr;
+    Tag* m_tag = nullptr;
 
     std::pair<int, int> m_interval = std::make_pair(-1, -1);
     std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
@@ -42,6 +44,7 @@ public:
     bool is_blocked();
     bool get_was_paused();
     void set_was_paused(bool value);
+    bool get_show_tags();
 
     // Interval settings
     void add_slider_interval(int start_frame, int end_frame);
@@ -62,16 +65,11 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *ev);
-public slots:    
-
-    // Set analysis to be used when displaying analysis interval
-    void set_analysis(AnalysisProxy*analysis);
+public slots:
 
     // Set analysis to be used when displaying slider pois
     void set_basic_analysis(BasicAnalysis *analysis);
-
-    // Set interval to the interval the analysis was run on
-    void set_ana_interval();
+    void set_analysis_proxy(AnalysisProxy* analysis);
 
     // Wrapped repaint
     void update();
@@ -91,9 +89,8 @@ public slots:
     void clear_slider();
 
 private:
-    std::vector<int> frames;
-    std::vector<std::pair<int, int>> rects;
-    std::vector<QRect> interval_rects;
+    std::vector<std::pair<int, int>> rects; // Analysis poi
+    std::vector<QRect> interval_rects;  // Intervals
 };
 
 #endif // ANALYSISSLIDER_H

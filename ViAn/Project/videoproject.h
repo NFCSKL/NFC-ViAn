@@ -30,10 +30,10 @@ class VideoProject : public Saveable{
     Video* video = nullptr;
     Project* m_project = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
-    ID m_ana_cnt = 0; // Analysis id counter
+    ID m_ana_id = 0; // Analysis id counter
 
     bool m_unsaved_changes = true;
-
+    bool current = false;
 
 public:
 
@@ -49,6 +49,8 @@ public:
     ID add_analysis(BasicAnalysis* analysis);
     ID add_bookmark(Bookmark* bookmark);
 
+    void remove_analysis(BasicAnalysis* analysis);
+
     void set_tree_index(std::stack<int> tree_index);
     void set_project(Project* proj);
 
@@ -59,6 +61,7 @@ public:
     void delete_bookmark(const int& id);
     void delete_artifacts();
 
+    // TODO, not used
     void remove_from_project();
 
     std::string get_index_path();
@@ -69,6 +72,8 @@ public:
     BasicAnalysis *get_analysis(const int &id);
 
     bool is_saved();
+    bool is_current();
+    void set_current(bool);
 
 };
 

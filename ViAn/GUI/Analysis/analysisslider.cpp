@@ -29,21 +29,31 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
     //Get one frame's width of the slider
-    double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+    double frame_width = (double)(groove_rect.right()-groove_rect.left())/maximum();
 
-    QBrush brush = Qt::yellow;
+    QBrush brush = Qt::red;
 
-    // Draws the detections on slider and the tags
-    if ((m_show_pois||m_show_tags)&& show_on_slider) {
-        if(m_show_tags) brush = Qt::red;
+    // Draws the tags
+    // Checks if tag is a nullptr and if the tag should be shown on the slider
+    if (m_show_tags && show_on_slider && m_tag) {
+        for (int frame : m_tag->get_frames()) {
+            double first = (double)(groove_rect.left() + (frame) * frame_width);
+            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, brush);
+        }
+    }
+    // Draws the detections on the slider
+    // Checks if the detection should be shown on the slider
+    if (m_show_pois && show_on_slider) {
+        brush = Qt::yellow;
 
         for (auto it = rects.begin(); it != rects.end(); ++it) {
             double first_frame = (double)(*it).first;
             double second_frame = (double)(*it).second;
 
             //Walk first/second_frame number of frames in on the slider
-            double first = (groove_rect.left()+first_frame*c);
-            double second = (groove_rect.left()+second_frame*c);
+            double first = (groove_rect.left()+first_frame*frame_width);
+            double second = (groove_rect.left()+second_frame*frame_width);
 
             //Draw the rects, +1 so it's not too small
             //QRect(int x, int y, int width, int height)
@@ -55,7 +65,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Draws the analysis interval
     if (show_ana_interval) {
         brush = Qt::darkMagenta;
-        draw_interval(m_ana_interval, groove_rect, c);
+        draw_interval(m_ana_interval, groove_rect, frame_width);
         for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }
@@ -63,7 +73,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Draws the interval
     if (show_interval) {
         brush = Qt::black;
-        draw_interval(m_interval, groove_rect, c);
+        draw_interval(m_interval, groove_rect, frame_width);
         for (auto rect : interval_rects) {
             painter.fillRect(rect, brush);
         }
@@ -113,34 +123,37 @@ void AnalysisSlider::update(){
     repaint();
 }
 
-void AnalysisSlider::set_analysis(AnalysisProxy * analysis) {
-    m_analysis = analysis->load_analysis();
-    set_ana_interval();
-}
-
 /**
- * @brief AnalysisSlider::set_analysis
+ * @brief AnalysisSlider::set_basic_analysis
+ * Set tag
  * Adds all POIs to the slider
  * @param analysis
  */
 void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
-    rects.clear();
     if (analysis != nullptr) {
-
-        for (auto p : analysis->get_intervals()) {
-            add_slider_interval(p->get_start(), p->get_end());
+        switch (analysis->get_type()) {
+        case TAG:
+        case DRAWING_TAG:
+            m_tag = dynamic_cast<Tag*>(analysis);
+            repaint();
+            break;
+        default:
+            break;
         }
     }
-    repaint();
 }
 
 /**
- * @brief AnalysisSlider::set_ana_interval
+ * @brief AnalysisSlider::set_analysis_proxy
+ * Set the analysis intervals to draw on the slider
  * @param analysis
- * Set interval to the interval the analysis was run on
  */
-void AnalysisSlider::set_ana_interval() {
-    m_ana_interval = std::make_pair(m_analysis->get_ana_interval().first, m_analysis->get_ana_interval().second);
+void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
+    rects.clear();
+    if (analysis) {
+        m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
+        rects = analysis->m_slider_interval;
+    }
 }
 
 /**
@@ -212,38 +225,37 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
  * @return
  */
 int AnalysisSlider::get_next_poi_start(int curr_frame) {
-    if (!rects.empty()) {
+    if (!show_on_slider) return curr_frame;
+
+    // If tags on slider get next frame after current
+    if (m_show_tags) {
+        return m_tag->next_frame(curr_frame);
+    }
+
+    // If analysis pois on slider get next start of next poi after current
+    if (m_show_pois) {
         for (std::pair<int, int> rect : rects) {
-            if ( rect.first > curr_frame) {
+            if (rect.first > curr_frame) {
                 return rect.first;
-            }
-        }
-    } else if (!frames.empty()) {
-        int edge_frame = curr_frame;
-        for (int frame : frames) {
-            if (frame > edge_frame+JUMP_INTERVAL+1) {
-                return frame;
-            } else if (frame > edge_frame+JUMP_INTERVAL){
-                edge_frame = frame;
             }
         }
     }
     return curr_frame;
-}
 
-/**
- * @brief AnalysisSlider::get_next_poi_end
- * Return the end frame of the POI after frame
- * @param frame     : current frame
- * @return
- */
-int AnalysisSlider::get_next_poi_end(int frame) {
-    for (std::pair<int, int> rect : rects) {
-        if ( rect.first > frame) {
-            return rect.second;
-        }
-    }
-    return frame;
+
+
+//      TODO Might need for when adding interval
+//    } else if (!frames.empty()) {
+//        int edge_frame = curr_frame;
+//        for (int frame : frames) {
+//            if (frame > edge_frame+JUMP_INTERVAL+1) {
+//                return frame;
+//            } else if (frame > edge_frame+JUMP_INTERVAL){
+//                edge_frame = frame;
+//            }
+//        }
+//    }
+//    return curr_frame;
 }
 
 /**
@@ -253,25 +265,41 @@ int AnalysisSlider::get_next_poi_end(int frame) {
  * @return
  */
 int AnalysisSlider::get_prev_poi_start(int curr_frame) {
-    int new_frame = curr_frame;
-    if (!rects.empty()) {
+    if (!show_on_slider) return curr_frame;
+
+    // If tags on slider get next frame after current
+    if (m_show_tags) {
+        return m_tag->previous_frame(curr_frame);
+    }
+
+    // If analysis pois on slider get next start of next poi after current
+    if (m_show_pois) {
+        int new_frame = curr_frame;
         for (std::pair<int, int> rect : rects) {
-            if ( rect.second >= curr_frame) {
+            if (rect.second >= curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
-    } else if (!frames.empty()) {
-        int edge_frame = curr_frame;
-        for (int i = frames.size()-1; i >= 0; i--) {
-            int frame = frames[i];
-            if (frame < edge_frame-JUMP_INTERVAL-1) {
-                return frame;
-            } else if (frame < edge_frame-JUMP_INTERVAL){
-                edge_frame = frame;
-            }
-        }
+        return new_frame;
     }
-    return new_frame;
+    return curr_frame;
+
+
+
+
+//      TODO Might need for when adding interval
+//    } else if (!frames.empty()) {
+//        int edge_frame = curr_frame;
+//        for (int i = frames.size()-1; i >= 0; i--) {
+//            int frame = frames[i];
+//            if (frame < edge_frame-JUMP_INTERVAL-1) {
+//                return frame;
+//            } else if (frame < edge_frame-JUMP_INTERVAL){
+//                edge_frame = frame;
+//            }
+//        }
+//    }
+//    return new_frame;
 }
 
 /**
@@ -326,7 +354,7 @@ void AnalysisSlider::set_show_interval(bool show) {
  */
 void AnalysisSlider::clear_slider() {
     rects.clear();
-    frames.clear();
+    m_ana_interval = std::make_pair(-1, -1);
 }
 
 void AnalysisSlider::set_blocked(bool value) {
@@ -355,4 +383,12 @@ bool AnalysisSlider::get_was_paused() {
  */
 void AnalysisSlider::set_was_paused(bool value) {
     m_was_paused = value;
+}
+
+/**
+ * @brief AnalysisSlider::get_show_tags
+ * @return
+ */
+bool AnalysisSlider::get_show_tags() {
+    return m_show_tags;
 }

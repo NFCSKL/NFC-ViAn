@@ -1,10 +1,22 @@
 #include "overlay.h"
 #include <QDebug>
+#include "utility.h"
 
 /**
  * @brief Overlay::Overlay
  */
 Overlay::Overlay() {}
+
+Overlay::~Overlay() {
+    emit clean_overlay();
+    for (auto &vector : overlays) {
+        for (Shapes* shape : vector.second) {
+            delete shape;
+        }
+        vector.second.clear();
+    }
+    overlays.clear();
+}
 
 /**
  * @brief Overlay::draw_overlay
@@ -14,10 +26,13 @@ Overlay::Overlay() {}
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
-        for (auto it = overlays[frame_nr].overlay.begin(); it != overlays[frame_nr].drawn; it++) {
-            frame = (*it)->draw(frame);
+        for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
+            if ((*it)->get_show()) {
+                frame = (*it)->draw(frame);
+            }
         }
     }
+    current_frame = frame_nr;
 }
 
 /**
@@ -45,6 +60,17 @@ void Overlay::set_showing_overlay(bool value) {
  */
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
+}
+
+/**
+ * @brief Overlay::create_text
+ * Create a new text drawing
+ * @param pos
+ * @param frame
+ */
+void Overlay::create_text(QPoint pos, int frame) {
+    Text* text = new Text(current_colour, pos, current_string, current_font_scale);
+    add_drawing(text, frame);
 }
 
 void Overlay::set_text_settings(QString text, float font_scale) {
@@ -77,12 +103,16 @@ SHAPES Overlay::get_tool() {
     return current_shape;
 }
 
+int Overlay::get_current_frame() {
+    return current_frame;
+}
+
 /**
  * @brief Overlay::get_empty_shape
  * @param shape_type
  * @return Returns a new shape of the given type.
  */
-Shape* Overlay::get_empty_shape(SHAPES shape_type) {
+Shapes* Overlay::get_empty_shape(SHAPES shape_type) {
     switch (shape_type) {
         case RECTANGLE:
             return new Rectangle();
@@ -109,26 +139,19 @@ Shape* Overlay::get_empty_shape(SHAPES shape_type) {
 }
 
 /**
- * @brief Overlay::empty_undo_list
- * Clean the top end of the drawing list so you can't redo anymore
- * @param frame_nr
- */
-void Overlay::empty_undo_list(int frame_nr) {
-    overlays[frame_nr].overlay.erase(overlays[frame_nr].drawn, overlays[frame_nr].overlay.end());
-}
-
-/**
  * @brief Overlay::add_drawing
  * Add a drawing to the list of drawings
  * @param shape
  * @param frame_nr
  */
-void Overlay::add_drawing(Shape* shape, int frame_nr) {
+void Overlay::add_drawing(Shapes* shape, int frame_nr) {
     if (shape->get_shape() == TEXT) {
         shape->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, shape->LINE_THICKNESS, &baseline));
     }
-    overlays[frame_nr].overlay.push_back(shape);
-    overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+    shape->set_frame(frame_nr);
+    overlays[frame_nr].push_back(shape);
+    emit new_drawing(shape, frame_nr);
+    set_current_drawing(shape);
     m_unsaved_changes = true;
 }
 
@@ -139,15 +162,34 @@ void Overlay::add_drawing(Shape* shape, int frame_nr) {
  * @param frame_nr
  */
 void Overlay::get_drawing(QPoint pos, int frame_nr) {
-    if (current_drawing != nullptr) current_drawing->invert_color();
     current_drawing = nullptr;
-    for (auto shape : overlays[frame_nr].overlay) {
+    for (auto shape : overlays[frame_nr]) {
         if (point_in_drawing(pos, shape)) {
             current_drawing = shape;
-            current_drawing->set_current_frame(frame_nr);
         }
     }
-    if (current_drawing != nullptr) current_drawing->invert_color();
+    emit select_current(current_drawing, frame_nr);
+}
+
+void Overlay::set_current_drawing(Shapes *shape) {
+    current_drawing = shape;
+}
+
+Shapes* Overlay::get_current_drawing() {
+    return current_drawing;
+}
+
+bool Overlay::get_show_overlay() {
+    return show_overlay;
+}
+
+void Overlay::update_text(QString text, Shapes* shape) {
+    if (shape->get_shape() == TEXT) {
+        dynamic_cast<Text*>(shape)->set_name(text);
+        double font_scale = dynamic_cast<Text*>(shape)->get_font_scale();
+        shape->set_text_size(cv::getTextSize(shape->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, shape->LINE_THICKNESS, &baseline));
+        shape->update_text_draw_end();
+    }
 }
 
 /**
@@ -156,9 +198,29 @@ void Overlay::get_drawing(QPoint pos, int frame_nr) {
  * @param shape
  * @return true if the point pos is in the hidden rect of drawing shape
  */
-bool Overlay::point_in_drawing(QPoint pos, Shape *shape) {
-    cv::Rect drawing = cv::Rect(shape->get_draw_start(), shape->get_draw_end());
-    return drawing.contains(qpoint_to_point(pos));
+bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
+    cv::Rect drawing;
+    if (shape->get_shape() == PEN) {
+        Pen* current = dynamic_cast<Pen*>(shape);
+        drawing = cv::boundingRect(current->get_points());
+    } else {
+        int tl_x = shape->get_draw_start().x;
+        int tl_y = shape->get_draw_start().y;
+        int br_x = shape->get_draw_end().x;
+        int br_y = shape->get_draw_end().y;
+
+        if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
+            tl_y += -DRAW_RECT_MARGIN;
+            br_y += DRAW_RECT_MARGIN;
+        }
+
+        if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
+            tl_x += -DRAW_RECT_MARGIN;
+            br_x += DRAW_RECT_MARGIN;
+        }
+        drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
+    }
+    return shape->get_show() && drawing.contains(qpoint_to_point(pos));
 }
 
 /**
@@ -171,6 +233,31 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
     return cv::Point(pnt.x(), pnt.y());
 }
 
+void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
+    switch (current_shape) {
+    case EDIT:
+        for (auto shape : overlays[frame_nr]) {
+            if (point_in_drawing(pos, shape)) {
+                return;
+            }
+        }
+        emit set_tool_zoom();
+        break;
+    case ZOOM:
+        for (auto shape : overlays[frame_nr]) {
+            if (point_in_drawing(pos, shape)) {
+                get_drawing(pos, frame_nr);
+                emit set_tool_edit();
+                prev_point = pos;
+                break;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 /**
  * @brief Overlay::mouse_pressed
  * Creates a drawing shape with the prechosen colour
@@ -181,40 +268,47 @@ cv::Point Overlay::qpoint_to_point(QPoint pnt) {
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
         switch (current_shape) {
-            case RECTANGLE:
-                empty_undo_list(frame_nr);
-                add_drawing(new Rectangle(current_colour, pos), frame_nr);
-                break;
-            case CIRCLE:
-                empty_undo_list(frame_nr);
-                add_drawing(new Circle(current_colour, pos), frame_nr);
-                break;
-            case LINE:
-                empty_undo_list(frame_nr);
-                add_drawing(new Line(current_colour, pos), frame_nr);
-                break;
-            case ARROW:
-                empty_undo_list(frame_nr);
-                add_drawing(new Arrow(current_colour, pos), frame_nr);
-                break;
-            case PEN:
-                empty_undo_list(frame_nr);
-                add_drawing(new Pen(current_colour, pos), frame_nr);
-                break;
-            case TEXT:
-                empty_undo_list(frame_nr);
-                add_drawing(new Text(current_colour, pos, current_string, current_font_scale), frame_nr);
-                break;
-            case HAND:
-                if (right_click) {
-                    m_right_click = right_click;
-                    break;
+        case RECTANGLE:
+            add_drawing(new Rectangle(current_colour, pos), frame_nr);
+            drawing = true;
+            break;
+        case CIRCLE:
+            add_drawing(new Circle(current_colour, pos), frame_nr);
+            drawing = true;
+            break;
+        case LINE:
+            add_drawing(new Line(current_colour, pos), frame_nr);
+            drawing = true;
+            break;
+        case ARROW:
+            add_drawing(new Arrow(current_colour, pos), frame_nr);
+            drawing = true;
+            break;
+        case PEN:
+            add_drawing(new Pen(current_colour, pos), frame_nr);
+            drawing = true;
+            break;
+        case EDIT:
+            prev_point = pos;
+            m_right_click = right_click;
+            if (right_click) {
+                if (current_drawing) {
+                    current_drawing->set_anchor(pos);
                 }
+                break;
+            }
+
+            if (current_drawing && point_in_drawing(pos, current_drawing)) {
+                break;
+            } else {
                 get_drawing(pos, frame_nr);
-                prev_point = pos;
-                break;
-            default:
-                break;
+            }
+            break;
+        case SELECT:
+            get_drawing(pos, frame_nr);
+            break;
+        default:
+            break;
         }
     }
 }
@@ -227,7 +321,20 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
-    update_drawing_position(pos, frame_nr);
+    Q_UNUSED(pos)
+    Q_UNUSED(frame_nr)
+    if (change_tool) {
+        emit set_tool_zoom();
+        change_tool = false;
+        return;
+    }
+    if (drawing) {
+        drawing = false;
+        emit set_tool_edit();
+        return;
+    }
+    // TODO Should not need
+    //update_drawing_position(pos, frame_nr);
     m_right_click = right_click;
 }
 
@@ -238,8 +345,9 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::mouse_moved(QPoint pos, int frame_nr) {
-    update_drawing_position(pos, frame_nr);
+void Overlay::mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl) {
+    if (change_tool) return;
+    update_drawing_position(pos, frame_nr, shift, ctrl);
 }
 
 /**
@@ -250,9 +358,21 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
+    if (current_shape == SELECT) {
+        emit set_tool_edit();
+        return;
+    }
     if (!current_drawing) return;
-    if (current_drawing->get_current_frame() == frame_nr && show_overlay) {
+    if (current_drawing->get_shape() == TEXT) {
+        double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
+        current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
+        current_drawing->update_text_draw_end();
+        m_unsaved_changes = true;
+        return;
+    }
+    if (current_drawing->get_frame() == frame_nr && show_overlay) {
         current_drawing->set_thickness(pos);
+        m_unsaved_changes = true;
     }
 }
 
@@ -262,35 +382,85 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
-    if (show_overlay && !overlays[frame_nr].overlay.empty()) {
-        if (current_shape == HAND) {
+void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool ctrl) {
+    if (show_overlay && !overlays[frame_nr].empty()) {
+        if (current_shape == EDIT) {
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
+                QPoint diff_point = pos - prev_point;
+                double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
+                current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, current_drawing->LINE_THICKNESS, &baseline));
+                current_drawing->update_text_draw_end();
+                prev_point = pos;
+                m_unsaved_changes = true;
                 return;
             }
-            else if (m_right_click){
-                current_drawing->update_drawing_pos(pos);
+            else if (m_right_click) {
+                QPoint diff_point = pos - prev_point;
+                current_drawing->edit_shape(diff_point);
+                prev_point = pos;
+                m_unsaved_changes = true;
                 return;
             }
             QPoint diff_point = pos - prev_point;
             current_drawing->move_shape(diff_point);
             prev_point = pos;
         } else if (current_shape == TEXT) {
-            overlays[frame_nr].overlay.back()->update_text_pos(pos);
+            overlays[frame_nr].back()->update_text_pos(pos);
+        } else if (current_shape == SELECT) {
         } else {
+            if (current_shape != PEN && shift) {
+                // When the shift modifier is used draw a symmetric drawing
+                // It's not possible with the pen tool.
+                int x = pos.x() - overlays[frame_nr].back()->get_draw_start().x;
+                int y = pos.y() - overlays[frame_nr].back()->get_draw_start().y;
+
+                if (x >= 0 && y >= 0) {
+                    overlays[frame_nr].back()->update_drawing_sym(std::max(x, y), std::max(x, y));
+                } else if (x <= 0 && y <= 0) {
+                    overlays[frame_nr].back()->update_drawing_sym(std::min(x, y), std::min(x, y));
+                } else if (x >= 0 && y <= 0) {
+                    int change = std::max(abs(x), abs(y));
+                    overlays[frame_nr].back()->update_drawing_sym(change, -change);
+                } else if (x <= 0 && y >= 0) {
+                    int change = std::max(abs(x), abs(y));
+                    overlays[frame_nr].back()->update_drawing_sym(-change, change);
+                }
+                m_unsaved_changes = true;
+                return;
+            } else if (ctrl && (current_shape == LINE || current_shape == ARROW)) {
+                int x = pos.x() - overlays[frame_nr].back()->get_draw_start().x;
+                int y = pos.y() - overlays[frame_nr].back()->get_draw_start().y;
+
+                if (x >= abs(y)) {
+                    overlays[frame_nr].back()->update_drawing_sym(x, 0);
+                } else if (-x >= abs(y)) {
+                    overlays[frame_nr].back()->update_drawing_sym(x, 0);
+                } else if (y >= abs(x)) {
+                    overlays[frame_nr].back()->update_drawing_sym(0, y);
+                } else if (-y >= abs(x)) {
+                    overlays[frame_nr].back()->update_drawing_sym(0, y);
+                }
+                m_unsaved_changes = true;
+                return;
+            }
             // The last appended shape is the one we're currently drawing.
-            overlays[frame_nr].overlay.back()->update_drawing_pos(pos);
+            overlays[frame_nr].back()->update_drawing_pos(pos);
         }
+        m_unsaved_changes = true;
     }
 }
 
-std::map<int, FrameOverlay> Overlay::get_overlays() {
+std::map<int,std::vector<Shapes*>> Overlay::get_overlays() {
     return overlays;
 }
 
-void Overlay::set_overlays(std::map<int, FrameOverlay> new_overlays) {
+void Overlay::set_overlays(std::map<int, std::vector<Shapes*>> new_overlays) {
     overlays = new_overlays;
+    m_unsaved_changes = true;
+}
+
+void Overlay::set_overlay_changed() {
     m_unsaved_changes = true;
 }
 
@@ -299,38 +469,13 @@ bool Overlay::is_saved() const{
 }
 
 /**
- * @brief Overlay::undo
- * Undo the drawings on the overlay, if the overlay is visible.
- * @param frame_nr Number of the frame currently shown in the video.
- */
-void Overlay::undo(int frame_nr) {
-    if (show_overlay && overlays[frame_nr].overlay.begin() != overlays[frame_nr].drawn) {
-        overlays[frame_nr].drawn--;
-    }
-    m_unsaved_changes = true;
-}
-
-/**
- * @brief Overlay::redo
- * Redo the drawings on the overlay, if the overlay is visible
- * @param frame_nr
- */
-void Overlay::redo(int frame_nr) {
-    if (show_overlay && overlays[frame_nr].overlay.end() != overlays[frame_nr].drawn) {
-        overlays[frame_nr].drawn++;
-    }
-    m_unsaved_changes = true;
-}
-
-/**
  * @brief Overlay::clear
- * Clear the drawings on the overlay, if the overlay is visible.
+ * Clear the drawings on the overlay
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::clear(int frame_nr) {
     if (show_overlay) {
-        overlays[frame_nr].overlay.clear();
-        overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
+        overlays[frame_nr].clear();
         m_unsaved_changes = true;
     }
 }
@@ -340,19 +485,22 @@ void Overlay::clear(int frame_nr) {
  * Delete the current drawing if the overlay is visible.
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::delete_drawing(int frame_nr) {
-    if (!show_overlay) return;
-    vector<Shape*>::iterator it = overlays[frame_nr].overlay.begin();
-    while (it != overlays[frame_nr].overlay.end()) {
-        if (*it == current_drawing) {
-            it = overlays[frame_nr].overlay.erase(it);
-            overlays[frame_nr].drawn--;
-            current_drawing = nullptr;
-            return;
-        } else {
-            ++it;
-        }
+void Overlay::delete_drawing(Shapes* shape) {
+    Shapes* drawing;
+    if (shape == nullptr) {
+        drawing = current_drawing;
+    } else {
+        drawing = shape;
     }
+    auto it = std::find(overlays[drawing->get_frame()].begin(), overlays[drawing->get_frame()].end(), drawing);
+
+    if (drawing == current_drawing) current_drawing = nullptr;
+
+    if (it != overlays[drawing->get_frame()].end()) {
+        overlays[drawing->get_frame()].erase(it);
+    }
+    delete drawing;
+    m_unsaved_changes = true;
 }
 
 /**
@@ -374,9 +522,10 @@ void Overlay::read(const QJsonObject& json) {
             QJsonObject json_shape = json_drawings[i].toObject();
             int shape_i = json_shape["shape"].toInt();
             SHAPES shape_t = static_cast<SHAPES>(shape_i);
-            Shape* shape = get_empty_shape(shape_t);
+            Shapes* shape = get_empty_shape(shape_t);
             shape->read(json_shape);
             add_drawing(shape, frame_nr);
+            set_current_drawing(nullptr);
         }
     }
     m_unsaved_changes = false;
@@ -390,16 +539,18 @@ void Overlay::read(const QJsonObject& json) {
 void Overlay::write(QJsonObject& json) {
     QJsonArray json_overlays;
     for (auto const& map_entry : overlays) {
-        QJsonObject json_overlay;
-        QJsonArray json_drawings;
-        for (auto it = map_entry.second.overlay.begin(); it != map_entry.second.drawn; it ++) {  // Second member is the value, i.e. the drawings.
-            QJsonObject json_shape;
-            (*it)->write(json_shape);
-            json_drawings.append(json_shape);
+        if (!map_entry.second.empty()) {
+            QJsonObject json_overlay;
+            QJsonArray json_drawings;
+            for (auto it = map_entry.second.begin(); it != map_entry.second.end(); it ++) {  // Second member is the value, i.e. the drawings.
+                QJsonObject json_shape;
+                (*it)->write(json_shape);
+                json_drawings.append(json_shape);
+            }
+            json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
+            json_overlay["drawings"] = json_drawings;
+            json_overlays.push_back(json_overlay);
         }
-        json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
-        json_overlay["drawings"] = json_drawings;
-        json_overlays.push_back(json_overlay);
     }
     json["overlays"] = json_overlays;
     m_unsaved_changes = false;

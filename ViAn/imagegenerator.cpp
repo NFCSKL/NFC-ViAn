@@ -42,8 +42,7 @@ std::string ImageGenerator::create_bookmark(std::string name) {
  * @return
  * Appends (i) to file if i-1 images with same name exist
  */
-std::string ImageGenerator::add_serial_number(std::string name, std::string file_end)
-{
+std::string ImageGenerator::add_serial_number(std::string name, std::string file_end) {
     QString qend = QString::fromStdString(file_end);
     QString qname = QString::fromStdString(name);
     QString res = qname+qend;
@@ -63,7 +62,7 @@ std::string ImageGenerator::add_serial_number(std::string name, std::string file
  * Creates the full directory path.
  * @return true if the path exists/has been creat§ed
  */
-bool ImageGenerator::create_directory(std::string path){
+bool ImageGenerator::create_directory(std::string path) {
     const QString q_path = QString::fromStdString(path);
     bool success = QDir().exists(q_path);
     if (!success) {
@@ -82,7 +81,6 @@ bool ImageGenerator::create_directory(std::string path){
  * Export single image to requested path with extension ext
  */
 std::string ImageGenerator::export_image(std::string requested_path, int ext, const unsigned int size, bool keep_aspect_ratio) {
-
     cv::Mat tmp = m_frame.clone();
     if (size > 0) {
         // Do resize

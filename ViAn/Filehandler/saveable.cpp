@@ -3,8 +3,7 @@
 const Saveable::SAVE_FORMAT Saveable::DEFAULT_SAVE_FORMAT;
 
 
-std::string Saveable::full_path() const
-{
+std::string Saveable::full_path() const {
     return m_full_path;
 }
 
@@ -66,6 +65,13 @@ bool Saveable::delete_saveable() {
     QFile file(QString::fromStdString(m_full_path));
     if(file.exists()) return file.remove();
     qWarning() << "Couldn't delete file: " + QString::fromStdString(m_full_path);
+    return false;
+}
+
+bool Saveable::delete_saveable(const std::string &full_path) {
+    QFile file(QString::fromStdString(full_path));
+    if(file.exists()) return file.remove();
+    qWarning() << "Couldn't delete file: " + QString::fromStdString(full_path);
     return false;
 }
 

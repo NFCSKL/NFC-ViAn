@@ -18,6 +18,7 @@ public:
     DetectionBox(std::pair<int,int> upper_left, std::pair<int,int> lower_right);
     DetectionBox(std::pair<int,int> upper_left, int height, int width);
     DetectionBox(cv::Rect rect);
+    ~DetectionBox() override;
 
     void read(const QJsonObject& json);
     void write(QJsonObject& json);

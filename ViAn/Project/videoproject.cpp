@@ -29,7 +29,7 @@ VideoProject::~VideoProject(){
  * Return associated video.
  */
 Video* VideoProject::get_video(){
-    return this->video;
+    return video;
 }
 
 /**
@@ -68,7 +68,7 @@ bool VideoProject::is_saved() {
 }
 
 /**
- * @brief VideoProject::remove_analysis
+ * @brief VideoProject::delete_analysis
  * @param id of the analysis
  */
 void VideoProject::delete_analysis(const int& id) {
@@ -126,17 +126,19 @@ void VideoProject::read(const QJsonObject& json){
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();        
         BasicAnalysis* analysis;
-        SAVE_TYPE save_type = (SAVE_TYPE)json_analysis["save_type"].toInt();
+        ANALYSIS_TYPE save_type = (ANALYSIS_TYPE)json_analysis["analysis_type"].toInt();
         switch(save_type){
-        case INTERVAL:
+        case TAG:
             analysis = new Tag();
             break;
-        case DETECTION:
+        case MOTION_DETECTION:
             analysis = new AnalysisProxy();
             break;
+        case DRAWING_TAG:
+            analysis = new Tag();
+            break;
         default:
-            analysis = new BasicAnalysis();
-            qWarning("Undefined analysis, read as default basic analysis");
+            qWarning("Undefined analysis");
             break;
         }
         analysis->read(json_analysis);
@@ -167,7 +169,7 @@ void VideoProject::write(QJsonObject& json){
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
         BasicAnalysis* an = it2->second;
-        json_analysis["save_type"] = an->get_save_type(); // Check for type in read
+        json_analysis["analysis_type"] = an->get_type(); // Check for type in read
         an->write(json_analysis);
         json_analyses.append(json_analysis);
     }
@@ -204,12 +206,12 @@ void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
-void VideoProject::reset_root_dir(const string &dir){
+void VideoProject::reset_root_dir(const std::string &dir) {
     for(auto bm : m_bookmarks){
         bm.second->reset_root_dir(dir+"Bookmarks/");
     }
-    for(auto an : m_analyses){
-        if(an.second->get_save_type() == DETECTION){ ;
+    for(auto& an : m_analyses){
+        if(an.second->get_type() == MOTION_DETECTION){ ;
             dynamic_cast<AnalysisProxy*>(an.second)->reset_root_dir(dir);
         }
     }
@@ -222,14 +224,22 @@ void VideoProject::reset_root_dir(const string &dir){
  * Adds analysis to video project.
  */
 ID VideoProject::add_analysis(BasicAnalysis *analysis){
-    m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    m_analyses.insert(std::make_pair(m_ana_id, analysis));
+    analysis->set_id(m_ana_id);
     m_unsaved_changes = true;
-    return m_ana_cnt++;
+    return m_ana_id++;
+}
+
+void VideoProject::remove_analysis(BasicAnalysis *analysis) {
+    m_analyses.erase(analysis->get_id());
+    m_unsaved_changes = true;
+    delete analysis;
 }
 
 /**
  * @brief VideoProject::delete_artifacts
  * Delete bookmark files.
+ * TODO "UNUSED"
  */
 void VideoProject::delete_artifacts(){
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
@@ -243,11 +253,20 @@ void VideoProject::delete_artifacts(){
     m_unsaved_changes = true;
 }
 
+// TODO, not used
 void VideoProject::remove_from_project() {
     m_project->remove_video_project(this);
     m_unsaved_changes = true;
 }
 
-string VideoProject::get_index_path() {
+std::string VideoProject::get_index_path() {
     return m_tree_index;
+}
+
+bool VideoProject::is_current() {
+    return current;
+}
+
+void VideoProject::set_current(bool value) {
+    current = value;
 }

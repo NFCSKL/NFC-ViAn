@@ -3,7 +3,7 @@
 /**
  * @brief Arrow::Arrow
  */
-Arrow::Arrow() : Shape(SHAPES::ARROW) {
+Arrow::Arrow() : Shapes(SHAPES::ARROW) {
 }
 
 /**
@@ -11,8 +11,10 @@ Arrow::Arrow() : Shape(SHAPES::ARROW) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Arrow::Arrow(QColor col, QPoint pos) : Shape(SHAPES::ARROW, col, pos) {
+Arrow::Arrow(QColor col, QPoint pos) : Shapes(SHAPES::ARROW, col, pos) {
 }
+
+Arrow::~Arrow() {}
 
 /**
  * @brief Arrow::draw
@@ -35,6 +37,14 @@ void Arrow::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
+QString Arrow::get_name() {
+    return m_name;
+}
+
+void Arrow::set_name(QString name) {
+    m_name = name;
+}
+
 /**
  * @brief Arrow::write
  * @param json
@@ -42,6 +52,7 @@ void Arrow::handle_new_pos(QPoint pos) {
  */
 void Arrow::write(QJsonObject& json) {
     write_shape(json);
+    json["name"] = m_name;
 }
 
 /**
@@ -51,4 +62,5 @@ void Arrow::write(QJsonObject& json) {
  */
 void Arrow::read(const QJsonObject& json) {
     read_shape(json);
+    m_name = json["name"].toString();
 }

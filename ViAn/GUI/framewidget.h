@@ -17,8 +17,6 @@
 #include "Analysis/analysissettings.h"
 #include "imagegenerator.h"
 
-//enum click_tool {NONE, ZOOM, MOVE,ANALYSIS_BOX};
-
 class FrameWidget : public QWidget
 {
 
@@ -30,38 +28,43 @@ class FrameWidget : public QWidget
     std::vector<cv::Rect> ooi_rects;
     cv::Rect bounding_box;
 
-    SHAPES tool = NONE;
+    SHAPES m_tool = NONE;
     QColor overlay_color = Qt::red;
     cv::Mat current_frame;
+    Shapes* copied_item = nullptr;
     Analysis* m_analysis = nullptr;
+    AnalysisProxy* current_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
-    Overlay* video_overlay;
 
     // Analysis bounding box
     QPoint ana_rect_start, ana_rect_end;
     bool show_box = false;
 
     // Zoom
-    QPoint rect_start, rect_end, prev_pos;
+    QPoint rect_start, rect_end, prev_pos = QPoint(0,0);
     bool mark_rect = false;
     QPoint anchor = QPoint(0,0);
+    QPoint prev_point, prev_point_scaled;
+    const int PAN_FACTOR = 20;
+    const double ZOOM_STEP = 1.1;
 
     bool do_zoom = false;
     bool do_zoom_out = false;
     bool m_detections = false;
     bool show_detections = true;
+    bool pan_rect = false;
 
     int current_frame_nr = 0;
     double m_scale_factor = 1;
+
+    std::pair<double, double> panning_tracker {}; // Track when to actually pan. Based on current zoom level
 
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
     cv::Mat get_modified_frame() const;
     cv::Mat get_org_frame() const;
-    void set_overlay(Overlay *overlay);
     void set_current_frame_nr(int);
-    Overlay* get_overlay();
 
 signals:
     void quick_analysis(AnalysisSettings* settings);
@@ -70,21 +73,24 @@ signals:
     void video_moved(QPoint pos);
     void current_size(int width, int height);
     void moved_xy(int x, int y);
-    void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
-    void trigger_zoom_out();
-    void send_tool(SHAPES tool);
+    void trigger_zoom_out(double);
+    void center_zoom_rect(QPoint, double);
+    void send_tool(SHAPES m_tool);
     void send_tool_text(QString, float);
     void send_color(QColor color);
+    void set_toolbar_zoom();
 
+    void mouse_double_click(QPoint);
     void mouse_pressed(QPoint, bool);
     void mouse_released(QPoint, bool);
-    void mouse_moved(QPoint);
+    void mouse_moved(QPoint, bool, bool);
     void mouse_scroll(QPoint);
+    void process_frame();
 public slots:
+    void copy();
+    void paste();
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
-    void toggle_zoom(bool value);
-    void set_analysis_tool(bool status);
     void show_bounding_box(bool b);
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
@@ -93,7 +99,7 @@ public slots:
     void set_detections_on_frame(int);
     void set_detections(bool);
     void set_show_detections(bool);
-    void set_tool(SHAPES tool);
+    void set_tool(SHAPES m_tool);
     void set_overlay_color(QColor color);
     void set_anchor(QPoint);
     void set_scale_factor(double scale_factor);
@@ -105,12 +111,14 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
     void wheelEvent(QWheelEvent *event) override;
 private:
+    void set_cursor(SHAPES m_tool);
     void init_panning(QPoint pos);
     void set_rect_start(QPoint pos);
     void set_analysis_settings();

@@ -29,8 +29,15 @@ struct zoomer_settings {
 
     QPoint zoom_tl = QPoint(0,0);
     QPoint zoom_br = QPoint(100,100);
+    QPoint center = QPoint(50,50);
+    QPoint anchor = QPoint(0,0);
+
+    bool set_state = false;
 
     double zoom_factor = 1;
+    double zoom_step = 1;
+
+    int interpolation = cv::INTER_NEAREST;
 
     // Panning
     int x_movement = 0;
@@ -39,6 +46,7 @@ struct zoomer_settings {
     // Specific commands
     bool fit = false;
     bool original = false;
+    bool do_center = false;
 };
 
 /**
@@ -63,24 +71,30 @@ struct overlay_settings {
     Overlay* overlay = nullptr;
 
     QPoint pos = QPoint(0,0);
-    int frame_nr = 0;
+    int frame = 0;
+    bool mouse_double_clicked = false;
     bool mouse_clicked = false;
     bool mouse_released = false;
     bool mouse_moved = false;
     bool mouse_scroll = false;
+    bool shift_modifier = false;
+    bool ctrl_modifier = false;
 
-    bool undo = false;
-    bool redo = false;
+    bool update_text = false;
     bool clear_drawings = false;
     bool delete_drawing = false;
     bool show_overlay = true;
     bool overlay_removed = false;
     bool right_click = false;
+    bool set_current_drawing = false;
+    bool create_text = false;
 
     SHAPES tool = NONE;
     QColor color = Qt::red;
+    QString text = "";
     QString current_string = "Enter text";
     float current_font_scale = 1;
+    Shapes* shape = nullptr;
 
 };
 /**
@@ -145,14 +159,15 @@ class FrameProcessor : public QObject {
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
 
-
+    bool skip_process = false;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                    std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
-                   std::atomic_int* frame_index, overlay_settings *o_settings, atomic_bool *overlay_changed);
+                   std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed);
     ~FrameProcessor();
     bool loop = true;
+
 public slots:
     void check_events(void);
 signals:

@@ -27,11 +27,14 @@ public:
     void set_zoom_rect(QPoint p1, QPoint p2);
     void set_frame_size(cv::Size frame_size);
     void set_viewport_size(const QSize size);
+    void set_interpolation_method(const int& method);
     void move_zoom_rect(int x, int y);
+    void center_zoom_rect(QPoint, double zoom_step);
+    void set_state(QPoint anchor, double scale_factor);
     void fit_viewport();
     void flip();
     void reset();
-    cv::Rect  m_zoom_rect;
+    cv::Rect m_zoom_rect;
 
     void scale_frame(cv::Mat& frame);
     cv::Rect get_zoom_rect() const;
@@ -39,6 +42,7 @@ public:
 
     QPoint get_anchor() const;
     QSize get_viewport_size() const;
+    int get_interpolation_method() const;
 
     void update_rect_size();
 private:
