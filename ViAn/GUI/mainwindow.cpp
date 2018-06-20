@@ -222,8 +222,11 @@ MainWindow::~MainWindow() {
     delete queue_wgt;
     qDebug() << "queue wgt deleted";
     delete status_bar;
+    qDebug() << "status bar deleted";
     delete draw_toolbar;
+    qDebug() << "draw toolbar deleted";
     delete main_toolbar;
+    qDebug() << "main toolbar deleted";
     qDebug() << "done";
 }
 
@@ -425,6 +428,7 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
 
     // ---------------------------------------
     widget_video->setAttribute(Qt::WA_DeleteOnClose);
+    widget_video->frame_wgt->set_tool(ZOOM);
     widget_video->load_marked_video_state(vid_proj, vid_proj->get_video()->state);
 
     connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
@@ -435,6 +439,7 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
 }
 
 void MainWindow::close_widget(VideoWidget *vid_wgt) {
+    qDebug() << "in close widgets";
     auto p = std::find(video_widgets.begin(), video_widgets.end(), vid_wgt);
     if (p != video_widgets.end()) {
         qDebug() << video_widgets.size();

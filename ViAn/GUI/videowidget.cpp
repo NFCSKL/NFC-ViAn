@@ -73,44 +73,14 @@ VideoWidget::~VideoWidget(){
     //qDebug() << "after quit";
     processing_thread->wait();
     //qDebug() << "after wait";
-    delete processing_thread;
+    processing_thread->deleteLater();
+    //delete processing_thread;
     qDebug() << "delete thread";
     
     delete v_controller;
 
     delete frame_wgt;
-    delete play_btn;
-    delete stop_btn;
-    delete next_frame_btn;
-    delete prev_frame_btn;
-    delete next_poi_btn;
-    delete prev_poi_btn;
-    delete bookmark_btn;
-    delete export_frame_btn;
-    delete analysis_play_btn;
-    delete new_tag_btn;
-    delete tag_btn;
-    delete fit_btn;
-    delete original_size_btn;
-    delete zoom_label;
-    delete set_start_interval_btn;
-    delete set_end_interval_btn;
     delete remove_frame_act;
-    delete speed_slider;
-    delete current_time;
-    delete total_time;
-    delete playback_slider;
-
-//    delete control_row;
-//    delete video_btns;
-//    delete analysis_btns;
-//    delete other_btns;
-//    delete zoom_btns;
-//    delete interval_btns;
-    delete speed_slider_layout;
-
-//    delete scroll_area;
-    delete vertical_layout;
 
     qDebug() << "Im kill";
 }
@@ -202,11 +172,14 @@ void VideoWidget::init_frame_processor() {
                                      &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
     try {
-        processing_thread = new QThread();
+        processing_thread = new QThread(this);
+        qDebug() << "you did good";
     } catch (const std::bad_alloc& e) {
         std::cout << "a Thread No-No" << std::endl;
+        close();
     } catch (const std::exception& e) {
         std::cout << "exception" << std::endl;
+        close();
     }
 
     f_processor->moveToThread(processing_thread);
@@ -260,8 +233,7 @@ void VideoWidget::set_btn_icons() {
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
 
 
-    zoom_label = new QLabel;
-    zoom_label->setText("100%");
+    zoom_label = new QLabel("100%", this);
     zoom_label->setMinimumWidth(40);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
@@ -371,7 +343,7 @@ void VideoWidget::set_btn_shortcuts() {
  * Create and add speed adjustment slider
  */
 void VideoWidget::init_speed_slider() {
-    speed_slider = new QSlider(Qt::Horizontal);
+    speed_slider = new QSlider(Qt::Horizontal, this);
     speed_slider->setRange(-4,4);
     speed_slider->setMaximumWidth(120);
     speed_slider->setPageStep(1);
@@ -596,7 +568,6 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
     cv::Mat org_frame = frame_wgt->get_org_frame();
-    int frame_nr = get_current_frame();
     QString time = current_time->text();
     emit new_bookmark(m_vid_proj, m_vid_proj->get_video()->state, bookmark_frame, org_frame, time);
 }
@@ -927,7 +898,6 @@ void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
-    qDebug() << "State";
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     set_state(state);

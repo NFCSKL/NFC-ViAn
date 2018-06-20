@@ -94,12 +94,12 @@ void VideoPlayer::check_events() {
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return !loop || m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
-            qDebug() << "";
-            qDebug() << "in vid_play";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
+
                 qDebug() << "new vid load";
                 wait_load_read();
+                qDebug() << "vide loaded";
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 qDebug() << "set frame";
                 set_frame();
@@ -143,7 +143,6 @@ void VideoPlayer::load_video_info() {
 }
 
 bool VideoPlayer::synced_read(){
-    try {
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
@@ -161,9 +160,6 @@ bool VideoPlayer::synced_read(){
     {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
-    }
-    } catch (cv::Exception &e) {
-        qDebug() << "BAAAD";
     }
 
     return true;

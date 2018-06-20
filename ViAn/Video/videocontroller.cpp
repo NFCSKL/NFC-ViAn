@@ -37,8 +37,7 @@ void VideoController::run() {
     connect(v_player, &VideoPlayer::playback_stopped, this, &VideoController::playback_stopped);
 
     v_player->check_events();
-    //exec();
-    qDebug() << "ayayayayaya after events";
+    exec();
     delete v_player;
 
 }
@@ -49,5 +48,6 @@ VideoController::~VideoController() {
     v_player->loop = false;
     qDebug() << "inb4 wait";
     wait();
+    deleteLater();
     qDebug() << "video controller is kill - done";
 }

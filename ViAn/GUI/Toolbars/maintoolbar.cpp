@@ -1,5 +1,6 @@
 #include "maintoolbar.h"
 #include <QIcon>
+#include <QDebug>
 
 /**
  * @brief MainToolbar::MainToolbar
@@ -10,10 +11,7 @@ MainToolbar::MainToolbar() {
 }
 
 MainToolbar::~MainToolbar() {
-    delete add_video_act;
-    delete save_act;
-    delete open_act;
-    delete toggle_draw_toolbar_act;
+    qDebug() << "toolbar is kill";
 }
 
 /**
