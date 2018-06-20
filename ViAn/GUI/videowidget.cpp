@@ -168,6 +168,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+    connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
 
     processing_thread->start();
 }
@@ -1171,6 +1172,8 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
+        m_settings.brightness = state.brightness;
+        m_settings.contrast = state.contrast;
         frame_index.store(state.frame);
     });
 }
@@ -1198,8 +1201,7 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    brightness = b_val;
-    contrast = c_val;
+    set_brightness_contrast(b_val, c_val);
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1273,9 +1275,16 @@ void VideoWidget::frame_line_edit_finished() {
 }
 
 int VideoWidget::get_brightness() {
-    return brightness;
+    return m_vid_proj->get_video()->state.brightness;
 }
 
 double VideoWidget::get_contrast() {
-    return contrast;
+    return m_vid_proj->get_video()->state.contrast;
+}
+
+void VideoWidget::set_brightness_contrast(int bri, double cont) {
+    qDebug() << "SEt THEM" << bri << cont;
+    if (!m_vid_proj) return;
+    m_vid_proj->get_video()->state.brightness = bri;
+    m_vid_proj->get_video()->state.contrast = cont;
 }

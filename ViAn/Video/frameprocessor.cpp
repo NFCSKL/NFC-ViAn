@@ -203,6 +203,7 @@ void FrameProcessor::update_zoomer_settings() {
  * the v_sync_lock has been acquired.
  */
 void FrameProcessor::update_manipulator_settings() {
+    qDebug() << "b - s" << m_man_settings->brightness << m_man_settings->contrast;
     m_manipulator.set_brightness(m_man_settings->brightness);
     m_manipulator.set_contrast(m_man_settings->contrast);
 
@@ -214,6 +215,7 @@ void FrameProcessor::update_manipulator_settings() {
         m_zoomer.flip();
     }
     m_man_settings->rotate = 0;
+    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
 }
 
 /**

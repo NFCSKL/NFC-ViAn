@@ -12,7 +12,7 @@
 
 struct VideoState {
     int frame = 0;
-    int contrast = FrameManipulator().CONTRAST_DEFAULT;
+    double contrast = FrameManipulator().CONTRAST_DEFAULT;
     int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
     int rotation = 0;
     double scale_factor = 1;

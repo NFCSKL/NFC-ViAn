@@ -171,6 +171,7 @@ public slots:
 signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
+    void set_bri_cont(int, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
 private:
     void process_frame();
