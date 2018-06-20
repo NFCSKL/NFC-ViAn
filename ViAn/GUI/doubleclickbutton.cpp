@@ -1,5 +1,4 @@
 #include "doubleclickbutton.h"
-#include <QDebug>
 
 DoubleClickButton::DoubleClickButton(QWidget *parent) :
     QPushButton(parent) {

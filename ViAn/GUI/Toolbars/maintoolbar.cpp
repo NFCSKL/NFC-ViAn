@@ -1,6 +1,5 @@
 #include "maintoolbar.h"
 #include <QIcon>
-#include <QDebug>
 
 /**
  * @brief MainToolbar::MainToolbar

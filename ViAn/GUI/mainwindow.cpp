@@ -413,16 +413,11 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
     widget_video->show();
     video_widgets.push_back(widget_video);
 
-    // ---------------------------------------
     widget_video->setAttribute(Qt::WA_DeleteOnClose);
     widget_video->frame_wgt->set_tool(ZOOM);
     widget_video->load_marked_video_state(vid_proj, vid_proj->get_video()->state);
 
     connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
-
-    //connect(widget_video, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
-    //connect(widget_video, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
-    //connect(widget_video, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
 }
 
 void MainWindow::close_widget(VideoWidget *vid_wgt) {
