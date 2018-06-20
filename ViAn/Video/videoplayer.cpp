@@ -29,7 +29,6 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
 }
 
 VideoPlayer::~VideoPlayer() {
-    qDebug() << "in videoplayer destructor";
     loop = false;
     m_player_con->notify_all();
 }
@@ -96,19 +95,11 @@ void VideoPlayer::check_events() {
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return !loop || m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
-
-                qDebug() << "new vid load";
                 wait_load_read();
-                qDebug() << "vide loaded";
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
-                qDebug() << "set frame";
                 set_frame();
             }
         } else {
-            if (!loop) {
-                qDebug() << "no loop";
-            }
-
             // Timer condition triggered. Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
             if (speed != m_cur_speed_step) {
@@ -124,7 +115,6 @@ void VideoPlayer::check_events() {
                 display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
-
             }
         }
         lk.unlock();

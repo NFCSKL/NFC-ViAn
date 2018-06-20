@@ -105,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::show_analysis_settings, this, &MainWindow::show_ana_settings_dock);
 
     // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
     addToolBar(main_toolbar);
 
@@ -210,24 +210,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
  * Destructor
  */
 MainWindow::~MainWindow() {
-    qDebug() << "main delete";
     delete video_wgt;
-    qDebug() << "video wgt deleted";
     delete project_wgt;
-    qDebug() << "project wgt deleted";
     delete analysis_wgt;
-    qDebug() << "analysis wgt deleted";
     delete bookmark_wgt;
-    qDebug() << "bookmark wgt deleted";
     delete queue_wgt;
-    qDebug() << "queue wgt deleted";
-    delete status_bar;
-    qDebug() << "status bar deleted";
-    delete draw_toolbar;
-    qDebug() << "draw toolbar deleted";
-    delete main_toolbar;
-    qDebug() << "main toolbar deleted";
-    qDebug() << "done";
 }
 
 /**
@@ -439,12 +426,9 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
 }
 
 void MainWindow::close_widget(VideoWidget *vid_wgt) {
-    qDebug() << "in close widgets";
     auto p = std::find(video_widgets.begin(), video_widgets.end(), vid_wgt);
     if (p != video_widgets.end()) {
-        qDebug() << video_widgets.size();
         video_widgets.erase(p);
-        qDebug() << video_widgets.size();
     }
 }
 

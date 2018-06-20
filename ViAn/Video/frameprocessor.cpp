@@ -26,7 +26,6 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 }
 
 FrameProcessor::~FrameProcessor() {
-    qDebug() << "in processor";
     loop = false;
     m_v_sync->con_var.notify_all();
 }
@@ -49,7 +48,6 @@ void FrameProcessor::check_events() {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !loop || m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
         if (!loop) {
-            qDebug() << "no loop";
             lk.unlock();
             continue;
         }
@@ -100,10 +98,9 @@ void FrameProcessor::check_events() {
         if (m_new_frame->load() && m_overlay) {
             m_new_frame->store(false);
             try {
-                qDebug() << "cloning";
                 m_frame = m_v_sync->frame.clone();
             } catch (cv::Exception& e) {
-                std::cout << "a FIRST No-No" << std::endl;
+                qWarning() << "Failed to copy new frame";
                 emit set_play_btn(false);
                 lk.unlock();
                 m_v_sync->con_var.notify_all();
@@ -129,12 +126,10 @@ void FrameProcessor::check_events() {
 void FrameProcessor::process_frame() {
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame;
-    // TODO not needed?
     try {
-        qDebug() << "processing";
         manipulated_frame = m_frame.clone();
     } catch (cv::Exception& e) {
-        std::cout << "a BIGGER No-No" << std::endl;
+        qWarning() << "Failed to copy new frame in processor";
         return;
     }
 

@@ -381,7 +381,6 @@ void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
-    qDebug() << "clicked" << m_tool;
     // Pos when the frame is at 100%
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {

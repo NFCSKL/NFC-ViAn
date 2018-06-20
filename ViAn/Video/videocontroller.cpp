@@ -43,11 +43,8 @@ void VideoController::run() {
 }
 
 VideoController::~VideoController() {
-    qDebug() << "video controller is kill";
     quit();
     v_player->loop = false;
-    qDebug() << "inb4 wait";
     wait();
     deleteLater();
-    qDebug() << "video controller is kill - done";
 }

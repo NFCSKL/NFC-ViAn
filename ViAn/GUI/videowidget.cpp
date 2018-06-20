@@ -65,24 +65,13 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
 
 VideoWidget::~VideoWidget(){
     play_btn_toggled(false);
-    qDebug() << "video widget before";
-
     delete f_processor;
-    //qDebug() << "after delete";
     processing_thread->quit();
-    //qDebug() << "after quit";
     processing_thread->wait();
-    //qDebug() << "after wait";
     processing_thread->deleteLater();
-    //delete processing_thread;
-    qDebug() << "delete thread";
-    
     delete v_controller;
-
     delete frame_wgt;
     delete remove_frame_act;
-
-    qDebug() << "Im kill";
 }
 
 void VideoWidget::closeEvent(QCloseEvent *event) {
@@ -173,12 +162,8 @@ void VideoWidget::init_frame_processor() {
 
     try {
         processing_thread = new QThread(this);
-        qDebug() << "you did good";
     } catch (const std::bad_alloc& e) {
-        std::cout << "a Thread No-No" << std::endl;
-        close();
-    } catch (const std::exception& e) {
-        std::cout << "exception" << std::endl;
+        qWarning() << "Failed to open new thread";
         close();
     }
 

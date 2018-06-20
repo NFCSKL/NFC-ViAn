@@ -10,10 +10,6 @@ MainToolbar::MainToolbar() {
     create_buttons();
 }
 
-MainToolbar::~MainToolbar() {
-    qDebug() << "toolbar is kill";
-}
-
 /**
  * @brief MainToolbar::create_actions
  * Creates all actions and sets the drawing toolbar action to be checkable
