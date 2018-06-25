@@ -25,7 +25,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDropIndicatorShown(true);
 
     // Create togglable action in the context menu for analysis details
-    show_details_act = new QAction("Show/hide details", this);
+    show_details_act = new QAction("Show/hide anlaysis details", this);
     show_details_act->setCheckable(true);
     connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
 
@@ -1062,6 +1062,7 @@ bool ProjectWidget::save_project() {
             // TODO: Update window title to new project name
             m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
             m_proj->remove_files();
+            qDebug() << "new" << path;
             m_proj->set_name_and_path(name.toStdString(), path.toStdString());
             m_proj->set_temporary(false);
             set_main_window_name(name);

@@ -197,8 +197,6 @@ private:
     QLabel* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
 
-    QShortcut* remove_frame_act;
-
     //Buttons
     QPushButton* play_btn;
     QPushButton* stop_btn;
@@ -209,7 +207,7 @@ private:
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;
     QPushButton* tag_btn;
-    QPushButton* new_tag_btn;
+    QPushButton* new_label_btn;
     QPushButton* fit_btn;
     QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;

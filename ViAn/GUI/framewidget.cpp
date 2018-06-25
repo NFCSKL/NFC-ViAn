@@ -198,7 +198,6 @@ void FrameWidget::set_tool(SHAPES tool) {
  */
 void FrameWidget::set_cursor(SHAPES tool) {
     switch (tool) {
-    case NONE:
     case ZOOM:
         unsetCursor();
         break;
@@ -384,8 +383,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     // Pos when the frame is at 100%
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
-    case NONE:
-        break;
     case ANALYSIS_BOX:
         if(event->button() == Qt::LeftButton) {
             ana_rect_start = event->pos();
@@ -421,9 +418,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     case MOVE:
         init_panning(event->pos());
         break;
-    case SELECT:
-        emit mouse_pressed(scale_point(event->pos()), false);
-        break;
     default:
         bool right_click = (event->button() == Qt::RightButton);
         emit mouse_pressed(scaled_pos, right_click);
@@ -438,8 +432,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
-    case NONE:
-        break;
     case ANALYSIS_BOX:
         set_analysis_settings();
         break;
@@ -450,8 +442,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     case MOVE:
         end_panning();
-        break;
-    case SELECT:
         break;
     default:
         emit mouse_released(scaled_pos, false);
@@ -466,8 +456,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
-    case NONE:
-        break;
     case ANALYSIS_BOX:
         if (event->buttons() == Qt::LeftButton) {
             ana_rect_end = rect_update(event->pos());
@@ -504,8 +492,6 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             panning(event->pos());
         }
         break;
-    case SELECT:
-        break;
     default:
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
             bool shift = (event->modifiers() == Qt::ShiftModifier);
@@ -526,7 +512,6 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
     case EDIT:
-    case SELECT:
         emit mouse_scroll(num_steps);
         event->accept();
         break;
