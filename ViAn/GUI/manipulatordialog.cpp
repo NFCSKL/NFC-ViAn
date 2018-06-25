@@ -4,7 +4,6 @@
 #include <QDebug>
 
 ManipulatorDialog::ManipulatorDialog(int b, double c, QWidget* parent) : QDialog(parent) {
-    qDebug() << "In dialog" << b << c;
     contrast = c;
     brightness = b;
 

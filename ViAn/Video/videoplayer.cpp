@@ -36,6 +36,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
  */
 
 void VideoPlayer::load_video(){
+    m_new_video->store(false);
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
@@ -45,8 +46,8 @@ void VideoPlayer::load_video(){
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
-    m_new_video->store(false);
     m_new_frame_video->store(true);
+    qDebug() << "load video done";
 }
 
 /**
@@ -69,6 +70,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
  * Moves the playback to the frame indicated by the number on top of the frame_stack.
  */
 void VideoPlayer::set_frame() {
+    qDebug() << "set frame";
     int frame_index = m_frame->load();
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
@@ -129,6 +131,7 @@ void VideoPlayer::load_video_info() {
 }
 
 bool VideoPlayer::synced_read(){
+    qDebug() << "synced read";
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
@@ -152,6 +155,7 @@ bool VideoPlayer::synced_read(){
 
 
 bool VideoPlayer::wait_load_read(){
+    qDebug() << "wait load read";
     // Wait for processing thread to finish processing new frame
     {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
@@ -169,6 +173,7 @@ bool VideoPlayer::wait_load_read(){
         }
         m_new_frame->store(true);
     }
+    qDebug() << "notifying";
     m_v_sync->con_var.notify_one();
     return true;
 }
