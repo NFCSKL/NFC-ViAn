@@ -576,7 +576,6 @@ void FrameWidget::set_analysis_settings() {
  */
 void FrameWidget::init_panning(QPoint pos) {
     prev_pos = pos;
-    //setCursor(Qt::ClosedHandCursor);
 }
 
 /**
