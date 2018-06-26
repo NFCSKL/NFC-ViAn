@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     project_wgt = new ProjectWidget();
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
+    project_wgt->new_project();
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
@@ -114,6 +115,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     toggle_drawing_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
+
+    // Recent projects menu
+    init_rp_dialog();
 
     //Initialize menu bar
     init_file_menu();
@@ -193,17 +197,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
-    // Recent projects menu
-    rp_dialog = new RecentProjectDialog(this);
-    rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-    // Create a new project if user presses "new project" or if dialog is rejected
-    connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
-    connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt,&ProjectWidget::new_project);
-
-    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
-    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
-    connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
+    // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
@@ -230,6 +224,7 @@ void MainWindow::init_file_menu() {
     QAction* new_project_act = new QAction(tr("&New project"), this);
     QAction* add_vid_act = new QAction(tr("&Add video..."), this);
     QAction* open_project_act = new QAction(tr("&Open project..."), this);
+    QAction* recent_project_act = new QAction(tr("&Recent project..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
@@ -237,6 +232,7 @@ void MainWindow::init_file_menu() {
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
+    recent_project_act->setIcon(QIcon("../ViAn/Icons/recent.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
 
@@ -244,6 +240,7 @@ void MainWindow::init_file_menu() {
     file_menu->addAction(new_project_act);
     file_menu->addAction(add_vid_act);
     file_menu->addAction(open_project_act);
+    file_menu->addAction(recent_project_act);
     file_menu->addAction(save_project_act);
     file_menu->addSeparator();
     file_menu->addAction(quit_act);
@@ -252,6 +249,7 @@ void MainWindow::init_file_menu() {
     new_project_act->setShortcuts(QKeySequence::New);       //Ctrl + N
     add_vid_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
     open_project_act->setShortcuts(QKeySequence::Open);     //Ctrl + O
+    //recent_project_act.setShortcut(QKeySequence(tr("Ctrl+"))); // TODO Add a good shortcut
     save_project_act->setShortcuts(QKeySequence::Save);     //Ctrl + S
     quit_act->setShortcut(QKeySequence(tr("Ctrl+E")));      //Ctrl + E
 
@@ -259,6 +257,7 @@ void MainWindow::init_file_menu() {
     new_project_act->setStatusTip(tr("Create a new project"));
     add_vid_act->setStatusTip(tr("Add video"));
     open_project_act->setStatusTip(tr("Load project"));
+    recent_project_act->setStatusTip(tr("Open the recent project dialog"));
     save_project_act->setStatusTip(tr("Save project"));
     quit_act->setStatusTip(tr("Quit the application"));
 
@@ -266,6 +265,7 @@ void MainWindow::init_file_menu() {
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
+    connect(recent_project_act, &QAction::triggered, this, &MainWindow::open_rp_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
@@ -593,6 +593,24 @@ void MainWindow::move() {
  */
 void MainWindow::gen_report() {
     emit set_status_bar("Generating report. Please wait.");
+}
+
+void MainWindow::init_rp_dialog() {
+    rp_dialog = new RecentProjectDialog(this);
+    rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    // Create a new project if user presses "new project" or if dialog is rejected
+    connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
+    //connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt, &ProjectWidget::new_project);
+
+    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
+}
+
+void MainWindow::open_rp_dialog() {
+    init_rp_dialog();
+    rp_dialog->exec();
 }
 
 /**

@@ -103,10 +103,8 @@ void RecentProjectDialog::on_remove_btn_clicked() {
         QString file = recent_list->takeItem(recent_list->currentRow())->toolTip();
         QString substr = file.left(file.lastIndexOf('/') + 1);
         QDir path(substr);
-        qDebug() << substr;
-        bool success{false};
         if (path.exists()) {
-            success = path.removeRecursively();
+            path.removeRecursively();
         }
     }
 

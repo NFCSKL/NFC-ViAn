@@ -269,8 +269,7 @@ void VideoWidget::set_btn_tab_order() {
     setTabOrder(prev_frame_btn, play_btn);
     setTabOrder(play_btn, next_frame_btn);
     setTabOrder(next_frame_btn, stop_btn);
-    setTabOrder(stop_btn, speed_slider);
-    setTabOrder(speed_slider, prev_poi_btn);
+    setTabOrder(stop_btn, prev_poi_btn);
     setTabOrder(next_poi_btn, analysis_play_btn);
     setTabOrder(analysis_play_btn, bookmark_btn);
     setTabOrder(bookmark_btn, export_frame_btn);

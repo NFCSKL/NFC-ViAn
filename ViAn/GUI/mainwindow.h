@@ -96,6 +96,9 @@ private:
 
     AnalysisWindow *analysis_window;
 
+    void init_rp_dialog();
+    void open_rp_dialog();
+
     void init_file_menu();
     void init_edit_menu();
     void init_view_menu();

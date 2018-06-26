@@ -26,6 +26,7 @@
 #include "Project/Analysis/tag.h"
 #include "Video/videocontroller.h"
 #include "Video/videoplayer.h"
+#include "Video/framemanipulator.h"
 
 class VideoWidget : public QWidget
 {
@@ -38,8 +39,8 @@ private:
 
     int prev_frame_idx;
     int POI_end;
-    double m_scale_factor = 1;
-    int brightness = 0;
+    double m_scale_factor = FrameManipulator().CONTRAST_DEFAULT;
+    int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
     double contrast = 1;
 
     zoomer_settings z_settings;
@@ -116,7 +117,7 @@ signals:
     void tag_remove_frame(int);
     void set_status_bar(QString);
     void load_video(std::string video_path); // TODO Not used?
-    void export_original_frame(VideoProject* ,const int, cv::Mat);
+    void export_original_frame(VideoProject*, const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
