@@ -1062,7 +1062,6 @@ bool ProjectWidget::save_project() {
             // TODO: Update window title to new project name
             m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
             m_proj->remove_files();
-            qDebug() << "new" << path;
             m_proj->set_name_and_path(name.toStdString(), path.toStdString());
             m_proj->set_temporary(false);
             set_main_window_name(name);

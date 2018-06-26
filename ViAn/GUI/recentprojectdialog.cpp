@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include <QMessageBox>
 #include "recentprojectdialog.h"
 #include <QDebug>
 
@@ -41,7 +42,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     connect(new_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_new_btn_clicked);
     connect(browse_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_browse_btn_clicked);
     connect(open_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_open_btn_clicked);
-    connect(remove_btn, &QPushButton::clicked, this, &RecentProjectDialog::remove_project);
+    connect(remove_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_remove_btn_clicked);
 }
 
 RecentProjectDialog::~RecentProjectDialog() {
@@ -88,4 +89,25 @@ void RecentProjectDialog::on_open_btn_clicked() {
     if (recent_list->selectedItems().length() == 0) return;
     emit open_project(recent_list->currentItem()->toolTip());
     accept();
+}
+
+void RecentProjectDialog::on_remove_btn_clicked() {
+    QMessageBox msg_box;
+    msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setText("Are you sure you want to remove the selected projects?");
+    msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg_box.setDefaultButton(QMessageBox::No);
+    int reply = msg_box.exec();
+    if (reply == QMessageBox::Yes) {
+        QString file = recent_list->takeItem(recent_list->currentRow())->toolTip();
+        QString substr = file.left(file.lastIndexOf('/') + 1);
+        QDir path(substr);
+        qDebug() << substr;
+        bool success{false};
+        if (path.exists()) {
+            success = path.removeRecursively();
+        }
+    }
+
 }

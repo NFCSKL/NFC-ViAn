@@ -40,6 +40,7 @@ private slots:
     void on_new_btn_clicked();
     void on_browse_btn_clicked();
     void on_open_btn_clicked();
+    void on_remove_btn_clicked();
 };
 
 #endif // RECENTPROJECTDIALOG_H

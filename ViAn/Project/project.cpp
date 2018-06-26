@@ -111,7 +111,6 @@ void Project::set_name_and_path(const std::string& name, const std::string& path
     if (!path.empty()){
         // Update path for all VideoProjects
         m_dir = path + name + "/";
-        qDebug() << "m_dir in project" << QString::fromStdString(m_dir);
         for (auto it = begin(m_videos); it != end(m_videos); ++it) {
             (*it)->reset_root_dir(m_dir);
         }
