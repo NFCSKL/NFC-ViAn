@@ -211,7 +211,6 @@ void FrameWidget::set_cursor(SHAPES tool) {
         setCursor(Qt::CrossCursor);
         break;
     case MOVE:
-        setCursor(Qt::OpenHandCursor);
         break;
         //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
     case EDIT:
@@ -577,7 +576,7 @@ void FrameWidget::set_analysis_settings() {
  */
 void FrameWidget::init_panning(QPoint pos) {
     prev_pos = pos;
-    setCursor(Qt::ClosedHandCursor);
+    //setCursor(Qt::ClosedHandCursor);
 }
 
 /**

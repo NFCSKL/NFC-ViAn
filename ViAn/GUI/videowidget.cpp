@@ -287,7 +287,7 @@ void VideoWidget::set_btn_tab_order() {
  * Set shortcuts to the buttons
  */
 void VideoWidget::set_btn_shortcuts() {
-    play_btn->setShortcut(QKeySequence(Qt::Key_Space));
+    //play_btn->setShortcut(QKeySequence(Qt::Key_Space)); // TODO Fix so this works
     stop_btn->setShortcut(Qt::Key_X);
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
