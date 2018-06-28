@@ -99,15 +99,6 @@ public:
     double get_contrast();
 
 signals:
-    void first_frame(cv::Mat frame);
-    void zoom_out(double zoom_factor);
-    void set_zoom(double zoom_factor);
-    void set_play_video(void);
-    void set_pause_video(void);
-    void set_stop_video(void);
-    void next_video_frame(void);
-    void prev_video_frame(void);
-    void ret_first_frame(void);
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
@@ -115,7 +106,6 @@ signals:
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);
-    void load_video(std::string video_path); // TODO Not used?
     void export_original_frame(VideoProject* ,const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
@@ -155,6 +145,7 @@ public slots:
     void set_interval(int start, int end);
     void delete_interval(void);
     void frame_line_edit_finished();
+    void zoom_label_finished();
     void enable_poi_btns(bool, bool);
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
@@ -178,6 +169,7 @@ public slots:
     void set_draw_area_size(QSize s);
     void set_interpolation_method(int method);
     void on_step_zoom(double step);
+    void set_zoom_factor(double scale_factor);
     void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
@@ -194,7 +186,7 @@ private:
     QLabel* current_time;
     QLabel* total_time;
     QLineEdit* frame_line_edit;
-    QLabel* zoom_label;
+    QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
 
     QShortcut* remove_frame_act;
