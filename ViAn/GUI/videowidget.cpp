@@ -1290,21 +1290,21 @@ void VideoWidget::zoom_label_finished() {
     std::string text = zoom_label->text().toStdString();
     text.erase(std::remove(text.begin(), text.end(), '%'), text.end());
     char* p;
-    double converted = strtod(text.c_str(), &p)/100;
+    double converted = strtod(text.c_str(), &p)/PERCENT_INT_CONVERT;
     if (*p != 0) {
         emit set_status_bar("Error! Input is not a number!");
     } else if (converted < 0) {
         emit set_status_bar("Error! Input is negative!");
-    } else if (converted < 0.01) {
+    } else if (converted < ZOOM_LABEL_MIN / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too small");
-    } else if (converted > 100) {
+    } else if (converted > ZOOM_LABEL_MAX / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too large");
     } else {
         set_zoom_factor(converted);
-        zoom_label->setText(QString::number(converted*100) + "%");
+        zoom_label->setText(QString::number(converted*PERCENT_INT_CONVERT) + "%");
         return;
     }
-    zoom_label->setText(QString::number(m_scale_factor*100) + "%");
+    zoom_label->setText(QString::number(m_scale_factor*PERCENT_INT_CONVERT) + "%");
 }
 
 int VideoWidget::get_brightness() {
