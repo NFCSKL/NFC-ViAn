@@ -185,6 +185,8 @@ void FrameWidget::update(){
 
 void FrameWidget::set_tool(SHAPES tool) {
     mark_rect = false;
+    rect_start = QPoint(0,0);
+    rect_end = QPoint(0,0);
     emit send_tool(tool);
     m_tool = tool;
     set_cursor(m_tool);
