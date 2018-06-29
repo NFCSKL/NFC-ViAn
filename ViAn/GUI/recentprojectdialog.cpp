@@ -30,8 +30,8 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     v_btn_layout->addWidget(open_btn);                          // Second row second col third row
 
     for (auto project : RecentProject().load_recent()) {
-        QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(project.first));
-        item->setToolTip(QString::fromStdString(project.second));
+        QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(std::get<0>(project)));
+        item->setToolTip(QString::fromStdString(std::get<1>(project)));
         recent_list->addItem(item);
     }
 

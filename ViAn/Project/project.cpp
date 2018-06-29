@@ -1,4 +1,6 @@
 #include "project.h"
+#include <chrono>
+#include <ctime>
 #include <QDebug>
 
 /**
@@ -214,6 +216,10 @@ bool Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
+    auto time = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(time);
+    last_changed = std::ctime(&now_c);
+    std::cout << last_changed << std::endl;
     return save_saveable(m_file);
 }
 
@@ -326,6 +332,10 @@ std::string Project::get_name() const {
 
 std::string Project::get_file() const {
     return m_file;
+}
+
+std::string Project::get_last_changed() const {
+    return last_changed;
 }
 
 void Project::set_name(std::string name) {
