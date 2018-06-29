@@ -9,28 +9,23 @@
 #include <QDebug>
 
 /**
- * @brief ProjectDialog::disable_ok_btn
- * Disables the ok button in the button box
- */
-void ProjectDialog::enable_ok_btn(const bool& enable) {
-    btn_box->button(QDialogButtonBox::Ok)->setEnabled(enable);
-}
-
-/**
  * @brief ProjectDialog::ProjectDialog
  * @param parent
- * Dialog usd to create new projects.
+ * Dialog used to create new projects.
  */
-ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QDialog(parent) {
+ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent, QString default_path) : QDialog(parent) {
     setWindowTitle("Save project as");
     setModal(true);
     m_name = name;
     m_path = path;
+    m_default_path = default_path;
 
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setMinimumWidth(400);
+    setWindowIcon(QIcon("../ViAn/Icons/save.png"));
     QVBoxLayout* vertical_layout = new QVBoxLayout;
-    path_text = new QLineEdit(DEFAULT_PATH, this);
+    path_text = new QLineEdit(m_default_path, this);
     name_text = new QLineEdit(this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
     btn_box = new QDialogButtonBox(Qt::Horizontal);
@@ -62,14 +57,21 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent) : QD
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &ProjectDialog::cancel_btn_clicked);
 
     connect(name_text, &QLineEdit::textEdited, this, &ProjectDialog::on_name_text_edited);
+}
 
+/**
+ * @brief ProjectDialog::enable_ok_btn
+ * Enables the ok button in the button box depending on variable enable
+ */
+void ProjectDialog::enable_ok_btn(const bool& enable) {
+    btn_box->button(QDialogButtonBox::Ok)->setEnabled(enable);
 }
 
 void ProjectDialog::browse_btn_clicked() {
     QDir standard;
-    standard.mkpath(DEFAULT_PATH);
+    standard.mkpath(m_default_path);
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"),
-                                                    DEFAULT_PATH);
+                                                    m_default_path);
     if(!dir.isEmpty()) {
         path_text->setText(dir);
     }

@@ -644,7 +644,7 @@ void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(
                 this,
                 tr("Open project"),
-                QDir::homePath(),
+                project_wgt->get_default_path(),
                 "*.vian");
     emit open_project(project_path);
 }
