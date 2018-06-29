@@ -2,6 +2,7 @@
 #include "utility.h"
 #include "GUI/drawscrollarea.h"
 #include "GUI/Analysis/tagdialog.h"
+#include "GUI/Bookmark/bookmarkdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -296,8 +297,15 @@ void VideoWidget::set_btn_shortcuts() {
     bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     // Tag and zoom shortcuts are in the menus
     export_frame_btn->setShortcut(Qt::Key_E);
-    set_start_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left));
-    set_end_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right));
+    set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
+    set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
+
+    bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
+    interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);
+
+    //connect
+    connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
+    connect(interpol_sc, &QShortcut::activated, interpolate_check, &QCheckBox::toggle);
 }
 
 /**
@@ -325,6 +333,11 @@ void VideoWidget::init_speed_slider() {
     speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
     speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
 
+    speed_slider_up = new QShortcut(QKeySequence(Qt::Key_Asterisk), this);
+    speed_slider_down = new QShortcut(QKeySequence(Qt::Key_Slash), this);
+
+    connect(speed_slider_up, &QShortcut::activated, this, &VideoWidget::speed_up_activate);
+    connect(speed_slider_down, &QShortcut::activated, this, &VideoWidget::speed_down_activate);
     connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::update_playback_speed);
 }
 
@@ -527,11 +540,20 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  * @brief VideoWidget::on_bookmark_clicked
  */
 void VideoWidget::on_bookmark_clicked() {
+    BookmarkDialog dialog;
+    bool ok = dialog.exec();
+    bmark_description = dialog.textValue();
+    if (!ok) return;
+    quick_bookmark();
+
+}
+
+void VideoWidget::quick_bookmark() {
     cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
     cv::Mat org_frame = frame_wgt->get_org_frame();
-    int frame_nr = get_current_frame();
     QString time = current_time->text();
-    emit new_bookmark(m_vid_proj, m_vid_proj->get_video()->state, bookmark_frame, org_frame, time);
+    emit new_bookmark(m_vid_proj, m_vid_proj->get_video()->state, bookmark_frame, org_frame, time, bmark_description);
+    bmark_description = "";
 }
 
 /**
@@ -1275,4 +1297,14 @@ int VideoWidget::get_brightness() {
 
 double VideoWidget::get_contrast() {
     return contrast;
+}
+
+void VideoWidget::speed_up_activate() {
+    if (speed_slider->value() == speed_slider->maximum()) return;
+    speed_slider->setValue(speed_slider->value() +1);
+}
+
+void VideoWidget::speed_down_activate() {
+    if (speed_slider->value() == speed_slider->minimum()) return;
+    speed_slider->setValue(speed_slider->value() -1);
 }

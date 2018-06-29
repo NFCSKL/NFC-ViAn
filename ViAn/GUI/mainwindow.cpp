@@ -308,7 +308,7 @@ void MainWindow::init_edit_menu() {
     zoom_in_act->setShortcut(Qt::Key_Plus);
     zoom_out_act->setShortcut(Qt::Key_Minus);
     fit_screen_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-    reset_zoom_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    reset_zoom_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
 
     cont_bri_act->setStatusTip(tr("Contrast and brightness"));
     cw_act->setStatusTip(tr("Rotate clockwise"));
