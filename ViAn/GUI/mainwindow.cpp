@@ -228,6 +228,7 @@ void MainWindow::init_file_menu() {
     // Init actions
     QAction* new_project_act = new QAction(tr("&New project"), this);
     QAction* add_vid_act = new QAction(tr("&Add video"), this);
+    QAction* add_seq_act = new QAction(tr("&Add images"), this);
     QAction* open_project_act = new QAction(tr("&Open project"), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
@@ -239,6 +240,7 @@ void MainWindow::init_file_menu() {
     // Set icons
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
+    add_seq_act->setIcon(QIcon("../ViAn/Icons/image_sequence.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     //gen_report_act->setIcon(QIcon("../ViAn/Icons/....png"));      //add if wanted
@@ -249,6 +251,7 @@ void MainWindow::init_file_menu() {
     // Add actions to the menu
     file_menu->addAction(new_project_act);
     file_menu->addAction(add_vid_act);
+    file_menu->addAction(add_seq_act);
     file_menu->addAction(open_project_act);
     file_menu->addAction(save_project_act);
     file_menu->addAction(close_project_act);
@@ -261,6 +264,7 @@ void MainWindow::init_file_menu() {
     // Set shortcuts
     new_project_act->setShortcuts(QKeySequence::New);       //Ctrl + N
     add_vid_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
+// TODO    add_seq_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
     open_project_act->setShortcuts(QKeySequence::Open);     //Ctrl + O
     save_project_act->setShortcuts(QKeySequence::Save);     //Ctrl + S
     close_project_act->setShortcuts(QKeySequence::Close);   //Ctrl + F4
@@ -271,6 +275,7 @@ void MainWindow::init_file_menu() {
     // Set shortcuts
     new_project_act->setStatusTip(tr("Create a new project"));
     add_vid_act->setStatusTip(tr("Add video"));
+    add_seq_act->setStatusTip(tr("Add images"));
     open_project_act->setStatusTip(tr("Load project"));
     save_project_act->setStatusTip(tr("Save project"));
     close_project_act->setStatusTip(tr("Close project"));
@@ -281,6 +286,7 @@ void MainWindow::init_file_menu() {
     // Connet with signals and slots
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    connect(add_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
