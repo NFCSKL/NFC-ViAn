@@ -142,7 +142,8 @@ void ProjectWidget::add_images() {
     bool ok;
     QString text = QInputDialog::getText(this, tr("Import image sequence"),
                                          tr("Sequence name:"), QLineEdit::Normal,
-                                         "Sequence", &ok);
+                                         "Sequence", &ok,
+                                         Qt::WindowCloseButtonHint);
 
     // Check if dialog was accepted and that proper name was used
     QString seq_name{"sequence"};
