@@ -622,7 +622,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         vid_item->get_video_project()->get_video()->state.frame = seq_item->get_index();
         emit set_video_project(vid_item->get_video_project());
         emit marked_video_state(vid_item->get_video_project(),
