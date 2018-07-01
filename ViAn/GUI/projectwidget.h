@@ -49,6 +49,9 @@ public:
     AnalysisSettings* analysis_settings = new AnalysisSettings();
     QPointer<QAction> show_details_act = nullptr;
     QPointer<QAction> show_settings_act = nullptr;
+    QPointer<QAction> rename_item_act = nullptr;
+    QPointer<QAction> remove_item_act = nullptr;
+    QPointer<QAction> new_folder_act = nullptr;
     QString get_default_path();
 
 signals:

@@ -41,6 +41,15 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
+    // Create remove, rename and new folder actions
+    remove_item_act = new QAction("Remove", this);
+    rename_item_act = new QAction("Rename", this);
+    new_folder_act = new QAction("New folder", this);
+
+    connect(remove_item_act, &QAction::triggered, this, &ProjectWidget::remove_item);
+    connect(rename_item_act, &QAction::triggered, this, &ProjectWidget::rename_item);
+    connect(new_folder_act, &QAction::triggered, this, &ProjectWidget::create_folder_item);
+
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
     new_folder_sc->setContext(Qt::WidgetWithChildrenShortcut);
@@ -832,46 +841,51 @@ void ProjectWidget::context_menu(const QPoint &point) {
     const int item_count = selectedItems().count();
     if (item_count == 0) {
         // Clicked on root tree
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction(new_folder_act);
     } else if (item_count == 1) {
         // Clicked on item
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
-        menu.addSeparator();
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
             case TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction(new_folder_act);
+                menu.addSeparator();
+                menu.addAction(rename_item_act);
+                menu.addAction(remove_item_act);
                 break;
             case DRAWING_TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction(new_folder_act);
+                menu.addSeparator();
+                menu.addAction(rename_item_act);
                 menu.addAction("Update", this, SLOT(drawing_tag()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction(remove_item_act);
                 break;
             case ANALYSIS_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction(new_folder_act);
+                menu.addSeparator();
+                menu.addAction(rename_item_act);
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
-                menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction(rename_item_act);
+                menu.addAction(remove_item_act);
                 break;
             case VIDEO_ITEM:
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction(remove_item_act);
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             case TAG_FRAME_ITEM:
+                menu.addAction(new_folder_act);
+                menu.addSeparator();
                 if (item->parent()->type() == TAG_ITEM) {
-                    menu.addAction("Delete", this, SLOT(remove_item()));
+                    menu.addAction(remove_item_act);
                 }
             default:
                 break;
         }
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
-        menu.addAction("Delete", this, SLOT(remove_item()));
+        menu.addAction(remove_item_act);
     }
     menu.exec(mapToGlobal(point));
 }
