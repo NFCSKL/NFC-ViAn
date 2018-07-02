@@ -16,7 +16,6 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
 
     for (auto item : recent_items) {
         if (std::get<1>(item) == std::get<1>(new_proj)) {
-            //auto item_it = recent_items.find
             recent_items.remove(item);
         }
     }

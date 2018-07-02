@@ -16,7 +16,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     v_main_layout->addLayout(h_layout);
 
     recent_list = new QTreeWidget();
-    recent_list->setColumnCount(2);
+    recent_list->setColumnCount(NUM_COLUMNS);
     recent_list->headerItem()->setText(0, "Project");
     recent_list->headerItem()->setText(1, "Last changed");
     recent_list->setRootIsDecorated(false);                     // Remove the empty space to the left of the item

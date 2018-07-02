@@ -26,6 +26,8 @@ class RecentProjectDialog : public QDialog {
     QPushButton* browse_btn;
     QPushButton* open_btn;
     QTreeWidget* recent_list;
+
+    const int NUM_COLUMNS = 2;
 public:
     RecentProjectDialog(QWidget* parent = nullptr);
     ~RecentProjectDialog();
