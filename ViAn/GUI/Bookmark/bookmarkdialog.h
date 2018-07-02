@@ -7,7 +7,7 @@ class BookmarkDialog : public QInputDialog {
     Q_OBJECT
 
 public:
-    explicit BookmarkDialog(QWidget* parnet = 0);
+    explicit BookmarkDialog(QWidget* parent = 0);
     void keyPressEvent(QKeyEvent *e) override;
 
 signals:

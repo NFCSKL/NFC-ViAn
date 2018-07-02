@@ -2,7 +2,7 @@
 #include <QKeyEvent>
 #include <QIcon>
 
-BookmarkDialog::BookmarkDialog(QWidget *parnet) : QInputDialog(parnet) {
+BookmarkDialog::BookmarkDialog(QWidget *parent) : QInputDialog(parent) {
     setOption(QInputDialog::UsePlainTextEditForTextInput);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowIcon(QIcon("../ViAn/Icons/bookmark.png"));
@@ -16,6 +16,8 @@ void BookmarkDialog::keyPressEvent(QKeyEvent *e) {
         done(1);
         e->accept();
         return;
+    } else if (e->key() == Qt::Key_Escape) {
+        close();
     }
     e->ignore();
 }
