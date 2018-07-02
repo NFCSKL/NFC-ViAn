@@ -221,6 +221,9 @@ private:
     QShortcut* interpol_sc;
     QShortcut* speed_slider_up;
     QShortcut* speed_slider_down;
+    QShortcut* frame_edit_act;
+    QShortcut* video_start_sc;
+    QShortcut* video_end_sc;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
@@ -268,6 +271,8 @@ private slots:
     void prev_frame_clicked(void);
     void speed_up_activate(void);
     void speed_down_activate(void);
+    void set_video_start(void);
+    void set_video_end(void);
 
     void on_interpolate_toggled(bool checked);
 };

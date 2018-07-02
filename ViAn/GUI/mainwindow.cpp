@@ -222,51 +222,57 @@ void MainWindow::init_file_menu() {
 
     // Init actions
     QAction* new_project_act = new QAction(tr("&New project"), this);
-    QAction* add_vid_act = new QAction(tr("&Add video..."), this);
     QAction* open_project_act = new QAction(tr("&Open project..."), this);
     QAction* recent_project_act = new QAction(tr("&Recent project..."), this);
+    QAction* open_proj_folder_act = new QAction(tr("Open &project folder..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
+    QAction* add_vid_act = new QAction(tr("&Import video..."), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
     // Set icons
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
-    add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
     recent_project_act->setIcon(QIcon("../ViAn/Icons/recent.png"));
+    open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/computer.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
+    add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
 
     // Add actions to the menu
     file_menu->addAction(new_project_act);
-    file_menu->addAction(add_vid_act);
     file_menu->addAction(open_project_act);
     file_menu->addAction(recent_project_act);
+    file_menu->addAction(open_proj_folder_act);
     file_menu->addAction(save_project_act);
+    file_menu->addAction(add_vid_act);
     file_menu->addSeparator();
     file_menu->addAction(quit_act);
 
     // Set shortcuts
-    new_project_act->setShortcuts(QKeySequence::New);       //Ctrl + N
-    add_vid_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
-    open_project_act->setShortcuts(QKeySequence::Open);     //Ctrl + O
-    //recent_project_act.setShortcut(QKeySequence(tr("Ctrl+"))); // TODO Add a good shortcut
-    save_project_act->setShortcuts(QKeySequence::Save);     //Ctrl + S
-    quit_act->setShortcut(QKeySequence(tr("Ctrl+E")));      //Ctrl + E
+    new_project_act->setShortcut(QKeySequence::New);       //Ctrl + N
+    open_project_act->setShortcut(QKeySequence::Open);     //Ctrl + O
+    recent_project_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    open_proj_folder_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
+    save_project_act->setShortcut(QKeySequence::Save);     //Ctrl + S
+    add_vid_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));     //Ctrl + I
+    quit_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     // Set status tips
     new_project_act->setStatusTip(tr("Create a new project"));
-    add_vid_act->setStatusTip(tr("Add video"));
     open_project_act->setStatusTip(tr("Load project"));
     recent_project_act->setStatusTip(tr("Open the recent project dialog"));
+    open_proj_folder_act->setStatusTip(tr("Go to the project folder"));
     save_project_act->setStatusTip(tr("Save project"));
+    add_vid_act->setStatusTip(tr("Add video"));
     quit_act->setStatusTip(tr("Quit the application"));
 
     // Connect with signals and slots
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
-    connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(recent_project_act, &QAction::triggered, this, &MainWindow::open_rp_dialog);
+    connect(open_proj_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
+    connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
 
@@ -277,7 +283,7 @@ void MainWindow::init_file_menu() {
 void MainWindow::init_edit_menu() {
     QMenu* edit_menu = menuBar()->addMenu(tr("&Edit"));
 
-    QAction* cont_bri_act = new QAction(tr("&Contrast/Brightness..."), this);
+    QAction* cont_bri_act = new QAction(tr("&Color corrections..."), this);
     QAction* cw_act = new QAction(tr("&Rotate 90°"), this);
     QAction* ccw_act = new QAction(tr("Ro&tate 90°"), this);
     QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
@@ -291,8 +297,8 @@ void MainWindow::init_edit_menu() {
     ccw_act->setIcon(QIcon("../ViAn/Icons/left.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
     zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
-    fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
-    reset_zoom_act->setIcon(QIcon("../ViAn/Icons/move.png"));
+    fit_screen_act->setIcon(QIcon("../ViAn/Icons/resize.png"));
+    reset_zoom_act->setIcon(QIcon("../ViAn/Icons/original_size.png"));
     options_act->setIcon(QIcon("../ViAn/Icons/gears.png"));
 
     edit_menu->addAction(cont_bri_act);
@@ -305,12 +311,15 @@ void MainWindow::init_edit_menu() {
     edit_menu->addSeparator();
     edit_menu->addAction(options_act);
 
+    cont_bri_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_G));
+    cw_act->setShortcut(QKeySequence(Qt::Key_R));
+    ccw_act->setShortcut(QKeySequence(Qt::Key_L));
     zoom_in_act->setShortcut(Qt::Key_Plus);
     zoom_out_act->setShortcut(Qt::Key_Minus);
     fit_screen_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
     reset_zoom_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
 
-    cont_bri_act->setStatusTip(tr("Contrast and brightness"));
+    cont_bri_act->setStatusTip(tr("Open a color correction dialog"));
     cw_act->setStatusTip(tr("Rotate clockwise"));
     ccw_act->setStatusTip(tr("Rotate counter clockwise"));
     zoom_in_act->setStatusTip(tr("Zoom in"));
@@ -349,7 +358,7 @@ void MainWindow::init_view_menu() {
     toggle_drawing_wgt->setStatusTip(tr("Show/hide drawing widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
-    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis settings widget"));
+    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
 }
 
 /**
@@ -361,7 +370,7 @@ void MainWindow::init_analysis_menu() {
 
     QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
     QAction* advanced_analysis_act = new QAction(tr("&Full analysis..."), this);
-    QAction* settings_act = new QAction(tr("&Settings..."), this);
+    QAction* settings_act = new QAction(tr("Analysis &settings..."), this);
     ana_details_act = new QAction(tr("Analysis &details"), this);
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
@@ -384,6 +393,9 @@ void MainWindow::init_analysis_menu() {
     ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
     detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
     bound_box_act->setStatusTip(tr("Toggle boxes on video on/off"));
+
+    //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
+    advanced_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);
@@ -410,7 +422,7 @@ void MainWindow::init_interval_menu() {
 
     QAction* new_label_act = new QAction(tr("New tag &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
-    QAction* remove_tag_act = new QAction(tr("&Remove tag"));
+    QAction* remove_tag_act = new QAction(tr("&Delete tag"));
 //    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
 //    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
 //    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
@@ -425,7 +437,7 @@ void MainWindow::init_interval_menu() {
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
-    remove_tag_act->setShortcut(Qt::Key_R);
+    remove_tag_act->setShortcut(Qt::Key_U);
 //    tag_interval_act->setShortcut(tr("Shift+T"));
 //    rm_tag_interval_act->setShortcut(tr("Shift+R"));
 //    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
@@ -506,6 +518,14 @@ void MainWindow::init_drawings_menu() {
     delete_drawing_act->setStatusTip(tr("Delete the current drawing"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
+    rectangle_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
+    circle_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
+    arrow_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
+    line_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
+    pen_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    text_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    color_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+
     //Connect
     connect(rectangle_act, &QAction::triggered, draw_toolbar->rectangle_tool_act, &QAction::trigger);
     connect(circle_act, &QAction::triggered, draw_toolbar->circle_tool_act, &QAction::trigger);
@@ -513,7 +533,7 @@ void MainWindow::init_drawings_menu() {
     connect(arrow_act, &QAction::triggered, draw_toolbar->arrow_tool_act, &QAction::trigger);
     connect(pen_act, &QAction::triggered, draw_toolbar->pen_tool_act, &QAction::trigger);
     connect(text_act, &QAction::triggered, draw_toolbar->text_tool_act, &QAction::trigger);
-    connect(delete_drawing_act, &QAction::triggered, draw_toolbar->delete_tool_act, &QAction::trigger);
+    connect(delete_drawing_act, &QAction::triggered, this, &MainWindow::delete_current_drawing);
     connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
 }
 
@@ -549,7 +569,7 @@ void MainWindow::init_help_menu() {
     QAction* help_act = new QAction(tr("Open manual"), this);
     help_act->setIcon(QIcon("../ViAn/Icons/question.png"));
     help_menu->addAction(help_act);
-    help_act->setShortcut(tr("Ctrl+h"));
+    help_act->setShortcut(QKeySequence(Qt::Key_F1));
     help_act->setStatusTip(tr("Help"));
 
     //connect

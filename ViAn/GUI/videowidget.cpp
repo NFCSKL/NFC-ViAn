@@ -211,8 +211,8 @@ void VideoWidget::set_btn_icons() {
  * Set tooltip on all buttons
  */
 void VideoWidget::set_btn_tool_tip() {
-    play_btn->setToolTip(tr("Play video: Space"));
-    stop_btn->setToolTip(tr("Stop video: X"));
+    play_btn->setToolTip(tr("Play: Space"));
+    stop_btn->setToolTip(tr("Stop: X"));
     next_frame_btn->setToolTip(tr("Next frame: Right"));
     prev_frame_btn->setToolTip(tr("Previous frame: Left"));
 
@@ -220,13 +220,13 @@ void VideoWidget::set_btn_tool_tip() {
     prev_poi_btn->setToolTip(tr("Previous POI: Ctrl + Left"));
     analysis_play_btn->setToolTip(tr("Play only the POIs"));
 
-    bookmark_btn->setToolTip(tr("Bookmark the current frame: Ctrl + B"));
+    bookmark_btn->setToolTip(tr("Bookmark current frame: Ctrl + B"));
     export_frame_btn->setToolTip("Export current frame: E");
     tag_btn->setToolTip(tr("Tag the current frame: T"));
     new_label_btn->setToolTip(tr("Create a new tag label: Ctrl + T"));
 
-    fit_btn->setToolTip(tr("Scale the video to screen: Ctrl + F"));
-    original_size_btn->setToolTip(tr("Reset zoom: Ctrl + R"));
+    fit_btn->setToolTip(tr("Scale video to screen: Ctrl + F"));
+    original_size_btn->setToolTip(tr("Reset zoom: Ctrl + H"));
     interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation");
 
     set_start_interval_btn->setToolTip("Set left interval point: Shift + Left");
@@ -302,10 +302,14 @@ void VideoWidget::set_btn_shortcuts() {
 
     bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);
+    video_start_sc = new QShortcut(QKeySequence(Qt::Key_Home), this);
+    video_end_sc = new QShortcut(QKeySequence(Qt::Key_End), this);
 
     //connect
     connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
     connect(interpol_sc, &QShortcut::activated, interpolate_check, &QCheckBox::toggle);
+    connect(video_start_sc, &QShortcut::activated, this, &VideoWidget::set_video_start);
+    connect(video_end_sc, &QShortcut::activated, this, &VideoWidget::set_video_end);
 }
 
 /**
@@ -424,9 +428,13 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
-    frame_line_edit = new QLineEdit("0");
+    frame_line_edit = new QLineEdit("0", this);
 
     frame_line_edit->setFixedWidth(50);
+
+    frame_edit_act = new QShortcut(QKeySequence(Qt::Key_F), this);
+    connect(frame_edit_act, &QShortcut::activated, frame_line_edit, &QLineEdit::selectAll);
+    connect(frame_edit_act, &QShortcut::activated, frame_line_edit, &QLineEdit::grabKeyboard);
 
     playback_slider = new AnalysisSlider(Qt::Horizontal);
 
@@ -1307,4 +1315,14 @@ void VideoWidget::speed_up_activate() {
 void VideoWidget::speed_down_activate() {
     if (speed_slider->value() == speed_slider->minimum()) return;
     speed_slider->setValue(speed_slider->value() -1);
+}
+
+void VideoWidget::set_video_start() {
+    frame_index.store(playback_slider->minimum());
+    on_new_frame();
+}
+
+void VideoWidget::set_video_end() {
+    frame_index.store(playback_slider->maximum());
+    on_new_frame();
 }

@@ -14,23 +14,26 @@ DrawingToolbar::DrawingToolbar() {
  * Creates all toolbar actions
  */
 void DrawingToolbar::create_actions() {
-    zoom_in_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_in.png"), tr("Zoom in tool"), this);
-    zoom_out_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_out.png"), tr("Zoom out tool"), this);
+    zoom_in_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_in.png"), tr("Zoom in"), this);
+    zoom_out_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_out.png"), tr("Zoom out"), this);
     analysis_tool_act = new QAction(QIcon("../ViAn/Icons/analys.png"), tr("ROI analysis"), this);
-    zoom_tool_act = new QAction(QIcon("../ViAn/Icons/cursor.png"), tr("Panning tool"), this);
+    zoom_tool_act = new QAction(QIcon("../ViAn/Icons/cursor.png"), tr("Pan/zoom tool"), this);
     edit_tool_act = new QAction(QIcon("../ViAn/Icons/edit.png"), tr("Edit tool"), this);
-    rectangle_tool_act = new QAction(QIcon("../ViAn/Icons/box.png"), tr("Rectangle tool"), this);
-    circle_tool_act = new QAction(QIcon("../ViAn/Icons/circle.png"), tr("Circle tool"), this);
-    arrow_tool_act = new QAction(QIcon("../ViAn/Icons/arrow.png"), tr("Arrow tool"), this);
-    line_tool_act = new QAction(QIcon("../ViAn/Icons/line.png"), tr("Line tool"), this);
-    pen_tool_act = new QAction(QIcon("../ViAn/Icons/pen.png"), tr("Pen tool"), this);
-    text_tool_act = new QAction(QIcon("../ViAn/Icons/text.png"), tr("Text tool"), this);
+    rectangle_tool_act = new QAction(QIcon("../ViAn/Icons/box.png"), tr("Rectangle"), this);
+    circle_tool_act = new QAction(QIcon("../ViAn/Icons/circle.png"), tr("Circle"), this);
+    arrow_tool_act = new QAction(QIcon("../ViAn/Icons/arrow.png"), tr("Arrow"), this);
+    line_tool_act = new QAction(QIcon("../ViAn/Icons/line.png"), tr("Line"), this);
+    pen_tool_act = new QAction(QIcon("../ViAn/Icons/pen.png"), tr("Pen"), this);
+    text_tool_act = new QAction(QIcon("../ViAn/Icons/text.png"), tr("Text"), this);
     color_label = new QLabel();
     pixmap = new QPixmap(10, 20);
     pixmap->fill(color);
     color_label->setPixmap(*pixmap);
     color_tool_act = new QAction(QIcon("../ViAn/Icons/color.png"), tr("Color picker"), this);
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
+
+    zoom_tool_act->setShortcut(QKeySequence(Qt::Key_V));
+    edit_tool_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_V));
 
     tools = new QActionGroup(this);
     tools->addAction(analysis_tool_act);
