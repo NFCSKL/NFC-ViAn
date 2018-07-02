@@ -212,7 +212,7 @@ void VideoWidget::set_btn_icons() {
  */
 void VideoWidget::set_btn_tool_tip() {
     play_btn->setToolTip(tr("Play: Space"));
-    stop_btn->setToolTip(tr("Stop: X"));
+    stop_btn->setToolTip(tr("Stop: S"));
     next_frame_btn->setToolTip(tr("Next frame: Right"));
     prev_frame_btn->setToolTip(tr("Previous frame: Left"));
 
@@ -221,7 +221,7 @@ void VideoWidget::set_btn_tool_tip() {
     analysis_play_btn->setToolTip(tr("Play only the POIs"));
 
     bookmark_btn->setToolTip(tr("Bookmark current frame: Ctrl + B"));
-    export_frame_btn->setToolTip("Export current frame: E");
+    export_frame_btn->setToolTip("Export current frame: X");
     tag_btn->setToolTip(tr("Tag the current frame: T"));
     new_label_btn->setToolTip(tr("Create a new tag label: Ctrl + T"));
 
@@ -289,14 +289,14 @@ void VideoWidget::set_btn_tab_order() {
  */
 void VideoWidget::set_btn_shortcuts() {
     //play_btn->setShortcut(QKeySequence(Qt::Key_Space)); // TODO Fix so this works
-    stop_btn->setShortcut(Qt::Key_X);
+    stop_btn->setShortcut(QKeySequence(Qt::Key_S));
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
     bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     // Tag and zoom shortcuts are in the menus
-    export_frame_btn->setShortcut(Qt::Key_E);
+    export_frame_btn->setShortcut(QKeySequence(Qt::Key_X));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
 
@@ -304,12 +304,16 @@ void VideoWidget::set_btn_shortcuts() {
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);
     video_start_sc = new QShortcut(QKeySequence(Qt::Key_Home), this);
     video_end_sc = new QShortcut(QKeySequence(Qt::Key_End), this);
+    page_step_front_sc = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Right), this);
+    page_step_back_sc = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Left), this);
 
     //connect
     connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
     connect(interpol_sc, &QShortcut::activated, interpolate_check, &QCheckBox::toggle);
     connect(video_start_sc, &QShortcut::activated, this, &VideoWidget::set_video_start);
     connect(video_end_sc, &QShortcut::activated, this, &VideoWidget::set_video_end);
+    connect(page_step_front_sc, &QShortcut::activated, this, &VideoWidget::page_step_front);
+    connect(page_step_back_sc, &QShortcut::activated, this, &VideoWidget::page_step_back);
 }
 
 /**
@@ -433,8 +437,7 @@ void VideoWidget::init_playback_slider() {
     frame_line_edit->setFixedWidth(50);
 
     frame_edit_act = new QShortcut(QKeySequence(Qt::Key_F), this);
-    connect(frame_edit_act, &QShortcut::activated, frame_line_edit, &QLineEdit::selectAll);
-    connect(frame_edit_act, &QShortcut::activated, frame_line_edit, &QLineEdit::grabKeyboard);
+    connect(frame_edit_act, &QShortcut::activated, this, &VideoWidget::frame_label_focus);
 
     playback_slider = new AnalysisSlider(Qt::Horizontal);
 
@@ -1297,6 +1300,7 @@ void VideoWidget::frame_line_edit_finished() {
         frame_index.store(converted);
         on_new_frame();
     }
+    frame_line_edit->clearFocus();
 }
 
 int VideoWidget::get_brightness() {
@@ -1318,11 +1322,40 @@ void VideoWidget::speed_down_activate() {
 }
 
 void VideoWidget::set_video_start() {
+    if (!video_btns_enabled) return;
     frame_index.store(playback_slider->minimum());
     on_new_frame();
 }
 
 void VideoWidget::set_video_end() {
+    if (!video_btns_enabled) return;
     frame_index.store(playback_slider->maximum());
     on_new_frame();
+}
+
+void VideoWidget::page_step_front() {
+    if (!video_btns_enabled) return;
+    int value = playback_slider->value();
+    if (value + playback_slider->PAGE_STEP > playback_slider->maximum()) {
+        frame_index.store(playback_slider->maximum());
+    } else {
+        frame_index.store(value + playback_slider->PAGE_STEP);
+    }
+    on_new_frame();
+}
+
+void VideoWidget::page_step_back() {
+    if (!video_btns_enabled) return;
+    int value = playback_slider->value();
+    if (value - playback_slider->PAGE_STEP < playback_slider->minimum()) {
+        frame_index.store(playback_slider->minimum());
+    } else {
+        frame_index.store(value - playback_slider->PAGE_STEP);
+    }
+    on_new_frame();
+}
+
+void VideoWidget::frame_label_focus() {
+    frame_line_edit->setFocus();
+    frame_line_edit->selectAll();
 }

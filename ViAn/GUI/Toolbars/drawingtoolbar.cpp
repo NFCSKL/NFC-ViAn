@@ -18,7 +18,7 @@ void DrawingToolbar::create_actions() {
     zoom_out_tool_act = new QAction(QIcon("../ViAn/Icons/zoom_out.png"), tr("Zoom out"), this);
     analysis_tool_act = new QAction(QIcon("../ViAn/Icons/analys.png"), tr("ROI analysis"), this);
     zoom_tool_act = new QAction(QIcon("../ViAn/Icons/cursor.png"), tr("Pan/zoom tool"), this);
-    edit_tool_act = new QAction(QIcon("../ViAn/Icons/edit.png"), tr("Edit tool"), this);
+    edit_tool_act = new QAction(QIcon("../ViAn/Icons/cross.png"), tr("Edit tool"), this);
     rectangle_tool_act = new QAction(QIcon("../ViAn/Icons/box.png"), tr("Rectangle"), this);
     circle_tool_act = new QAction(QIcon("../ViAn/Icons/circle.png"), tr("Circle"), this);
     arrow_tool_act = new QAction(QIcon("../ViAn/Icons/arrow.png"), tr("Arrow"), this);
@@ -33,7 +33,7 @@ void DrawingToolbar::create_actions() {
     delete_tool_act = new QAction(QIcon("../ViAn/Icons/clear.png"), tr("Delete current drawing"), this);
 
     zoom_tool_act->setShortcut(QKeySequence(Qt::Key_V));
-    edit_tool_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_V));
+    edit_tool_act->setShortcut(QKeySequence(Qt::Key_E));
 
     tools = new QActionGroup(this);
     tools->addAction(analysis_tool_act);

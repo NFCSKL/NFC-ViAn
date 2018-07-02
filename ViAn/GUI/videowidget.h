@@ -224,6 +224,8 @@ private:
     QShortcut* frame_edit_act;
     QShortcut* video_start_sc;
     QShortcut* video_end_sc;
+    QShortcut* page_step_front_sc;
+    QShortcut* page_step_back_sc;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
@@ -273,6 +275,9 @@ private slots:
     void speed_down_activate(void);
     void set_video_start(void);
     void set_video_end(void);
+    void page_step_front(void);
+    void page_step_back(void);
+    void frame_label_focus(void);
 
     void on_interpolate_toggled(bool checked);
 };
