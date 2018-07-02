@@ -601,8 +601,6 @@ void MainWindow::init_rp_dialog() {
 
     // Create a new project if user presses "new project" or if dialog is rejected
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
-    //connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt, &ProjectWidget::new_project);
-
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
