@@ -1295,9 +1295,9 @@ void VideoWidget::zoom_label_finished() {
         emit set_status_bar("Error! Input is not a number!");
     } else if (converted < 0) {
         emit set_status_bar("Error! Input is negative!");
-    } else if (converted < ZOOM_LABEL_MIN / PERCENT_INT_CONVERT) {
+    } else if (converted < (double)ZOOM_LABEL_MIN / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too small");
-    } else if (converted > ZOOM_LABEL_MAX / PERCENT_INT_CONVERT) {
+    } else if (converted > (double)ZOOM_LABEL_MAX / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too large");
     } else {
         set_zoom_factor(converted);
