@@ -36,6 +36,7 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
 void VideoItem::set_thumbnail() {
     std::string path = m_vid_proj->get_video()->file_path;
     cv::VideoCapture cap(path);
+    if (!cap.isOpened()) return;
     cv::Mat frame;
     cap >> frame;
     ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());
