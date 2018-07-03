@@ -25,11 +25,11 @@
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
-    QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
-    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
-    QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
-    queue_dock = new QDockWidget(tr("Analysis queue"), this);
-    ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
+    QDockWidget* project_dock = new QDockWidget(tr("&Projects"), this);
+    QDockWidget* bookmark_dock = new QDockWidget(tr("&Bookmarks"), this);
+    QDockWidget* drawing_dock = new QDockWidget(tr("&Drawings"), this);
+    queue_dock = new QDockWidget(tr("&Analysis queue"), this);
+    ana_settings_dock = new QDockWidget(tr("&Analysis settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -106,13 +106,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Main toolbar
     main_toolbar = new MainToolbar();
-    main_toolbar->setWindowTitle(tr("Main toolbar"));
+    main_toolbar->setWindowTitle(tr("&Main toolbar"));
     toggle_main_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
 
     // Draw toolbar
     draw_toolbar = new DrawingToolbar();
-    draw_toolbar->setWindowTitle(tr("Draw toolbar"));
+    draw_toolbar->setWindowTitle(tr("&Draw toolbar"));
     toggle_drawing_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
 
@@ -224,7 +224,7 @@ void MainWindow::init_file_menu() {
     QAction* new_project_act = new QAction(tr("&New project"), this);
     QAction* open_project_act = new QAction(tr("&Open project..."), this);
     QAction* recent_project_act = new QAction(tr("&Recent project..."), this);
-    QAction* open_proj_folder_act = new QAction(tr("Open &project folder..."), this);
+    QAction* open_proj_folder_act = new QAction(tr("&Open project folder..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* add_vid_act = new QAction(tr("&Import video..."), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
@@ -285,11 +285,11 @@ void MainWindow::init_edit_menu() {
 
     QAction* cont_bri_act = new QAction(tr("&Color corrections..."), this);
     QAction* cw_act = new QAction(tr("&Rotate 90°"), this);
-    QAction* ccw_act = new QAction(tr("Ro&tate 90°"), this);
+    QAction* ccw_act = new QAction(tr("&Rotate 90°"), this);
     QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
-    QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
+    QAction* zoom_out_act = new QAction(tr("&Zoom out"), this);
     QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
-    QAction* reset_zoom_act = new QAction(tr("Re&set zoom"), this);
+    QAction* reset_zoom_act = new QAction(tr("&Reset zoom"), this);
     QAction* options_act = new QAction(tr("&Options..."), this);
 
     cont_bri_act->setIcon(QIcon("../ViAn/Icons/screen.png"));
@@ -371,7 +371,7 @@ void MainWindow::init_analysis_menu() {
     QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
     QAction* advanced_analysis_act = new QAction(tr("&Full analysis..."), this);
     QAction* settings_act = new QAction(tr("Analysis &settings..."), this);
-    ana_details_act = new QAction(tr("Analysis &details"), this);
+    ana_details_act = new QAction(tr("&Analysis details"), this);
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
 
@@ -475,8 +475,8 @@ void MainWindow::init_drawings_menu() {
 
     color_act = new QAction(tr("&Color..."), this);
     QAction* rectangle_act = new QAction(tr("&Rectangle"), this);
-    QAction* circle_act = new QAction(tr("C&ircle"), this);
-    QAction* line_act = new QAction(tr("Li&ne"), this);
+    QAction* circle_act = new QAction(tr("&Circle"), this);
+    QAction* line_act = new QAction(tr("&Line"), this);
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
@@ -540,7 +540,7 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("&Export interval..."), this);
+    QAction* export_act = new QAction(tr("E&xport interval..."), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
     export_act->setIcon(QIcon("../ViAn/Icons/folder_interval.png"));
@@ -550,7 +550,7 @@ void MainWindow::init_export_menu() {
     export_menu->addSeparator();
     export_menu->addAction(gen_report_act);
 
-    export_act->setShortcut(tr("Shift+E"));
+    export_act->setShortcut(tr("Shift+X"));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
@@ -566,7 +566,7 @@ void MainWindow::init_export_menu() {
  */
 void MainWindow::init_help_menu() {
     QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
-    QAction* help_act = new QAction(tr("Open manual"), this);
+    QAction* help_act = new QAction(tr("&Open manual"), this);
     help_act->setIcon(QIcon("../ViAn/Icons/question.png"));
     help_menu->addAction(help_act);
     help_act->setShortcut(QKeySequence(Qt::Key_F1));
