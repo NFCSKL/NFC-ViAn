@@ -180,6 +180,9 @@ public slots:
     void update_playback_speed(int speed);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
+    const int PERCENT_INT_CONVERT = 100;
+    const int ZOOM_LABEL_MIN = 1;
+    const int ZOOM_LABEL_MAX = 10000;
 
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
