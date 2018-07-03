@@ -8,6 +8,7 @@
 #include <QShortcut>
 #include <QScrollBar>
 #include <QProgressDialog>
+#include <algorithm>
 
 #include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
@@ -196,9 +197,12 @@ void VideoWidget::set_btn_icons() {
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/original_size.png"), "", this);
 
 
-    zoom_label = new QLabel;
+    zoom_label = new QLineEdit(this);
     zoom_label->setText("100%");
     zoom_label->setMinimumWidth(40);
+    zoom_label->setMaximumWidth(60);
+    zoom_label->setEnabled(false);
+    connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     play_btn->setCheckable(true);
@@ -920,6 +924,7 @@ void VideoWidget::set_video_btns(bool b) {
     interpolate_check->setEnabled(b);
     playback_slider->setEnabled(b);
     frame_line_edit->setEnabled(b);
+    zoom_label->setEnabled(b);
     speed_slider->setEnabled(b);
     tag_btn->setEnabled(b);
     video_btns_enabled = b;
@@ -1157,6 +1162,10 @@ void VideoWidget::on_step_zoom(double step){
     update_processing_settings([&](){z_settings.zoom_factor *= step;});
 }
 
+void VideoWidget::set_zoom_factor(double scale_factor) {
+    update_processing_settings([&](){z_settings.zoom_factor = scale_factor;});
+}
+
 /**
  * @brief VideoWidget::set_state
  * Tells the frame processor to set the state of the video.
@@ -1249,7 +1258,7 @@ void VideoWidget::on_export_frame() {
 
 /**
  * @brief VideoWidget::frame_line_edit_finished
- * Slot function for when the frame_line_edit is finished edited och enter is pressed
+ * Slot function for when the frame_line_edit is finished edited and enter is pressed
  * Checks if input is a legal frame and then set that as current frame.
  */
 void VideoWidget::frame_line_edit_finished() {
@@ -1267,6 +1276,32 @@ void VideoWidget::frame_line_edit_finished() {
         frame_index.store(converted);
         on_new_frame();
     }
+}
+
+/**
+ * @brief VideoWidget::zoom_label_finished
+ * Slot function for when the zoom_label is finished edited and enter is pressed
+ * Checks if input is a legal scale factor and the sends it to the processor.
+ */
+void VideoWidget::zoom_label_finished() {
+    std::string text = zoom_label->text().toStdString();
+    text.erase(std::remove(text.begin(), text.end(), '%'), text.end());
+    char* p;
+    double converted = strtod(text.c_str(), &p)/PERCENT_INT_CONVERT;
+    if (*p != 0) {
+        emit set_status_bar("Error! Input is not a number!");
+    } else if (converted < 0) {
+        emit set_status_bar("Error! Input is negative!");
+    } else if (converted < (double)ZOOM_LABEL_MIN / PERCENT_INT_CONVERT) {
+        emit set_status_bar("Error! Input is too small");
+    } else if (converted > (double)ZOOM_LABEL_MAX / PERCENT_INT_CONVERT) {
+        emit set_status_bar("Error! Input is too large");
+    } else {
+        set_zoom_factor(converted);
+        zoom_label->setText(QString::number(converted*PERCENT_INT_CONVERT) + "%");
+        return;
+    }
+    zoom_label->setText(QString::number(m_scale_factor*PERCENT_INT_CONVERT) + "%");
 }
 
 int VideoWidget::get_brightness() {
