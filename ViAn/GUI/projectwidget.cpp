@@ -1081,7 +1081,7 @@ bool ProjectWidget::save_project() {
 
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->get_name(), m_proj->get_file());
+    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
     set_status_bar("Project saved");
     return true;
 }
