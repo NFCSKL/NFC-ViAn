@@ -182,19 +182,19 @@ void VideoWidget::set_btn_icons() {
     stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
     prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
-    next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next_poi.png"), "", this);
+    next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next.png"), "", this);
     prev_poi_btn = new DoubleClickButton(this);
-    prev_poi_btn->setIcon(QIcon("../ViAn/Icons/prev_poi.png"));
+    prev_poi_btn->setIcon(QIcon("../ViAn/Icons/prev.png"));
     bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
-    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/camera.png"),"",this);
+    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/export.png"),"",this);
 
-    analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
-    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
-    tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
+    analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play+check.png"), "", this);
+    tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag_frame.png"), "", this);
+    new_label_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
 
     interpolate_check = new QCheckBox("Interpolate", this);
-    fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
-    original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+    fit_btn = new QPushButton(QIcon("../ViAn/Icons/resize.png"), "", this);
+    original_size_btn = new QPushButton(QIcon("../ViAn/Icons/original_size.png"), "", this);
 
 
     zoom_label = new QLineEdit(this);
@@ -225,8 +225,8 @@ void VideoWidget::set_btn_tool_tip() {
 
     bookmark_btn->setToolTip(tr("Bookmark the current frame: Ctrl + B"));
     export_frame_btn->setToolTip("Export current frame: E");
-    new_tag_btn->setToolTip(tr("Create a new tag: Ctrl + T"));
     tag_btn->setToolTip(tr("Tag the current frame: T"));
+    new_label_btn->setToolTip(tr("Create a new tag label: Ctrl + T"));
 
     fit_btn->setToolTip(tr("Scale the video to screen: Ctrl + F"));
     original_size_btn->setToolTip(tr("Reset zoom: Ctrl + R"));
@@ -234,7 +234,6 @@ void VideoWidget::set_btn_tool_tip() {
 
     set_start_interval_btn->setToolTip("Set left interval point: Shift + Left");
     set_end_interval_btn->setToolTip("Set right interval point: Shift + Right");
-
 }
 
 /**
@@ -247,7 +246,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(next_frame_btn);
     btns.push_back(prev_frame_btn);
     btns.push_back(bookmark_btn);
-    btns.push_back(new_tag_btn);
+    btns.push_back(new_label_btn);
     btns.push_back(fit_btn);
     btns.push_back(original_size_btn);
     btns.push_back(set_start_interval_btn);
@@ -271,17 +270,19 @@ void VideoWidget::set_btn_size() {
  * Set the tab order for the buttons
  */
 void VideoWidget::set_btn_tab_order() {
-    // TODO update
     setTabOrder(prev_frame_btn, play_btn);
     setTabOrder(play_btn, next_frame_btn);
     setTabOrder(next_frame_btn, stop_btn);
     setTabOrder(stop_btn, prev_poi_btn);
-    setTabOrder(next_poi_btn, bookmark_btn);
+    setTabOrder(next_poi_btn, analysis_play_btn);
+    setTabOrder(analysis_play_btn, bookmark_btn);
     setTabOrder(bookmark_btn, export_frame_btn);
-    setTabOrder(export_frame_btn, new_tag_btn);
-    setTabOrder(new_tag_btn, tag_btn);
+    setTabOrder(export_frame_btn, tag_btn);
+    setTabOrder(tag_btn, new_label_btn);
+    setTabOrder(new_label_btn, fit_btn);
     setTabOrder(fit_btn, original_size_btn);
-    setTabOrder(original_size_btn, set_start_interval_btn);
+    setTabOrder(original_size_btn, interpolate_check);
+    setTabOrder(interpolate_check, set_start_interval_btn);
     setTabOrder(set_start_interval_btn, set_end_interval_btn);
 }
 
@@ -290,18 +291,15 @@ void VideoWidget::set_btn_tab_order() {
  * Set shortcuts to the buttons
  */
 void VideoWidget::set_btn_shortcuts() {
+    //play_btn->setShortcut(QKeySequence(Qt::Key_Space)); // TODO Fix so this works
     stop_btn->setShortcut(Qt::Key_X);
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
     bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    tag_btn->setShortcut(Qt::Key_T);
+    // Tag and zoom shortcuts are in the menus
     export_frame_btn->setShortcut(Qt::Key_E);
-    remove_frame_act = new QShortcut(Qt::Key_R, this);
-    new_tag_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-    fit_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-    original_size_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right));
 }
@@ -355,15 +353,15 @@ void VideoWidget::add_btns_to_layouts() {
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(export_frame_btn);
-    other_btns->addWidget(new_tag_btn);
     other_btns->addWidget(tag_btn);
+    other_btns->addWidget(new_label_btn);
 
     control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(original_size_btn);
-    zoom_btns->addWidget(interpolate_check);
     zoom_btns->addWidget(zoom_label);
+    zoom_btns->addWidget(interpolate_check);
 
     control_row->addLayout(zoom_btns);
 
@@ -394,8 +392,7 @@ void VideoWidget::connect_btns() {
 
     // Tag
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
-    connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
-    connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
+    connect(new_label_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
 
     // Zoom
     connect(frame_wgt, &FrameWidget::trigger_zoom_out, this, &VideoWidget::on_step_zoom);

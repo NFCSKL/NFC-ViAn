@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QProgressDialog>
 #include <QTemporaryDir>
+#include <QDesktopServices>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shapes.h"
@@ -49,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     project_wgt = new ProjectWidget();
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
+    project_wgt->new_project();
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
@@ -103,15 +105,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::show_analysis_settings, this, &MainWindow::show_ana_settings_dock);
 
     // Main toolbar
-    MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
+    toggle_main_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
 
     // Draw toolbar
     draw_toolbar = new DrawingToolbar();
     draw_toolbar->setWindowTitle(tr("Draw toolbar"));
-    QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
+    toggle_drawing_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
+
+    // Recent projects menu
+    init_rp_dialog();
 
     //Initialize menu bar
     init_file_menu();
@@ -119,15 +125,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_view_menu();
     init_analysis_menu();
     init_interval_menu();
-    init_tools_menu();
+    init_drawings_menu();
+    init_export_menu();
     init_help_menu();
 
     // Toolbar connects
-    connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
+    connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    connect(main_toolbar->open_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
     //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
-    connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar, SIGNAL(send_text(QString, float)), video_wgt, SLOT(set_tool_text(QString,float)));
@@ -190,16 +197,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
-    // Recent projects menu
-    rp_dialog = new RecentProjectDialog(this);
-    rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-    // Create a new project if user presses "new project" or if dialog is rejected
-    connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
-    connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt,&ProjectWidget::new_project);
-
-    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
-    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
+    // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
@@ -213,8 +211,6 @@ MainWindow::~MainWindow() {
     delete analysis_wgt;
     delete bookmark_wgt;
     delete status_bar;
-    delete draw_toolbar;
-    delete main_toolbar;
 }
 
 /**
@@ -226,34 +222,26 @@ void MainWindow::init_file_menu() {
 
     // Init actions
     QAction* new_project_act = new QAction(tr("&New project"), this);
-    QAction* add_vid_act = new QAction(tr("&Add video"), this);
-    QAction* open_project_act = new QAction(tr("&Open project"), this);
+    QAction* add_vid_act = new QAction(tr("&Add video..."), this);
+    QAction* open_project_act = new QAction(tr("&Open project..."), this);
+    QAction* recent_project_act = new QAction(tr("&Recent projects..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
-    QAction* gen_report_act = new QAction(tr("&Generate report"), this);
-    QAction* close_project_act = new QAction(tr("&Close project"), this);
-    QAction* remove_project_act = new QAction(tr("&Remove project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
-
 
     // Set icons
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
+    recent_project_act->setIcon(QIcon("../ViAn/Icons/recent.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
-    //gen_report_act->setIcon(QIcon("../ViAn/Icons/....png"));      //add if wanted
-    //close_project_act->setIcon(QIcon("../ViAn/Icons/....png"));   //add if wanted
-    remove_project_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
     quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
 
     // Add actions to the menu
     file_menu->addAction(new_project_act);
     file_menu->addAction(add_vid_act);
     file_menu->addAction(open_project_act);
+    file_menu->addAction(recent_project_act);
     file_menu->addAction(save_project_act);
-    file_menu->addAction(close_project_act);
-    file_menu->addAction(remove_project_act);
-    file_menu->addSeparator();
-    file_menu->addAction(gen_report_act);
     file_menu->addSeparator();
     file_menu->addAction(quit_act);
 
@@ -261,30 +249,24 @@ void MainWindow::init_file_menu() {
     new_project_act->setShortcuts(QKeySequence::New);       //Ctrl + N
     add_vid_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
     open_project_act->setShortcuts(QKeySequence::Open);     //Ctrl + O
+    //recent_project_act.setShortcut(QKeySequence(tr("Ctrl+"))); // TODO Add a good shortcut
     save_project_act->setShortcuts(QKeySequence::Save);     //Ctrl + S
-    close_project_act->setShortcuts(QKeySequence::Close);   //Ctrl + F4
-    //remove_project_act->setShortcuts(QKeySequence::Delete); //Del
-    gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
     quit_act->setShortcut(QKeySequence(tr("Ctrl+E")));      //Ctrl + E
 
-    // Set shortcuts
+    // Set status tips
     new_project_act->setStatusTip(tr("Create a new project"));
     add_vid_act->setStatusTip(tr("Add video"));
     open_project_act->setStatusTip(tr("Load project"));
+    recent_project_act->setStatusTip(tr("Open the recent project dialog"));
     save_project_act->setStatusTip(tr("Save project"));
-    close_project_act->setStatusTip(tr("Close project"));
-    remove_project_act->setStatusTip(tr("Remove project"));
-    gen_report_act->setStatusTip(tr("Generate report"));
     quit_act->setStatusTip(tr("Quit the application"));
 
-    // Connet with signals and slots
+    // Connect with signals and slots
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
+    connect(recent_project_act, &QAction::triggered, this, &MainWindow::open_rp_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
-    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
-    connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
-    connect(remove_project_act, &QAction::triggered, project_wgt, &ProjectWidget::remove_project);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
 
@@ -295,31 +277,56 @@ void MainWindow::init_file_menu() {
 void MainWindow::init_edit_menu() {
     QMenu* edit_menu = menuBar()->addMenu(tr("&Edit"));
 
-    QAction* cont_bri_act = new QAction(tr("&Contrast/Brightness"), this);
+    QAction* cont_bri_act = new QAction(tr("&Contrast/Brightness..."), this);
     QAction* cw_act = new QAction(tr("&Rotate 90°"), this);
     QAction* ccw_act = new QAction(tr("Ro&tate 90°"), this);
-    QAction* options_act = new QAction(tr("&Options"), this);
+    QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
+    QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
+    QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
+    QAction* reset_zoom_act = new QAction(tr("Re&set zoom"), this);
+    QAction* options_act = new QAction(tr("&Options..."), this);
 
     cont_bri_act->setIcon(QIcon("../ViAn/Icons/screen.png"));
     cw_act->setIcon(QIcon("../ViAn/Icons/right.png"));
     ccw_act->setIcon(QIcon("../ViAn/Icons/left.png"));
+    zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
+    zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
+    fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
+    reset_zoom_act->setIcon(QIcon("../ViAn/Icons/move.png"));
     options_act->setIcon(QIcon("../ViAn/Icons/gears.png"));
 
     edit_menu->addAction(cont_bri_act);
     edit_menu->addAction(cw_act);
     edit_menu->addAction(ccw_act);
+    edit_menu->addAction(zoom_in_act);
+    edit_menu->addAction(zoom_out_act);
+    edit_menu->addAction(fit_screen_act);
+    edit_menu->addAction(reset_zoom_act);
     edit_menu->addSeparator();
     edit_menu->addAction(options_act);
+
+    zoom_in_act->setShortcut(Qt::Key_Plus);
+    zoom_out_act->setShortcut(Qt::Key_Minus);
+    fit_screen_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+    reset_zoom_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
     cont_bri_act->setStatusTip(tr("Contrast and brightness"));
     cw_act->setStatusTip(tr("Rotate clockwise"));
     ccw_act->setStatusTip(tr("Rotate counter clockwise"));
+    zoom_in_act->setStatusTip(tr("Zoom in"));
+    zoom_out_act->setStatusTip(tr("Zoom out"));
+    fit_screen_act->setStatusTip(tr("Fit to screen"));
+    reset_zoom_act->setStatusTip(tr("Reset zoom"));
     options_act->setStatusTip(tr("Program options"));
 
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
     connect(options_act, &QAction::triggered, this, &MainWindow::options);
     connect(cw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_cw);
     connect(ccw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_ccw);
+    connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);
+    connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
+    connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
+    connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
 }
 
 /**
@@ -327,47 +334,22 @@ void MainWindow::init_edit_menu() {
  * Set up the view menu
  */
 void MainWindow::init_view_menu() {
-    QMenu* view_menu = menuBar()->addMenu(tr("&View"));
-
-    detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
-    bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
-    interval_act = new QAction(tr("&Interval"), this);
-    drawing_act = new QAction(tr("&Paintings"), this);
-
-    detect_intv_act->setCheckable(true);
-    bound_box_act->setCheckable(true);
-    interval_act->setCheckable(true);
-    drawing_act->setCheckable(true);
-
-    detect_intv_act->setChecked(true);
-    bound_box_act->setChecked(true);
-    interval_act->setChecked(true);
-    drawing_act->setChecked(true);
+    QMenu* view_menu = menuBar()->addMenu(tr("&Windows"));
 
     view_menu->addAction(toggle_project_wgt);
+    view_menu->addAction(toggle_drawing_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addAction(toggle_queue_wgt);
+    view_menu->addAction(toggle_ana_settings_wgt);
     view_menu->addSeparator();
-    view_menu->addAction(detect_intv_act);
-    view_menu->addAction(bound_box_act);
-    view_menu->addAction(interval_act);
-    view_menu->addAction(drawing_act);
+    view_menu->addAction(toggle_main_toolbar);
+    view_menu->addAction(toggle_drawing_toolbar);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
+    toggle_drawing_wgt->setStatusTip(tr("Show/hide drawing widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
-    detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
-    bound_box_act->setStatusTip(tr("Toggle detections on/off"));
-    interval_act->setStatusTip(tr("Toggle interval on/off"));
-    drawing_act->setStatusTip(tr("Toggle drawings on/off"));
-
-    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
-    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
-    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
-    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
-    connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
-    connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
-    connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
+    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis settings widget"));
 }
 
 /**
@@ -377,147 +359,185 @@ void MainWindow::init_view_menu() {
 void MainWindow::init_analysis_menu() {
     QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
 
-    QAction* advanced_analysis_act = new QAction(tr("&Full analysis"), this);
     QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
-    QAction* settings_act = new QAction(tr("&Settings"), this);
+    QAction* advanced_analysis_act = new QAction(tr("&Full analysis..."), this);
+    QAction* settings_act = new QAction(tr("&Settings..."), this);
+    ana_details_act = new QAction(tr("Analysis &details"), this);
+    detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
+    bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
 
-    ana_details_act = new QAction(tr("Analysis &Details"), this);
     ana_details_act->setCheckable(true);
-    ana_details_act->setChecked(false);
+    detect_intv_act->setCheckable(true);
+    bound_box_act->setCheckable(true);
 
-    advanced_analysis_act->setIcon(QIcon("../ViAn/Icons/advanced_analysis.png"));
-    quick_analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
+    ana_details_act->setChecked(false);
+    detect_intv_act->setChecked(true);
+    bound_box_act->setChecked(true);
+
+    advanced_analysis_act->setIcon(QIcon("../ViAn/Icons/advanced_analys.png"));
+    quick_analysis_act->setIcon(QIcon("../ViAn/Icons/analys.png"));
     settings_act->setIcon(QIcon("../ViAn/Icons/cog.png"));
 
-    advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
     quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
+    advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
     settings_act->setStatusTip(tr("Change the settings for analyses."));
-    toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis settings widget"));
     ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
+    detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
+    bound_box_act->setStatusTip(tr("Toggle boxes on video on/off"));
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);
     analysis_menu->addAction(settings_act);
     analysis_menu->addSeparator();
-    analysis_menu->addAction(toggle_ana_settings_wgt);
     analysis_menu->addAction(ana_details_act);
+    analysis_menu->addAction(detect_intv_act);
+    analysis_menu->addAction(bound_box_act);
 
     connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
     connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
+    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
+    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
+    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
+    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 void MainWindow::init_interval_menu() {
-    QMenu* interval_menu = menuBar()->addMenu(tr("&Interval"));
+    QMenu* interval_menu = menuBar()->addMenu(tr("&Tag/Interval"));
 
-    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
-    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
-    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
+    // Interval code is outcommented since intervals currently is not available
+    // Add the code back when intervals are re-added.
 
-    tag_interval_act->setShortcut(tr("Shift+T"));
-    rm_tag_interval_act->setShortcut(tr("Shift+R"));
-    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
+    QAction* new_label_act = new QAction(tr("New tag &label..."));
+    QAction* new_tag_act = new QAction(tr("New &tag"));
+    QAction* remove_tag_act = new QAction(tr("&Remove tag"));
+//    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
+//    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
+//    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
+    interval_act = new QAction(tr("&Interval"), this);
 
-    interval_menu->addAction(tag_interval_act);
-    interval_menu->addAction(rm_tag_interval_act);
-    interval_menu->addAction(rm_interval_act);
+    interval_act->setCheckable(true);
+    interval_act->setChecked(true);
 
-    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
-    connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
-    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
+    new_label_act->setIcon(QIcon("../ViAn/Icons/tag.png"));
+    new_tag_act->setIcon(QIcon("../ViAn/Icons/tag_frame.png"));
+    remove_tag_act->setIcon(QIcon("../ViAn/Icons/remove_frame.png"));
+
+    new_label_act->setShortcut(tr("Ctrl+T"));
+    new_tag_act->setShortcut(Qt::Key_T);
+    remove_tag_act->setShortcut(Qt::Key_R);
+//    tag_interval_act->setShortcut(tr("Shift+T"));
+//    rm_tag_interval_act->setShortcut(tr("Shift+R"));
+//    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
+
+    new_label_act->setStatusTip(tr("Create new tag label"));
+    new_tag_act->setStatusTip(tr("Tag the current frame"));
+    remove_tag_act->setStatusTip(tr("Untag the current frame"));
+    interval_act->setStatusTip(tr("Toggle interval on/off"));
+
+    interval_menu->addAction(new_label_act);
+    interval_menu->addAction(new_tag_act);
+    interval_menu->addAction(remove_tag_act);
+    interval_menu->addSeparator();
+//    interval_menu->addAction(tag_interval_act);
+//    interval_menu->addAction(rm_tag_interval_act);
+//    interval_menu->addAction(rm_interval_act);
+    interval_menu->addAction(interval_act);
+
+    connect(new_label_act, &QAction::triggered, video_wgt, &VideoWidget::new_tag_clicked);
+    connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
+    connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
+//    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
+//    connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
+//    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
+    connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
+    connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 /**
  * @brief MainWindow::init_tools_menu
  * Set up the tools menu
  */
-void MainWindow::init_tools_menu() {
-    QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
+void MainWindow::init_drawings_menu() {
+    QMenu* tool_menu = menuBar()->addMenu(tr("&Drawings"));
 
-    QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
-    color_act = new QAction(tr("&Color"), this);
-    QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
-    QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
-    QAction* reset_zoom_act = new QAction(tr("Re&set zoom"), this);
+    color_act = new QAction(tr("&Color..."), this);
     QAction* rectangle_act = new QAction(tr("&Rectangle"), this);
     QAction* circle_act = new QAction(tr("C&ircle"), this);
     QAction* line_act = new QAction(tr("Li&ne"), this);
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
-
-    QAction* export_act = new QAction(tr("&Export interval"), this);
-    export_act->setShortcut(tr("Shift+E"));
-    QAction* clear_frame_act = new QAction(tr("C&lear"), this);
     QAction* delete_drawing_act = new QAction(tr("&Delete drawing"), this);
 
+    drawing_act = new QAction(tr("&Drawings"), this);
+    drawing_act->setCheckable(true);
+    drawing_act->setChecked(true);
+
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
-    zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
-    zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
-    fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
-    reset_zoom_act->setIcon(QIcon("../ViAn/Icons/move.png"));
     rectangle_act->setIcon(QIcon("../ViAn/Icons/box.png"));
     circle_act->setIcon(QIcon("../ViAn/Icons/circle.png"));
     line_act->setIcon(QIcon("../ViAn/Icons/line.png"));
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
-    clear_frame_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
     delete_drawing_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
-
-    // Export submenu
-    QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
-    export_menu->addAction(export_act);
-
-    tool_menu->addSeparator();
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
     drawing_tools->addAction(rectangle_act);
     drawing_tools->addAction(circle_act);
-    drawing_tools->addAction(line_act);
     drawing_tools->addAction(arrow_act);
+    drawing_tools->addAction(line_act);
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
 
     tool_menu->addAction(delete_drawing_act);
-    tool_menu->addAction(clear_frame_act);
     tool_menu->addSeparator();
-    tool_menu->addAction(zoom_in_act);
-    tool_menu->addAction(zoom_out_act);
-    tool_menu->addAction(fit_screen_act);
-    tool_menu->addAction(reset_zoom_act);
-
-    clear_frame_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Delete));
+    tool_menu->addAction(drawing_act);
 
     color_act->setStatusTip(tr("Color picker"));
-    zoom_in_act->setStatusTip(tr("Zoom in"));
-    zoom_out_act->setStatusTip(tr("Zoom out"));
-    fit_screen_act->setStatusTip(tr("Fit to screen"));
-    reset_zoom_act->setStatusTip(tr("Reset zoom"));
     rectangle_act->setStatusTip(tr("Rectangle tool"));
     circle_act->setStatusTip(tr("Circle tool"));
     line_act->setStatusTip(tr("Line tool"));
     arrow_act->setStatusTip(tr("Arrow tool"));
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
-    clear_frame_act->setStatusTip(tr("Clear all drawings on the current frame"));
     delete_drawing_act->setStatusTip(tr("Delete the current drawing"));
+    drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
     //Connect
-    connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
-    connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
-    connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
     connect(rectangle_act, &QAction::triggered, draw_toolbar->rectangle_tool_act, &QAction::trigger);
     connect(circle_act, &QAction::triggered, draw_toolbar->circle_tool_act, &QAction::trigger);
     connect(line_act, &QAction::triggered, draw_toolbar->line_tool_act, &QAction::trigger);
     connect(arrow_act, &QAction::triggered, draw_toolbar->arrow_tool_act, &QAction::trigger);
     connect(pen_act, &QAction::triggered, draw_toolbar->pen_tool_act, &QAction::trigger);
     connect(text_act, &QAction::triggered, draw_toolbar->text_tool_act, &QAction::trigger);
-    connect(clear_frame_act, &QAction::triggered, this, &MainWindow::clear_current);
     connect(delete_drawing_act, &QAction::triggered, draw_toolbar->delete_tool_act, &QAction::trigger);
-    connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);
-    connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
+    connect(drawing_act, &QAction::toggled, video_wgt, &VideoWidget::set_show_overlay);
+}
+
+void MainWindow::init_export_menu() {
+    QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
+
+    QAction* export_act = new QAction(tr("&Export interval..."), this);
+    QAction* gen_report_act = new QAction(tr("&Generate report"), this);
+
+    export_act->setIcon(QIcon("../ViAn/Icons/folder_interval.png"));
+    gen_report_act->setIcon(QIcon("../ViAn/Icons/report.png"));
+
+    export_menu->addAction(export_act);
+    export_menu->addSeparator();
+    export_menu->addAction(gen_report_act);
+
+    export_act->setShortcut(tr("Shift+E"));
+    gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
+
+    export_act->setStatusTip(tr("Export all frames in an interval"));
+    gen_report_act->setStatusTip(tr("Generate report"));
+
+    connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
 }
 
 /**
@@ -551,10 +571,6 @@ void MainWindow::clear(int frame) {
     video_wgt->set_clear_drawings(frame);
 }
 
-void MainWindow::clear_current() {
-    video_wgt->set_clear_drawings(-1);
-}
-
 void MainWindow::delete_drawing(Shapes *shape) {
     video_wgt->set_delete_drawing(shape);
 }
@@ -577,6 +593,22 @@ void MainWindow::move() {
  */
 void MainWindow::gen_report() {
     emit set_status_bar("Generating report. Please wait.");
+}
+
+void MainWindow::init_rp_dialog() {
+    rp_dialog = new RecentProjectDialog(this);
+    rp_dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    // Create a new project if user presses "new project" or if dialog is rejected
+    connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
+}
+
+void MainWindow::open_rp_dialog() {
+    init_rp_dialog();
+    rp_dialog->exec();
 }
 
 /**
@@ -644,9 +676,15 @@ void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(
                 this,
                 tr("Open project"),
-                QDir::homePath(),
+                project_wgt->get_default_path(),
                 "*.vian");
     emit open_project(project_path);
+}
+
+void MainWindow::open_project_folder() {
+    if (!project_wgt->m_proj) return;
+    std::string dir = project_wgt->m_proj->get_dir();
+    QDesktopServices::openUrl(QUrl("file:///"+QString::fromStdString(dir), QUrl::TolerantMode));
 }
 
 void MainWindow::show_analysis_dock(bool show) {
