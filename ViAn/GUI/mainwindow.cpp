@@ -224,7 +224,7 @@ void MainWindow::init_file_menu() {
     QAction* new_project_act = new QAction(tr("&New project"), this);
     QAction* add_vid_act = new QAction(tr("&Add video..."), this);
     QAction* open_project_act = new QAction(tr("&Open project..."), this);
-    QAction* recent_project_act = new QAction(tr("&Recent project..."), this);
+    QAction* recent_project_act = new QAction(tr("&Recent projects..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
