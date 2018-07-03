@@ -89,7 +89,7 @@ struct overlay_settings {
     bool set_current_drawing = false;
     bool create_text = false;
 
-    SHAPES tool = NONE;
+    SHAPES tool = ZOOM;
     QColor color = Qt::red;
     QString text = "";
     QString current_string = "Enter text";

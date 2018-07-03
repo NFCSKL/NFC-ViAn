@@ -9,7 +9,7 @@
 
 #include "opencv2/opencv.hpp"
 
-enum SHAPES {NONE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, EDIT, ZOOM, MOVE, ANALYSIS_BOX, SELECT};
+enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, EDIT, ZOOM, MOVE, ANALYSIS_BOX};
 
 class Shapes {
 
@@ -56,7 +56,7 @@ public:
     bool get_show();
 
 protected:
-    SHAPES shape = NONE;
+    SHAPES shape = ZOOM;
     cv::Scalar color;
     QColor q_color;
     int thickness = 2;
