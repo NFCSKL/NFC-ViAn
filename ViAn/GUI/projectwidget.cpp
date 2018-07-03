@@ -1052,7 +1052,7 @@ bool ProjectWidget::save_project() {
     if (m_proj->is_temporary()) {
         QString name{}, path{};
 //        std::unique_ptr<ProjectDialog> project_dialog(new ProjectDialog(&name, &path));
-        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this);
+        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, DEFAULT_PATH);
         connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
         int status = project_dialog->exec();
 
@@ -1199,4 +1199,8 @@ bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
     msg_box.setDefaultButton(QMessageBox::No);
     int reply = msg_box.exec();
     return reply == QMessageBox::Yes;
+}
+
+QString ProjectWidget::get_default_path() {
+    return DEFAULT_PATH;
 }
