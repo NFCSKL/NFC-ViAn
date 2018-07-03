@@ -10,13 +10,12 @@ class MainToolbar : public QToolBar
     void create_buttons();
 public:
     MainToolbar();
-    QAction* add_video_act;
     QAction* save_act;
     QAction* open_act;
-    QAction* toggle_draw_toolbar_act;
+    QAction* add_video_act;
+    QAction* open_folder_act;
 
 signals:
-    void add_video(void);
 };
 
 #endif // MAINTOOLBAR_H

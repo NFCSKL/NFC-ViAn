@@ -58,7 +58,6 @@ private slots:
     void export_images();
     void update_text(QString, Shapes*);
     void clear(int frame);
-    void clear_current();
     void delete_drawing(Shapes* shape);
     void delete_current_drawing();
     void zoom();
@@ -69,6 +68,7 @@ private slots:
 public slots:
     void options(void);
     void open_project_dialog();
+    void open_project_folder();
     void show_analysis_dock(bool);
     void show_ana_settings_dock(bool);
 
@@ -93,17 +93,23 @@ private:
     QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
     QAction* toggle_ana_settings_wgt;
+    QAction* toggle_main_toolbar;
+    QAction* toggle_drawing_toolbar;
 
     AnalysisWindow *analysis_window;
 
     std::vector<VideoWidget*> video_widgets;
+
+    void init_rp_dialog();
+    void open_rp_dialog();
 
     void init_file_menu();
     void init_edit_menu();
     void init_view_menu();
     void init_analysis_menu();
     void init_interval_menu();
-    void init_tools_menu();
+    void init_drawings_menu();
+    void init_export_menu();
     void init_help_menu();
 
     void closeEvent(QCloseEvent *event) override;

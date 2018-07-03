@@ -25,7 +25,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     setDropIndicatorShown(true);
 
     // Create togglable action in the context menu for analysis details
-    show_details_act = new QAction("Show/hide details", this);
+    show_details_act = new QAction("Show/hide anlaysis details", this);
     show_details_act->setCheckable(true);
     connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
 
@@ -59,11 +59,7 @@ ProjectWidget::~ProjectWidget() {
  * Creates a new empty project if current project is closed/user closes it
  */
 void ProjectWidget::new_project() {
-//    ProjectDialog* proj_dialog = new ProjectDialog();
-//    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
-//    QObject::connect(proj_dialog, SIGNAL(open_project(QString)), this, SLOT(open_project(QString)));
     add_project("New project", "");
-
 }
 
 /**
@@ -73,7 +69,7 @@ void ProjectWidget::new_project() {
  * @param project_name
  * @param project_path
  */
-void ProjectWidget::add_project(QString project_name, QString project_path) {
+void ProjectWidget::add_project(const QString project_name, const QString project_path) {
     if (!close_project()) return;
 
     std::string name = project_name.toStdString();
@@ -1058,7 +1054,7 @@ bool ProjectWidget::save_project() {
     if (m_proj->is_temporary()) {
         QString name{}, path{};
 //        std::unique_ptr<ProjectDialog> project_dialog(new ProjectDialog(&name, &path));
-        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this);
+        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, DEFAULT_PATH);
         connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
         int status = project_dialog->exec();
 
@@ -1091,7 +1087,7 @@ bool ProjectWidget::save_project() {
 
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->get_name(), m_proj->get_file());
+    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
     set_status_bar("Project saved");
     return true;
 }
@@ -1157,6 +1153,7 @@ bool ProjectWidget::close_project() {
 
     delete m_proj;
     m_proj = nullptr;
+    m_tag_item = nullptr;
     this->clear();
     return true;
 }
@@ -1205,4 +1202,8 @@ bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
     msg_box.setDefaultButton(QMessageBox::No);
     int reply = msg_box.exec();
     return reply == QMessageBox::Yes;
+}
+
+QString ProjectWidget::get_default_path() {
+    return DEFAULT_PATH;
 }

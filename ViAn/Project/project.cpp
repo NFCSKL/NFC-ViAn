@@ -1,4 +1,7 @@
 #include "project.h"
+#include <chrono>
+#include <ctime>
+#include <string>
 #include <QDebug>
 
 /**
@@ -110,7 +113,7 @@ void Project::set_name_and_path(const std::string& name, const std::string& path
     m_name = name;
     if (!path.empty()){
         // Update path for all VideoProjects
-        m_dir = path + "/" + name + "/";
+        m_dir = path + name + "/";
         for (auto it = begin(m_videos); it != end(m_videos); ++it) {
             (*it)->reset_root_dir(m_dir);
         }
@@ -214,6 +217,10 @@ bool Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(m_dir));
     directory.mkpath(QString::fromStdString(m_dir_bookmarks));
+    auto time = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(time);
+    last_changed = std::ctime(&now_c);
+    last_changed.erase(last_changed.end()-1);       // Remove the "\n"
     return save_saveable(m_file);
 }
 
@@ -326,6 +333,10 @@ std::string Project::get_name() const {
 
 std::string Project::get_file() const {
     return m_file;
+}
+
+std::string Project::get_last_changed() const {
+    return last_changed;
 }
 
 void Project::set_name(std::string name) {
