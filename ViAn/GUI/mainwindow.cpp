@@ -10,7 +10,6 @@
 #include <QDebug>
 #include <QProgressDialog>
 #include <QTemporaryDir>
-#include <chrono>
 #include <thread>
 #include "Video/shapes/shapes.h"
 #include "Analysis/motiondetection.h"
