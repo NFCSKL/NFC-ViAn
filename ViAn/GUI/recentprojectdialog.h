@@ -25,6 +25,7 @@ class RecentProjectDialog : public QDialog {
     QPushButton* new_btn;
     QPushButton* browse_btn;
     QPushButton* open_btn;
+    QPushButton* remove_btn;
     QTreeWidget* recent_list;
 
     const int NUM_COLUMNS = 2;
@@ -35,11 +36,13 @@ signals:
     void open_project(QString project_path);
     void open_project_from_file(QString);
     void new_project(void);
+    void remove_project();
 private slots:
     void on_item_double_clicked(QTreeWidgetItem *item);
     void on_new_btn_clicked();
     void on_browse_btn_clicked();
     void on_open_btn_clicked();
+    void on_remove_btn_clicked();
 };
 
 #endif // RECENTPROJECTDIALOG_H
