@@ -108,12 +108,13 @@ void RecentProjectDialog::on_remove_btn_clicked() {
     msg_box.setDefaultButton(QMessageBox::No);
     int reply = msg_box.exec();
     if (reply == QMessageBox::Yes) {
-        QString file = recent_list->takeItem(recent_list->currentRow())->toolTip();
+        QString file = recent_list->currentItem()->toolTip(0);
         QString substr = file.left(file.lastIndexOf('/') + 1);
         QDir path(substr);
         if (path.exists()) {
             path.removeRecursively();
         }
+        delete recent_list->currentItem();
     }
 
 }
