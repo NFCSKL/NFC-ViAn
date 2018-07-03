@@ -115,7 +115,7 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;
         // Load thumbnail TODO add check for file
-        std::string t_path = m_path + "_thumbnails/" + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
+        std::string t_path = m_path + ImageGenerator::THUMBNAIL_FOLDER + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
         std::pair<int, std::string> new_container = bm->get_container();
         BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
         bm_item->set_thumbnail(t_path);
