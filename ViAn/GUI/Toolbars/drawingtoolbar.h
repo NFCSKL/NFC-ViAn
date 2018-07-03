@@ -20,6 +20,9 @@ class DrawingToolbar : public QToolBar
     void create_actions();
     void create_buttons();
 
+    const int COLOR_WIDTH = 10;
+    const int COLOR_HEIGHT = 20;
+
 public:
     DrawingToolbar();
     QColor color = Qt::red;

@@ -26,7 +26,7 @@ void DrawingToolbar::create_actions() {
     pen_tool_act = new QAction(QIcon("../ViAn/Icons/pen.png"), tr("Pen"), this);
     text_tool_act = new QAction(QIcon("../ViAn/Icons/text.png"), tr("Text"), this);
     color_label = new QLabel();
-    pixmap = new QPixmap(10, 20);
+    pixmap = new QPixmap(COLOR_WIDTH, COLOR_HEIGHT);
     pixmap->fill(color);
     color_label->setPixmap(*pixmap);
     color_tool_act = new QAction(QIcon("../ViAn/Icons/color.png"), tr("Color picker"), this);

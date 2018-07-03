@@ -6,8 +6,8 @@
 #include <QObject>
 #include <QBoxLayout>
 #include <QPushButton>
-#include <QListWidget>
-#include <QListWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QLabel>
 
 #include "Project/recentproject.h"
@@ -26,7 +26,9 @@ class RecentProjectDialog : public QDialog {
     QPushButton* browse_btn;
     QPushButton* open_btn;
     QPushButton* remove_btn;
-    QListWidget* recent_list;
+    QTreeWidget* recent_list;
+
+    const int NUM_COLUMNS = 2;
 public:
     RecentProjectDialog(QWidget* parent = nullptr);
     ~RecentProjectDialog();
@@ -36,7 +38,7 @@ signals:
     void new_project(void);
     void remove_project();
 private slots:
-    void on_item_double_clicked(QListWidgetItem* item);
+    void on_item_double_clicked(QTreeWidgetItem *item);
     void on_new_btn_clicked();
     void on_browse_btn_clicked();
     void on_open_btn_clicked();

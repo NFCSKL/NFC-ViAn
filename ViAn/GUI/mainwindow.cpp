@@ -223,7 +223,7 @@ void MainWindow::init_file_menu() {
     // Init actions
     QAction* new_project_act = new QAction(tr("&New project"), this);
     QAction* open_project_act = new QAction(tr("&Open project..."), this);
-    QAction* recent_project_act = new QAction(tr("&Recent project..."), this);
+    QAction* recent_project_act = new QAction(tr("&Recent projects..."), this);
     QAction* open_proj_folder_act = new QAction(tr("&Open project folder..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* add_vid_act = new QAction(tr("&Import video..."), this);
@@ -394,7 +394,7 @@ void MainWindow::init_analysis_menu() {
     detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
     bound_box_act->setStatusTip(tr("Toggle boxes on video on/off"));
 
-    //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
+    //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));   // Not set because it collides with the alt menu shortcuts
     advanced_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
 
     analysis_menu->addAction(quick_analysis_act);
@@ -621,8 +621,6 @@ void MainWindow::init_rp_dialog() {
 
     // Create a new project if user presses "new project" or if dialog is rejected
     connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
-    //connect(rp_dialog, &RecentProjectDialog::rejected, project_wgt, &ProjectWidget::new_project);
-
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
@@ -698,7 +696,7 @@ void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(
                 this,
                 tr("Open project"),
-                QDir::homePath(),
+                project_wgt->get_default_path(),
                 "*.vian");
     emit open_project(project_path);
 }
