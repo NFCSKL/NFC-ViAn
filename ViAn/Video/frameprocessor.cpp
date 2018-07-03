@@ -44,7 +44,6 @@ void FrameProcessor::check_events() {
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
         // A new video has been loaded. Reset processing settings    
         if (m_new_frame_video->load()) {
-            qDebug() << "Reset in processor";
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
@@ -71,31 +70,28 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug() << "settings changed";
             m_changed->store(false);
             update_manipulator_settings();
             update_zoomer_settings();
 
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load() && !skip_process) {
-            //if (!m_new_frame->load() && !m_new_frame_video->load()) {
-                qDebug() << "process in changed";
                 process_frame();
+                lk.unlock();
+                skip_process = false;
+                continue;
             }
-            lk.unlock();
             skip_process = false;
-            continue;
         }
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
-            qDebug() << "new frame in processor";
+            m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
             process_frame();
 
-            m_new_frame->store(false);
             lk.unlock();
-            m_v_sync->con_var.notify_all();
+            m_v_sync->con_var.notify_one();
             continue;
         }
     }
@@ -207,7 +203,6 @@ void FrameProcessor::update_zoomer_settings() {
  * the v_sync_lock has been acquired.
  */
 void FrameProcessor::update_manipulator_settings() {
-    qDebug() << "b - s" << m_man_settings->brightness << m_man_settings->contrast;
     m_manipulator.set_brightness(m_man_settings->brightness);
     m_manipulator.set_contrast(m_man_settings->contrast);
 

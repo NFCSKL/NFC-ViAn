@@ -866,12 +866,14 @@ void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
+    // TODO Wait for video to be loaded?
+    set_state(state);
 
     if (m_vid_proj != vid_proj) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
-        m_vid_proj = vid_proj;
 
+        m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
@@ -879,8 +881,6 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         player_lock.unlock();
         player_con.notify_all();
     }
-    // Wait for video to be loaded?
-    set_state(state);
     m_interval = std::make_pair(0,0);
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
@@ -889,7 +889,6 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     if (state.frame > -1) {
         on_new_frame();
     }
-
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1170,7 +1169,6 @@ void VideoWidget::on_step_zoom(double step){
  * @param state
  */
 void VideoWidget::set_state(VideoState state) {
-    qDebug() << "set state";
     update_processing_settings([&](){
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
@@ -1286,7 +1284,6 @@ double VideoWidget::get_contrast() {
 }
 
 void VideoWidget::set_brightness_contrast(int bri, double cont) {
-    qDebug() << "SEt THEM" << bri << cont;
     if (!m_vid_proj) return;
     m_vid_proj->get_video()->state.brightness = bri;
     m_vid_proj->get_video()->state.contrast = cont;
