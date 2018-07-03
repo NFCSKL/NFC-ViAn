@@ -1,4 +1,5 @@
 #include "imageimporter.h"
+#include <QCoreApplication>
 #include <QDebug>
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
@@ -31,6 +32,7 @@ void ImageImporter::import_images() {
                 m_images.erase(m_images.begin() + i);
 
             emit update_progress(i + 1);
+            QCoreApplication::processEvents(); // Process thread event loop. Needed for abort flag to update
             if (m_abort) {
                 break;
             }
@@ -42,6 +44,7 @@ void ImageImporter::import_images() {
 
     if (!m_abort)
         emit imported_sequence(m_images, m_dest.toStdString());
+    emit update_progress(m_images.size());
     emit finished();
 }
 
