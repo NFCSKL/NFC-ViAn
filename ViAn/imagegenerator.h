@@ -22,6 +22,7 @@ public:
     std::string add_serial_number(std::string name, std::string file_end);
 
     static const unsigned int THUMBNAIL_SIZE;
+    static const std::string THUMBNAIL_FOLDER;
 private:
     std::string export_image(std::string s_path, int ext, unsigned int size = 0, bool keep_aspect_ratio = true);
     bool create_directory(std::string path);

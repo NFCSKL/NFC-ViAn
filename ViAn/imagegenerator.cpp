@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
+const std::string ImageGenerator::THUMBNAIL_FOLDER = "_thumbnails/";
 
 ImageGenerator::ImageGenerator(cv::Mat frame, std::string proj_path){
     m_frame = frame.clone();
@@ -17,7 +18,7 @@ ImageGenerator::~ImageGenerator() {
 }
 
 std::string ImageGenerator::create_thumbnail(std::string name) {
-    std::string save_path = m_path + "_thumbnails/";
+    std::string save_path = m_path + THUMBNAIL_FOLDER;
     if (!create_directory(save_path)) return "";
     return export_image(save_path + name, PNG, ImageGenerator::THUMBNAIL_SIZE);
 
