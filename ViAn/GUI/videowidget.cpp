@@ -25,7 +25,7 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
                                        &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
-                                       &m_speed_step);
+                                       &m_speed_step, &m_abort_playback);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -62,6 +62,16 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 }
 
 VideoWidget::~VideoWidget(){
+    if (v_controller->isRunning()) {
+        // Tell controller thread to exit and wait for it to finish
+        m_abort_playback.store(true);
+        v_controller->exit();
+        if (!v_controller->wait(5000)) {
+            // Controller did not finish in time. Force shutdown
+            v_controller->terminate();
+            v_controller->wait();
+        }
+    }
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -135,6 +145,7 @@ void VideoWidget::init_video_controller(){
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
+    connect(v_controller, &VideoController::finished, v_controller, &VideoController::deleteLater);
 }
 
 /**

@@ -7,7 +7,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool *new_frame_video, std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
-                         std::atomic_int* speed_step, QObject *parent) : QObject(parent) {
+                         std::atomic_int* speed_step, std::atomic_bool* abort_playback, QObject *parent) : QObject(parent) {
 
 
     m_frame = frame_index;
@@ -26,6 +26,14 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
     m_video_path = video_path;
     m_speed_step = speed_step;
 
+    m_abort_playback = abort_playback;
+
+}
+
+VideoPlayer::~VideoPlayer() {
+    if (m_capture.isOpened()) {
+        m_capture.release();
+    }
 }
 
 /**
@@ -36,6 +44,10 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
  */
 
 void VideoPlayer::load_video(){
+    if (m_capture.isOpened()) {
+        m_capture.release();
+    }
+
     m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
@@ -87,11 +99,13 @@ void VideoPlayer::set_frame() {
  */
 void VideoPlayer::check_events() {
     std::chrono::duration<double> elapsed{0};
-    while (true) {
+    while (!m_abort_playback->load()) {
         std::unique_lock<std::mutex> lk(*m_player_lock);
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
-        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
+        if (m_player_con->wait_until(lk, now + delay - elapsed,
+                                     [&](){return m_abort_playback->load() || m_new_video->load() ||
+                                     (current_frame != m_frame->load() && m_video_loaded->load());})) {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 wait_load_read();

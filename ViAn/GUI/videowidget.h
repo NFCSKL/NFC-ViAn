@@ -61,6 +61,7 @@ private:
     std::atomic_bool new_video{false};          // True when a new video is loaded
     std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
     std::atomic_bool video_loaded{false};       // True when a video is loaded/open
+    std::atomic_bool m_abort_playback{false};     // Flag used to abort playback when closing program
 
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
