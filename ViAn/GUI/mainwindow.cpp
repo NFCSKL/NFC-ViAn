@@ -25,11 +25,11 @@
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
-    QDockWidget* project_dock = new QDockWidget(tr("&Projects"), this);
-    QDockWidget* bookmark_dock = new QDockWidget(tr("&Bookmarks"), this);
-    QDockWidget* drawing_dock = new QDockWidget(tr("&Drawings"), this);
-    queue_dock = new QDockWidget(tr("&Analysis queue"), this);
-    ana_settings_dock = new QDockWidget(tr("&Analysis settings"), this);
+    QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
+    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
+    queue_dock = new QDockWidget(tr("Analysis queue"), this);
+    ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -106,13 +106,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Main toolbar
     main_toolbar = new MainToolbar();
-    main_toolbar->setWindowTitle(tr("&Main toolbar"));
+    main_toolbar->setWindowTitle(tr("Main toolbar"));
     toggle_main_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
 
     // Draw toolbar
     draw_toolbar = new DrawingToolbar();
-    draw_toolbar->setWindowTitle(tr("&Draw toolbar"));
+    draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     toggle_drawing_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
 

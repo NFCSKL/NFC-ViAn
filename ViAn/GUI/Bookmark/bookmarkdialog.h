@@ -10,10 +10,6 @@ public:
     explicit BookmarkDialog(QWidget* parent = 0);
     void keyPressEvent(QKeyEvent *e) override;
 
-signals:
-
-public slots:
-
 };
 
 #endif // BOOKMARKDIALOG_H
