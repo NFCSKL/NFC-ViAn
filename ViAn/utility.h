@@ -5,6 +5,8 @@
 
 #include <QRect>
 #include <QSize>
+#include <QDir>
+#include <QCryptographicHash>
 
 namespace Utility{
      std::pair<double, double> size_ratio(QSize s1, QSize s2);
@@ -22,6 +24,9 @@ namespace Utility{
      cv::Point from_qpoint(QPoint point);
      cv::Rect from_qrect(QRect rect);
      QRect from_cvrect(cv::Rect rect);
+     QByteArray checksum(const QString& file,
+                         QCryptographicHash::Algorithm hash_algorithm=QCryptographicHash::Algorithm::Sha256);
+     bool remove_checksum_files(const QString& parent_folder, const QStringList& hashes);
 }
 
 #endif // UTILITY_H

@@ -1392,6 +1392,29 @@ bool ProjectWidget::close_project() {
     emit set_tag_slider(false);
     emit enable_poi_btns(false, false);
 
+    // Revert unsaved changes done to sequences
+    for (auto vid_proj : m_proj->get_videos()) {
+        if (vid_proj->get_video()->is_sequence()) {
+            auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
+            if (sequence) {
+                // Delete the files with the corresponding checksums
+                QStringList hashes;
+                for (auto hash : sequence->get_unsaved_hashes()) hashes.append(QString::fromStdString(hash));
+                if (!hashes.isEmpty()) {
+                    Utility::remove_checksum_files(QString::fromStdString(sequence->get_container_path()),
+                                              hashes);
+                }
+
+                // Delete container folder if there are no images left
+                if (!sequence->get_saved_order().size()){
+                    qDebug() << "No items left. Removing container folder " << QString::fromStdString(sequence->get_container_path());
+                    QDir directory(QString::fromStdString(sequence->get_container_path()));
+                    qDebug() << directory.removeRecursively();
+                }
+            }
+        }
+    }
+
     // Remove project if temporary
     if (m_proj->is_temporary()) {
         m_proj->remove_files();

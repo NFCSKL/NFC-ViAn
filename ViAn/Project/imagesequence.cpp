@@ -1,9 +1,14 @@
 #include "imagesequence.h"
 
-#include "project.h"
-#include "utility.h"
-
-#include <QJsonArray>
+/**
+ * @brief ImageSequence::on_save
+ * Should be called when the sequence is saved.
+ * Updates the order tracking variables
+ */
+void ImageSequence::on_save() {
+    m_saved_order = m_unsaved_order;
+    //TODO remove items that no longer are in the sequence
+}
 
 /**
  * @brief ImageSequence::ImageSequence
@@ -11,7 +16,7 @@
  */
 ImageSequence::ImageSequence(const std::string& path) : Video(true){
     seq_path = path;
-    auto index = path.find_last_of('/') + 1;
+    int index = path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
 }
 
@@ -23,10 +28,23 @@ ImageSequence::ImageSequence(const std::string& path) : Video(true){
 ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string> &images)
     : Video(true) {
     seq_path = path;
-    auto index = path.find_last_of('/') + 1;
+    int index = path.find_last_of('/') + 1;
     m_name = path.substr(index);
     m_images = images;
     file_path = seq_path + "/" + get_pattern_name();
+
+    // Go through each file in the sequence folder and hash it
+    for (unsigned int i = 0; i < m_images.size(); ++i) {
+        QString file_path = QString::fromStdString(seq_path + "/" + Utility::zfill(std::to_string(i), Utility::number_of_digits(m_images.size())));
+        std::string hash = Utility::checksum(file_path).toStdString();
+        m_unsaved_order[hash] = i;
+        m_original_images[hash] = images[i];
+        qDebug() << "Checksum created: " << QString::fromStdString(hash);
+    }
+}
+
+std::string ImageSequence::get_container_path() const {
+    return seq_path;
 }
 
 /**
@@ -44,7 +62,7 @@ std::vector<std::string> ImageSequence::get_images(){
 std::vector<std::string> ImageSequence::get_image_names() {
     std::vector<std::string> names;
     for (auto image_path : m_images){
-        auto index = image_path.find_last_of('/') + 1;
+        int index = image_path.find_last_of('/') + 1;
         names.push_back(image_path.substr(index));
     }
     return names;
@@ -59,6 +77,30 @@ std::vector<std::string> ImageSequence::get_image_names() {
 std::string ImageSequence::get_pattern_name() {
     int digits = Utility::number_of_digits(length());
     return "%0" + std::to_string(digits) + "d";
+}
+
+std::map<std::string, int> ImageSequence::get_saved_order() const {
+    return m_saved_order;
+}
+
+std::map<std::string, int> ImageSequence::get_unsaved_order() const {
+    return m_unsaved_order;
+}
+
+/**
+ * @brief ImageSequence::get_unsaved_hashes
+ * Returns a vector of all checksums for the files that has been added but are unsaved.
+ * @return
+ */
+std::vector<std::string> ImageSequence::get_unsaved_hashes() const {
+    std::vector<std::string> hashes;
+    for (auto it = m_unsaved_order.begin(); it != m_unsaved_order.end(); ++it) {
+        if (m_saved_order.find((*it).first) == m_saved_order.end()) {
+            qDebug() << QString::fromStdString((*it).first) << ": Not saved";
+            hashes.push_back((*it).first);
+        }
+    }
+    return hashes;
 }
 
 /**
@@ -79,6 +121,7 @@ void ImageSequence::read(const QJsonObject &json) {
 }
 
 void ImageSequence::write(QJsonObject &json) {
+    on_save();
     Video::write(json);
     json["seq_path"] = QString::fromStdString(seq_path);
     QJsonArray images;
@@ -86,6 +129,14 @@ void ImageSequence::write(QJsonObject &json) {
         images.append(QString::fromStdString(image_path));
     }
     json["images"] = images;
+
+    QJsonObject order, original_images;
+    for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
+        order[QString::fromStdString((*it).first)] = (*it).second;
+        original_images[QString::fromStdString((*it).first)] = QString::fromStdString(m_original_images[(*it).first]);
+    }
+    json["order"] = order;
+    json["original_images"] = original_images;
 }
 
 void ImageSequence::add_image(const std::string &image_path, const int& index) {
@@ -106,9 +157,3 @@ void ImageSequence::reorder_elem(const int &from, const int &to) {
         m_images.erase(m_images.begin() + from);
     }
 }
-
-void ImageSequence::reset_root_dir(const std::string &dir) {
-    seq_path = dir + Project::SEQUENCE_FOLDER +  Utility::name_from_path(seq_path);
-    file_path = seq_path + "/" + get_pattern_name();
-}
-
