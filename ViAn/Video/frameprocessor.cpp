@@ -47,6 +47,8 @@ void FrameProcessor::check_events() {
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
+            update_manipulator_settings();
+            update_zoomer_settings();
 
             lk.unlock();
             continue;
@@ -214,6 +216,7 @@ void FrameProcessor::update_manipulator_settings() {
         m_zoomer.flip();
     }
     m_man_settings->rotate = 0;
+    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
 }
 
 /**
@@ -288,12 +291,12 @@ void FrameProcessor::reset_settings() {
 
     // Reset manipulator values
     m_manipulator.reset();
-    m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
-    m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
+    //m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
+    //m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
 
     m_z_settings->set_state = true;
-    update_zoomer_settings();
+    //update_zoomer_settings();
     skip_process = false;
 
     emit set_anchor(m_zoomer.get_anchor());

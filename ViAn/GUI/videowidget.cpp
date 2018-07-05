@@ -169,6 +169,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+    connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
 
     processing_thread->start();
 }
@@ -868,7 +869,6 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     if (!video_btns_enabled) set_video_btns(true);
     //set_state(state);
 
-
     if (m_vid_proj != vid_proj) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
@@ -876,6 +876,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
+        m_settings.brightness = state.brightness;
+        m_settings.contrast = state.contrast;
         frame_index.store(state.frame);
 
         m_vid_proj = vid_proj;
@@ -960,7 +962,6 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  * notified of new settings when videoplayer has loaded a new video
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
-    qDebug() << "in info loaded";
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;
@@ -1193,6 +1194,8 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
+        m_settings.brightness = state.brightness;
+        m_settings.contrast = state.contrast;
         frame_index.store(state.frame);
     });
 }
@@ -1220,8 +1223,7 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    brightness = b_val;
-    contrast = c_val;
+    set_brightness_contrast(b_val, c_val);
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1321,9 +1323,15 @@ void VideoWidget::zoom_label_finished() {
 }
 
 int VideoWidget::get_brightness() {
-    return brightness;
+    return m_vid_proj->get_video()->state.brightness;
 }
 
 double VideoWidget::get_contrast() {
-    return contrast;
+    return m_vid_proj->get_video()->state.contrast;
+}
+
+void VideoWidget::set_brightness_contrast(int bri, double cont) {
+    if (!m_vid_proj) return;
+    m_vid_proj->get_video()->state.brightness = bri;
+    m_vid_proj->get_video()->state.contrast = cont;
 }

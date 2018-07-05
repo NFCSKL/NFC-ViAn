@@ -1,6 +1,7 @@
 #include "manipulatordialog.h"
 #include <QPushButton>
 #include <Video/framemanipulator.h>
+#include <QDebug>
 
 ManipulatorDialog::ManipulatorDialog(int b, double c, QWidget* parent) : QDialog(parent) {
     contrast = c;
@@ -50,17 +51,7 @@ ManipulatorDialog::ManipulatorDialog(int b, double c, QWidget* parent) : QDialog
     layout->addWidget(btn_box);
     setLayout(layout);
     setWindowTitle(tr("Brightness and Contrast"));
-}
-
-ManipulatorDialog::~ManipulatorDialog() {
-    delete brightness_value_label;
-    delete contrast_value_label;
-    delete brightness_slider;
-    delete contrast_slider;
-    delete btn_box;
-    delete brightness_layout;
-    delete contrast_layout;
-    delete layout;
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 /**

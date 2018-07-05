@@ -167,6 +167,8 @@ void Bookmark::read(const QJsonObject& json){
     int x = json["anchor x"].toInt();
     int y = json["anchor y"].toInt();
     state.anchor = QPoint(x, y);
+    state.brightness = json["brightness"].toInt();
+    state.contrast = json["contrast"].toDouble();
     m_state = state;
     
     m_unsaved_changes = false;
@@ -188,6 +190,8 @@ void Bookmark::write(QJsonObject& json){
     json["scale_factor"] = m_state.scale_factor;
     json["anchor x"] = m_state.anchor.x();
     json["anchor y"] = m_state.anchor.y();
+    json["brightness"] = m_state.brightness;
+    json["contrast"] = m_state.contrast;
 
     m_unsaved_changes = false;
 }
