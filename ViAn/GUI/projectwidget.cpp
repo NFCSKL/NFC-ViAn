@@ -30,7 +30,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
 
     // Create togglable action in the context menu for analysis settings
-    show_settings_act = new QAction("Show/hide analysis settings", this);
+    show_settings_act = new QAction("Show/hide analysis info", this);
     show_settings_act->setCheckable(true);
     connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
 
@@ -758,37 +758,37 @@ void ProjectWidget::context_menu(const QPoint &point) {
         switch (item->type()) {
             case TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case DRAWING_TAG_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Update", this, SLOT(drawing_tag()));
-                menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case ANALYSIS_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
-                menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case VIDEO_ITEM:
-                menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Delete", this, SLOT(remove_item()));
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             case TAG_FRAME_ITEM:
                 if (item->parent()->type() == TAG_ITEM) {
-                    menu.addAction("Remove", this, SLOT(remove_item()));
+                    menu.addAction("Delete", this, SLOT(remove_item()));
                 }
             default:
                 break;
         }
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
-        menu.addAction("Remove", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
 }
@@ -1022,13 +1022,15 @@ void ProjectWidget::create_folder_item() {
             p_item->insertChild(index + 1, item);
         }
     } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
-        QTreeWidgetItem* p_item = s_item->parent()->parent();
+        QTreeWidgetItem* p_item = s_item->parent();
         if (p_item == nullptr) {
             insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
         } else {
             int index = p_item->indexOfChild(s_item);
             p_item->insertChild(index + 1, item);
         }
+    } else {        // Tag frame item
+        insertTopLevelItem(topLevelItemCount(), item);
     }
     editItem(item);
     clearSelection();

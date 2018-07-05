@@ -9,7 +9,7 @@
 
 AnalysisSlider::AnalysisSlider(Qt::Orientation orientation, QWidget * parent) : QSlider(parent) {
     setOrientation(orientation);
-    setPageStep(10);
+    setPageStep(PAGE_STEP);
 }
 
 /**

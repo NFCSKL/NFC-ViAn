@@ -25,8 +25,7 @@ class AnalysisSlider : public QSlider {
     bool show_interval = true;
     bool show_ana_interval = false;
 
-    //Change this to set how many frames the POI buttons should ignore
-    const int JUMP_INTERVAL = 0;
+    const int JUMP_INTERVAL = 0;    //Change this to set how many frames the POI buttons should ignore
 
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
@@ -61,7 +60,7 @@ public:
     int get_next_poi_end(int frame);
     int get_prev_poi_start(int curr_frame);
 
-
+    const int PAGE_STEP = 10;
 
 protected:
     void paintEvent(QPaintEvent *ev);

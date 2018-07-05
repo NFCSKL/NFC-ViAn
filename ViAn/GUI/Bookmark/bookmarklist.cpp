@@ -2,7 +2,7 @@
 #include "bookmarkitem.h"
 #include "bookmarklist.h"
 #include "imagegenerator.h"
-#include "myinputdialog.h"
+#include "bookmarkdialog.h"
 #include <QAction>
 #include <QMenu>
 #include <QMimeData>
@@ -158,7 +158,7 @@ void BookmarkList::rename_item(){
     switch (clicked_item->type()) {
     case BOOKMARK: {
         auto item = dynamic_cast<BookmarkItem*>(clicked_item);
-        MyInputDialog dialog;
+        BookmarkDialog dialog;
 
         dialog.setTextValue(QString::fromStdString(item->get_bookmark()->get_description()));
         dialog.setLabelText("Enter a new description");

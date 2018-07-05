@@ -35,7 +35,7 @@ public:
 signals:
     void play_bookmark_video(VideoProject* vid_proj, VideoState state);
 public slots:
-    void create_bookmark(VideoProject *vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time);
+    void create_bookmark(VideoProject *vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description);
     void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
