@@ -49,6 +49,7 @@ void FrameProcessor::check_events() {
             m_o_settings->overlay_removed = false;
             update_manipulator_settings();
             update_zoomer_settings();
+            skip_process = false;
 
             lk.unlock();
             continue;
@@ -179,7 +180,7 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.fit_viewport();
     }
     // Set original size (no zoom)
-    else if (m_z_settings->original){
+    else if (m_z_settings->original) {
         m_z_settings->original = false;
         m_zoomer.reset();
     }
