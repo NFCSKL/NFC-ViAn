@@ -46,6 +46,7 @@ void VideoPlayer::load_video(){
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
+    m_video_loaded->store(true);
     m_new_frame_video->store(true);
 }
 
@@ -167,6 +168,7 @@ bool VideoPlayer::wait_load_read(){
 
             return false;
         }
+        m_new_frame->store(true);
     }
     m_v_sync->con_var.notify_one();
     return true;

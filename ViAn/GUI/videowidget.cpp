@@ -1003,9 +1003,6 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     set_total_time((last_frame + 1) / frame_rate);
     set_current_time(frame_index.load() / m_frame_rate);
 
-    video_loaded.store(true);
-    new_frame.store(true);
-    v_sync.con_var.notify_all();
     on_new_frame();
 }
 
