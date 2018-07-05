@@ -130,7 +130,7 @@ class FrameProcessor : public QObject {
     // Overlay changed by user
     std::atomic_bool* m_overlay_changed;
     // New video loaded by video player
-    std::atomic_bool* m_new_video;
+    std::atomic_bool* m_new_frame_video;
 
     /**
      *  Input settings,
