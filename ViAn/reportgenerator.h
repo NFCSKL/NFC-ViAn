@@ -10,6 +10,7 @@
 #include "GUI/Bookmark/bookmarkitem.h"
 #include <ctime>
 #include "utility.h"
+
 enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
 using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
 using Category = std::pair<QString,RefDisp>;
@@ -22,15 +23,14 @@ using ReportContainer = std::vector<Category>;
  * It uses Words COM interface and QTs ActiveQt tool with
  * QAxObjects to communicate with Word.
  *
- * Mainly to methods are used (very few are available)
+ * Mainly two methods are used (very few are available)
  *
  * obj->dynamicCall("SomeString(param1, param2)", param1,param2)
  * is used to make function calls
-
-* obj_return = obj->querySubObject("Range") is a request
+ *
+ * obj_return = obj->querySubObject("Range") is a request
  * for member Range in obj. querySubObject is however used whenever
  * a returned object is to be used in some way after the call.
- *
  */
 class ReportGenerator : public QObject {
     Q_OBJECT
@@ -66,13 +66,12 @@ private:
     void cell_add_text(QAxObject* range, QString entry, int row, int col);
     void cell_add_img(QAxObject* table, QString file_name, int row, int col);
 
-    // Methods Finishing up reportgeneraion
+    // Methods finishing up reportgeneration
     QString save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
 
     // Formatting methods
     std::string date_time_generator();
-    QString calculate_time(int ms);
 signals:
     void done(void);
 };

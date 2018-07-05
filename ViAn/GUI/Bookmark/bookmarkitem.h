@@ -17,6 +17,7 @@ public:
     void set_thumbnail(std::string thum_path);
     BookmarkItem* copy();
     QString get_description() const;
+    QString get_time() const;
 
    static const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
 
