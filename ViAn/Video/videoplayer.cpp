@@ -167,7 +167,6 @@ bool VideoPlayer::wait_load_read(){
 
             return false;
         }
-        //m_new_frame->store(true);
     }
     m_v_sync->con_var.notify_one();
     return true;

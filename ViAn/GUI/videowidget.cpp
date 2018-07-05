@@ -867,12 +867,12 @@ void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
-    //set_state(state);
 
     if (m_vid_proj != vid_proj) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
 
+        // Set state variables but don't update the processor
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
@@ -897,8 +897,6 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
-
-
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -971,7 +969,6 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     playback_slider->setMaximum(last_frame);
     set_total_time((last_frame + 1) / frame_rate);
     set_current_time(frame_index.load() / m_frame_rate);
-
 
     video_loaded.store(true);
     new_frame.store(true);

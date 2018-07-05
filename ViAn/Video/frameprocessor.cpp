@@ -149,7 +149,7 @@ void FrameProcessor::update_zoomer_settings() {
     else if (m_z_settings->set_state) {
         m_zoomer.fit_viewport();
         m_z_settings->set_state = false;
-        //skip_process = true;
+        skip_process = true;
         m_zoomer.set_state(m_z_settings->anchor, m_z_settings->zoom_factor);
     }
     // Center the zoom rect
@@ -291,12 +291,8 @@ void FrameProcessor::reset_settings() {
 
     // Reset manipulator values
     m_manipulator.reset();
-    //m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
-    //m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
 
-    m_z_settings->set_state = true;
-    //update_zoomer_settings();
     skip_process = false;
 
     emit set_anchor(m_zoomer.get_anchor());
