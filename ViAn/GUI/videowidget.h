@@ -102,7 +102,7 @@ public:
 
 signals:
     void close_video_widget(VideoWidget*);
-    void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString);
+    void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_tag(VideoProject*, Tag*);
@@ -143,6 +143,7 @@ public slots:
     void set_current_frame_size(QSize size);
     void on_export_frame(void);
     void on_bookmark_clicked(void);
+    void quick_bookmark(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
     void set_interval(int start, int end);
@@ -213,6 +214,17 @@ private:
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
 
+    //Shortcuts
+    QShortcut* bookmark_quick_sc;
+    QShortcut* interpol_sc;
+    QShortcut* speed_slider_up;
+    QShortcut* speed_slider_down;
+    QShortcut* frame_edit_act;
+    QShortcut* video_start_sc;
+    QShortcut* video_end_sc;
+    QShortcut* page_step_front_sc;
+    QShortcut* page_step_back_sc;
+
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
     QHBoxLayout* video_btns;      // Play, pause etc
@@ -234,6 +246,8 @@ private:
     bool slider_is_blocked = false;
     bool video_btns_enabled = false;
     bool analysis_only = false;
+
+    QString bmark_description = "";
 
     void set_video_btns(bool b);
 
@@ -258,6 +272,13 @@ private slots:
     void stop_btn_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+    void speed_up_activate(void);
+    void speed_down_activate(void);
+    void set_video_start(void);
+    void set_video_end(void);
+    void page_step_front(void);
+    void page_step_back(void);
+    void frame_label_focus(void);
 
     void on_interpolate_toggled(bool checked);
 };

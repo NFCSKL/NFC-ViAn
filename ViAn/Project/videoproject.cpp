@@ -273,6 +273,10 @@ std::string VideoProject::get_index_path() {
     return m_tree_index;
 }
 
+std::string VideoProject::get_proj_path() {
+    return m_project->get_dir();
+}
+
 bool VideoProject::is_current() {
     return current;
 }

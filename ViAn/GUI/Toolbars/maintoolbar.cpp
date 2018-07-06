@@ -15,9 +15,9 @@ MainToolbar::MainToolbar() {
  */
 void MainToolbar::create_actions() {
     save_act = new QAction(QIcon("../ViAn/Icons/save.png"),tr("Save project"), this);
-    open_act = new QAction(QIcon("../ViAn/Icons/open.png"), tr("Load project"), this);
-    add_video_act = new QAction(QIcon("../ViAn/Icons/add_video.png"), tr("Add video"), this);
-    open_folder_act = new QAction(QIcon("../ViAn/Icons/computer.png"), tr("Open folder"), this);
+    open_act = new QAction(QIcon("../ViAn/Icons/open.png"), tr("Open project"), this);
+    add_video_act = new QAction(QIcon("../ViAn/Icons/add_video.png"), tr("Import video"), this);
+    open_folder_act = new QAction(QIcon("../ViAn/Icons/computer.png"), tr("Open project folder"), this);
 }
 
 /**
