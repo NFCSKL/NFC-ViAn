@@ -404,16 +404,20 @@ void MainWindow::init_analysis_menu() {
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    VideoWidget* widget_video = new VideoWidget(nullptr, true);
-    widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
-    widget_video->show();
-    video_widgets.push_back(widget_video);
+    if (video_widgets.size() < FLOATING_WIDGET_MAX) {
+        VideoWidget* widget_video = new VideoWidget(nullptr, true);
+        widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
+        widget_video->show();
+        video_widgets.push_back(widget_video);
 
-    widget_video->setAttribute(Qt::WA_DeleteOnClose);
-    widget_video->frame_wgt->set_tool(ZOOM);
-    widget_video->load_marked_video_state(vid_proj, vid_proj->get_video()->state);
+        widget_video->setAttribute(Qt::WA_DeleteOnClose);
+        widget_video->frame_wgt->set_tool(ZOOM);
+        widget_video->load_marked_video_state(vid_proj, vid_proj->get_video()->state);
 
-    connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
+        connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
+    } else {
+        set_status_bar("No more video widgets allowed");
+    }
 }
 
 void MainWindow::close_widget(VideoWidget *vid_wgt) {

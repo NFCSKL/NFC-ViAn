@@ -67,9 +67,12 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
 VideoWidget::~VideoWidget(){
     play_btn_toggled(false);
     delete f_processor;
-    processing_thread->quit();
-    processing_thread->wait();
     processing_thread->deleteLater();
+    processing_thread->quit();
+    if (!processing_thread->wait(ONE_SEC)) {
+        processing_thread->terminate();
+    }
+
     delete v_controller;
     delete frame_wgt;
 }

@@ -186,6 +186,7 @@ private:
     const int PERCENT_INT_CONVERT = 100;
     const int ZOOM_LABEL_MIN = 1;
     const int ZOOM_LABEL_MAX = 10000;
+    const int ONE_SEC = 1000;
 
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;

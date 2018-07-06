@@ -43,8 +43,8 @@ void VideoController::run() {
 }
 
 VideoController::~VideoController() {
-    quit();
     v_player->loop = false;
+    quit();
     wait();
     deleteLater();
 }
