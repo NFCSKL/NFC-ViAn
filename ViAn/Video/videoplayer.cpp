@@ -56,6 +56,7 @@ void VideoPlayer::load_video(){
  * @param speed_steps   :   Steps to increase/decrease
  */
 void VideoPlayer::set_playback_speed(int speed_steps) {
+    //qDebug() << speed_steps;
     if (speed_steps > 0) {
         speed_multiplier = 1.0 / (speed_steps * 2);
     } else if (speed_steps < 0) {
@@ -63,6 +64,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
     } else {
         speed_multiplier = 1;
     }
+    //qDebug() << speed_multiplier;
 }
 
 /**

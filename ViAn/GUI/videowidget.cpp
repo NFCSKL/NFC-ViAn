@@ -204,8 +204,10 @@ void VideoWidget::set_btn_icons() {
     zoom_label->setMaximumWidth(60);
     zoom_label->setEnabled(false);
     connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
+    fps_label = new QLabel("Fps: 0", this);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
+
     play_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
 }
@@ -233,8 +235,9 @@ void VideoWidget::set_btn_tool_tip() {
     original_size_btn->setToolTip(tr("Reset zoom: Ctrl + H"));
     interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation");
 
-    set_start_interval_btn->setToolTip("Set left interval point: Shift + Left");
-    set_end_interval_btn->setToolTip("Set right interval point: Shift + Right");
+    fps_label->setToolTip("The frame rate of the video");
+    set_start_interval_btn->setToolTip("Set left interval point: I");
+    set_end_interval_btn->setToolTip("Set right interval point: O");
 }
 
 /**
@@ -386,6 +389,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     control_row->addLayout(zoom_btns);
 
+    interval_btns->addWidget(fps_label);
     interval_btns->addWidget(set_start_interval_btn);
     interval_btns->addWidget(set_end_interval_btn);
 
@@ -436,6 +440,7 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
+    max_frames = new QLabel("0", this);
     frame_line_edit = new QLineEdit("0", this);
 
     frame_line_edit->setFixedWidth(50);
@@ -451,6 +456,7 @@ void VideoWidget::init_playback_slider() {
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
     progress_area->addWidget(frame_line_edit);
+    progress_area->addWidget(max_frames);
     vertical_layout->addLayout(progress_area);
 
     connect(playback_slider, &QSlider::sliderPressed, this, &VideoWidget::on_playback_slider_pressed);
@@ -993,6 +999,8 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     playback_slider->setMaximum(last_frame);
     set_total_time((last_frame + 1) / frame_rate);
     set_current_time(frame_index.load() / m_frame_rate);
+    fps_label->setText("Fps: " + QString::number(m_frame_rate));
+    max_frames->setText("/ " + QString::number(last_frame));
 }
 
 void VideoWidget::on_playback_stopped(){
@@ -1275,7 +1283,8 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
     v_sync.con_var.notify_all();
 }
 
-void VideoWidget::update_playback_speed(int speed){
+void VideoWidget::update_playback_speed(int speed) {
+    qDebug() << speed;
     m_speed_step.store(speed);
 }
 

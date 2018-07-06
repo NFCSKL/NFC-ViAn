@@ -190,9 +190,11 @@ private:
     QSlider* speed_slider;
     QLabel* current_time;
     QLabel* total_time;
+    QLabel* max_frames;
     QLineEdit* frame_line_edit;
     QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
+    QLabel* fps_label;
 
     //Buttons
     QPushButton* play_btn;
