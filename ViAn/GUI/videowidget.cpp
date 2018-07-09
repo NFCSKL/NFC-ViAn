@@ -335,9 +335,9 @@ void VideoWidget::init_speed_slider() {
     speed_slider->setTickPosition(QSlider::TicksBelow);
     speed_slider->setEnabled(false);
     speed_slider->setToolTip(tr("Adjust playback speed"));
-    QLabel *label1 = new QLabel("1/16x", this);
+    QLabel *label1 = new QLabel("1/8x", this);
     QLabel *label2 = new QLabel("1x", this);
-    QLabel *label3 = new QLabel("16x", this);
+    QLabel *label3 = new QLabel("8x", this);
     QFont f("Helvetica", 6, QFont::Normal);
     label1->setFont(f);
     label2->setFont(f);
@@ -1284,8 +1284,14 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
 }
 
 void VideoWidget::update_playback_speed(int speed) {
-    qDebug() << speed;
     m_speed_step.store(speed);
+    if (speed > 0) {
+        fps_label->setText("Fps: " + QString::number(m_frame_rate*speed*2));
+    } else if (speed < 0) {
+        fps_label->setText("Fps: " + QString::number(m_frame_rate/std::abs(speed*2)));
+    } else {
+        fps_label->setText("Fps: " + QString::number(m_frame_rate));
+    }
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {

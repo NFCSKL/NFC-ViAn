@@ -55,7 +55,7 @@ class VideoPlayer : public QObject{
     // Player state
     std::atomic_bool* m_is_playing;
     bool m_playback_status = false;
-    int m_cur_speed_step = 1;
+    int m_cur_speed_step = 0;
     double speed_multiplier = 1;
     int current_frame = -1;
 
