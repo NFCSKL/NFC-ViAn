@@ -35,6 +35,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 
 void BookmarkWidget::generate_report() {
     ReportContainer rp_cont;
+    std::vector<BookmarkItem*> bmark_list;
     for(int i = 0; i != bm_list->count(); ++i){
         QListWidgetItem* item = bm_list->item(i);
         if (item->type() == CONTAINER) {
@@ -46,10 +47,14 @@ void BookmarkWidget::generate_report() {
 
             RefDisp ref_disp = std::make_pair(_temp_disp, _temp_ref);
             rp_cont.push_back(std::make_pair(cat_name, ref_disp));
+        } else if (item->type() == BOOKMARK) {
+            BookmarkItem* bmark = dynamic_cast<BookmarkItem*>(item);
+            bmark_list.push_back(bmark);
         }
     }
     processing_thread = new QThread;    
     ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
+    rp_gen->uncat_bmarks = bmark_list;
     rp_gen->create_report();
 }
 

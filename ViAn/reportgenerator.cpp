@@ -1,4 +1,5 @@
 #include "reportgenerator.h"
+#include <QDebug>
 
 /**
  * @brief ReportGenerator::ReportGenerator
@@ -48,7 +49,7 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
     QString brightness = QString("Brightness: %1").arg(bm->get_bookmark()->get_state().brightness);
     QString contrast = QString("Contrast: %1").arg(bm->get_bookmark()->get_state().contrast);
     QString description = bm->get_description();
-    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + contrast;
+    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast;
     if (description != "") {
         bm_description = description + QString("\v") + bm_description;
     }
@@ -85,17 +86,17 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_
     // Space to use for table
     QAxObject* range = para->querySubObject("Range(int,int)",0,0);
 
-    //Table should have room for categories, their titles and its own title
-    QAxObject* table = add_table(range,rp_cont.size()*2+1,2,BORDER);
+    // Table should have room for categories, their titles and its own title
+    QAxObject* table = add_table(range, rp_cont.size()*2+1,2,BORDER);
 
-    //Add title text
+    // Add title text
     cell_add_text(table, "Omstritt", 1,1);
     cell_add_text(table, "Referens", 1,2);
 
-    //Table indexed from 1, begin after title.
+    // Table indexed from 1, begin after title.
     int cell_row = 2;
     for (size_t i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
-        //Access duplicate category title cells and merge them together
+        // Access duplicate category title cells and merge them together
         QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
         _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
@@ -119,6 +120,28 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_
 
         // Go to next table row
         cell_row++;
+    }
+
+    // Iterate over the uncategorized bookmarks backwards
+    for (auto i = uncat_bmarks.size(); i --> 0;) {
+        // Access Bookmark
+        BookmarkItem* bm = uncat_bmarks.at(i);
+        QString file_name = bm->get_file_path();
+        file_name.replace("/", "\\\\");
+
+        // Get the range "table" occupy
+        QAxObject* bmark_range = table->querySubObject("Range");
+        // Get the last position of that range
+        bmark_range->dynamicCall("Collapse(int)", 0);   // 0 - get end, 1 - get start of range
+
+        // Insert the bookmark description, divider line and bookmark image as a stack
+        // beacause they are all inserted at the same position
+        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm));
+        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + "-----------------------");
+
+        QAxObject* p_shapes = para->querySubObject("InlineShapes");
+        p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
+                     file_name, false, true, bmark_range->asVariant());
     }
 }
 /**
@@ -174,6 +197,7 @@ void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row,
                 "AddPicture(const QString&,bool,bool,QVariant)",
                  file_name, false, true, range->asVariant());
 }
+
 /**
  * @brief ReportGenerator::cell_add_text
  * @param table
@@ -206,6 +230,7 @@ void ReportGenerator::make_doc(QAxObject *obj, QString file_name) {
        out << obj->generateDocumentation();
        file1.close();
 }
+
 /**
  * @brief ReportGenerator::add_table
  * @param range

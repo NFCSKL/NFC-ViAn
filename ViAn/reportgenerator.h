@@ -36,14 +36,15 @@ class ReportGenerator : public QObject {
     Q_OBJECT
     std::string m_path;
     QAxObject* word;
-    std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 136.0;
     ReportContainer m_rep_cont;
 public:
     friend class test_report_generator;
-    explicit ReportGenerator(std::string proj_path,ReportContainer report_container);
+    explicit ReportGenerator(std::string proj_path, ReportContainer report_container);
     ~ReportGenerator();
-    void create_report();    
+    void create_report();
+
+    std::vector<BookmarkItem*> uncat_bmarks;
 private:
     /**
      * Creates documentation for a given QAxObject*,
