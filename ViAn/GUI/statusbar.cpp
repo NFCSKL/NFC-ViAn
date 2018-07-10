@@ -8,6 +8,7 @@ StatusBar::StatusBar() {
     ana_prog->setMaximumHeight(PROG_BAR_HEIGHT);
     ana_prog->setMaximumWidth(PROG_BAR_WIDTH);
     addPermanentWidget(ana_prog);
+    remove_analysis_bar();
 }
 
 /**
