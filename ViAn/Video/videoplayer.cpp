@@ -38,7 +38,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
  */
 
 void VideoPlayer::load_video(){
-    m_video_loaded->store(true);
+    m_new_video->store(false);
     current_frame = -1;
     m_is_playing->store(false);
     m_capture.open(*m_video_path);
@@ -47,7 +47,7 @@ void VideoPlayer::load_video(){
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
-    m_new_video->store(false);
+    m_video_loaded->store(true);
     m_new_frame_video->store(true);
 }
 
