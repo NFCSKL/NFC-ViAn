@@ -35,7 +35,6 @@ signals:
     void values(int b_value, double c_value);
 public:
     explicit ManipulatorDialog(int b, double c, QWidget *parent = nullptr);
-    ~ManipulatorDialog();
 private slots:
     void ok_clicked();
     void cancel_clicked();

@@ -5,7 +5,8 @@
 
 VideoController::VideoController(std::atomic<int>* frame_index, std::atomic_bool* is_playing,
                                  std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
-                                 std::atomic_bool* new_video, std::atomic_bool* new_frame_video, std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
+                                 std::atomic_bool* new_video, std::atomic_bool* new_frame_video,
+                                 std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                                  std::mutex* player_lock, std::string* video_path, std::atomic_int* speed){
 
     m_frame = frame_index;
