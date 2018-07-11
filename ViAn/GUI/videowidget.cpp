@@ -984,9 +984,9 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     prev_poi_btn->setEnabled(b);
 
     analysis_play_btn->setEnabled(ana_play_btn);
-    if (!b) {
-        analysis_play_btn->setChecked(b);
-        analysis_only = b;
+    if (!ana_play_btn) {
+        analysis_play_btn->setChecked(ana_play_btn);
+        analysis_only = ana_play_btn;
     }
 }
 
