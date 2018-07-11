@@ -194,6 +194,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
     connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
+    connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
 
     processing_thread->start();
 }
@@ -227,8 +228,10 @@ void VideoWidget::set_btn_icons() {
     zoom_label->setMaximumWidth(60);
     zoom_label->setEnabled(false);
     connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
+    fps_label = new QLabel("Fps: 0", this);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
+
     play_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
 }
@@ -256,8 +259,9 @@ void VideoWidget::set_btn_tool_tip() {
     original_size_btn->setToolTip(tr("Reset zoom: Ctrl + H"));
     interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation");
 
-    set_start_interval_btn->setToolTip("Set left interval point: Shift + Left");
-    set_end_interval_btn->setToolTip("Set right interval point: Shift + Right");
+    fps_label->setToolTip("The frame rate of the video");
+    set_start_interval_btn->setToolTip("Set left interval point: I");
+    set_end_interval_btn->setToolTip("Set right interval point: O");
 }
 
 /**
@@ -355,9 +359,9 @@ void VideoWidget::init_speed_slider() {
     speed_slider->setTickPosition(QSlider::TicksBelow);
     speed_slider->setEnabled(false);
     speed_slider->setToolTip(tr("Adjust playback speed"));
-    QLabel *label1 = new QLabel("1/16x", this);
+    QLabel *label1 = new QLabel("1/8x", this);
     QLabel *label2 = new QLabel("1x", this);
-    QLabel *label3 = new QLabel("16x", this);
+    QLabel *label3 = new QLabel("8x", this);
     QFont f("Helvetica", 6, QFont::Normal);
     label1->setFont(f);
     label2->setFont(f);
@@ -409,6 +413,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     control_row->addLayout(zoom_btns);
 
+    interval_btns->addWidget(fps_label);
     interval_btns->addWidget(set_start_interval_btn);
     interval_btns->addWidget(set_end_interval_btn);
 
@@ -459,6 +464,7 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
+    max_frames = new QLabel("0", this);
     frame_line_edit = new QLineEdit("0", this);
 
     frame_line_edit->setFixedWidth(50);
@@ -474,6 +480,7 @@ void VideoWidget::init_playback_slider() {
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
     progress_area->addWidget(frame_line_edit);
+    progress_area->addWidget(max_frames);
     vertical_layout->addLayout(progress_area);
 
     connect(playback_slider, &QSlider::sliderPressed, this, &VideoWidget::on_playback_slider_pressed);
@@ -922,11 +929,18 @@ void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
-    set_state(state);
 
     if (m_vid_proj != vid_proj) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
+
+        // Set state variables but don't update the processor
+        z_settings.set_state = true;
+        z_settings.anchor = state.anchor;
+        z_settings.zoom_factor = state.scale_factor;
+        m_settings.brightness = state.brightness;
+        m_settings.contrast = state.contrast;
+        frame_index.store(state.frame);
 
         m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());
@@ -935,15 +949,16 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();
+    } else {
+        set_state(state);
+        if (state.frame > -1) {
+            on_new_frame();
+        }
     }
     m_interval = std::make_pair(0,0);
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
-
-    if (state.frame > -1) {
-        on_new_frame();
-    }
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1021,6 +1036,10 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     playback_slider->setMaximum(last_frame);
     set_total_time((last_frame + 1) / frame_rate);
     set_current_time(frame_index.load() / m_frame_rate);
+    fps_label->setText("Fps: " + QString::number(m_frame_rate));
+    max_frames->setText("/ " + QString::number(last_frame));
+
+    on_new_frame();
 }
 
 void VideoWidget::on_playback_stopped(){
@@ -1238,6 +1257,8 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
+        m_settings.brightness = state.brightness;
+        m_settings.contrast = state.contrast;
         frame_index.store(state.frame);
     });
 }
@@ -1265,8 +1286,7 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    brightness = b_val;
-    contrast = c_val;
+    set_brightness_contrast(b_val, c_val);
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1303,8 +1323,15 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
     v_sync.con_var.notify_all();
 }
 
-void VideoWidget::update_playback_speed(int speed){
+void VideoWidget::update_playback_speed(int speed) {
     m_speed_step.store(speed);
+    if (speed > 0) {
+        fps_label->setText("Fps: " + QString::number(m_frame_rate*speed*2));
+    } else if (speed < 0) {
+        fps_label->setText("Fps: " + QString::number(m_frame_rate/std::abs(speed*2)));
+    } else {
+        fps_label->setText("Fps: " + QString::number(m_frame_rate));
+    }
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {
@@ -1367,11 +1394,17 @@ void VideoWidget::zoom_label_finished() {
 }
 
 int VideoWidget::get_brightness() {
-    return brightness;
+    return m_vid_proj->get_video()->state.brightness;
 }
 
 double VideoWidget::get_contrast() {
-    return contrast;
+    return m_vid_proj->get_video()->state.contrast;
+}
+
+void VideoWidget::set_brightness_contrast(int bri, double cont) {
+    if (!m_vid_proj) return;
+    m_vid_proj->get_video()->state.brightness = bri;
+    m_vid_proj->get_video()->state.contrast = cont;
 }
 
 void VideoWidget::speed_up_activate() {

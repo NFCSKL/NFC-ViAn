@@ -666,6 +666,7 @@ void MainWindow::open_rp_dialog() {
  * Creates a dialog for choosing contrast and brightness values.
  */
 void MainWindow::cont_bri() {
+    if (video_wgt->get_current_video_project() == nullptr) return;
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
     man_dialog->setAttribute(Qt::WA_DeleteOnClose);

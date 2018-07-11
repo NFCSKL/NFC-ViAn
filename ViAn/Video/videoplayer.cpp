@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include <chrono>
+#include <cmath>
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
@@ -35,14 +36,10 @@ VideoPlayer::~VideoPlayer() {
 }
 
 /**
- * @brief VideoPlayer::on_load_video
+ * @brief VideoPlayer::load_video
  * Loads the video and updates member variables with video information.
- * It also emits the first frame back to the controller
- * @param video_path    :   Path to the video
  */
-
 void VideoPlayer::load_video() {
-    m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
     m_capture.open(*m_video_path);
@@ -51,7 +48,7 @@ void VideoPlayer::load_video() {
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
-    m_new_video->store(false);
+    m_video_loaded->store(true);
     m_new_frame_video->store(true);
 }
 
@@ -68,6 +65,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
     } else {
         speed_multiplier = 1;
     }
+    m_cur_speed_step = speed_steps;
 }
 
 /**
