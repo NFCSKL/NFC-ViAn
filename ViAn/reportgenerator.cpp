@@ -97,36 +97,43 @@ void ReportGenerator::create_bookmark_table(QAxObject* para) {
     QAxObject* range = para->querySubObject("Range(int,int)",0,0);
 
     // Table should have room for categories, their titles and its own title
-    QAxObject* table = add_table(range, m_rep_cont.size()*2+1, 2, BORDER);
+    // so the table needs 1 (title) + 2*(number of categories) of rows
+    auto table_rows = m_rep_cont.size()*2+1;
 
-    // Add title text
-    cell_add_text(table, "Omstritt", 1,1);
-    cell_add_text(table, "Referens", 1,2);
+    // Create the table for all bookmarks
+    QAxObject* table = add_table(range, table_rows, 2, BORDER);
 
     // Table indexed from 1, begin after title.
-    int cell_row = 2;
+    int cell_row = 1;
+
+    // Add title text
+    cell_add_text(table, "Omstritt", cell_row, 1);
+    cell_add_text(table, "Referens", cell_row, 2);
+
+    cell_row++;
+
     for (size_t i = 0; i != m_rep_cont.size(); i++) { // for each category, make a paragraph of bookmarks
         // Access duplicate category title cells and merge them together
         QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
         _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
         // Write category name
-        cell_add_text(table, m_rep_cont.at(i).first, cell_row,1);
+        cell_add_text(table, m_rep_cont.at(i).first, cell_row, 1);
 
         // Go to next table row
         cell_row++;
 
         // Access disputed and reference bookmarks
-        std::vector<BookmarkItem*> bm_ref = m_rep_cont.at(i).second.first;
-        std::vector<BookmarkItem*> bm_disp = m_rep_cont.at(i).second.second;
+        std::vector<BookmarkItem*> bm_disp = m_rep_cont.at(i).second.first;
+        std::vector<BookmarkItem*> bm_ref = m_rep_cont.at(i).second.second;
 
         // Access cells to be used for storing disp and ref bookmarks
-        QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 1);
-        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 2);
+        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 1);
+        QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 2);
 
-        // Insert categories into reference and disputed cells.
-        cell_insert_category(cell_ref, bm_ref);
+        // Insert categories into disputed and reference cells.
         cell_insert_category(cell_disp, bm_disp);
+        cell_insert_category(cell_ref, bm_ref);
 
         // Go to next table row
         cell_row++;
@@ -147,7 +154,6 @@ void ReportGenerator::create_bookmark_table(QAxObject* para) {
         // Insert the bookmark description, divider line and bookmark image as a stack
         // because they are all inserted at the same position
         bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm));
-        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + "-----------------------");
 
         QAxObject* p_shapes = para->querySubObject("InlineShapes");
         p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
@@ -179,7 +185,7 @@ void ReportGenerator::cell_insert_category(QAxObject* cell, std::vector<Bookmark
         // Add Its image to current cell
         cell_add_img(table, bm->get_file_path(), cell_row, 1);
         // Add Its text to current cell
-        cell_add_text(table, get_bookmark_descr(bm),cell_row,1);
+        cell_add_text(table, get_bookmark_descr(bm), cell_row, 1);
         // Go to next cell
         cell_row++;
     }
@@ -253,7 +259,6 @@ void ReportGenerator::make_doc(QAxObject *obj, QString file_name) {
 QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABLE_STYLE style) {
     range->dynamicCall("Collapse(int)",1); // Don't touch this, magically works
     QAxObject* tables = range->querySubObject("Tables");
-    make_doc(tables, "tables");
     QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), rows,cols,1,1);
     table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
     table->dynamicCall("SetTitle(QString)", "Title");
