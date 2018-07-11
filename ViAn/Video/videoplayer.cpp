@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include <chrono>
+#include <cmath>
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
@@ -63,6 +64,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
     } else {
         speed_multiplier = 1;
     }
+    m_cur_speed_step = speed_steps;
 }
 
 /**
@@ -111,7 +113,6 @@ void VideoPlayer::check_events() {
                 display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
-
             }
         }
         lk.unlock();
