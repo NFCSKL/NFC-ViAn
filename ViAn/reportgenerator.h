@@ -55,9 +55,9 @@ private:
     void add_paragraph(QAxObject* selection);
 
     QString get_bookmark_descr(BookmarkItem *bm);
-    void create_bookmark_table(QAxObject *para, ReportContainer bookmark_list);
+    void create_bookmark_table(QAxObject *para);
 
-    QAxObject* add_table(QAxObject* range, int rows, int cols, TABLE_STYLE style= NO_BORDER);
+    QAxObject* add_table(QAxObject* range, int rows, int cols, TABLE_STYLE style = NO_BORDER);
     QAxObject* get_cell(QAxObject* table, int row, int cols);
 
     void resize_picture(QString pic_path, QAxObject* inline_shape);
@@ -69,7 +69,7 @@ private:
 
     // Methods finishing up reportgeneration
     QString save_report(QAxObject* active_document);
-    void close_report(QAxObject* doc, QAxObject*  word);
+    void close_report(QAxObject* doc);
 
     // Formatting methods
     std::string date_time_generator();

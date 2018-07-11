@@ -1,5 +1,4 @@
 #include "reportgenerator.h"
-#include <QDebug>
 
 /**
  * @brief ReportGenerator::ReportGenerator
@@ -33,15 +32,24 @@ void ReportGenerator::create_report() {
         doc->dynamicCall("Add()");
         QAxObject* active_doc = word->querySubObject("ActiveDocument");
         //4. ADD IMAGES FROM BOOKMARK FOLDER
-        create_bookmark_table(active_doc, m_rep_cont);
+        create_bookmark_table(active_doc);
         //5. SAVE AND CLOSE FILE
-        save_report(active_doc);
-        close_report(doc, word);
+        QString path = save_report(active_doc);
+        path.replace("/", "\\\\");
+        close_report(doc);
+        doc->dynamicCall("Open(QString path)", path);
     } else {
         qWarning("Could not find Word instance");
     }
 }
 
+/**
+ * @brief ReportGenerator::get_bookmark_descr
+ * Create a string from the description of the bookmark bm.
+ * The string contains all the information that will be printed in the report.
+ * @param bm
+ * @return
+ */
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
     std::string f_name = Utility::name_from_path(bm->get_file_path().toStdString());
     QString img_file = QString::fromStdString(f_name);
@@ -64,6 +72,8 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
  * @param pic_path, path to the bookmark that is to be resized.
  * @param inline_shape, A word specific object that is a shape where its
  * layout is "inline" with the rest of the document.
+ *
+ * TODO Unused
  */
 void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) {
     QImage image = QImage(pic_path);
@@ -77,17 +87,17 @@ void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) 
 }
 
 /**
- * @brief ReportGenerator::add_bookmarks
+ * @brief ReportGenerator::create_bookmark_table
  * This method will add all bookmarks for the current project
  * to the document.
- * @param selection, the selector in the active document.
+ * @param para, document to add the bookmarks to
  */
-void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_cont) {
+void ReportGenerator::create_bookmark_table(QAxObject* para) {
     // Space to use for table
     QAxObject* range = para->querySubObject("Range(int,int)",0,0);
 
     // Table should have room for categories, their titles and its own title
-    QAxObject* table = add_table(range, rp_cont.size()*2+1,2,BORDER);
+    QAxObject* table = add_table(range, m_rep_cont.size()*2+1, 2, BORDER);
 
     // Add title text
     cell_add_text(table, "Omstritt", 1,1);
@@ -95,20 +105,20 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_
 
     // Table indexed from 1, begin after title.
     int cell_row = 2;
-    for (size_t i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
+    for (size_t i = 0; i != m_rep_cont.size(); i++) { // for each category, make a paragraph of bookmarks
         // Access duplicate category title cells and merge them together
         QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
         _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
         // Write category name
-        cell_add_text(table, rp_cont.at(i).first, cell_row,1);
+        cell_add_text(table, m_rep_cont.at(i).first, cell_row,1);
 
         // Go to next table row
         cell_row++;
 
         // Access disputed and reference bookmarks
-        std::vector<BookmarkItem*> bm_ref = rp_cont.at(i).second.first;
-        std::vector<BookmarkItem*> bm_disp = rp_cont.at(i).second.second;
+        std::vector<BookmarkItem*> bm_ref = m_rep_cont.at(i).second.first;
+        std::vector<BookmarkItem*> bm_disp = m_rep_cont.at(i).second.second;
 
         // Access cells to be used for storing disp and ref bookmarks
         QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 1);
@@ -135,7 +145,7 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_
         bmark_range->dynamicCall("Collapse(int)", 0);   // 0 - get end, 1 - get start of range
 
         // Insert the bookmark description, divider line and bookmark image as a stack
-        // beacause they are all inserted at the same position
+        // because they are all inserted at the same position
         bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm));
         bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + "-----------------------");
 
@@ -280,14 +290,13 @@ QString ReportGenerator::save_report(QAxObject* active_document) {
     active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
     return QString::fromStdString(path);
 }
+
 /**
  * @brief ReportGenerator::close_report
- * This method will close the document and quit the the word application that are sent in
+ * This method will close the document that are sent in
  * as a parameter.
  * @param doc, document instance
- * @param word, word application
  */
-void ReportGenerator::close_report(QAxObject* doc, QAxObject* word) {
+void ReportGenerator::close_report(QAxObject* doc) {
     doc->dynamicCall("Close()");
-    word->dynamicCall("Quit()");
 }
