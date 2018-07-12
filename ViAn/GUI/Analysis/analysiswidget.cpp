@@ -94,6 +94,11 @@ void AnalysisWidget::abort_analysis() {
     *abort = true;
 }
 
+void AnalysisWidget::abort_all_analysis() {
+    abort_all = true;
+    abort_analysis();
+}
+
 void AnalysisWidget::on_analysis_aborted() {
     analysis_queue.pop_front();
     delete current_analysis_item; // Delete item from tree
@@ -105,6 +110,9 @@ void AnalysisWidget::on_analysis_aborted() {
         current_analysis_item = std::get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
+        if (abort_all) {
+            abort_analysis();
+        }
         return;
     }
     // Queue Empty
