@@ -36,6 +36,7 @@ public:
     const int SIZE_MULTIPLIER = 40;
     const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
     const int VIDEO_WGT_HEIGHT = 9;
+    const int FLOATING_WIDGET_MAX = 3;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
@@ -62,6 +63,8 @@ private slots:
     void delete_current_drawing();
     void zoom();
     void move();
+    void open_widget(VideoProject *vid_proj);
+    void close_widget(VideoWidget*);
 
 public slots:
     void options(void);
@@ -95,6 +98,8 @@ private:
     QAction* toggle_drawing_toolbar;
 
     AnalysisWindow *analysis_window;
+
+    std::vector<VideoWidget*> video_widgets;
 
     void init_rp_dialog();
     void open_rp_dialog();

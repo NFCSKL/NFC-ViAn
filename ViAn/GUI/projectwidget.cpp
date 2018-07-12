@@ -8,15 +8,11 @@
 #include <QDirIterator>
 #include <QShortcut>
 #include <QMessageBox>
-#include <QtConcurrent/QtConcurrent>
-#include <QThread>
-#include <QProgressDialog>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include "Project/projecttreestate.h"
 #include "Project/recentproject.h"
-#include "imageimporter.h"
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -115,66 +111,6 @@ void ProjectWidget::add_video() {
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
     }
-}
-
-/**
- * @brief ProjectWidget::add_images
- * Slot function for adding image sequences
- * Each selected image is copied to the project folder
- */
-void ProjectWidget::add_images() {
-    if (m_proj == nullptr)  return;
-
-    QStringList image_paths = QFileDialog().getOpenFileNames(
-                this,
-                tr("Add images"),
-                m_proj->get_dir().c_str());
-
-    // Assert that user selected files
-    if (!image_paths.size()){
-        return;
-    }
-
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Import image sequence"),
-                                         tr("Sequence name:"), QLineEdit::Normal,
-                                         "Sequence", &ok,
-                                         Qt::WindowCloseButtonHint);
-
-    // Check if dialog was accepted and that proper name was used
-    QString seq_name{"sequence"};
-    if (ok && !text.isEmpty())
-        seq_name = text;
-    else
-        return;
-
-
-    QString path = QString::fromStdString(m_proj->get_dir()) + "Sequences/" + seq_name;
-
-    QProgressDialog* progress = new QProgressDialog(
-                "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
-    ImageImporter* importer = new ImageImporter(image_paths, path);
-    QThread* copy_thread = new QThread();
-    importer->moveToThread(copy_thread);
-
-    connect(progress, &QProgressDialog::canceled, importer, &ImageImporter::abort);
-    connect(importer, &ImageImporter::update_progress, progress, &QProgressDialog::setValue);
-
-    connect(copy_thread, &QThread::started, importer, &ImageImporter::import_images);
-    connect(importer, &ImageImporter::finished, copy_thread, &QThread::quit);
-    connect(importer, &ImageImporter::finished, importer, &ImageImporter::deleteLater);
-    connect(copy_thread, &QThread::finished, copy_thread, &QThread::deleteLater);
-    connect(importer, &ImageImporter::imported_sequence, this, &ProjectWidget::create_sequence);
-    progress->show();
-    copy_thread->start();
-}
-
-void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
-    std::vector<std::string> images;
-    for (auto image : image_paths) {images.push_back(image.toStdString());}
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
-    m_proj->add_video_project(vid_proj);
-    tree_add_video(vid_proj, "test");
 }
 
 /**
@@ -458,10 +394,6 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
-            auto vid = vid_proj->get_video();
-            if (vid && vid->is_sequence()) {
-                v_item->load_sequence_items();
-            }
         }
     }
 }
@@ -616,22 +548,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     Q_UNUSED(col)
     if (!item) return;
     switch(item->type()){
-    case SEQUENCE_ITEM: {
-        auto seq_item = dynamic_cast<SequenceItem*>(item);
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        vid_item->get_video_project()->get_video()->state.frame = seq_item->get_index();
-        emit set_video_project(vid_item->get_video_project());
-        emit marked_video_state(vid_item->get_video_project(),
-                                vid_item->get_video_project()->get_video()->state);
-
-        emit set_detections(false);
-        emit set_poi_slider(false);
-        emit set_tag_slider(false);
-        emit enable_poi_btns(false,false);
-
-        update_current_tag(vid_item);
-        break;
-    } case VIDEO_ITEM: {
+    case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit set_video_project(vid_item->get_video_project());
         VideoState state;
@@ -860,6 +777,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case VIDEO_ITEM:
                 menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             case TAG_FRAME_ITEM:
@@ -874,6 +792,11 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Delete", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
+}
+
+void ProjectWidget::open_video_in_widget() {
+    VideoItem* v_item = dynamic_cast<VideoItem*>(currentItem());
+    emit open_in_widget(v_item->get_video_project());
 }
 
 /**

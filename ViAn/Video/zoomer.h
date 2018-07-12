@@ -43,7 +43,6 @@ public:
     QPoint get_anchor() const;
     QSize get_viewport_size() const;
     int get_interpolation_method() const;
-    cv::Rect get_frame_rect() const;
 
     void update_rect_size();
 private:

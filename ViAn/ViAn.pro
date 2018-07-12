@@ -35,7 +35,6 @@ SOURCES += main.cpp \
     Project/projecttreestate.cpp \
     GUI/Analysis/tagdialog.cpp \
     imageexporter.cpp \
-    imageimporter.cpp \
     Project/Analysis/tag.cpp \
     Video/videocontroller.cpp \
     Video/videoplayer.cpp \
@@ -79,8 +78,6 @@ SOURCES += main.cpp \
     GUI/TreeItems/tagframeitem.cpp \
     Project/Analysis/interval.cpp \
     Project/Analysis/tagframe.cpp \
-    Project/imagesequence.cpp \
-    GUI/TreeItems/sequenceitem.cpp \
     GUI/Analysis/anasettingwidget.cpp \
     GUI/Bookmark/bookmarkdialog.cpp
 
@@ -99,7 +96,6 @@ HEADERS += reportgenerator.h\
     Project/Test/videoprojecttest.h \
     GUI/Bookmark/bookmarkcategory.h \
     imagegenerator.h \
-    imageimporter.h \
     GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
     GUI/Analysis/analysiswidget.h \
@@ -151,8 +147,6 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/tagframeitem.h \
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
-    Project/imagesequence.h \
-    GUI/TreeItems/sequenceitem.h \
     GUI/Analysis/anasettingwidget.h \
     GUI/Bookmark/bookmarkdialog.h
 

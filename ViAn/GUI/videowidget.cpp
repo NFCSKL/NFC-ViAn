@@ -22,12 +22,13 @@
 
 
 
-VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
+VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scroll_area(new DrawScrollArea) {
+    m_floating = floating;
     // Init video controller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
                                        &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
-                                       &m_speed_step, &m_abort_playback);
+                                       &m_speed_step);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -59,21 +60,27 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
 
     init_video_controller();
+
     v_controller->start();
     init_frame_processor();
 }
 
 VideoWidget::~VideoWidget(){
-    if (v_controller->isRunning()) {
-        // Tell controller thread to exit and wait for it to finish
-        m_abort_playback.store(true);
-        v_controller->exit();
-        if (!v_controller->wait(5000)) {
-            // Controller did not finish in time. Force shutdown
-            v_controller->terminate();
-            v_controller->wait();
-        }
+    play_btn_toggled(false);
+    delete f_processor;
+    processing_thread->deleteLater();
+    processing_thread->quit();
+    if (!processing_thread->wait(ONE_SEC)) {
+        processing_thread->terminate();
     }
+
+    delete v_controller;
+    delete frame_wgt;
+}
+
+void VideoWidget::closeEvent(QCloseEvent *event) {
+    event->accept();
+    emit close_video_widget(this);
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -147,7 +154,6 @@ void VideoWidget::init_video_controller(){
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
-    connect(v_controller, &VideoController::finished, v_controller, &VideoController::deleteLater);
 }
 
 /**
@@ -158,7 +164,13 @@ void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
                                      &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
-    QThread* processing_thread = new QThread();
+    try {
+        processing_thread = new QThread(this);
+    } catch (const std::bad_alloc& e) {
+        qWarning() << "Failed to open new thread";
+        close();
+    }
+
     f_processor->moveToThread(processing_thread);
     connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
     connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
@@ -181,6 +193,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+    connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
     connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
 
     processing_thread->start();
@@ -210,8 +223,7 @@ void VideoWidget::set_btn_icons() {
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/original_size.png"), "", this);
 
 
-    zoom_label = new QLineEdit(this);
-    zoom_label->setText("100%");
+    zoom_label = new QLineEdit("100%", this);
     zoom_label->setMinimumWidth(40);
     zoom_label->setMaximumWidth(60);
     zoom_label->setEnabled(false);
@@ -340,7 +352,7 @@ void VideoWidget::set_btn_shortcuts() {
  * Create and add speed adjustment slider
  */
 void VideoWidget::init_speed_slider() {
-    speed_slider = new QSlider(Qt::Horizontal);
+    speed_slider = new QSlider(Qt::Horizontal, this);
     speed_slider->setRange(-4,4);
     speed_slider->setMaximumWidth(120);
     speed_slider->setPageStep(1);
@@ -934,7 +946,6 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         set_overlay(m_vid_proj->get_overlay());
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
-
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();
@@ -988,6 +999,11 @@ void VideoWidget::set_video_btns(bool b) {
     speed_slider->setEnabled(b);
     tag_btn->setEnabled(b);
     video_btns_enabled = b;
+    if (m_floating) {
+        bookmark_btn->setDisabled(true);
+        new_label_btn->setDisabled(true);
+        tag_btn->setDisabled(true);
+    }
 }
 
 
@@ -996,9 +1012,9 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     prev_poi_btn->setEnabled(b);
 
     analysis_play_btn->setEnabled(ana_play_btn);
-    if (!ana_play_btn) {
-        analysis_play_btn->setChecked(ana_play_btn);
-        analysis_only = ana_play_btn;
+    if (!b) {
+        analysis_play_btn->setChecked(b);
+        analysis_only = b;
     }
 }
 

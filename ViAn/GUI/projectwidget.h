@@ -9,7 +9,6 @@
 #include <QAction>
 #include <QStandardPaths>
 #include <vector>
-#include "Project/imagesequence.h"
 #include "Project/project.h"
 #include "GUI/TreeItems/tagitem.h"
 #include "GUI/TreeItems/analysisitem.h"
@@ -81,8 +80,6 @@ public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
-    void add_images();
-    void create_sequence(QStringList image_paths, std::string path);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_tag(VideoProject*, Tag *tag);
     void add_frames_to_tag_item(TreeItem *item);
@@ -106,6 +103,7 @@ public slots:
     bool prompt_save();
 private slots:
     void context_menu(const QPoint& point);
+    void open_video_in_widget();
     void remove_item();
     void rename_item();
     void drawing_tag();
@@ -136,6 +134,7 @@ private:
 signals:
     void project_closed();
     void item_removed(VideoProject* vid_proj);
+    void open_in_widget(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
     void clear_analysis();
 };

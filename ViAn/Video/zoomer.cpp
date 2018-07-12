@@ -164,10 +164,6 @@ QSize Zoomer::get_viewport_size() const {
     return m_viewport_size;
 }
 
-cv::Rect Zoomer::get_frame_rect() const {
-    return m_frame_rect;
-}
-
 /**
  * @brief Zoomer::get_interpolation_method
  * @return current interpolation method
@@ -219,18 +215,12 @@ void Zoomer::reset() {
 void Zoomer::scale_frame(cv::Mat &frame) {
     if (m_frame_size.width < m_zoom_rect.width || m_frame_size.height < m_zoom_rect.height) {
         qWarning("Zoom rectangle is larger then the frame. Fitting to screen");
+
         m_zoom_rect = m_frame_rect;
     }
-
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;
-
-    try {
-        cv::resize(frame(m_zoom_rect), frame, cv::Size(), m_scale_factor, m_scale_factor, interpol);
-    } catch (cv::Exception& e) {
-        const char* err_msg = e.what();
-        qCritical() << "Exception: " << err_msg;
-    }
+    cv::resize(frame(m_zoom_rect), frame, cv::Size(), m_scale_factor, m_scale_factor, interpol);
 }
 
 /**

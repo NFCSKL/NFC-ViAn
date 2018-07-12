@@ -25,6 +25,11 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
     // cv::namedWindow("test");
 }
 
+FrameProcessor::~FrameProcessor() {
+    loop = false;
+    m_v_sync->con_var.notify_all();
+}
+
 /**
  * @brief FrameProcessor::check_events
  * This method handles all processing requests and will sleep when there is none.
@@ -39,9 +44,14 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
  * load settings
  */
 void FrameProcessor::check_events() {
-    while (true) {
+    while (loop) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
+        m_v_sync->con_var.wait(lk, [&]{return !loop || m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
+        if (!loop) {
+            lk.unlock();
+            continue;
+        }
+
         // A new video has been loaded. Reset processing settings    
         if (m_new_frame_video->load()) {
             reset_settings();
@@ -90,11 +100,20 @@ void FrameProcessor::check_events() {
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
             m_new_frame->store(false);
-            m_frame = m_v_sync->frame.clone();
+            try {
+                m_frame = m_v_sync->frame.clone();
+            } catch (cv::Exception& e) {
+                qWarning() << "Failed to copy new frame";
+                emit set_play_btn(false);
+                lk.unlock();
+                m_v_sync->con_var.notify_all();
+                continue;
+            }
+
             process_frame();
 
             lk.unlock();
-            m_v_sync->con_var.notify_one();
+            m_v_sync->con_var.notify_all();
             continue;
         }
     }
@@ -108,15 +127,18 @@ void FrameProcessor::check_events() {
  * When done it will emit the manipulated frame on the done_processing signal.
  */
 void FrameProcessor::process_frame() {
-
     if (m_frame.empty()) return;
-    cv::Mat manipulated_frame = m_frame.clone();
+    cv::Mat manipulated_frame;
+    try {
+        manipulated_frame = m_frame.clone();
+    } catch (cv::Exception& e) {
+        qWarning() << "Failed to copy new frame in processor";
+        return;
+    }
 
-    bool rotated{false};
     // Rotates the frame, according to the choosen direction.
     if (ROTATE_MIN <= m_rotate_direction && m_rotate_direction <= ROTATE_MAX) {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
-        rotated = true;
     }
 
     // Displays the zoom rectangle on the original frame in a new windows.
@@ -128,21 +150,6 @@ void FrameProcessor::process_frame() {
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
 
     // Scales the frame
-    cv::Rect prev_rect = m_zoomer.get_frame_rect();
-    if (!rotated && (prev_rect.width != m_width->load() || prev_rect.height != m_height->load())) {
-        // Source size has changed (image sequence)
-        m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
-        m_zoomer.fit_viewport();
-
-        // Store changes made
-        m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
-        cv::Rect tmp = m_zoomer.get_zoom_rect();
-        m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
-        m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
-
-        emit set_anchor(m_zoomer.get_anchor());
-        emit set_scale_factor(m_zoomer.get_scale_factor());
-    }
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
