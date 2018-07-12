@@ -1,4 +1,5 @@
 #include "videoitem.h"
+#include "sequencecontaineritem.h"
 
 #include "imagegenerator.h"
 #include "Project/imagesequence.h"
@@ -76,17 +77,45 @@ void VideoItem::load_thumbnail() {
 /**
  * @brief VideoItem::load_sequence_items
  * Adds each image from the sequence as a child to the list item.
+ * The items are added in order based on their indices
  */
 void VideoItem::load_sequence_items() {
     if (m_vid_proj == nullptr ) return;
     auto seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
     if (seq) {
-        QTreeWidgetItem* container = new QTreeWidgetItem();
-        container->setText(0, SEQUENCE_CONTAINER_NAME);
+        // Create container item for all SequenceItems
+        SequenceContainerItem* container = new SequenceContainerItem();
         addChild(container);
-        int i{};
-        for (auto img_name : seq->get_image_names()) {
-            container->addChild(new SequenceItem(img_name, i++));
+
+        // Add all SequenceItems
+        for (auto pair : seq->get_unsaved_order()) {
+            auto seq_item = new SequenceItem(seq->get_original_name_from_hash(pair.first), pair.first);
+
+            // Insert in order
+            if (!container->childCount()) {
+                // First item to be addded
+                container->addChild(seq_item);
+            } else {
+                // Insert item before items with larger index
+                int seq_item_index = seq->get_index_of_hash(pair.first);
+                bool added{false};
+                for (auto i = 0; i < container->childCount(); ++i) {
+                    auto child_item = dynamic_cast<SequenceItem*>(container->child(i));
+                    if (child_item) {
+                        if (child_item->get_index() > seq_item_index) {
+                            container->insertChild(i, seq_item);
+                            added = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!added) {
+                    // Item should be added at the end
+                    container->addChild(seq_item);
+                }
+            }
         }
+        container->update_text();
     }
 }

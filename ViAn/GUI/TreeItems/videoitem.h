@@ -5,7 +5,6 @@
 class VideoProject;
 class VideoItem : public TreeItem {
     VideoProject* m_vid_proj = nullptr;
-    const QString SEQUENCE_CONTAINER_NAME = "Images";
 public:
     VideoItem(VideoProject* video_project);
     VideoItem();

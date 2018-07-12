@@ -8,6 +8,7 @@
 void ImageSequence::on_save() {
     m_saved_order = m_unsaved_order;
     //TODO remove items that no longer are in the sequence
+    // update original images
 }
 
 /**
@@ -15,7 +16,7 @@ void ImageSequence::on_save() {
  * @param name: name of the sequence
  */
 ImageSequence::ImageSequence(const std::string& path) : Video(true){
-    seq_path = path;
+    m_seq_path = path;
     int index = path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
 }
@@ -25,53 +26,31 @@ ImageSequence::ImageSequence(const std::string& path) : Video(true){
  * @param name: name of the sequence
  * @param images: vector of paths to images
  */
-ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string> &images)
-    : Video(true) {
-    seq_path = path;
-    int index = path.find_last_of('/') + 1;
-    m_name = path.substr(index);
-    m_images = images;
-    file_path = seq_path + "/" + get_pattern_name();
+ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string>& images, const std::vector<std::string>& checksums)
+    : Video(path, true) {
 
-    // Go through each file in the sequence folder and hash it
-    for (unsigned int i = 0; i < m_images.size(); ++i) {
-        QString file_path = QString::fromStdString(seq_path + "/" + Utility::zfill(std::to_string(i), Utility::number_of_digits(m_images.size())));
-        std::string hash = Utility::checksum(file_path).toStdString();
-        m_unsaved_order[hash] = i;
-        m_original_images[hash] = images[i];
-        qDebug() << "Checksum created: " << QString::fromStdString(hash);
+    // Store image order and original file paths
+    for (size_t i = 0; i < checksums.size(); ++i) {
+        m_unsaved_order[checksums[i]] = i;
+        m_original_images[checksums[i]] = images[i];
     }
-}
 
-std::string ImageSequence::get_container_path() const {
-    return seq_path;
+    m_seq_path = path;
+    file_path = path + "/" + get_pattern_name();
 }
 
 /**
- * @brief ImageSequence::get_images
- * @return vector of image paths
+ * @brief ImageSequence::get_search_path
+ * @return std::string with the actual disc path to the folder containing the images
  */
-std::vector<std::string> ImageSequence::get_images(){
-    return m_images;
-}
-
-/**
- * @brief ImageSequence::get_image_names
- * @return returns the file names of each item in the sequence (including suffix)
- */
-std::vector<std::string> ImageSequence::get_image_names() {
-    std::vector<std::string> names;
-    for (auto image_path : m_images){
-        int index = image_path.find_last_of('/') + 1;
-        names.push_back(image_path.substr(index));
-    }
-    return names;
+std::string ImageSequence::get_search_path() const {
+    return m_seq_path;
 }
 
 /**
  * @brief ImageSequence::get_pattern_name
  * Returns the string neccessary for opencv's VideoCapture class to open and play the sequence.
- * The string is a path relative the project path and need as such be appended to that before playback.
+ * The string is a path relative the project path.
  * @return sequence pattern
  */
 std::string ImageSequence::get_pattern_name() {
@@ -79,10 +58,20 @@ std::string ImageSequence::get_pattern_name() {
     return "%0" + std::to_string(digits) + "d";
 }
 
+/**
+ * @brief ImageSequence::get_saved_order
+ * Returns the saved order of the sequence
+ * @return std::map key: checksum of file, value: index in sequence
+ */
 std::map<std::string, int> ImageSequence::get_saved_order() const {
     return m_saved_order;
 }
 
+/**
+ * @brief ImageSequence::get_unsaved_order
+ * Returns the unsaved order of the sequence
+ * @return std::map key: checksum of file, value: index in sequence
+ */
 std::map<std::string, int> ImageSequence::get_unsaved_order() const {
     return m_unsaved_order;
 }
@@ -96,7 +85,6 @@ std::vector<std::string> ImageSequence::get_unsaved_hashes() const {
     std::vector<std::string> hashes;
     for (auto it = m_unsaved_order.begin(); it != m_unsaved_order.end(); ++it) {
         if (m_saved_order.find((*it).first) == m_saved_order.end()) {
-            qDebug() << QString::fromStdString((*it).first) << ": Not saved";
             hashes.push_back((*it).first);
         }
     }
@@ -104,31 +92,79 @@ std::vector<std::string> ImageSequence::get_unsaved_hashes() const {
 }
 
 /**
- * @brief ImageSequence::length
- * @return amount of images
+ * @brief ImageSequence::get_index_of_hash
+ * @param hash: file hash/checksum
+ * @return int the index in of the hash in the unsaved order
  */
-int ImageSequence::length(){
-    return m_images.size();
+int ImageSequence::get_index_of_hash(const std::string &hash) const {
+    return m_unsaved_order.at(hash);
 }
 
+/**
+ * @brief ImageSequence::get_hash_origin
+ * Returns the path to the original file mapped to the hash/checksum
+ * @param hash
+ * @return std::string containing original image path
+ */
+std::string ImageSequence::get_original_name_from_hash(const std::string &hash) const {
+    return Utility::name_from_path(m_original_images.at(hash));
+}
+
+/**
+ * @brief ImageSequence::remove_image_with_hash
+ * Removes the image with hash from the unsaved order
+ * Also renames the actual file on disc (not removed so it can be "restored" and added to the sequence again)
+ * @param hash
+ * @return bool success
+ */
+bool ImageSequence::remove_image_with_hash(const std::string &hash) {
+    auto it = m_unsaved_order.find(hash);
+    if (it == m_unsaved_order.end()) return false;
+    m_unsaved_order.erase(it);
+    // TODO rename file to some temp name
+    return true;
+}
+
+/**
+ * @brief ImageSequence::length
+ * @return int length of the sequence
+ */
+int ImageSequence::length(){
+    return m_unsaved_order.size();
+}
+
+/**
+ * @brief ImageSequence::read
+ * Reads members from json object
+ * @param json
+ */
 void ImageSequence::read(const QJsonObject &json) {
     Video::read(json);
-    seq_path = json["seq_path"].toString().toStdString();
-    QJsonArray images = json["images"].toArray();
-    for(auto item : images){
-        m_images.push_back(item.toString().toStdString());
+    m_seq_path = json["seq_path"].toString().toStdString();
+
+    // read sequence order
+    QJsonObject order = json["order"].toObject();
+    for (auto key : order.keys()) {
+        m_saved_order[key.toStdString()] = order.value(key).toInt();
+    }
+    m_unsaved_order = m_saved_order;
+
+    // read sequence order
+    QJsonObject original_images = json["original_images"].toObject();
+    for (auto key : original_images.keys()) {
+        m_original_images[key.toStdString()] = original_images.value(key).toString().toStdString();
     }
 }
 
+/**
+ * @brief ImageSequence::write
+ * Writes members to json object
+ * @param json
+ */
 void ImageSequence::write(QJsonObject &json) {
     on_save();
     Video::write(json);
-    json["seq_path"] = QString::fromStdString(seq_path);
-    QJsonArray images;
-    for (auto image_path : m_images){
-        images.append(QString::fromStdString(image_path));
-    }
-    json["images"] = images;
+    json["seq_path"] = QString::fromStdString(m_seq_path);
 
     QJsonObject order, original_images;
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
@@ -140,20 +176,26 @@ void ImageSequence::write(QJsonObject &json) {
 }
 
 void ImageSequence::add_image(const std::string &image_path, const int& index) {
-    if (index == -1) {
-        m_images.push_back(image_path);
-    } else {
-        m_images.insert(m_images.begin() + index, image_path);
-    }
+    Q_UNUSED(image_path);
+    Q_UNUSED(index);
+// SAVE CODE INCASE OF REIMPLEMENTATION
+//    if (index == -1) {
+//        m_images.push_back(image_path);
+//    } else {
+//        m_images.insert(m_images.begin() + index, image_path);
+//    }
 }
 
 void ImageSequence::reorder_elem(const int &from, const int &to) {
-    if (!(from >= 0 && to >= 0 && from < m_images.size() && to <= m_images.size())) return;
-    auto tmp = m_images.at(from);
-    m_images.insert(m_images.begin() + to, tmp);
-    if (to < from) {
-        m_images.erase(m_images.begin() + from + 1);
-    } else {
-        m_images.erase(m_images.begin() + from);
-    }
+    Q_UNUSED(from);
+    Q_UNUSED(to);
+// SAVE CODE INCASE OF REIMPLEMENTATION
+//    if (!(from >= 0 && to >= 0 && from < m_images.size() && to <= m_images.size())) return;
+//    auto tmp = m_images.at(from);
+//    m_images.insert(m_images.begin() + to, tmp);
+//    if (to < from) {
+//        m_images.erase(m_images.begin() + from + 1);
+//    } else {
+//        m_images.erase(m_images.begin() + from);
+//    }
 }

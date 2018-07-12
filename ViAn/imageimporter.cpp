@@ -1,12 +1,6 @@
 #include "imageimporter.h"
-
-#include "utility.h"
-
 #include <QCoreApplication>
-#include <QDir>
-#include <QFileInfo>
 #include <QDebug>
-
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
     m_images(images),
@@ -28,14 +22,19 @@ void ImageImporter::import_images() {
     int num_images = m_images.size();
     int num_digits = Utility::number_of_digits(num_images);
 
+    QStringList checksums;
+
     if (QDir().mkpath(m_dest)) {
         for (int i = 0; i < m_images.size(); ++i) {
             QFileInfo file_info(m_images[i]);
             QString padded_num = QString::fromStdString(Utility::zfill(std::to_string(i), num_digits));
+            QString new_path = m_dest + "/" + padded_num;
 
-            bool copied = QFile().copy(m_images[i], m_dest + "/" + padded_num);
+            bool copied = QFile().copy(m_images[i], new_path);
             if (!copied)
                 m_images.erase(m_images.begin() + i);
+            else
+                checksums.append(Utility::checksum(new_path));
 
             emit update_progress(i + 1);
             QCoreApplication::processEvents(); // Process thread event loop. Needed for abort flag to update
@@ -49,7 +48,7 @@ void ImageImporter::import_images() {
     }
 
     if (!m_abort)
-        emit imported_sequence(m_images, m_dest.toStdString());
+        emit imported_sequence(m_images, checksums, m_dest.toStdString());
     emit update_progress(m_images.size());
     emit finished();
 }

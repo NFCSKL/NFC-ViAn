@@ -2,13 +2,13 @@
 #define SEQUENCEITEM_H
 
 #include "treeitem.h"
-
 class SequenceItem : public TreeItem {
 private:
-    int m_index{};
+    std::string m_hash{};
 public:
-    SequenceItem(const std::string& name, const int& index);
+    SequenceItem(const std::string& name, const std::string& hash);
     int get_index();
+    std::string get_hash() const;
     void remove();
     void rename();
 };

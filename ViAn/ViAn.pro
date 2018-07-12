@@ -30,6 +30,7 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarklist.cpp \
     GUI/statusbar.cpp \
     GUI/Analysis/analysiswidget.cpp \
+    GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
     Project/projecttreestate.cpp \
     GUI/Analysis/tagdialog.cpp \
@@ -71,6 +72,7 @@ SOURCES += main.cpp \
     GUI/DrawingItems/shapeitem.cpp \
     GUI/DrawingItems/textitem.cpp \
     GUI/DrawingItems/penitem.cpp \
+    Project/Analysis/drawingtag.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
     Project/Test/bookmarktest.cpp \
     GUI/textdialog.cpp \
@@ -83,7 +85,12 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
-    GUI/Analysis/analysislistitem.cpp
+    GUI/Analysis/analysislistitem.cpp \
+    GUI/Bookmark/myinputdialog.cpp \
+    GUI/Analysis/anasettingwidget.cpp \
+    Project/imagesequence.cpp \
+    GUI/TreeItems/sequenceitem.cpp \
+    GUI/TreeItems/sequencecontaineritem.cpp
 
 #
 # TEST
@@ -104,6 +111,7 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
     GUI/Analysis/analysiswidget.h \
+    GUI/manipulatordialog.h \
     Video/frameprocessor.h \
     Project/projecttreestate.h \
     GUI/Analysis/tagdialog.h \
@@ -144,6 +152,7 @@ HEADERS += reportgenerator.h\
     GUI/DrawingItems/shapeitem.h \
     GUI/DrawingItems/textitem.h \
     GUI/DrawingItems/penitem.h \
+    Project/Analysis/drawingtag.h \
     GUI/TreeItems/drawingtagitem.h \
     Project/Test/bookmarktest.h \
     GUI/textdialog.h \
@@ -156,7 +165,13 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
-    GUI/Analysis/analysislistitem.h
+    GUI/Analysis/analysislistitem.h \
+    GUI/Bookmark/myinputdialog.h \
+    GUI/Analysis/anasettingwidget.h \
+    Project/imagesequence.h \
+    Project/video.h \
+    GUI/TreeItems/sequenceitem.h \
+    GUI/TreeItems/sequencecontaineritem.h
 
 #
 # LIBRARY
@@ -192,6 +207,7 @@ SOURCES += \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
     Video/shapes/text.cpp \
+    Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
 HEADERS += \
@@ -202,6 +218,7 @@ HEADERS += \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
     Video/shapes/text.h \
+    Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h \
     Video/framemanipulator.h
 
@@ -246,6 +263,7 @@ HEADERS  += \
 # Project
 #
 SOURCES += Project/Test/projecttestsuite.cpp \
+    Project/report.cpp \
     Project/project.cpp \
     Project/video.cpp \
     Project/videoproject.cpp \
@@ -259,6 +277,7 @@ HEADERS +=Project/Test/projecttestsuite.h \
     Project/video.h \
     Project/videoproject.h \
     Project/bookmark.h  \
+    Project/report.h \
     Project/Analysis/analysis.h \
     Project/Analysis/poi.h
 

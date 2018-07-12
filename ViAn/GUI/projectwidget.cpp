@@ -204,10 +204,13 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
-    std::vector<std::string> images;
-    for (auto image : image_paths) {images.push_back(image.toStdString());}
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
+void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, std::string path){
+    std::vector<std::string> images, hashes;
+    for (auto i = 0; i < image_paths.size(); i++) {
+        images.push_back(image_paths.at(i).toStdString());
+        hashes.push_back(checksums.at(i).toStdString());
+    }
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -1401,15 +1404,14 @@ bool ProjectWidget::close_project() {
                 QStringList hashes;
                 for (auto hash : sequence->get_unsaved_hashes()) hashes.append(QString::fromStdString(hash));
                 if (!hashes.isEmpty()) {
-                    Utility::remove_checksum_files(QString::fromStdString(sequence->get_container_path()),
+                    Utility::remove_checksum_files(QString::fromStdString(sequence->get_search_path()),
                                               hashes);
                 }
 
                 // Delete container folder if there are no images left
                 if (!sequence->get_saved_order().size()){
-                    qDebug() << "No items left. Removing container folder " << QString::fromStdString(sequence->get_container_path());
-                    QDir directory(QString::fromStdString(sequence->get_container_path()));
-                    qDebug() << directory.removeRecursively();
+                    QDir directory(QString::fromStdString(sequence->get_search_path()));
+                    directory.removeRecursively();
                 }
             }
         }
