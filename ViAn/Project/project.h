@@ -37,6 +37,7 @@ class Project : public Saveable{
     std::string m_name = "";            // Simply the project name
     std::string m_dir_bookmarks = "";   // Project directory + /Bookmarks
     std::string m_file = "";            // Full path to the project file: project path + project name + .vian
+    std::string last_changed = "";      // Date and time when the project was last saved
 
     std::vector<VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
@@ -80,6 +81,7 @@ public:
     std::string get_dir() const;
     std::string get_name() const;
     std::string get_file() const;
+    std::string get_last_changed() const;
     void set_name(std::string);
     void set_dir(std::string);
     void set_file(std::string);

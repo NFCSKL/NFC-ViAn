@@ -79,10 +79,10 @@ SOURCES += main.cpp \
     GUI/TreeItems/tagframeitem.cpp \
     Project/Analysis/interval.cpp \
     Project/Analysis/tagframe.cpp \
-    GUI/Bookmark/myinputdialog.cpp \
-    GUI/Analysis/anasettingwidget.cpp \
     Project/imagesequence.cpp \
-    GUI/TreeItems/sequenceitem.cpp
+    GUI/TreeItems/sequenceitem.cpp \
+    GUI/Analysis/anasettingwidget.cpp \
+    GUI/Bookmark/bookmarkdialog.cpp
 
 #
 # TEST
@@ -151,11 +151,10 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/tagframeitem.h \
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
-    GUI/Bookmark/myinputdialog.h \
-    GUI/Analysis/anasettingwidget.h \
     Project/imagesequence.h \
-    Project/video.h \
-    GUI/TreeItems/sequenceitem.h
+    GUI/TreeItems/sequenceitem.h \
+    GUI/Analysis/anasettingwidget.h \
+    GUI/Bookmark/bookmarkdialog.h
 
 #
 # LIBRARY

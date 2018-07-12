@@ -1,7 +1,7 @@
 #include "anasettingwidget.h"
 
 AnaSettingWidget::AnaSettingWidget(AnalysisSettings* settings, QWidget *parent) : QWidget(parent) {
-    setWindowTitle("Vian - Analysis settings");
+    setWindowTitle("Vian - Analysis info");
     form_layout = new QFormLayout();
     setLayout(form_layout);
     m_settings = settings;

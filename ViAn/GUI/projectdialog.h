@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QString>
-#include <QStandardPaths>
+#include <QDir>
 
 class ProjectDialog : public QDialog
 {
@@ -16,11 +16,13 @@ class ProjectDialog : public QDialog
     QLineEdit* path_text;
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
-    const QString DEFAULT_PATH = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ViAn Projects";
+    QString m_default_path;
+
+    const int MIN_WIDTH = 400;
 
     void enable_ok_btn(const bool& enable);
 public:
-    explicit ProjectDialog(QString* name, QString* path, QWidget *parent = nullptr);
+    explicit ProjectDialog(QString* name, QString* path, QWidget *parent = nullptr, QString default_path = QDir::homePath());
 
 signals:
     void project_path(QString name, QString path);

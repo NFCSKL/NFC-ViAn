@@ -304,9 +304,6 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
                 get_drawing(pos, frame_nr);
             }
             break;
-        case SELECT:
-            get_drawing(pos, frame_nr);
-            break;
         default:
             break;
         }
@@ -358,10 +355,6 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
-    if (current_shape == SELECT) {
-        emit set_tool_edit();
-        return;
-    }
     if (!current_drawing) return;
     if (current_drawing->get_shape() == TEXT) {
         double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
@@ -407,7 +400,6 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
             prev_point = pos;
         } else if (current_shape == TEXT) {
             overlays[frame_nr].back()->update_text_pos(pos);
-        } else if (current_shape == SELECT) {
         } else {
             if (current_shape != PEN && shift) {
                 // When the shift modifier is used draw a symmetric drawing

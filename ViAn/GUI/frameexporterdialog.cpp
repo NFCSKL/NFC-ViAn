@@ -9,6 +9,7 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_old_path_text = QString::fromStdString(proj_path +"Stills/");
     setWindowTitle("ViAn - Image exporter");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setWindowIcon(QIcon("../ViAn/Icons/folder_interval.png"));
 
     m_from_box = new QSpinBox(this);
     m_from_box->setRange(0, max_frame);

@@ -5,7 +5,7 @@
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                               std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
+                               std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
                                std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed) {
     m_new_frame = new_frame;
 
@@ -15,7 +15,7 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
     m_man_settings = m_settings;
     m_o_settings = o_settings;
     m_v_sync = v_sync;
-    m_new_video = new_video;
+    m_new_frame_video = new_frame_video;
 
     m_width = width;
     m_height = height;
@@ -41,12 +41,15 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
+        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
         // A new video has been loaded. Reset processing settings    
-        if (m_new_video->load()) {
+        if (m_new_frame_video->load()) {
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
+            update_manipulator_settings();
+            update_zoomer_settings();
+            skip_process = false;
 
             lk.unlock();
             continue;
@@ -194,7 +197,7 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.fit_viewport();
     }
     // Set original size (no zoom)
-    else if (m_z_settings->original){
+    else if (m_z_settings->original) {
         m_z_settings->original = false;
         m_zoomer.reset();
     }
@@ -231,6 +234,7 @@ void FrameProcessor::update_manipulator_settings() {
         m_zoomer.flip();
     }
     m_man_settings->rotate = 0;
+    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
 }
 
 /**
@@ -300,17 +304,13 @@ void FrameProcessor::update_overlay_settings() {
  * (Modifies shared data. Use v_sync_lock)
  */
 void FrameProcessor::reset_settings() {
-    m_new_video->store(false);
+    m_new_frame_video->store(false);
     m_rotate_direction = ROTATE_NONE;
 
     // Reset manipulator values
     m_manipulator.reset();
-    m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
-    m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
 
-    m_z_settings->set_state = true;
-    update_zoomer_settings();
     skip_process = false;
 
     emit set_anchor(m_zoomer.get_anchor());

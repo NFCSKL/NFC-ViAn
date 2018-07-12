@@ -26,6 +26,7 @@
 #include "Project/Analysis/tag.h"
 #include "Video/videocontroller.h"
 #include "Video/videoplayer.h"
+#include "Video/framemanipulator.h"
 
 class VideoWidget : public QWidget
 {
@@ -39,8 +40,8 @@ private:
     int prev_frame_idx;
     int POI_end;
     double m_scale_factor = 1;
-    int brightness = 0;
-    double contrast = 1;
+    int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
+    double contrast = FrameManipulator().CONTRAST_DEFAULT;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -100,24 +101,14 @@ public:
     double get_contrast();
 
 signals:
-    void first_frame(cv::Mat frame);
-    void zoom_out(double zoom_factor);
-    void set_zoom(double zoom_factor);
-    void set_play_video(void);
-    void set_pause_video(void);
-    void set_stop_video(void);
-    void next_video_frame(void);
-    void prev_video_frame(void);
-    void ret_first_frame(void);
-    void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString);
+    void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_tag(VideoProject*, Tag*);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);
-    void load_video(std::string video_path); // TODO Not used?
-    void export_original_frame(VideoProject* ,const int, cv::Mat);
+    void export_original_frame(VideoProject*, const int, cv::Mat);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
@@ -151,11 +142,13 @@ public slots:
     void set_current_frame_size(QSize size);
     void on_export_frame(void);
     void on_bookmark_clicked(void);
+    void quick_bookmark(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
     void set_interval(int start, int end);
     void delete_interval(void);
     void frame_line_edit_finished();
+    void zoom_label_finished();
     void enable_poi_btns(bool, bool);
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
@@ -179,6 +172,7 @@ public slots:
     void set_draw_area_size(QSize s);
     void set_interpolation_method(int method);
     void on_step_zoom(double step);
+    void set_zoom_factor(double scale_factor);
     void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
@@ -187,18 +181,22 @@ public slots:
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);
     void update_playback_speed(int speed);
+    void set_brightness_contrast(int bri, double cont);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
+    const int PERCENT_INT_CONVERT = 100;
+    const int ZOOM_LABEL_MIN = 1;
+    const int ZOOM_LABEL_MAX = 10000;
 
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
     QLabel* current_time;
     QLabel* total_time;
+    QLabel* max_frames;
     QLineEdit* frame_line_edit;
-    QLabel* zoom_label;
+    QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
-
-    QShortcut* remove_frame_act;
+    QLabel* fps_label;
 
     //Buttons
     QPushButton* play_btn;
@@ -210,12 +208,23 @@ private:
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;
     QPushButton* tag_btn;
-    QPushButton* new_tag_btn;
+    QPushButton* new_label_btn;
     QPushButton* fit_btn;
     QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
+
+    //Shortcuts
+    QShortcut* bookmark_quick_sc;
+    QShortcut* interpol_sc;
+    QShortcut* speed_slider_up;
+    QShortcut* speed_slider_down;
+    QShortcut* frame_edit_act;
+    QShortcut* video_start_sc;
+    QShortcut* video_end_sc;
+    QShortcut* page_step_front_sc;
+    QShortcut* page_step_back_sc;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
@@ -238,6 +247,8 @@ private:
     bool video_btns_enabled = false;
     bool analysis_only = false;
 
+    QString bmark_description = "";
+
     void set_video_btns(bool b);
 
     void init_control_buttons();
@@ -259,6 +270,13 @@ private slots:
     void stop_btn_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+    void speed_up_activate(void);
+    void speed_down_activate(void);
+    void set_video_start(void);
+    void set_video_end(void);
+    void page_step_front(void);
+    void page_step_back(void);
+    void frame_label_focus(void);
 
     void on_interpolate_toggled(bool checked);
 };

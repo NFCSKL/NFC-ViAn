@@ -2,6 +2,8 @@
 #include <QThread>
 #include <QDebug>
 #include <QTime>
+#include <chrono>
+#include <cmath>
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
@@ -47,8 +49,8 @@ void VideoPlayer::load_video(){
     if (m_capture.isOpened()) {
         m_capture.release();
     }
+    m_new_video->store(false);
 
-    m_video_loaded->store(true);
     current_frame = -1;
     m_is_playing->store(false);
     m_frame->store(0);
@@ -59,8 +61,7 @@ void VideoPlayer::load_video(){
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
-
-    m_new_video->store(false);
+    m_video_loaded->store(true);
     m_new_frame_video->store(true);
 }
 
@@ -77,6 +78,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
     } else {
         speed_multiplier = 1;
     }
+    m_cur_speed_step = speed_steps;
 }
 
 /**
@@ -128,7 +130,6 @@ void VideoPlayer::check_events() {
                 display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
-
             }
         }
         lk.unlock();

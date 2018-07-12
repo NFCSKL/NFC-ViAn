@@ -28,7 +28,7 @@ class FrameWidget : public QWidget
     std::vector<cv::Rect> ooi_rects;
     cv::Rect bounding_box;
 
-    SHAPES m_tool = NONE;
+    SHAPES m_tool = ZOOM;
     QColor overlay_color = Qt::red;
     cv::Mat current_frame;
     Shapes* copied_item = nullptr;

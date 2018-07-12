@@ -66,6 +66,7 @@ public:
     void remove_from_project();
 
     std::string get_index_path();
+    std::string get_proj_path();
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();

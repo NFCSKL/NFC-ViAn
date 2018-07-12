@@ -1,5 +1,4 @@
 #include "bookmarkwidget.h"
-#include "myinputdialog.h"
 #include <imagegenerator.h>
 #include <QString>
 #include <QMenu>
@@ -83,10 +82,7 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
     return bm_cat;
 }
 
-void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time) {
-    bool ok;
-    QString text = get_input_text("", &ok);
-    if(!ok) return;
+void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description) {
     export_original_frame(vid_proj, state.frame, org_frame);
     std::string file_name = vid_proj->get_video()->get_name();
     file_name += "_" + std::to_string(state.frame);
@@ -94,7 +90,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     ImageGenerator im_gen(bookmark_frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
     std::string bm_file = im_gen.create_bookmark(file_name);
-    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString(), state, time);
+    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description.toStdString(), state, time);
     vid_proj->add_bookmark(bookmark);
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
@@ -115,7 +111,7 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;
         // Load thumbnail TODO add check for file
-        std::string t_path = m_path + "_thumbnails/" + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
+        std::string t_path = m_path + ImageGenerator::THUMBNAIL_FOLDER + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
         std::pair<int, std::string> new_container = bm->get_container();
         BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
         bm_item->set_thumbnail(t_path);
@@ -134,28 +130,4 @@ void BookmarkWidget::set_path(std::string path) {
 
 void BookmarkWidget::clear_bookmarks() {
     bm_list->clear();
-}
-
-/**
- * @brief BookmarkWidget::get_input_text
- * @param text Text shown in the text edit when opening the dialog.
- * @param ok Parameter set to false if the user cancels.
- * @return Returns a description for the bookmark,
- *         obtained from the user.
- */
-QString BookmarkWidget::get_input_text(QString text, bool* ok) {
-    // Create the dialog
-    MyInputDialog dialog;
-    dialog.setTextValue(text);
-    dialog.setWindowTitle("Bookmark description");
-    dialog.setLabelText("Write a description of the bookmark:");
-    dialog.setToolTip("Write a descriptopn of the bookmark. This will be used when creating a report.");
-    *ok = dialog.exec();
-
-    QString description = dialog.textValue();
-
-    if (ok) {
-        return description;
-    }
-    return "";
 }

@@ -89,7 +89,7 @@ struct overlay_settings {
     bool set_current_drawing = false;
     bool create_text = false;
 
-    SHAPES tool = NONE;
+    SHAPES tool = ZOOM;
     QColor color = Qt::red;
     QString text = "";
     QString current_string = "Enter text";
@@ -130,7 +130,7 @@ class FrameProcessor : public QObject {
     // Overlay changed by user
     std::atomic_bool* m_overlay_changed;
     // New video loaded by video player
-    std::atomic_bool* m_new_video;
+    std::atomic_bool* m_new_frame_video;
 
     /**
      *  Input settings,
@@ -163,7 +163,7 @@ class FrameProcessor : public QObject {
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                   std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
+                   std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
                    std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed);
 
 public slots:
@@ -171,6 +171,7 @@ public slots:
 signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
+    void set_bri_cont(int, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
 private:
     void process_frame();

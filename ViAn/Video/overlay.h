@@ -83,7 +83,7 @@ private:
     int baseline = 0;
     int current_frame = 0;
 
-    SHAPES current_shape = NONE;
+    SHAPES current_shape = ZOOM;
     QColor current_colour = Qt::red;
     QString current_string = "Enter text";
     float current_font_scale = 1;
