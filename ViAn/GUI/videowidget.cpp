@@ -28,7 +28,7 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
                                        &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
-                                       &m_speed_step);
+                                       &m_speed_step, &m_abort_playback);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -68,12 +68,25 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
 VideoWidget::~VideoWidget(){
     play_btn_toggled(false);
     delete f_processor;
+    // Tell processor thread to exit and wait for it to finish
     processing_thread->deleteLater();
-    processing_thread->quit();
-    if (!processing_thread->wait(ONE_SEC)) {
+    processing_thread->exit();
+    if (!processing_thread->wait(FIVE_SEC)) {
+        // Controller did not finish in time. Force shutdown
         processing_thread->terminate();
+        processing_thread->wait();
     }
 
+    if (v_controller->isRunning()) {
+        // Tell controller thread to exit and wait for it to finish
+        m_abort_playback.store(true);
+        v_controller->exit();
+        if (!v_controller->wait(FIVE_SEC)) {
+            // Controller did not finish in time. Force shutdown
+            v_controller->terminate();
+            v_controller->wait();
+        }
+    }
     delete v_controller;
     delete frame_wgt;
 }
@@ -154,6 +167,7 @@ void VideoWidget::init_video_controller(){
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
+    connect(v_controller, &VideoController::finished, v_controller, &VideoController::deleteLater);
 }
 
 /**
@@ -946,6 +960,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         set_overlay(m_vid_proj->get_overlay());
         player_lock.lock();
         m_video_path = vid_proj->get_video()->file_path;
+
         new_video.store(true);
         player_lock.unlock();
         player_con.notify_all();
@@ -1012,9 +1027,9 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     prev_poi_btn->setEnabled(b);
 
     analysis_play_btn->setEnabled(ana_play_btn);
-    if (!b) {
-        analysis_play_btn->setChecked(b);
-        analysis_only = b;
+    if (!ana_play_btn) {
+        analysis_play_btn->setChecked(ana_play_btn);
+        analysis_only = ana_play_btn;
     }
 }
 
