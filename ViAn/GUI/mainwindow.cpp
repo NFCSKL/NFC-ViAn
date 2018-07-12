@@ -135,7 +135,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
-    connect(main_toolbar->add_img_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
     connect(main_toolbar->open_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
     //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
@@ -229,7 +228,6 @@ void MainWindow::init_file_menu() {
     QAction* open_proj_folder_act = new QAction(tr("&Open project folder..."), this);
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* add_vid_act = new QAction(tr("&Import video..."), this);
-    QAction* add_seq_act = new QAction(tr("&Import images"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
     // Set icons
@@ -239,7 +237,6 @@ void MainWindow::init_file_menu() {
     open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/computer.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
-    add_seq_act->setIcon(QIcon("../ViAn/Icons/image_sequence.png"));
     quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
 
     // Add actions to the menu
@@ -249,7 +246,6 @@ void MainWindow::init_file_menu() {
     file_menu->addAction(open_proj_folder_act);
     file_menu->addAction(save_project_act);
     file_menu->addAction(add_vid_act);
-    file_menu->addAction(add_seq_act);
     file_menu->addSeparator();
     file_menu->addAction(quit_act);
 
@@ -260,7 +256,6 @@ void MainWindow::init_file_menu() {
     open_proj_folder_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
     save_project_act->setShortcut(QKeySequence::Save);     //Ctrl + S
     add_vid_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));     //Ctrl + I
-    // TODO    add_seq_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
     quit_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     // Set status tips
@@ -270,7 +265,6 @@ void MainWindow::init_file_menu() {
     open_proj_folder_act->setStatusTip(tr("Go to the project folder"));
     save_project_act->setStatusTip(tr("Save project"));
     add_vid_act->setStatusTip(tr("Add video"));
-    add_vid_act->setStatusTip(tr("Import images"));
     quit_act->setStatusTip(tr("Quit the application"));
 
     // Connect with signals and slots
@@ -280,7 +274,6 @@ void MainWindow::init_file_menu() {
     connect(open_proj_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
-    connect(add_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
 

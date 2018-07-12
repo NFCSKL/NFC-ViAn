@@ -66,22 +66,14 @@ class VideoPlayer : public QObject{
     std::atomic_int* m_video_height;
     int m_frame_rate = 0;
     int m_last_frame = 0;
-
-    // Abort flag for loop
-    std::atomic_bool* m_abort_playback;
 public:
     explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool* new_frame_video, std::atomic_bool* video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
-<<<<<<< HEAD
                          std::atomic_int* speed_step, QObject *parent = nullptr);
     ~VideoPlayer();
     bool loop = true;
-=======
-                         std::atomic_int* speed_step, std::atomic_bool* abort_playback, QObject *parent = nullptr);
-    ~VideoPlayer();
->>>>>>> development
 
 signals:
     void display(cv::Mat frame, int frame_index);

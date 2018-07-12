@@ -46,6 +46,7 @@ public:
     bool get_show_tags();
 
     // Interval settings
+    void add_slider_interval(int start_frame, int end_frame);
     int set_interval_first();
     int set_interval_second();
 
