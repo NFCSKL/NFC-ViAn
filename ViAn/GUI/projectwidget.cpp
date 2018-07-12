@@ -42,7 +42,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 
     // Create remove, rename and new folder actions
-    remove_item_act = new QAction("Remove", this);
+    remove_item_act = new QAction("Delete", this);
     rename_item_act = new QAction("Rename", this);
     new_folder_act = new QAction("New folder", this);
 
