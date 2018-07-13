@@ -53,7 +53,6 @@ void VideoPlayer::load_video(){
 
     current_frame = -1;
     m_is_playing->store(false);
-    m_frame->store(0);
 
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
