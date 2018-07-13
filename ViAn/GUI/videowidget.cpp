@@ -831,6 +831,7 @@ void VideoWidget::set_slider_max(int value) {
  */
 void VideoWidget::on_new_frame() {
     int frame_num = frame_index.load();
+    qDebug() << "On new frame: " << frame_num;
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
@@ -872,6 +873,7 @@ void VideoWidget::on_playback_slider_pressed() {
  */
 void VideoWidget::on_playback_slider_released() {
     playback_slider->set_blocked(false);
+    qDebug() << "on_playback_slider_released " << playback_slider->value();
     frame_index.store(playback_slider->value());
     on_new_frame();
 }
@@ -923,12 +925,15 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         vid_proj->set_current(true);
 
         // Set state variables but don't update the processor
+        v_sync.lock.lock();
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
         z_settings.zoom_factor = state.scale_factor;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
         frame_index.store(state.frame);
+        qDebug() << "Stored state frame: " << state.frame;
+        v_sync.lock.unlock();
 
         m_vid_proj = vid_proj;
         set_overlay(m_vid_proj->get_overlay());

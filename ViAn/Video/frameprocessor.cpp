@@ -22,7 +22,7 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     // NICLAS
-    // cv::namedWindow("test");
+     cv::namedWindow("test");
 }
 
 /**
@@ -42,7 +42,8 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
-        // A new video has been loaded. Reset processing settings    
+        qDebug() << m_new_frame->load() << " " << m_changed->load() << " " << m_new_frame_video->load() << " " << m_overlay_changed->load() << " " << m_frame_index->load();
+        // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
             reset_settings();
             m_overlay = m_o_settings->overlay;
@@ -91,6 +92,14 @@ void FrameProcessor::check_events() {
         if (m_new_frame->load() && m_overlay) {
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
+
+           // Check if the new frame has other dimensions then the previous one
+           cv::Rect prev_size = m_zoomer.get_frame_rect();
+           int new_width{m_frame.cols}, new_height{m_frame.rows};
+           if (prev_size.width != new_width || prev_size.height != new_height) {
+               qDebug() << "New source dimensions";
+               m_zoomer.set_frame_size(cv::Size(new_width, new_height));
+           }
             process_frame();
 
             lk.unlock();
@@ -121,28 +130,29 @@ void FrameProcessor::process_frame() {
 
     // Displays the zoom rectangle on the original frame in a new windows.
     // NICLAS
-    // cv::Mat tmp = manipulated_frame.clone();
-    // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
-    // cv::imshow("test", tmp);
+     cv::Mat tmp = manipulated_frame.clone();
+     cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
+     cv::imshow("test", tmp);
     // Draws the overlay
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
 
     // Scales the frame
-    cv::Rect prev_rect = m_zoomer.get_frame_rect();
-    if (!rotated && (prev_rect.width != m_width->load() || prev_rect.height != m_height->load())) {
-        // Source size has changed (image sequence)
-        m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
-        m_zoomer.fit_viewport();
+//    cv::Rect prev_rect = m_zoomer.get_frame_rect();
+//    if (!rotated && (prev_rect.width != m_width->load() || prev_rect.height != m_height->load())) {
+//        qDebug() << "new frame size";
+//        // Source size has changed (image sequence)
+//        m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
+//        m_zoomer.fit_viewport();
 
-        // Store changes made
-        m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
-        cv::Rect tmp = m_zoomer.get_zoom_rect();
-        m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
-        m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
+//        // Store changes made
+//        m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
+//        cv::Rect tmp = m_zoomer.get_zoom_rect();
+//        m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
+//        m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
-        emit set_anchor(m_zoomer.get_anchor());
-        emit set_scale_factor(m_zoomer.get_scale_factor());
-    }
+//        emit set_anchor(m_zoomer.get_anchor());
+//        emit set_scale_factor(m_zoomer.get_scale_factor());
+//    }
     m_zoomer.scale_frame(manipulated_frame);
 
     // Applies brightness and contrast
