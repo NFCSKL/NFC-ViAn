@@ -111,7 +111,16 @@ std::map<ID, BasicAnalysis*> VideoProject::get_analyses() {
  */
 void VideoProject::read(const QJsonObject& json){
     m_tree_index = json["tree_index"].toString().toStdString();
-    this->m_video->read(json);
+    Video* vid = new Video();
+    vid->read(json);
+    if (vid->is_sequence()) {
+        ImageSequence* seq = new ImageSequence("");
+        seq->read(json);
+        this->m_video = seq;
+    } else
+        this->m_video = vid;
+
+
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     // Read bookmarks from json
     for(int i = 0; i != json_bookmarks.size(); i++){

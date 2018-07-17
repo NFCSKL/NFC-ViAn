@@ -153,6 +153,7 @@ void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
     if (analysis) {
         m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
         rects = analysis->m_slider_interval;
+        last_poi_end = rects.back().second;
     }
 }
 
@@ -198,24 +199,6 @@ int AnalysisSlider::set_interval_first() {
 int AnalysisSlider::set_interval_second() {
     m_interval.second = value();
     return m_interval.second;
-}
-
-/**
- * @brief AnalysisSlider::add_slider_rect
- * Adds a pair of doubles to a pair vector. This pair represents
- * a certain area of the slider from start to end.
- * @param start frame
- * @param end frame
- */
-void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
-    std::pair<int, int> pair;
-    if (start_frame > end_frame) {
-        pair = std::make_pair(end_frame, start_frame);
-    } else {
-        pair = std::make_pair(start_frame, end_frame);
-    }
-    rects.push_back(pair);
-    last_poi_end = end_frame;
 }
 
 /**
