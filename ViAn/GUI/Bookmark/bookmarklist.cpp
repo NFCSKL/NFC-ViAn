@@ -184,8 +184,16 @@ void BookmarkList::rename_item(){
     }
     case CONTAINER: {
         auto item = dynamic_cast<BookmarkCategory*>(currentItem());
-        QString text = QInputDialog::getText(nullptr, "Change title", "Enter a new title", QLineEdit::Normal, QString::fromStdString(item->get_name()), &ok);
-        item->update_title(text);
+
+        BookmarkDialog dialog;
+        dialog.setTextValue(QString::fromStdString(item->get_name()));
+        dialog.setLabelText("Enter a new category name");
+        dialog.setWindowTitle("Category name");
+        ok = dialog.exec();
+        QString new_text = dialog.textValue();
+        if (ok) {
+            item->update_title(new_text);
+        }
         break;
     }
     default:
