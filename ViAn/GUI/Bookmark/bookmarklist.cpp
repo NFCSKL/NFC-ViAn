@@ -28,6 +28,11 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     delete_sc->setContext(Qt::WidgetShortcut);
     connect(delete_sc, &QShortcut::activated, this, &BookmarkList::remove_item);
 
+    // Shortcut for renaming item
+    QShortcut* rename_sc = new QShortcut(QKeySequence(Qt::Key_F2), this);
+    rename_sc->setContext(Qt::WidgetShortcut);
+    connect(rename_sc, &QShortcut::activated, this, &BookmarkList::rename_item);
+
     clear();
 }
 
@@ -162,9 +167,9 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
  */
 void BookmarkList::rename_item(){
     bool ok;
-    switch (clicked_item->type()) {
+    switch (currentItem()->type()) {
     case BOOKMARK: {
-        auto item = dynamic_cast<BookmarkItem*>(clicked_item);
+        auto item = dynamic_cast<BookmarkItem*>(currentItem());
         BookmarkDialog dialog;
 
         dialog.setTextValue(QString::fromStdString(item->get_bookmark()->get_description()));
@@ -178,7 +183,7 @@ void BookmarkList::rename_item(){
         break;
     }
     case CONTAINER: {
-        auto item = dynamic_cast<BookmarkCategory*>(clicked_item);
+        auto item = dynamic_cast<BookmarkCategory*>(currentItem());
         QString text = QInputDialog::getText(nullptr, "Change title", "Enter a new title", QLineEdit::Normal, QString::fromStdString(item->get_name()), &ok);
         item->update_title(text);
         break;
