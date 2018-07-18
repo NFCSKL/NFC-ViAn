@@ -201,7 +201,7 @@ void BookmarkList::remove_item() {
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
     msg_box.setText("Deleting item\n"
-                    "this will delete all bookmarks in all categories");
+                    "this will delete all bookmarks in the categories");
     msg_box.setInformativeText("Are you sure?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msg_box.setDefaultButton(QMessageBox::No);
