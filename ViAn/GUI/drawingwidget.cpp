@@ -5,6 +5,7 @@
 #include <QDropEvent>
 #include <QShortcut>
 #include <QColorDialog>
+#include <QMessageBox>
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -20,9 +21,9 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     headerItem()->setText(1, "Color");
     headerItem()->setText(2, "Hide");
 
-    // Shortcut for deleteing item
-    QShortcut* delete_sc = new QShortcut(this);
-    delete_sc->setKey(QKeySequence(QKeySequence::Delete));
+    // Shortcut for deleting item
+    QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::delete_item);
 
     connect(this, &DrawingWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
@@ -375,6 +376,16 @@ void DrawingWidget::delete_item() {
     if (item->type() == FRAME_ITEM) {
         FrameItem* f_item = dynamic_cast<FrameItem*>(item);
         if (f_item->get_frame() == m_overlay->get_current_frame()) {
+            QMessageBox msg_box;
+            msg_box.setIcon(QMessageBox::Warning);
+            msg_box.setText("Deleting frameitem\n"
+                            "This will delete all drawings on this frame");
+            msg_box.setInformativeText("Do you wish to continue?");
+            msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msg_box.setDefaultButton(QMessageBox::No);
+            int reply = msg_box.exec();
+            if (reply == QMessageBox::No) return;
+
             remove_from_tree(f_item);
             clearSelection();
         }

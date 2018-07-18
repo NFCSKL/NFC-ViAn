@@ -47,6 +47,11 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     new_folder_sc->setKey(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
     connect(new_folder_sc, &QShortcut::activated, this, &ProjectWidget::create_folder_item);
 
+    // Shortcut for deleting item
+    QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(delete_sc, &QShortcut::activated, this, &ProjectWidget::remove_item);
+
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
 

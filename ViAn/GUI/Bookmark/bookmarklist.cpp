@@ -9,6 +9,8 @@
 #include <QDrag>
 #include <QApplication>
 #include <algorithm>
+#include <QShortcut>
+#include <QMessageBox>
 #include <QDebug>
 
 BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* parent) : QListWidget(parent) {
@@ -20,6 +22,11 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setAcceptDrops(true);
     setDropIndicatorShown(true);
     setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
+
+    // Shortcut for deleting item
+    QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetShortcut);
+    connect(delete_sc, &QShortcut::activated, this, &BookmarkList::remove_item);
 
     clear();
 }
@@ -186,6 +193,16 @@ void BookmarkList::rename_item(){
  * Removes the clicked list item
  */
 void BookmarkList::remove_item() {
+    QMessageBox msg_box;
+    msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setText("Deleting item\n"
+                    "this will delete all bookmarks in all categories");
+    msg_box.setInformativeText("Are you sure?");
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg_box.setDefaultButton(QMessageBox::No);
+    int reply = msg_box.exec();
+    if (reply == QMessageBox::No) return;
+
     if (currentItem()->type() == BOOKMARK) {
         BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
         Bookmark* b_mark = bm_item->get_bookmark();
