@@ -26,18 +26,18 @@
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
-    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
+    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
-    toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_drawing_wgt = drawing_dock->toggleViewAction();
+    toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
 
@@ -61,12 +61,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
             analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
 
-    // Initialize bookmark widget
-    bookmark_wgt = new BookmarkWidget();
-    bookmark_wgt->setWindowFlags(Qt::Window);
-    addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
-    bookmark_dock->close();
-
     // Initialize drawing widget
     drawing_wgt = new DrawingWidget();
     drawing_dock->setWidget(drawing_wgt);
@@ -78,6 +72,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(drawing_wgt, SIGNAL(clear_frame(int)), this, SLOT(clear(int)));
     connect(drawing_wgt, SIGNAL(update_text(QString, Shapes*)), this, SLOT(update_text(QString, Shapes*)));
     connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
+
+    // Initialize bookmark widget
+    bookmark_wgt = new BookmarkWidget();
+    bookmark_wgt->setWindowFlags(Qt::Window);
+    addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
+    bookmark_dock->close();
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();

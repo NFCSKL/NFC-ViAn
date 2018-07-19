@@ -241,7 +241,6 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_item->setExpanded(true);
 }
 
-
 /**
  * @brief ProjectWidget::add_frames_to_tag_item
  * Create the TagFrameItems from all the frames. Used when opening a project

@@ -94,7 +94,9 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
     menu->addAction(rename, this, SLOT(rename_item()));
     menu->addAction("Delete", this, SLOT(remove_item()));
     menu->addSeparator();
-    menu->addAction("New category", this, SLOT(add_new_folder()));
+    if (m_container_type == UNSORTED) {
+        menu->addAction("New category", this, SLOT(add_new_folder()));
+    }
     menu->exec(mapToGlobal(pos));
     delete menu;
 }

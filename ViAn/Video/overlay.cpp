@@ -54,8 +54,6 @@ void Overlay::set_showing_overlay(bool value) {
 /**
  * @brief Overlay::set_tool
  * Sets the overlay tool's shape.
- * If the tool is the text-tool the user is prompted
- * to enter a text and a font scale.
  * @param s New tool to be set.
  */
 void Overlay::set_tool(SHAPES s) {
@@ -326,12 +324,11 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
         return;
     }
     if (drawing) {
-        drawing = false;
         emit set_tool_edit();
+        drawing = false;
+        qDebug() << "release";
         return;
     }
-    // TODO Should not need
-    //update_drawing_position(pos, frame_nr);
     m_right_click = right_click;
 }
 
@@ -344,6 +341,7 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
  */
 void Overlay::mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl) {
     if (change_tool) return;
+    qDebug() << "move";
     update_drawing_position(pos, frame_nr, shift, ctrl);
 }
 
@@ -376,6 +374,7 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool ctrl) {
+    // Only update the overlay is is exists and is currently being shown
     if (show_overlay && !overlays[frame_nr].empty()) {
         if (current_shape == EDIT) {
             if (current_drawing == nullptr) return;

@@ -91,6 +91,8 @@ void Shapes::update_text_draw_end() {
  * Adds the diff_pointer to the shape and therefore moves it that much
  */
 void Shapes::move_shape(QPoint diff_point) {
+    qDebug() << "moving" << diff_point;
+    qDebug() << "old" << draw_start.x << draw_start.y;
     draw_start += qpoint_to_point(diff_point);
     draw_end += qpoint_to_point(diff_point);
 }
