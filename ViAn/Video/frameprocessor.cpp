@@ -22,7 +22,7 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     // NICLAS
-     cv::namedWindow("test");
+    cv::namedWindow("test");
 }
 
 /**
@@ -42,7 +42,6 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
-        qDebug() << m_new_frame->load() << " " << m_changed->load() << " " << m_new_frame_video->load() << " " << m_overlay_changed->load() << " " << m_frame_index->load();
         // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
             reset_settings();
@@ -93,13 +92,21 @@ void FrameProcessor::check_events() {
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
 
-           // Check if the new frame has other dimensions then the previous one
+           // Check for new dimensions on unrotated frame
+           // update zoomer as necessary
            cv::Rect prev_size = m_zoomer.get_frame_rect();
            int new_width{m_frame.cols}, new_height{m_frame.rows};
-           if (prev_size.width != new_width || prev_size.height != new_height) {
+           bool has_new_frame_size{m_unrotated_size.width != new_width || m_unrotated_size.height != new_height};
+           bool frame_rect_changed{prev_size.width != new_width || prev_size.height != new_height};
+
+           if (frame_rect_changed && has_new_frame_size) {
                qDebug() << "New source dimensions";
+               qDebug() << "Previous size: " << prev_size.width << " " << prev_size.height;
+               qDebug() << "New size: " << new_width << " " << new_height;
+               qDebug() << "\n";
                m_zoomer.set_frame_size(cv::Size(new_width, new_height));
            }
+           m_unrotated_size = cv::Size(new_width, new_height);
             process_frame();
 
             lk.unlock();
@@ -121,17 +128,28 @@ void FrameProcessor::process_frame() {
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame = m_frame.clone();
 
-    bool rotated{false};
     // Rotates the frame, according to the choosen direction.
     if (ROTATE_MIN <= m_rotate_direction && m_rotate_direction <= ROTATE_MAX) {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
-        rotated = true;
     }
 
     // Displays the zoom rectangle on the original frame in a new windows.
     // NICLAS
      cv::Mat tmp = manipulated_frame.clone();
-     cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
+     double factor{0.7};
+     cv::resize(tmp, tmp, cv::Size(), factor, factor);
+
+
+     cv::RotatedRect rrect = m_zoomer.get_viewport();
+     cv::Point2f points[4]; //bl, tl, tr, br
+     rrect.points(points);
+     rrect.points(points);
+     cv::Rect r = m_zoomer.get_cutting_rect();
+     cv::rectangle(tmp, r.tl() * factor, r.br() * factor, cv::Scalar(255,255,255), 2);
+
+
+
+
      cv::imshow("test", tmp);
     // Draws the overlay
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
@@ -139,7 +157,7 @@ void FrameProcessor::process_frame() {
     // Scales the frame
 //    cv::Rect prev_rect = m_zoomer.get_frame_rect();
 //    if (!rotated && (prev_rect.width != m_width->load() || prev_rect.height != m_height->load())) {
-//        qDebug() << "new frame size";
+//        () << "new frame size";
 //        // Source size has changed (image sequence)
 //        m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
 //        m_zoomer.fit_viewport();
@@ -171,19 +189,31 @@ void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
     if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
-        m_zoomer.update_rect_size();
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
     else if (m_z_settings->set_state) {
         m_zoomer.fit_viewport();
         m_z_settings->set_state = false;
         skip_process = true;
-        m_zoomer.set_state(m_z_settings->anchor, m_z_settings->zoom_factor);
+
+        m_zoomer.reset();
+        m_zoomer.set_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation);
+
+        if (m_z_settings->rotation == 0) {
+            m_rotate_direction = ROTATE_NONE;
+        } else if (m_z_settings->rotation == 90) {
+            m_rotate_direction = ROTATE_90;
+        } else if (m_z_settings->rotation == 180) {
+            m_rotate_direction = ROTATE_180;
+        } else if (m_z_settings->rotation == 270) {
+            m_rotate_direction = ROTATE_270;
+        }
     }
     // Center the zoom rect
     else if (m_z_settings->do_center) {
+        qDebug() << "centering";
         m_z_settings->do_center = false;
-        m_zoomer.center_zoom_rect(m_z_settings->center, m_z_settings->zoom_step);
+        m_zoomer.point_zoom(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Scale/zoom factor has been changed
     else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
@@ -197,7 +227,7 @@ void FrameProcessor::update_zoomer_settings() {
     }
     // Panning occured
     else if (m_z_settings->x_movement != 0 || m_z_settings->y_movement != 0) {
-        m_zoomer.move_zoom_rect(m_z_settings->x_movement, m_z_settings->y_movement);
+        m_zoomer.move_viewport_center(m_z_settings->x_movement, m_z_settings->y_movement);
         m_z_settings->x_movement = 0;
         m_z_settings->y_movement = 0;
     }
@@ -222,6 +252,8 @@ void FrameProcessor::update_zoomer_settings() {
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
+    qDebug() << "Emitting new state";
+    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
 }
@@ -236,14 +268,15 @@ void FrameProcessor::update_manipulator_settings() {
     m_manipulator.set_brightness(m_man_settings->brightness);
     m_manipulator.set_contrast(m_man_settings->contrast);
 
+    int rotate_direction = m_rotate_direction;
     if (m_man_settings->rotate == 1) {
-        m_rotate_direction = (m_rotate_direction + 1) % ROTATE_NUM;
-        m_zoomer.flip();
+        rotate_direction = (m_rotate_direction + (ROTATE_NUM + 1)) % ROTATE_NUM;
     } else if (m_man_settings->rotate == -1) {
-        m_rotate_direction = (m_rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
-        m_zoomer.flip();
+        rotate_direction = (m_rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
     }
+    update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
+    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
     emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
 }
 
@@ -304,6 +337,22 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->set_current_drawing) {
         m_o_settings->set_current_drawing = false;
         m_overlay->set_current_drawing(m_o_settings->shape);
+    }
+}
+
+void FrameProcessor::update_rotation(const int& direction) {
+    qDebug() << "Updating rotation " << direction;
+    if (direction != m_rotate_direction) {
+        m_rotate_direction = direction;
+        if (m_rotate_direction == ROTATE_NONE) {
+            m_zoomer.update_rotation(0);
+        } else if (m_rotate_direction == ROTATE_90) {
+            m_zoomer.update_rotation(90);
+        } else if (m_rotate_direction == ROTATE_180) {
+            m_zoomer.update_rotation(180);
+        } else if (m_rotate_direction == ROTATE_270) {
+            m_zoomer.update_rotation(270);
+        }
     }
 }
 

@@ -32,6 +32,8 @@ struct zoomer_settings {
     QPoint center = QPoint(50,50);
     QPoint anchor = QPoint(0,0);
 
+    int rotation = 0;
+
     bool set_state = false;
 
     double zoom_factor = 1;
@@ -107,6 +109,7 @@ struct overlay_settings {
 class FrameProcessor : public QObject {
     Q_OBJECT
     cv::Mat m_frame;
+    cv::Size m_unrotated_size{};
     std::atomic_int* m_frame_index;
 
     /**
@@ -171,6 +174,7 @@ public slots:
 signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
+    void set_zoom_state(QPoint, double, int);
     void set_bri_cont(int, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
 private:
@@ -178,6 +182,7 @@ private:
     void update_zoomer_settings();
     void update_manipulator_settings();
     void update_overlay_settings();
+    void update_rotation(const int& rotation);
 
     void reset_settings();
 };

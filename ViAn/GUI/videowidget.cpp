@@ -167,7 +167,7 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
-    connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
+    connect(frame_wgt, &FrameWidget::move_viewport_center, this, &VideoWidget::center);
     connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
@@ -181,6 +181,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+    connect(f_processor, &FrameProcessor::set_zoom_state, this, &VideoWidget::set_zoom_state);
     connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
 
     processing_thread->start();
@@ -570,6 +571,19 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 }
 
 /**
+ * @brief VideoWidget::set_zoom_state
+ * Stores the current zoom modifications and rotation made to the video
+ */
+void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
+    qDebug() << "Saving zoom state: " << center << " : " << scale << " : " << angle;
+    if (!m_vid_proj) return;
+    Video* video = m_vid_proj->get_video();
+    video->state.center = center;
+    video->state.scale_factor = scale;
+    video->state.rotation = angle;
+}
+
+/**
  * @brief VideoWidget::on_bookmark_clicked
  */
 void VideoWidget::on_bookmark_clicked() {
@@ -831,7 +845,6 @@ void VideoWidget::set_slider_max(int value) {
  */
 void VideoWidget::on_new_frame() {
     int frame_num = frame_index.load();
-    qDebug() << "On new frame: " << frame_num;
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
@@ -873,7 +886,6 @@ void VideoWidget::on_playback_slider_pressed() {
  */
 void VideoWidget::on_playback_slider_released() {
     playback_slider->set_blocked(false);
-    qDebug() << "on_playback_slider_released " << playback_slider->value();
     frame_index.store(playback_slider->value());
     on_new_frame();
 }
@@ -891,11 +903,15 @@ void VideoWidget::on_playback_slider_value_changed() {
  */
 void VideoWidget::on_playback_slider_moved() {
     if (std::abs(playback_slider->value() - prev_frame_idx) % 5 == 0) {
+        v_sync.lock.lock();
         frame_index.store(playback_slider->value());
+        v_sync.lock.unlock();
     }
 
     if (timer.elapsed() > 200) {
+        v_sync.lock.lock();
         frame_index.store(playback_slider->value());
+        v_sync.lock.unlock();
         timer.restart();
     }
     on_new_frame();
@@ -928,11 +944,12 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         v_sync.lock.lock();
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
+        z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
+        z_settings.rotation = state.rotation;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
         frame_index.store(state.frame);
-        qDebug() << "Stored state frame: " << state.frame;
         v_sync.lock.unlock();
 
         m_vid_proj = vid_proj;
@@ -953,6 +970,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
+
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1016,15 +1034,21 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  * notified of new settings when videoplayer has loaded a new video
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
+    int current_frame_index = frame_index.load();
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;
     m_frame_length = last_frame + 1;
-
     current_frame_size = QSize(video_width, video_height);
+
+    // Solves a bug where the setMaximum will set the frame index to max in some cases
+    this->blockSignals(true);
+    playback_slider->setValue(current_frame_index);
     playback_slider->setMaximum(last_frame);
+    this->blockSignals(false);
+
     set_total_time((last_frame + 1) / frame_rate);
-    set_current_time(frame_index.load() / m_frame_rate);
+    set_current_time(current_frame_index / m_frame_rate);
     fps_label->setText("Fps: " + QString::number(m_frame_rate));
     max_frames->setText("/ " + QString::number(last_frame));
 
@@ -1245,6 +1269,7 @@ void VideoWidget::set_state(VideoState state) {
     update_processing_settings([&](){
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
+        z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;

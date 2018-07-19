@@ -6,6 +6,7 @@
 
 #include <stack>
 #include "Project/video.h"
+#include "zoomrectangle.h"
 #include <mutex>
 #include <atomic>
 #include <condition_variable>

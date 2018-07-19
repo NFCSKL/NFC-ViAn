@@ -114,6 +114,7 @@ public slots:
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);
+    void set_zoom_state(QPoint, double, int);
     void play_btn_toggled(bool status);
     void tag_frame(void);
     void remove_tag_frame(void);

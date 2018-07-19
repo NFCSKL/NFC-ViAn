@@ -166,7 +166,9 @@ void FrameWidget::set_show_detections(bool show) {
 
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
-    if (m_vid_proj) m_vid_proj->get_video()->state.anchor = p;
+    if (m_vid_proj) {
+        m_vid_proj->get_video()->state.anchor = p;
+    }
 }
 
 void FrameWidget::set_scale_factor(double scale_factor) {
@@ -535,9 +537,9 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
         }
         else if (event->modifiers() == Qt::ControlModifier) {
             if (num_steps.y() < 0) {
-                emit center_zoom_rect(scaled_pos, 1/ZOOM_STEP);
+                emit move_viewport_center(scaled_pos, 1/ZOOM_STEP);
             } else {
-                emit center_zoom_rect(scaled_pos, ZOOM_STEP);
+                emit move_viewport_center(scaled_pos, ZOOM_STEP);
             }
         } else {
             init_panning(event->pos());

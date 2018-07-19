@@ -190,7 +190,6 @@ SOURCES += \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
     Video/shapes/text.cpp \
-    Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
 HEADERS += \
@@ -201,7 +200,6 @@ HEADERS += \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
     Video/shapes/text.h \
-    Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h \
     Video/framemanipulator.h
 

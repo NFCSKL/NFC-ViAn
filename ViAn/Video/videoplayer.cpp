@@ -110,6 +110,7 @@ void VideoPlayer::check_events() {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 wait_load_read();
+                qDebug() << m_frame->load();
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 set_frame();
             }
