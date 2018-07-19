@@ -27,8 +27,8 @@ struct zoomer_settings {
 
     QSize draw_area_size = QSize(100,100);
 
-    QPoint zoom_tl = QPoint(0,0);
-    QPoint zoom_br = QPoint(100,100);
+    QPoint zoom_area_tl = QPoint(0,0);
+    QPoint zoom_area_br = QPoint(100,100);
     QPoint center = QPoint(50,50);
     QPoint anchor = QPoint(0,0);
 
@@ -48,7 +48,8 @@ struct zoomer_settings {
     // Specific commands
     bool fit = false;
     bool original = false;
-    bool do_center = false;
+    bool do_point_zoom = false;
+    bool has_new_zoom_area{false};
 };
 
 /**

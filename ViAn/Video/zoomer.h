@@ -16,6 +16,7 @@ class Zoomer{
     // Viewport rectangle and size
     QSize m_viewport_size;
     cv::RotatedRect m_viewport;
+
     // Current rotation
     int m_angle{};
 
@@ -32,42 +33,40 @@ class Zoomer{
 public:
     Zoomer();
     Zoomer(const cv::Size frame_size);
+
+    void area_zoom(QPoint p1, QPoint p2);
+    void point_zoom(QPoint, double zoom_step);
+    void update_rotation(const int& angle);
+    void translate_viewport_center(int x, int y);
+    void load_state(QPoint anchor, double scale_factor, int angle);
+    void fit_viewport();
+    void scale_frame(cv::Mat& frame);
+    void reset();
+
+    // Setters
     void set_scale_factor(double scale_factor);
-    void set_zoom_rect(QPoint p1, QPoint p2);
     void set_frame_size(cv::Size frame_size);
     void set_viewport_size(const QSize size);
     void set_interpolation_method(const int& method);
-    void update_rotation(const int& angle);
 
-    void move_viewport_center(int x, int y);
-    void point_zoom(QPoint, double zoom_step);
-    void set_state(QPoint anchor, double scale_factor, int angle);
-    void fit_viewport();
-    void reset();
-    void center();
-    void flip();
-    cv::Rect m_zoom_rect;
-
-    void scale_frame(cv::Mat& frame);
-    cv::Rect get_zoom_rect() const;
+    // Getters
+    int get_angle() const;
+    int get_interpolation_method() const;
     double get_scale_factor() const;
 
     QPoint get_anchor() const;
     QPoint get_center() const;
-
     QSize get_viewport_size() const;
+
     cv::RotatedRect get_viewport() const;
-
-    int get_angle() const;
-    int get_interpolation_method() const;
     cv::Rect get_frame_rect() const;
-    cv::Rect get_cutting_rect() const;
+    cv::Rect get_view_rect() const;
 
-    void update_rect_size();
 private:
-    void force_bounds();
     void update_scale(const double& width, const double& height);
     void update_anchor();
+    void flip();
+    void center();
 };
 
 #endif // ZOOMER_H

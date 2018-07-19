@@ -164,7 +164,7 @@ void VideoWidget::init_frame_processor() {
     connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
 
 
-    connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
+    connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
     connect(frame_wgt, &FrameWidget::move_viewport_center, this, &VideoWidget::center);
@@ -575,7 +575,6 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  * Stores the current zoom modifications and rotation made to the video
  */
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
-    qDebug() << "Saving zoom state: " << center << " : " << scale << " : " << angle;
     if (!m_vid_proj) return;
     Video* video = m_vid_proj->get_video();
     video->state.center = center;
@@ -933,6 +932,7 @@ void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
+    qDebug() << "Loading state";
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
 
@@ -1209,21 +1209,22 @@ void VideoWidget::pan(int x, int y) {
 void VideoWidget::center(QPoint pos, double zoom_step) {
     update_processing_settings([&](){
         z_settings.center = pos;
-        z_settings.do_center = true;
+        z_settings.do_point_zoom = true;
         z_settings.zoom_step = zoom_step;
     });
 }
 
 /**
- * @brief VideoWidget::set_zoom_rectangle
- * Notifies the frame processor that a new zoom rectangle has been set
- * @param p1 tl point of the zoom rectangle
- * @param p2 br point of the zoom rectangle
+ * @brief VideoWidget::set_zoom_area
+ * Notifies the frame processor that a new zoom area has been set
+ * @param p1 tl point of the zoom area
+ * @param p2 br point of the zoom area
  */
-void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
+void VideoWidget::set_zoom_area(QPoint p1, QPoint p2) {
     update_processing_settings([&](){
-        z_settings.zoom_tl = p1;
-        z_settings.zoom_br = p2;
+        z_settings.zoom_area_tl = p1;
+        z_settings.zoom_area_br = p2;
+        z_settings.has_new_zoom_area = true;
     });
 }
 
@@ -1271,6 +1272,7 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.anchor = state.anchor;
         z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
+        z_settings.rotation = state.rotation;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
         frame_index.store(state.frame);

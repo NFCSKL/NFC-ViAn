@@ -83,7 +83,7 @@ void FrameProcessor::check_events() {
                 lk.unlock();
                 skip_process = false;
                 continue;
-            }
+            } else {qDebug() << "Skipping";}
             skip_process = false;
         }
 
@@ -136,7 +136,7 @@ void FrameProcessor::process_frame() {
     // Displays the zoom rectangle on the original frame in a new windows.
     // NICLAS
      cv::Mat tmp = manipulated_frame.clone();
-     double factor{0.7};
+     double factor{0.5};
      cv::resize(tmp, tmp, cv::Size(), factor, factor);
 
 
@@ -144,7 +144,7 @@ void FrameProcessor::process_frame() {
      cv::Point2f points[4]; //bl, tl, tr, br
      rrect.points(points);
      rrect.points(points);
-     cv::Rect r = m_zoomer.get_cutting_rect();
+     cv::Rect r = m_zoomer.get_view_rect();
      cv::rectangle(tmp, r.tl() * factor, r.br() * factor, cv::Scalar(255,255,255), 2);
 
 
@@ -192,12 +192,11 @@ void FrameProcessor::update_zoomer_settings() {
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
     else if (m_z_settings->set_state) {
-        m_zoomer.fit_viewport();
         m_z_settings->set_state = false;
         skip_process = true;
 
         m_zoomer.reset();
-        m_zoomer.set_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation);
+        m_zoomer.load_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation);
 
         if (m_z_settings->rotation == 0) {
             m_rotate_direction = ROTATE_NONE;
@@ -210,9 +209,8 @@ void FrameProcessor::update_zoomer_settings() {
         }
     }
     // Center the zoom rect
-    else if (m_z_settings->do_center) {
-        qDebug() << "centering";
-        m_z_settings->do_center = false;
+    else if (m_z_settings->do_point_zoom) {
+        m_z_settings->do_point_zoom = false;
         m_zoomer.point_zoom(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Scale/zoom factor has been changed
@@ -220,14 +218,13 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.set_scale_factor(m_z_settings->zoom_factor);
     }
     // Zoom rectangle has changed
-    else if (m_zoomer.get_zoom_rect() != cv::Rect(m_z_settings->zoom_tl.x(), m_z_settings->zoom_tl.y(),
-                                                    m_z_settings->zoom_br.x(), m_z_settings->zoom_br.y())) {
-
-        m_zoomer.set_zoom_rect(m_z_settings->zoom_tl, m_z_settings->zoom_br);
+    else if (m_z_settings->has_new_zoom_area) {
+        m_zoomer.area_zoom(m_z_settings->zoom_area_tl, m_z_settings->zoom_area_br);
+        m_z_settings->has_new_zoom_area = false;
     }
     // Panning occured
     else if (m_z_settings->x_movement != 0 || m_z_settings->y_movement != 0) {
-        m_zoomer.move_viewport_center(m_z_settings->x_movement, m_z_settings->y_movement);
+        m_zoomer.translate_viewport_center(m_z_settings->x_movement, m_z_settings->y_movement);
         m_z_settings->x_movement = 0;
         m_z_settings->y_movement = 0;
     }
@@ -248,11 +245,7 @@ void FrameProcessor::update_zoomer_settings() {
 
     // Store changes made
     m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
-    cv::Rect tmp = m_zoomer.get_zoom_rect();
-    m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
-    m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
 
-    qDebug() << "Emitting new state";
     emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
@@ -306,11 +299,7 @@ void FrameProcessor::update_overlay_settings() {
         m_overlay->delete_drawing(m_o_settings->shape);
     // Create a new text drawing
     } else if (m_o_settings->create_text) {
-        int height = m_zoomer.get_zoom_rect().height;
-        int width = m_zoomer.get_zoom_rect().width;
-        int anchor_x = m_zoomer.get_anchor().x();
-        int anchor_y = m_zoomer.get_anchor().y();
-        QPoint text_point = QPoint(anchor_x+width/2, anchor_y+height/2);
+        QPoint text_point = m_zoomer.get_center();
         m_o_settings->create_text = false;
         m_overlay->create_text(text_point, curr_frame);
     // Mouse double clicked action
@@ -341,7 +330,6 @@ void FrameProcessor::update_overlay_settings() {
 }
 
 void FrameProcessor::update_rotation(const int& direction) {
-    qDebug() << "Updating rotation " << direction;
     if (direction != m_rotate_direction) {
         m_rotate_direction = direction;
         if (m_rotate_direction == ROTATE_NONE) {
