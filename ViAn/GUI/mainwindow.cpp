@@ -154,6 +154,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(this, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(bookmark_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(analysis_wgt, &AnalysisWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
     connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
@@ -564,7 +565,7 @@ void MainWindow::init_export_menu() {
     gen_report_act->setStatusTip(tr("Generate report"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
-    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
+    connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
 }
 
 /**
@@ -612,14 +613,6 @@ void MainWindow::zoom() {
 
 void MainWindow::move() {
     video_wgt->frame_wgt->set_tool(MOVE);
-}
-
-/**
- * @brief MainWindow::gen_report
- * runs when the generate report action is triggered
- */
-void MainWindow::gen_report() {
-    emit set_status_bar("Generating report. Please wait.");
 }
 
 void MainWindow::init_rp_dialog() {

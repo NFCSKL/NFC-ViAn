@@ -34,16 +34,17 @@ public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
 signals:
     void play_bookmark_video(VideoProject* vid_proj, VideoState state);
+    void set_status_bar(QString);
 public slots:
     void create_bookmark(VideoProject *vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description);
     void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
     void clear_bookmarks();
+    void generate_report();
 private slots:
 //    void item_context_menu(QPoint pos);
 private:
-    void generate_report();
     BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
     QString get_input_text(QString text, bool* ok);
 };

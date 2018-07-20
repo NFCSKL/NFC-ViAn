@@ -34,6 +34,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void BookmarkWidget::generate_report() {
+    emit set_status_bar("Generating report. Please wait.");
     ReportContainer rp_cont;
     for(int i = 0; i != bm_list->count(); ++i){
         QListWidgetItem* item = bm_list->item(i);
