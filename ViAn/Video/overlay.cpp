@@ -326,7 +326,6 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
     if (drawing) {
         emit set_tool_edit();
         drawing = false;
-        qDebug() << "release";
         return;
     }
     m_right_click = right_click;
@@ -341,7 +340,6 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
  */
 void Overlay::mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl) {
     if (change_tool) return;
-    qDebug() << "move";
     update_drawing_position(pos, frame_nr, shift, ctrl);
 }
 
