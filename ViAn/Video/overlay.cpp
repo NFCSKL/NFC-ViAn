@@ -265,6 +265,28 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
+        if (current_shape == EDIT) {
+            prev_point = pos;
+            m_right_click = right_click;
+            if (right_click) {
+                if (current_drawing) {
+                    current_drawing->set_anchor(pos);
+                }
+                return;
+            }
+
+            if (current_drawing && point_in_drawing(pos, current_drawing)) {
+                return;
+            } else {
+                get_drawing(pos, frame_nr);
+            }
+            return;
+        }
+
+        if (right_click) {
+            emit set_tool_zoom();
+            return;
+        }
         switch (current_shape) {
         case RECTANGLE:
             add_drawing(new Rectangle(current_colour, pos), frame_nr);
@@ -285,22 +307,6 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
         case PEN:
             add_drawing(new Pen(current_colour, pos), frame_nr);
             drawing = true;
-            break;
-        case EDIT:
-            prev_point = pos;
-            m_right_click = right_click;
-            if (right_click) {
-                if (current_drawing) {
-                    current_drawing->set_anchor(pos);
-                }
-                break;
-            }
-
-            if (current_drawing && point_in_drawing(pos, current_drawing)) {
-                break;
-            } else {
-                get_drawing(pos, frame_nr);
-            }
             break;
         default:
             break;
