@@ -274,10 +274,12 @@ void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (frame < temp->get_frame()) {
             m_tag_item->insertChild(i, tf_item);
+            setCurrentItem(tf_item);
             return;
         }
     }
     m_tag_item->addChild(tf_item);
+    setCurrentItem(tf_item);
 }
 
 /**
