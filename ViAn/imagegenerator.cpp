@@ -4,9 +4,9 @@
 #include <QDir>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "Project/project.h"
 
 const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
-const std::string ImageGenerator::THUMBNAIL_FOLDER = "_thumbnails/";
 
 ImageGenerator::ImageGenerator(cv::Mat frame, std::string proj_path){
     m_frame = frame.clone();
@@ -18,21 +18,21 @@ ImageGenerator::~ImageGenerator() {
 }
 
 std::string ImageGenerator::create_thumbnail(std::string name) {
-    std::string save_path = m_path + THUMBNAIL_FOLDER;
+    std::string save_path = m_path + Project::THUMBNAIL_FOLDER;
     if (!create_directory(save_path)) return "";
-    return export_image(save_path + name, PNG, ImageGenerator::THUMBNAIL_SIZE);
+    return export_image(save_path + name, PNG, THUMBNAIL_SIZE);
 
 }
 
 std::string ImageGenerator::create_tiff(std::string name) {
-    std::string save_path = m_path + "Stills/";
+    std::string save_path = m_path + Project::STILLS_FOLDER;
     if (!create_directory(save_path)) return "";    
     return export_image(save_path + name, TIFF);
 }
 
 
 std::string ImageGenerator::create_bookmark(std::string name) {
-    std::string save_path = m_path + "Bookmarks/";
+    std::string save_path = m_path + Project::BOOKMARK_FOLDER;
     if (!create_directory(save_path)) return "";
     return export_image(save_path + name, TIFF);
 }

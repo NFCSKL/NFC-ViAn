@@ -16,6 +16,7 @@
 
 #include "imageexporter.h"
 #include "Project/video.h"
+#include "Project/project.h"
 
 class FrameExporterDialog : public QDialog {
     Q_OBJECT
