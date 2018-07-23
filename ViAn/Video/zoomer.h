@@ -24,7 +24,8 @@ class Zoomer{
     QPoint anchor;
 
     // Frame rectangle and size for the frame being resized/zoomed
-    cv::Size m_frame_size = cv::Size(0,0);
+    cv::Size m_original_frame_size = cv::Size(0,0);
+    cv::Rect m_transformed_frame_rect;
     cv::Rect m_frame_rect;
 
     int m_interpol_method = cv::INTER_NEAREST;
@@ -65,7 +66,7 @@ public:
 private:
     void update_scale(const double& width, const double& height);
     void update_anchor();
-    void flip();
+    void adjust_frame_rect_rotation();
     void center();
 };
 

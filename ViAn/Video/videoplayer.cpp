@@ -51,7 +51,7 @@ void VideoPlayer::load_video(){
     }
     m_new_video->store(false);
 
-    current_frame = -1;
+    current_frame = 0;
     m_is_playing->store(false);
 
     m_capture.open(*m_video_path);
@@ -62,6 +62,7 @@ void VideoPlayer::load_video(){
 
     m_video_loaded->store(true);
     m_new_frame_video->store(true);
+    qDebug() << "VideoPlayer: New video loaded";
 }
 
 /**
@@ -86,6 +87,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
  */
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
+//    qDebug() << "Set frame: "<< frame_index;
 
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
@@ -110,7 +112,7 @@ void VideoPlayer::check_events() {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 wait_load_read();
-                qDebug() << m_frame->load();
+                qDebug() << "New frame index" << m_frame->load() << " old: " << current_frame;
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 set_frame();
             }
@@ -123,6 +125,7 @@ void VideoPlayer::check_events() {
 
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
+                qDebug() << "VideoPlayer: Video is playing";
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
                 if (!synced_read()) continue;
                 ++*m_frame;
@@ -151,6 +154,7 @@ bool VideoPlayer::synced_read(){
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        qDebug() << "Player locked v_sync in synced read";
         int ccols = m_v_sync->frame.cols;
         int crows = m_v_sync->frame.rows;
         if (!m_capture.grab()) {
@@ -186,7 +190,8 @@ bool VideoPlayer::synced_read(){
 
         }
     }
-    m_v_sync->con_var.notify_one();
+    qDebug() << "VideoPlayer: New frame";
+    m_v_sync->con_var.notify_all();
 
     // Wait for processing thread to finish processing new frame
     {
@@ -205,16 +210,36 @@ bool VideoPlayer::wait_load_read(){
     }
     // Read new frame and notify processing thread
     {
-        std::lock_guard<std::mutex> lk(m_v_sync->lock);
+//        std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        qDebug() << "Player: v_sync locked in wait_load";
+        m_v_sync->lock.lock();
+        int load_video_at = m_v_sync->frame_index_on_load;
+        m_frame->store(load_video_at);
         load_video();
-        if (!m_capture.read(m_v_sync->frame)) {
+        if (load_video_at != 0) {
+            qDebug() <<  "Load state index";
+            m_frame->store(load_video_at);
+            m_v_sync->frame_index_on_load = 0;
+
+            // Must unlock before set_frame() since
+            // it calls synced_read() which in turn
+            // uses the same lock
+            m_v_sync->lock.unlock();
+            set_frame();
+            return m_new_frame->load();
+        } else if (m_capture.read(m_v_sync->frame)) {
+            m_new_frame->store(true);
+            m_frame->store(0);
+            qDebug() << "Load zero index";
+            m_v_sync->lock.unlock();
+        } else {
             m_is_playing->store(false);
             playback_stopped();
-
+            m_v_sync->lock.unlock();
             return false;
         }
-        m_new_frame->store(true);
     }
-    m_v_sync->con_var.notify_one();
+    qDebug() << "VideoPlayer: New frame (wait_load_read)";
+    m_v_sync->con_var.notify_all();
     return true;
 }
