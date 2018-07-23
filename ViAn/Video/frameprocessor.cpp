@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QTime>
 #include "utility.h"
-#include <chrono>
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -125,7 +124,6 @@ void FrameProcessor::check_events() {
  * When done it will emit the manipulated frame on the done_processing signal.
  */
 void FrameProcessor::process_frame() {
-    auto start = std::chrono::high_resolution_clock::now();
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame = m_frame.clone();
 

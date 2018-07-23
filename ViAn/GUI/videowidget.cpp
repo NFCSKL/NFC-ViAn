@@ -902,15 +902,11 @@ void VideoWidget::on_playback_slider_value_changed() {
  */
 void VideoWidget::on_playback_slider_moved() {
     if (std::abs(playback_slider->value() - prev_frame_idx) % 5 == 0) {
-        v_sync.lock.lock();
         frame_index.store(playback_slider->value());
-        v_sync.lock.unlock();
     }
 
     if (timer.elapsed() > 200) {
-        v_sync.lock.lock();
         frame_index.store(playback_slider->value());
-        v_sync.lock.unlock();
         timer.restart();
     }
     on_new_frame();
