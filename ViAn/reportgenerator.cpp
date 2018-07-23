@@ -52,6 +52,7 @@ void ReportGenerator::create_report() {
  */
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
     std::string f_name = Utility::name_from_path(bm->get_file_path().toStdString());
+    f_name = Utility::remove_serial_number(f_name);
     QString img_file = QString::fromStdString(f_name);
     QString time = QString("Time: %1").arg(bm->get_time());
     QString brightness = QString("Brightness: %1").arg(bm->get_bookmark()->get_state().brightness);

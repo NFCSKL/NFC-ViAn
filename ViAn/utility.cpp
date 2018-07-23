@@ -1,4 +1,5 @@
 #include "utility.h"
+
 /**
  * @brief Utility::size_ratio
  * calculates and returns the height and width ratios between the two QSize objects
@@ -79,6 +80,16 @@ std::string Utility::add_serial_number(std::string name, std::string file_end) {
         res = qname + QString("(%1)"+ qend).arg(i);
     }
     return res.toStdString();
+}
+
+std::string Utility::remove_serial_number(std::string file) {
+    std::string file_type = file.substr(file.find_last_of("."), file.size());
+    std::string img_name = file.substr(0, file.size() - file_type.size());
+    std::string res = img_name;
+    if (img_name.back() == ')') {
+        res = img_name.substr(0, img_name.find_last_of("("));
+    }
+    return res + file_type;
 }
 
 /**
