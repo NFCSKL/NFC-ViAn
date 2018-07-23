@@ -50,7 +50,6 @@ void FrameProcessor::check_events() {
             update_overlay_settings();
             update_manipulator_settings();
             update_zoomer_settings();
-            m_overlay_loaded = false;
             lk.unlock();
             continue;
         }
@@ -65,10 +64,9 @@ void FrameProcessor::check_events() {
             m_overlay_changed->store(false);
             update_overlay_settings();
             // Skip reprocessing of old frame if there is a new
-            if (!m_new_frame->load() && m_overlay_loaded) {
+            if (!m_new_frame->load()) {
                 process_frame();
             }
-            m_overlay_loaded = true;
             lk.unlock();
             continue;
         }
