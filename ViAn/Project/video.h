@@ -10,6 +10,7 @@
 #include "Video/framemanipulator.h"
 #include <opencv2/opencv.hpp>
 
+class ImageSequence;
 struct VideoState {
     int frame = 0;
     double contrast = FrameManipulator().CONTRAST_DEFAULT;
@@ -32,17 +33,21 @@ struct VideoState {
 
 typedef int ID;
 class Video : Writeable{
+protected:
     std::string m_name;
+    bool m_is_sequence;
 public:
     VideoState state;
 public:
-    Video();
-    Video(std::string file_path);
+    Video(const bool& is_sequence=false);
+    Video(std::string file_path, const bool& is_sequence=false);
     ~Video();
     std::string file_path;
     std::string get_name();
-    void read(const QJsonObject& json);
-    void write(QJsonObject& json);
+    void set_name(const std::string& new_name);
+    bool is_sequence();
+    virtual void read(const QJsonObject& json);
+    virtual void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);
 };
 

@@ -3,12 +3,13 @@
 #include <QDebug>
 #include <QTime>
 #include <chrono>
+#include <cmath>
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool *new_frame_video, std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
                          std::mutex* player_lock, std::string* video_path,
-                         std::atomic_int* speed_step, QObject *parent) : QObject(parent) {
+                         std::atomic_int* speed_step, std::atomic_bool* abort_playback, QObject *parent) : QObject(parent) {
 
 
     m_frame = frame_index;
@@ -27,6 +28,14 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
     m_video_path = video_path;
     m_speed_step = speed_step;
 
+    m_abort_playback = abort_playback;
+
+}
+
+VideoPlayer::~VideoPlayer() {
+    if (m_capture.isOpened()) {
+        m_capture.release();
+    }
 }
 
 /**
@@ -37,9 +46,14 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
  */
 
 void VideoPlayer::load_video(){
+    if (m_capture.isOpened()) {
+        m_capture.release();
+    }
     m_new_video->store(false);
+
     current_frame = -1;
     m_is_playing->store(false);
+
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
@@ -63,6 +77,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
     } else {
         speed_multiplier = 1;
     }
+    m_cur_speed_step = speed_steps;
 }
 
 /**
@@ -71,6 +86,7 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
  */
 void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
+
     if (frame_index >= 0 && frame_index <= m_last_frame) {
         m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
         current_frame = frame_index;
@@ -84,11 +100,13 @@ void VideoPlayer::set_frame() {
  */
 void VideoPlayer::check_events() {
     std::chrono::duration<double> elapsed{0};
-    while (true) {
+    while (!m_abort_playback->load()) {
         std::unique_lock<std::mutex> lk(*m_player_lock);
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
-        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || (current_frame != m_frame->load() && m_video_loaded->load());})) {
+        if (m_player_con->wait_until(lk, now + delay - elapsed,
+                                     [&](){return m_abort_playback->load() || m_new_video->load() ||
+                                     (current_frame != m_frame->load() && m_video_loaded->load());})) {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 wait_load_read();
@@ -111,7 +129,6 @@ void VideoPlayer::check_events() {
                 display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
-
             }
         }
         lk.unlock();
@@ -133,13 +150,40 @@ bool VideoPlayer::synced_read(){
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
-        if (!m_capture.read(m_v_sync->frame)) {
+        int ccols = m_v_sync->frame.cols;
+        int crows = m_v_sync->frame.rows;
+        if (!m_capture.grab()) {
             m_is_playing->store(false);
             playback_stopped();
-
             return false;
         }
-        m_new_frame->store(true);
+
+        int ncols = m_capture.get(CV_CAP_PROP_FRAME_WIDTH);
+        int nrows = m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+        if (ncols != ccols || nrows != crows) {
+            // New frame is not equal in size to the previous one
+            try {
+                m_v_sync->frame.release();
+                m_capture.retrieve(m_v_sync->frame);
+                m_new_frame->store(true);
+                m_video_width->store(m_v_sync->frame.cols);
+                m_video_height->store(m_v_sync->frame.rows);
+            } catch( cv::Exception& e ) {
+                const char* err_msg = e.what();
+                qWarning("Could not retrieve frame of different source size.");
+                qWarning(err_msg);
+            }
+        } else {
+            try {
+                m_capture.retrieve(m_v_sync->frame);
+                m_new_frame->store(true);
+            } catch( cv::Exception& e ) {
+                const char* err_msg = e.what();
+                qWarning("Could not retrieve frame.");
+                qWarning(err_msg);
+            }
+
+        }
     }
     m_v_sync->con_var.notify_one();
 
