@@ -96,6 +96,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
     std::string bm_file = im_gen.create_bookmark(file_name);
     Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description.toStdString(), state, time);
+    bookmark->set_thumbnail_path(thumbnail_path);
     vid_proj->add_bookmark(bookmark);
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
@@ -116,7 +117,7 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;
         // Load thumbnail TODO add check for file
-        std::string t_path = m_path + ImageGenerator::THUMBNAIL_FOLDER + vid_proj->get_video()->get_name() + "_" + std::to_string(bm->get_frame_number()) + ".png";
+        std::string t_path = bm->get_thumbnail_path();
         std::pair<int, std::string> new_container = bm->get_container();
         BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
         bm_item->set_thumbnail(t_path);

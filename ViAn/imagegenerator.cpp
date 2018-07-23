@@ -112,7 +112,7 @@ std::string ImageGenerator::export_image(std::string requested_path, int ext, co
             end = ".png";
             break;
     }
-    std::string saved_path = add_serial_number(requested_path,end);
+    std::string saved_path = add_serial_number(requested_path, end);
     cv::imwrite(saved_path, tmp);
     tmp.release();
     return saved_path;

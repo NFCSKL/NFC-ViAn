@@ -42,7 +42,7 @@ int Utility::number_of_digits(int n) {
  * @param length    :   specifies how long the return string should be
  * @return
  */
-std::string Utility::zfill(std::string number, int length){
+std::string Utility::zfill(std::string number, int length) {
     length -= number.length();
     if (length)
         return std::string(length, '0').append(number);
@@ -55,8 +55,7 @@ std::string Utility::zfill(std::string number, int length){
  * @param full_path
  * @return with path "C:/Somepath/somefile.ending" returns "somefile.ending"
  */
-std::string Utility::name_from_path(const std::string full_path)
-{
+std::string Utility::name_from_path(const std::string full_path) {
     std::string res = full_path.substr(full_path.find_last_of("/")+1, full_path.size());
     return res;
 }
@@ -89,8 +88,7 @@ std::string Utility::add_serial_number(std::string name, std::string file_end) {
  * @param anchor
  * @return scaled cv::Rect
  */
-cv::Rect Utility::scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor)
-{
+cv::Rect Utility::scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor) {
     cv::Point start(rect.tl().x/scale_factor - anchor.x/scale_factor, rect.tl().y/scale_factor - anchor.y/scale_factor);
     cv::Point end(rect.br().x/scale_factor - anchor.x/scale_factor, rect.br().y/scale_factor - anchor.y/scale_factor);
     cv::Rect res = cv::Rect(start, end);
@@ -113,8 +111,7 @@ QRect Utility::scale_rect(QRect rect, double scale_factor, QPoint anchor){
  * @param point
  * @return QPoint from cv::Point
  */
-QPoint Utility::from_cvpoint(cv::Point point)
-{
+QPoint Utility::from_cvpoint(cv::Point point) {
     return QPoint(point.x,point.y);
 }
 
@@ -123,8 +120,7 @@ QPoint Utility::from_cvpoint(cv::Point point)
  * @param point
  * @return cv::Point from Qpoint
  */
-cv::Point Utility::from_qpoint(QPoint point)
-{
+cv::Point Utility::from_qpoint(QPoint point) {
     return cv::Point(point.x(),point.y());
 }
 
@@ -133,8 +129,7 @@ cv::Point Utility::from_qpoint(QPoint point)
  * @param rect
  * @return cv::Rect from QRect
  */
-cv::Rect Utility::from_qrect(QRect rect)
-{
+cv::Rect Utility::from_qrect(QRect rect) {
     return cv::Rect(from_qpoint(rect.topLeft()), from_qpoint(rect.bottomRight()));
 }
 
@@ -143,7 +138,6 @@ cv::Rect Utility::from_qrect(QRect rect)
  * @param rect
  * @return QRect from cv::Rect
  */
-QRect Utility::from_cvrect(cv::Rect rect)
-{
+QRect Utility::from_cvrect(cv::Rect rect) {
     return QRect(from_cvpoint(rect.tl()), from_cvpoint(rect.br()));
 }
