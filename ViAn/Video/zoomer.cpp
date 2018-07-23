@@ -113,58 +113,31 @@ void Zoomer::translate_viewport_center(int x, int y){
     // TODO don't move outside frame rect
     bool is_moving_left{x < 0}, is_moving_right{x > 0}, is_moving_up{y < 0}, is_moving_down{y > 0};
 
-    cv::Point2f center = m_viewport.center;
-    cv::Point2f moved_center = center;
-    cv::RotatedRect contained_rect(cv::Point2f(center.x + x, center.y + y),
-                                  m_viewport.size, 0);
+    cv::RotatedRect contained_rect(cv::Point2f(m_viewport.center.x + x, m_viewport.center.y + y),
+                                  cv::Size(m_viewport.size.width / m_scale_factor, m_viewport.size.height / m_scale_factor),
+                                  0);
 
 
     int length{4};
     cv::Point2f p[length];
     contained_rect.points(p); //bl, tl, tr, br
-    cv::Rect intersecting_rect = cv::Rect(p[1], p[3]) & m_transformed_frame_rect;
-    if (intersecting_rect.area() > 0) {
-        m_viewport = contained_rect;
+
+    bool left_contained{p[0].x >= 0 || p[1].x >= 0};
+    bool up_contained{p[1].y >= 0 || p[2].y >= 0};
+    bool right_contained{p[2].x <= m_transformed_frame_rect.width || p[3].x <= m_transformed_frame_rect.width};
+    bool down_contained{p[3].y <= m_transformed_frame_rect.height || p[0].y <= m_transformed_frame_rect.height};
+
+    int dx{}, dy{};
+    if ((is_moving_left && left_contained) || (is_moving_right && right_contained)) {
+        dx = x;
+    }
+    if (is_moving_up && up_contained || is_moving_down && down_contained) {
+        dy = y;
     }
 
-//    int tl_x, tl_y, br_x, br_y;
-//    if (is_moving_left) {
-//        // Moving left
-//        tl_x = std::max(0, tl.x + x);
-//        br_x = tl_x + m_zoom_rect.width;
-//        if (m_frame_rect.contains(p[0]) || m_frame_rect.contains(p[1])) {
-//            moved_center = cv::Point2f(moved_center.x + x, moved_center.y);
-//        }
-//    } else if (is_moving_right) {
-//        // Moving right
-//        br_x = std::min(m_frame_size.width, br.x + x);
-//        tl_x = br_x - m_zoom_rect.width;
-//        if (m_frame_rect.contains(p[2]) && m_frame_rect.contains(p[3])) {
-//            moved_center = cv::Point2f(moved_center.x + x, moved_center.y);
-//        }
-//    } else {
-//        tl_x = tl.x;
-//        br_x = br.x;
-//    }
-
-//    if (is_moving_up) {
-//        // Moving up
-//        tl_y = std::max(0, tl.y + y);
-//        br_y = tl_y + m_zoom_rect.height;
-//        if (m_frame_rect.contains(p[1]) || m_frame_rect.contains(p[2])) {
-//            moved_center = cv::Point2f(moved_center.x, moved_center.y + y);
-//        }
-//    } else if (is_moving_down) {
-//        // Moving down
-//        br_y = std::min(m_frame_size.height, br.y + y);
-//        tl_y = br_y - m_zoom_rect.height;
-//        if (m_frame_rect.contains(p[0]) || m_frame_rect.contains(p[3])) {
-//            moved_center = cv::Point2f(moved_center.x, moved_center.y + y);
-//        }
-//    } else {
-//        tl_y = tl.y;
-//        br_y = br.y;
-//    }
+    m_viewport = cv::RotatedRect(cv::Point2f(m_viewport.center.x + dx, m_viewport.center.y + dy),
+                                 m_viewport.size,
+                                 m_angle);
     update_anchor();
 }
 

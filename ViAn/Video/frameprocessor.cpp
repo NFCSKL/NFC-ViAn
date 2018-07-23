@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QTime>
 #include "utility.h"
+#include <chrono>
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -22,7 +23,7 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     // NICLAS
-    cv::namedWindow("test");
+    //    cv::namedWindow("test");
 }
 
 /**
@@ -124,20 +125,24 @@ void FrameProcessor::check_events() {
  * When done it will emit the manipulated frame on the done_processing signal.
  */
 void FrameProcessor::process_frame() {
+    auto start = std::chrono::high_resolution_clock::now();
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame = m_frame.clone();
+
     // Rotates the frame, according to the choosen direction.
+    // TODO: Computation heavy.. Will cause lag on larger images.
+    // Should ideally be applied after zoom
     if (ROTATE_MIN <= m_rotate_direction && m_rotate_direction <= ROTATE_MAX) {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
     }
 
     // Create zoom perview mat
-    cv::Mat tmp = manipulated_frame.clone();
-    double factor{0.5};
-    cv::resize(tmp, tmp, cv::Size(), factor, factor);
-    cv::Rect view_rectangle = m_zoomer.get_view_rect();
-    cv::rectangle(tmp, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255), 2);
-    cv::imshow("test", tmp); // can cause a deadlock
+    //    cv::Mat tmp = manipulated_frame.clone();
+    //    double factor{0.5};
+    //    cv::resize(tmp, tmp, cv::Size(), factor, factor);
+    //    cv::Rect view_rectangle = m_zoomer.get_view_rect();
+    //    cv::rectangle(tmp, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255), 2);
+    //    cv::imshow("test", tmp); // can cause a deadlock
 
     // Draws the overlay
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());

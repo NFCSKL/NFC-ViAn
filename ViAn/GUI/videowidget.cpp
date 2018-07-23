@@ -943,29 +943,23 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
 
         // Set state variables but don't update the processor
         {
-            qDebug() << "v_sync lock";
             std::lock_guard<std::mutex> v_lock(v_sync.lock);
-            qDebug() << "v_sync lock acquired";
             z_settings.set_state = true;
             z_settings.anchor = state.anchor;
             z_settings.center = state.center;
             z_settings.zoom_factor = state.scale_factor;
             z_settings.rotation = state.rotation;
-    //        z_settings.skip_frame_refresh = true;
             m_settings.brightness = state.brightness;
             m_settings.contrast = state.contrast;
             o_settings.overlay = m_vid_proj->get_overlay();
         }
 
-        qDebug() << "v_sync unlock";
         // Set new video information and notify player
         {
-            qDebug() << "player lock";
             std::lock_guard<std::mutex> p_lock(player_lock);
             v_sync.frame_index_on_load = state.frame;
             m_video_path = vid_proj->get_video()->file_path;
             new_video.store(true);
-            qDebug() << "player unlock";
         }
         player_con.notify_all();
 
@@ -1044,7 +1038,6 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
-    qDebug() << current_frame_index;
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;
@@ -1283,7 +1276,6 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
         z_settings.rotation = state.rotation;
-        qDebug() << "Loading state: " << frame_index.load() << " " << state.frame;
         z_settings.skip_frame_refresh = frame_index.load() != state.frame;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
