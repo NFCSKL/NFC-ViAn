@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
     connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
             analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
+    connect(project_wgt, &ProjectWidget::abort_all_analysis, analysis_wgt, &AnalysisWidget::abort_all_analysis);
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();

@@ -441,6 +441,14 @@ void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem
     }
 }
 
+void ProjectWidget::get_analysis_items(QTreeWidgetItem *root, std::vector<AnalysisItem *> &items) {
+    for(int i = 0; i < root->childCount(); i++){
+        QTreeWidgetItem* item = root->child(i);
+        if(item->type() == ANALYSIS_ITEM) items.push_back(dynamic_cast<AnalysisItem*>(item));
+        if(item->type() != ANALYSIS_ITEM) get_analysis_items(item, items);
+    }
+}
+
 /**
  * @brief ProjectWidget::insert_to_path_index
  * Inserts a VideoProject into the project tree based on its index_path
@@ -861,10 +869,12 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case ANALYSIS_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction(show_details_act);
-                menu.addAction(show_settings_act);
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+                    menu.addAction("Rename", this, SLOT(rename_item()));
+                    menu.addAction(show_details_act);
+                    menu.addAction(show_settings_act);
+                    menu.addAction("Delete", this, SLOT(remove_item()));
+                }
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -1142,11 +1152,31 @@ void ProjectWidget::create_folder_item() {
 bool ProjectWidget::save_project() {
     if (m_proj == nullptr ) return false;
 
+    std::vector<AnalysisItem*> a_items;
+    get_analysis_items(invisibleRootItem(), a_items);
+    bool analysis_running = false;
+    for (AnalysisItem* item : a_items) {
+        if (!item->is_finished()) {
+            analysis_running = true;
+        }
+    }
+
+    if (analysis_running) {
+        QString text = "One or more analyses are currently running";
+        QString info_text = "Let them finish or stop them before saving";
+        QMessageBox msg_box;
+        msg_box.setText(text);
+        msg_box.setInformativeText(info_text);
+        msg_box.setStandardButtons(QMessageBox::Ok);
+        msg_box.setDefaultButton(QMessageBox::Ok);
+        msg_box.exec();
+        return false;
+    }
+
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
     if (m_proj->is_temporary()) {
         QString name{}, path{};
-//        std::unique_ptr<ProjectDialog> project_dialog(new ProjectDialog(&name, &path));
         ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, DEFAULT_PATH);
         connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
         int status = project_dialog->exec();
@@ -1154,7 +1184,6 @@ bool ProjectWidget::save_project() {
         if (status == project_dialog->Accepted) {
             // User clicked ok, dialog checked for proper path & name
             // Update project path
-            // TODO: Update window title to new project name
             m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
             m_proj->remove_files();
             m_proj->set_name_and_path(name.toStdString(), path.toStdString());
@@ -1225,6 +1254,25 @@ bool ProjectWidget::open_project(QString project_path) {
  */
 bool ProjectWidget::close_project() {
     if (m_proj == nullptr) return true;
+
+    std::vector<AnalysisItem*> a_items;
+    get_analysis_items(invisibleRootItem(), a_items);
+    bool analysis_running = false;
+    for (AnalysisItem* item : a_items) {
+        if (!item->is_finished()) {
+            analysis_running = true;
+        }
+    }
+
+    if (analysis_running) {
+        QString text = "One or more analyses are currently running";
+        QString info_text = "Are you sure you wanna continue? Doing so will stop the analyses.";
+        if (message_box(text, info_text, true)) {
+            emit abort_all_analysis();
+        } else {
+            return false;
+        }
+    }
 
     // Prompt user to save. If cancel keep the current project
     bool abort_close = false;
