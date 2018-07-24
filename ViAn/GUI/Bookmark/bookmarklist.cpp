@@ -9,6 +9,8 @@
 #include <QDrag>
 #include <QApplication>
 #include <algorithm>
+#include <QShortcut>
+#include <QMessageBox>
 #include <QDebug>
 
 BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* parent) : QListWidget(parent) {
@@ -20,6 +22,16 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setAcceptDrops(true);
     setDropIndicatorShown(true);
     setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
+
+    // Shortcut for deleting item
+    QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetShortcut);
+    connect(delete_sc, &QShortcut::activated, this, &BookmarkList::remove_item);
+
+    // Shortcut for renaming item
+    QShortcut* rename_sc = new QShortcut(QKeySequence(Qt::Key_F2), this);
+    rename_sc->setContext(Qt::WidgetShortcut);
+    connect(rename_sc, &QShortcut::activated, this, &BookmarkList::rename_item);
 
     clear();
 }
@@ -155,9 +167,9 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
  */
 void BookmarkList::rename_item(){
     bool ok;
-    switch (clicked_item->type()) {
+    switch (currentItem()->type()) {
     case BOOKMARK: {
-        auto item = dynamic_cast<BookmarkItem*>(clicked_item);
+        auto item = dynamic_cast<BookmarkItem*>(currentItem());
         BookmarkDialog dialog;
 
         dialog.setTextValue(QString::fromStdString(item->get_bookmark()->get_description()));
@@ -171,9 +183,17 @@ void BookmarkList::rename_item(){
         break;
     }
     case CONTAINER: {
-        auto item = dynamic_cast<BookmarkCategory*>(clicked_item);
-        QString text = QInputDialog::getText(nullptr, "Change title", "Enter a new title", QLineEdit::Normal, QString::fromStdString(item->get_name()), &ok);
-        item->update_title(text);
+        auto item = dynamic_cast<BookmarkCategory*>(currentItem());
+
+        BookmarkDialog dialog;
+        dialog.setTextValue(QString::fromStdString(item->get_name()));
+        dialog.setLabelText("Enter a new category name");
+        dialog.setWindowTitle("Category name");
+        ok = dialog.exec();
+        QString new_text = dialog.textValue();
+        if (ok) {
+            item->update_title(new_text);
+        }
         break;
     }
     default:
@@ -186,6 +206,16 @@ void BookmarkList::rename_item(){
  * Removes the clicked list item
  */
 void BookmarkList::remove_item() {
+    QMessageBox msg_box;
+    msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setText("Deleting item\n"
+                    "this will delete all bookmarks in the categories");
+    msg_box.setInformativeText("Are you sure?");
+    msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg_box.setDefaultButton(QMessageBox::No);
+    int reply = msg_box.exec();
+    if (reply == QMessageBox::No) return;
+
     if (currentItem()->type() == BOOKMARK) {
         BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
         Bookmark* b_mark = bm_item->get_bookmark();
