@@ -46,6 +46,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
         recent_list->addTopLevelItem(item);
     }
 
+    connect(recent_list, &QTreeWidget::itemSelectionChanged, this, &RecentProjectDialog::item_selection_changed);
     connect(recent_list, &QTreeWidget::itemDoubleClicked, this, &RecentProjectDialog::on_item_double_clicked);
     connect(new_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_new_btn_clicked);
     connect(browse_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_browse_btn_clicked);
@@ -55,6 +56,19 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
 
 RecentProjectDialog::~RecentProjectDialog() {
     recent_list->clear();
+}
+
+/**
+ * @brief RecentProjectDialog::on_item_clicked
+ * Selects the open button
+ * @param item
+ */
+void RecentProjectDialog::item_selection_changed() {
+    if (recent_list->selectedItems().length() > 0) {
+        open_btn->setDefault(true);
+    } else {
+        new_btn->setDefault(true);
+    }
 }
 
 /**

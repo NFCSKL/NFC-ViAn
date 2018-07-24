@@ -3,6 +3,7 @@
 FrameItem::FrameItem(int frame) : ShapeItem(FRAME_ITEM) {
     m_frame = frame;
     setFlags(flags() | Qt::ItemIsDropEnabled);
+    setFlags(flags() & ~Qt::ItemIsEditable);
     setText(0, QString::number(frame));
 }
 

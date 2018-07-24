@@ -44,7 +44,7 @@ void TextDialog::ok_btn_clicked() {
     } else {
         emit text(name->text(), double_box->value());
     }
-    close();
+    accept();
 }
 
 /**
@@ -52,5 +52,5 @@ void TextDialog::ok_btn_clicked() {
  * Close widget
  */
 void TextDialog::cancel_btn_clicked() {
-    close();
+    reject();
 }

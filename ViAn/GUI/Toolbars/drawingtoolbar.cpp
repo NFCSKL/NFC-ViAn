@@ -153,7 +153,7 @@ void DrawingToolbar::text_tool_clicked() {
     emit set_status_bar("Text tool");
     TextDialog* text_dialog = new TextDialog;
     text_dialog->deleteLater();
+    connect(text_dialog, &TextDialog::accepted, edit_tool_act, &QAction::trigger);
     connect(text_dialog, &TextDialog::text, this, &DrawingToolbar::send_text);
     text_dialog->exec();
-    edit_tool_act->trigger();
 }

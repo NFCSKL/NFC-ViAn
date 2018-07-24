@@ -253,7 +253,6 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_item->setExpanded(true);
 }
 
-
 /**
  * @brief ProjectWidget::add_frames_to_tag_item
  * Create the TagFrameItems from all the frames. Used when opening a project
@@ -287,10 +286,12 @@ void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (frame < temp->get_frame()) {
             m_tag_item->insertChild(i, tf_item);
+            setCurrentItem(tf_item);
             return;
         }
     }
     m_tag_item->addChild(tf_item);
+    setCurrentItem(tf_item);
 }
 
 /**
@@ -639,10 +640,11 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        vid_item->get_video_project()->get_video()->state.frame = seq_item->get_index();
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        state.frame = seq_item->get_index();
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video_state(vid_item->get_video_project(),
-                                vid_item->get_video_project()->get_video()->state);
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(false);
         emit set_poi_slider(false);

@@ -54,8 +54,6 @@ void Overlay::set_showing_overlay(bool value) {
 /**
  * @brief Overlay::set_tool
  * Sets the overlay tool's shape.
- * If the tool is the text-tool the user is prompted
- * to enter a text and a font scale.
  * @param s New tool to be set.
  */
 void Overlay::set_tool(SHAPES s) {
@@ -267,6 +265,28 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
+        if (current_shape == EDIT) {
+            prev_point = pos;
+            m_right_click = right_click;
+            if (right_click) {
+                if (current_drawing) {
+                    current_drawing->set_anchor(pos);
+                }
+                return;
+            }
+
+            if (current_drawing && point_in_drawing(pos, current_drawing)) {
+                return;
+            } else {
+                get_drawing(pos, frame_nr);
+            }
+            return;
+        }
+
+        if (right_click) {
+            emit set_tool_zoom();
+            return;
+        }
         switch (current_shape) {
         case RECTANGLE:
             add_drawing(new Rectangle(current_colour, pos), frame_nr);
@@ -287,22 +307,6 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
         case PEN:
             add_drawing(new Pen(current_colour, pos), frame_nr);
             drawing = true;
-            break;
-        case EDIT:
-            prev_point = pos;
-            m_right_click = right_click;
-            if (right_click) {
-                if (current_drawing) {
-                    current_drawing->set_anchor(pos);
-                }
-                break;
-            }
-
-            if (current_drawing && point_in_drawing(pos, current_drawing)) {
-                break;
-            } else {
-                get_drawing(pos, frame_nr);
-            }
             break;
         default:
             break;
@@ -326,12 +330,10 @@ void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
         return;
     }
     if (drawing) {
-        drawing = false;
         emit set_tool_edit();
+        drawing = false;
         return;
     }
-    // TODO Should not need
-    //update_drawing_position(pos, frame_nr);
     m_right_click = right_click;
 }
 
@@ -376,6 +378,7 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool ctrl) {
+    // Only update the overlay is is exists and is currently being shown
     if (show_overlay && !overlays[frame_nr].empty()) {
         if (current_shape == EDIT) {
             if (current_drawing == nullptr) return;

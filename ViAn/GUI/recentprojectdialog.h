@@ -38,6 +38,7 @@ signals:
     void new_project(void);
     void remove_project();
 private slots:
+    void item_selection_changed();
     void on_item_double_clicked(QTreeWidgetItem *item);
     void on_new_btn_clicked();
     void on_browse_btn_clicked();

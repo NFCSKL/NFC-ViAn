@@ -53,7 +53,6 @@ public:
     RecentProjectDialog* rp_dialog;
 
 private slots:
-    void gen_report(void);
     void cont_bri(void);
     void export_images();
     void update_text(QString, Shapes*);

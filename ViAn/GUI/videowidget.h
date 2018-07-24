@@ -221,7 +221,8 @@ private:
     QShortcut* interpol_sc;
     QShortcut* speed_slider_up;
     QShortcut* speed_slider_down;
-    QShortcut* frame_edit_act;
+    QShortcut* frame_edit_sc;
+    QShortcut* zoom_edit_sc;
     QShortcut* video_start_sc;
     QShortcut* video_end_sc;
     QShortcut* page_step_front_sc;
@@ -279,6 +280,7 @@ private slots:
     void page_step_front(void);
     void page_step_back(void);
     void frame_label_focus(void);
+    void zoom_label_focus(void);
 
     void on_interpolate_toggled(bool checked);
 };

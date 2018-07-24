@@ -26,18 +26,18 @@
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
-    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
+    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
-    toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_drawing_wgt = drawing_dock->toggleViewAction();
+    toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
 
@@ -62,12 +62,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
             analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
     connect(project_wgt, &ProjectWidget::abort_all_analysis, analysis_wgt, &AnalysisWidget::abort_all_analysis);
 
-    // Initialize bookmark widget
-    bookmark_wgt = new BookmarkWidget();
-    bookmark_wgt->setWindowFlags(Qt::Window);
-    addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
-    bookmark_dock->close();
-
     // Initialize drawing widget
     drawing_wgt = new DrawingWidget();
     drawing_dock->setWidget(drawing_wgt);
@@ -80,6 +74,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(drawing_wgt, SIGNAL(update_text(QString, Shapes*)), this, SLOT(update_text(QString, Shapes*)));
     connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
     connect(video_wgt, &VideoWidget::delete_sc_activated, drawing_wgt, &DrawingWidget::delete_item);
+
+    // Initialize bookmark widget
+    bookmark_wgt = new BookmarkWidget();
+    bookmark_wgt->setWindowFlags(Qt::Window);
+    addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
+    bookmark_dock->close();
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();
@@ -156,6 +156,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(this, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(bookmark_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(analysis_wgt, &AnalysisWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
     connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
@@ -566,7 +567,7 @@ void MainWindow::init_export_menu() {
     gen_report_act->setStatusTip(tr("Generate report"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
-    connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
+    connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
 }
 
 /**
@@ -614,14 +615,6 @@ void MainWindow::zoom() {
 
 void MainWindow::move() {
     video_wgt->frame_wgt->set_tool(MOVE);
-}
-
-/**
- * @brief MainWindow::gen_report
- * runs when the generate report action is triggered
- */
-void MainWindow::gen_report() {
-    emit set_status_bar("Generating report. Please wait.");
 }
 
 void MainWindow::init_rp_dialog() {
