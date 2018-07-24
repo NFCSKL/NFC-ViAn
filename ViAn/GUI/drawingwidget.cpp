@@ -378,7 +378,7 @@ void DrawingWidget::delete_item() {
         if (f_item->get_frame() == m_overlay->get_current_frame()) {
             QMessageBox msg_box;
             msg_box.setIcon(QMessageBox::Warning);
-            msg_box.setText("Deleting frameitem\n"
+            msg_box.setText("Deleting drawings on frame "+QString::number(f_item->get_frame())+"\n"
                             "This will delete all drawings on this frame");
             msg_box.setInformativeText("Do you wish to continue?");
             msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
