@@ -59,12 +59,18 @@ void Zoomer::set_scale_factor(double scale_factor) {
  * @param p2 end point
  */
 void Zoomer::area_zoom(QPoint p1, QPoint p2) {
-    cv::Point2f new_center(p1.x() + (p2.x() - p1.x()) / 2, p1.y() + (p2.y() - p1.y()) / 2);
+    int start_x = (p1.x() < p2.x()) ? p1.x() : p2.x();
+    int end_x = (p1.x() < p2.x()) ? p2.x() : p1.x();
+
+    int start_y = (p1.y() < p2.y()) ? p1.y() : p2.y();
+    int end_y = (p1.y() < p2.y()) ? p2.y() : p1.y();
+
+    cv::Point2f new_center(start_x + (end_x - start_x) / 2, start_y + (end_y - start_y) / 2);
     m_viewport = cv::RotatedRect(new_center,
                                  m_viewport.size,
                                  m_angle);
 
-    update_scale(p2.x() - p1.x(), p2.y() - p1.y());
+    update_scale(end_x - start_x, end_y - start_y);
     update_anchor();
 }
 
@@ -235,8 +241,8 @@ void Zoomer::fit_viewport() {
  */
 void Zoomer::update_scale(const double& width, const double& height) {
     if (width * height == 0) return;
-    m_scale_factor = std::max(m_viewport_size.width() / width,
-                              m_viewport_size.height() / height);
+    set_scale_factor(std::min(m_viewport_size.width() / width,
+                              m_viewport_size.height() / height));
 }
 
 /**

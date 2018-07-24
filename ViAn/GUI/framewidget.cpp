@@ -289,23 +289,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (mark_rect) {
-        // Draw the zoom box with correct dimension
-        if(m_tool == ZOOM){
-            QPoint start = rect_start;
-            QPoint end = rect_end;
-
-            int width = end.x() - start.x();
-            int height = end.y() - start.y();
-
-            double width_ratio = double(width) / _qimage.width();
-            double height_mod = std::copysign(_qimage.height() * width_ratio, height);
-
-            end = QPoint(end.x(), start.y() + height_mod);
-
-            painter.setPen(QColor(255,0,0));
-            QRectF correct_dim_rect((start-anchor)*m_scale_factor, (end-anchor)*m_scale_factor);
-            painter.drawRect(correct_dim_rect);
-        }
         // Draw the zoom box
         painter.setPen(QColor(0,255,0));
         QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
@@ -650,14 +633,5 @@ void FrameWidget::end_panning() {
  */
 void FrameWidget::end_zoom() {
     repaint();
-
-    // ROI rect points
-    int wid = rect_end.x() - rect_start.x();
-    int hei = rect_end.y() - rect_start.y();
-
-    double wid_ratio = double(wid) / _qimage.width();
-    double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
-    QPoint end = QPoint(rect_end.x(), rect_start.y() + height_mod);
-
-    emit zoom_points(rect_start, end);
+    emit zoom_points(rect_start, rect_end);
 }
