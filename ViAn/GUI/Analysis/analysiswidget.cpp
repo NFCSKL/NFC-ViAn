@@ -103,7 +103,7 @@ void AnalysisWidget::on_analysis_aborted() {
     analysis_queue.pop_front();
     delete current_analysis_item; // Delete item from tree
     auto it = abort_map.find(current_method);
-    abort_map.erase(it);
+    if (it != abort_map.end()) abort_map.erase(it);
 
     m_queue_wgt->next();
     if (!analysis_queue.empty()) {
