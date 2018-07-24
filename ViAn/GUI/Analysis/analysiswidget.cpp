@@ -101,7 +101,7 @@ void AnalysisWidget::on_analysis_aborted() {
     abort_map.erase(it);
 
     m_queue_wgt->next();
-    if (!analysis_queue.empty()) {        
+    if (!analysis_queue.empty()) {
         current_analysis_item = std::get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());

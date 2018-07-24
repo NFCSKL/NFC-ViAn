@@ -47,6 +47,16 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     new_folder_sc->setKey(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
     connect(new_folder_sc, &QShortcut::activated, this, &ProjectWidget::create_folder_item);
 
+    // Shortcut for deleting item
+    QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(delete_sc, &QShortcut::activated, this, &ProjectWidget::remove_item);
+
+    // Shortcut for updating drawing tag item
+    QShortcut* update_sc = new QShortcut(QKeySequence(Qt::Key_F5), this);
+    update_sc->setContext(Qt::WidgetShortcut);
+    connect(update_sc, &QShortcut::activated, this, &ProjectWidget::drawing_tag);
+
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
 
@@ -224,6 +234,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
+        setCurrentItem(item);
         for (auto t_frame : tag->tag_map) {
             TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
             tf_item->set_state(t_frame.second);
@@ -236,6 +247,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
+        setCurrentItem(item);
         tree_item_clicked(item);
     }
     vid_item->setExpanded(true);
@@ -895,6 +907,8 @@ void ProjectWidget::drawing_tag() {
         delete selectedItems().front();
     } else if (selectedItems().front()->type() == VIDEO_ITEM) {
         vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
+    } else {
+        return;
     }
     // Create tag drawing
     Tag* tag = new Tag("Drawing tag", true);

@@ -109,6 +109,7 @@ signals:
     void tag_remove_frame(int);
     void set_status_bar(QString);
     void export_original_frame(VideoProject*, const int, cv::Mat);
+    void delete_sc_activated();
 public slots:
     void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
@@ -226,6 +227,7 @@ private:
     QShortcut* video_end_sc;
     QShortcut* page_step_front_sc;
     QShortcut* page_step_back_sc;
+    QShortcut* delete_sc;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas

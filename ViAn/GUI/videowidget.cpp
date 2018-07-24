@@ -308,7 +308,8 @@ void VideoWidget::set_btn_tab_order() {
  * Set shortcuts to the buttons
  */
 void VideoWidget::set_btn_shortcuts() {
-    //play_btn->setShortcut(QKeySequence(Qt::Key_Space)); // TODO Fix so this works
+    play_btn->setShortcut(QKeySequence(Qt::Key_Space));
+    play_btn->setFocusPolicy(Qt::NoFocus);
     stop_btn->setShortcut(QKeySequence(Qt::Key_S));
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
@@ -327,6 +328,8 @@ void VideoWidget::set_btn_shortcuts() {
     video_end_sc = new QShortcut(QKeySequence(Qt::Key_End), this);
     page_step_front_sc = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Right), this);
     page_step_back_sc = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Left), this);
+    delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
 
     //connect
     connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
@@ -336,6 +339,7 @@ void VideoWidget::set_btn_shortcuts() {
     connect(video_end_sc, &QShortcut::activated, this, &VideoWidget::set_video_end);
     connect(page_step_front_sc, &QShortcut::activated, this, &VideoWidget::page_step_front);
     connect(page_step_back_sc, &QShortcut::activated, this, &VideoWidget::page_step_back);
+    connect(delete_sc, &QShortcut::activated, this, &VideoWidget::delete_sc_activated);
 }
 
 /**
