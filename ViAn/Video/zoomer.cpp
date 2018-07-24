@@ -17,6 +17,38 @@ Zoomer::Zoomer(cv::Size frame_size) {
  */
 void Zoomer::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
+
+    cv::RotatedRect temp(m_viewport.center,
+                         cv::Size(m_viewport.size.width / scale_factor, m_viewport.size.height / scale_factor),
+                         m_angle);
+    cv::Point2f p[4];
+    temp.points(p);
+    cv::Point2f tl = p[1];
+    cv::Point2f br = p[3];
+
+    double dx{}, dy{};
+    if ((tl.x) < 0 && (br.x ) > m_transformed_frame_rect.width) {
+        dx = 0;
+    } else if ((tl.x) < 0) {
+        // Frame is being cropped on the left side, move center to the right
+        dx = std::abs(tl.x);
+    } else if ((br.x ) > m_transformed_frame_rect.width) {
+        // Frame is being cropped on the right side, move center to the left
+        dx = m_transformed_frame_rect.width - br.x;
+    }
+
+    if ((tl.y) < 0 && (br.y) > m_transformed_frame_rect.height) {
+        dy = 0;
+    } else if ((tl.y) < 0) {
+        // Frame is being cropped on the top, move center down
+        dy = std::abs(tl.y);
+    } else if ((br.y) > m_transformed_frame_rect.height) {
+        // Frame is being cropped on the bottom, move center up
+        dy = m_transformed_frame_rect.height - br.y;
+    }
+    m_viewport = cv::RotatedRect(cv::Point2f(m_viewport.center.x + std::round(dx), m_viewport.center.y + std::round(dy)),
+                                 m_viewport.size,
+                                 m_angle);
     update_anchor();
 }
 
@@ -149,8 +181,6 @@ void Zoomer::translate_viewport_center(int x, int y){
  * @param zoom_step :   How much the zoom should be modified
  */
 void Zoomer::point_zoom(QPoint original_point, double zoom_step) {
-    set_scale_factor(m_scale_factor * zoom_step);
-
     // Calculate point displacement relative the old viewport center
     double dx = (original_point.x() - m_viewport.center.x) * (zoom_step - 1);
     double dy = (original_point.y() - m_viewport.center.y) * (zoom_step - 1);
@@ -159,7 +189,7 @@ void Zoomer::point_zoom(QPoint original_point, double zoom_step) {
     m_viewport = cv::RotatedRect(cv::Point2f(m_viewport.center.x + dx, m_viewport.center.y + dy),
                                  m_viewport.size,
                                  m_angle);
-    update_anchor();
+    set_scale_factor(m_scale_factor * zoom_step);
 }
 
 /**
