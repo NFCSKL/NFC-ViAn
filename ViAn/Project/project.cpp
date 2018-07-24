@@ -4,6 +4,10 @@
 #include <string>
 #include <QDebug>
 
+const std::string Project::BOOKMARK_FOLDER = "Bookmarks/";
+const std::string Project::THUMBNAIL_FOLDER = "_thumbnails/";
+const std::string Project::STILLS_FOLDER = "Stills/";
+
 /**
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
@@ -124,7 +128,7 @@ void Project::set_name_and_path(const std::string& name, const std::string& path
         m_dir = !tmp_dir.empty() ? (tmp_dir + "/") : (DEFAULT_PATH + "/temporary" + std::to_string(std::rand()) + "/");
     }
     m_file = m_dir + m_name + ".vian";
-    m_dir_bookmarks = m_dir + "Bookmarks/";
+    m_dir_bookmarks = m_dir + BOOKMARK_FOLDER;
 }
 
 /**
@@ -159,7 +163,7 @@ void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
     m_file = full_path();
     m_dir = m_file.substr(0,m_file.find_last_of("/")+1);
-    m_dir_bookmarks = m_dir + "Bookmarks/";
+    m_dir_bookmarks = m_dir + BOOKMARK_FOLDER;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {

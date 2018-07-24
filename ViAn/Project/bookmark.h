@@ -29,6 +29,7 @@ class Bookmark : public Writeable {
     QString m_time = "";               // Time of the bookmark (format "mm:ss")
     std::string m_description = "";    // Description for the bookmark, given by user
     VideoState m_state;                 // Contains the state of the video, eg frame, zoom rect and scale factor
+    std::string m_thumbnail_path = "";        // Contains the path to the thumbnail for the bookmark
 
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
     ID id = 0;
@@ -50,6 +51,8 @@ public:
     void set_description(const std::string &text);
     void set_container(std::string name, int type);
     void rename_container(std::string old_name, std::string new_name);
+    void set_thumbnail_path(std::__cxx11::string path);
+    std::__cxx11::string get_thumbnail_path();
     void set_video_project(VideoProject* vid_proj);
     void add_to_video_project();
     bool remove();

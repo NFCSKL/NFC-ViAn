@@ -13,6 +13,7 @@ namespace Utility{
      std::string zfill(std::string number, int length);
      std::string name_from_path(const std::string full_path);
      std::string add_serial_number(std::string name, std::string file_end);
+     std::string remove_serial_number(std::string file);
 
      cv::Rect scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor);
      QRect scale_rect(QRect rect, double scale_factor, QPoint anchor);
