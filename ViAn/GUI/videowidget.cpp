@@ -926,7 +926,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
 
-    if (m_vid_proj != vid_proj) {
+    if (!vid_proj->is_current()) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
 

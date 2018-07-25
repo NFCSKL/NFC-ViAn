@@ -7,6 +7,7 @@
 const std::string Project::BOOKMARK_FOLDER = "Bookmarks/";
 const std::string Project::THUMBNAIL_FOLDER = "_thumbnails/";
 const std::string Project::STILLS_FOLDER = "Stills/";
+const std::string Project::SEQUENCE_FOLDER = "Sequences/";
 
 /**
  * @brief Project::Project

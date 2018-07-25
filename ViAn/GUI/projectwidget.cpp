@@ -1194,6 +1194,15 @@ bool ProjectWidget::save_project() {
             emit proj_path(m_proj->get_dir());
             QDir dir;
             dir.mkpath(QString::fromStdString(m_proj->get_dir()));
+
+            // If the current video is a sequence then it needs to be reloaded
+            // since the images path will have changed
+            for (auto vid_proj : m_proj->get_videos()) {
+                if (vid_proj->is_current() && vid_proj->get_video()->is_sequence()) {
+                    vid_proj->set_current(false);
+                    emit marked_video_state(vid_proj, vid_proj->get_video()->state);
+                }
+            }
         } else {
             // User aborted dialog, cancel save
             return false;
@@ -1211,7 +1220,7 @@ bool ProjectWidget::save_project() {
 
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
+    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());    
     set_status_bar("Project saved");
     return true;
 }

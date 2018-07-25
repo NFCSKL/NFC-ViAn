@@ -206,6 +206,13 @@ void VideoProject::set_project(Project *proj){
 }
 
 void VideoProject::reset_root_dir(const std::string &dir) {
+    if (m_video->is_sequence()) {
+        auto seq = dynamic_cast<ImageSequence*>(m_video);
+        if (seq) {
+            seq->reset_root_dir(dir);
+        }
+    }
+
     for(auto bm : m_bookmarks){
         bm.second->reset_root_dir(dir);
     }
