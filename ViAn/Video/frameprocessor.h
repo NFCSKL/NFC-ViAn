@@ -163,6 +163,8 @@ class FrameProcessor : public QObject {
     FrameManipulator m_manipulator;
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
+
+    bool has_new_zoom_state{false};
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -186,6 +188,7 @@ private:
 
     void reset_settings();
     void load_zoomer_state();
+    void emit_zoom_data();
 };
 
 #endif // FRAMEPROCESSOR_H

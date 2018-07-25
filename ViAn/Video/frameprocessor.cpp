@@ -50,6 +50,8 @@ void FrameProcessor::check_events() {
             update_overlay_settings();
             update_manipulator_settings();
             update_zoomer_settings();
+
+            m_unrotated_size = cv::Size(0, 0);
             lk.unlock();
             continue;
         }
@@ -97,6 +99,8 @@ void FrameProcessor::check_events() {
 
             // Check for new dimensions on unrotated frame
             // update zoomer as necessary
+            // This is required for image sequences since
+            // they can contain images of various sizes
             cv::Rect prev_size = m_zoomer.get_frame_rect();
             int new_width{m_frame.cols}, new_height{m_frame.rows};
             bool has_new_frame_size{m_unrotated_size.width != new_width || m_unrotated_size.height != new_height};
@@ -104,7 +108,14 @@ void FrameProcessor::check_events() {
 
             if (frame_rect_changed && has_new_frame_size) {
                 m_zoomer.set_frame_size(cv::Size(new_width, new_height));
+                if (has_new_zoom_state) {
+                    m_zoomer.enforce_frame_boundaries();
+                } else {
+                    m_zoomer.fit_viewport();
+                }
+                emit_zoom_data();
             }
+            has_new_zoom_state = false;
             m_unrotated_size = cv::Size(new_width, new_height);
             process_frame();
 
@@ -169,6 +180,19 @@ void FrameProcessor::load_zoomer_state() {
     } else if (m_z_settings->rotation == 270) {
         m_rotate_direction = ROTATE_270;
     }
+    has_new_zoom_state = true;
+}
+
+/**
+ * @brief FrameProcessor::emit_zoom_data
+ * Emitts all signals that sends zoom data
+ */
+void FrameProcessor::emit_zoom_data() {
+        m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
+
+        emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
+        emit set_anchor(m_zoomer.get_anchor());
+        emit set_scale_factor(m_zoomer.get_scale_factor());
 }
 
 /**
@@ -223,9 +247,7 @@ void FrameProcessor::update_zoomer_settings() {
     // Store changes made
     m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
 
-    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
-    emit set_anchor(m_zoomer.get_anchor());
-    emit set_scale_factor(m_zoomer.get_scale_factor());
+    emit_zoom_data();
 }
 
 /**
@@ -318,6 +340,7 @@ void FrameProcessor::update_rotation(const int& direction) {
         } else if (m_rotate_direction == ROTATE_270) {
             m_zoomer.update_rotation(270);
         }
+        m_zoomer.enforce_frame_boundaries();
     }
 }
 
@@ -333,6 +356,7 @@ void FrameProcessor::reset_settings() {
 
     // Reset manipulator values
     m_manipulator.reset();
+    m_zoomer.set_angle(0);
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
     m_zoomer.reset();
 

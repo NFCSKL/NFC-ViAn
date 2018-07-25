@@ -49,6 +49,7 @@ public:
     void set_frame_size(cv::Size frame_size);
     void set_viewport_size(const QSize size);
     void set_interpolation_method(const int& method);
+    void set_angle(const int& angle);
 
     // Getters
     int get_angle() const;
@@ -63,6 +64,8 @@ public:
     cv::Rect get_frame_rect() const;
     cv::Rect get_view_rect() const;
 
+    void enforce_frame_boundaries();
+    
 private:
     void update_scale(const double& width, const double& height);
     void update_anchor();

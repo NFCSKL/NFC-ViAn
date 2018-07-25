@@ -12,15 +12,14 @@ Zoomer::Zoomer(cv::Size frame_size) {
 }
 
 /**
- * @brief Zoomer::set_scale_factor
- * @param scale_factor
+ * @brief Zoomer::enforce_frame_boundaries
+ * Moves the viewport rectangle in relation to the current frame rectangle so that
+ * each corner of the viewport rectangle are contained within the frame
  */
-void Zoomer::set_scale_factor(double scale_factor) {
-    m_scale_factor = scale_factor;
-
+void Zoomer::enforce_frame_boundaries() {
     cv::RotatedRect temp(m_viewport.center,
-                         cv::Size(m_viewport.size.width / scale_factor, m_viewport.size.height / scale_factor),
-                         m_angle);
+                         cv::Size(m_viewport.size.width / m_scale_factor, m_viewport.size.height / m_scale_factor),
+                         0);
     cv::Point2f p[4];
     temp.points(p);
     cv::Point2f tl = p[1];
@@ -50,6 +49,15 @@ void Zoomer::set_scale_factor(double scale_factor) {
                                  m_viewport.size,
                                  m_angle);
     update_anchor();
+}
+
+/**
+ * @brief Zoomer::set_scale_factor
+ * @param scale_factor
+ */
+void Zoomer::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+    enforce_frame_boundaries();
 }
 
 /**
@@ -95,7 +103,7 @@ void Zoomer::set_viewport_size(const QSize size) {
     m_viewport = cv::RotatedRect(m_viewport.center,
                                  cv::Point2f(size.width(),size.height()),
                                  m_angle);
-    update_anchor();
+    enforce_frame_boundaries();
 }
 
 /**
@@ -105,6 +113,15 @@ void Zoomer::set_viewport_size(const QSize size) {
  */
 void Zoomer::set_interpolation_method(const int &method) {
     m_interpol_method = method;
+}
+
+/**
+ * @brief Zoomer::set_angle
+ * Sets the angle in degrees (does not update any of the necessary settings)
+ * @param angle
+ */
+void Zoomer::set_angle(const int &angle) {
+    m_angle = angle;
 }
 
 /**
@@ -137,7 +154,6 @@ void Zoomer::update_rotation(const int &angle) {
     translated_y = rotated_y + m_transformed_frame_rect.height / 2;
     cv::Point2f rotated_center(translated_x, translated_y);
     m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);
-
     update_anchor();
 }
 
@@ -314,9 +330,7 @@ int Zoomer::get_interpolation_method() const {
  * Also centers the viewport to the frame
  */
 void Zoomer::reset() {
-    m_angle = 0;
     m_scale_factor = 1;
-    adjust_frame_rect_rotation();
     center();
 }
 
@@ -361,7 +375,7 @@ void Zoomer::scale_frame(cv::Mat &frame) {
         const char* err_msg = e.what();
         qCritical() << "Exception: " << err_msg;
         qWarning() << "Failed to resize frame to view rectangle. Resetting zoomer";
-        reset();
+        center();
     }
 }
 
