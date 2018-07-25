@@ -56,6 +56,7 @@ public:
     static const std::string BOOKMARK_FOLDER;
     static const std::string THUMBNAIL_FOLDER;
     static const std::string STILLS_FOLDER;
+    static const std::string SEQUENCE_FOLDER;
 
     ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
