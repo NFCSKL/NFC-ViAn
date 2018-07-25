@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     project_wgt->new_project();
 
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
+    connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
@@ -446,6 +447,13 @@ void MainWindow::close_widget(VideoWidget *vid_wgt) {
     }
 }
 
+void MainWindow::close_all_widgets() {
+    for (auto widget : video_widgets) {
+        delete widget;
+    }
+    video_widgets.clear();
+}
+
 void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Tag/Interval"));
 
@@ -610,10 +618,6 @@ void MainWindow::init_help_menu() {
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (project_wgt->close_project()) {
         event->accept();
-        for (auto widget : video_widgets) {
-            delete widget;
-        }
-        video_widgets.clear();
     } else {
         event->ignore();
     }

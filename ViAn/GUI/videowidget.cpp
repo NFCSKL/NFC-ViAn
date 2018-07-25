@@ -179,37 +179,38 @@ void VideoWidget::init_frame_processor() {
 
     try {
         processing_thread = new QThread(this);
+
+        f_processor->moveToThread(processing_thread);
+        connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
+        connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
+
+
+        connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
+        connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
+        connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+        connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
+        connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
+        connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
+        connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
+        connect(frame_wgt, SIGNAL(mouse_moved(QPoint,bool,bool)), this, SLOT(mouse_moved(QPoint,bool,bool)));
+        connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
+        connect(frame_wgt, SIGNAL(process_frame()), this, SLOT(process_frame()));
+        connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
+        connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
+        connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
+
+        connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
+        connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
+        connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+        connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
+        connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
+
+        processing_thread->start();
+
     } catch (const std::bad_alloc& e) {
         qWarning() << "Failed to open new thread";
         close();
     }
-
-    f_processor->moveToThread(processing_thread);
-    connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
-    connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
-
-
-    connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
-    connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
-    connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
-    connect(frame_wgt, &FrameWidget::center_zoom_rect, this, &VideoWidget::center);
-    connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
-    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
-    connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
-    connect(frame_wgt, SIGNAL(mouse_moved(QPoint,bool,bool)), this, SLOT(mouse_moved(QPoint,bool,bool)));
-    connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
-    connect(frame_wgt, SIGNAL(process_frame()), this, SLOT(process_frame()));
-    connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
-    connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
-    connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
-
-    connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
-    connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
-    connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
-    connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
-    connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
-
-    processing_thread->start();
 }
 
 /**
@@ -225,7 +226,7 @@ void VideoWidget::set_btn_icons() {
     prev_poi_btn = new DoubleClickButton(this);
     prev_poi_btn->setIcon(QIcon("../ViAn/Icons/prev.png"));
     bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
-    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/export.png"),"",this);
+    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/export.png"), "", this);
 
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play+check.png"), "", this);
     tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag_frame.png"), "", this);
@@ -1017,6 +1018,9 @@ void VideoWidget::set_video_btns(bool b) {
         bookmark_btn->setDisabled(true);
         new_label_btn->setDisabled(true);
         tag_btn->setDisabled(true);
+        export_frame_btn->setDisabled(true);
+        set_start_interval_btn->setDisabled(true);
+        set_end_interval_btn->setDisabled(true);
     }
 }
 

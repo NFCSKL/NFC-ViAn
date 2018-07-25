@@ -1227,6 +1227,8 @@ bool ProjectWidget::close_project() {
         }
     }
 
+    emit close_all_widgets();
+
     // Remove project if temporary
     if (m_proj->is_temporary()) {
         m_proj->remove_files();

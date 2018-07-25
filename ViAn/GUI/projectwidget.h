@@ -135,6 +135,7 @@ private:
     void update_current_tag(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
+    void close_all_widgets();
     void project_closed();
     void item_removed(VideoProject* vid_proj);
     void open_in_widget(VideoProject* vid_proj);

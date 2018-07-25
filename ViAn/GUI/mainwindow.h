@@ -72,6 +72,7 @@ public slots:
     void open_project_folder();
     void show_analysis_dock(bool);
     void show_ana_settings_dock(bool);
+    void close_all_widgets();
 
 signals:
     void set_status_bar(QString);
