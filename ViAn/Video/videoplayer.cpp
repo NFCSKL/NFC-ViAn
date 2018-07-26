@@ -209,7 +209,6 @@ bool VideoPlayer::wait_load_read(){
         m_frame->store(load_video_at);
         load_video();
         if (load_video_at != 0) {
-            m_frame->store(load_video_at);
             m_v_sync->frame_index_on_load = 0;
 
             // Must unlock before set_frame() since

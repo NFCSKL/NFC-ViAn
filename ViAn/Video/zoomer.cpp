@@ -2,9 +2,9 @@
 #include <math.h>
 #include <QDebug>
 
-Zoomer::Zoomer() {
-//    anchor = QPoint(0,0);
-}
+const double Zoomer::DEGREES_TO_RADIANS_FACTOR = M_PI / 180;
+
+Zoomer::Zoomer() {}
 
 Zoomer::Zoomer(cv::Size frame_size) {
     set_frame_size(frame_size);
@@ -136,7 +136,7 @@ void Zoomer::set_angle(const int &angle) {
  * @param angle :   Desired rotation
  */
 void Zoomer::update_rotation(const int &angle) {
-    double angle_diff{(angle - m_angle) * M_PI /180};
+    double angle_diff{(angle - m_angle) * DEGREES_TO_RADIANS_FACTOR};
 
     // Translate by negative pivot of old frame size
     double translated_x{m_viewport.center.x - m_transformed_frame_rect.width / 2};
@@ -185,7 +185,7 @@ void Zoomer::translate_viewport_center(int x, int y){
     if ((is_moving_left && left_contained) || (is_moving_right && right_contained)) {
         dx = x;
     }
-    if (is_moving_up && up_contained || is_moving_down && down_contained) {
+    if ((is_moving_up && up_contained) || (is_moving_down && down_contained)) {
         dy = y;
     }
 
@@ -303,7 +303,7 @@ cv::Rect Zoomer::get_frame_rect() const {
 }
 
 /**
- * @brief Zoomer::get_cutting_rect
+ * @brief Zoomer::get_view_rect
  * Calculates the intersection rectangle between
  * the scaled viewport rectangle and the frame rectangle
  * @return cv::Rect :   intersection rectangle

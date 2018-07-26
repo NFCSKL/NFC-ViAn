@@ -13,6 +13,8 @@
  * it's settings are updated properly
  */
 class Zoomer{
+    static const double DEGREES_TO_RADIANS_FACTOR;
+
     // Viewport rectangle and size
     QSize m_viewport_size;
     cv::RotatedRect m_viewport;
@@ -43,6 +45,7 @@ public:
     void fit_viewport();
     void scale_frame(cv::Mat& frame);
     void reset();
+    void enforce_frame_boundaries();
 
     // Setters
     void set_scale_factor(double scale_factor);
@@ -64,8 +67,6 @@ public:
     cv::Rect get_frame_rect() const;
     cv::Rect get_view_rect() const;
 
-    void enforce_frame_boundaries();
-    
 private:
     void update_scale(const double& width, const double& height);
     void update_anchor();

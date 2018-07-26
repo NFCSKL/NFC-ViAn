@@ -157,6 +157,11 @@ class FrameProcessor : public QObject {
     int const ROTATE_NUM = 4;
     int m_rotate_direction = ROTATE_NONE;
 
+    static const int DEGREES_0;
+    static const int DEGREES_90;
+    static const int DEGREES_180;
+    static const int DEGREES_270;
+
     // Used to zoom and scale frame
     Zoomer m_zoomer;
     // Used to adjust contrast and brightness of frame
