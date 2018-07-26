@@ -129,6 +129,7 @@ private:
     std::stack<int> get_index_path(QTreeWidgetItem* item);
     VideoItem* get_video_item(VideoProject* v_proj, QTreeWidgetItem* s_item = nullptr);
     void get_video_items(QTreeWidgetItem* root, std::vector<VideoItem *> &items);
+    void get_analysis_items(QTreeWidgetItem* root, std::vector<AnalysisItem*> &items);
     void insert_to_path_index(VideoProject* vid_proj);
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
@@ -141,6 +142,7 @@ signals:
     void open_in_widget(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
     void clear_analysis();
+    void abort_all_analysis();
 };
 
 #endif // PROJECTWIDGET_H

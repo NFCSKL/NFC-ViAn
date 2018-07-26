@@ -5,6 +5,7 @@
 #include <vector>
 #include "utility.h"
 #include <QJsonArray>
+#include "project.h"
 
 class ImageSequence : public Video {
 private:
@@ -20,6 +21,7 @@ public:
 
     void add_image(const std::string &image_path, const int& index=-1);
     void reorder_elem(const int& from, const int& to);
+    void reset_root_dir(const std::string &dir);
     int length();
 
     void read(const QJsonObject& json) override;

@@ -3,6 +3,7 @@
 TagFrameItem::TagFrameItem(int frame) : TreeItem(TAG_FRAME_ITEM) {
     m_frame = frame;
     setText(0, QString::number(m_frame));
+    setFlags(flags() & ~Qt::ItemIsEditable);
 }
 
 void TagFrameItem::set_state(TagFrame* t_frame) {
