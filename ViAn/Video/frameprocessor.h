@@ -160,13 +160,13 @@ class FrameProcessor : public QObject {
     Overlay* m_overlay = nullptr;
 
     bool skip_process = false;
+    std::atomic_bool* m_abort;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                    std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                   std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed);
+                   std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed, std::atomic_bool *abort);
     ~FrameProcessor();
-    bool loop = true;
 
 public slots:
     void check_events(void);
