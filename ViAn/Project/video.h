@@ -18,6 +18,8 @@ struct VideoState {
     int rotation = 0;
     double scale_factor = 1;
     QPoint anchor = QPoint(0,0);
+    // Center point is relative the rotation
+    QPoint center = QPoint(-1,-1);
     cv::Rect zoom_rect;
     VideoState(){}
     VideoState(VideoState&rh){
@@ -27,6 +29,7 @@ struct VideoState {
         rotation = rh.rotation;
         scale_factor = rh.scale_factor;
         anchor = rh.anchor;
+        center = rh.center;
         zoom_rect = rh.zoom_rect;
     }
 };

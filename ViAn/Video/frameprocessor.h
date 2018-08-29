@@ -27,10 +27,12 @@ struct zoomer_settings {
 
     QSize draw_area_size = QSize(100,100);
 
-    QPoint zoom_tl = QPoint(0,0);
-    QPoint zoom_br = QPoint(100,100);
+    QPoint zoom_area_tl = QPoint(0,0);
+    QPoint zoom_area_br = QPoint(100,100);
     QPoint center = QPoint(50,50);
     QPoint anchor = QPoint(0,0);
+
+    int rotation = 0;
 
     bool set_state = false;
 
@@ -46,7 +48,9 @@ struct zoomer_settings {
     // Specific commands
     bool fit = false;
     bool original = false;
-    bool do_center = false;
+    bool do_point_zoom = false;
+    bool has_new_zoom_area{false};
+    bool skip_frame_refresh{false};
 };
 
 /**
@@ -107,6 +111,7 @@ struct overlay_settings {
 class FrameProcessor : public QObject {
     Q_OBJECT
     cv::Mat m_frame;
+    cv::Size m_unrotated_size{};
     std::atomic_int* m_frame_index;
 
     /**
@@ -152,6 +157,11 @@ class FrameProcessor : public QObject {
     int const ROTATE_NUM = 4;
     int m_rotate_direction = ROTATE_NONE;
 
+    static const int DEGREES_0;
+    static const int DEGREES_90;
+    static const int DEGREES_180;
+    static const int DEGREES_270;
+
     // Used to zoom and scale frame
     Zoomer m_zoomer;
     // Used to adjust contrast and brightness of frame
@@ -159,7 +169,7 @@ class FrameProcessor : public QObject {
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
 
-    bool skip_process = false;
+    bool has_new_zoom_state{false};
     std::atomic_bool* m_abort;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
@@ -173,6 +183,7 @@ public slots:
 signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
+    void set_zoom_state(QPoint, double, int);
     void set_play_btn(bool);
     void set_bri_cont(int, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
@@ -181,8 +192,11 @@ private:
     void update_zoomer_settings();
     void update_manipulator_settings();
     void update_overlay_settings();
+    void update_rotation(const int& rotation);
 
     void reset_settings();
+    void load_zoomer_state();
+    void emit_zoom_data();
 };
 
 #endif // FRAMEPROCESSOR_H

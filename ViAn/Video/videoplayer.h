@@ -26,6 +26,8 @@ struct video_sync {
     std::condition_variable con_var;
     // Frame to lock
     cv::Mat frame;
+
+    int frame_index_on_load{0};
 };
 
 /**

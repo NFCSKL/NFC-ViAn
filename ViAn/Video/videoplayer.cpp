@@ -46,7 +46,9 @@ void VideoPlayer::load_video() {
     if (m_capture.isOpened()) {
         m_capture.release();
     }
-    current_frame = -1;
+    m_new_video->store(false);
+
+    current_frame = 0;
     m_is_playing->store(false);
 
     m_capture.open(*m_video_path);
@@ -185,7 +187,7 @@ bool VideoPlayer::synced_read(){
 
         }
     }
-    m_v_sync->con_var.notify_one();
+    m_v_sync->con_var.notify_all();
 
     // Wait for processing thread to finish processing new frame
     {
@@ -205,16 +207,30 @@ bool VideoPlayer::wait_load_read(){
     }
     // Read new frame and notify processing thread
     {
-        std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        m_v_sync->lock.lock();
+        int load_video_at = m_v_sync->frame_index_on_load;
+        m_frame->store(load_video_at);
         load_video();
-        if (!m_capture.read(m_v_sync->frame)) {
+        if (load_video_at != 0) {
+            m_v_sync->frame_index_on_load = 0;
+
+            // Must unlock before set_frame() since
+            // it calls synced_read() which in turn
+            // uses the same lock
+            m_v_sync->lock.unlock();
+            set_frame();
+            return m_new_frame->load();
+        } else if (m_capture.read(m_v_sync->frame)) {
+            m_new_frame->store(true);
+            m_frame->store(0);
+            m_v_sync->lock.unlock();
+        } else {
             m_is_playing->store(false);
             playback_stopped();
-
+            m_v_sync->lock.unlock();
             return false;
         }
-        m_new_frame->store(true);
     }
-    m_v_sync->con_var.notify_one();
+    m_v_sync->con_var.notify_all();
     return true;
 }

@@ -75,7 +75,7 @@ signals:
     void moved_xy(int x, int y);
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out(double);
-    void center_zoom_rect(QPoint, double);
+    void move_viewport_center(QPoint, double);
     void send_tool(SHAPES m_tool);
     void send_tool_text(QString, float);
     void send_color(QColor color);

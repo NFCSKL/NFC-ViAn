@@ -118,6 +118,7 @@ public slots:
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);
+    void set_zoom_state(QPoint, double, int);
     void play_btn_toggled(bool status);
     void tag_frame(void);
     void remove_tag_frame(void);
@@ -172,7 +173,7 @@ public slots:
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void center(QPoint, double);
-    void set_zoom_rectangle(QPoint p1, QPoint p2);
+    void set_zoom_area(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
     void set_interpolation_method(int method);
     void on_step_zoom(double step);
