@@ -56,7 +56,8 @@ void Bookmark::set_id(ID new_id) {
 }
 
 void Bookmark::reset_root_dir(const std::string &dir){    
-    m_file = dir + Utility::name_from_path(m_file);
+    m_file = dir + Project::BOOKMARK_FOLDER + Utility::name_from_path(m_file);
+    m_thumbnail_path = dir + Project::THUMBNAIL_FOLDER + Utility::name_from_path(m_thumbnail_path);
     m_unsaved_changes = true;
 }
 
@@ -126,8 +127,21 @@ void Bookmark::rename_container(std::string old_name, std::string new_name) {
 }
 
 /**
+ * @brief Bookmark::set_thumbnail_path
+ * Saves the path where the thumbnail for the bookmark is saved.
+ * @param path
+ */
+void Bookmark::set_thumbnail_path(std::string path) {
+    m_thumbnail_path = path;
+}
+
+std::string Bookmark::get_thumbnail_path() {
+    return m_thumbnail_path;
+}
+
+/**
  * @brief Bookmark::set_video_project
- * Sets the video project that the bookmark belogs to
+ * Sets the video project that the bookmark belongs to
  * @param vid_proj
  */
 void Bookmark::set_video_project(VideoProject *vid_proj){
@@ -157,6 +171,7 @@ bool Bookmark::remove() {
 void Bookmark::read(const QJsonObject& json){
     m_time = json["time"].toString();
     m_file = json["path"].toString().toStdString();
+    m_thumbnail_path = json["thumbnail path"].toString().toStdString();
     m_description = json["description"].toString().toStdString();
     std::pair<int, std::string> pair(json["type"].toInt(), json["container"].toString().toStdString());
     m_container = pair;
@@ -187,6 +202,7 @@ void Bookmark::write(QJsonObject& json){
     json["time"] = m_time;
     json["frame"] = m_state.frame;
     json["path"] = QString::fromStdString(m_file);
+    json["thumbnail path"] = QString::fromStdString(m_thumbnail_path);
     json["description"] = QString::fromStdString(m_description);
     json["container"] =QString::fromStdString( m_container.second);
     json["type"] = m_container.first;

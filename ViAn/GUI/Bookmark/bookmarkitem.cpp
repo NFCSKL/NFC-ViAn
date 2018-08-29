@@ -72,6 +72,10 @@ QString BookmarkItem::get_description() const {
     return QString::fromStdString(m_bookmark->get_description());
 }
 
+QString BookmarkItem::get_time() const {
+    return m_bookmark->get_time();
+}
+
 /**
  * @brief Bookmark::update_description
  * Sets the text description of the bookmark to the specified string,

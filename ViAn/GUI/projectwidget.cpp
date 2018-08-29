@@ -47,6 +47,16 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     new_folder_sc->setKey(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
     connect(new_folder_sc, &QShortcut::activated, this, &ProjectWidget::create_folder_item);
 
+    // Shortcut for deleting item
+    QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(delete_sc, &QShortcut::activated, this, &ProjectWidget::remove_item);
+
+    // Shortcut for updating drawing tag item
+    QShortcut* update_sc = new QShortcut(QKeySequence(Qt::Key_F5), this);
+    update_sc->setContext(Qt::WidgetShortcut);
+    connect(update_sc, &QShortcut::activated, this, &ProjectWidget::drawing_tag);
+
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
 
@@ -224,6 +234,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
+        setCurrentItem(item);
         for (auto t_frame : tag->tag_map) {
             TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
             tf_item->set_state(t_frame.second);
@@ -236,11 +247,11 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
+        setCurrentItem(item);
         tree_item_clicked(item);
     }
     vid_item->setExpanded(true);
 }
-
 
 /**
  * @brief ProjectWidget::add_frames_to_tag_item
@@ -275,10 +286,12 @@ void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (frame < temp->get_frame()) {
             m_tag_item->insertChild(i, tf_item);
+            setCurrentItem(tf_item);
             return;
         }
     }
     m_tag_item->addChild(tf_item);
+    setCurrentItem(tf_item);
 }
 
 /**
@@ -426,6 +439,14 @@ void ProjectWidget::get_video_items(QTreeWidgetItem *root, std::vector<VideoItem
         QTreeWidgetItem* item = root->child(i);
         if(item->type() == VIDEO_ITEM) items.push_back(dynamic_cast<VideoItem*>(item));
         if(item->type() != VIDEO_ITEM) get_video_items(item, items);
+    }
+}
+
+void ProjectWidget::get_analysis_items(QTreeWidgetItem *root, std::vector<AnalysisItem *> &items) {
+    for(int i = 0; i < root->childCount(); i++){
+        QTreeWidgetItem* item = root->child(i);
+        if(item->type() == ANALYSIS_ITEM) items.push_back(dynamic_cast<AnalysisItem*>(item));
+        if(item->type() != ANALYSIS_ITEM) get_analysis_items(item, items);
     }
 }
 
@@ -619,10 +640,11 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        vid_item->get_video_project()->get_video()->state.frame = seq_item->get_index();
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        state.frame = seq_item->get_index();
         emit set_video_project(vid_item->get_video_project());
-        emit marked_video_state(vid_item->get_video_project(),
-                                vid_item->get_video_project()->get_video()->state);
+        emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -849,10 +871,12 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Delete", this, SLOT(remove_item()));
                 break;
             case ANALYSIS_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction(show_details_act);
-                menu.addAction(show_settings_act);
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+                    menu.addAction("Rename", this, SLOT(rename_item()));
+                    menu.addAction(show_details_act);
+                    menu.addAction(show_settings_act);
+                    menu.addAction("Delete", this, SLOT(remove_item()));
+                }
                 break;
             case FOLDER_ITEM:
                 menu.addAction("Rename", this, SLOT(rename_item()));
@@ -893,6 +917,8 @@ void ProjectWidget::drawing_tag() {
         delete selectedItems().front();
     } else if (selectedItems().front()->type() == VIDEO_ITEM) {
         vid_item = dynamic_cast<VideoItem*>(selectedItems().front());
+    } else {
+        return;
     }
     // Create tag drawing
     Tag* tag = new Tag("Drawing tag", true);
@@ -1128,11 +1154,31 @@ void ProjectWidget::create_folder_item() {
 bool ProjectWidget::save_project() {
     if (m_proj == nullptr ) return false;
 
+    std::vector<AnalysisItem*> a_items;
+    get_analysis_items(invisibleRootItem(), a_items);
+    bool analysis_running = false;
+    for (AnalysisItem* item : a_items) {
+        if (!item->is_finished()) {
+            analysis_running = true;
+        }
+    }
+
+    if (analysis_running) {
+        QString text = "One or more analyses are currently running";
+        QString info_text = "Let them finish or stop them before saving";
+        QMessageBox msg_box;
+        msg_box.setText(text);
+        msg_box.setInformativeText(info_text);
+        msg_box.setStandardButtons(QMessageBox::Ok);
+        msg_box.setDefaultButton(QMessageBox::Ok);
+        msg_box.exec();
+        return false;
+    }
+
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
     if (m_proj->is_temporary()) {
         QString name{}, path{};
-//        std::unique_ptr<ProjectDialog> project_dialog(new ProjectDialog(&name, &path));
         ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, DEFAULT_PATH);
         connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
         int status = project_dialog->exec();
@@ -1140,7 +1186,6 @@ bool ProjectWidget::save_project() {
         if (status == project_dialog->Accepted) {
             // User clicked ok, dialog checked for proper path & name
             // Update project path
-            // TODO: Update window title to new project name
             m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
             m_proj->remove_files();
             m_proj->set_name_and_path(name.toStdString(), path.toStdString());
@@ -1149,6 +1194,15 @@ bool ProjectWidget::save_project() {
             emit proj_path(m_proj->get_dir());
             QDir dir;
             dir.mkpath(QString::fromStdString(m_proj->get_dir()));
+
+            // If the current video is a sequence then it needs to be reloaded
+            // since the images path will have changed
+            for (auto vid_proj : m_proj->get_videos()) {
+                if (vid_proj->is_current() && vid_proj->get_video()->is_sequence()) {
+                    vid_proj->set_current(false);
+                    emit marked_video_state(vid_proj, vid_proj->get_video()->state);
+                }
+            }
         } else {
             // User aborted dialog, cancel save
             return false;
@@ -1166,7 +1220,7 @@ bool ProjectWidget::save_project() {
 
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
+    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());    
     set_status_bar("Project saved");
     return true;
 }
@@ -1211,6 +1265,25 @@ bool ProjectWidget::open_project(QString project_path) {
  */
 bool ProjectWidget::close_project() {
     if (m_proj == nullptr) return true;
+
+    std::vector<AnalysisItem*> a_items;
+    get_analysis_items(invisibleRootItem(), a_items);
+    bool analysis_running = false;
+    for (AnalysisItem* item : a_items) {
+        if (!item->is_finished()) {
+            analysis_running = true;
+        }
+    }
+
+    if (analysis_running) {
+        QString text = "One or more analyses are currently running";
+        QString info_text = "Are you sure you wanna continue? Doing so will stop the analyses.";
+        if (message_box(text, info_text, true)) {
+            emit abort_all_analysis();
+        } else {
+            return false;
+        }
+    }
 
     // Prompt user to save. If cancel keep the current project
     bool abort_close = false;

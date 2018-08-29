@@ -246,7 +246,8 @@ void VideoWidget::set_btn_tool_tip() {
 
     fit_btn->setToolTip(tr("Scale video to screen: Ctrl + F"));
     original_size_btn->setToolTip(tr("Reset zoom: Ctrl + H"));
-    interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation");
+    zoom_label->setToolTip("The zoom factor of the video: Z");
+    interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation: N");
 
     fps_label->setToolTip("The frame rate of the video");
     set_start_interval_btn->setToolTip("Set left interval point: I");
@@ -308,7 +309,8 @@ void VideoWidget::set_btn_tab_order() {
  * Set shortcuts to the buttons
  */
 void VideoWidget::set_btn_shortcuts() {
-    //play_btn->setShortcut(QKeySequence(Qt::Key_Space)); // TODO Fix so this works
+    play_btn->setShortcut(QKeySequence(Qt::Key_Space));
+    play_btn->setFocusPolicy(Qt::NoFocus);
     stop_btn->setShortcut(QKeySequence(Qt::Key_S));
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
@@ -321,19 +323,24 @@ void VideoWidget::set_btn_shortcuts() {
     set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
 
     bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
+    zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);
     video_start_sc = new QShortcut(QKeySequence(Qt::Key_Home), this);
     video_end_sc = new QShortcut(QKeySequence(Qt::Key_End), this);
     page_step_front_sc = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Right), this);
     page_step_back_sc = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Left), this);
+    delete_sc = new QShortcut(QKeySequence::Delete, this);
+    delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
 
     //connect
     connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
+    connect(zoom_edit_sc, &QShortcut::activated, this, &VideoWidget::zoom_label_focus);
     connect(interpol_sc, &QShortcut::activated, interpolate_check, &QCheckBox::toggle);
     connect(video_start_sc, &QShortcut::activated, this, &VideoWidget::set_video_start);
     connect(video_end_sc, &QShortcut::activated, this, &VideoWidget::set_video_end);
     connect(page_step_front_sc, &QShortcut::activated, this, &VideoWidget::page_step_front);
     connect(page_step_back_sc, &QShortcut::activated, this, &VideoWidget::page_step_back);
+    connect(delete_sc, &QShortcut::activated, this, &VideoWidget::delete_sc_activated);
 }
 
 /**
@@ -347,7 +354,7 @@ void VideoWidget::init_speed_slider() {
     speed_slider->setPageStep(1);
     speed_slider->setTickPosition(QSlider::TicksBelow);
     speed_slider->setEnabled(false);
-    speed_slider->setToolTip(tr("Adjust playback speed"));
+    speed_slider->setToolTip(tr("Adjust playback speed: * & /"));
     QLabel *label1 = new QLabel("1/8x", this);
     QLabel *label2 = new QLabel("1x", this);
     QLabel *label3 = new QLabel("8x", this);
@@ -457,9 +464,10 @@ void VideoWidget::init_playback_slider() {
     frame_line_edit = new QLineEdit("0", this);
 
     frame_line_edit->setFixedWidth(50);
+    frame_line_edit->setToolTip("Jump to frame: F");
 
-    frame_edit_act = new QShortcut(QKeySequence(Qt::Key_F), this);
-    connect(frame_edit_act, &QShortcut::activated, this, &VideoWidget::frame_label_focus);
+    frame_edit_sc = new QShortcut(QKeySequence(Qt::Key_F), this);
+    connect(frame_edit_sc, &QShortcut::activated, this, &VideoWidget::frame_label_focus);
 
     playback_slider = new AnalysisSlider(Qt::Horizontal);
 
@@ -931,7 +939,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
 
-    if (m_vid_proj != vid_proj) {
+    if (!vid_proj->is_current()) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
@@ -1404,9 +1412,11 @@ void VideoWidget::zoom_label_finished() {
     } else {
         set_zoom_factor(converted);
         zoom_label->setText(QString::number(converted*PERCENT_INT_CONVERT) + "%");
+        zoom_label->clearFocus();
         return;
     }
     zoom_label->setText(QString::number(m_scale_factor*PERCENT_INT_CONVERT) + "%");
+    zoom_label->clearFocus();
 }
 
 int VideoWidget::get_brightness() {
@@ -1470,4 +1480,9 @@ void VideoWidget::page_step_back() {
 void VideoWidget::frame_label_focus() {
     frame_line_edit->setFocus();
     frame_line_edit->selectAll();
+}
+
+void VideoWidget::zoom_label_focus() {
+    zoom_label->setFocus();
+    zoom_label->selectAll();
 }

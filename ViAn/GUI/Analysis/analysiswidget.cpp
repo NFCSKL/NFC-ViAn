@@ -94,17 +94,25 @@ void AnalysisWidget::abort_analysis() {
     *abort = true;
 }
 
+void AnalysisWidget::abort_all_analysis() {
+    abort_all = true;
+    abort_analysis();
+}
+
 void AnalysisWidget::on_analysis_aborted() {
     analysis_queue.pop_front();
     delete current_analysis_item; // Delete item from tree
-    auto it = abort_map.find(current_method);   
-    abort_map.erase(it);
+    auto it = abort_map.find(current_method);
+    if (it != abort_map.end()) abort_map.erase(it);
 
     m_queue_wgt->next();
-    if (!analysis_queue.empty()) {        
+    if (!analysis_queue.empty()) {
         current_analysis_item = std::get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
+        if (abort_all) {
+            abort_analysis();
+        }
         return;
     }
     // Queue Empty
