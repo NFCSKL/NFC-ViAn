@@ -6,7 +6,7 @@
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                                std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed) {
+                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
     m_new_frame = new_frame;
 
     m_overlay_changed = overlay_changed;
@@ -21,9 +21,12 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
     m_height = height;
 
     m_frame_index = frame_index;
+    m_abort = abort;
     // NICLAS
     // cv::namedWindow("test");
 }
+
+FrameProcessor::~FrameProcessor() {}
 
 /**
  * @brief FrameProcessor::check_events
@@ -39,9 +42,14 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
  * load settings
  */
 void FrameProcessor::check_events() {
-    while (true) {
+    while (!m_abort->load()) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
+        m_v_sync->con_var.wait(lk, [&]{return m_abort->load() || m_new_frame->load() || m_changed->load() || m_new_frame_video->load() || m_overlay_changed->load();});
+        if (m_abort->load()) {
+            lk.unlock();
+            break;
+        }
+
         // A new video has been loaded. Reset processing settings    
         if (m_new_frame_video->load()) {
             reset_settings();
@@ -90,15 +98,23 @@ void FrameProcessor::check_events() {
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
             m_new_frame->store(false);
-            m_frame = m_v_sync->frame.clone();
+            try {
+                m_frame = m_v_sync->frame.clone();
+            } catch (cv::Exception& e) {
+                qWarning() << "Failed to copy new frame";
+                emit set_play_btn(false);
+                lk.unlock();
+                m_v_sync->con_var.notify_all();
+                continue;
+            }
+
             process_frame();
 
             lk.unlock();
-            m_v_sync->con_var.notify_one();
+            m_v_sync->con_var.notify_all();
             continue;
         }
     }
-
 }
 
 /**
@@ -108,9 +124,14 @@ void FrameProcessor::check_events() {
  * When done it will emit the manipulated frame on the done_processing signal.
  */
 void FrameProcessor::process_frame() {
-
     if (m_frame.empty()) return;
-    cv::Mat manipulated_frame = m_frame.clone();
+    cv::Mat manipulated_frame;
+    try {
+        manipulated_frame = m_frame.clone();
+    } catch (cv::Exception& e) {
+        qWarning() << "Failed to copy new frame in processor";
+        return;
+    }
 
     bool rotated{false};
     // Rotates the frame, according to the choosen direction.

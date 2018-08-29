@@ -52,6 +52,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     project_wgt->new_project();
 
+    connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
+    connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
+
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
 
@@ -214,7 +217,6 @@ MainWindow::~MainWindow() {
     delete project_wgt;
     delete analysis_wgt;
     delete bookmark_wgt;
-    delete status_bar;
 }
 
 /**
@@ -422,6 +424,37 @@ void MainWindow::init_analysis_menu() {
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+}
+
+void MainWindow::open_widget(VideoProject* vid_proj) {
+    if (video_widgets.size() < FLOATING_WIDGET_MAX) {
+        VideoWidget* widget_video = new VideoWidget(nullptr, true);
+        widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
+        widget_video->show();
+        video_widgets.push_back(widget_video);
+
+        widget_video->setAttribute(Qt::WA_DeleteOnClose);
+        widget_video->frame_wgt->set_tool(ZOOM);
+        widget_video->load_marked_video_state(vid_proj, vid_proj->get_video()->state);
+
+        connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
+    } else {
+        set_status_bar("No more video widgets allowed");
+    }
+}
+
+void MainWindow::close_widget(VideoWidget *vid_wgt) {
+    auto p = std::find(video_widgets.begin(), video_widgets.end(), vid_wgt);
+    if (p != video_widgets.end()) {
+        video_widgets.erase(p);
+    }
+}
+
+void MainWindow::close_all_widgets() {
+    for (auto widget : video_widgets) {
+        delete widget;
+    }
+    video_widgets.clear();
 }
 
 void MainWindow::init_interval_menu() {

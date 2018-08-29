@@ -39,18 +39,13 @@ VideoPlayer::~VideoPlayer() {
 }
 
 /**
- * @brief VideoPlayer::on_load_video
+ * @brief VideoPlayer::load_video
  * Loads the video and updates member variables with video information.
- * It also emits the first frame back to the controller
- * @param video_path    :   Path to the video
  */
-
-void VideoPlayer::load_video(){
+void VideoPlayer::load_video() {
     if (m_capture.isOpened()) {
         m_capture.release();
     }
-    m_new_video->store(false);
-
     current_frame = -1;
     m_is_playing->store(false);
 
@@ -60,6 +55,7 @@ void VideoPlayer::load_video(){
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;
 
+    m_new_video->store(false);
     m_video_loaded->store(true);
     m_new_frame_video->store(true);
 }
@@ -107,6 +103,10 @@ void VideoPlayer::check_events() {
         if (m_player_con->wait_until(lk, now + delay - elapsed,
                                      [&](){return m_abort_playback->load() || m_new_video->load() ||
                                      (current_frame != m_frame->load() && m_video_loaded->load());})) {
+            if (m_abort_playback->load()) {
+                lk.unlock();
+                break;
+            }
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 wait_load_read();
@@ -192,6 +192,7 @@ bool VideoPlayer::synced_read(){
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
     }
+
     return true;
 }
 
