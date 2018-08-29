@@ -151,11 +151,22 @@ void FrameWidget::set_detections_on_frame(int frame_num) {
     }
 }
 
+/**
+ * @brief FrameWidget::set_details_checked
+ * Details_checked will be true when the details setting is checked
+ * @param b
+ */
 void FrameWidget::set_details_checked(bool b) {
     details_checked = b;
     repaint();
 }
 
+/**
+ * @brief FrameWidget::set_show_box
+ * Show_box will be true when the details box should be shown.
+ * Only when an analysis is clicked
+ * @param b
+ */
 void FrameWidget::set_show_box(bool b) {
     show_box = b;
 }
