@@ -29,7 +29,7 @@ VideoController::VideoController(std::atomic<int>* frame_index, std::atomic_bool
 }
 
 void VideoController::run() {
-    VideoPlayer* v_player = new VideoPlayer(m_frame, m_is_playing, m_new_frame,
+    v_player = new VideoPlayer(m_frame, m_is_playing, m_new_frame,
                                             m_width, m_height, m_new_video, m_new_frame_video, m_video_loaded,
                                             m_v_sync, m_player_con, m_player_lock, m_video_path,
                                             m_speed, m_abort_playback);
@@ -43,4 +43,11 @@ void VideoController::run() {
     exec();
     delete v_player;
 
+}
+
+VideoController::~VideoController() {
+    v_player->loop = false;
+    quit();
+    wait();
+    deleteLater();
 }

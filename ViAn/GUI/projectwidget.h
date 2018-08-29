@@ -106,6 +106,7 @@ public slots:
     bool prompt_save();
 private slots:
     void context_menu(const QPoint& point);
+    void open_video_in_widget();
     void remove_item();
     void rename_item();
     void drawing_tag();
@@ -135,8 +136,10 @@ private:
     void update_current_tag(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
+    void close_all_widgets();
     void project_closed();
     void item_removed(VideoProject* vid_proj);
+    void open_in_widget(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
     void clear_analysis();
     void abort_all_analysis();

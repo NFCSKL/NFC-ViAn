@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QShortcut>
+#include <QCloseEvent>
 
 #include <vector>
 #include <atomic>
@@ -63,6 +64,7 @@ private:
     std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
     std::atomic_bool video_loaded{false};       // True when a video is loaded/open
     std::atomic_bool m_abort_playback{false};     // Flag used to abort playback when closing program
+    std::atomic_bool m_abort_processor{false};
 
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
@@ -75,14 +77,14 @@ private:
     std::pair<int, int> m_interval = std::make_pair(-1, -1);
 
     FrameProcessor* f_processor;
+    QThread* processing_thread;
 public:
-    explicit VideoWidget(QWidget *parent = nullptr);
+    explicit VideoWidget(QWidget *parent = nullptr, bool floating = false);
     ~VideoWidget();
 
     QVBoxLayout* vertical_layout;
 
     // Lock and wait condition to sleep player when video is paused
-    video_player* m_video_player;
     FrameWidget* frame_wgt;
     AnalysisSlider* playback_slider;
 
@@ -101,6 +103,7 @@ public:
     double get_contrast();
 
 signals:
+    void close_video_widget(VideoWidget*);
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
@@ -189,6 +192,7 @@ private:
     const int PERCENT_INT_CONVERT = 100;
     const int ZOOM_LABEL_MIN = 1;
     const int ZOOM_LABEL_MAX = 10000;
+    const int FIVE_SEC = 5000;
 
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
@@ -244,6 +248,7 @@ private:
     QString convert_time(int time);
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
+    bool m_floating = false;
 
     bool tag_clicked = false;
 
@@ -270,6 +275,8 @@ private:
     void add_btns_to_layouts();
     void connect_btns();
     void init_playback_slider();
+
+    void closeEvent(QCloseEvent *event) override;
 private slots:
     void stop_btn_clicked(void);
     void next_frame_clicked(void);

@@ -107,4 +107,3 @@ void ImageSequence::reset_root_dir(const std::string &dir) {
     file_path = seq_path + "/" + get_pattern_name();
 }
 
-

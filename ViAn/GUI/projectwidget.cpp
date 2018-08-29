@@ -884,6 +884,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 break;
             case VIDEO_ITEM:
                 menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             case TAG_FRAME_ITEM:
@@ -898,6 +899,11 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Delete", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
+}
+
+void ProjectWidget::open_video_in_widget() {
+    VideoItem* v_item = dynamic_cast<VideoItem*>(currentItem());
+    emit open_in_widget(v_item->get_video_project());
 }
 
 /**
@@ -1293,6 +1299,8 @@ bool ProjectWidget::close_project() {
             return false;
         }
     }
+
+    emit close_all_widgets();
 
     // Remove project if temporary
     if (m_proj->is_temporary()) {
