@@ -64,6 +64,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void set_show_analysis_details(bool);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
     void set_poi_slider(bool);
@@ -89,6 +90,7 @@ public slots:
     void add_new_frame_to_tag_item(int frame, TagFrame *t_frame);
     void remove_frame_from_tag_item(int frame);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
+    void toggle_details(bool b);
     bool save_project();
     bool open_project(QString project_path="");
     bool close_project();
@@ -110,7 +112,6 @@ private slots:
     void remove_item();
     void rename_item();
     void drawing_tag();
-    void toggle_details(bool b);
     void toggle_settings(bool b);
     void update_settings();
     void create_folder_item();
