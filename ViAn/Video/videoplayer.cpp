@@ -103,6 +103,10 @@ void VideoPlayer::check_events() {
         if (m_player_con->wait_until(lk, now + delay - elapsed,
                                      [&](){return m_abort_playback->load() || m_new_video->load() ||
                                      (current_frame != m_frame->load() && m_video_loaded->load());})) {
+            if (m_abort_playback->load()) {
+                lk.unlock();
+                break;
+            }
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 wait_load_read();

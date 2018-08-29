@@ -67,17 +67,21 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
 
 VideoWidget::~VideoWidget(){
     play_btn_toggled(false);
-    delete f_processor;
-    processing_thread->deleteLater();
-    processing_thread->exit();
-    if (!processing_thread->wait(FIVE_SEC)) {
-        processing_thread->terminate();
-        processing_thread->wait();
+    m_abort_processor.store(true);
+    v_sync.con_var.notify_all();
+    if (processing_thread->isRunning()) {
+        processing_thread->deleteLater();
+        processing_thread->exit();
+        if (!processing_thread->wait(FIVE_SEC)) {
+            processing_thread->terminate();
+            processing_thread->wait();
+        }
     }
 
     if (v_controller->isRunning()) {
         // Tell controller thread to exit and wait for it to finish
         m_abort_playback.store(true);
+        player_con.notify_all();
         v_controller->exit();
         if (!v_controller->wait(FIVE_SEC)) {
             // Controller did not finish in time. Force shutdown
@@ -85,6 +89,8 @@ VideoWidget::~VideoWidget(){
             v_controller->wait();
         }
     }
+    delete f_processor;
+    delete processing_thread;
 
     delete v_controller;
     delete frame_wgt;
@@ -175,7 +181,7 @@ void VideoWidget::init_video_controller(){
  */
 void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
+                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed, &m_abort_processor);
 
     try {
         processing_thread = new QThread(this);
@@ -952,7 +958,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
 
-    if (!vid_proj->is_current()) {
+    if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
 
