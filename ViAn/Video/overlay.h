@@ -78,6 +78,7 @@ private:
     bool m_right_click = false;
     bool change_tool = false;
     bool drawing = false;
+    bool edit = false;
 
     bool show_overlay = true;
     int baseline = 0;
