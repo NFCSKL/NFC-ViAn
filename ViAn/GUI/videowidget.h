@@ -139,7 +139,6 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
 
-    void load_marked_video(VideoProject *vid_proj, int frame);
     void load_marked_video_state(VideoProject *vid_proj, VideoState state);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);

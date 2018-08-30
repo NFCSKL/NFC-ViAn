@@ -276,7 +276,12 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     switch (item->type()) {
     case FRAME_ITEM: {
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
-        emit jump_to_frame(m_vid_proj, frame_item->get_frame());
+
+        VideoState state;
+        state = m_vid_proj->get_video()->state;
+        state.frame = frame_item->get_frame();
+
+        emit jump_to_frame(m_vid_proj, state);
         emit set_current_drawing(nullptr);
         break;
     }
@@ -297,7 +302,12 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         } else if (col == 2) {
             shape_item->update_show_icon(shape->toggle_show());
         }
-        emit jump_to_frame(m_vid_proj, shape->get_frame());
+
+        VideoState state;
+        state = m_vid_proj->get_video()->state;
+        state.frame = shape->get_frame();
+
+        emit jump_to_frame(m_vid_proj, state);
         emit set_current_drawing(shape);
         emit set_tool_edit();
         break;
