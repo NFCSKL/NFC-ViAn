@@ -28,7 +28,6 @@ using ID = int;
  * incomplete class, will be added on
  * along with parser functionality
  */
-class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
 
@@ -41,7 +40,6 @@ class Project : public Saveable{
     std::string last_changed = "";      // Date and time when the project was last saved
 
     std::vector<VideoProject*> m_videos;
-    std::map<ID, Report*> m_reports;
     int m_vid_count = 0;
     int m_rp_count = 0;
     bool m_temporary = true;
@@ -58,13 +56,8 @@ public:
     static const std::string STILLS_FOLDER;
     static const std::string SEQUENCE_FOLDER;
 
-    ID add_report(Report* report);
     ID add_video_project(VideoProject *vid_proj);
-    // TODO
-    //ID add_drawing();
-    // void remove_drawing();
     void remove_video_project(VideoProject* vid_proj);
-    void remove_report(const int& id);
 
     // read and write operator for Projects
     void read(const QJsonObject& json);
@@ -83,7 +76,6 @@ public:
 
     std::vector<VideoProject *>& get_videos();
     VideoProject* get_video(const int& v_pos);
-    std::string getDir_bookmarks() const;
     std::string get_dir() const;
     std::string get_name() const;
     std::string get_file() const;
