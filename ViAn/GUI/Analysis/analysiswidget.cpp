@@ -55,7 +55,9 @@ void AnalysisWidget::perform_analysis(std::tuple<AnalysisMethod*, QTreeWidgetIte
     connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);       
     connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
+    qDebug() << "before" << QThreadPool::globalInstance()->activeThreadCount();
     QThreadPool::globalInstance()->start(method);
+    qDebug() << "after" << QThreadPool::globalInstance()->activeThreadCount();
     emit add_analysis_bar();
     emit show_analysis_queue(true);
 }

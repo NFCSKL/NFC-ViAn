@@ -15,6 +15,8 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     m_save_path = save_path;
 }
 
+AnalysisMethod::~AnalysisMethod(){}
+
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.
@@ -30,24 +32,38 @@ bool AnalysisMethod::sample_current_frame() {
  * @return all detections from the performed analysis.
  */
 void AnalysisMethod::run() {
-    setup_analysis();
-    sample_freq = get_setting("SAMPLE_FREQUENCY");
-    capture.open(m_source_file);
+    qDebug() << "OpenCV version:" << CV_VERSION;
+    qDebug() << "Major version:" << CV_MAJOR_VERSION;
+    qDebug() << "Minor version:" << CV_MINOR_VERSION;
+    qDebug() << "Subminor version:" << CV_SUBMINOR_VERSION;
+    //setup_analysis();
+    //sample_freq = get_setting("SAMPLE_FREQUENCY");
+    std::cout << m_source_file << std::endl;
+    cv::VideoCapture capture(m_source_file);
+    //capture.open(m_source_file);
+    //capture.open(m_source_file);
+    //capture.open(m_source_file);
+    //capture.open(m_source_file);
+    capture.release();
     if (!capture.isOpened()) {
+        emit analysis_aborted();
         return;
     }
     std::vector<DetectionBox> detections;
-    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
-    POI* m_POI = new POI();    
+    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
+    POI* m_POI = new POI();
 
     int end_frame = num_frames -1;
     int start_frame = 0;
     // If Interval should be used, use interval frames
-    if(analysis_settings->use_interval){
+    if (analysis_settings->use_interval) {
         start_frame = analysis_settings->interval.first;
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
         end_frame = analysis_settings->interval.second;
         num_frames = end_frame - start_frame;
+        qDebug() << "start" << start_frame;
+        qDebug() << "end" << end_frame;
+        qDebug() << "number" << num_frames;
         current_frame_index = start_frame;
     }
 
@@ -98,6 +114,7 @@ void AnalysisMethod::run() {
         emit send_progress(get_progress(start_frame));
         ++current_frame_index;
         original_frame.release();
+
     }
     if(*aborted){
         capture.release();
