@@ -646,6 +646,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_video_project(vid_item->get_video_project());
         emit marked_video_state(vid_item->get_video_project(), state);
 
+        emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -660,6 +661,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
 
+        emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -679,6 +681,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
 
+        emit set_show_analysis_details(true);
         emit set_detections(true);
         emit set_poi_slider(true);
         emit set_tag_slider(false);
@@ -699,6 +702,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
 
+        emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
@@ -733,6 +737,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
 
+        emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
@@ -746,6 +751,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         // TODO set from state
         // set brightness/contrast, rotation
 
+        emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
@@ -1226,7 +1232,7 @@ bool ProjectWidget::save_project() {
 
     RecentProject rp;
     rp.load_recent();
-    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());    
+    rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
     set_status_bar("Project saved");
     return true;
 }
@@ -1328,7 +1334,7 @@ void ProjectWidget::remove_project() {
     QString text = "Are you sure you want to remove the project?";
     QString info_text = "This will delete all project files (images, reports, etc).";
     if (!message_box(text, info_text)) return;
-  
+
     set_main_window_name(QString::fromStdString(""));
     emit set_status_bar("Removing project and associated files");
 
