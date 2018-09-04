@@ -48,12 +48,7 @@ Project::~Project(){
         delete video_proj;
     }
 
-    // TODO
-    for (auto report : m_reports) {
-        //delete report;
-    }
     m_videos.clear();
-    m_reports.clear();
 }
 
 /**
@@ -78,28 +73,6 @@ void Project::remove_video_project(VideoProject* vid_proj){
     if (it == m_videos.end()) return;
     delete *it;
     m_videos.erase(it);
-    m_unsaved_changes = true;
-}
-
-
-/**
- * @brief Project::add_report
- * @param report
- * Required for load, object locally allocated
- */
-ID Project::add_report(Report *report){
-    m_reports.insert(std::make_pair(m_rp_count,report));   
-    m_unsaved_changes = true;
-    return m_rp_count++;
-}
-
-/**
- * @brief Project::remove_report
- * @param id
- */
-void Project::remove_report(const int &id) {
-    Report* temp = m_reports.at(id);
-    m_reports.erase(id);
     m_unsaved_changes = true;
 }
 
@@ -174,15 +147,6 @@ void Project::read(const QJsonObject& json){
         add_video_project(v);
         v->reset_root_dir(m_dir);
     }    
-    // Read reports from json
-    QJsonArray json_reports = json["reports"].toArray();
-    for (int i = 0; i < json_reports.size(); ++i) {
-        QJsonObject json_report = json_reports[i].toObject();
-        Report* report = new Report();
-        report->read(json_report);
-        add_report(report);
-        report->reset_root_dir(m_dir);
-    }
     m_unsaved_changes = false;
 }
 
@@ -202,15 +166,6 @@ void Project::write(QJsonObject& json){
         json_proj.append(json_vid_proj);
     }
     json["videos"] = json_proj;
-    // Write reports to json
-    QJsonArray json_reports;
-    for(auto it = m_reports.begin(); it != m_reports.end(); it++){
-        QJsonObject json_report;
-        Report* report = it->second;
-        report->write(json_report);
-        json_reports.append(json_report);
-    }
-    json["reports"] = json_reports;
     m_unsaved_changes = false;
 }
 
@@ -319,13 +274,6 @@ std::vector<VideoProject*> &Project::get_videos(){
  */
 VideoProject* Project::get_video(const int& v_pos) {
     return m_videos.at(v_pos);
-}
-
-/**
- * @brief Project::Project
- */
-std::string Project::getDir_bookmarks() const {
-    return m_dir_bookmarks;
 }
 
 std::string Project::get_dir() const {
