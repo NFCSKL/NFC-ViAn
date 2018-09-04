@@ -1308,6 +1308,12 @@ bool ProjectWidget::close_project() {
 
     emit close_all_widgets();
 
+    emit set_show_analysis_details(false);
+    emit set_detections(false);
+    emit set_poi_slider(false);
+    emit set_tag_slider(false);
+    emit enable_poi_btns(false, false);
+
     // Remove project if temporary
     if (m_proj->is_temporary()) {
         m_proj->remove_files();
