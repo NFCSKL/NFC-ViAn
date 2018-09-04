@@ -20,15 +20,40 @@ Overlay::~Overlay() {
 
 /**
  * @brief Overlay::draw_overlay
- * Draws an overlay on top of the specified frame.
+ * Draws the text drawings from an overlay on top of the specified frame.
  * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
-            if ((*it)->get_show()) {
+            // Only draw the text drawings
+            if ((*it)->get_show() && (*it)->get_shape() == TEXT) {
                 frame = (*it)->draw(frame);
+            }
+        }
+    }
+    current_frame = frame_nr;
+}
+
+/**
+ * @brief Overlay::draw_overlay_scaled
+ * Draws the non-text drawings from an overlay on top of the specified frame.
+ * These drawings are scaled to fit the Mat
+ * @param img - Frame to draw on
+ * @param frame_nr - Number of the frame currently shown in the video.
+ * @param anchor - The top left coordinate of the zoomrect, used to scale the drawings
+ * @param scale_factor - The zoom percent, used to scale the drawings
+ */
+void Overlay::draw_overlay_scaled(cv::Mat &frame, int frame_nr, cv::Point anchor, double scale_factor) {
+    if (show_overlay) {
+        for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
+            // Don't draw text drawings since they work a little different.
+            // They can't be scaled as big and small as needed the same way as other drawings
+            // They are drawing first and then scaled with the Mat
+            if ((*it)->get_show() && (*it)->get_shape() != TEXT) {
+                // The anchor and scale factor is used to scale the drawing
+                frame = (*it)->draw_scaled(frame, anchor, scale_factor);
             }
         }
     }
