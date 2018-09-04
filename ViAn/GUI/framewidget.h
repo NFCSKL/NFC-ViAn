@@ -38,6 +38,7 @@ class FrameWidget : public QWidget
 
     // Analysis bounding box
     QPoint ana_rect_start, ana_rect_end;
+    bool details_checked = false;
     bool show_box = false;
 
     // Zoom
@@ -91,12 +92,13 @@ public slots:
     void copy();
     void paste();
     void on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index);
-    void show_bounding_box(bool b);
+    void set_details_checked(bool b);
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
     void clear_analysis();
     void set_video_project(VideoProject*);
     void set_detections_on_frame(int);
+    void set_show_box(bool);
     void set_detections(bool);
     void set_show_detections(bool);
     void set_tool(SHAPES m_tool);

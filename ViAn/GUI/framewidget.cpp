@@ -151,9 +151,24 @@ void FrameWidget::set_detections_on_frame(int frame_num) {
     }
 }
 
-void FrameWidget::show_bounding_box(bool b) {
-    show_box = b;
+/**
+ * @brief FrameWidget::set_details_checked
+ * Details_checked will be true when the details setting is checked
+ * @param b
+ */
+void FrameWidget::set_details_checked(bool b) {
+    details_checked = b;
     repaint();
+}
+
+/**
+ * @brief FrameWidget::set_show_box
+ * Show_box will be true when the details box should be shown.
+ * Only when an analysis is clicked
+ * @param b
+ */
+void FrameWidget::set_show_box(bool b) {
+    show_box = b;
 }
 
 void FrameWidget::set_detections(bool detections) {
@@ -300,7 +315,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
     }
-    if (show_box && m_analysis != nullptr) {
+    if (details_checked && show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
 
         auto box = m_analysis->settings->bounding_box;

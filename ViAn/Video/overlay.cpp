@@ -291,6 +291,7 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
     if (show_overlay) {
         if (current_shape == EDIT) {
+            edit = true;
             prev_point = pos;
             m_right_click = right_click;
             if (right_click) {
@@ -349,6 +350,7 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
 void Overlay::mouse_released(QPoint pos, int frame_nr, bool right_click) {
     Q_UNUSED(pos)
     Q_UNUSED(frame_nr)
+    edit = false;
     if (change_tool) {
         emit set_tool_zoom();
         change_tool = false;
@@ -405,7 +407,7 @@ void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
 void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool ctrl) {
     // Only update the overlay is is exists and is currently being shown
     if (show_overlay && !overlays[frame_nr].empty()) {
-        if (current_shape == EDIT) {
+        if (current_shape == EDIT && edit) {
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;

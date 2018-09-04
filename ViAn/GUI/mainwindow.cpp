@@ -182,13 +182,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->frame_wgt, &FrameWidget::set_analysis);
     connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->playback_slider, &AnalysisSlider::set_analysis_proxy);
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
-    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::show_bounding_box);
-    connect(ana_details_act, SIGNAL(toggled(bool)), project_wgt, SLOT(toggle_details(bool)));
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_details_checked);
+    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
+    connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
     connect(toggle_ana_settings_wgt, SIGNAL(toggled(bool)), project_wgt, SLOT(toggle_settings(bool)));
     connect(project_wgt, &ProjectWidget::toggle_analysis_details, ana_details_act, &QAction::toggle);
     connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
 
+    connect(project_wgt, &ProjectWidget::set_show_analysis_details, video_wgt->frame_wgt, &FrameWidget::set_show_box);
+    connect(project_wgt, &ProjectWidget::set_show_analysis_details, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));

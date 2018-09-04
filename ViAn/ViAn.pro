@@ -244,7 +244,6 @@ HEADERS  += \
 # Project
 #
 SOURCES += Project/Test/projecttestsuite.cpp \
-    Project/report.cpp \
     Project/project.cpp \
     Project/video.cpp \
     Project/videoproject.cpp \
@@ -258,7 +257,6 @@ HEADERS +=Project/Test/projecttestsuite.h \
     Project/video.h \
     Project/videoproject.h \
     Project/bookmark.h  \
-    Project/report.h \
     Project/Analysis/analysis.h \
     Project/Analysis/poi.h
 

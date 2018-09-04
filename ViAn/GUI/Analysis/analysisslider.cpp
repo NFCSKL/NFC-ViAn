@@ -63,7 +63,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     }
 
     // Draws the analysis interval
-    if (show_ana_interval) {
+    if (details_checked && show_ana_interval) {
         brush = Qt::darkMagenta;
         draw_interval(m_ana_interval, groove_rect, frame_width);
         for (auto rect : interval_rects) {
@@ -158,12 +158,23 @@ void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
 }
 
 /**
+ * @brief AnalysisSlider::set_details_checked
+ * Details_checked will be true when the details settings is checked
+ * @param b
+ */
+void AnalysisSlider::set_details_checked(bool b) {
+    details_checked = b;
+    repaint();
+}
+
+/**
  * @brief AnalysisSlider::set_show_ana_interval
+ * Show_ana_interval will be true when the details analysis interval should be shown.
+ * Only when an analysis is clicked
  * @param show
  */
 void AnalysisSlider::set_show_ana_interval(bool show) {
     show_ana_interval = show;
-    repaint();
 }
 
 /**
