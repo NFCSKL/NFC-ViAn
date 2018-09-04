@@ -33,14 +33,11 @@ bool AnalysisMethod::sample_current_frame() {
  */
 void AnalysisMethod::run() {
     qDebug() << "OpenCV version:" << CV_VERSION;
-    qDebug() << "Major version:" << CV_MAJOR_VERSION;
-    qDebug() << "Minor version:" << CV_MINOR_VERSION;
-    qDebug() << "Subminor version:" << CV_SUBMINOR_VERSION;
-    //setup_analysis();
-    //sample_freq = get_setting("SAMPLE_FREQUENCY");
+    setup_analysis();
+    sample_freq = get_setting("SAMPLE_FREQUENCY");
     std::cout << m_source_file << std::endl;
-    cv::VideoCapture capture(m_source_file);
-    //capture.open(m_source_file);
+    //cv::VideoCapture capture(m_source_file);
+    capture.open(m_source_file);
     //capture.open(m_source_file);
     //capture.open(m_source_file);
     //capture.open(m_source_file);
@@ -67,8 +64,11 @@ void AnalysisMethod::run() {
         current_frame_index = start_frame;
     }
 
-    while(!(*aborted) && capture.read(original_frame) &&
-          !(analysis_settings->use_interval && (current_frame_index >= end_frame))) {
+    while(!(*aborted) && !(analysis_settings->use_interval && (current_frame_index >= end_frame))) {
+        if (!capture.read(original_frame)) {
+            break;
+        }
+
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
             // Slice frame if bounding box should be used
@@ -114,7 +114,6 @@ void AnalysisMethod::run() {
         emit send_progress(get_progress(start_frame));
         ++current_frame_index;
         original_frame.release();
-
     }
     if(*aborted){
         capture.release();
@@ -128,6 +127,7 @@ void AnalysisMethod::run() {
             m_analysis.add_interval(m_POI);
         }
         capture.release();
+
         m_analysis.settings = analysis_settings;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
         int index = new_path.find_last_of('/') + 1;

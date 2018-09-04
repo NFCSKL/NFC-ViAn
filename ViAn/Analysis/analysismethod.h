@@ -48,7 +48,7 @@ protected:
     int scaled_height = -1;         // Height after scaling
     float scaling_ratio = 1.0;      // Scaling factor
 
-    //cv::VideoCapture capture;       // Video source
+    cv::VideoCapture capture;       // Video source
 
     cv::Mat analysis_frame, original_frame;
     Analysis m_analysis;
