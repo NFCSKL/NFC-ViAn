@@ -616,10 +616,12 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  */
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
-    Video* video = m_vid_proj->get_video();
-    video->state.center = center;
-    video->state.scale_factor = scale;
-    video->state.rotation = angle;
+    if (!m_floating) {
+        Video* video = m_vid_proj->get_video();
+        video->state.center = center;
+        video->state.scale_factor = scale;
+        video->state.rotation = angle;
+    }
 }
 
 /**
