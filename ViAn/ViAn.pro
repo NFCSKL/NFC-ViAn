@@ -82,7 +82,8 @@ SOURCES += main.cpp \
     Project/imagesequence.cpp \
     GUI/TreeItems/sequenceitem.cpp \
     GUI/Analysis/anasettingwidget.cpp \
-    GUI/Bookmark/bookmarkdialog.cpp
+    GUI/Bookmark/bookmarkdialog.cpp \
+    GUI/manipulatorwidget.cpp
 
 #
 # TEST
@@ -154,7 +155,8 @@ HEADERS += reportgenerator.h\
     Project/imagesequence.h \
     GUI/TreeItems/sequenceitem.h \
     GUI/Analysis/anasettingwidget.h \
-    GUI/Bookmark/bookmarkdialog.h
+    GUI/Bookmark/bookmarkdialog.h \
+    GUI/manipulatorwidget.h
 
 #
 # LIBRARY

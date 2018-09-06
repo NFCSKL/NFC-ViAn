@@ -58,7 +58,7 @@ ManipulatorDialog::ManipulatorDialog(int b, double c, QWidget* parent) : QDialog
  * Emits the current values and closes the dialog
  */
 void ManipulatorDialog::ok_clicked() {
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT);
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
     close();
 }
 
@@ -67,7 +67,7 @@ void ManipulatorDialog::ok_clicked() {
  * Closes the dialog
  */
 void ManipulatorDialog::cancel_clicked() {
-    emit values(brightness, contrast);
+    emit values(brightness, contrast, true);
     close();
 }
 
@@ -87,7 +87,7 @@ void ManipulatorDialog::reset_clicked() {
  */
 void ManipulatorDialog::b_changed(int value) {
     brightness_value_label->setText(QString::number(value));
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT);
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
 }
 
 /**
@@ -98,5 +98,5 @@ void ManipulatorDialog::b_changed(int value) {
 void ManipulatorDialog::c_changed(int value) {
     QString text = QString::number(value/DOUBLE_TO_INT);
     contrast_value_label->setText(text);
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT);
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
 }

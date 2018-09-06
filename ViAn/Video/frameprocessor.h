@@ -61,6 +61,7 @@ struct zoomer_settings {
 struct manipulation_settings {
     int brightness = 0;
     double contrast = 1;
+    bool update_state = true;
 
     // -1 LEFT(CCW), 0 NONE, 1 RIGHT(CW)
     int rotate = 0;

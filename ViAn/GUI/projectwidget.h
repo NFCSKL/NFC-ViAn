@@ -91,6 +91,7 @@ public slots:
     void remove_frame_from_tag_item(int frame);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void toggle_details(bool b);
+    void toggle_settings(bool b);
     bool save_project();
     bool open_project(QString project_path="");
     bool close_project();
@@ -112,7 +113,6 @@ private slots:
     void remove_item();
     void rename_item();
     void drawing_tag();
-    void toggle_settings(bool b);
     void update_settings();
     void create_folder_item();
     void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
