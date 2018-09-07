@@ -14,6 +14,8 @@ public:
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
 
+    void update_color_correction(int b, double c);
+
     VideoState m_state;
     int m_frame;
 };

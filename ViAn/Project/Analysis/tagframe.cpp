@@ -14,6 +14,11 @@ TagFrame::~TagFrame() {
 
 }
 
+void TagFrame::update_color_correction(int b, double c) {
+    m_state.brightness = b;
+    m_state.contrast = c;
+}
+
 void TagFrame::read(const QJsonObject &json) {
     VideoState state;
     m_frame = json["frame"].toInt();

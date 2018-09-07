@@ -121,7 +121,8 @@ public slots:
     void set_scale_factor(double);
     void set_zoom_state(QPoint, double, int);
     void play_btn_toggled(bool status);
-    void tag_frame(void);
+    void update_tag(int b, double c);
+    void tag_frame();
     void remove_tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);

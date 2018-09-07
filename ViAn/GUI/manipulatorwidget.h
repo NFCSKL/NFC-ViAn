@@ -26,6 +26,7 @@ class ManipulatorWidget : public QWidget {
 
 signals:
     void values(int b_value, double c_value, bool update);
+    void update_tag(int b_value, double c_value);
 
 public:
     ManipulatorWidget(int b = FrameManipulator().BRIGHTNESS_DEFAULT, double c = FrameManipulator().CONTRAST_DEFAULT, QWidget* parent = 0);
