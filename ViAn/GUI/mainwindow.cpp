@@ -28,11 +28,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    QDockWidget* zoom_preview_dock = new QDockWidget(tr("Zoom preview"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    zoom_preview_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
@@ -83,6 +85,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     bookmark_dock->close();
+
+    // Initialize zoom preview widget
+    zoom_wgt = new zoompreviewwidget();
+    zoom_preview_dock->setWidget(zoom_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, zoom_preview_dock);
+
+    connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &zoompreviewwidget::frame_update);
+    connect(zoom_wgt, &zoompreviewwidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();

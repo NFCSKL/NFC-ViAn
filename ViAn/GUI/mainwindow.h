@@ -20,6 +20,7 @@
 
 #include "videowidget.h"
 #include "projectwidget.h"
+#include "zoompreviewwidget.h"
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "drawingwidget.h"
@@ -86,6 +87,7 @@ private:
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
     DrawingWidget* drawing_wgt;
+    zoompreviewwidget* zoom_wgt;
     QueueWidget* queue_wgt;
     AnaSettingWidget* ana_settings_wgt;
 

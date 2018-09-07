@@ -16,7 +16,9 @@ class zoompreviewwidget : public QWidget
 private:
     cv::Mat _tmp;
     QImage _qimage;
+    QPoint anchor{0, 0};
 
+    void center_image(const QSize& s);
 
 public:
     explicit zoompreviewwidget(QWidget *parent = nullptr);

@@ -171,11 +171,14 @@ void FrameProcessor::process_frame() {
     }
 
     // Create zoom perview mat
-    //    cv::Mat tmp = manipulated_frame.clone();
-    //    double factor{0.5};
-    //    cv::resize(tmp, tmp, cv::Size(), factor, factor);
-    //    cv::Rect view_rectangle = m_zoomer.get_view_rect();
-    //    cv::rectangle(tmp, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255), 2);
+    cv::Mat preview_frame = manipulated_frame.clone();
+    QSize s = m_z_settings->preview_window_size;
+    std::pair<double, double> ratios = Utility::size_ratio(s, m_zoomer.get_transformed_size());
+    double factor{std::min(ratios.first, ratios.second)};
+    cv::resize(preview_frame, preview_frame, cv::Size(), factor, factor);
+    cv::Rect view_rectangle = m_zoomer.get_view_rect();
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255));
     //    cv::imshow("test", tmp); // can cause a deadlock
 
     // Draws the overlay
@@ -188,6 +191,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
+    emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
