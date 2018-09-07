@@ -87,7 +87,7 @@ private:
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
     DrawingWidget* drawing_wgt;
-    zoompreviewwidget* zoom_wgt;
+    ZoomPreviewWidget* zoom_wgt;
     QueueWidget* queue_wgt;
     AnaSettingWidget* ana_settings_wgt;
 

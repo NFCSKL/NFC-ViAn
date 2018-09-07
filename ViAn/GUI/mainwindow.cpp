@@ -87,12 +87,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_dock->close();
 
     // Initialize zoom preview widget
-    zoom_wgt = new zoompreviewwidget();
+    zoom_wgt = new ZoomPreviewWidget();
     zoom_preview_dock->setWidget(zoom_wgt);
-    addDockWidget(Qt::LeftDockWidgetArea, zoom_preview_dock);
+    addDockWidget(Qt::RightDockWidgetArea, zoom_preview_dock);
 
-    connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &zoompreviewwidget::frame_update);
-    connect(zoom_wgt, &zoompreviewwidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
+    connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
+    connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();

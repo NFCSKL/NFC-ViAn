@@ -6,12 +6,14 @@
  * Centers the image in the widget
  * @param s QSize   : The size of the image to be centered
  */
-void zoompreviewwidget::center_image(const QSize &s) {
-    anchor = QPoint((this->width() - s.width()) / 2, (this->height()- s.height()) / 2);
+void ZoomPreviewWidget::center_image(const QSize &s) {
+    // Will center the image both horizontally and vertically
+    // anchor = QPoint((this->width() - s.width()) / 2, (this->height()- s.height()) / 2);
+    anchor = QPoint((this->width() - s.width()) / 2, 0);
 }
 
-zoompreviewwidget::zoompreviewwidget(QWidget *parent) : QWidget(parent) {
-    setMinimumSize(QSize(100,100));
+ZoomPreviewWidget::ZoomPreviewWidget(QWidget *parent) : QWidget(parent) {
+    setMinimumSize(QSize(200,100));
 }
 
 /**
@@ -19,7 +21,7 @@ zoompreviewwidget::zoompreviewwidget(QWidget *parent) : QWidget(parent) {
  * Repaint the stored image at anchor point
  * @param event
  */
-void zoompreviewwidget::paintEvent(QPaintEvent *event) {
+void ZoomPreviewWidget::paintEvent(QPaintEvent *event) {
     Q_UNUSED (event)
     QPainter painter(this);
     painter.drawImage(anchor, _qimage);
@@ -30,7 +32,7 @@ void zoompreviewwidget::paintEvent(QPaintEvent *event) {
  * emits the current window size when the widget is resized
  * @param event
  */
-void zoompreviewwidget::resizeEvent(QResizeEvent *event) {
+void ZoomPreviewWidget::resizeEvent(QResizeEvent *event) {
     emit window_size(event->size());
 }
 
@@ -40,7 +42,7 @@ void zoompreviewwidget::resizeEvent(QResizeEvent *event) {
  * This is later used when repainting the widget
  * @param preview_image cv::Mat :   The provided preview image
  */
-void zoompreviewwidget::frame_update(cv::Mat preview_image) {
+void ZoomPreviewWidget::frame_update(cv::Mat preview_image) {
     switch (preview_image.type()) {
         case CV_8UC1:
             cvtColor(preview_image, _tmp, CV_GRAY2RGB);

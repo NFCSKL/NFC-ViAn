@@ -9,7 +9,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
-class zoompreviewwidget : public QWidget
+class ZoomPreviewWidget : public QWidget
 {
     Q_OBJECT
 
@@ -21,7 +21,7 @@ private:
     void center_image(const QSize& s);
 
 public:
-    explicit zoompreviewwidget(QWidget *parent = nullptr);
+    explicit ZoomPreviewWidget(QWidget *parent = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
