@@ -2,6 +2,14 @@
 #include <QPushButton>
 #include <QDebug>
 
+/**
+ * @brief ManipulatorWidget::ManipulatorWidget
+ * Widget for the color corrections.
+ * Currently contains settigns for contrast and brightness.
+ * @param b - Brightness
+ * @param c - Contrast
+ * @param parent
+ */
 ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget(parent) {
     setWindowTitle("Vian - Color Correction");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -43,7 +51,6 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
     // Button setup
     btn_box = new QDialogButtonBox(Qt::Horizontal, this);
     btn_box->addButton(QDialogButtonBox::Ok)->setText("Apply");
-    //btn_box->addButton(QDialogButtonBox::Cancel);
     btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
 
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ManipulatorWidget::ok_clicked);
@@ -55,27 +62,56 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
     show();
 }
 
+/**
+ * @brief ManipulatorWidget::ok_clicked
+ * Slot function for the ok ("Apply") button
+ * Saves the changes to the video state
+ */
 void ManipulatorWidget::ok_clicked() {
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
 }
 
+/**
+ * @brief ManipulatorWidget::default_clicked
+ * Slot function for the default button.
+ * Resets the changes to default and saves them in the video state.
+ */
 void ManipulatorWidget::default_clicked() {
     brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
     contrast_slider->setValue(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT);
     ok_clicked();
 }
 
+/**
+ * @brief ManipulatorWidget::b_changed
+ * Slot function for when the brightness slider's value is changed
+ * Update the frameprocessor with the brightness value
+ * @param value
+ */
 void ManipulatorWidget::b_changed(int value) {
     brightness_value_label->setText(QString::number(value));
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, false);
 }
 
+/**
+ * @brief ManipulatorWidget::c_changed
+ * Slot function for when the contrast slider's value is changed
+ * Update the frameprocessor with the contrast value
+ * @param value
+ */
 void ManipulatorWidget::c_changed(int value) {
     QString text = QString::number(value/DOUBLE_TO_INT);
     contrast_value_label->setText(text);
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, false);
 }
 
+/**
+ * @brief ManipulatorWidget::set_values
+ * Slot function for when the color correction values changes elsewhere.
+ * Update the sliders and block unnecessary "value_changed" calls from the sliders.
+ * @param b_value
+ * @param c_value
+ */
 void ManipulatorWidget::set_values(int b_value, double c_value) {
     blockSignals(true);
     brightness_slider->setValue(b_value);
