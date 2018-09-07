@@ -96,6 +96,7 @@ private:
     QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
     QAction* toggle_ana_settings_wgt;
+    QAction* toggle_zoom_preview_wgt;
     QAction* toggle_main_toolbar;
     QAction* toggle_drawing_toolbar;
 

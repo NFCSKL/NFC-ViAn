@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
+    toggle_zoom_preview_wgt = zoom_preview_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -374,6 +375,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addAction(toggle_queue_wgt);
     view_menu->addAction(toggle_ana_settings_wgt);
+    view_menu->addAction(toggle_zoom_preview_wgt);
     view_menu->addSeparator();
     view_menu->addAction(toggle_main_toolbar);
     view_menu->addAction(toggle_drawing_toolbar);
@@ -383,6 +385,7 @@ void MainWindow::init_view_menu() {
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
+    toggle_zoom_preview_wgt->setStatusTip(tr("Show/hide zoom preview"));
 }
 
 /**
