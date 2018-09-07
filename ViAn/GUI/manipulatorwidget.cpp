@@ -3,7 +3,7 @@
 #include <QDebug>
 
 ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget(parent) {
-    setWindowTitle("Vian - Brightness and Contrast");
+    setWindowTitle("Vian - Color Correction");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setAttribute(Qt::WA_DeleteOnClose);
 

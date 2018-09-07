@@ -16,7 +16,6 @@
 #include "Video/shapes/shapes.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
-#include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
 
@@ -30,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
-    manipulator_dock = new QDockWidget(tr("Manipulator settings"), this);
+    manipulator_dock = new QDockWidget(tr("Color correction settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -120,8 +119,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     manipulator_dock->close();
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
-
-
 
     // Main toolbar
     main_toolbar = new MainToolbar();
@@ -390,7 +387,7 @@ void MainWindow::init_view_menu() {
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
-    toggle_manipulator_wgt->setStatusTip(tr("Show/hide manipulator widget"));
+    toggle_manipulator_wgt->setStatusTip(tr("Show/hide color correction widget"));
 }
 
 /**
@@ -693,14 +690,8 @@ void MainWindow::open_rp_dialog() {
  */
 void MainWindow::cont_bri() {
     if (video_wgt->get_current_video_project() == nullptr) return;
-    emit set_status_bar("Opening contrast/brightness settings");
+    emit set_status_bar("Opening color correction settings");
     manipulator_dock->show();
-
-//    ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
-//    man_dialog->setAttribute(Qt::WA_DeleteOnClose);
-//    //connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
-//    connect(man_dialog, &ManipulatorDialog::values, video_wgt, &VideoWidget::update_brightness_contrast);
-//    man_dialog->exec();
 }
 
 void MainWindow::export_images(){

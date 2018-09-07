@@ -30,7 +30,6 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarklist.cpp \
     GUI/statusbar.cpp \
     GUI/Analysis/analysiswidget.cpp \
-    GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
     Project/projecttreestate.cpp \
     GUI/Analysis/tagdialog.cpp \
@@ -104,7 +103,6 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
     GUI/Analysis/analysiswidget.h \
-    GUI/manipulatordialog.h \
     Video/frameprocessor.h \
     Project/projecttreestate.h \
     GUI/Analysis/tagdialog.h \

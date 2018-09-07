@@ -37,7 +37,7 @@ public:
     const int SIZE_MULTIPLIER = 40;
     const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
     const int VIDEO_WGT_HEIGHT = 9;
-    const int FLOATING_WIDGET_MAX = 3;
+    const unsigned int FLOATING_WIDGET_MAX = 3;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
