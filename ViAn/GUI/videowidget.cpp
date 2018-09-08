@@ -616,10 +616,12 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  */
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
-    Video* video = m_vid_proj->get_video();
-    video->state.center = center;
-    video->state.scale_factor = scale;
-    video->state.rotation = angle;
+    if (!m_floating) {
+        Video* video = m_vid_proj->get_video();
+        video->state.center = center;
+        video->state.scale_factor = scale;
+        video->state.rotation = angle;
+    }
 }
 
 /**
@@ -906,7 +908,9 @@ void VideoWidget::on_new_frame() {
     if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
     frame_line_edit->setText(QString::number(frame_index.load()));
 
-    m_vid_proj->get_video()->state.frame = frame_num;
+    if (!m_floating) {
+        m_vid_proj->get_video()->state.frame = frame_num;
+    }
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
@@ -950,16 +954,6 @@ void VideoWidget::on_playback_slider_moved() {
         timer.restart();
     }
     on_new_frame();
-}
-
-// TODO Remove
-// All calls should go the load_marked_video_state
-// This is a temporary function until the other end is fixed
-void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
-    VideoState state;
-    state = vid_proj->get_video()->state;
-    state.frame =  frame;
-    load_marked_video_state(vid_proj, state);
 }
 
 /**
