@@ -780,7 +780,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     } default:
         break;
     }
-    emit update_slider();
 }
 
 /**
