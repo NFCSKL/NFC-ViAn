@@ -744,7 +744,7 @@ void VideoWidget::tag_frame() {
  * Un-tags the current frame
  */
 void VideoWidget::remove_tag_frame() {
-    if (m_tag != nullptr) {
+    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
         if (m_tag->find_frame(playback_slider->value())) {
             m_tag->remove_frame(playback_slider->value());
             emit tag_remove_frame(playback_slider->value());
