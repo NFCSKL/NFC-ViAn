@@ -302,19 +302,19 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     Q_UNUSED (event)
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
-
+    // Draw the zoom box
     if (mark_rect) {
-        // Draw the zoom box
         painter.setPen(QColor(0,255,0));
         QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
         painter.drawRect(zoom);
     }
-
+    // Draw the select-analysis-area box
     if(m_tool == ANALYSIS_BOX){
         painter.setPen(QColor(0,255,0));
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
     }
+    // Draw analysis details bounding box
     if (details_checked && show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
 
@@ -324,6 +324,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.drawRect(bounding_rect);
     }
+    // Draw analysis detection boxes
     if (m_detections && show_detections) {
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
@@ -339,6 +340,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         painter.end();
         return;
     }
+    // Draw the current drawing bounding box
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
     if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame() && m_tool == EDIT) {
@@ -347,11 +349,11 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         if (current_drawing->get_shape() == PEN) {
             Pen* current = dynamic_cast<Pen*>(current_drawing);
             cv::Rect bounding_rect = cv::boundingRect(current->get_points());
-            tl = QPoint(bounding_rect.tl().x, bounding_rect.tl().y);
-            br = QPoint(bounding_rect.br().x, bounding_rect.br().y);
+            tl = Utility::from_cvpoint(bounding_rect.tl());
+            br = Utility::from_cvpoint(bounding_rect.br());
         } else {
-            tl = QPoint(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
-            br = QPoint(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
+            tl = Utility::from_cvpoint(current_drawing->get_draw_start());
+            br = Utility::from_cvpoint(current_drawing->get_draw_end());
         }
         QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.setPen(Qt::black);

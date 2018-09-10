@@ -780,7 +780,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     } default:
         break;
     }
-    emit update_frame();
+    emit update_slider();
 }
 
 /**
@@ -1067,7 +1067,6 @@ void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
     vid_item->get_video_project()->remove_analysis(tag);
     m_tag_item = nullptr;
     emit marked_basic_analysis(nullptr);
-    emit update_frame();
 }
 
 /**
@@ -1081,7 +1080,6 @@ void ProjectWidget::remove_drawing_tag_item(QTreeWidgetItem* item) {
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     Tag* tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
     vid_item->get_video_project()->remove_analysis(tag);
-    emit update_frame();
 }
 
 /**
@@ -1099,7 +1097,6 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
 
     analysis->delete_saveable(analysis->full_path());
     vid_item->get_video_project()->remove_analysis(analysis);
-    emit update_frame();
     emit clear_analysis();
 }
 

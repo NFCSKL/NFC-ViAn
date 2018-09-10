@@ -74,7 +74,7 @@ signals:
     void clear_slider();
     void set_status_bar(QString);
     void begin_analysis(QTreeWidgetItem*, AnalysisMethod*);
-    void update_frame();
+    void update_slider();
     void remove_overlay();
     void new_vid_proj(VideoProject*);
 
