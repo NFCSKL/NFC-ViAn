@@ -30,7 +30,6 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarklist.cpp \
     GUI/statusbar.cpp \
     GUI/Analysis/analysiswidget.cpp \
-    GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
     Project/projecttreestate.cpp \
     GUI/Analysis/tagdialog.cpp \
@@ -82,7 +81,8 @@ SOURCES += main.cpp \
     Project/imagesequence.cpp \
     GUI/TreeItems/sequenceitem.cpp \
     GUI/Analysis/anasettingwidget.cpp \
-    GUI/Bookmark/bookmarkdialog.cpp
+    GUI/Bookmark/bookmarkdialog.cpp \
+    GUI/manipulatorwidget.cpp
 
 #
 # TEST
@@ -103,7 +103,6 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
     GUI/Analysis/analysiswidget.h \
-    GUI/manipulatordialog.h \
     Video/frameprocessor.h \
     Project/projecttreestate.h \
     GUI/Analysis/tagdialog.h \
@@ -154,7 +153,8 @@ HEADERS += reportgenerator.h\
     Project/imagesequence.h \
     GUI/TreeItems/sequenceitem.h \
     GUI/Analysis/anasettingwidget.h \
-    GUI/Bookmark/bookmarkdialog.h
+    GUI/Bookmark/bookmarkdialog.h \
+    GUI/manipulatorwidget.h
 
 #
 # LIBRARY

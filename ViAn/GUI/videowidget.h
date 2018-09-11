@@ -113,6 +113,7 @@ signals:
     void set_status_bar(QString);
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
+    void update_manipulator_wgt(int, double);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
@@ -180,7 +181,7 @@ public slots:
     void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
-    void update_brightness_contrast(int c_val, double v_val);
+    void update_brightness_contrast(int c_val, double v_val, bool update);
     void rotate_cw(void);
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);

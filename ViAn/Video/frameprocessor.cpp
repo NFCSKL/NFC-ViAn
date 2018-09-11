@@ -296,7 +296,9 @@ void FrameProcessor::update_manipulator_settings() {
     update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
     emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
-    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
+    if (m_man_settings->update_state) {
+        emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
+    }
 }
 
 /**

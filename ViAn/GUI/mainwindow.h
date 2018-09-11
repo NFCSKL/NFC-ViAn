@@ -24,6 +24,7 @@
 #include "Bookmark/bookmarkwidget.h"
 #include "drawingwidget.h"
 #include "Analysis/anasettingwidget.h"
+#include "manipulatorwidget.h"
 #include "statusbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "Toolbars/maintoolbar.h"
@@ -36,7 +37,7 @@ public:
     const int SIZE_MULTIPLIER = 40;
     const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
     const int VIDEO_WGT_HEIGHT = 9;
-    const int FLOATING_WIDGET_MAX = 3;
+    const unsigned int FLOATING_WIDGET_MAX = 3;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
@@ -80,6 +81,7 @@ signals:
 private:
     QDockWidget* queue_dock;
     QDockWidget* ana_settings_dock;
+    QDockWidget* manipulator_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
@@ -88,12 +90,14 @@ private:
     DrawingWidget* drawing_wgt;
     QueueWidget* queue_wgt;
     AnaSettingWidget* ana_settings_wgt;
+    ManipulatorWidget* manipulator_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
     QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
     QAction* toggle_ana_settings_wgt;
+    QAction* toggle_manipulator_wgt;
     QAction* toggle_main_toolbar;
     QAction* toggle_drawing_toolbar;
 

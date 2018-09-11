@@ -1003,7 +1003,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
-
+    emit update_manipulator_wgt(state.brightness, state.contrast);
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1343,11 +1343,12 @@ void VideoWidget::on_original_size(){
  * @param b_val brightness value
  * @param c_val contrast value
  */
-void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    set_brightness_contrast(b_val, c_val);
+void VideoWidget::update_brightness_contrast(int b_val, double c_val, bool update) {
+    //set_brightness_contrast(b_val, c_val);
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
+        m_settings.update_state = update;
     });
 }
 
