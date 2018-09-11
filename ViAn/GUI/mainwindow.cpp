@@ -44,12 +44,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     toggle_manipulator_wgt = manipulator_dock->toggleViewAction();
 
     // Initialize video widget
-    video_wgt = new VideoWidget();
+    video_wgt = new VideoWidget(this);
     video_wgt->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT * SIZE_MULTIPLIER); // width and height sets aspect ratio
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget();
+    project_wgt = new ProjectWidget(this);
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     project_wgt->new_project();
