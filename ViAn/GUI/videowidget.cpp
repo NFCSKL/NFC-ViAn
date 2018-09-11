@@ -501,7 +501,7 @@ void VideoWidget::init_playback_slider() {
     frame_edit_sc = new QShortcut(QKeySequence(Qt::Key_F), this);
     connect(frame_edit_sc, &QShortcut::activated, this, &VideoWidget::frame_label_focus);
 
-    playback_slider = new AnalysisSlider(Qt::Horizontal);
+    playback_slider = new AnalysisSlider(Qt::Horizontal, this);
 
     frame_line_edit->setEnabled(false);
     playback_slider->setEnabled(false);
