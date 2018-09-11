@@ -178,20 +178,22 @@ void FrameProcessor::process_frame() {
     //    cv::rectangle(tmp, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255), 2);
     //    cv::imshow("test", tmp); // can cause a deadlock
 
+    int frame_num = m_frame_index->load();
+
     // Draws the text drawings on the overlay
-    m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
+    m_overlay->draw_overlay(manipulated_frame, frame_num);
 
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
 
     // Draws the other drawings on the overlay
-    m_overlay->draw_overlay_scaled(manipulated_frame, m_frame_index->load(), Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor);
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
+    emit done_processing(m_frame, manipulated_frame, frame_num);
 }
 
 /**
