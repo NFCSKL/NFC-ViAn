@@ -707,6 +707,14 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
+void VideoWidget::update_tag(int b, double c) {
+    if (m_tag == nullptr || m_tag->is_drawing_tag() || !m_tag->find_frame(playback_slider->value())) {
+        return;
+    }
+    m_tag->update_color_correction(playback_slider->value(), b, c);
+    emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+}
+
 /**
  * @brief VideoWidget::tag_frame
  * Adds the current frame to a tag.
@@ -1344,7 +1352,6 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val, bool update) {
-    //set_brightness_contrast(b_val, c_val);
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;

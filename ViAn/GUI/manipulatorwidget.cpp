@@ -68,7 +68,10 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
  * Saves the changes to the video state
  */
 void ManipulatorWidget::ok_clicked() {
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
+    int b = brightness_slider->value();
+    double c = contrast_slider->value()/DOUBLE_TO_INT;
+    emit values(b, c, true);
+    emit update_tag(b, c);
 }
 
 /**
@@ -79,7 +82,7 @@ void ManipulatorWidget::ok_clicked() {
 void ManipulatorWidget::default_clicked() {
     brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
     contrast_slider->setValue(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT);
-    ok_clicked();
+    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
 }
 
 /**

@@ -119,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     manipulator_dock->close();
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
+    connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag);
 
     // Main toolbar
     main_toolbar = new MainToolbar();

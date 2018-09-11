@@ -30,6 +30,14 @@ void Tag::remove_frame(int frame) {
     }
 }
 
+void Tag::update_color_correction(int frame, int b_value, double c_value) {
+    auto it = tag_map.find(frame);
+    if (it != tag_map.end()) {
+        (*it).second->update_color_correction(b_value, c_value);
+        m_unsaved_changes = true;
+    }
+}
+
 int Tag::next_frame(int frame) {
     auto it = tag_map.upper_bound(frame);
     if (it != tag_map.end()) {
