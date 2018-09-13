@@ -126,9 +126,13 @@ void VideoPlayer::check_events() {
             if (m_is_playing->load()) {
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
                 if (!synced_read()) continue;
+                qDebug() << "m_frame and current before" << m_frame->load() << current_frame;
                 ++*m_frame;
                 ++current_frame;
-                display_index();
+                qDebug() << "m_frame and current after" << m_frame->load() << current_frame;
+                m_new_frame->store(true);
+                m_v_sync->con_var.notify_all();
+                emit display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
             }
@@ -178,6 +182,7 @@ bool VideoPlayer::synced_read(){
         } else {
             try {
                 m_capture.retrieve(m_v_sync->frame);
+                qDebug() << "in synced read";
                 m_new_frame->store(true);
             } catch( cv::Exception& e ) {
                 const char* err_msg = e.what();

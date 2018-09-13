@@ -771,6 +771,10 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
+    qDebug() << "slider" << playback_slider->value();
+    qDebug() << "frame_index" << frame_index.load();
+    qDebug() << "from vid_proj" << m_vid_proj->get_video()->state.frame;
+    qDebug() << "overlay settings" << o_settings.frame;
     if (!m_vid_proj) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -893,6 +897,7 @@ void VideoWidget::set_slider_max(int value) {
  * @param frame_num
  */
 void VideoWidget::on_new_frame() {
+    qDebug() << "on new frame";
     int frame_num = frame_index.load();
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
     if (analysis_only) {

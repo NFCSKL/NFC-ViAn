@@ -138,10 +138,12 @@ void FrameProcessor::check_events() {
             }
             has_new_zoom_state = false;
             m_unrotated_size = cv::Size(new_width, new_height);
+            qDebug() << "frameprocessor frame nr" << m_frame_index->load();
             process_frame();
 
             lk.unlock();
             m_v_sync->con_var.notify_all();
+            qDebug() << "after" << m_frame_index->load();
             continue;
         }
     }
