@@ -58,7 +58,11 @@ void AnalysisItem::remove(){}
  * Rename item
  */
 void AnalysisItem::rename(){
-    m_analysis->m_name = text(0).toStdString();
+    if (is_new) {
+        m_analysis->m_name = text(0).remove(NEW_STR).toStdString();
+    } else {
+        m_analysis->m_name = text(0).toStdString();
+    }
 }
 
 void AnalysisItem::set_not_new() {
