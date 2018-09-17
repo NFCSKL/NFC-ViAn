@@ -25,7 +25,6 @@ Overlay::~Overlay() {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
-    qDebug() << "overlay frame nr" << frame_nr;
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
             if ((*it)->get_show()) {
