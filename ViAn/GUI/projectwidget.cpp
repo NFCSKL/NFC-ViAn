@@ -988,6 +988,10 @@ void ProjectWidget::update_settings() {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
+    if (!dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
+        return;
+    }
+
     QString text = "Deleting item(s)\n"
                    "(Unselected items within selected folders will be deleted as well)";
     QString info_text = "Do you wish to continue?";
