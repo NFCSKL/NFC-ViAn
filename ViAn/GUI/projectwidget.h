@@ -51,6 +51,8 @@ public:
     QPointer<QAction> show_settings_act = nullptr;
     QString get_default_path();
 
+    std::vector<std::string> remove_list;
+
 signals:
     void selected_media();
     void marked_video_state(VideoProject *vid_proj, VideoState state);

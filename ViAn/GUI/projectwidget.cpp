@@ -622,6 +622,9 @@ bool ProjectWidget::prompt_save() {
         case QMessageBox::Cancel:
                 ok = false;
                 break;
+        case QMessageBox::No:
+                remove_list.clear();
+                break;
     }
     return ok;
 }
@@ -1098,7 +1101,7 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
 
-    analysis->delete_saveable(analysis->full_path());
+    remove_list.push_back(analysis->full_path());
     vid_item->get_video_project()->remove_analysis(analysis);
     emit clear_analysis();
 }
@@ -1186,6 +1189,14 @@ bool ProjectWidget::save_project() {
         msg_box.exec();
         return false;
     }
+
+    for (std::string path : remove_list) {
+        QFile file(QString::fromStdString(path));
+        if(file.exists()) {
+            file.remove();
+        }
+    }
+    remove_list.clear();
 
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
