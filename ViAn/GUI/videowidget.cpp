@@ -1479,6 +1479,10 @@ double VideoWidget::get_contrast() {
 
 void VideoWidget::set_brightness_contrast(int bri, double cont) {
     if (!m_vid_proj) return;
+    if (state_video) {
+        m_vid_proj->state.brightness = bri;
+        m_vid_proj->state.contrast = cont;
+    }
     m_vid_proj->get_video()->state.brightness = bri;
     m_vid_proj->get_video()->state.contrast = cont;
 }
