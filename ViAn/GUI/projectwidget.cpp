@@ -658,7 +658,8 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit set_video_project(vid_item->get_video_project());
         VideoState state;
-        state = vid_item->get_video_project()->get_video()->state;
+        vid_item->get_video_project()->state.video = true;
+        state = vid_item->get_video_project()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
 
         emit set_show_analysis_details(false);

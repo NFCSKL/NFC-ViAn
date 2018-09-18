@@ -917,6 +917,9 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     if (!m_floating) {
+        if (state_video) {
+            m_vid_proj->state.frame = frame_num;
+        }
         m_vid_proj->get_video()->state.frame = frame_num;
     }
 
@@ -972,6 +975,11 @@ void VideoWidget::on_playback_slider_moved() {
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
+    if (state.video) {
+        state_video = true;
+    } else {
+        state_video = false;
+    }
 
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);
