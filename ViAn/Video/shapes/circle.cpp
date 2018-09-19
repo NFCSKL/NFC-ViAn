@@ -30,6 +30,23 @@ cv::Mat Circle::draw(cv::Mat &frame) {
 }
 
 /**
+ * @brief Circle::draw_scaled
+ * Scales and draws the object on top the specified frame.
+ * @param frame - Frame to draw on.
+ * @param anchor - Top left corner in zoomrect, used to scale drawing.
+ * @param scale_factor - Zoom factor, used to scale drawing.
+ * @return Returns the frame with drawing.
+ */
+cv::Mat Circle::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+    cv::Rect rect((draw_start-anchor)*scale_factor, (draw_end-anchor)*scale_factor);
+    cv::Size size = rect.size();
+    cv::Point center = (rect.br() + rect.tl())*0.5;
+    cv::RotatedRect bounding_rect(center, size, 0);
+    cv::ellipse(frame, bounding_rect, color, thickness);
+    return frame;
+}
+
+/**
  * @brief Circle::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.
