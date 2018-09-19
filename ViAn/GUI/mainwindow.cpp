@@ -44,12 +44,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     toggle_manipulator_wgt = manipulator_dock->toggleViewAction();
 
     // Initialize video widget
-    video_wgt = new VideoWidget(this);
+    video_wgt = new VideoWidget();
     video_wgt->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT * SIZE_MULTIPLIER); // width and height sets aspect ratio
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget(this);
+    project_wgt = new ProjectWidget();
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     project_wgt->new_project();
@@ -216,6 +216,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
+    connect(project_wgt, &ProjectWidget::update_slider, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
     // Open the recent project dialog
