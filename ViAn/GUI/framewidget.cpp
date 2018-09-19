@@ -291,6 +291,7 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
     _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
+    if (!isVisible()) show();
     repaint();
 }
 
