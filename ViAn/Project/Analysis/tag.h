@@ -26,6 +26,7 @@ public:
     std::vector<int> get_frames();
     bool is_drawing_tag();
     void set_drawing_tag(bool);
+    void update_color_whole_tag(int b, double c);
 
     std::map<int, TagFrame*> tag_map;
 };

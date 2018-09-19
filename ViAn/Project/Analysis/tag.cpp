@@ -74,6 +74,13 @@ void Tag::set_drawing_tag(bool value) {
     m_drawing_tag = value;
 }
 
+void Tag::update_color_whole_tag(int b, double c) {
+    for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
+        (*it).second->m_state.brightness = b;
+        (*it).second->m_state.contrast = c;
+    }
+}
+
 ANALYSIS_TYPE Tag::get_type() const {
     if (m_drawing_tag) return DRAWING_TAG;
     return TAG;

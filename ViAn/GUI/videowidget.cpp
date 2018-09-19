@@ -707,11 +707,15 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
-void VideoWidget::update_tag(int b, double c) {
-    // check if current tag is checked/m_tag is checked.
-    // Loop over m_tag changing every frame.
+void VideoWidget::update_tag(int b, double c, bool update_whole) {
+    if (m_tag == nullptr || m_tag->is_drawing_tag()) return;
 
-    if (m_tag == nullptr || m_tag->is_drawing_tag() || !m_tag->find_frame(playback_slider->value())) {
+    if (update_whole) {
+        m_tag->update_color_whole_tag(b, c);
+        return;
+    }
+
+    if (!m_tag->find_frame(playback_slider->value())) {
         return;
     }
     m_tag->update_color_correction(playback_slider->value(), b, c);

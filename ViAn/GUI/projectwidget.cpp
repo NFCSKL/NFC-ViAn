@@ -727,10 +727,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
             item->setCheckState(0, Qt::Checked);
             m_tag_item = tag_item;
         }
-        // If the current selected tag already is the current tag, deselect it
-        else if (m_tag_item == tag_item) {
-            update_current_tag(nullptr);
-        }
 
         emit set_video_project(vid_item->get_video_project());
         VideoState state;

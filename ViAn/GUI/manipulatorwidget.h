@@ -26,7 +26,7 @@ class ManipulatorWidget : public QWidget {
 
 signals:
     void values(int b_value, double c_value, bool update);
-    void update_tag(int b_value, double c_value);
+    void update_tag(int b_value, double c_value, bool b);
 
 public:
     ManipulatorWidget(int b = FrameManipulator().BRIGHTNESS_DEFAULT, double c = FrameManipulator().CONTRAST_DEFAULT, QWidget* parent = 0);
@@ -35,6 +35,7 @@ public:
 
 private slots:
     void ok_clicked();
+    void apply_clicked();
     void default_clicked();
     void b_changed(int value);
     void c_changed(int value);

@@ -50,10 +50,13 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
 
     // Button setup
     btn_box = new QDialogButtonBox(Qt::Horizontal, this);
+
     btn_box->addButton(QDialogButtonBox::Ok)->setText("Apply");
+    btn_box->addButton(QDialogButtonBox::Apply)->setText("Apply to label");
     btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
 
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ManipulatorWidget::ok_clicked);
+    connect(btn_box->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &ManipulatorWidget::apply_clicked);
     connect(btn_box->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &ManipulatorWidget::default_clicked);
 
     layout->addWidget(btn_box);
@@ -71,7 +74,14 @@ void ManipulatorWidget::ok_clicked() {
     int b = brightness_slider->value();
     double c = contrast_slider->value()/DOUBLE_TO_INT;
     emit values(b, c, true);
-    emit update_tag(b, c);
+    emit update_tag(b, c, false);
+}
+
+void ManipulatorWidget::apply_clicked() {
+    int b = brightness_slider->value();
+    double c = contrast_slider->value()/DOUBLE_TO_INT;
+    emit values(b, c, true);
+    emit update_tag(b, c, true);
 }
 
 /**
