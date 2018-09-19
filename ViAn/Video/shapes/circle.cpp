@@ -21,9 +21,13 @@ Circle::~Circle() {}
  * @return Returns the frame with drawing.
  */
 cv::Mat Circle::draw(cv::Mat &frame) {
+    int diff = draw_end.x - draw_start.x;
+    if (diff <= 2 && diff >= -2) {
+        draw_end = cv::Point(draw_end.x+(3-diff), draw_end.y);
+    }
     cv::Rect rect(draw_start, draw_end);
     cv::Size size = rect.size();
-    cv::Point center = (rect.br() + rect.tl())*0.5;
+    cv::Point center = (rect.br() + rect.tl())/2;
     cv::RotatedRect bounding_rect(center, size, 0);
     cv::ellipse(frame, bounding_rect, color, thickness);
     return frame;
