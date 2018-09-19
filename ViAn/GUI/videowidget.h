@@ -251,8 +251,6 @@ private:
     Tag* m_tag = nullptr;
     bool m_floating = false;
 
-    bool tag_clicked = false;
-
     bool slider_is_blocked = false;
     bool video_btns_enabled = false;
     bool analysis_only = false;
