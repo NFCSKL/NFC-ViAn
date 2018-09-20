@@ -522,9 +522,15 @@ void VideoWidget::init_playback_slider() {
 
 void VideoWidget::stop_btn_clicked() {
     set_status_bar("Stop");
-    frame_index.store(0);
+
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        frame_index.store(0);
+    }
+
     is_playing.store(false);
     play_btn->setChecked(false);
+
     on_new_frame();
 }
 
@@ -894,6 +900,7 @@ void VideoWidget::set_slider_max(int value) {
  */
 void VideoWidget::on_new_frame() {
     int frame_num = frame_index.load();
+    qDebug() << frame_num;
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
@@ -922,6 +929,7 @@ void VideoWidget::on_new_frame() {
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
+    player_con.notify_one();
 }
 
 /**

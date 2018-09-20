@@ -114,6 +114,7 @@ void VideoPlayer::check_events() {
                 wait_load_read();
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 set_frame();
+                qDebug() << "after set frame";
             }
         } else {
             // Timer condition triggered. Update playback speed if nessecary and read new frame
@@ -124,6 +125,7 @@ void VideoPlayer::check_events() {
 
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
+                qDebug() << "else is playing";
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
                 if (!synced_read()) continue;
                 ++*m_frame;
