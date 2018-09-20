@@ -104,7 +104,8 @@ void VideoPlayer::check_events() {
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed,
                                      [&](){return m_abort_playback->load() || m_new_video->load() ||
-                                     (current_frame != m_frame->load() && m_video_loaded->load());})) {
+                                     (current_frame != m_frame->load() && m_video_loaded->load())||
+                                     m_speed_step->load() != m_cur_speed_step;})) {
             if (m_abort_playback->load()) {
                 lk.unlock();
                 break;
@@ -114,18 +115,16 @@ void VideoPlayer::check_events() {
                 wait_load_read();
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 set_frame();
-                qDebug() << "after set frame";
             }
-        } else {
+
             // Timer condition triggered. Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
             if (speed != m_cur_speed_step) {
                 set_playback_speed(speed);
             }
-
+        } else {
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
-                qDebug() << "else is playing";
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
                 if (!synced_read()) continue;
                 ++*m_frame;
