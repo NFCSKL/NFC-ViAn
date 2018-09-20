@@ -18,6 +18,8 @@ private:
     QImage _qimage;
     QPoint anchor{0, 0};
 
+    bool center_along_xy{false}; // If false the image will only be centered along the x-axis
+
     void center_image(const QSize& s);
 
 public:
@@ -32,6 +34,7 @@ signals:
 
 public slots:
     void frame_update(cv::Mat frame);
+    void on_floating_changed(const bool is_floating);
 };
 
 #endif // ZOOMPREVIEWWIDGET_H

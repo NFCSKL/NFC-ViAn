@@ -7,9 +7,11 @@
  * @param s QSize   : The size of the image to be centered
  */
 void ZoomPreviewWidget::center_image(const QSize &s) {
-    // Will center the image both horizontally and vertically
-    // anchor = QPoint((this->width() - s.width()) / 2, (this->height()- s.height()) / 2);
-    anchor = QPoint((this->width() - s.width()) / 2, 0);
+    if (center_along_xy) {
+        anchor = QPoint((this->width() - s.width()) / 2, (this->height()- s.height()) / 2);
+    } else {
+        anchor = QPoint((this->width() - s.width()) / 2, 0);
+    }
 }
 
 ZoomPreviewWidget::ZoomPreviewWidget(QWidget *parent) : QWidget(parent) {
@@ -64,6 +66,14 @@ void ZoomPreviewWidget::frame_update(cv::Mat preview_image) {
     QSize s = _qimage.size();
     center_image(s);
     update();
+}
+
+/**
+ * @brief ZoomPreviewWidget::on_floating_changed
+ * @param is_floating
+ */
+void ZoomPreviewWidget::on_floating_changed(const bool is_floating) {
+    center_along_xy = is_floating;
 }
 
 

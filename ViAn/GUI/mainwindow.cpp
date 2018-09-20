@@ -94,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
     connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
+    connect(zoom_preview_dock, &QDockWidget::topLevelChanged, zoom_wgt, &ZoomPreviewWidget::on_floating_changed);
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();
@@ -373,9 +374,9 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_drawing_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
+    view_menu->addAction(toggle_zoom_preview_wgt);
     view_menu->addAction(toggle_queue_wgt);
     view_menu->addAction(toggle_ana_settings_wgt);
-    view_menu->addAction(toggle_zoom_preview_wgt);
     view_menu->addSeparator();
     view_menu->addAction(toggle_main_toolbar);
     view_menu->addAction(toggle_drawing_toolbar);
@@ -383,9 +384,9 @@ void MainWindow::init_view_menu() {
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_drawing_wgt->setStatusTip(tr("Show/hide drawing widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
+    toggle_zoom_preview_wgt->setStatusTip(tr("Show/hide zoom preview"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
-    toggle_zoom_preview_wgt->setStatusTip(tr("Show/hide zoom preview"));
 }
 
 /**
