@@ -21,7 +21,28 @@ Circle::~Circle() {}
  * @return Returns the frame with drawing.
  */
 cv::Mat Circle::draw(cv::Mat &frame) {
+    int diff = draw_end.x - draw_start.x;
+    if (diff <= 2 && diff >= -2) {
+        draw_end = cv::Point(draw_end.x+(3-diff), draw_end.y);
+    }
     cv::Rect rect(draw_start, draw_end);
+    cv::Size size = rect.size();
+    cv::Point center = (rect.br() + rect.tl())/2;
+    cv::RotatedRect bounding_rect(center, size, 0);
+    cv::ellipse(frame, bounding_rect, color, thickness);
+    return frame;
+}
+
+/**
+ * @brief Circle::draw_scaled
+ * Scales and draws the object on top the specified frame.
+ * @param frame - Frame to draw on.
+ * @param anchor - Top left corner in zoomrect, used to scale drawing.
+ * @param scale_factor - Zoom factor, used to scale drawing.
+ * @return Returns the frame with drawing.
+ */
+cv::Mat Circle::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+    cv::Rect rect((draw_start-anchor)*scale_factor, (draw_end-anchor)*scale_factor);
     cv::Size size = rect.size();
     cv::Point center = (rect.br() + rect.tl())*0.5;
     cv::RotatedRect bounding_rect(center, size, 0);

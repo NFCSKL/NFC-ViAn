@@ -9,6 +9,7 @@ public:
     Arrow(QColor col, QPoint pos);
     ~Arrow() override;
     cv::Mat draw(cv::Mat &frame) override;
+    cv::Mat draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) override;
     void handle_new_pos(QPoint pos) override;
     void write(QJsonObject& json) override;
     void read(const QJsonObject& json) override;

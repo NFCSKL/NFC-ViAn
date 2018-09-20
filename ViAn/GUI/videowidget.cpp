@@ -502,7 +502,7 @@ void VideoWidget::init_playback_slider() {
     frame_edit_sc = new QShortcut(QKeySequence(Qt::Key_F), this);
     connect(frame_edit_sc, &QShortcut::activated, this, &VideoWidget::frame_label_focus);
 
-    playback_slider = new AnalysisSlider(Qt::Horizontal);
+    playback_slider = new AnalysisSlider(Qt::Horizontal, this);
 
     frame_line_edit->setEnabled(false);
     playback_slider->setEnabled(false);
@@ -617,10 +617,12 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  */
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
-    Video* video = m_vid_proj->get_video();
-    video->state.center = center;
-    video->state.scale_factor = scale;
-    video->state.rotation = angle;
+    if (!m_floating) {
+        Video* video = m_vid_proj->get_video();
+        video->state.center = center;
+        video->state.scale_factor = scale;
+        video->state.rotation = angle;
+    }
 }
 
 /**
@@ -706,6 +708,14 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
+void VideoWidget::update_tag(int b, double c) {
+    if (m_tag == nullptr || m_tag->is_drawing_tag() || !m_tag->find_frame(playback_slider->value())) {
+        return;
+    }
+    m_tag->update_color_correction(playback_slider->value(), b, c);
+    emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+}
+
 /**
  * @brief VideoWidget::tag_frame
  * Adds the current frame to a tag.
@@ -743,7 +753,7 @@ void VideoWidget::tag_frame() {
  * Un-tags the current frame
  */
 void VideoWidget::remove_tag_frame() {
-    if (m_tag != nullptr) {
+    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
         if (m_tag->find_frame(playback_slider->value())) {
             m_tag->remove_frame(playback_slider->value());
             emit tag_remove_frame(playback_slider->value());
@@ -907,7 +917,9 @@ void VideoWidget::on_new_frame() {
     if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
     frame_line_edit->setText(QString::number(frame_index.load()));
 
-    m_vid_proj->get_video()->state.frame = frame_num;
+    if (!m_floating) {
+        m_vid_proj->get_video()->state.frame = frame_num;
+    }
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
@@ -953,23 +965,12 @@ void VideoWidget::on_playback_slider_moved() {
     on_new_frame();
 }
 
-// TODO Remove
-// All calls should go the load_marked_video_state
-// This is a temporary function until the other end is fixed
-void VideoWidget::load_marked_video(VideoProject *vid_proj, int frame) {
-    VideoState state;
-    state = vid_proj->get_video()->state;
-    state.frame =  frame;
-    load_marked_video_state(vid_proj, state);
-}
-
 /**
  * @brief VideoWidget::load_marked_video_state
  * Slot function for loading a new video
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
-    if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
 
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
@@ -1010,7 +1011,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
-
+    emit update_manipulator_wgt(state.brightness, state.contrast);
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1350,11 +1351,11 @@ void VideoWidget::on_original_size(){
  * @param b_val brightness value
  * @param c_val contrast value
  */
-void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
-    set_brightness_contrast(b_val, c_val);
+void VideoWidget::update_brightness_contrast(int b_val, double c_val, bool update) {
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
+        m_settings.update_state = update;
     });
 }
 

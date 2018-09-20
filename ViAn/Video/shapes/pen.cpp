@@ -35,12 +35,27 @@ cv::Mat Pen::draw(cv::Mat &frame) {
         p = point;
     }
     return frame;
-    
-    
-//    for (std::pair<cv::Point, cv::Point> line : lines) {
-//        cv::line(frame, line.first, line.second, color, thickness);
-//    }
-//    return frame;
+}
+
+/**
+ * @brief Pen::draw_scaled
+ * Scales and draws the object on top the specified frame.
+ * @param frame - Frame to draw on.
+ * @param anchor - Top left corner in zoomrect, used to scale drawing.
+ * @param scale_factor - Zoom factor, used to scale drawing.
+ * @return Returns the frame with drawing.
+ */
+cv::Mat Pen::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+    cv::Point p(-1, -1);
+    for (auto point : points) {
+        if (p.x < 0 || p.y < 0) {
+            p = point;
+            continue;
+        }
+        cv::line(frame, (p-anchor)*scale_factor, (point-anchor)*scale_factor, color, thickness);
+        p = point;
+    }
+    return frame;
 }
 
 /**

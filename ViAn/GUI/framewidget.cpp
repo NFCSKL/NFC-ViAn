@@ -291,6 +291,7 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
     _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
+    if (!isVisible()) show();
     repaint();
 }
 
@@ -302,19 +303,19 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     Q_UNUSED (event)
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
-
+    // Draw the zoom box
     if (mark_rect) {
-        // Draw the zoom box
         painter.setPen(QColor(0,255,0));
         QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
         painter.drawRect(zoom);
     }
-
+    // Draw the select-analysis-area box
     if(m_tool == ANALYSIS_BOX){
         painter.setPen(QColor(0,255,0));
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
     }
+    // Draw analysis details bounding box
     if (details_checked && show_box && m_analysis != nullptr) {
         painter.setPen(QColor(180,200,200));
 
@@ -324,6 +325,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.drawRect(bounding_rect);
     }
+    // Draw analysis detection boxes
     if (m_detections && show_detections) {
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
@@ -339,6 +341,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         painter.end();
         return;
     }
+    // Draw the current drawing bounding box
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();
     if (show_overlay && current_drawing && current_frame_nr == current_drawing->get_frame() && m_tool == EDIT) {
@@ -347,11 +350,11 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         if (current_drawing->get_shape() == PEN) {
             Pen* current = dynamic_cast<Pen*>(current_drawing);
             cv::Rect bounding_rect = cv::boundingRect(current->get_points());
-            tl = QPoint(bounding_rect.tl().x, bounding_rect.tl().y);
-            br = QPoint(bounding_rect.br().x, bounding_rect.br().y);
+            tl = Utility::from_cvpoint(bounding_rect.tl());
+            br = Utility::from_cvpoint(bounding_rect.br());
         } else {
-            tl = QPoint(current_drawing->get_draw_start().x, current_drawing->get_draw_start().y);
-            br = QPoint(current_drawing->get_draw_end().x, current_drawing->get_draw_end().y);
+            tl = Utility::from_cvpoint(current_drawing->get_draw_start());
+            br = Utility::from_cvpoint(current_drawing->get_draw_end());
         }
         QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
         painter.setPen(Qt::black);
@@ -564,11 +567,10 @@ void FrameWidget::set_analysis_settings() {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
         settings->quick_analysis = true;
 
-        cv::Point end = cv::Point(ana_rect_end.x(), ana_rect_end.y());
-        cv::Point start (ana_rect_start.x(), ana_rect_start.y());
-        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x/m_scale_factor, anchor.y()/m_scale_factor + start.y/m_scale_factor),
-                      cv::Point(anchor.x()/m_scale_factor + end.x/m_scale_factor, anchor.y()/m_scale_factor + end.y/m_scale_factor));
-        settings->set_bounding_box(scaled);
+        QPoint scaled_start = scale_point(ana_rect_start);
+        QPoint scaled_end = scale_point(ana_rect_end);
+        QRect scaled_rect(scaled_start, scaled_end);
+        settings->set_bounding_box(Utility::from_qrect(scaled_rect));
 
         emit quick_analysis(settings);
         emit set_toolbar_zoom();

@@ -16,7 +16,6 @@
 #include "Video/shapes/shapes.h"
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
-#include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
 
 
@@ -31,18 +30,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* zoom_preview_dock = new QDockWidget(tr("Zoom preview"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
+    manipulator_dock = new QDockWidget(tr("Color correction settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     zoom_preview_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    manipulator_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_drawing_wgt = drawing_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
     toggle_zoom_preview_wgt = zoom_preview_dock->toggleViewAction();
+    toggle_manipulator_wgt = manipulator_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -73,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     drawing_dock->setWidget(drawing_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, drawing_dock);
     //connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), drawing_wgt, SLOT(add_drawing(Shapes*, int)));
-    connect(drawing_wgt, SIGNAL(jump_to_frame(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*, int)));
+    connect(drawing_wgt, &DrawingWidget::jump_to_frame, video_wgt, &VideoWidget::load_marked_video_state);
     connect(drawing_wgt, SIGNAL(set_current_drawing(Shapes*)), video_wgt, SLOT(set_current_drawing(Shapes*)));
     connect(drawing_wgt, SIGNAL(delete_drawing(Shapes*)), this, SLOT(delete_drawing(Shapes*)));
     connect(drawing_wgt, SIGNAL(clear_frame(int)), this, SLOT(clear(int)));
@@ -120,6 +122,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(project_wgt, &ProjectWidget::update_settings_wgt, ana_settings_wgt, &AnaSettingWidget::set_ana_settings);
     connect(project_wgt, &ProjectWidget::show_analysis_settings, this, &MainWindow::show_ana_settings_dock);
+
+    // Initialize manipulator widget
+    manipulator_wgt = new ManipulatorWidget();
+    manipulator_dock->setWidget(manipulator_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, manipulator_dock);
+    manipulator_dock->setFloating(true);
+    manipulator_dock->close();
+
+    connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
+    connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag);
 
     // Main toolbar
     main_toolbar = new MainToolbar();
@@ -181,6 +193,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt,   &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
     connect(project_wgt, &ProjectWidget::clear_slider, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
     connect(project_wgt, &ProjectWidget::marked_video_state, video_wgt, &VideoWidget::load_marked_video_state);
+    connect(video_wgt, &VideoWidget::update_manipulator_wgt, manipulator_wgt, &ManipulatorWidget::set_values);
     connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
     connect(project_wgt, &ProjectWidget::set_video_project, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::set_video_project, drawing_wgt, &DrawingWidget::set_video_project);
@@ -198,6 +211,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
     connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
     connect(toggle_ana_settings_wgt, SIGNAL(toggled(bool)), project_wgt, SLOT(toggle_settings(bool)));
+    connect(toggle_ana_settings_wgt, &QAction::toggled, project_wgt, &ProjectWidget::toggle_settings);
     connect(project_wgt, &ProjectWidget::toggle_analysis_details, ana_details_act, &QAction::toggle);
     connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
 
@@ -214,8 +228,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
-    connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
-    connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
+    connect(project_wgt, &ProjectWidget::update_slider, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
     // Open the recent project dialog
@@ -377,6 +390,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_zoom_preview_wgt);
     view_menu->addAction(toggle_queue_wgt);
     view_menu->addAction(toggle_ana_settings_wgt);
+    view_menu->addAction(toggle_manipulator_wgt);
     view_menu->addSeparator();
     view_menu->addAction(toggle_main_toolbar);
     view_menu->addAction(toggle_drawing_toolbar);
@@ -387,6 +401,7 @@ void MainWindow::init_view_menu() {
     toggle_zoom_preview_wgt->setStatusTip(tr("Show/hide zoom preview"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
+    toggle_manipulator_wgt->setStatusTip(tr("Show/hide color correction widget"));
 }
 
 /**
@@ -689,11 +704,8 @@ void MainWindow::open_rp_dialog() {
  */
 void MainWindow::cont_bri() {
     if (video_wgt->get_current_video_project() == nullptr) return;
-    emit set_status_bar("Opening contrast/brightness settings");
-    ManipulatorDialog* man_dialog = new ManipulatorDialog(video_wgt->get_brightness(), video_wgt->get_contrast(), this);
-    man_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
-    man_dialog->exec();
+    emit set_status_bar("Opening color correction settings");
+    manipulator_dock->show();
 }
 
 void MainWindow::export_images(){

@@ -28,6 +28,19 @@ cv::Mat Line::draw(cv::Mat &frame) {
 }
 
 /**
+ * @brief Line::draw_scaled
+ * Scales and draws the object on top the specified frame.
+ * @param frame - Frame to draw on.
+ * @param anchor - Top left corner in zoomrect, used to scale drawing.
+ * @param scale_factor - Zoom factor, used to scale drawing.
+ * @return Returns the frame with drawing.
+ */
+cv::Mat Line::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+    cv::line(frame, (draw_start-anchor)*scale_factor, (draw_end-anchor)*scale_factor, color, thickness);
+    return frame;
+}
+
+/**
  * @brief Line::handle_new_pos
  * Function to handle the new position of the mouse.
  * Does not need to store the new position.

@@ -37,6 +37,12 @@ cv::Mat Text::draw(cv::Mat &frame) {
     return frame;
 }
 
+cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+    Q_UNUSED (anchor)
+    Q_UNUSED (scale_factor)
+    return draw(frame);
+}
+
 /**
  * @brief Text::handle_new_pos
  * Function to handle the new position of the mouse.

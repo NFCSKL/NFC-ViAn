@@ -25,6 +25,7 @@
 #include "Bookmark/bookmarkwidget.h"
 #include "drawingwidget.h"
 #include "Analysis/anasettingwidget.h"
+#include "manipulatorwidget.h"
 #include "statusbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "Toolbars/maintoolbar.h"
@@ -37,7 +38,7 @@ public:
     const int SIZE_MULTIPLIER = 40;
     const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
     const int VIDEO_WGT_HEIGHT = 9;
-    const int FLOATING_WIDGET_MAX = 3;
+    const unsigned int FLOATING_WIDGET_MAX = 3;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
@@ -65,6 +66,7 @@ private slots:
     void move();
     void open_widget(VideoProject *vid_proj);
     void close_widget(VideoWidget*);
+    void close_all_widgets();
 
 public slots:
     void options(void);
@@ -72,7 +74,6 @@ public slots:
     void open_project_folder();
     void show_analysis_dock(bool);
     void show_ana_settings_dock(bool);
-    void close_all_widgets();
 
 signals:
     void set_status_bar(QString);
@@ -81,6 +82,7 @@ signals:
 private:
     QDockWidget* queue_dock;
     QDockWidget* ana_settings_dock;
+    QDockWidget* manipulator_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
@@ -90,6 +92,7 @@ private:
     ZoomPreviewWidget* zoom_wgt;
     QueueWidget* queue_wgt;
     AnaSettingWidget* ana_settings_wgt;
+    ManipulatorWidget* manipulator_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;
@@ -97,6 +100,7 @@ private:
     QAction* toggle_queue_wgt;
     QAction* toggle_ana_settings_wgt;
     QAction* toggle_zoom_preview_wgt;
+    QAction* toggle_manipulator_wgt;
     QAction* toggle_main_toolbar;
     QAction* toggle_drawing_toolbar;
 

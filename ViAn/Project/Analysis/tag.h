@@ -20,6 +20,7 @@ public:
     void add_frame(int frame, TagFrame *t_frame);
     bool find_frame(int);
     void remove_frame(int);
+    void update_color_correction(int frame, int b_value, double c_value);
     int next_frame(int);
     int previous_frame(int);
     std::vector<int> get_frames();
