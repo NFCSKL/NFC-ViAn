@@ -921,7 +921,6 @@ void VideoWidget::on_new_frame() {
     }
 
     playback_slider->update();
-    frame_wgt->set_current_frame_nr(frame_num);
 }
 
 /**

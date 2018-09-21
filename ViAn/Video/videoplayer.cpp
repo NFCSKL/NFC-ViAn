@@ -125,11 +125,15 @@ void VideoPlayer::check_events() {
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-                if (!synced_read()) continue;
                 ++*m_frame;
                 ++current_frame;
-                m_new_frame->store(true);
-                m_v_sync->con_var.notify_all();
+                if (!synced_read()) {
+                    --*m_frame;
+                    --current_frame;
+                    continue;
+                }
+
+
                 emit display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
@@ -195,7 +199,6 @@ bool VideoPlayer::synced_read(){
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
     }
-
     return true;
 }
 
