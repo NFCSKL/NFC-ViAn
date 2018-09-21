@@ -978,7 +978,6 @@ void VideoWidget::on_playback_slider_moved() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
-    if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
     if (state.video) {
         state_video = true;
