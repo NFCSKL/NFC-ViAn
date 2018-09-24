@@ -208,6 +208,7 @@ void VideoWidget::init_frame_processor() {
         connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+        connect(f_processor, &FrameProcessor::set_rotation, frame_wgt, &FrameWidget::set_rotation);
         connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
         connect(f_processor, &FrameProcessor::set_zoom_state, this, &VideoWidget::set_zoom_state);
         connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);

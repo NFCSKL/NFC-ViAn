@@ -152,3 +152,18 @@ cv::Rect Utility::from_qrect(QRect rect) {
 QRect Utility::from_cvrect(cv::Rect rect) {
     return QRect(from_cvpoint(rect.tl()), from_cvpoint(rect.br()));
 }
+
+
+QPoint Utility::rotate(QPoint pos, double rotation, int width, int height) {
+    double angle_diff{(rotation*90) * (M_PI / 180)};
+
+//    double translated_x{pos.x() - scaled_pos.x()};
+//    double translated_y{pos.y() - scaled_pos.y()};
+
+//    double rotated_x{translated_x * std::cos(angle_diff) - translated_y * std::sin(angle_diff)};
+//    double rotated_y{translated_x * std::sin(angle_diff) + translated_y * std::cos(angle_diff)};
+
+
+//    QPoint q_pos(rotated_x, rotated_y);
+//    return q_pos;
+}

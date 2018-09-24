@@ -76,7 +76,6 @@ public:
     bool is_saved();
     bool is_current();
     void set_current(bool);
-
 };
 
 

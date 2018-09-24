@@ -192,6 +192,13 @@ void FrameWidget::set_scale_factor(double scale_factor) {
     if (m_vid_proj) m_vid_proj->get_video()->state.scale_factor = scale_factor;
 }
 
+void FrameWidget::set_rotation(int rotation) {
+    m_rotation = rotation;
+    if (m_vid_proj) {
+        m_vid_proj->get_video()->state.rotation = rotation;
+    }
+}
+
 void FrameWidget::set_current_frame_nr(int nr) {
     current_frame_nr = nr;
 }
@@ -266,7 +273,6 @@ cv::Mat FrameWidget::get_org_frame() const {
 }
 
 void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index) {
-    current_frame = mod_image;
     m_org_image = org_image;
     switch (mod_image.type()) {
         case CV_8UC1:
@@ -367,7 +373,12 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
 }
 
 QPoint FrameWidget::scale_point(QPoint pos) {
-    return anchor + pos/m_scale_factor;
+    QPoint scaled_pos = anchor + pos/m_scale_factor;
+    VideoState state;
+    state = m_vid_proj->get_video()->state;
+    //QPoint q_pos = Utility::rotate(pos, scaled_pos, m_rotation);
+    //qDebug() << q_pos;
+    return scaled_pos;
 }
 
 /**
@@ -392,6 +403,7 @@ void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     // Pos when the frame is at 100%
     QPoint scaled_pos = scale_point(event->pos());
+    qDebug() << "event & scaled" << event->pos() << scaled_pos;
     switch (m_tool) {
     case ANALYSIS_BOX:
         if(event->button() == Qt::LeftButton) {

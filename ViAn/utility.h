@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QRect>
 #include <QDir>
+#include <Project/video.h>
 
 namespace Utility{
      std::pair<double, double> size_ratio(QSize s1, QSize s2);
@@ -22,6 +23,8 @@ namespace Utility{
      cv::Point from_qpoint(QPoint point);
      cv::Rect from_qrect(QRect rect);
      QRect from_cvrect(cv::Rect rect);
+
+     QPoint rotate(QPoint pos, double rotation, int width, int height);
 }
 
 #endif // UTILITY_H

@@ -227,6 +227,8 @@ void FrameProcessor::emit_zoom_data() {
     emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_rotation(m_zoomer.get_angle());
+
 }
 
 /**
@@ -362,8 +364,13 @@ void FrameProcessor::update_overlay_settings() {
 }
 
 void FrameProcessor::update_rotation(const int& direction) {
+    qDebug() << "m_rotatte_direction" << m_rotate_direction; // 0-3
+    
+    
+    //qDebug() << "current rotation" << m_z_settings->rotation;
     if (direction != m_rotate_direction) {
         m_rotate_direction = direction;
+
         if (m_rotate_direction == ROTATE_NONE) {
             m_zoomer.update_rotation(DEGREES_0);
         } else if (m_rotate_direction == ROTATE_90) {
