@@ -113,6 +113,7 @@ signals:
     void set_status_bar(QString);
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
+    void zoom_preview(cv::Mat preview_frame);
     void update_manipulator_wgt(int, double);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
@@ -188,6 +189,7 @@ public slots:
     void update_processing_settings(std::function<void(void)> lambda);
     void update_playback_speed(int speed);
     void set_brightness_contrast(int bri, double cont);
+    void update_zoom_preview_size(QSize s);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
     const int PERCENT_INT_CONVERT = 100;

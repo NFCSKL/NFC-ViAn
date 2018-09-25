@@ -62,6 +62,7 @@ public:
     QPoint get_anchor() const;
     QPoint get_center() const;
     QSize get_viewport_size() const;
+    QSize get_transformed_size() const;
 
     cv::RotatedRect get_viewport() const;
     cv::Rect get_frame_rect() const;
