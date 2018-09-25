@@ -384,10 +384,10 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
 QPoint FrameWidget::scale_to_view(QPoint pos) {
     //auto video = m_vid_proj->get_video();
     QPoint scaled_pos = (pos-anchor)*m_scale_factor;
-    qDebug() << "scaled" << scaled_pos;
-    qDebug() << _tmp_frame.rows;
+    //qDebug() << "scaled" << scaled_pos;
+    //qDebug() << _tmp_frame.rows;
     QPoint q_pos = Utility::rotate(scaled_pos, 360-m_rotation, _tmp_frame.cols, _tmp_frame.rows);
-    qDebug() << "-------" << q_pos;
+    //qDebug() << "-------" << q_pos;
     return q_pos;
 }
 
@@ -438,7 +438,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
                 mark_rect = false;
                 unsetCursor();
             } else {
-                rect_start = scaled_pos;
+                rect_start = rotate(scaled_pos);
                 mark_rect = true;
             }
 
@@ -508,7 +508,8 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             }
         } else if (event->buttons() == Qt::LeftButton && mark_rect) {
             //rect_end = rect_update(scale_point(event->pos()));
-            rect_end = scaled_pos;
+            //rect_end = scaled_pos;
+            rect_end = rotate(scaled_pos);
             repaint();
         } else {
             if (zoom_rect.contains(scaled_pos) && mark_rect) {
@@ -623,6 +624,8 @@ void FrameWidget::panning(QPoint pos) {
     panning_tracker.first += dx / m_scale_factor;
     panning_tracker.second += dy/ m_scale_factor;
 
+    qDebug() << panning_tracker.first << panning_tracker.second;
+
     auto scale_panning = [] (double& actual, int& scaled) {
         if (std::abs(actual) >= 1) {
             scaled = std::floor(actual);
@@ -634,9 +637,21 @@ void FrameWidget::panning(QPoint pos) {
     scale_panning(panning_tracker.first, x);
     scale_panning(panning_tracker.second, y);
 
-
+    //qDebug() << x << y;
+    //rotate(x, y);
+    //qDebug() << x << y;
     emit moved_xy(x, y);
     prev_pos = pos;
+}
+
+QPoint FrameWidget::rotate(QPoint pos) {
+    int x = pos.x();
+    int y = pos.y();
+    for (int i = m_rotation / 90; i > 0; --i) {
+        std::swap(x,y);
+        y *= -1;
+    }
+    return QPoint(x,y);
 }
 
 /**

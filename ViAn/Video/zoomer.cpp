@@ -173,6 +173,7 @@ void Zoomer::update_rotation(const int &angle) {
  * @param y movement on the y-axis
  */
 void Zoomer::translate_viewport_center(int x, int y){
+    qDebug() << x << y;
     // TODO don't move outside frame rect
     bool is_moving_left{x < 0}, is_moving_right{x > 0}, is_moving_up{y < 0}, is_moving_down{y > 0};
 
