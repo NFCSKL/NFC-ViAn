@@ -37,7 +37,6 @@ cv::Mat Rectangle::draw(cv::Mat &frame) {
  * @return Returns the frame with drawing.
  */
 cv::Mat Rectangle::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
-
     cv::Rect rect((draw_start-anchor)*scale_factor, (draw_end-anchor)*scale_factor);
     cv::rectangle(frame, rect, color, thickness);
     return frame;

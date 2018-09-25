@@ -154,9 +154,31 @@ QRect Utility::from_cvrect(cv::Rect rect) {
 }
 
 
-QPoint Utility::rotate(QPoint pos, double rotation, int width, int height) {
-    double angle_diff{(rotation*90) * (M_PI / 180)};
+QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
+    //qDebug() << "rotation" << rotation;
+    QPoint new_point;
+    switch (rotation) {
+    case 90:
+        new_point = QPoint(pos.y(), height-pos.x());
+        break;
+    case 180:
+        new_point = QPoint(width-pos.x(), height-pos.y());
+        break;
+    case 270:
+        new_point = QPoint(width-pos.y(), pos.x());
+        break;
+    case 0:
+    case 360:
+        new_point = pos;
+        break;
+    default:
+        break;
+    }
 
+    return new_point;
+
+
+//    double angle_diff{(rotation*90) * (M_PI / 180)};
 //    double translated_x{pos.x() - scaled_pos.x()};
 //    double translated_y{pos.y() - scaled_pos.y()};
 

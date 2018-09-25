@@ -143,15 +143,15 @@ void Zoomer::update_rotation(const int &angle) {
     double translated_x{m_viewport.center.x - m_transformed_frame_rect.width / 2};
     double translated_y{m_viewport.center.y - m_transformed_frame_rect.height / 2};
 
-    qDebug() << "transformed rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
+    //qDebug() << "transformed rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
 
-    qDebug() << "x & y" << translated_x << translated_y;
+    //qDebug() << "x & y" << translated_x << translated_y;
 
     // Rotate around pivot
     double rotated_x{translated_x * std::cos(angle_diff) - translated_y * std::sin(angle_diff)};
     double rotated_y{translated_x * std::sin(angle_diff) + translated_y * std::cos(angle_diff)};
 
-    qDebug() << "rotated x & y" << rotated_x << rotated_y;
+    //qDebug() << "rotated x & y" << rotated_x << rotated_y;
 
     m_angle = angle;
     adjust_frame_rect_rotation();
@@ -159,7 +159,7 @@ void Zoomer::update_rotation(const int &angle) {
     // Translate back using the new frame size
     translated_x = rotated_x + m_transformed_frame_rect.width / 2;
     translated_y = rotated_y + m_transformed_frame_rect.height / 2;
-    qDebug() << "Translated x & y" << translated_x << translated_y;
+    //qDebug() << "Translated x & y" << translated_x << translated_y;
 
     cv::Point2f rotated_center(translated_x, translated_y);
     m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);

@@ -1084,6 +1084,7 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
+    m_vid_proj->get_video()->set_size(video_width, video_height);
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;

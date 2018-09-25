@@ -128,7 +128,8 @@ private:
     QPoint rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
-    QPoint scale_point(QPoint pos);
+    QPoint scale_to_video(QPoint pos);
+    QPoint scale_to_view(QPoint pos);
 };
 
 #endif // FRAMEWIDGET_H

@@ -24,7 +24,7 @@ namespace Utility{
      cv::Rect from_qrect(QRect rect);
      QRect from_cvrect(cv::Rect rect);
 
-     QPoint rotate(QPoint pos, double rotation, int width, int height);
+     QPoint rotate(QPoint pos, int rotation, int width, int height);
 }
 
 #endif // UTILITY_H

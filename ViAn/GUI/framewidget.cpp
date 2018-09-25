@@ -312,7 +312,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     // Draw the zoom box
     if (mark_rect) {
         painter.setPen(QColor(0,255,0));
-        QRectF zoom((rect_start-anchor)*m_scale_factor, (rect_end-anchor)*m_scale_factor);
+        QRectF zoom(scale_to_view(rect_start), scale_to_view(rect_end));
         painter.drawRect(zoom);
     }
     // Draw the select-analysis-area box
@@ -328,7 +328,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         auto box = m_analysis->settings->bounding_box;
         QPoint tl = Utility::from_cvpoint(box.tl());
         QPoint br = Utility::from_cvpoint(box.br());
-        QRectF bounding_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+        QRectF bounding_rect(scale_to_view(tl), scale_to_view(br));
         painter.drawRect(bounding_rect);
     }
     // Draw analysis detection boxes
@@ -336,7 +336,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
             QPoint br(rect.x+rect.width, rect.y+rect.height);
-            QRectF detect_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+            QRectF detect_rect(scale_to_view(tl), scale_to_view(br));
             painter.setPen(QColor(0,0,255));
             painter.drawRect(detect_rect);
         }
@@ -362,7 +362,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             tl = Utility::from_cvpoint(current_drawing->get_draw_start());
             br = Utility::from_cvpoint(current_drawing->get_draw_end());
         }
-        QRectF current_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
+        QRectF current_rect(scale_to_view(tl), scale_to_view(br));
         painter.setPen(Qt::black);
         painter.drawRect(current_rect);
         QPen pen(Qt::white, 1, Qt::DashLine);
@@ -372,13 +372,23 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.end();
 }
 
-QPoint FrameWidget::scale_point(QPoint pos) {
+QPoint FrameWidget::scale_to_video(QPoint pos) {
+    //qDebug() << pos;
     QPoint scaled_pos = anchor + pos/m_scale_factor;
-    VideoState state;
-    state = m_vid_proj->get_video()->state;
-    //QPoint q_pos = Utility::rotate(pos, scaled_pos, m_rotation);
+    //auto video = m_vid_proj->get_video();
+    QPoint q_pos = Utility::rotate(scaled_pos, m_rotation, m_org_image.cols, m_org_image.rows);
     //qDebug() << q_pos;
-    return scaled_pos;
+    return q_pos;
+}
+
+QPoint FrameWidget::scale_to_view(QPoint pos) {
+    //auto video = m_vid_proj->get_video();
+    QPoint scaled_pos = (pos-anchor)*m_scale_factor;
+    qDebug() << "scaled" << scaled_pos;
+    qDebug() << _tmp_frame.rows;
+    QPoint q_pos = Utility::rotate(scaled_pos, 360-m_rotation, _tmp_frame.cols, _tmp_frame.rows);
+    qDebug() << "-------" << q_pos;
+    return q_pos;
 }
 
 /**
@@ -392,7 +402,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
-    QPoint scaled_pos = scale_point(event->pos());
+    QPoint scaled_pos = scale_to_video(event->pos());
     emit mouse_double_click(scaled_pos);
 }
 
@@ -402,7 +412,7 @@ void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     // Pos when the frame is at 100%
-    QPoint scaled_pos = scale_point(event->pos());
+    QPoint scaled_pos = scale_to_video(event->pos());
     qDebug() << "event & scaled" << event->pos() << scaled_pos;
     switch (m_tool) {
     case ANALYSIS_BOX:
@@ -452,7 +462,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
-    QPoint scaled_pos = scale_point(event->pos());
+    QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
         set_analysis_settings();
@@ -476,7 +486,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
-    QPoint scaled_pos = scale_point(event->pos());
+    QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
         if (event->buttons() == Qt::LeftButton) {
@@ -529,7 +539,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
-    QPoint scaled_pos = scale_point(event->pos());
+    QPoint scaled_pos = scale_to_video(event->pos());
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
     switch (m_tool) {
@@ -579,8 +589,8 @@ void FrameWidget::set_analysis_settings() {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
         settings->quick_analysis = true;
 
-        QPoint scaled_start = scale_point(ana_rect_start);
-        QPoint scaled_end = scale_point(ana_rect_end);
+        QPoint scaled_start = scale_to_video(ana_rect_start);
+        QPoint scaled_end = scale_to_video(ana_rect_end);
         QRect scaled_rect(scaled_start, scaled_end);
         settings->set_bounding_box(Utility::from_qrect(scaled_rect));
 
