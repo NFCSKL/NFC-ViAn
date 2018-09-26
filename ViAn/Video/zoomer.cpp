@@ -1,4 +1,5 @@
 #include "zoomer.h"
+#include "utility.h"
 #include <math.h>
 #include <QDebug>
 
@@ -144,7 +145,6 @@ void Zoomer::update_rotation(const int &angle) {
     double translated_y{m_viewport.center.y - m_transformed_frame_rect.height / 2};
 
     //qDebug() << "transformed rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
-
     //qDebug() << "x & y" << translated_x << translated_y;
 
     // Rotate around pivot
@@ -277,7 +277,12 @@ void Zoomer::update_scale(const double& width, const double& height) {
  * between the viewport rectangle and the frame rectangle
  */
 void Zoomer::update_anchor() {
+    //m_angle;
     anchor = QPoint(get_view_rect().tl().x, get_view_rect().y);
+    //qDebug() << "m_transformed_rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
+    //qDebug() << "ori frame size" << m_original_frame_size.width << m_original_frame_size.height;
+    //anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
+    qDebug() << "anchor in zoom" << anchor;
 }
 
 /**

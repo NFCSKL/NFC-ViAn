@@ -189,7 +189,9 @@ void FrameWidget::set_anchor(QPoint p) {
 void FrameWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
 
-    if (m_vid_proj) m_vid_proj->get_video()->state.scale_factor = scale_factor;
+    if (m_vid_proj) {
+        m_vid_proj->get_video()->state.scale_factor = scale_factor;
+    }
 }
 
 void FrameWidget::set_rotation(int rotation) {
@@ -313,6 +315,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     if (mark_rect) {
         painter.setPen(QColor(0,255,0));
         QRectF zoom(scale_to_view(rect_start), scale_to_view(rect_end));
+        qDebug() << "in paint start" << rect_start << zoom.topLeft();
         painter.drawRect(zoom);
     }
     // Draw the select-analysis-area box
@@ -373,22 +376,40 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
 }
 
 QPoint FrameWidget::scale_to_video(QPoint pos) {
-    //qDebug() << pos;
+    qDebug() << "view" << pos;
     QPoint scaled_pos = anchor + pos/m_scale_factor;
-    //auto video = m_vid_proj->get_video();
-    QPoint q_pos = Utility::rotate(scaled_pos, m_rotation, m_org_image.cols, m_org_image.rows);
-    //qDebug() << q_pos;
+    //QPoint scaled_pos = pos/m_scale_factor;
+
+    int width = m_org_image.cols;
+    int height = m_org_image.rows;
+//    if (m_rotation == 90 || m_rotation == 270) {
+//        std::swap(width, height);
+//    }
+    QPoint q_pos = Utility::rotate(scaled_pos, m_rotation, width, height);
+    //qDebug() << "before anchor" << q_pos;
+    qDebug() << "anchor" << anchor;
+    //q_pos += anchor;
+    qDebug() << q_pos;
     return q_pos;
 }
 
 QPoint FrameWidget::scale_to_view(QPoint pos) {
-    //auto video = m_vid_proj->get_video();
-    QPoint scaled_pos = (pos-anchor)*m_scale_factor;
-    //qDebug() << "scaled" << scaled_pos;
-    //qDebug() << _tmp_frame.rows;
-    QPoint q_pos = Utility::rotate(scaled_pos, 360-m_rotation, _tmp_frame.cols, _tmp_frame.rows);
-    //qDebug() << "-------" << q_pos;
-    return q_pos;
+    qDebug() << "pos at start" << pos;
+    //QPoint new_pos = pos-anchor;
+    qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
+    int width = m_org_image.cols;
+    int height = m_org_image.rows;
+    if (m_rotation == 90 || m_rotation == 270) {
+        std::swap(width, height);
+    }
+
+    QPoint q_pos = Utility::rotate(pos, 360-m_rotation, width, height);
+    qDebug() << "-------" << q_pos;
+    //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
+    QPoint scaled_pos = (q_pos-anchor)*m_scale_factor;
+    //qDebug() << "anchor" << anchor;
+    qDebug() << "scaled" << scaled_pos;
+    return scaled_pos;
 }
 
 /**
@@ -438,10 +459,10 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
                 mark_rect = false;
                 unsetCursor();
             } else {
-                rect_start = rotate(scaled_pos);
+                qDebug() << "rect start" << scaled_pos;
+                rect_start = scaled_pos;
                 mark_rect = true;
             }
-
             rect_end = rect_start;
             repaint();
         }
@@ -508,8 +529,9 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             }
         } else if (event->buttons() == Qt::LeftButton && mark_rect) {
             //rect_end = rect_update(scale_point(event->pos()));
-            //rect_end = scaled_pos;
-            rect_end = rotate(scaled_pos);
+            qDebug() << "rect end" << scaled_pos;
+            rect_end = scaled_pos;
+            //rect_end = rotate(scaled_pos);
             repaint();
         } else {
             if (zoom_rect.contains(scaled_pos) && mark_rect) {
