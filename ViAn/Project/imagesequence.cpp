@@ -1,4 +1,5 @@
 #include "imagesequence.h"
+#include <algorithm>
 
 /**
  * @brief ImageSequence::on_save
@@ -120,8 +121,43 @@ std::string ImageSequence::get_original_name_from_hash(const std::string &hash) 
 bool ImageSequence::remove_image_with_hash(const std::string &hash) {
     auto it = m_unsaved_order.find(hash);
     if (it == m_unsaved_order.end()) return false;
+    auto hash_idx = (*it);
     m_unsaved_order.erase(it);
+
+    int index = hash_idx.second;
+    QString base_path = QString::fromStdString(m_seq_path + "/");
+    QString old_name = base_path + QString::number(index);
+    QString new_name = base_path + QString::fromStdString(hash_idx.first);
+    bool renamed = QFile::rename(old_name, new_name);
+//    qDebug() << "Renamed: " << old_name << " -> " << new_name << " " << renamed;
+    std::vector<int> indices;
+
+    auto cmp = [](std::pair<std::string,int> const & a, std::pair<std::string,int> const & b)
+    {
+         return a.second != b.second?  a.second < b.second : a.first < b.first;
+    };
+    std::sort(m_unsaved_order.begin(), m_unsaved_order.end());
+
+    for (auto it = m_unsaved_order.begin(); it != m_unsaved_order.end(); ++it) {
+//        indices.push_back((*it).second);
+        qDebug() << (*it).second;
+    }
+//    std::sort(indices.begin(), indices.end());
+//    for (auto i : indices) {
+//        if (i > index) {
+
+//        }
+//        qDebug() << i;
+//    }
+//            if (key_val.second > index) {
+//                // Index is larger than removed index. Decrease by 1
+//                QString old_name = base_path + QString::number(key_val.second);
+//                QString new_name = base_path + QString::fromStdString(hash_idx.first);
+//                --key_val.second;
+//            }
+
     // TODO rename file to some temp name
+    // go through each of the items after and decrease order index by 1
     return true;
 }
 

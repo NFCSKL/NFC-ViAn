@@ -1,5 +1,15 @@
 #include "sequenceitem.h"
-#include "videoitem.h"
+
+ImageSequence* SequenceItem::get_img_sequence() {
+    auto vid_item = dynamic_cast<VideoItem*>(this->parent()->parent());
+    if (vid_item) {
+        auto sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
+        if (sequence) {
+            return sequence;
+        }
+    }
+    return nullptr;
+}
 
 SequenceItem::SequenceItem(const std::string& name, const std::string& hash) : TreeItem(SEQUENCE_ITEM) {
     m_hash = hash;
@@ -32,6 +42,10 @@ std::string SequenceItem::get_hash() const {
     return m_hash;
 }
 
-void SequenceItem::remove(){}
+void SequenceItem::remove(){
+    ImageSequence* sequence = get_img_sequence();
+    if (sequence == nullptr) return; // Something went wrong here TODO
+    sequence->remove_image_with_hash(m_hash);
+}
 
 void SequenceItem::rename(){}

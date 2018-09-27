@@ -941,6 +941,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
+        case SEQUENCE_ITEM:
+            if (item->parent()->type() == SEQUENCE_CONTAINER_ITEM) {
+                menu.addAction("Remove", this, SLOT(remove_item()));
+            }
         default:
             break;
         }
@@ -1080,6 +1084,9 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     case TAG_FRAME_ITEM:
         remove_tag_frame_item(item);
         break;
+    case SEQUENCE_ITEM:
+        remove_sequence_item(item);
+        break;
     default:
         break;
     }
@@ -1161,6 +1168,14 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
     int frame = tf_item->get_frame();
     tag_item->get_tag()->remove_frame(frame);
+}
+
+void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
+    qDebug() << "Removing sequnce item";
+    SequenceItem* seq_item = dynamic_cast<SequenceItem*>(item);
+    if (seq_item) {
+        seq_item->remove();
+    }
 }
 
 /**
