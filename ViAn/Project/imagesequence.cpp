@@ -13,14 +13,16 @@ void ImageSequence::on_save() {
 
     // If a hash from the saved order no longer exists in the unsaved order the file should be removed.
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
-//        std::string frist = (*it).first;
-//        std::string second = m_unsaved_order[first]
         if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
-//            qDebug() << (*it).first << " has been removed";
             QFile::remove(base_path + QString::fromStdString((*it).first));
         }
     }
     m_saved_order = m_unsaved_order;
+}
+
+void ImageSequence::on_restore() {
+    qDebug() << m_saved_order != m_unsaved_order;
+
 }
 
 /**
@@ -159,6 +161,7 @@ bool ImageSequence::remove_image_with_hash(const std::string &hash) {
             m_unsaved_order[key_val.first] = i - 1;
         }
     }
+    on_restore();
     return true;
 }
 
