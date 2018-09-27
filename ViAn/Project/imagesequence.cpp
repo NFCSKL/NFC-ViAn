@@ -7,9 +7,20 @@
  * Updates the order tracking variables
  */
 void ImageSequence::on_save() {
-    m_saved_order = m_unsaved_order;
+    QString base_path = QString::fromStdString(m_seq_path + "/");
     //TODO remove items that no longer are in the sequence
     // update original images
+
+    // If a hash from the saved order no longer exists in the unsaved order the file should be removed.
+    for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
+//        std::string frist = (*it).first;
+//        std::string second = m_unsaved_order[first]
+        if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
+//            qDebug() << (*it).first << " has been removed";
+            QFile::remove(base_path + QString::fromStdString((*it).first));
+        }
+    }
+    m_saved_order = m_unsaved_order;
 }
 
 /**
