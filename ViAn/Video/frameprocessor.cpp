@@ -174,11 +174,11 @@ void FrameProcessor::process_frame() {
                                                            m_zoomer.get_transformed_size());
     double factor{std::min(ratios.first, ratios.second)};
     cv::resize(preview_frame, preview_frame, cv::Size(), factor, factor);
-    cv::Rect view_rectangle = m_zoomer.get_view_rect();
-    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
-                  view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
-    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
-                  view_rectangle.br() * factor, cv::Scalar(255,255,255));
+//    cv::Rect view_rectangle = m_zoomer.get_view_rect();
+//    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+//                  view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
+//    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+//                  view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
     int frame_num = m_frame_index->load();
 
@@ -193,6 +193,8 @@ void FrameProcessor::process_frame() {
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
+
+    qDebug() << "viewport in process" << Utility::from_cvpoint(m_zoomer.get_viewport().boundingRect().tl()) << Utility::from_cvpoint(m_zoomer.get_viewport().boundingRect().br());
 
     // Emit manipulated frame and current frame number
     emit zoom_preview(preview_frame);

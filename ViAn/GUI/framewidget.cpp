@@ -406,8 +406,8 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
     //qDebug() << "before anchor" << q_pos;
     //qDebug() << "anchor" << anchor;
     //q_pos += anchor;
-    qDebug() << scaled_pos;
-    return scaled_pos;
+    qDebug() << q_pos;
+    return q_pos;
 }
 
 QPoint FrameWidget::scale_to_view(QPoint pos) {
@@ -423,7 +423,7 @@ QPoint FrameWidget::scale_to_view(QPoint pos) {
     QPoint q_pos = Utility::rotate(pos, 360-m_rotation, width, height);
     //qDebug() << "-------" << q_pos;
     //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
-    QPoint scaled_pos = (pos-anchor)*m_scale_factor;
+    QPoint scaled_pos = (q_pos-anchor)*m_scale_factor;
     //qDebug() << "anchor" << anchor;
     //qDebug() << "scaled" << scaled_pos;
     return scaled_pos;
