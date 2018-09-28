@@ -364,7 +364,7 @@ void FrameProcessor::update_overlay_settings() {
 }
 
 void FrameProcessor::update_rotation(const int& direction) {
-    qDebug() << "m_rotatte_direction" << m_rotate_direction; // 0-3
+    //qDebug() << "m_rotatte_direction" << m_rotate_direction; // 0-3
     
     
     //qDebug() << "current rotation" << m_z_settings->rotation;

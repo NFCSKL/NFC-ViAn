@@ -387,7 +387,7 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
 //    }
     QPoint q_pos = Utility::rotate(scaled_pos, m_rotation, width, height);
     //qDebug() << "before anchor" << q_pos;
-    qDebug() << "anchor" << anchor;
+    //qDebug() << "anchor" << anchor;
     //q_pos += anchor;
     qDebug() << q_pos;
     return q_pos;
@@ -396,7 +396,7 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
 QPoint FrameWidget::scale_to_view(QPoint pos) {
     qDebug() << "pos at start" << pos;
     //QPoint new_pos = pos-anchor;
-    qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
+    //qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
     int width = m_org_image.cols;
     int height = m_org_image.rows;
     if (m_rotation == 90 || m_rotation == 270) {
@@ -709,5 +709,6 @@ void FrameWidget::end_panning() {
  */
 void FrameWidget::end_zoom() {
     repaint();
+    qDebug() << rect_start << rect_end;
     emit zoom_points(rect_start, rect_end);
 }
