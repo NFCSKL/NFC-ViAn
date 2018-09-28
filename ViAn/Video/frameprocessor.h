@@ -26,6 +26,7 @@ struct zoomer_settings {
     int video_height = 0;
 
     QSize draw_area_size = QSize(100,100);
+    QSize preview_window_size = QSize(100, 50);
 
     QPoint zoom_area_tl = QPoint(0,0);
     QPoint zoom_area_br = QPoint(100,100);
@@ -189,6 +190,7 @@ signals:
     void set_play_btn(bool);
     void set_bri_cont(int, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
+    void zoom_preview(cv::Mat preview_frame);
 private:
     void process_frame();
     void update_zoomer_settings();

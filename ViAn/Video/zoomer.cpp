@@ -320,6 +320,10 @@ QSize Zoomer::get_viewport_size() const {
     return m_viewport_size;
 }
 
+QSize Zoomer::get_transformed_size() const {
+    return QSize(m_transformed_frame_rect.width, m_transformed_frame_rect.height);
+}
+
 /**
  * @brief Zoomer::get_viewport
  * @return cv::RotatedRect  :   Viewport rectangle

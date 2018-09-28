@@ -189,6 +189,7 @@ void VideoWidget::init_frame_processor() {
         f_processor->moveToThread(processing_thread);
         connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
+        connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
 
 
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
@@ -1474,6 +1475,12 @@ void VideoWidget::set_brightness_contrast(int bri, double cont) {
     if (!m_vid_proj) return;
     m_vid_proj->get_video()->state.brightness = bri;
     m_vid_proj->get_video()->state.contrast = cont;
+}
+
+void VideoWidget::update_zoom_preview_size(QSize s) {
+    update_processing_settings([&](){
+        z_settings.preview_window_size = s;
+    });
 }
 
 void VideoWidget::speed_up_activate() {

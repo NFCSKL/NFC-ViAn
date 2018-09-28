@@ -20,6 +20,7 @@
 
 #include "videowidget.h"
 #include "projectwidget.h"
+#include "zoompreviewwidget.h"
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "drawingwidget.h"
@@ -88,6 +89,7 @@ private:
     AnalysisWidget* analysis_wgt;
     BookmarkWidget* bookmark_wgt;
     DrawingWidget* drawing_wgt;
+    ZoomPreviewWidget* zoom_wgt;
     QueueWidget* queue_wgt;
     AnaSettingWidget* ana_settings_wgt;
     ManipulatorWidget* manipulator_wgt;
@@ -97,6 +99,7 @@ private:
     QAction* toggle_drawing_wgt;
     QAction* toggle_queue_wgt;
     QAction* toggle_ana_settings_wgt;
+    QAction* toggle_zoom_preview_wgt;
     QAction* toggle_manipulator_wgt;
     QAction* toggle_main_toolbar;
     QAction* toggle_drawing_toolbar;

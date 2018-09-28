@@ -27,8 +27,6 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     m_abort = abort;
-    // NICLAS
-    //    cv::namedWindow("test");
 }
 
 FrameProcessor::~FrameProcessor() {}
@@ -170,13 +168,17 @@ void FrameProcessor::process_frame() {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
     }
 
-    // Create zoom preview mat
-    //    cv::Mat tmp = manipulated_frame.clone();
-    //    double factor{0.5};
-    //    cv::resize(tmp, tmp, cv::Size(), factor, factor);
-    //    cv::Rect view_rectangle = m_zoomer.get_view_rect();
-    //    cv::rectangle(tmp, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255), 2);
-    //    cv::imshow("test", tmp); // can cause a deadlock
+    // Create zoom perview mat
+    cv::Mat preview_frame = manipulated_frame.clone();
+    std::pair<double, double> ratios = Utility::size_ratio(m_z_settings->preview_window_size,
+                                                           m_zoomer.get_transformed_size());
+    double factor{std::min(ratios.first, ratios.second)};
+    cv::resize(preview_frame, preview_frame, cv::Size(), factor, factor);
+    cv::Rect view_rectangle = m_zoomer.get_view_rect();
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+                  view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+                  view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
     int frame_num = m_frame_index->load();
 
@@ -193,7 +195,8 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    emit done_processing(m_frame, manipulated_frame, frame_num);
+    emit zoom_preview(preview_frame);
+    emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
 /**
