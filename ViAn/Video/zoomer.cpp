@@ -38,8 +38,8 @@ void Zoomer::enforce_frame_boundaries() {
     cv::Point2f br = p[3];
 
     //qDebug() << "corner" << corner;
-    qDebug() << "tl" << Utility::from_cvpoint(tl);
-    qDebug() << "br" << Utility::from_cvpoint(br);
+    //qDebug() << "tl" << Utility::from_cvpoint(tl);
+    //qDebug() << "br" << Utility::from_cvpoint(br);
     //qDebug() << "other two" << Utility::from_cvpoint(p[0]) << Utility::from_cvpoint(p[2]);
     //qDebug() << "transformed frame rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
 
@@ -67,7 +67,7 @@ void Zoomer::enforce_frame_boundaries() {
     m_viewport = cv::RotatedRect(cv::Point2f(m_viewport.center.x + std::round(dx), m_viewport.center.y + std::round(dy)),
                                  m_viewport.size,
                                  m_angle);
-    qDebug() << "viewport" << m_viewport.size.width << m_viewport.size.height;
+    //qDebug() << "viewport" << m_viewport.size.width << m_viewport.size.height;
     update_anchor();
     //anchor = Utility::rotate(Utility::from_cvpoint(tl), 360-m_angle, m_transformed_frame_rect.size().width, m_transformed_frame.size().height);
     //anchor = Utility::from_cvpoint(tl);
@@ -90,7 +90,7 @@ void Zoomer::set_scale_factor(double scale_factor) {
  * @param p2 end point
  */
 void Zoomer::area_zoom(QPoint p1, QPoint p2) {
-    qDebug() << "p1 and p2" << p1 << p2;
+    //qDebug() << "p1 and p2" << p1 << p2;
     int start_x = (p1.x() < p2.x()) ? p1.x() : p2.x();
     int end_x = (p1.x() < p2.x()) ? p2.x() : p1.x();
 
@@ -98,9 +98,9 @@ void Zoomer::area_zoom(QPoint p1, QPoint p2) {
     int end_y = (p1.y() < p2.y()) ? p2.y() : p1.y();
 
     cv::Point2f new_center(start_x + (end_x - start_x) / 2, start_y + (end_y - start_y) / 2);
-    qDebug() << "center" << Utility::from_cvpoint(new_center);
+    //qDebug() << "center" << Utility::from_cvpoint(new_center);
     m_viewport = cv::RotatedRect(new_center, m_viewport.size, m_angle);
-    qDebug() << "size" << m_viewport.size.width << m_viewport.size.height;
+    //qDebug() << "size" << m_viewport.size.width << m_viewport.size.height;
     //qDebug() << "viewport" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
 
     update_scale(end_x - start_x, end_y - start_y);
@@ -355,16 +355,16 @@ cv::Rect Zoomer::get_frame_rect() const {
  * @return cv::Rect :   intersection rectangle
  */
 cv::Rect Zoomer::get_view_rect() const {
-    qDebug() << "ANCHOR" << anchor;
-    qDebug() << "viewport center" << Utility::from_cvpoint(m_viewport.center);
+    //qDebug() << "ANCHOR" << anchor;
+    //qDebug() << "viewport center" << Utility::from_cvpoint(m_viewport.center);
     cv::RotatedRect scaled_viewport(m_viewport.center,
                                     cv::Size(m_viewport.size.width / m_scale_factor,
                                              m_viewport.size.height / m_scale_factor),
                                     0);
-    qDebug() << "scaled viewport points" << Utility::from_cvpoint(scaled_viewport.boundingRect().tl()) << Utility::from_cvpoint(scaled_viewport.boundingRect().br());
-    qDebug() << "transform rect points" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
+    //qDebug() << "scaled viewport points" << Utility::from_cvpoint(scaled_viewport.boundingRect().tl()) << Utility::from_cvpoint(scaled_viewport.boundingRect().br());
+    //qDebug() << "transform rect points" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
     auto rect = scaled_viewport.boundingRect() & m_transformed_frame_rect;
-    qDebug() << "transformed" <<Utility::from_cvpoint(rect.tl()) << Utility::from_cvpoint(rect.br());
+    //qDebug() << "transformed" <<Utility::from_cvpoint(rect.tl()) << Utility::from_cvpoint(rect.br());
     return rect;
 }
 
@@ -415,8 +415,8 @@ void Zoomer::adjust_frame_rect_rotation() {
  * @param frame
  */
 void Zoomer::scale_frame(cv::Mat &frame) {
-    qDebug() << "scaling frame";
-    qDebug() << "center in scale frame" << Utility::from_cvpoint(m_viewport.center);
+    //qDebug() << "scaling frame";
+    //qDebug() << "center in scale frame" << Utility::from_cvpoint(m_viewport.center);
     cv::Rect view_rectangle = get_view_rect();
     // TODO assert that the view_rectangle has an area
 

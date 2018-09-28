@@ -159,13 +159,15 @@ QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
     QPoint new_point;
     switch (rotation) {
     case 90:
-        new_point = QPoint(pos.y(), height-pos.x());
+        //new_point = QPoint(pos.y(), height-pos.x());
+        new_point = QPoint(height-pos.y(), pos.x());
         break;
     case 180:
         new_point = QPoint(width-pos.x(), height-pos.y());
         break;
     case 270:
-        new_point = QPoint(width-pos.y(), pos.x());
+        //new_point = QPoint(width-pos.y(), pos.x());
+        new_point = QPoint(pos.y(), width-pos.x());
         break;
     case 0:
     case 360:

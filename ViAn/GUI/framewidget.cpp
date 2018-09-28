@@ -195,7 +195,24 @@ void FrameWidget::set_scale_factor(double scale_factor) {
 }
 
 void FrameWidget::set_rotation(int rotation) {
+    int width = m_org_image.cols;
+    int height = m_org_image.rows;
+    //qDebug() << "width height" << width << height;
+    if (m_rotation == 90 || m_rotation == 270) {
+        std::swap(width, height);
+    }
+    qDebug() << "rotation" << rotation;
+    qDebug() << "m_rotation" << m_rotation;
+    int diff_rotation = rotation - m_rotation;
+    if (diff_rotation < 0) diff_rotation += 360;
+    rect_start = Utility::rotate(rect_start, diff_rotation, width, height);
+    rect_end = Utility::rotate(rect_end, diff_rotation, width, height);
+    qDebug() << "rect_start" << rect_start;
+    qDebug() << "rect_end" << rect_end;
+
+
     m_rotation = rotation;
+
     if (m_vid_proj) {
         m_vid_proj->get_video()->state.rotation = rotation;
     }
@@ -389,12 +406,12 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
     //qDebug() << "before anchor" << q_pos;
     //qDebug() << "anchor" << anchor;
     //q_pos += anchor;
-    qDebug() << q_pos;
-    return q_pos;
+    qDebug() << scaled_pos;
+    return scaled_pos;
 }
 
 QPoint FrameWidget::scale_to_view(QPoint pos) {
-    qDebug() << "pos at start" << pos;
+    //qDebug() << "pos at start" << pos;
     //QPoint new_pos = pos-anchor;
     //qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
     int width = m_org_image.cols;
@@ -404,11 +421,11 @@ QPoint FrameWidget::scale_to_view(QPoint pos) {
     }
 
     QPoint q_pos = Utility::rotate(pos, 360-m_rotation, width, height);
-    qDebug() << "-------" << q_pos;
+    //qDebug() << "-------" << q_pos;
     //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
-    QPoint scaled_pos = (q_pos-anchor)*m_scale_factor;
+    QPoint scaled_pos = (pos-anchor)*m_scale_factor;
     //qDebug() << "anchor" << anchor;
-    qDebug() << "scaled" << scaled_pos;
+    //qDebug() << "scaled" << scaled_pos;
     return scaled_pos;
 }
 
@@ -461,6 +478,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             } else {
                 qDebug() << "rect start" << scaled_pos;
                 rect_start = scaled_pos;
+                qDebug() << "rect state at the start" << rect_start;
                 mark_rect = true;
             }
             rect_end = rect_start;
