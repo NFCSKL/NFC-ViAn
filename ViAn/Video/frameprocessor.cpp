@@ -194,8 +194,6 @@ void FrameProcessor::process_frame() {
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
 
-    qDebug() << "viewport in process" << Utility::from_cvpoint(m_zoomer.get_viewport().boundingRect().tl()) << Utility::from_cvpoint(m_zoomer.get_viewport().boundingRect().br());
-
     // Emit manipulated frame and current frame number
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());

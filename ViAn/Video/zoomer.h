@@ -73,6 +73,7 @@ private:
     void update_anchor();
     void adjust_frame_rect_rotation();
     void center();
+    void print_rotated_rect(cv::RotatedRect rect, QString str);
 };
 
 #endif // ZOOMER_H

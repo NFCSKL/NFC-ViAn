@@ -155,12 +155,12 @@ QRect Utility::from_cvrect(cv::Rect rect) {
 
 
 QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
-    //qDebug() << "rotation" << rotation;
+
     QPoint new_point;
     switch (rotation) {
     case 90:
         new_point = QPoint(pos.y(), height-pos.x()); // when rotating in framewgt
-        //new_point = QPoint(height-pos.y(), pos.x()); // when 0,0 in tl
+        //new_point = QPoint(height-pos.x(), pos.y()); // when 0,0 in tl
         break;
     case 180:
         new_point = QPoint(width-pos.x(), height-pos.y());
@@ -179,15 +179,25 @@ QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
 
     return new_point;
 
+    const double DEGREES_TO_RADIAN_FACTOR = M_PI / 180;
+    double angle = rotation*DEGREES_TO_RADIAN_FACTOR;
+    //qDebug() << "rotation" << rotation;
+    // rotation clockwise
 
-//    double angle_diff{(rotation*90) * (M_PI / 180)};
-//    double translated_x{pos.x() - scaled_pos.x()};
-//    double translated_y{pos.y() - scaled_pos.y()};
+    // Translate by negative pivot of old frame size
+    double translated_x{pos.x() - (double)width / 2};
+    double translated_y{pos.y() - (double)height / 2};
 
-//    double rotated_x{translated_x * std::cos(angle_diff) - translated_y * std::sin(angle_diff)};
-//    double rotated_y{translated_x * std::sin(angle_diff) + translated_y * std::cos(angle_diff)};
+    // Rotate around pivot
+    double rotated_x{translated_x * std::cos(angle) - translated_y * std::sin(angle)};
+    double rotated_y{translated_x * std::sin(angle) + translated_y * std::cos(angle)};
 
+    // Translate back using the new frame size
+    translated_x = rotated_x + height / 2;
+    translated_y = rotated_y + width / 2;
 
-//    QPoint q_pos(rotated_x, rotated_y);
-//    return q_pos;
+    QPoint new_pos = QPoint(translated_x, translated_y);
+    qDebug() << "new pos" << new_pos;
+
+    return new_pos;
 }

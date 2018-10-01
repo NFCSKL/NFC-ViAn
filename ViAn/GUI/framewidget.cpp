@@ -395,10 +395,12 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
 QPoint FrameWidget::scale_to_video(QPoint pos) {
     qDebug() << "view" << pos;
     QPoint scaled_pos = anchor + pos/m_scale_factor;
+    qDebug() << "scaled pos" << scaled_pos;
     //QPoint scaled_pos = pos/m_scale_factor;
 
     int width = m_org_image.cols;
     int height = m_org_image.rows;
+    //qDebug() << "width height" << width << height;
 //    if (m_rotation == 90 || m_rotation == 270) {
 //        std::swap(width, height);
 //    }
