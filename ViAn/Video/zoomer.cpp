@@ -103,10 +103,12 @@ void Zoomer::area_zoom(QPoint p1, QPoint p2) {
 
     cv::Point2f new_center(start_x + (end_x - start_x) / 2, start_y + (end_y - start_y) / 2);
     qDebug() << "center" << Utility::from_cvpoint(new_center);
-    qDebug() << "viewport pre" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
+    //qDebug() << "viewport pre" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
+    print_rotated_rect(m_viewport, "viewport pre");
     m_viewport = cv::RotatedRect(new_center, m_viewport.size, m_angle);
     qDebug() << "size" << m_viewport.size.width << m_viewport.size.height;
-    qDebug() << "viewport" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
+    //qDebug() << "viewport" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
+    print_rotated_rect(m_viewport, "viewport");
 
     update_scale(end_x - start_x, end_y - start_y);
     //qDebug() << "scale" << m_scale_factor;

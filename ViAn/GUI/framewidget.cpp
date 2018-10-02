@@ -724,5 +724,5 @@ void FrameWidget::end_panning() {
 void FrameWidget::end_zoom() {
     repaint();
     qDebug() << rect_start << rect_end;
-    emit zoom_points(rect_start, rect_end);
+    emit zoom_points(rotate(rect_start), rotate(rect_end));
 }
