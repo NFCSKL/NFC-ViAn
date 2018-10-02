@@ -198,6 +198,7 @@ void Zoomer::update_rotation(const int &angle) {
     cv::Point2f rotated_center(translated_x, translated_y);
 
     m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);
+    //m_viewport = cv::RotatedRect(rotated_center, cv::Size(m_viewport.size.height, m_viewport.size.width), 0);
 
     print_rotated_rect(m_viewport, "viewport after rotated correct");
 
@@ -209,6 +210,7 @@ void Zoomer::print_rotated_rect(cv::RotatedRect rect, QString str) {
     cv::Point2f points[4];
     rect.points(points);
     qDebug() << str << Utility::from_cvpoint(points[1]) << Utility::from_cvpoint(points[3]);
+    qDebug() << "top left" << Utility::rotate(Utility::from_cvpoint(points[1]), 360-m_angle, m_transformed_frame_rect.width, m_transformed_frame_rect.height);
 }
 
 /**
@@ -440,6 +442,13 @@ void Zoomer::adjust_frame_rect_rotation() {
     } else {
         m_transformed_frame_rect = m_frame_rect;
     }
+
+//    if (true) {
+//        cv::Point center(m_frame_rect.width/2, m_frame_rect.height/2);
+//        m_transformed_frame_rect = cv::RotatedRect(center, cv::Size(m_frame_rect.width, m_frame_rect.height), m_angle);
+//    } else {
+//        m_transformed_frame_rect = m_frame_rect;
+//    }
 }
 
 /**

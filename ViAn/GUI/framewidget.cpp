@@ -205,8 +205,10 @@ void FrameWidget::set_rotation(int rotation) {
     qDebug() << "m_rotation" << m_rotation;
     int diff_rotation = rotation - m_rotation;
     if (diff_rotation < 0) diff_rotation += 360;
-    rect_start = Utility::rotate(rect_start, diff_rotation, width, height);
-    rect_end = Utility::rotate(rect_end, diff_rotation, width, height);
+
+    // Should not be used
+    //rect_start = Utility::rotate(rect_start, diff_rotation, width, height);
+    //rect_end = Utility::rotate(rect_end, diff_rotation, width, height);
     qDebug() << "rect_start" << rect_start;
     qDebug() << "rect_end" << rect_end;
 
@@ -416,13 +418,8 @@ QPoint FrameWidget::scale_to_view(QPoint pos) {
     //qDebug() << "pos at start" << pos;
     //QPoint new_pos = pos-anchor;
     //qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
-    int width = m_org_image.cols;
-    int height = m_org_image.rows;
-    if (m_rotation == 90 || m_rotation == 270) {
-        std::swap(width, height);
-    }
 
-    QPoint q_pos = Utility::rotate(pos, 360-m_rotation, width, height);
+    QPoint q_pos = rotate(pos);
     //qDebug() << "-------" << q_pos;
     //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
     QPoint scaled_pos = (q_pos-anchor)*m_scale_factor;
@@ -679,21 +676,18 @@ void FrameWidget::panning(QPoint pos) {
     scale_panning(panning_tracker.first, x);
     scale_panning(panning_tracker.second, y);
 
-    //qDebug() << x << y;
-    //rotate(x, y);
-    //qDebug() << x << y;
     emit moved_xy(x, y);
     prev_pos = pos;
 }
 
 QPoint FrameWidget::rotate(QPoint pos) {
-    int x = pos.x();
-    int y = pos.y();
-    for (int i = m_rotation / 90; i > 0; --i) {
-        std::swap(x,y);
-        y *= -1;
+    int width = m_org_image.cols;
+    int height = m_org_image.rows;
+    if (m_rotation == 90 || m_rotation == 270) {
+        std::swap(width, height);
     }
-    return QPoint(x,y);
+    QPoint point = Utility::rotate(pos, 360-m_rotation, width, height);
+    return point;
 }
 
 /**
