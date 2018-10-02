@@ -105,7 +105,7 @@ void Zoomer::area_zoom(QPoint p1, QPoint p2) {
     qDebug() << "center" << Utility::from_cvpoint(new_center);
     //qDebug() << "viewport pre" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
     print_rotated_rect(m_viewport, "viewport pre");
-    m_viewport = cv::RotatedRect(new_center, m_viewport.size, m_angle);
+    m_viewport = cv::RotatedRect(new_center, m_viewport.size, 0);
     qDebug() << "size" << m_viewport.size.width << m_viewport.size.height;
     //qDebug() << "viewport" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
     print_rotated_rect(m_viewport, "viewport");
@@ -137,7 +137,7 @@ void Zoomer::set_viewport_size(const QSize size) {
     m_viewport_size = size;
     m_viewport = cv::RotatedRect(m_viewport.center,
                                  cv::Point2f(size.width(),size.height()),
-                                 m_angle);
+                                 0);
     enforce_frame_boundaries();
 }
 
@@ -190,7 +190,7 @@ void Zoomer::update_rotation(const int &angle) {
     //qDebug() << "rotated x & y" << rotated_x << rotated_y;
 
     m_angle = angle;
-    adjust_frame_rect_rotation();
+    //adjust_frame_rect_rotation();
 
     // Translate back using the new frame size
     translated_x = rotated_x + m_transformed_frame_rect.width / 2;
@@ -199,13 +199,13 @@ void Zoomer::update_rotation(const int &angle) {
 
     cv::Point2f rotated_center(translated_x, translated_y);
 
-    m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);
+    //m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);
     //m_viewport = cv::RotatedRect(rotated_center, cv::Size(m_viewport.size.height, m_viewport.size.width), 0);
 
     print_rotated_rect(m_viewport, "viewport after rotated correct");
 
     //qDebug() << "viewport after rotated" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
-    update_anchor();
+    //update_anchor();
 }
 
 void Zoomer::print_rotated_rect(cv::RotatedRect rect, QString str) {
@@ -389,6 +389,7 @@ cv::Rect Zoomer::get_view_rect() const {
     //qDebug() << "ANCHOR" << anchor;
     //qDebug() << "viewport center" << Utility::from_cvpoint(m_viewport.center);
     //qDebug() << "viewport in get view rect" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
+    //print_rotated_rect(m_viewport, "viewport in get view rect");
     qDebug() << "scalefactor" << m_scale_factor;
 
     cv::RotatedRect scaled_viewport(m_viewport.center,
