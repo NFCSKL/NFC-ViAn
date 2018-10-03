@@ -116,7 +116,7 @@ void VideoPlayer::check_events() {
                 set_frame();
             }
         } else {
-            // Timer condition triggered. Update playback speed if nessecary and read new frame
+            // Timer condition triggered. Update playback speed if necessary and read new frame
             int speed = m_speed_step->load();
             if (speed != m_cur_speed_step) {
                 set_playback_speed(speed);
@@ -125,14 +125,17 @@ void VideoPlayer::check_events() {
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+                // Update frame number
                 ++*m_frame;
                 ++current_frame;
+                // If not in sync with frame processor
+                // Undo the update on the frame number
+                // It's done in this order so the processing in synced read is done on the new frame
                 if (!synced_read()) {
                     --*m_frame;
                     --current_frame;
                     continue;
                 }
-
 
                 emit display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
