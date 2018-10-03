@@ -117,7 +117,7 @@ void VideoPlayer::check_events() {
                 set_frame();
             }
 
-            // Timer condition triggered. Update playback speed if nessecary and read new frame
+            // Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
             if (speed != m_cur_speed_step) {
                 set_playback_speed(speed);
