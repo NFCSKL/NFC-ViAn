@@ -403,12 +403,6 @@ cv::Rect Zoomer::get_frame_rect() const {
  * @return cv::Rect :   intersection rectangle
  */
 cv::Rect Zoomer::get_view_rect(int rotation) const {
-    //qDebug() << "ANCHOR" << anchor;
-    //qDebug() << "viewport center" << Utility::from_cvpoint(m_viewport.center);
-    //qDebug() << "viewport in get view rect" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
-    //print_rotated_rect(m_viewport, "viewport in get view rect");
-    qDebug() << "scalefactor" << m_scale_factor;
-
     cv::RotatedRect scaled_viewport(m_viewport.center,
                                     cv::Size(m_viewport.size.width / m_scale_factor,
                                              m_viewport.size.height / m_scale_factor),

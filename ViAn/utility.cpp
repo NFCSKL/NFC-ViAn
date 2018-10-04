@@ -155,7 +155,6 @@ QRect Utility::from_cvrect(cv::Rect rect) {
 
 
 QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
-
     QPoint new_point;
     switch (rotation) {
     case 90:
