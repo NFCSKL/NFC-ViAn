@@ -339,7 +339,23 @@ void Zoomer::update_anchor() {
     anchor = QPoint(view_rect.tl().x, view_rect.y);
     //qDebug() << "m_transformed_rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
     //qDebug() << "ori frame size" << m_original_frame_size.width << m_original_frame_size.height;
-    QPoint new_anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
+    //QPoint new_anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
+    cv::Rect new_view_rect = get_view_rect(m_angle);
+    QPoint new_anchor = Utility::from_cvpoint(new_view_rect.tl());
+//    if (m_angle == 90) {
+//        new_anchor = QPoint(new_view_rect.tl().x, new_view_rect.br().y);
+//        //anchor = new_anchor;
+//    } else if (m_angle == 180) {
+//        new_anchor = QPoint(new_view_rect.br().x, new_view_rect.br().y);
+//        //anchor = new_anchor;
+//    } else if (m_angle == 270) {
+//        new_anchor = QPoint(new_view_rect.br().x, new_view_rect.tl().y);
+//        //anchor = new_anchor;
+//    } else {
+//        new_anchor = QPoint(new_view_rect.tl().x, new_view_rect.tl().y);
+//        //anchor = new_anchor;
+//    }
+    anchor = new_anchor;
     //print_rotated_rect(m_viewport, "THIS IS VIEWPORT");
     qDebug() << "anchor in zoom" << anchor << new_anchor;
 }

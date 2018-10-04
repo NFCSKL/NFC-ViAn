@@ -185,8 +185,6 @@ void FrameProcessor::process_frame() {
     // Draws the text drawings on the overlay
     m_overlay->draw_overlay(manipulated_frame, frame_num);
 
-    qDebug() << "SIZE before" << manipulated_frame.cols << manipulated_frame.rows;
-
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
 
@@ -196,17 +194,10 @@ void FrameProcessor::process_frame() {
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
 
-    qDebug() << "SIZE" << manipulated_frame.cols << manipulated_frame.rows;
-
     // Why not?
     if (ROTATE_MIN <= m_rotate_direction && m_rotate_direction <= ROTATE_MAX) {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
     }
-
-    //m_zoomer.scale_frame(manipulated_frame);
-
-    qDebug() << "SIZE 2" << manipulated_frame.cols << manipulated_frame.rows;
-
 
     // Emit manipulated frame and current frame number
     emit zoom_preview(preview_frame);

@@ -398,7 +398,12 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
     qDebug() << "view" << pos;
     QPoint scaled_pos = anchor + pos/m_scale_factor;
     qDebug() << "scaled pos" << scaled_pos << anchor;
-    //QPoint scaled_pos = pos/m_scale_factor;
+    QPoint scaled_pos_no_anch = pos/m_scale_factor;
+
+    // Rotated first then scale and lastly add anchor.
+    QPoint rot_pos = Utility::rotate(pos, m_rotation, this->width(), this->height());
+    qDebug() << "SCROLL AREA SIZE" << this->width() << this->height();
+    QPoint r_pos = anchor + rot_pos/m_scale_factor;
 
     int width = m_org_image.cols;
     int height = m_org_image.rows;
@@ -406,26 +411,27 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
 //    if (m_rotation == 90 || m_rotation == 270) {
 //        std::swap(width, height);
 //    }
-    QPoint q_pos = Utility::rotate(scaled_pos, m_rotation, width, height);
+    QPoint q_pos = Utility::rotate(scaled_pos_no_anch, m_rotation, width, height);
     //qDebug() << "before anchor" << q_pos;
     //qDebug() << "anchor" << anchor;
-    //q_pos += anchor;
-    qDebug() << q_pos;
-    return q_pos;
+    q_pos += anchor;
+    qDebug() << r_pos;
+    return r_pos;
 }
 
 QPoint FrameWidget::scale_to_view(QPoint pos) {
     //qDebug() << "pos at start" << pos;
-    //QPoint new_pos = pos-anchor;
+    QPoint new_pos = pos-anchor;
     //qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
 
     QPoint q_pos = rotate(pos);
     //qDebug() << "-------" << q_pos;
     //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
-    QPoint scaled_pos = (q_pos-anchor)*m_scale_factor;
+    QPoint scaled_pos = (pos-anchor)*m_scale_factor;
+    QPoint r_pos = rotate(scaled_pos);
     //qDebug() << "anchor" << anchor;
     //qDebug() << "scaled" << scaled_pos;
-    return scaled_pos;
+    return r_pos;
 }
 
 /**
@@ -681,8 +687,8 @@ void FrameWidget::panning(QPoint pos) {
 }
 
 QPoint FrameWidget::rotate(QPoint pos) {
-    int width = m_org_image.cols;
-    int height = m_org_image.rows;
+    int width = this->width();
+    int height = this->height();
     if (m_rotation == 90 || m_rotation == 270) {
         std::swap(width, height);
     }
