@@ -523,9 +523,13 @@ void VideoWidget::init_playback_slider() {
 
 void VideoWidget::stop_btn_clicked() {
     set_status_bar("Stop");
-    frame_index.store(0);
-    is_playing.store(false);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        frame_index.store(0);
+        is_playing.store(false);
+    }
     play_btn->setChecked(false);
+
     on_new_frame();
 }
 
@@ -923,6 +927,7 @@ void VideoWidget::on_new_frame() {
 
     playback_slider->update();
     frame_wgt->set_current_frame_nr(frame_num);
+    player_con.notify_one();
 }
 
 /**
@@ -1390,7 +1395,11 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
 }
 
 void VideoWidget::update_playback_speed(int speed) {
-    m_speed_step.store(speed);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        m_speed_step.store(speed);
+        player_con.notify_one();
+    }
     if (speed > 0) {
         fps_label->setText("Fps: " + QString::number(m_frame_rate*speed*2));
     } else if (speed < 0) {
