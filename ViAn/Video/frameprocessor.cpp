@@ -174,11 +174,11 @@ void FrameProcessor::process_frame() {
                                                            m_zoomer.get_transformed_size());
     double factor{std::min(ratios.first, ratios.second)};
     cv::resize(preview_frame, preview_frame, cv::Size(), factor, factor);
-//    cv::Rect view_rectangle = m_zoomer.get_view_rect();
-//    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
-//                  view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
-//    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
-//                  view_rectangle.br() * factor, cv::Scalar(255,255,255));
+    cv::Rect view_rectangle = m_zoomer.get_view_rect(0);
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+                  view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+                  view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
     int frame_num = m_frame_index->load();
 

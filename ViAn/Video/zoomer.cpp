@@ -330,7 +330,7 @@ void Zoomer::update_scale(const double& width, const double& height) {
  */
 void Zoomer::update_anchor() {
     //m_angle;
-    cv::Rect view_rect = get_view_rect();
+    cv::Rect view_rect = get_view_rect(0);
 //    if (m_angle == 0) {
 //        anchor = QPoint(view_rect.tl().x, view_rect.tl().y);
 //    } else if (m_angle == 90) {
@@ -339,8 +339,9 @@ void Zoomer::update_anchor() {
     anchor = QPoint(view_rect.tl().x, view_rect.y);
     //qDebug() << "m_transformed_rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
     //qDebug() << "ori frame size" << m_original_frame_size.width << m_original_frame_size.height;
-    //anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
-    qDebug() << "anchor in zoom" << anchor;
+    QPoint new_anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
+    //print_rotated_rect(m_viewport, "THIS IS VIEWPORT");
+    qDebug() << "anchor in zoom" << anchor << new_anchor;
 }
 
 /**
@@ -385,7 +386,7 @@ cv::Rect Zoomer::get_frame_rect() const {
  * the scaled viewport rectangle and the frame rectangle
  * @return cv::Rect :   intersection rectangle
  */
-cv::Rect Zoomer::get_view_rect() const {
+cv::Rect Zoomer::get_view_rect(int rotation) const {
     //qDebug() << "ANCHOR" << anchor;
     //qDebug() << "viewport center" << Utility::from_cvpoint(m_viewport.center);
     //qDebug() << "viewport in get view rect" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
@@ -395,7 +396,7 @@ cv::Rect Zoomer::get_view_rect() const {
     cv::RotatedRect scaled_viewport(m_viewport.center,
                                     cv::Size(m_viewport.size.width / m_scale_factor,
                                              m_viewport.size.height / m_scale_factor),
-                                    0);
+                                    rotation);
 
 
     qDebug() << "scaled viewport points (not saved)" << Utility::from_cvpoint(scaled_viewport.boundingRect().tl()) << Utility::from_cvpoint(scaled_viewport.boundingRect().br());
@@ -463,7 +464,7 @@ void Zoomer::adjust_frame_rect_rotation() {
 void Zoomer::scale_frame(cv::Mat &frame) {
     //qDebug() << "scaling frame";
     //qDebug() << "center in scale frame" << Utility::from_cvpoint(m_viewport.center);
-    cv::Rect view_rectangle = get_view_rect();
+    cv::Rect view_rectangle = get_view_rect(m_angle);
     // TODO assert that the view_rectangle has an area
 
     int interpol = m_interpol_method;

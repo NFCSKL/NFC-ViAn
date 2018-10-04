@@ -66,7 +66,7 @@ public:
 
     cv::RotatedRect get_viewport() const;
     cv::Rect get_frame_rect() const;
-    cv::Rect get_view_rect() const;
+    cv::Rect get_view_rect(int rotation) const;
 
 private:
     void update_scale(const double& width, const double& height);
