@@ -266,6 +266,7 @@ cv::Mat FrameWidget::get_org_frame() const {
 }
 
 void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index) {
+    current_frame_nr = frame_index;
     current_frame = mod_image;
     m_org_image = org_image;
     switch (mod_image.type()) {
