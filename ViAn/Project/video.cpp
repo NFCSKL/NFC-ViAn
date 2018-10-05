@@ -18,6 +18,7 @@ Video::Video(std::string file_path, const bool& is_sequence){
     this->file_path = file_path;
     int index = file_path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
+    m_is_saved = !is_sequence; // Ordinary videos can't be changed thus are allways "saved"
 }
 
 Video::~Video() {}
@@ -32,6 +33,10 @@ void Video::set_name(const std::string &new_name) {
 
 bool Video::is_sequence() {
     return m_is_sequence;
+}
+
+bool Video::is_saved() {
+    return m_is_saved;
 }
 
 /**
@@ -53,6 +58,7 @@ void Video::read(const QJsonObject& json){
     m_is_sequence = json["sequence"].toBool();
     this->file_path = json["file_path"].toString().toStdString();
     m_name = json["name"].toString().toStdString();
+    m_is_saved = true;
 }
 
 /**
@@ -64,4 +70,5 @@ void Video::write(QJsonObject& json){
     json["sequence"] = m_is_sequence;
     json["name"] = QString::fromStdString(m_name);
     json["file_path"] = QString::fromStdString(this->file_path);
+    m_is_saved = true;
 }

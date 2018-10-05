@@ -25,7 +25,7 @@ private:
     std::string m_seq_path{};
 
     void on_save();
-    void on_restore();
+
 public:
     ImageSequence(const std::string& name);
     ImageSequence(const std::string& name, const std::vector<std::string>& images, const std::vector<std::string>& checksums);
@@ -42,6 +42,8 @@ public:
     void add_image(const std::string &image_path, const int& index=-1); //UNUSED TODO REMOVE?
     void reorder_elem(const int& from, const int& to); //UNUSED TODO REMOVE?
     int length();
+
+    void restore();
 
     void read(const QJsonObject& json) override;
     void write(QJsonObject& json) override;

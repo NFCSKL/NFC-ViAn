@@ -41,6 +41,7 @@ class Video : Writeable{
 protected:
     std::string m_name;
     bool m_is_sequence;
+    bool m_is_saved{false};
 public:
     VideoState state;
 public:
@@ -51,6 +52,7 @@ public:
     std::string get_name();
     void set_name(const std::string& new_name);
     bool is_sequence();
+    bool is_saved();
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

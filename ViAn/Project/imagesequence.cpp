@@ -7,6 +7,7 @@
  * Updates the order tracking variables
  */
 void ImageSequence::on_save() {
+    qDebug() << "on save";
     QString base_path = QString::fromStdString(m_seq_path + "/");
     //TODO remove items that no longer are in the sequence
     // update original images
@@ -18,11 +19,6 @@ void ImageSequence::on_save() {
         }
     }
     m_saved_order = m_unsaved_order;
-}
-
-void ImageSequence::on_restore() {
-    qDebug() << m_saved_order != m_unsaved_order;
-
 }
 
 /**
@@ -161,7 +157,7 @@ bool ImageSequence::remove_image_with_hash(const std::string &hash) {
             m_unsaved_order[key_val.first] = i - 1;
         }
     }
-    on_restore();
+    m_is_saved = false;
     return true;
 }
 
@@ -171,6 +167,24 @@ bool ImageSequence::remove_image_with_hash(const std::string &hash) {
  */
 int ImageSequence::length(){
     return m_unsaved_order.size();
+}
+
+/**
+ * @brief ImageSequence::restore
+ * Restores the sequence order by renaming the files to their prior names
+ */
+void ImageSequence::restore() {
+    qDebug() << "Restoring sequence";
+    QString base_path = QString::fromStdString(m_seq_path + "/");
+    for (auto it = m_unsaved_order.begin(); it != m_unsaved_order.end(); ++it) {
+        QFile::rename(base_path + QString::number((*it).second), base_path + QString::fromStdString((*it).first));
+    }
+
+    for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
+        QFile::rename(base_path + QString::fromStdString((*it).first), base_path + QString::number((*it).second));
+    }
+    m_unsaved_order = m_saved_order;
+
 }
 
 /**

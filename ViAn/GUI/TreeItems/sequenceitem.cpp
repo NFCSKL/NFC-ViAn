@@ -11,6 +11,8 @@ ImageSequence* SequenceItem::get_img_sequence() {
     return nullptr;
 }
 
+
+
 SequenceItem::SequenceItem(const std::string& name, const std::string& hash) : TreeItem(SEQUENCE_ITEM) {
     m_hash = hash;
     setText(0, QString::fromStdString(name));

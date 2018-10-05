@@ -73,7 +73,7 @@ bool VideoProject::is_saved() {
                                        [](std::map<ID,Bookmark*>::const_reference t){return t.second->is_saved();});
     bool analyses_saved = std::all_of(m_analyses.begin(), m_analyses.end(),
                                        [](std::map<ID,BasicAnalysis*>::const_reference t){return t.second->is_saved();});
-    return !m_unsaved_changes && analyses_saved && bookmarks_saved && m_overlay->is_saved();
+    return !m_unsaved_changes && analyses_saved && bookmarks_saved && m_overlay->is_saved() && m_video->is_saved();
 }
 
 /**
