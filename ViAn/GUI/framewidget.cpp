@@ -292,6 +292,7 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
     _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
+    if (!isVisible()) show();
     repaint();
 }
 
@@ -567,11 +568,10 @@ void FrameWidget::set_analysis_settings() {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
         settings->quick_analysis = true;
 
-        cv::Point end = cv::Point(ana_rect_end.x(), ana_rect_end.y());
-        cv::Point start (ana_rect_start.x(), ana_rect_start.y());
-        cv::Rect scaled = cv::Rect(cv::Point(anchor.x()/m_scale_factor + start.x/m_scale_factor, anchor.y()/m_scale_factor + start.y/m_scale_factor),
-                      cv::Point(anchor.x()/m_scale_factor + end.x/m_scale_factor, anchor.y()/m_scale_factor + end.y/m_scale_factor));
-        settings->set_bounding_box(scaled);
+        QPoint scaled_start = scale_point(ana_rect_start);
+        QPoint scaled_end = scale_point(ana_rect_end);
+        QRect scaled_rect(scaled_start, scaled_end);
+        settings->set_bounding_box(Utility::from_qrect(scaled_rect));
 
         emit quick_analysis(settings);
         emit set_toolbar_zoom();

@@ -189,6 +189,7 @@ void VideoWidget::init_frame_processor() {
         f_processor->moveToThread(processing_thread);
         connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
+        connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
 
 
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
@@ -522,9 +523,13 @@ void VideoWidget::init_playback_slider() {
 
 void VideoWidget::stop_btn_clicked() {
     set_status_bar("Stop");
-    frame_index.store(0);
-    is_playing.store(false);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        frame_index.store(0);
+        is_playing.store(false);
+    }
     play_btn->setChecked(false);
+
     on_new_frame();
 }
 
@@ -921,6 +926,7 @@ void VideoWidget::on_new_frame() {
     }
 
     playback_slider->update();
+    player_con.notify_one();
 }
 
 /**
@@ -969,7 +975,6 @@ void VideoWidget::on_playback_slider_moved() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
-    if (!frame_wgt->isVisible()) frame_wgt->show();
     if (!video_btns_enabled) set_video_btns(true);
 
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
@@ -1389,7 +1394,11 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
 }
 
 void VideoWidget::update_playback_speed(int speed) {
-    m_speed_step.store(speed);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        m_speed_step.store(speed);
+        player_con.notify_one();
+    }
     if (speed > 0) {
         fps_label->setText("Fps: " + QString::number(m_frame_rate*speed*2));
     } else if (speed < 0) {
@@ -1472,6 +1481,12 @@ void VideoWidget::set_brightness_contrast(int bri, double cont) {
     if (!m_vid_proj) return;
     m_vid_proj->get_video()->state.brightness = bri;
     m_vid_proj->get_video()->state.contrast = cont;
+}
+
+void VideoWidget::update_zoom_preview_size(QSize s) {
+    update_processing_settings([&](){
+        z_settings.preview_window_size = s;
+    });
 }
 
 void VideoWidget::speed_up_activate() {

@@ -27,12 +27,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    QDockWidget* zoom_preview_dock = new QDockWidget(tr("Zoom preview"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     manipulator_dock = new QDockWidget(tr("Color correction settings"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    zoom_preview_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     manipulator_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -41,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
     toggle_queue_wgt = queue_dock->toggleViewAction();
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
+    toggle_zoom_preview_wgt = zoom_preview_dock->toggleViewAction();
     toggle_manipulator_wgt = manipulator_dock->toggleViewAction();
 
     // Initialize video widget
@@ -85,6 +88,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
     bookmark_dock->close();
+
+    // Initialize zoom preview widget
+    zoom_wgt = new ZoomPreviewWidget();
+    zoom_preview_dock->setWidget(zoom_wgt);
+    addDockWidget(Qt::RightDockWidgetArea, zoom_preview_dock);
+
+    connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
+    connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
+    connect(zoom_preview_dock, &QDockWidget::topLevelChanged, zoom_wgt, &ZoomPreviewWidget::on_floating_changed);
     
     // Initialize analysis queue widget
     queue_wgt = new QueueWidget();
@@ -216,6 +228,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
+    connect(project_wgt, &ProjectWidget::update_slider, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
     // Open the recent project dialog
@@ -374,6 +387,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_drawing_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
+    view_menu->addAction(toggle_zoom_preview_wgt);
     view_menu->addAction(toggle_queue_wgt);
     view_menu->addAction(toggle_ana_settings_wgt);
     view_menu->addAction(toggle_manipulator_wgt);
@@ -384,6 +398,7 @@ void MainWindow::init_view_menu() {
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_drawing_wgt->setStatusTip(tr("Show/hide drawing widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
+    toggle_zoom_preview_wgt->setStatusTip(tr("Show/hide zoom preview"));
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
     toggle_manipulator_wgt->setStatusTip(tr("Show/hide color correction widget"));

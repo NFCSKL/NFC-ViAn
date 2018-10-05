@@ -27,8 +27,6 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     m_abort = abort;
-    // NICLAS
-    //    cv::namedWindow("test");
 }
 
 FrameProcessor::~FrameProcessor() {}
@@ -171,23 +169,33 @@ void FrameProcessor::process_frame() {
     }
 
     // Create zoom perview mat
-    //    cv::Mat tmp = manipulated_frame.clone();
-    //    double factor{0.5};
-    //    cv::resize(tmp, tmp, cv::Size(), factor, factor);
-    //    cv::Rect view_rectangle = m_zoomer.get_view_rect();
-    //    cv::rectangle(tmp, view_rectangle.tl() * factor, view_rectangle.br() * factor, cv::Scalar(255,255,255), 2);
-    //    cv::imshow("test", tmp); // can cause a deadlock
+    cv::Mat preview_frame = manipulated_frame.clone();
+    std::pair<double, double> ratios = Utility::size_ratio(m_z_settings->preview_window_size,
+                                                           m_zoomer.get_transformed_size());
+    double factor{std::min(ratios.first, ratios.second)};
+    cv::resize(preview_frame, preview_frame, cv::Size(), factor, factor);
+    cv::Rect view_rectangle = m_zoomer.get_view_rect();
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+                  view_rectangle.br() * factor, cv::Scalar(0,0,0), 2);
+    cv::rectangle(preview_frame, view_rectangle.tl() * factor,
+                  view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
-    // Draws the overlay
-    m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
+    int frame_num = m_frame_index->load();
+
+    // Draws the text drawings on the overlay
+    m_overlay->draw_overlay(manipulated_frame, frame_num);
 
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
+
+    // Draws the other drawings on the overlay
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
+    emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
@@ -215,11 +223,13 @@ void FrameProcessor::load_zoomer_state() {
  * Emitts all signals that sends zoom data
  */
 void FrameProcessor::emit_zoom_data() {
-        m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
+    // Store changes made
+    m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
+    m_z_settings->anchor = m_zoomer.get_anchor();
 
-        emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
-        emit set_anchor(m_zoomer.get_anchor());
-        emit set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
+    emit set_anchor(m_zoomer.get_anchor());
+    emit set_scale_factor(m_zoomer.get_scale_factor());
 }
 
 /**
@@ -270,9 +280,6 @@ void FrameProcessor::update_zoomer_settings() {
     else if (m_zoomer.get_interpolation_method() != m_z_settings->interpolation){
         m_zoomer.set_interpolation_method(m_z_settings->interpolation);
     }
-
-    // Store changes made
-    m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
 
     emit_zoom_data();
 }
