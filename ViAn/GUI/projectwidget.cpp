@@ -1,5 +1,6 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
+#include "sequencedialog.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -145,25 +146,34 @@ void ProjectWidget::add_images() {
         return;
     }
 
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Import image sequence"),
-                                         tr("Sequence name:"), QLineEdit::Normal,
-                                         "Sequence", &ok,
-                                         Qt::WindowCloseButtonHint);
+    //bool ok;
+//    QString text = QInputDialog::getText(this, tr("Import image sequence"),
+//                                         tr("Sequence name:"), QLineEdit::Normal,
+//                                         "Sequence", &ok,
+//                                         Qt::WindowCloseButtonHint);
+
+    QString text{};
+    int sequence_type;
+    SequenceDialog* seq_dialog = new SequenceDialog(&text, &sequence_type, this);
+
+    bool reply = seq_dialog->exec();
+
+    //QString text = SequenceDialog
+
 
     // Check if dialog was accepted and that proper name was used
     QString seq_name{"sequence"};
-    if (ok && !text.isEmpty())
+    if (reply && !text.isEmpty()) {
         seq_name = text;
-    else
+    } else {
         return;
-
+    }
 
     QString path = QString::fromStdString(m_proj->get_dir()) + "Sequences/" + seq_name;
 
     QProgressDialog* progress = new QProgressDialog(
                 "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
-    ImageImporter* importer = new ImageImporter(image_paths, path);
+    ImageImporter* importer = new ImageImporter(image_paths, path, sequence_type);
     QThread* copy_thread = new QThread();
     importer->moveToThread(copy_thread);
 
@@ -179,7 +189,7 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
+void ProjectWidget::create_sequence(QStringList image_paths, std::string path, int seq_type){
     std::vector<std::string> images;
     for (auto image : image_paths) {images.push_back(image.toStdString());}
     VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));

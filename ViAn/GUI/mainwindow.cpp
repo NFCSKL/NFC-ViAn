@@ -291,7 +291,7 @@ void MainWindow::init_file_menu() {
     open_proj_folder_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
     save_project_act->setShortcut(QKeySequence::Save);     //Ctrl + S
     add_vid_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));     //Ctrl + I
-    // TODO    add_seq_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
+    //add_seq_act->setShortcuts(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_I));     //Ctrl + shift + A
     quit_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     // Set status tips

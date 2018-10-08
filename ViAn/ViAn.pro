@@ -83,7 +83,8 @@ SOURCES += main.cpp \
     GUI/Analysis/anasettingwidget.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
-    GUI/manipulatorwidget.cpp
+    GUI/manipulatorwidget.cpp \
+    GUI/sequencedialog.cpp
 
 #
 # TEST
@@ -156,7 +157,8 @@ HEADERS += reportgenerator.h\
     GUI/Analysis/anasettingwidget.h \
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
-    GUI/manipulatorwidget.h
+    GUI/manipulatorwidget.h \
+    GUI/sequencedialog.h
 
 #
 # LIBRARY
