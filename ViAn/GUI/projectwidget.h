@@ -40,7 +40,7 @@ class ProjectWidget : public QTreeWidget
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",
                                 "m4p", "m4v", "mpg", "mp2", "mpeg",
                                 "mpe", "mpv", "m2v", "m4v", "3gp", "3g2",
-                                "flv", "f4v", "f4p", "f4a", "f4b"};
+                                "flv", "f4v", "f4p", "f4a", "f4b", "webm"};
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     ~ProjectWidget();
