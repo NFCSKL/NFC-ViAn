@@ -617,7 +617,7 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
     if (!m_floating) {
-        if (state_video) {
+        if (proj_tree_item == VIDEO_ITEM) {
             m_vid_proj->state.center = center;
             m_vid_proj->state.scale_factor = scale;
             m_vid_proj->state.rotation = angle;
@@ -713,11 +713,13 @@ void VideoWidget::play_btn_toggled(bool status) {
 }
 
 void VideoWidget::update_tag(int b, double c) {
-    if (m_tag == nullptr || m_tag->is_drawing_tag() || !m_tag->find_frame(playback_slider->value())) {
-        return;
+    if (proj_tree_item == TAG_FRAME_ITEM) {
+        m_tag->update_color_correction(playback_slider->value(), b, c);
+        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+    } else if (proj_tree_item == TAG_ITEM) {
+        m_tag->update_color_whole_tag(b, c);
+        emit set_status_bar("Whole tag '"+ QString::fromStdString(m_tag->get_name()) +"' updated");
     }
-    m_tag->update_color_correction(playback_slider->value(), b, c);
-    emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
 }
 
 /**
@@ -922,7 +924,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     if (!m_floating) {
-        if (state_video) {
+        if (proj_tree_item == VIDEO_ITEM) {
             m_vid_proj->state.frame = frame_num;
         }
         m_vid_proj->get_video()->state.frame = frame_num;
@@ -979,17 +981,10 @@ void VideoWidget::on_playback_slider_moved() {
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!video_btns_enabled) set_video_btns(true);
-    if (state.video) {
-        state_video = true;
-    } else {
-        state_video = false;
-    }
-
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
-
 
         // Set state variables but don't update the processor
         {
@@ -1024,6 +1019,15 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
     emit update_manipulator_wgt(state.brightness, state.contrast);
+}
+
+/**
+ * @brief VideoWidget::set_item_type
+ * Save the item type of the clicked item in the project tree
+ * @param type
+ */
+void VideoWidget::set_item_type(int type) {
+    proj_tree_item = type;
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1364,7 +1368,7 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val, bool update) {
-    if (state_video) update = true;
+    if (proj_tree_item == VIDEO_ITEM) update = true;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1484,12 +1488,10 @@ double VideoWidget::get_contrast() {
 
 void VideoWidget::set_brightness_contrast(int bri, double cont) {
     if (!m_vid_proj) return;
-    if (state_video) {
+    if (proj_tree_item == VIDEO_ITEM) {
         m_vid_proj->state.brightness = bri;
         m_vid_proj->state.contrast = cont;
     }
-    m_vid_proj->get_video()->state.brightness = bri;
-    m_vid_proj->get_video()->state.contrast = cont;
 }
 
 void VideoWidget::speed_up_activate() {

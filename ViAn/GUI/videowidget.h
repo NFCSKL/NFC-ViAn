@@ -38,6 +38,7 @@ private:
     QSize current_frame_size;
     QTime timer;
 
+    int proj_tree_item = 1001;      // Default is VIDEO_ITEM, based on ITEM_TYPE on treeitem
     int prev_frame_idx;
     int POI_end;
     double m_scale_factor = 1;
@@ -142,6 +143,7 @@ public slots:
     void on_playback_slider_moved(void);
 
     void load_marked_video_state(VideoProject *vid_proj, VideoState state);
+    void set_item_type(int);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
