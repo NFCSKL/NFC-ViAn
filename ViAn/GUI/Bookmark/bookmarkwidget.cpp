@@ -106,7 +106,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
 }
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
-    std::string file_name = vid_proj->get_video()->file_path;
+    std::string file_name = vid_proj->get_video()->m_file_path;
     int index = file_name.find_last_of('/') + 1;
     file_name = file_name.substr(index);
     file_name += "_" + std::to_string(frame_nbr);

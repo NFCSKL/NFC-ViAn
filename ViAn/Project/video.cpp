@@ -3,9 +3,9 @@
 /**
  * @brief Video::Video
  */
-Video::Video(const bool& is_sequence){
-    m_is_sequence = is_sequence;
-    this->file_path = "";
+Video::Video(const int& sequence_type){
+    m_sequence_type = sequence_type;
+    m_file_path = "";
 }
 
 /**
@@ -13,9 +13,9 @@ Video::Video(const bool& is_sequence){
  * @param id
  * @param filepath
  */
-Video::Video(std::string file_path, const bool& is_sequence){
-    m_is_sequence = is_sequence;
-    this->file_path = file_path;
+Video::Video(std::string file_path, const int& sequence_type){
+    m_sequence_type = sequence_type;
+    m_file_path = file_path;
     int index = file_path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
 }
@@ -30,8 +30,8 @@ void Video::set_name(const std::string &new_name) {
     m_name = new_name;
 }
 
-bool Video::is_sequence() {
-    return m_is_sequence;
+int Video::get_sequence_type() {
+    return m_sequence_type;
 }
 
 /**
@@ -41,7 +41,7 @@ bool Video::is_sequence() {
  * @return if videos the same TRUE
  */
 bool operator==(Video v1, Video v2){
-    return v1.file_path == v2.file_path;
+    return v1.m_file_path == v2.m_file_path;
 }
 
 /**
@@ -50,8 +50,8 @@ bool operator==(Video v1, Video v2){
  * Read video parameters from json object.
  */
 void Video::read(const QJsonObject& json){
-    m_is_sequence = json["sequence"].toBool();
-    this->file_path = json["file_path"].toString().toStdString();
+    m_sequence_type = json["sequence"].toBool();
+    m_file_path = json["file_path"].toString().toStdString();
     m_name = json["name"].toString().toStdString();
 }
 
@@ -61,7 +61,7 @@ void Video::read(const QJsonObject& json){
  * Write video parameters to json object.
  */
 void Video::write(QJsonObject& json){
-    json["sequence"] = m_is_sequence;
+    json["sequence"] = m_sequence_type;
     json["name"] = QString::fromStdString(m_name);
-    json["file_path"] = QString::fromStdString(this->file_path);
+    json["file_path"] = QString::fromStdString(m_file_path);
 }

@@ -4,10 +4,10 @@
  * @brief ImageSequence::ImageSequence
  * @param name: name of the sequence
  */
-ImageSequence::ImageSequence(const std::string& path) : Video(true){
+ImageSequence::ImageSequence(const std::string& path, int seq_type) : Video(seq_type){
     seq_path = path;
     int index = path.find_last_of('/') + 1;
-    m_name = file_path.substr(index);
+    m_name = m_file_path.substr(index);
 }
 
 /**
@@ -15,13 +15,14 @@ ImageSequence::ImageSequence(const std::string& path) : Video(true){
  * @param name: name of the sequence
  * @param images: vector of paths to images
  */
-ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string> &images)
-    : Video(true) {
+ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string> &images, int seq_type)
+    : Video(seq_type) {
     seq_path = path;
     int index = path.find_last_of('/') + 1;
     m_name = path.substr(index);
     m_images = images;
-    file_path = seq_path + "/" + get_pattern_name();
+    m_type = seq_type;
+    m_file_path = seq_path + "/" + get_pattern_name();
 }
 
 /**
@@ -54,6 +55,15 @@ std::vector<std::string> ImageSequence::get_image_names() {
 std::string ImageSequence::get_pattern_name() {
     int digits = Utility::number_of_digits(length());
     return "%0" + std::to_string(digits) + "d";
+}
+
+/**
+ * @brief ImageSequence::get_type
+ * Return the type of sequence. 0 = video type, 1 = tag type
+ * @return
+ */
+int ImageSequence::get_type() {
+    return m_type;
 }
 
 /**
@@ -104,6 +114,6 @@ void ImageSequence::reorder_elem(const int &from, const int &to) {
 
 void ImageSequence::reset_root_dir(const std::string &dir) {
     seq_path = dir + Project::SEQUENCE_FOLDER +  Utility::name_from_path(seq_path);
-    file_path = seq_path + "/" + get_pattern_name();
+    m_file_path = seq_path + "/" + get_pattern_name();
 }
 

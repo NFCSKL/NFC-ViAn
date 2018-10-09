@@ -9,7 +9,7 @@ VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     setText(0, QString::fromStdString(video_project->get_video()->get_name()));
 
     auto vid = m_vid_proj->get_video();
-    if (vid && vid->is_sequence()) {
+    if (vid && vid->get_sequence_type() >= 1) {
         load_sequence_items();
     } else {
         set_thumbnail();
@@ -42,7 +42,7 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
  * Create a thumbnail from the video and set it as icon.
  */
 void VideoItem::set_thumbnail() {
-    std::string path = m_vid_proj->get_video()->file_path;
+    std::string path = m_vid_proj->get_video()->m_file_path;
     cv::VideoCapture cap(path);
     if (!cap.isOpened()) return;
     cv::Mat frame;
@@ -70,7 +70,7 @@ void VideoItem::load_thumbnail() {
 void VideoItem::load_sequence_items() {
     if (m_vid_proj == nullptr ) return;
     auto seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
-    if (seq) {
+    if (seq && seq->get_type() == 1) {      // 1 = tag as a video
         QTreeWidgetItem* container = new QTreeWidgetItem();
         container->setText(0, SEQUENCE_CONTAINER_NAME);
         addChild(container);
@@ -78,5 +78,14 @@ void VideoItem::load_sequence_items() {
         for (auto img_name : seq->get_image_names()) {
             container->addChild(new SequenceItem(img_name, i++));
         }
+    } else if (seq && seq->get_type() == 2) {       // 2 == tag as a tag
+        int i{};
+        Tag* sequence = new Tag();
+        for (auto img_name : seq->get_image_names()) {
+            VideoState state;
+            TagFrame* frame = new TagFrame(i++, state);
+            addChild(new SequenceTagItem(img_name, i++, frame));
+        }
     }
+    qDebug() << "Type: " << seq->get_type();
 }

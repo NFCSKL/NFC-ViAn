@@ -38,17 +38,17 @@ typedef int ID;
 class Video : Writeable{
 protected:
     std::string m_name;
-    bool m_is_sequence;
+    int m_sequence_type;
 public:
     VideoState state;
 public:
-    Video(const bool& is_sequence=false);
-    Video(std::string file_path, const bool& is_sequence=false);
+    Video(const int& sequence_type=0);
+    Video(std::string m_file_path, const int& sequence_type=0);
     ~Video();
-    std::string file_path;
+    std::string m_file_path;
     std::string get_name();
     void set_name(const std::string& new_name);
-    bool is_sequence();
+    int get_sequence_type();
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

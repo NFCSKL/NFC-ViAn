@@ -192,7 +192,10 @@ void ProjectWidget::add_images() {
 void ProjectWidget::create_sequence(QStringList image_paths, std::string path, int seq_type){
     std::vector<std::string> images;
     for (auto image : image_paths) {images.push_back(image.toStdString());}
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, seq_type));
+    // Save the img sequence as a "tag"
+    // or at least restrict the functions that can be used
+    // Probably create a new project item
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -206,7 +209,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     AnalysisMethod* method;
     switch (settings->get_type()) {
     case MOTION_DETECTION:
-        method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
+        method = new MotionDetection(vid_proj->get_video()->m_file_path, m_proj->m_dir, settings);
         break;
     default:
         break;
@@ -490,7 +493,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
             auto vid = vid_proj->get_video();
-            if (vid && vid->is_sequence()) {
+            if (vid && vid->get_sequence_type() >= 1) {
                 v_item->load_sequence_items();
             }
         }
@@ -644,12 +647,30 @@ bool ProjectWidget::prompt_save() {
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
+    qDebug() << "Tree clicked type: " << item->type();
     Q_UNUSED(col)
     if (!item) return;
     switch(item->type()){
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        state.frame = seq_item->get_index();
+        emit set_video_project(vid_item->get_video_project());
+        emit marked_video_state(vid_item->get_video_project(), state);
+
+        emit set_show_analysis_details(false);
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(false);
+        emit enable_poi_btns(false,false);
+
+        update_current_tag(vid_item);
+        break;
+    } case SEQUENCE_TAG_ITEM: {
+        auto seq_item = dynamic_cast<SequenceTagItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
         VideoState state;
         state = vid_item->get_video_project()->get_video()->state;
         state.frame = seq_item->get_index();
@@ -1217,7 +1238,7 @@ bool ProjectWidget::save_project() {
             // If the current video is a sequence then it needs to be reloaded
             // since the images path will have changed
             for (auto vid_proj : m_proj->get_videos()) {
-                if (vid_proj->is_current() && vid_proj->get_video()->is_sequence()) {
+                if (vid_proj->is_current() && vid_proj->get_video()->get_sequence_type() >= 1) {
                     vid_proj->set_current(false);
                     emit marked_video_state(vid_proj, vid_proj->get_video()->state);
                 }

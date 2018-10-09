@@ -2,6 +2,7 @@
 #define VIDEOITEM_H
 #include "treeitem.h"
 #include "sequenceitem.h"
+#include "sequencetagitem.h"
 #include "Project/videoproject.h"
 
 class VideoProject;

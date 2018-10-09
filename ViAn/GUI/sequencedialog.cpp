@@ -45,16 +45,18 @@ SequenceDialog::SequenceDialog(QString* name, int* type, QWidget* parent) : QDia
 }
 
 SequenceDialog::~SequenceDialog() {
-    delete m_name;
     delete name_text;
+    delete btn_box;
+    delete video_type;
+    delete tag_type;
 }
 
 void SequenceDialog::ok_btn_clicked() {
     *m_name = name_text->text();
     if (video_type->isChecked()) {
-        *m_type = 0;
-    } else if (tag_type->isChecked()) {
         *m_type = 1;
+    } else if (tag_type->isChecked()) {
+        *m_type = 2;
     }
     accept();
 }

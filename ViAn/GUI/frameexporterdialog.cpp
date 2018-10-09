@@ -47,7 +47,7 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_btn_box->addButton(m_export_btn, QDialogButtonBox::AcceptRole);
     connect(m_btn_box, &QDialogButtonBox::accepted, this, &FrameExporterDialog::save_values);
     connect(m_btn_box, &QDialogButtonBox::rejected, this, &FrameExporterDialog::reject);
-    m_video_path = new QLabel(QString::fromStdString(video->file_path));
+    m_video_path = new QLabel(QString::fromStdString(video->m_file_path));
     // Input layout
     m_input_layout = new QFormLayout(this);
     m_input_layout->addRow(new QLabel(tr("Video"), this), m_video_path);

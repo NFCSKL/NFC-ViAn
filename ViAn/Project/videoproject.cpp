@@ -113,12 +113,12 @@ void VideoProject::read(const QJsonObject& json){
     m_tree_index = json["tree_index"].toString().toStdString();
     Video* vid = new Video();
     vid->read(json);
-    if (vid->is_sequence()) {
+    if (vid->get_sequence_type() >= 1) {
         ImageSequence* seq = new ImageSequence("");
         seq->read(json);
-        this->m_video = seq;
+        m_video = seq;
     } else
-        this->m_video = vid;
+        m_video = vid;
 
 
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
@@ -206,7 +206,7 @@ void VideoProject::set_project(Project *proj){
 }
 
 void VideoProject::reset_root_dir(const std::string &dir) {
-    if (m_video->is_sequence()) {
+    if (m_video->get_sequence_type() >= 1) {
         auto seq = dynamic_cast<ImageSequence*>(m_video);
         if (seq) {
             seq->reset_root_dir(dir);

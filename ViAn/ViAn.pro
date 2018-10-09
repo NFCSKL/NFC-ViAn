@@ -84,7 +84,8 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
-    GUI/sequencedialog.cpp
+    GUI/sequencedialog.cpp \
+    GUI/TreeItems/sequencetagitem.cpp
 
 #
 # TEST
@@ -158,7 +159,8 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
-    GUI/sequencedialog.h
+    GUI/sequencedialog.h \
+    GUI/TreeItems/sequencetagitem.h
 
 #
 # LIBRARY

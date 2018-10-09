@@ -1000,7 +1000,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         {
             std::lock_guard<std::mutex> p_lock(player_lock);
             v_sync.frame_index_on_load = state.frame;
-            m_video_path = vid_proj->get_video()->file_path;
+            m_video_path = vid_proj->get_video()->m_file_path;
             new_video.store(true);
         }
         player_con.notify_all();

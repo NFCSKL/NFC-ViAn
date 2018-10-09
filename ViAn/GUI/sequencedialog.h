@@ -15,7 +15,7 @@ class SequenceDialog : public QDialog
 {
     Q_OBJECT
     QString* m_name;      // Name of sequence
-    int* m_type;        // type of sequence, 0 = video, 1 = tag
+    int* m_type;        // type of sequence, 1 = video, 2 = tag
     QLineEdit* name_text;
     QDialogButtonBox* btn_box;
 
