@@ -83,8 +83,10 @@ void VideoItem::load_sequence_items() {
         Tag* sequence = new Tag();
         for (auto img_name : seq->get_image_names()) {
             VideoState state;
-            TagFrame* frame = new TagFrame(i++, state);
-            addChild(new SequenceTagItem(img_name, i++, frame));
+            TagFrame* frame = new TagFrame(i, state);
+            addChild(new SequenceTagItem(img_name, i, frame));
+            sequence->add_frame(i, frame);
+            i++;
         }
     }
     qDebug() << "Type: " << seq->get_type();
