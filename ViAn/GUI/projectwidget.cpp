@@ -773,12 +773,13 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
             m_tag_item = tag_item;
         } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
             emit marked_video_state(vid_item->get_video_project(), state);
-            emit item_type(DRAWING_TAG_ITEM);
+            emit item_type(item->type());
             DrawingTagItem* dt_item = dynamic_cast<DrawingTagItem*>(item->parent());
             emit marked_basic_analysis(dt_item->get_tag());
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }
+        break;
     } case FOLDER_ITEM: {
         emit item_type(item->type());
         break;
@@ -902,6 +903,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 if (item->parent()->type() == TAG_ITEM) {
                     menu.addAction("Delete", this, SLOT(remove_item()));
                 }
+                break;
             default:
                 break;
         }

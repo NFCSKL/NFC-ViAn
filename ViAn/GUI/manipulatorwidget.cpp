@@ -34,10 +34,10 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
     brightness_slider->setValue(brightness);
     brightness_value_label->setText(QString::number(brightness_slider->value()));
 
-    contrast_slider->setSingleStep(FrameManipulator().CONTRAST_STEP*DOUBLE_TO_INT);
-    contrast_slider->setMaximum(FrameManipulator().CONTRAST_MAX*DOUBLE_TO_INT);
-    contrast_slider->setMinimum(FrameManipulator().CONTRAST_MIN*DOUBLE_TO_INT);
-    contrast_slider->setValue(contrast*DOUBLE_TO_INT);
+    contrast_slider->setSingleStep(static_cast<int>(FrameManipulator().CONTRAST_STEP*DOUBLE_TO_INT));
+    contrast_slider->setMaximum(static_cast<int>(FrameManipulator().CONTRAST_MAX*DOUBLE_TO_INT));
+    contrast_slider->setMinimum(static_cast<int>(FrameManipulator().CONTRAST_MIN*DOUBLE_TO_INT));
+    contrast_slider->setValue(static_cast<int>(contrast*DOUBLE_TO_INT));
     contrast_value_label->setText(QString::number(contrast_slider->value()/DOUBLE_TO_INT));
 
     connect(brightness_slider, &QSlider::valueChanged, this, &ManipulatorWidget::b_changed);
@@ -89,8 +89,7 @@ void ManipulatorWidget::ok_clicked() {
  */
 void ManipulatorWidget::default_clicked() {
     brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
-    contrast_slider->setValue(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT);
-    apply_btn->setDisabled(true);
+    contrast_slider->setValue(static_cast<int>(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT));
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
 }
 
@@ -129,7 +128,7 @@ void ManipulatorWidget::c_changed(int value) {
 void ManipulatorWidget::set_values(int b_value, double c_value) {
     blockSignals(true);
     brightness_slider->setValue(b_value);
-    contrast_slider->setValue(c_value*DOUBLE_TO_INT);
+    contrast_slider->setValue(static_cast<int>(c_value*DOUBLE_TO_INT));
     blockSignals(false);
     apply_btn->setDisabled(true);
 }

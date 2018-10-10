@@ -712,11 +712,12 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
+
 void VideoWidget::update_tag(int b, double c) {
     if (proj_tree_item == TAG_FRAME_ITEM) {
         m_tag->update_color_correction(playback_slider->value(), b, c);
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
-    } else if (proj_tree_item == TAG_ITEM) {
+    } else if (proj_tree_item == TAG_ITEM || proj_tree_item == DRAWING_TAG_ITEM) {
         m_tag->update_color_whole_tag(b, c);
         emit set_status_bar("Whole tag '"+ QString::fromStdString(m_tag->get_name()) +"' updated");
     }
