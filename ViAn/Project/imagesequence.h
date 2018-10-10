@@ -25,7 +25,7 @@ private:
     std::string m_seq_path{};
 
     void on_save();
-
+    static const int INDEX_LENGTH{10};
 public:
     ImageSequence(const std::string& name);
     ImageSequence(const std::string& name, const std::vector<std::string>& images, const std::vector<std::string>& checksums);

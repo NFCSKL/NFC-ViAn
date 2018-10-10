@@ -20,7 +20,7 @@ ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QOb
  */
 void ImageImporter::import_images() {
     int num_images = m_images.size();
-    int num_digits = Utility::number_of_digits(num_images);
+    int num_digits = 10;//Utility::number_of_digits(num_images);
 
     QStringList checksums;
 

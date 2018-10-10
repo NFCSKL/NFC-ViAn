@@ -54,6 +54,14 @@ std::string Utility::zfill(std::string number, int length) {
         return number;
 }
 
+std::string Utility::zfill(const int& number, int length){
+    length -= std::to_string(number).length();
+    if (length)
+        return std::string(length, '0').append(std::to_string(number));
+    else
+        return std::to_string(number);
+}
+
 /**
  * @brief Utility::name_from_path
  * @param full_path

@@ -15,7 +15,7 @@ void ImageSequence::on_save() {
     // If a hash from the saved order no longer exists in the unsaved order the file should be removed.
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
         if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
-            QFile::remove(base_path + QString::fromStdString((*it).first));
+            QFile::remove(base_path + QString::fromStdString(Utility::zfill((*it).first, 10)));
         }
     }
     m_saved_order = m_unsaved_order;
@@ -64,7 +64,7 @@ std::string ImageSequence::get_search_path() const {
  * @return sequence pattern
  */
 std::string ImageSequence::get_pattern_name() {
-    int digits = Utility::number_of_digits(length());
+    int digits = 10;//Utility::number_of_digits(length());
     return "%0" + std::to_string(digits) + "d";
 }
 
@@ -135,7 +135,7 @@ bool ImageSequence::remove_image_with_hash(const std::string &hash) {
 
     int index = hash_idx.second;
     QString base_path = QString::fromStdString(m_seq_path + "/");
-    QString old_name = base_path + QString::number(index);
+    QString old_name = base_path + QString::fromStdString(Utility::zfill(std::to_string(index), 10));
     QString new_name = base_path + QString::fromStdString(hash_idx.first);
     bool renamed = QFile::rename(old_name, new_name);
     std::vector<std::pair<std::string, int>> unsaved;
@@ -152,7 +152,7 @@ bool ImageSequence::remove_image_with_hash(const std::string &hash) {
         int i = key_val.second;
         if (i > index) {
             // Index was after, needs to be shifted down
-            bool success  = QFile::rename(base_path + QString::number(i), base_path + QString::number(i - 1));
+            bool success  = QFile::rename(base_path + QString::fromStdString(Utility::zfill(std::to_string(i), 10)), base_path +QString::fromStdString(Utility::zfill(std::to_string(i - 1), 10)));
             qDebug() << "renamed: " << i << " " << i - 1 << " " << success;
             m_unsaved_order[key_val.first] = i - 1;
         }
@@ -177,11 +177,11 @@ void ImageSequence::restore() {
     qDebug() << "Restoring sequence";
     QString base_path = QString::fromStdString(m_seq_path + "/");
     for (auto it = m_unsaved_order.begin(); it != m_unsaved_order.end(); ++it) {
-        QFile::rename(base_path + QString::number((*it).second), base_path + QString::fromStdString((*it).first));
+        QFile::rename(base_path + QString::fromStdString(Utility::zfill(std::to_string((*it).second), 10)), base_path + QString::fromStdString((*it).first));
     }
 
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
-        QFile::rename(base_path + QString::fromStdString((*it).first), base_path + QString::number((*it).second));
+        QFile::rename(base_path + QString::fromStdString((*it).first), base_path + QString::fromStdString(Utility::zfill(std::to_string((*it).second), 10)));
     }
     m_unsaved_order = m_saved_order;
 
