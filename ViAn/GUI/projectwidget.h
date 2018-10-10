@@ -18,7 +18,6 @@
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
-#include "Project/Analysis/drawingtag.h"
 #include "Project/videoproject.h"
 #include "Analysis/analysismethod.h"
 #include "Analysis/motiondetection.h"
