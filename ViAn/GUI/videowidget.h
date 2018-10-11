@@ -38,6 +38,7 @@ private:
     QSize current_frame_size;
     QTime timer;
 
+    int proj_tree_item = 1001;      // Default is VIDEO_ITEM, based on ITEM_TYPE on treeitem
     int prev_frame_idx;
     int POI_end;
     double m_scale_factor = 1;
@@ -122,7 +123,8 @@ public slots:
     void set_scale_factor(double);
     void set_zoom_state(QPoint, double, int);
     void play_btn_toggled(bool status);
-    void update_tag(int b, double c);
+    void update_tag();
+    void update_tag_color(int b, double c);
     void tag_frame();
     void remove_tag_frame(void);
     void new_tag_clicked();
@@ -143,6 +145,7 @@ public slots:
     void on_playback_slider_moved(void);
 
     void load_marked_video_state(VideoProject *vid_proj, VideoState state);
+    void set_item_type(int);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
@@ -252,6 +255,7 @@ private:
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
     bool m_floating = false;
+    bool state_video = false;
 
     bool tag_clicked = false;
 
