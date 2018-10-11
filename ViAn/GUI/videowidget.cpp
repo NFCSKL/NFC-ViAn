@@ -1509,6 +1509,8 @@ void VideoWidget::set_brightness_contrast(int bri, double cont) {
         m_vid_proj->state.brightness = bri;
         m_vid_proj->state.contrast = cont;
     }
+    m_vid_proj->get_video()->state.brightness = bri;
+    m_vid_proj->get_video()->state.contrast = cont;
 }
 
 void VideoWidget::speed_up_activate() {
