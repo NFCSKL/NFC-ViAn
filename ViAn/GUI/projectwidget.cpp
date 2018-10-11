@@ -39,7 +39,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
-    connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_clicked);
+    connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_changed);
 
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
@@ -241,14 +241,14 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
             item->addChild(tf_item);
         }
         item->setExpanded(true);
-        tree_item_clicked(item);
+        tree_item_changed(item);
     } else if (!tag->is_drawing_tag()) {
         TagItem* item = new TagItem(tag);
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
         setCurrentItem(item);
-        tree_item_clicked(item);
+        tree_item_changed(item);
     }
     vid_item->setExpanded(true);
 }
@@ -627,13 +627,14 @@ bool ProjectWidget::prompt_save() {
 }
 
 /**
- * @brief ProjectWidget::tree_item_clicked
- * Slot function for when a tree item is clicked.
+ * @brief ProjectWidget::tree_item_changed
+ * Slot function for when the current tree item is changed.
  * Performs different operations based on tree item type.
- * @param item
- * @param col
+ * @param item          : new tree item
+ * @param prev_item     : previous tree item
  */
-void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
+void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
+    qDebug() << "item changed";
     Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){

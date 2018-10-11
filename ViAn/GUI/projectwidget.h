@@ -117,7 +117,7 @@ private slots:
     void drawing_tag();
     void update_settings();
     void create_folder_item();
-    void tree_item_clicked(QTreeWidgetItem *item, QTreeWidgetItem *prev_item = nullptr);
+    void tree_item_changed(QTreeWidgetItem *item, QTreeWidgetItem *prev_item = nullptr);
     void check_selection();
     void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 
