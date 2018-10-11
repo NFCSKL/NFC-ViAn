@@ -73,6 +73,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
     analysis_queue.pop_front();
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     ana_item->set_analysis(analysis);
+    ana_item->saved = false;
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis_item->parent());
     vid->get_video_project()->add_analysis(analysis);
     current_analysis_item = nullptr;

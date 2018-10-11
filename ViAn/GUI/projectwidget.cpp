@@ -1236,6 +1236,11 @@ bool ProjectWidget::save_project() {
     save_item_data();
     emit save_draw_wgt();
 
+    // Mark all analysis as saved
+    for (AnalysisItem* item : a_items) {
+        item->saved = true;
+    }
+
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->get_dir() + "treestate");
@@ -1315,6 +1320,14 @@ bool ProjectWidget::close_project() {
         abort_close = !prompt_save();
         if (abort_close) {
             return false;
+        }
+    }
+
+    // Remove the analysis file from the folder of all the analyses that are not saved
+    for (AnalysisItem* item : a_items) {
+        if (!(item->saved)) {
+            AnalysisProxy* analysis = item->get_analysis();
+            analysis->delete_saveable(analysis->full_path());
         }
     }
 
