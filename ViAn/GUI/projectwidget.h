@@ -78,6 +78,7 @@ signals:
     void remove_overlay();
     void new_vid_proj(VideoProject*);
     void item_type(int);
+    void update_tag();
 
 public slots:
     void new_project(void);
@@ -116,7 +117,7 @@ private slots:
     void drawing_tag();
     void update_settings();
     void create_folder_item();
-    void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
+    void tree_item_clicked(QTreeWidgetItem *item, QTreeWidgetItem *prev_item = nullptr);
     void check_selection();
     void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 

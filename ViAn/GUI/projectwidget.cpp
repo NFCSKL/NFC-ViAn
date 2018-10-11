@@ -39,7 +39,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_clicked);
 
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
@@ -633,8 +633,8 @@ bool ProjectWidget::prompt_save() {
  * @param item
  * @param col
  */
-void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    Q_UNUSED(col)
+void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
+    Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){
     case SEQUENCE_ITEM: {
@@ -900,6 +900,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             case TAG_FRAME_ITEM:
+                menu.addAction("Update", this, SIGNAL(update_tag()));
                 if (item->parent()->type() == TAG_ITEM) {
                     menu.addAction("Delete", this, SLOT(remove_item()));
                 }

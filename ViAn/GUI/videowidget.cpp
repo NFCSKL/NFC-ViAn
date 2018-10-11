@@ -712,8 +712,25 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
+/**
+ * @brief VideoWidget::update_tag
+ * Update the Tag in the current label that corresponds to the current frame
+ */
+void VideoWidget::update_tag() {
+    try {
+        TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
+        VideoState state = m_vid_proj->get_video()->state;
+        t_frame->m_state = state;
+        t_frame->m_state.brightness = m_settings.brightness;
+        t_frame->m_state.contrast = m_settings.contrast;
+        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+    } catch (const std::out_of_range) {
+        qWarning() << "Can't update. No tag found on current frame";
+        return;
+    }
+}
 
-void VideoWidget::update_tag(int b, double c) {
+void VideoWidget::update_tag_color(int b, double c) {
     if (proj_tree_item == TAG_FRAME_ITEM) {
         m_tag->update_color_correction(playback_slider->value(), b, c);
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
@@ -734,7 +751,6 @@ void VideoWidget::tag_frame() {
     }
 
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
-        QString text = " tagged";
         if (m_tag->find_frame(playback_slider->value())) {
             QMessageBox msg_box;
             msg_box.setText("Do you wanna overwrite the tag?");
@@ -742,16 +758,16 @@ void VideoWidget::tag_frame() {
             msg_box.setDefaultButton(QMessageBox::No);
             int reply = msg_box.exec();
             if (reply == QMessageBox::No) return;
-            remove_tag_frame();
-            text = " updated";
+            update_tag();
+        } else {
+            // Add frame to tag
+            VideoState state = m_vid_proj->get_video()->state;
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+            m_tag->add_frame(playback_slider->value(), t_frame);
+            emit tag_new_frame(playback_slider->value(), t_frame);
+            emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " tagged");
+            playback_slider->update();
         }
-        // Add frame to tag
-        VideoState state = m_vid_proj->get_video()->state;
-        TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
-        m_tag->add_frame(playback_slider->value(), t_frame);
-        emit tag_new_frame(playback_slider->value(), t_frame);
-        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + text);
-        playback_slider->update();
     }
 }
 

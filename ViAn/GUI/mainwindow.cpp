@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     manipulator_dock->close();
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
-    connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag);
+    connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag_color);
 
     // Main toolbar
     main_toolbar = new MainToolbar();
@@ -186,6 +186,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
     connect(project_wgt, &ProjectWidget::set_video_project, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::set_video_project, drawing_wgt, &DrawingWidget::set_video_project);
+    connect(project_wgt, &ProjectWidget::update_tag, video_wgt, &VideoWidget::update_tag);
 
     connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
