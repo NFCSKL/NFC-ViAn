@@ -497,7 +497,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     default:
         // Rotate here
         bool right_click = (event->button() == Qt::RightButton);
-        emit mouse_pressed(scaled_pos, right_click);
+
+        emit mouse_pressed(rotate(scaled_pos, 360-m_rotation), right_click);
         break;
     }
 }
@@ -521,7 +522,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         end_panning();
         break;
     default:
-        emit mouse_released(scaled_pos, false);
+        emit mouse_released(rotate(scaled_pos, 360-m_rotation), false);
         break;
     }
 }
@@ -575,7 +576,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
             bool shift = (event->modifiers() == Qt::ShiftModifier);
             bool ctrl = (event->modifiers() == Qt::ControlModifier);
-            emit mouse_moved(scaled_pos, shift, ctrl);
+            emit mouse_moved(rotate(scaled_pos, 360-m_rotation), shift, ctrl);
         }
         break;
     }
@@ -682,22 +683,18 @@ void FrameWidget::panning(QPoint pos) {
     int x{}, y{};
     scale_panning(panning_tracker.first, x);
     scale_panning(panning_tracker.second, y);
-
-    //qDebug() << x << y;
-    //rotate(x, y);
-    //qDebug() << x << y;
     emit moved_xy(x, y);
     prev_pos = pos;
 }
 
-QPoint FrameWidget::rotate(QPoint pos) {
-    int x = pos.x();
-    int y = pos.y();
-    for (int i = m_rotation / 90; i > 0; --i) {
-        std::swap(x,y);
-        y *= -1;
+QPoint FrameWidget::rotate(QPoint pos, int rotation) {
+    int width = m_org_image.cols;
+    int height = m_org_image.rows;
+
+    if (rotation == 90 || rotation == 270) {
+        std::swap(width, height);
     }
-    return QPoint(x,y);
+    return Utility::rotate(pos, rotation, width, height);
 }
 
 /**

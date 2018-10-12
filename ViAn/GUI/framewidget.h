@@ -125,7 +125,7 @@ private:
     void set_rect_start(QPoint pos);
     void set_analysis_settings();
     void panning(QPoint pos);
-    QPoint rotate(QPoint pos);
+    QPoint rotate(QPoint pos, int rotation);
     QPoint rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
