@@ -37,9 +37,12 @@ cv::Mat Text::draw(cv::Mat &frame) {
     return frame;
 }
 
-cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
     Q_UNUSED (anchor)
     Q_UNUSED (scale_factor)
+    Q_UNUSED(angle)
+    Q_UNUSED(width)
+    Q_UNUSED(height)
     return draw(frame);
 }
 

@@ -399,14 +399,18 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
 
     int width = m_org_image.cols;
     int height = m_org_image.rows;
-//    if (m_rotation == 90 || m_rotation == 270) {
-//        std::swap(width, height);
-//    }
-    QPoint q_pos = Utility::rotate(scaled_pos, m_rotation, width, height);
-    //qDebug() << "before anchor" << q_pos;
-    //qDebug() << "anchor" << anchor;
+    //int width = this->width();
+    //int height = this->height();
+    if (m_rotation == 90 || m_rotation == 270) {
+        std::swap(width, height);
+    }
+    QPoint q_pos = Utility::rotate(scaled_pos, 360-m_rotation, width, height);
+    qDebug() << "with rotation" << q_pos;
+    //qDebug() << "after scale" << anchor + q_pos/m_scale_factor;
+
+    qDebug() << "anchor" << anchor;
     //q_pos += anchor;
-    qDebug() << scaled_pos;
+    //qDebug() << scaled_pos;
     return scaled_pos;
 }
 
@@ -420,12 +424,13 @@ QPoint FrameWidget::scale_to_view(QPoint pos) {
         std::swap(width, height);
     }
 
-    QPoint q_pos = Utility::rotate(pos, 360-m_rotation, width, height);
+    QPoint q_pos = Utility::rotate(pos, m_rotation, width, height);
     //qDebug() << "-------" << q_pos;
     //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
     QPoint scaled_pos = (pos-anchor)*m_scale_factor;
+    QPoint rotated_q_pos = (q_pos-anchor)*m_scale_factor;
     //qDebug() << "anchor" << anchor;
-    //qDebug() << "scaled" << scaled_pos;
+    qDebug() << "scaled to view pos" << rotated_q_pos;
     return scaled_pos;
 }
 
@@ -490,6 +495,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         init_panning(event->pos());
         break;
     default:
+        // Rotate here
         bool right_click = (event->button() == Qt::RightButton);
         emit mouse_pressed(scaled_pos, right_click);
         break;

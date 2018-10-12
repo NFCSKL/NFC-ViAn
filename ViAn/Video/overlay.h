@@ -36,7 +36,7 @@ public:
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void draw_overlay(cv::Mat &frame, int frame_nr);
-    void draw_overlay_scaled(cv::Mat &frame, int frame_nr, cv::Point anchor, double scale_factor);
+    void draw_overlay_scaled(cv::Mat &frame, int frame_nr, cv::Point anchor, double scale_factor, int angle, int width, int height);
 
     void create_text(QPoint, int);
     void set_text_settings(QString text, float font_scale);

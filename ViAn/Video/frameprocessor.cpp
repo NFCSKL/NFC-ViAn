@@ -181,6 +181,8 @@ void FrameProcessor::process_frame() {
                   view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
     int frame_num = m_frame_index->load();
+    int width = m_width->load();
+    int height = m_height->load();
 
     // Draws the text drawings on the overlay
     m_overlay->draw_overlay(manipulated_frame, frame_num);
@@ -188,8 +190,10 @@ void FrameProcessor::process_frame() {
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
 
+    qDebug() << "size" << m_width->load() << m_height->load() << m_zoomer.get_angle();
+
     // Draws the other drawings on the overlay
-    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor);
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);

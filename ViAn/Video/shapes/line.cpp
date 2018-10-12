@@ -35,8 +35,10 @@ cv::Mat Line::draw(cv::Mat &frame) {
  * @param scale_factor - Zoom factor, used to scale drawing.
  * @return Returns the frame with drawing.
  */
-cv::Mat Line::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
-    cv::line(frame, (draw_start-anchor)*scale_factor, (draw_end-anchor)*scale_factor, color, thickness);
+cv::Mat Line::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+    QPoint rot_start = Utility::rotate(Utility::from_cvpoint(draw_start), angle, width, height);
+    QPoint rot_end = Utility::rotate(Utility::from_cvpoint(draw_end), angle, width, height);
+    cv::line(frame, (Utility::from_qpoint(rot_start)-anchor)*scale_factor, (Utility::from_qpoint(rot_end)-anchor)*scale_factor, color, thickness);
     return frame;
 }
 
