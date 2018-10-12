@@ -331,7 +331,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     // Draw the zoom box
     if (mark_rect) {
         painter.setPen(QColor(0,255,0));
-        QRectF zoom(scale_to_view(rect_start), scale_to_view(rect_end));
+        QRectF zoom(scale_to_view(rect_start, false), scale_to_view(rect_end, false));
         qDebug() << "in paint start" << rect_start << zoom.topLeft();
         painter.drawRect(zoom);
     }
@@ -408,29 +408,30 @@ QPoint FrameWidget::scale_to_video(QPoint pos) {
     qDebug() << "with rotation" << q_pos;
     //qDebug() << "after scale" << anchor + q_pos/m_scale_factor;
 
-    qDebug() << "anchor" << anchor;
+    //qDebug() << "anchor" << anchor;
     //q_pos += anchor;
     //qDebug() << scaled_pos;
     return scaled_pos;
 }
 
-QPoint FrameWidget::scale_to_view(QPoint pos) {
+QPoint FrameWidget::scale_to_view(QPoint pos, bool rotate) {
     //qDebug() << "pos at start" << pos;
     //QPoint new_pos = pos-anchor;
     //qDebug() << "t,p frame" << _tmp_frame.cols << _tmp_frame.rows;
     int width = m_org_image.cols;
     int height = m_org_image.rows;
-    if (m_rotation == 90 || m_rotation == 270) {
-        std::swap(width, height);
-    }
 
-    QPoint q_pos = Utility::rotate(pos, m_rotation, width, height);
-    //qDebug() << "-------" << q_pos;
-    //QPoint rotated_anchor = Utility::rotate(anchor, m_rotation, m_org_image.cols, m_org_image.rows);
+    if (rotate) {
+//        if (m_rotation == 90 || m_rotation == 270) {
+//            std::swap(width, height);
+//        }
+
+        pos = Utility::rotate(pos, m_rotation, width, height);
+    }
     QPoint scaled_pos = (pos-anchor)*m_scale_factor;
-    QPoint rotated_q_pos = (q_pos-anchor)*m_scale_factor;
+    //QPoint rotated_q_pos = (q_pos-anchor)*m_scale_factor;
     //qDebug() << "anchor" << anchor;
-    qDebug() << "scaled to view pos" << rotated_q_pos;
+    qDebug() << "scaled to view pos" << scaled_pos;
     return scaled_pos;
 }
 
@@ -498,7 +499,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         // Rotate here
         bool right_click = (event->button() == Qt::RightButton);
 
-        emit mouse_pressed(rotate(scaled_pos, 360-m_rotation), right_click);
+        emit mouse_pressed(rotate(scaled_pos, 360-m_rotation, true), right_click);
         break;
     }
 }
@@ -522,7 +523,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         end_panning();
         break;
     default:
-        emit mouse_released(rotate(scaled_pos, 360-m_rotation), false);
+        emit mouse_released(rotate(scaled_pos, 360-m_rotation, true), false);
         break;
     }
 }
@@ -576,7 +577,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
             bool shift = (event->modifiers() == Qt::ShiftModifier);
             bool ctrl = (event->modifiers() == Qt::ControlModifier);
-            emit mouse_moved(rotate(scaled_pos, 360-m_rotation), shift, ctrl);
+            emit mouse_moved(rotate(scaled_pos, 360-m_rotation, true), shift, ctrl);
         }
         break;
     }
@@ -687,11 +688,11 @@ void FrameWidget::panning(QPoint pos) {
     prev_pos = pos;
 }
 
-QPoint FrameWidget::rotate(QPoint pos, int rotation) {
+QPoint FrameWidget::rotate(QPoint pos, int rotation, bool swap) {
     int width = m_org_image.cols;
     int height = m_org_image.rows;
 
-    if (rotation == 90 || rotation == 270) {
+    if (swap && (rotation == 90 || rotation == 270)) {
         std::swap(width, height);
     }
     return Utility::rotate(pos, rotation, width, height);

@@ -125,12 +125,12 @@ private:
     void set_rect_start(QPoint pos);
     void set_analysis_settings();
     void panning(QPoint pos);
-    QPoint rotate(QPoint pos, int rotation);
+    QPoint rotate(QPoint pos, int rotation, bool swap);
     QPoint rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
     QPoint scale_to_video(QPoint pos);
-    QPoint scale_to_view(QPoint pos);
+    QPoint scale_to_view(QPoint pos, bool rotate = true);
 };
 
 #endif // FRAMEWIDGET_H
