@@ -1110,9 +1110,15 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
         m_proj->get_videos().erase(it);
+        // TODO store folder for deletion if project saved
+        if (v_proj->get_video()->is_sequence()) {
+            // Will be deleted in close
+            removed_sequences.push_back(v_proj);
+        } else {
+            delete v_proj;
+        }
         m_proj->set_unsaved(true);
     }
-    delete v_proj;
     emit item_removed(v_proj);
     emit remove_overlay();
 }
@@ -1302,6 +1308,15 @@ bool ProjectWidget::save_project() {
         }
     }
 
+    for (auto v_proj : removed_sequences) {
+        auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
+        qDebug() << "deleting " << QString::fromStdString(seq->get_search_path());
+        QDir directory(QString::fromStdString(seq->get_search_path()));
+        directory.removeRecursively();
+        delete v_proj;
+    }
+    removed_sequences.clear();
+
     save_item_data();
     emit save_draw_wgt();
 
@@ -1410,37 +1425,36 @@ bool ProjectWidget::close_project() {
     emit set_tag_slider(false);
     emit enable_poi_btns(false, false);
 
-    // Restore changes on all image sequences that are unsaved
-    for (auto vid_proj : m_proj->get_videos()) {
-        if (vid_proj->get_video()->is_sequence()) {
-            auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
-            if (sequence && !sequence->is_saved()) {
-                sequence->restore();
+    // If the user chose not to save
+    // Restore changes on all image sequences that are unsaved but not removed
+    if (!m_proj->is_saved()) {
+        for (auto vid_proj : m_proj->get_videos()) {
+            // Remove folder if sequence has been removed (never added) from the project
+            if (vid_proj->get_video()->is_sequence()) {
+                auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
+                if (sequence->never_saved()) {
+                    // Remove sequences that have never been saved
+                    qDebug() << "deleting " << QString::fromStdString(sequence->get_search_path());
+                    QDir directory(QString::fromStdString(sequence->get_search_path()));
+                    directory.removeRecursively();
+                } else if (!sequence->is_saved()) {
+                    // Revert changes done to sequences
+                    sequence->revert();
+                }
             }
         }
     }
 
-//    // Revert unsaved changes done to sequences
-//    for (auto vid_proj : m_proj->get_videos()) {
-//        if (vid_proj->get_video()->is_sequence()) {
-//            auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
-//            if (sequence) {
-//                // Delete the files with the corresponding checksums
-//                QStringList hashes;
-//                for (auto hash : sequence->get_unsaved_hashes()) hashes.append(QString::fromStdString(hash));
-//                if (!hashes.isEmpty()) {
-//                    Utility::remove_checksum_files(QString::fromStdString(sequence->get_search_path()),
-//                                              hashes);
-//                }
-
-//                // Delete container folder if there are no images left
-//                if (!sequence->get_saved_order().size()){
-//                    QDir directory(QString::fromStdString(sequence->get_search_path()));
-//                    directory.removeRecursively();
-//                }
-//            }
-//        }
-//    }
+    // If the user chose to save, remove all folders of the removed image sequences
+    // Otherwise, revert the changes made
+    if (!m_proj->is_saved()) {
+        for (auto v_proj : removed_sequences) {
+            auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
+            qDebug() << "Reverting changes made on " << QString::fromStdString(seq->get_search_path());
+            seq->revert();
+            delete v_proj;
+        }
+    }
 
     // Remove project if temporary
     if (m_proj->is_temporary()) {

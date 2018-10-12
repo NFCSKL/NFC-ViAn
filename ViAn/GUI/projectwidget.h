@@ -135,6 +135,7 @@ private:
     void add_analyses_to_item(VideoItem* v_item);
     void update_current_tag(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
+    std::vector<VideoProject*> removed_sequences;
 signals:
     void close_all_widgets();
     void project_closed();
