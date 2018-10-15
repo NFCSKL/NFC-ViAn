@@ -38,24 +38,11 @@ cv::Mat Text::draw(cv::Mat &frame) {
 }
 
 cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+    Q_UNUSED(anchor) Q_UNUSED(scale_factor)
     QPoint rot_start = Utility::rotate(Utility::from_cvpoint(draw_start), angle, width, height);
-    cv::Mat text_img = cv::Mat::zeros(frame.rows, frame.cols, frame.type());
-    //cv::Mat text_img = cv::Mat::zeros(wid, hei, frame.type());
-    cv::putText(text_img, m_name.toStdString(), draw_start, cv::FONT_HERSHEY_SIMPLEX, font_scale,
+    cv::putText(frame, m_name.toStdString(), Utility::from_qpoint(rot_start), cv::FONT_HERSHEY_SIMPLEX, font_scale,
                 color, thickness);
-    rotate(text_img, 360-angle, text_img);
-    frame = frame+text_img;
     return frame;
-}
-
-void Text::rotate(cv::Mat& src, double angle, cv::Mat& dst) {
-    int len = std::min(src.cols, src.rows);
-    int width = src.cols;
-    int height = src.rows;
-    cv::Point2f pt(width/2., height/2.);
-    cv::Mat r = cv::getRotationMatrix2D(pt, angle, 1.0);
-
-    cv::warpAffine(src, dst, r, cv::Size(width, height));
 }
 
 /**
