@@ -153,7 +153,15 @@ QRect Utility::from_cvrect(cv::Rect rect) {
     return QRect(from_cvpoint(rect.tl()), from_cvpoint(rect.br()));
 }
 
-
+/**
+ * @brief Utility::rotate
+ * Rotate the given point by the given rotation
+ * @param pos           : Point to be rotated
+ * @param rotation      : Wanted rotation
+ * @param width         : Width of frame
+ * @param height        : Height of frame
+ * @return              : Rotated point
+ */
 QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
     const double DEGREE_TO_RADIAN_FACTOR = M_PI / 180;
     double angle = rotation*DEGREE_TO_RADIAN_FACTOR;
@@ -173,7 +181,5 @@ QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
     translated_x = rotated_x + width / 2;
     translated_y = rotated_y + height / 2;
 
-    QPoint new_pos = QPoint(translated_x, translated_y);
-
-    return new_pos;
+    return QPoint(translated_x, translated_y);
 }

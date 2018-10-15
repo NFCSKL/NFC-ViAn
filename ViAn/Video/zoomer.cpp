@@ -152,7 +152,6 @@ void Zoomer::update_rotation(const int &angle) {
     // Translate back using the new frame size
     translated_x = rotated_x + m_transformed_frame_rect.width / 2;
     translated_y = rotated_y + m_transformed_frame_rect.height / 2;
-
     cv::Point2f rotated_center(translated_x, translated_y);
     m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);
     update_anchor();
@@ -318,8 +317,7 @@ cv::Rect Zoomer::get_view_rect() const {
                                     cv::Size(m_viewport.size.width / m_scale_factor,
                                              m_viewport.size.height / m_scale_factor),
                                     0);
-    auto rect = scaled_viewport.boundingRect() & m_transformed_frame_rect;
-    return rect;
+    return scaled_viewport.boundingRect() & m_transformed_frame_rect;
 }
 
 /**

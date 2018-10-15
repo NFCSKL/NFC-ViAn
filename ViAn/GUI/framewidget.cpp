@@ -194,6 +194,12 @@ void FrameWidget::set_scale_factor(double scale_factor) {
     }
 }
 
+/**
+ * @brief FrameWidget::set_rotation
+ * Slot function for updating framewidget after rotation have been done
+ * This will update the zoom rect coordinates
+ * @param rotation
+ */
 void FrameWidget::set_rotation(int rotation) {
     int width = m_org_image.cols;
     int height = m_org_image.rows;
@@ -385,11 +391,24 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.end();
 }
 
+/**
+ * @brief FrameWidget::scale_to_video
+ * Scale a point to the coordinates in the video
+ * @param pos   : point in the viewport
+ * @return
+ */
 QPoint FrameWidget::scale_to_video(QPoint pos) {
     QPoint scaled_pos = anchor + pos/m_scale_factor;
     return scaled_pos;
 }
 
+/**
+ * @brief FrameWidget::scale_to_view
+ * Scale and rotate a point to coordinates in the viewport
+ * @param pos       : point in the video
+ * @param rotate    : if the point should be rotated
+ * @return
+ */
 QPoint FrameWidget::scale_to_view(QPoint pos, bool rotate) {
     int width = m_org_image.cols;
     int height = m_org_image.rows;
@@ -645,6 +664,14 @@ void FrameWidget::panning(QPoint pos) {
     prev_pos = pos;
 }
 
+/**
+ * @brief FrameWidget::rotate
+ * Will rotate the given point with the given rotation
+ * @param pos           : Point to be rotated
+ * @param rotation      : Rotation
+ * @param swap          : If the width and height might need to be swaped
+ * @return
+ */
 QPoint FrameWidget::rotate(QPoint pos, int rotation, bool swap) {
     int width = m_org_image.cols;
     int height = m_org_image.rows;

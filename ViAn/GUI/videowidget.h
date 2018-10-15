@@ -73,7 +73,6 @@ private:
     int m_video_width = 0;
     int m_video_height = 0;
 
-
     int m_frame_rate = 0;
     int m_frame_length = 0;
 

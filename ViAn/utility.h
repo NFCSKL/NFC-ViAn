@@ -5,7 +5,6 @@
 #include <QPoint>
 #include <QRect>
 #include <QDir>
-#include <Project/video.h>
 
 namespace Utility{
      std::pair<double, double> size_ratio(QSize s1, QSize s2);
