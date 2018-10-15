@@ -18,7 +18,6 @@
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
-#include "Project/Analysis/drawingtag.h"
 #include "Project/videoproject.h"
 #include "Analysis/analysismethod.h"
 #include "Analysis/motiondetection.h"
@@ -40,7 +39,7 @@ class ProjectWidget : public QTreeWidget
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",
                                 "m4p", "m4v", "mpg", "mp2", "mpeg",
                                 "mpe", "mpv", "m2v", "m4v", "3gp", "3g2",
-                                "flv", "f4v", "f4p", "f4a", "f4b"};
+                                "flv", "f4v", "f4p", "f4a", "f4b", "webm"};
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     ~ProjectWidget();
@@ -50,6 +49,8 @@ public:
     QPointer<QAction> show_details_act = nullptr;
     QPointer<QAction> show_settings_act = nullptr;
     QString get_default_path();
+
+    std::vector<std::string> remove_list;
 
 signals:
     void selected_media();
@@ -77,6 +78,8 @@ signals:
     void update_slider();
     void remove_overlay();
     void new_vid_proj(VideoProject*);
+    void item_type(int);
+    void update_tag();
 
 public slots:
     void new_project(void);
@@ -115,7 +118,7 @@ private slots:
     void drawing_tag();
     void update_settings();
     void create_folder_item();
-    void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
+    void tree_item_changed(QTreeWidgetItem *item, QTreeWidgetItem *prev_item = nullptr);
     void check_selection();
     void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 

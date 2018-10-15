@@ -34,10 +34,10 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
     brightness_slider->setValue(brightness);
     brightness_value_label->setText(QString::number(brightness_slider->value()));
 
-    contrast_slider->setSingleStep(FrameManipulator().CONTRAST_STEP*DOUBLE_TO_INT);
-    contrast_slider->setMaximum(FrameManipulator().CONTRAST_MAX*DOUBLE_TO_INT);
-    contrast_slider->setMinimum(FrameManipulator().CONTRAST_MIN*DOUBLE_TO_INT);
-    contrast_slider->setValue(contrast*DOUBLE_TO_INT);
+    contrast_slider->setSingleStep(static_cast<int>(FrameManipulator().CONTRAST_STEP*DOUBLE_TO_INT));
+    contrast_slider->setMaximum(static_cast<int>(FrameManipulator().CONTRAST_MAX*DOUBLE_TO_INT));
+    contrast_slider->setMinimum(static_cast<int>(FrameManipulator().CONTRAST_MIN*DOUBLE_TO_INT));
+    contrast_slider->setValue(static_cast<int>(contrast*DOUBLE_TO_INT));
     contrast_value_label->setText(QString::number(contrast_slider->value()/DOUBLE_TO_INT));
 
     connect(brightness_slider, &QSlider::valueChanged, this, &ManipulatorWidget::b_changed);
@@ -50,10 +50,17 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
 
     // Button setup
     btn_box = new QDialogButtonBox(Qt::Horizontal, this);
-    btn_box->addButton(QDialogButtonBox::Ok)->setText("Apply");
+
+    apply_btn = new QPushButton(tr("&Apply"));
+
+    btn_box->addButton(apply_btn, QDialogButtonBox::AcceptRole);
     btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
 
-    connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ManipulatorWidget::ok_clicked);
+    apply_btn->setDisabled(true);
+    QString default_tool_tip = "Brightness: "+QString::number(FrameManipulator().BRIGHTNESS_DEFAULT)+"\nContrast: "+QString::number(FrameManipulator().CONTRAST_DEFAULT);
+    btn_box->button(QDialogButtonBox::RestoreDefaults)->setToolTip(default_tool_tip);
+
+    connect(apply_btn, &QPushButton::clicked, this, &ManipulatorWidget::ok_clicked);
     connect(btn_box->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &ManipulatorWidget::default_clicked);
 
     layout->addWidget(btn_box);
@@ -70,6 +77,7 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, QWidget* parent) : QWidget
 void ManipulatorWidget::ok_clicked() {
     int b = brightness_slider->value();
     double c = contrast_slider->value()/DOUBLE_TO_INT;
+    apply_btn->setDisabled(true);
     emit values(b, c, true);
     emit update_tag(b, c);
 }
@@ -81,7 +89,7 @@ void ManipulatorWidget::ok_clicked() {
  */
 void ManipulatorWidget::default_clicked() {
     brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
-    contrast_slider->setValue(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT);
+    contrast_slider->setValue(static_cast<int>(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT));
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, true);
 }
 
@@ -93,6 +101,7 @@ void ManipulatorWidget::default_clicked() {
  */
 void ManipulatorWidget::b_changed(int value) {
     brightness_value_label->setText(QString::number(value));
+    apply_btn->setDisabled(false);
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, false);
 }
 
@@ -105,6 +114,7 @@ void ManipulatorWidget::b_changed(int value) {
 void ManipulatorWidget::c_changed(int value) {
     QString text = QString::number(value/DOUBLE_TO_INT);
     contrast_value_label->setText(text);
+    apply_btn->setDisabled(false);
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, false);
 }
 
@@ -118,6 +128,7 @@ void ManipulatorWidget::c_changed(int value) {
 void ManipulatorWidget::set_values(int b_value, double c_value) {
     blockSignals(true);
     brightness_slider->setValue(b_value);
-    contrast_slider->setValue(c_value*DOUBLE_TO_INT);
+    contrast_slider->setValue(static_cast<int>(c_value*DOUBLE_TO_INT));
     blockSignals(false);
+    apply_btn->setDisabled(true);
 }

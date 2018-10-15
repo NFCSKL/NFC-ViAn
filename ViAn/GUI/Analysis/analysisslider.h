@@ -7,7 +7,6 @@
 #include <set>
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/tag.h"
-#include "Project/Analysis/drawingtag.h"
 /**
  * @brief The AnalysisSlider class
  * This class represents a conventional slider

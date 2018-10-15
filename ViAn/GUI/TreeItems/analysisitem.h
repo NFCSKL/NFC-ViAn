@@ -18,5 +18,6 @@ public:
     void set_not_new();
 
     const QString NEW_STR = " (NEW!)";
+    bool saved = true;
 };
 #endif // ANALYSISITEM_H

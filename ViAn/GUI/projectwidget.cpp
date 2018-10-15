@@ -39,7 +39,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_changed);
 
     // Widget only shortcut for creating a new folder
     QShortcut* new_folder_sc = new QShortcut(this);
@@ -241,14 +241,14 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
             item->addChild(tf_item);
         }
         item->setExpanded(true);
-        tree_item_clicked(item);
+        tree_item_changed(item);
     } else if (!tag->is_drawing_tag()) {
         TagItem* item = new TagItem(tag);
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
         setCurrentItem(item);
-        tree_item_clicked(item);
+        tree_item_changed(item);
     }
     vid_item->setExpanded(true);
 }
@@ -622,19 +622,23 @@ bool ProjectWidget::prompt_save() {
         case QMessageBox::Cancel:
                 ok = false;
                 break;
+        case QMessageBox::No:
+                remove_list.clear();
+                break;
     }
     return ok;
 }
 
 /**
- * @brief ProjectWidget::tree_item_clicked
- * Slot function for when a tree item is clicked.
+ * @brief ProjectWidget::tree_item_changed
+ * Slot function for when the current tree item is changed.
  * Performs different operations based on tree item type.
- * @param item
- * @param col
+ * @param item          : new tree item
+ * @param prev_item     : previous tree item
  */
-void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
-    Q_UNUSED(col)
+void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
+    qDebug() << "item changed";
+    Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){
     case SEQUENCE_ITEM: {
@@ -645,6 +649,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         state.frame = seq_item->get_index();
         emit set_video_project(vid_item->get_video_project());
         emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
 
         emit set_show_analysis_details(false);
         emit set_detections(false);
@@ -658,8 +663,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit set_video_project(vid_item->get_video_project());
         VideoState state;
-        state = vid_item->get_video_project()->get_video()->state;
+        vid_item->get_video_project()->state.video = true;
+        state = vid_item->get_video_project()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
 
         emit set_show_analysis_details(false);
         emit set_detections(false);
@@ -680,6 +687,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         VideoState state;
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
 
         emit set_show_analysis_details(true);
         emit set_detections(true);
@@ -701,6 +709,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         VideoState state;
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
 
         emit set_show_analysis_details(false);
         emit set_detections(false);
@@ -727,15 +736,12 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
             item->setCheckState(0, Qt::Checked);
             m_tag_item = tag_item;
         }
-        // If the current selected tag already is the current tag, deselect it
-        else if (m_tag_item == tag_item) {
-            update_current_tag(nullptr);
-        }
 
         emit set_video_project(vid_item->get_video_project());
         VideoState state;
         state = vid_item->get_video_project()->get_video()->state;
         emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
 
         emit set_show_analysis_details(false);
         emit set_detections(false);
@@ -761,6 +767,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         state = tf_item->get_state();
         if (item->parent()->type() == TAG_ITEM) {
             emit marked_video_state(vid_item->get_video_project(), state);
+            emit item_type(item->type());
 
             TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
             emit marked_basic_analysis(tag_item->get_tag());
@@ -770,12 +777,15 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
             m_tag_item = tag_item;
         } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
             emit marked_video_state(vid_item->get_video_project(), state);
+            emit item_type(item->type());
             DrawingTagItem* dt_item = dynamic_cast<DrawingTagItem*>(item->parent());
             emit marked_basic_analysis(dt_item->get_tag());
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }
+        break;
     } case FOLDER_ITEM: {
+        emit item_type(item->type());
         break;
     } default:
         break;
@@ -894,9 +904,11 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
                 break;
             case TAG_FRAME_ITEM:
+                menu.addAction("Update", this, SIGNAL(update_tag()));
                 if (item->parent()->type() == TAG_ITEM) {
                     menu.addAction("Delete", this, SLOT(remove_item()));
                 }
+                break;
             default:
                 break;
         }
@@ -989,6 +1001,10 @@ void ProjectWidget::update_settings() {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
+    if (!dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
+        return;
+    }
+
     QString text = "Deleting item(s)\n"
                    "(Unselected items within selected folders will be deleted as well)";
     QString info_text = "Do you wish to continue?";
@@ -1095,7 +1111,7 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     AnalysisProxy* analysis = dynamic_cast<AnalysisItem*>(item)->get_analysis();
 
-    analysis->delete_saveable(analysis->full_path());
+    remove_list.push_back(analysis->full_path());
     vid_item->get_video_project()->remove_analysis(analysis);
     emit clear_analysis();
 }
@@ -1184,6 +1200,14 @@ bool ProjectWidget::save_project() {
         return false;
     }
 
+    for (std::string path : remove_list) {
+        QFile file(QString::fromStdString(path));
+        if(file.exists()) {
+            file.remove();
+        }
+    }
+    remove_list.clear();
+
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
     if (m_proj->is_temporary()) {
@@ -1220,6 +1244,11 @@ bool ProjectWidget::save_project() {
 
     save_item_data();
     emit save_draw_wgt();
+
+    // Mark all analysis as saved
+    for (AnalysisItem* item : a_items) {
+        item->saved = true;
+    }
 
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -1300,6 +1329,14 @@ bool ProjectWidget::close_project() {
         abort_close = !prompt_save();
         if (abort_close) {
             return false;
+        }
+    }
+
+    // Remove the analysis file from the folder of all the analyses that are not saved
+    for (AnalysisItem* item : a_items) {
+        if (!(item->saved)) {
+            AnalysisProxy* analysis = item->get_analysis();
+            analysis->delete_saveable(analysis->full_path());
         }
     }
 

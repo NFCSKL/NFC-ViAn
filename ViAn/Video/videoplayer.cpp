@@ -104,7 +104,8 @@ void VideoPlayer::check_events() {
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed,
                                      [&](){return m_abort_playback->load() || m_new_video->load() ||
-                                     (current_frame != m_frame->load() && m_video_loaded->load());})) {
+                                     (current_frame != m_frame->load() && m_video_loaded->load())||
+                                     m_speed_step->load() != m_cur_speed_step;})) {
             if (m_abort_playback->load()) {
                 lk.unlock();
                 break;
@@ -115,20 +116,29 @@ void VideoPlayer::check_events() {
             } else if (current_frame != m_frame->load() && m_video_loaded->load()) {
                 set_frame();
             }
-        } else {
-            // Timer condition triggered. Update playback speed if nessecary and read new frame
+
+            // Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
             if (speed != m_cur_speed_step) {
                 set_playback_speed(speed);
             }
-
+        } else {
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-                if (!synced_read()) continue;
+                // Update frame number
                 ++*m_frame;
                 ++current_frame;
-                display_index();
+                // If not in sync with frame processor
+                // Undo the update on the frame number
+                // It's done in this order so the processing in synced read is done on the new frame
+                if (!synced_read()) {
+                    --*m_frame;
+                    --current_frame;
+                    continue;
+                }
+
+                emit display_index();
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
                 elapsed = end - start;
             }
@@ -184,7 +194,6 @@ bool VideoPlayer::synced_read(){
                 qWarning("Could not retrieve frame.");
                 qWarning(err_msg);
             }
-
         }
     }
     m_v_sync->con_var.notify_all();
@@ -194,7 +203,6 @@ bool VideoPlayer::synced_read(){
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
     }
-
     return true;
 }
 

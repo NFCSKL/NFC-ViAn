@@ -26,6 +26,7 @@ public:
     Analysis *load_analysis(); // Only use this if all analysisinformation is needed
 
     std::vector<std::pair<int, int>> m_slider_interval;
+    bool is_new = false;
 
     AnalysisSettings *get_settings();
 

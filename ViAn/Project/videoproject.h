@@ -41,6 +41,8 @@ public:
     VideoProject();
     ~VideoProject();
 
+    VideoState state;
+
     Q_DECL_DEPRECATED ID id;
 
     void read(const QJsonObject& json);

@@ -524,9 +524,13 @@ void VideoWidget::init_playback_slider() {
 
 void VideoWidget::stop_btn_clicked() {
     set_status_bar("Stop");
-    frame_index.store(0);
-    is_playing.store(false);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        frame_index.store(0);
+        is_playing.store(false);
+    }
     play_btn->setChecked(false);
+
     on_new_frame();
 }
 
@@ -619,6 +623,11 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
     if (!m_floating) {
+        if (proj_tree_item == VIDEO_ITEM) {
+            m_vid_proj->state.center = center;
+            m_vid_proj->state.scale_factor = scale;
+            m_vid_proj->state.rotation = angle;
+        }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
         video->state.scale_factor = scale;
@@ -709,12 +718,32 @@ void VideoWidget::play_btn_toggled(bool status) {
     }
 }
 
-void VideoWidget::update_tag(int b, double c) {
-    if (m_tag == nullptr || m_tag->is_drawing_tag() || !m_tag->find_frame(playback_slider->value())) {
+/**
+ * @brief VideoWidget::update_tag
+ * Update the Tag in the current label that corresponds to the current frame
+ */
+void VideoWidget::update_tag() {
+    try {
+        TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
+        VideoState state = m_vid_proj->get_video()->state;
+        t_frame->m_state = state;
+        t_frame->m_state.brightness = m_settings.brightness;
+        t_frame->m_state.contrast = m_settings.contrast;
+        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+    } catch (const std::out_of_range) {
+        qWarning() << "Can't update. No tag found on current frame";
         return;
     }
-    m_tag->update_color_correction(playback_slider->value(), b, c);
-    emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+}
+
+void VideoWidget::update_tag_color(int b, double c) {
+    if (proj_tree_item == TAG_FRAME_ITEM) {
+        m_tag->update_color_correction(playback_slider->value(), b, c);
+        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
+    } else if (proj_tree_item == TAG_ITEM || proj_tree_item == DRAWING_TAG_ITEM) {
+        m_tag->update_color_whole_tag(b, c);
+        emit set_status_bar("Whole tag '"+ QString::fromStdString(m_tag->get_name()) +"' updated");
+    }
 }
 
 /**
@@ -728,7 +757,6 @@ void VideoWidget::tag_frame() {
     }
 
     if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
-        QString text = " tagged";
         if (m_tag->find_frame(playback_slider->value())) {
             QMessageBox msg_box;
             msg_box.setText("Do you wanna overwrite the tag?");
@@ -736,16 +764,16 @@ void VideoWidget::tag_frame() {
             msg_box.setDefaultButton(QMessageBox::No);
             int reply = msg_box.exec();
             if (reply == QMessageBox::No) return;
-            remove_tag_frame();
-            text = " updated";
+            update_tag();
+        } else {
+            // Add frame to tag
+            VideoState state = m_vid_proj->get_video()->state;
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+            m_tag->add_frame(playback_slider->value(), t_frame);
+            emit tag_new_frame(playback_slider->value(), t_frame);
+            emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " tagged");
+            playback_slider->update();
         }
-        // Add frame to tag
-        VideoState state = m_vid_proj->get_video()->state;
-        TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
-        m_tag->add_frame(playback_slider->value(), t_frame);
-        emit tag_new_frame(playback_slider->value(), t_frame);
-        emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + text);
-        playback_slider->update();
     }
 }
 
@@ -919,11 +947,14 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_index.load()));
 
     if (!m_floating) {
+        if (proj_tree_item == VIDEO_ITEM) {
+            m_vid_proj->state.frame = frame_num;
+        }
         m_vid_proj->get_video()->state.frame = frame_num;
     }
 
     playback_slider->update();
-    frame_wgt->set_current_frame_nr(frame_num);
+    player_con.notify_one();
 }
 
 /**
@@ -973,12 +1004,10 @@ void VideoWidget::on_playback_slider_moved() {
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!video_btns_enabled) set_video_btns(true);
-
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
-
 
         // Set state variables but don't update the processor
         {
@@ -1013,6 +1042,15 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
     emit update_manipulator_wgt(state.brightness, state.contrast);
+}
+
+/**
+ * @brief VideoWidget::set_item_type
+ * Save the item type of the clicked item in the project tree
+ * @param type
+ */
+void VideoWidget::set_item_type(int type) {
+    proj_tree_item = type;
 }
 
 void VideoWidget::remove_item(VideoProject* vid_proj) {
@@ -1354,6 +1392,7 @@ void VideoWidget::on_original_size(){
  * @param c_val contrast value
  */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val, bool update) {
+    if (proj_tree_item == VIDEO_ITEM) update = true;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
@@ -1392,7 +1431,11 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
 }
 
 void VideoWidget::update_playback_speed(int speed) {
-    m_speed_step.store(speed);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        m_speed_step.store(speed);
+        player_con.notify_one();
+    }
     if (speed > 0) {
         fps_label->setText("Fps: " + QString::number(m_frame_rate*speed*2));
     } else if (speed < 0) {
@@ -1473,6 +1516,10 @@ double VideoWidget::get_contrast() {
 
 void VideoWidget::set_brightness_contrast(int bri, double cont) {
     if (!m_vid_proj) return;
+    if (proj_tree_item == VIDEO_ITEM) {
+        m_vid_proj->state.brightness = bri;
+        m_vid_proj->state.contrast = cont;
+    }
     m_vid_proj->get_video()->state.brightness = bri;
     m_vid_proj->get_video()->state.contrast = cont;
 }

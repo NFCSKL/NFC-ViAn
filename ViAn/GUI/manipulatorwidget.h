@@ -23,6 +23,7 @@ class ManipulatorWidget : public QWidget {
     QSlider* brightness_slider;
     QSlider* contrast_slider;
     QDialogButtonBox* btn_box;
+    QPushButton* apply_btn;
 
 signals:
     void values(int b_value, double c_value, bool update);

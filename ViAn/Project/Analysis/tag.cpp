@@ -30,11 +30,31 @@ void Tag::remove_frame(int frame) {
     }
 }
 
+/**
+ * @brief Tag::update_color_correction
+ * Update the current tag_frame's color correction
+ * @param frame     : Frame number of the tag_frame
+ * @param b_value   : brightness value
+ * @param c_value   : contrast value
+ */
 void Tag::update_color_correction(int frame, int b_value, double c_value) {
     auto it = tag_map.find(frame);
     if (it != tag_map.end()) {
         (*it).second->update_color_correction(b_value, c_value);
         m_unsaved_changes = true;
+    }
+}
+
+/**
+ * @brief Tag::update_color_whole_tag
+ * Updates the color correction on all tag_frames in the current tag
+ * @param b     : brightness value
+ * @param c     : contrast value
+ */
+void Tag::update_color_whole_tag(int b, double c) {
+    for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
+        (*it).second->m_state.brightness = b;
+        (*it).second->m_state.contrast = c;
     }
 }
 

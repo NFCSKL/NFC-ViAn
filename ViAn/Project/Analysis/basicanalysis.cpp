@@ -1,7 +1,6 @@
 #include "basicanalysis.h"
 #include "tag.h"
 #include "analysis.h"
-#include "drawingtag.h"
 
 BasicAnalysis::BasicAnalysis() {}
 
