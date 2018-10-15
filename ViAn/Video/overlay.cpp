@@ -24,12 +24,12 @@ Overlay::~Overlay() {
  * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
+void Overlay::draw_overlay(cv::Mat &frame, int frame_nr, cv::Point anchor, double scale_factor, int angle, int width, int height) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
             // Only draw the text drawings
             if ((*it)->get_show() && (*it)->get_shape() == TEXT) {
-                frame = (*it)->draw(frame);
+                frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle, width, height);
             }
         }
     }

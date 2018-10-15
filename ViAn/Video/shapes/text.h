@@ -26,6 +26,8 @@ private:
     double font_scale;
     cv::Size text_size;
     int baseline = 0;
+
+    void rotate(cv::Mat& src, double angle, cv::Mat& dst);
 };
 
 #endif // TEXT_H
