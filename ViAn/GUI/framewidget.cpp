@@ -638,8 +638,8 @@ void FrameWidget::set_analysis_settings() {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
         settings->quick_analysis = true;
 
-        QPoint scaled_start = scale_to_video(ana_rect_start);
-        QPoint scaled_end = scale_to_video(ana_rect_end);
+        QPoint scaled_start = rotate(scale_to_video(ana_rect_start), 360-m_rotation, true);
+        QPoint scaled_end = rotate(scale_to_video(ana_rect_end), 360-m_rotation, true);
         QRect scaled_rect(scaled_start, scaled_end);
         settings->set_bounding_box(Utility::from_qrect(scaled_rect));
 
