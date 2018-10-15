@@ -155,35 +155,8 @@ QRect Utility::from_cvrect(cv::Rect rect) {
 
 
 QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
-    //qDebug() << "rotation" << rotation;
-    QPoint new_point;
-    switch (rotation) {
-    case 90:
-        //new_point = QPoint(pos.y(), height-pos.x());
-        new_point = QPoint(height-pos.y(), pos.x());
-        break;
-    case 180:
-        new_point = QPoint(width-pos.x(), height-pos.y());
-        break;
-    case 270:
-        //new_point = QPoint(width-pos.y(), pos.x());
-        new_point = QPoint(pos.y(), width-pos.x());
-        break;
-    case 0:
-    case 360:
-        new_point = pos;
-        break;
-    default:
-        break;
-    }
-
-    //return new_point;
-
-
     const double DEGREE_TO_RADIAN_FACTOR = M_PI / 180;
     double angle = rotation*DEGREE_TO_RADIAN_FACTOR;
-
-    qDebug() << "rotation" << rotation;
 
     // Translate by negative pivot of old frame size
     double translated_x{pos.x() - static_cast<double>(width) / 2};
@@ -201,8 +174,6 @@ QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
     translated_y = rotated_y + height / 2;
 
     QPoint new_pos = QPoint(translated_x, translated_y);
-    qDebug() << "new pos" << new_pos;
-    //return new_pos;
 
-    return new_point;
+    return new_pos;
 }

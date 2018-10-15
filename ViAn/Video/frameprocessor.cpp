@@ -71,7 +71,6 @@ void FrameProcessor::check_events() {
             m_overlay_changed->store(false);
         }
 
-
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
             m_overlay_changed->store(false);
@@ -323,7 +322,6 @@ void FrameProcessor::update_overlay_settings() {
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
 
-
     // Update text action
     if (m_o_settings->update_text) {
         m_o_settings->update_text = false;
@@ -369,10 +367,6 @@ void FrameProcessor::update_overlay_settings() {
 }
 
 void FrameProcessor::update_rotation(const int& direction) {
-    //qDebug() << "m_rotatte_direction" << m_rotate_direction; // 0-3
-    
-    
-    //qDebug() << "current rotation" << m_z_settings->rotation;
     if (direction != m_rotate_direction) {
         m_rotate_direction = direction;
 

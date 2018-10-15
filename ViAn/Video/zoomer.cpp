@@ -19,29 +19,15 @@ Zoomer::Zoomer(cv::Size frame_size) {
  * each corner of the viewport rectangle are contained within the frame
  */
 void Zoomer::enforce_frame_boundaries() {
-    //qDebug() << "enforcing" << m_viewport.size.width << m_viewport.size.height;
     cv::RotatedRect temp(m_viewport.center,
                          cv::Size(m_viewport.size.width / m_scale_factor,
                                   m_viewport.size.height / m_scale_factor),
                          0);
 
-    //qDebug() << "angle" << m_angle;
     cv::Point2f p[4];
     temp.points(p);
-//    int corner = 1;
-//    for (int i = m_angle/90; i > 0; --i) {
-//        corner -= 1;
-//        if (corner <0) corner +=4;
-//    }
-
     cv::Point2f tl = p[1];
     cv::Point2f br = p[3];
-
-    //qDebug() << "corner" << corner;
-    //qDebug() << "tl" << Utility::from_cvpoint(tl);
-    //qDebug() << "br" << Utility::from_cvpoint(br);
-    //qDebug() << "other two" << Utility::from_cvpoint(p[0]) << Utility::from_cvpoint(p[2]);
-    //qDebug() << "transformed frame rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
 
     double dx{}, dy{};
     if ((tl.x) < 0 && (br.x) > m_transformed_frame_rect.width) {
@@ -63,15 +49,10 @@ void Zoomer::enforce_frame_boundaries() {
         // Frame is being cropped on the bottom, move center up
         dy = m_transformed_frame_rect.height - br.y;
     }
-    //qDebug() << "dx, dy" << dx << dy;
     m_viewport = cv::RotatedRect(cv::Point2f(m_viewport.center.x + std::round(dx), m_viewport.center.y + std::round(dy)),
                                  m_viewport.size,
                                  m_angle);
-    //qDebug() << "viewport" << m_viewport.size.width << m_viewport.size.height;
     update_anchor();
-    //anchor = Utility::rotate(Utility::from_cvpoint(tl), 360-m_angle, m_transformed_frame_rect.size().width, m_transformed_frame.size().height);
-    //anchor = Utility::from_cvpoint(tl);
-    //qDebug() << "THIS IS anchor" << anchor;
 }
 
 /**
@@ -90,7 +71,6 @@ void Zoomer::set_scale_factor(double scale_factor) {
  * @param p2 end point
  */
 void Zoomer::area_zoom(QPoint p1, QPoint p2) {
-    //qDebug() << "p1 and p2" << p1 << p2;
     int start_x = (p1.x() < p2.x()) ? p1.x() : p2.x();
     int end_x = (p1.x() < p2.x()) ? p2.x() : p1.x();
 
@@ -98,16 +78,8 @@ void Zoomer::area_zoom(QPoint p1, QPoint p2) {
     int end_y = (p1.y() < p2.y()) ? p2.y() : p1.y();
 
     cv::Point2f new_center(start_x + (end_x - start_x) / 2, start_y + (end_y - start_y) / 2);
-    //qDebug() << "center" << Utility::from_cvpoint(new_center);
     m_viewport = cv::RotatedRect(new_center, m_viewport.size, m_angle);
-    //qDebug() << "size" << m_viewport.size.width << m_viewport.size.height;
-    //qDebug() << "viewport" << Utility::from_cvpoint(m_viewport.boundingRect().tl()) << Utility::from_cvpoint(m_viewport.boundingRect().br());
-
     update_scale(end_x - start_x, end_y - start_y);
-    //qDebug() << "scale" << m_scale_factor;
-    //anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
-    //update_anchor();
-    //qDebug() << "anchor" << anchor;
 }
 
 /**
@@ -170,14 +142,9 @@ void Zoomer::update_rotation(const int &angle) {
     double translated_x{m_viewport.center.x - m_transformed_frame_rect.width / 2};
     double translated_y{m_viewport.center.y - m_transformed_frame_rect.height / 2};
 
-    //qDebug() << "transformed rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
-    //qDebug() << "x & y" << translated_x << translated_y;
-
     // Rotate around pivot
     double rotated_x{translated_x * std::cos(angle_diff) - translated_y * std::sin(angle_diff)};
     double rotated_y{translated_x * std::sin(angle_diff) + translated_y * std::cos(angle_diff)};
-
-    //qDebug() << "rotated x & y" << rotated_x << rotated_y;
 
     m_angle = angle;
     adjust_frame_rect_rotation();
@@ -185,7 +152,6 @@ void Zoomer::update_rotation(const int &angle) {
     // Translate back using the new frame size
     translated_x = rotated_x + m_transformed_frame_rect.width / 2;
     translated_y = rotated_y + m_transformed_frame_rect.height / 2;
-    //qDebug() << "Translated x & y" << translated_x << translated_y;
 
     cv::Point2f rotated_center(translated_x, translated_y);
     m_viewport = cv::RotatedRect(rotated_center, m_viewport.size, angle);
@@ -199,7 +165,6 @@ void Zoomer::update_rotation(const int &angle) {
  * @param y movement on the y-axis
  */
 void Zoomer::translate_viewport_center(int x, int y){
-    qDebug() << x << y;
     // TODO don't move outside frame rect
     bool is_moving_left{x < 0}, is_moving_right{x > 0}, is_moving_up{y < 0}, is_moving_down{y > 0};
 
@@ -264,7 +229,7 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
 
     // Check for default state
     if (center_point.x() == -1 && center_point.y() == -1) {
-        if (scale_factor == 1) {
+        if (scale_factor == 1.) {
             fit_viewport();
         } else {
             center();
@@ -292,8 +257,7 @@ void Zoomer::fit_viewport() {
  * Updates the zooming factor based on viewport and zoom rectangle sizes
  */
 void Zoomer::update_scale(const double& width, const double& height) {
-    //qDebug() << "width height" << width << height;
-    if (width * height == 0) return;
+    if (width * height == 0.) return;
     set_scale_factor(std::min(m_viewport_size.width() / width,
                               m_viewport_size.height() / height));
 }
@@ -304,12 +268,7 @@ void Zoomer::update_scale(const double& width, const double& height) {
  * between the viewport rectangle and the frame rectangle
  */
 void Zoomer::update_anchor() {
-    //m_angle;
     anchor = QPoint(get_view_rect().tl().x, get_view_rect().y);
-    //qDebug() << "m_transformed_rect" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
-    //qDebug() << "ori frame size" << m_original_frame_size.width << m_original_frame_size.height;
-    //anchor = Utility::rotate(anchor, m_angle, m_original_frame_size.width, m_original_frame_size.height);
-    qDebug() << "anchor in zoom" << anchor;
 }
 
 /**
@@ -355,16 +314,11 @@ cv::Rect Zoomer::get_frame_rect() const {
  * @return cv::Rect :   intersection rectangle
  */
 cv::Rect Zoomer::get_view_rect() const {
-    //qDebug() << "ANCHOR" << anchor;
-    //qDebug() << "viewport center" << Utility::from_cvpoint(m_viewport.center);
     cv::RotatedRect scaled_viewport(m_viewport.center,
                                     cv::Size(m_viewport.size.width / m_scale_factor,
                                              m_viewport.size.height / m_scale_factor),
                                     0);
-    //qDebug() << "scaled viewport points" << Utility::from_cvpoint(scaled_viewport.boundingRect().tl()) << Utility::from_cvpoint(scaled_viewport.boundingRect().br());
-    //qDebug() << "transform rect points" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
     auto rect = scaled_viewport.boundingRect() & m_transformed_frame_rect;
-    //qDebug() << "transformed" <<Utility::from_cvpoint(rect.tl()) << Utility::from_cvpoint(rect.br());
     return rect;
 }
 
@@ -415,8 +369,6 @@ void Zoomer::adjust_frame_rect_rotation() {
  * @param frame
  */
 void Zoomer::scale_frame(cv::Mat &frame) {
-    //qDebug() << "scaling frame";
-    //qDebug() << "center in scale frame" << Utility::from_cvpoint(m_viewport.center);
     cv::Rect view_rectangle = get_view_rect();
     // TODO assert that the view_rectangle has an area
 
