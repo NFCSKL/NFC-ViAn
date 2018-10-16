@@ -143,7 +143,7 @@ void ManipulatorWidget::c_changed(int value) {
 void ManipulatorWidget::g_changed(int value) {
     QString text = QString::number(value/DOUBLE_TO_INT);
     gamma_value_label->setText(text);
-    //apply_btn->setDisabled(false);
+    apply_btn->setDisabled(false);
     emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, gamma_slider->value()/DOUBLE_TO_INT, false);
 }
 
