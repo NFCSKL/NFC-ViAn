@@ -17,6 +17,7 @@
 #include "Analysis/motiondetection.h"
 #include "Analysis/analysismethod.h"
 #include "GUI/frameexporterdialog.h"
+#include "GUI/settingsdialog.h"
 
 
 /**
@@ -460,7 +461,7 @@ void MainWindow::init_analysis_menu() {
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    if (video_widgets.size() < FLOATING_WIDGET_MAX) {
+    if (video_widgets.size() < m_settings_const->FLOATING_WIDGET_MAX) {
         VideoWidget* widget_video = new VideoWidget(nullptr, true);
         widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
         widget_video->show();
@@ -755,6 +756,8 @@ void MainWindow::export_images(){
  *  runs when the options action is triggered
  */
 void MainWindow::options() {
+    SettingsDialog* dialog = new SettingsDialog(this);
+    dialog->show();
     emit set_status_bar("Opening options");
 }
 

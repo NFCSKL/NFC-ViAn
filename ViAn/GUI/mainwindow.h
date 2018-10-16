@@ -30,6 +30,10 @@
 #include "Toolbars/drawingtoolbar.h"
 #include "Toolbars/maintoolbar.h"
 
+struct settings_constants {
+    unsigned int FLOATING_WIDGET_MAX = 3;
+};
+
 class AnalysisWindow;
 class MainWindow : public QMainWindow
 {
@@ -38,9 +42,11 @@ public:
     const int SIZE_MULTIPLIER = 40;
     const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
     const int VIDEO_WGT_HEIGHT = 9;
-    const unsigned int FLOATING_WIDGET_MAX = 3;
-    explicit MainWindow(QWidget *parent = 0);
+    //const unsigned int FLOATING_WIDGET_MAX = 3;
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    settings_constants* m_settings_const;
 
     StatusBar* status_bar;
     DrawingToolbar* draw_toolbar;

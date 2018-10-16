@@ -11,7 +11,6 @@
 #include "video.h"
 #include "project.h"
 #include "Project/Analysis/analysisproxy.h" // TODO Include basic instead
-#include "Project/report.h"
 #include <stack>
 
 /**
@@ -78,7 +77,6 @@ public:
     bool is_saved();
     bool is_current();
     void set_current(bool);
-
 };
 
 
