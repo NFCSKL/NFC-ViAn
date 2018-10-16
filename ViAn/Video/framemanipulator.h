@@ -23,7 +23,7 @@ public:
     // Constants for the limits and the precision of contrast and brightness values.
     const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
     const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
-    const double GAMMA_MIN = 0, GAMMA_MAX = 2, GAMMA_DEFAULT = 1, GAMMA_STEP = 0.01;
+    const double GAMMA_MIN = 0.01, GAMMA_MAX = 4, GAMMA_DEFAULT = 1, GAMMA_STEP = 0.01;
 };
 
 #endif // FRAMEMANIPULATOR_H
