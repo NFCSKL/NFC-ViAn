@@ -23,12 +23,25 @@ void FrameManipulator::set_contrast(double value) {
     alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, value));
 }
 
+/**
+ * @brief FrameManipulator::set_gamma
+ * Sets the gamma value
+ * @param value
+ */
+void FrameManipulator::set_gamma(double value) {
+    gamma = std::min(GAMMA_MAX, std::max(GAMMA_MIN, value));
+}
+
 int FrameManipulator::get_brightness() {
     return beta;
 }
 
 double FrameManipulator::get_contrast() {
     return alpha;
+}
+
+double FrameManipulator::get_gamma() {
+    return gamma;
 }
 
 
@@ -40,6 +53,21 @@ double FrameManipulator::get_contrast() {
 void FrameManipulator::apply(cv::Mat &src) {
     // Do the operation modified_frame = alpha * frame + beta
     src.convertTo(src, -1, alpha, beta);
+    src = correct_gamma(src, gamma);
+}
+
+cv::Mat FrameManipulator::correct_gamma(cv::Mat& img, double gamma) {
+    double inverse_gamma = 1.0 / gamma;
+
+    cv::Mat lut_matrix(1, 256, CV_8UC1);
+    uchar * ptr = lut_matrix.ptr();
+    for (int i = 0; i < 256; i++)
+        ptr[i] = (int)(pow((double)i / 255.0, inverse_gamma) * 255.0);
+
+    cv::Mat result;
+    cv::LUT(img, lut_matrix, result);
+
+    return result;
 }
 
 /**
@@ -49,4 +77,5 @@ void FrameManipulator::apply(cv::Mat &src) {
 void FrameManipulator::reset() {
     alpha = CONTRAST_DEFAULT;
     beta = BRIGHTNESS_DEFAULT;
+    gamma = GAMMA_DEFAULT;
 }

@@ -37,10 +37,10 @@ void Tag::remove_frame(int frame) {
  * @param b_value   : brightness value
  * @param c_value   : contrast value
  */
-void Tag::update_color_correction(int frame, int b_value, double c_value) {
+void Tag::update_color_correction(int frame, int b_value, double c_value, double g_value) {
     auto it = tag_map.find(frame);
     if (it != tag_map.end()) {
-        (*it).second->update_color_correction(b_value, c_value);
+        (*it).second->update_color_correction(b_value, c_value, g_value);
         m_unsaved_changes = true;
     }
 }
@@ -51,10 +51,11 @@ void Tag::update_color_correction(int frame, int b_value, double c_value) {
  * @param b     : brightness value
  * @param c     : contrast value
  */
-void Tag::update_color_whole_tag(int b, double c) {
+void Tag::update_color_whole_tag(int b, double c, double g) {
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
         (*it).second->m_state.brightness = b;
         (*it).second->m_state.contrast = c;
+        (*it).second->m_state.gamma = g;
     }
 }
 

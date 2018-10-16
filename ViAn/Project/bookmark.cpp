@@ -188,6 +188,7 @@ void Bookmark::read(const QJsonObject& json){
     state.rotation = json["rotation"].toInt();
     state.brightness = json["brightness"].toInt();
     state.contrast = json["contrast"].toDouble();
+    state.gamma = json["gamma"].toDouble();
     m_state = state;
     
     m_unsaved_changes = false;
@@ -215,6 +216,7 @@ void Bookmark::write(QJsonObject& json){
     json["rotation"] = m_state.rotation;
     json["brightness"] = m_state.brightness;
     json["contrast"] = m_state.contrast;
+    json["gamma"] = m_state.gamma;
 
     m_unsaved_changes = false;
 }
