@@ -1,12 +1,12 @@
 #ifndef RECENTPROJECT_H
 #define RECENTPROJECT_H
 
-#include <QStandardPaths>
-#include <QJsonArray>
-#include <QDir>
-#include <list>
-
 #include "Filehandler/saveable.h"
+
+#include <QJsonObject>
+
+#include <list>
+#include <tuple>
 
 class RecentProject : public Saveable {
     std::list<std::tuple<std::string, std::string, std::string>> recent_items;

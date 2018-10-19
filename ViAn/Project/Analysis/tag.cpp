@@ -1,5 +1,9 @@
 #include "tag.h"
 
+#include "tagframe.h"
+
+#include <QJsonArray>
+
 Tag::Tag(std::string name, bool drawing_tag) {
     m_name = name;
     m_drawing_tag = drawing_tag;

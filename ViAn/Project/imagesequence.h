@@ -2,10 +2,8 @@
 #define IMAGESEQUENCE_H
 
 #include "video.h"
-#include <vector>
-#include "utility.h"
-#include <QJsonArray>
-#include "project.h"
+
+#include <QJsonObject>
 
 class ImageSequence : public Video {
 private:

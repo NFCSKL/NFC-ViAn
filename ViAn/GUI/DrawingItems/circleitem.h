@@ -8,8 +8,8 @@ class CircleItem : public ShapeItem {
     Circle* m_circle;
 public:
     CircleItem(Circle *circle);
-    Circle* get_shape();
-    void remove();
+    Circle* get_shape() override;
+    void remove() override;
     ~CircleItem() override;
 };
 

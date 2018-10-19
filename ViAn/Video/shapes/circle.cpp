@@ -1,5 +1,8 @@
 #include "circle.h"
-#include <QDebug>
+
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QPoint>
 
 Circle::Circle() : Shapes(SHAPES::CIRCLE) {
 }

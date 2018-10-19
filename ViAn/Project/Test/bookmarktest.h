@@ -1,11 +1,14 @@
 #ifndef BOOKMARKTEST_H
 #define BOOKMARKTEST_H
 
+#include "Project/bookmark.h"
+
 #include <QObject>
-#include <QTest>
 #include <QTemporaryDir>
 
-#include "../bookmark.h"
+#include <memory>
+
+class Bookmark;
 
 class BookmarkTest : public QObject
 {

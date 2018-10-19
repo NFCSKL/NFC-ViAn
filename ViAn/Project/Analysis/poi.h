@@ -1,15 +1,15 @@
 #ifndef POI_H
 #define POI_H
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QString>
-#include <QObject>
-#include <vector>
-#include <map>
-#include "Filehandler/saveable.h"
-#include "opencv2/core/core.hpp"
-#include "detectionbox.h"
+
 #include "analysisinterval.h"
+#include "detectionbox.h"
+
+#include "opencv2/core/core.hpp"
+
+#include <QJsonObject>
+
+#include <map>
+
 class POI : public AnalysisInterval{    
     std::map<int,std::vector<DetectionBox>> OOIs = {};
 public:

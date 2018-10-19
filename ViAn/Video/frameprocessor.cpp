@@ -1,7 +1,12 @@
 #include "frameprocessor.h"
-#include <QDebug>
-#include <QTime>
+
+#include "overlay.h"
 #include "utility.h"
+#include "Video/videoplayer.h"
+
+#include <QDebug>
+
+#include <mutex>
 
 const int FrameProcessor::DEGREES_0 = 0;
 const int FrameProcessor::DEGREES_90 = 90;
@@ -396,5 +401,4 @@ void FrameProcessor::reset_settings() {
 
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
-
 }

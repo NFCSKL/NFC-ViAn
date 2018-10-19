@@ -1,5 +1,9 @@
 #include "pen.h"
-#include <QDebug>
+
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QJsonArray>
+#include <QPoint>
 
 /**
  * @brief Pen::Pen

@@ -1,13 +1,9 @@
 #ifndef ZOOMPREVIEWWIDGET_H
 #define ZOOMPREVIEWWIDGET_H
 
-#include <QObject>
 #include <QWidget>
-#include <QImage>
-#include <QPainter>
-#include <QResizeEvent>
-#include "opencv2/opencv.hpp"
-#include "opencv2/videoio/videoio.hpp"
+
+#include "opencv2/core/core.hpp"
 
 class ZoomPreviewWidget : public QWidget
 {
@@ -27,7 +23,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void window_size(QSize s);

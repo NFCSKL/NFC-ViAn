@@ -1,6 +1,16 @@
 #include "overlay.h"
+
+#include "shapes/arrow.h"
+#include "shapes/circle.h"
+#include "shapes/line.h"
+#include "shapes/pen.h"
+#include "shapes/rectangle.h"
+#include "shapes/text.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include <QDebug>
-#include "utility.h"
+#include <QJsonArray>
 
 /**
  * @brief Overlay::Overlay
@@ -139,25 +149,18 @@ Shapes* Overlay::get_empty_shape(SHAPES shape_type) {
     switch (shape_type) {
         case RECTANGLE:
             return new Rectangle();
-            break;
         case CIRCLE:
             return new Circle();
-            break;
         case LINE:
             return new Line();
-            break;
         case ARROW:
             return new Arrow();
-            break;
         case PEN:
             return new Pen();
-            break;
         case TEXT:
             return new Text();
-            break;
         default:
             return nullptr;
-            break;
     }
 }
 
@@ -577,4 +580,3 @@ void Overlay::write(QJsonObject& json) {
     json["overlays"] = json_overlays;
     m_unsaved_changes = false;
 }
-

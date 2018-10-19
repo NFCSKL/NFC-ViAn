@@ -1,9 +1,8 @@
 #include "framemanipulator.h"
 #include <QDebug>
-#include <iostream>
+//#include <iostream>
 
-FrameManipulator::FrameManipulator() {
-}
+FrameManipulator::FrameManipulator() {}
 
 /**
  * @brief FrameManipulator::set_brightness

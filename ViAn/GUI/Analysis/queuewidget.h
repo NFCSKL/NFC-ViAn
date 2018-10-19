@@ -1,12 +1,13 @@
 #ifndef QUEUEWIDGET_H
 #define QUEUEWIDGET_H
+
 #include <QWidget>
-#include <QListWidget>
-#include <QListWidgetItem>
-#include <QLayout>
-#include <QProgressBar>
-#include <QLabel>
-#include "videolistitem.h"
+
+class AnalysisMethod;
+class QListWidget;
+class QLabel;
+class QProgressBar;
+class QPushButton;
 
 /**
  * @brief The QueueWidget class
@@ -28,7 +29,7 @@ class QueueWidget : public QWidget
     QPushButton* abort_btn;
 
 public:
-    QueueWidget(QWidget* parent = 0);
+    QueueWidget(QWidget* parent = nullptr);
     // Move queue forward
     void next();
     // Append method to queue

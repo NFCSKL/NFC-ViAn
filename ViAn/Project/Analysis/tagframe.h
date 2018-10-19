@@ -1,9 +1,10 @@
 #ifndef TAGFRAME_H
 #define TAGFRAME_H
 
-#include <QJsonObject>
-#include "Project/video.h"
 #include "Filehandler/writeable.h"
+#include "Project/video.h"
+
+#include <QJsonObject>
 
 class TagFrame : public Writeable {
 

@@ -1,6 +1,7 @@
 #include "bookmarkdialog.h"
-#include <QKeyEvent>
+
 #include <QIcon>
+#include <QKeyEvent>
 
 BookmarkDialog::BookmarkDialog(QWidget *parent) : QInputDialog(parent) {
     setOption(QInputDialog::UsePlainTextEditForTextInput);

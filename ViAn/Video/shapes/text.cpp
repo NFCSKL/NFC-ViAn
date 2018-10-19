@@ -1,5 +1,9 @@
 #include "text.h"
 
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QPoint>
+
 /**
  * @brief Text::Text
  */
@@ -93,6 +97,6 @@ void Text::write(QJsonObject& json) {
  */
 void Text::read(const QJsonObject& json) {
     read_shape(json);
-    this->m_name = json["name"].toString();
-    this->font_scale = json["font"].toDouble();
+    m_name = json["name"].toString();
+    font_scale = json["font"].toDouble();
 }

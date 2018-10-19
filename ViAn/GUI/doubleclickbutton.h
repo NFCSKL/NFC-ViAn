@@ -2,13 +2,13 @@
 #define DOUBLECLICKBUTTON_H
 
 #include <QPushButton>
-#include <QMouseEvent>
 
+class QMouseEvent;
 class DoubleClickButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit DoubleClickButton(QWidget *parent = 0);
+    explicit DoubleClickButton(QWidget *parent = nullptr);
 
 private slots:
     void mouseDoubleClickEvent(QMouseEvent *e);

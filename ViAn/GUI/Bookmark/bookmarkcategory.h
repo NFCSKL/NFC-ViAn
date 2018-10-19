@@ -1,14 +1,17 @@
 #ifndef BOOKMARKFOLDER_H
 #define BOOKMARKFOLDER_H
-#include <QWidget>
-#include <QVBoxLayout>
+
+#include "Project/video.h"
+
 #include <QListWidget>
-#include <QDebug>
-#include <QScrollArea>
-#include <QCommonStyle>
-#include <QMenu>
-#include "bookmarkitem.h"
-#include "bookmarklist.h"
+#include <QObject>
+
+class BookmarkItem;
+class BookmarkList;
+class QScrollArea;
+class QVBoxLayout;
+class VideoProject;
+
 /**
  * @brief The BookmarkCategory class
  * This class is inteded to store two scrollable lists
@@ -21,7 +24,7 @@ class BookmarkCategory : public QObject, public QListWidgetItem {
     // Category name
     std::string m_name = "";
     // Widget layout
-    QVBoxLayout*  layout = nullptr;
+    QVBoxLayout* layout = nullptr;
     // Scroll areas for disp_ref
     QScrollArea* disputed = nullptr;
     QScrollArea* reference = nullptr;

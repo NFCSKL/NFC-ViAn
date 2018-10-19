@@ -1,9 +1,10 @@
 #ifndef TAGFRAMEITEM_H
 #define TAGFRAMEITEM_H
-#include "treeitem.h"
-#include "Project/video.h"
-#include "tagitem.h"
 
+#include "Project/video.h"
+#include "treeitem.h"
+
+class TagFrame;
 class TagFrameItem : public TreeItem {
     int m_frame;
     TagFrame* m_t_frame = nullptr;

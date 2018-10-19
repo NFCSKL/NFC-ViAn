@@ -1,11 +1,27 @@
 #include "framewidget.h"
-#include <QDebug>
+
+#include "Analysis/analysissettings.h"
 #include "Project/Analysis/analysis.h"
-#include <QTime>
-#include <QThread>
-#include <QShortcut>
-#include <QMessageBox>
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/videoproject.h"
 #include "utility.h"
+#include "Video/shapes/arrow.h"
+#include "Video/shapes/circle.h"
+#include "Video/shapes/line.h"
+#include "Video/shapes/pen.h"
+#include "Video/shapes/rectangle.h"
+#include "Video/shapes/text.h"
+
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QDebug>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QShortcut>
+#include <QWheelEvent>
+
 
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
@@ -67,7 +83,7 @@ void FrameWidget::copy() {
  */
 void FrameWidget::paste() {
     if (!copied_item) return;
-    Shapes* new_item;
+    Shapes* new_item = nullptr;
     switch (copied_item->get_shape()) {
     case RECTANGLE:
         new_item = new Rectangle(copied_item->get_color(), QPoint(0,0));
@@ -234,9 +250,6 @@ void FrameWidget::set_cursor(SHAPES tool) {
         //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
     case EDIT:
         setCursor(Qt::SizeAllCursor);
-        break;
-    default:
-        unsetCursor();
         break;
     }
 }
