@@ -637,7 +637,6 @@ bool ProjectWidget::prompt_save() {
  * @param prev_item     : previous tree item
  */
 void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
-    qDebug() << "item changed";
     Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){
@@ -1001,7 +1000,7 @@ void ProjectWidget::update_settings() {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
-    if (!dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
+    if (currentItem()->type() == ANALYSIS_ITEM && !dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
         return;
     }
 
