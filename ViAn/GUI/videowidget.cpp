@@ -21,6 +21,8 @@
 #include <opencv2/video/video.hpp>
 
 
+#include "pathdialog.h"
+
 
 VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scroll_area(new DrawScrollArea) {
     m_floating = floating;
@@ -169,6 +171,7 @@ void VideoWidget::init_layouts() {
  */
 void VideoWidget::init_video_controller(){
     // Video data
+    connect(v_controller, &VideoController::capture_failed, this, &VideoWidget::capture_failed);
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
@@ -1109,6 +1112,17 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     if (!ana_play_btn) {
         analysis_play_btn->setChecked(ana_play_btn);
         analysis_only = ana_play_btn;
+    }
+}
+
+void VideoWidget::capture_failed() {
+    PathDialog* dialog = new PathDialog(&m_video_path);
+
+    int status = dialog->exec();
+
+    if (status == dialog->Accepted) {
+        m_vid_proj->get_video()->file_path = m_video_path;
+        qDebug() << "Updated";
     }
 }
 

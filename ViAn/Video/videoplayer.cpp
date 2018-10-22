@@ -51,8 +51,11 @@ void VideoPlayer::load_video() {
     current_frame = 0;
     m_is_playing->store(false);
 
-    m_capture.open(*m_video_path);
-    if (!m_capture.isOpened()) return;
+    if (!m_capture.open(*m_video_path)) {
+        emit capture_failed();
+        qWarning() << "Failed to open video at " << m_video_path->c_str();
+        return;
+    }
     load_video_info();
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
     m_delay = 1000 / m_frame_rate;

@@ -36,6 +36,7 @@ void VideoController::run() {
 
     // FROM PLAYER
     connect(v_player, &VideoPlayer::display_index, this, &VideoController::display_index);
+    connect(v_player, &VideoPlayer::capture_failed, this, &VideoController::capture_failed);
     connect(v_player, &VideoPlayer::video_info, this, &VideoController::video_info);
     connect(v_player, &VideoPlayer::playback_stopped, this, &VideoController::playback_stopped);
 
