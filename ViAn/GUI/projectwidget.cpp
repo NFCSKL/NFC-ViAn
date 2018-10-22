@@ -637,7 +637,6 @@ bool ProjectWidget::prompt_save() {
  * @param prev_item     : previous tree item
  */
 void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
-    qDebug() << "item changed";
     Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){

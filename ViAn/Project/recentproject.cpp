@@ -14,15 +14,31 @@ RecentProject::RecentProject(){}
 void RecentProject::update_recent(const std::string& name, const std::string &project_path, const std::string &last_changed) {
     std::tuple<std::string, std::string, std::string> new_proj = std::make_tuple(name, project_path, last_changed);
 
-    for (auto item : recent_items) {
-        if (std::get<1>(item) == std::get<1>(new_proj)) {
-            recent_items.remove(item);
-        }
-    }
+    remove_project(project_path);
     if (recent_items.size() >= RECENT_MAX) recent_items.resize(RECENT_MAX);
     recent_items.push_front(new_proj);
     QDir().mkpath(QString::fromStdString(PATH));
-    save_saveable(PATH + FILE_NAME);
+    save();
+}
+
+/**
+ * @brief RecentProject::remove_project
+ * Remove a project from the recent_project list.
+ * Returns true if successful else returns false;
+ * @param name
+ * @return
+ */
+bool RecentProject::remove_project(const std::string& project_path) {
+    qDebug() << "remove path" << QString::fromStdString(project_path);
+    for (auto item : recent_items) {
+        qDebug() << "get 1" << QString::fromStdString(std::get<1>(item));
+        if (std::get<1>(item) == project_path) {
+            qDebug() << "true";
+            //recent_items.remove(item);
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -31,10 +47,20 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  * @return
  */
 std::list<std::tuple<std::string, std::string, std::string> > RecentProject::load_recent(){
+    qDebug() << "size before" << recent_items.size();
+    qDebug() << QString::fromStdString(PATH + FILE_NAME);
     load_saveable(PATH + FILE_NAME);
+    qDebug() << "size after" << recent_items.size();
     return recent_items;
 }
 
+/**
+ * @brief RecentProject::save
+ * Save the recent project file
+ */
+void RecentProject::save() {
+    save_saveable(PATH + FILE_NAME);
+}
 /**
  * @brief RecentProject::read
  * @param json
@@ -47,6 +73,8 @@ void RecentProject::read(const QJsonObject &json) {
         std::string last_changed = tuple["last changed"].toString().toStdString();
         if (QFile(QString::fromStdString(path)).exists()) {
             recent_items.push_back(std::make_tuple(name, path, last_changed));
+        } else {
+            qWarning("Failed to load file %s ", path.c_str());
         }
     }
 }

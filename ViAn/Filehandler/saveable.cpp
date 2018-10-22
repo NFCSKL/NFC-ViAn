@@ -91,6 +91,7 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
         // Ur code handling failure
         return false;
     }
+    qDebug() << "loading...";
     QByteArray save_data = load_file.readAll();         // Read file to be loaded
     QJsonDocument load_doc(save_format == JSON          // Decide format to decode to
         ? QJsonDocument::fromJson(save_data)
