@@ -2,6 +2,9 @@
 #define VIDEOCONTROLLER_H
 
 #include <QThread>
+#include <condition_variable>
+#include <mutex>
+
 
 class VideoPlayer;
 struct video_sync;
