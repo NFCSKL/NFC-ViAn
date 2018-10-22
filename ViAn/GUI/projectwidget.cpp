@@ -327,6 +327,7 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid_item = new VideoItem(vid_proj);
+    vid_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
 
     // If there only is one selected item and it's a folder,
     // add the new video to that folder otherwise to the top level
@@ -477,6 +478,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
         // Create and add VideoItem
         if (item != nullptr && item->type() == VIDEO_ITEM) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            v_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
             auto vid = vid_proj->get_video();
@@ -1256,7 +1258,6 @@ bool ProjectWidget::save_project() {
     m_proj->save_project();
 
     RecentProject rp;
-    //rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
     set_status_bar("Project saved");
     return true;
