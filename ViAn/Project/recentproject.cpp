@@ -29,12 +29,15 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  * @return
  */
 bool RecentProject::remove_project(const std::string& project_path) {
+    load_recent();
     qDebug() << "remove path" << QString::fromStdString(project_path);
+    qDebug() << "size" << recent_items.size();
     for (auto item : recent_items) {
         qDebug() << "get 1" << QString::fromStdString(std::get<1>(item));
         if (std::get<1>(item) == project_path) {
             qDebug() << "true";
-            //recent_items.remove(item);
+            recent_items.remove(item);
+            save();
             return true;
         }
     }
