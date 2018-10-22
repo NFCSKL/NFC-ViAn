@@ -126,7 +126,6 @@ void RecentProjectDialog::on_remove_btn_clicked() {
         QString substr = file.left(file.lastIndexOf('/') + 1);
         QDir path(substr);
         if (path.exists()) {
-            qDebug() << "file" << file;
             RecentProject().remove_project(file.toStdString());
             path.removeRecursively();
         }

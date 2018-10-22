@@ -13,7 +13,6 @@ RecentProject::RecentProject(){}
  */
 void RecentProject::update_recent(const std::string& name, const std::string &project_path, const std::string &last_changed) {
     std::tuple<std::string, std::string, std::string> new_proj = std::make_tuple(name, project_path, last_changed);
-
     remove_project(project_path);
     if (recent_items.size() >= RECENT_MAX) recent_items.resize(RECENT_MAX);
     recent_items.push_front(new_proj);
@@ -30,12 +29,8 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  */
 bool RecentProject::remove_project(const std::string& project_path) {
     load_recent();
-    qDebug() << "remove path" << QString::fromStdString(project_path);
-    qDebug() << "size" << recent_items.size();
     for (auto item : recent_items) {
-        qDebug() << "get 1" << QString::fromStdString(std::get<1>(item));
         if (std::get<1>(item) == project_path) {
-            qDebug() << "true";
             recent_items.remove(item);
             save();
             return true;
@@ -50,10 +45,7 @@ bool RecentProject::remove_project(const std::string& project_path) {
  * @return
  */
 std::list<std::tuple<std::string, std::string, std::string> > RecentProject::load_recent(){
-    qDebug() << "size before" << recent_items.size();
-    qDebug() << QString::fromStdString(PATH + FILE_NAME);
     load_saveable(PATH + FILE_NAME);
-    qDebug() << "size after" << recent_items.size();
     return recent_items;
 }
 
