@@ -1029,6 +1029,8 @@ void ProjectWidget::update_settings() {
 void ProjectWidget::remove_item() {
     if (currentItem()->type() == ANALYSIS_ITEM && !dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
         return;
+    } else if (currentItem()->type() == VIDEO_ITEM) {
+        if (is_analysis_running(currentItem())) return;
     }
 
     QString text = "Deleting item(s)\n"
@@ -1200,32 +1202,44 @@ void ProjectWidget::create_folder_item() {
 }
 
 /**
- * @brief ProjectWidget::save_project
- * Slot function to save the open project
+ * @brief ProjectWidget::is_analysis_running
+ * Searches for all analysisitems under root
+ * to see if anyone of them is currently running.
+ * @param root
+ * @return
  */
-bool ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return false;
+bool ProjectWidget::is_analysis_running(QTreeWidgetItem* root) {
+    if (root == nullptr) { root = invisibleRootItem(); }
 
     std::vector<AnalysisItem*> a_items;
-    get_analysis_items(invisibleRootItem(), a_items);
+    get_analysis_items(root, a_items);
     bool analysis_running = false;
     for (AnalysisItem* item : a_items) {
         if (!item->is_finished()) {
             analysis_running = true;
+            break;
         }
     }
 
     if (analysis_running) {
         QString text = "One or more analyses are currently running";
-        QString info_text = "Let them finish or stop them before saving";
+        QString info_text = "Let them finish or stop them before continuing";
         QMessageBox msg_box;
         msg_box.setText(text);
         msg_box.setInformativeText(info_text);
         msg_box.setStandardButtons(QMessageBox::Ok);
         msg_box.setDefaultButton(QMessageBox::Ok);
         msg_box.exec();
-        return false;
     }
+    return analysis_running;
+}
+
+/**
+ * @brief ProjectWidget::save_project
+ * Slot function to save the open project
+ */
+bool ProjectWidget::save_project() {
+    if (m_proj == nullptr || is_analysis_running()) return false;
 
     for (std::string path : remove_list) {
         QFile file(QString::fromStdString(path));
@@ -1273,6 +1287,8 @@ bool ProjectWidget::save_project() {
     emit save_draw_wgt();
 
     // Mark all analysis as saved
+    std::vector<AnalysisItem*> a_items;
+    get_analysis_items(invisibleRootItem(), a_items);
     for (AnalysisItem* item : a_items) {
         item->saved = true;
     }

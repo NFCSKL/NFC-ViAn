@@ -117,6 +117,7 @@ private slots:
 
     void update_item_data(QTreeWidgetItem *item, int column);
 private:
+    bool is_analysis_running(QTreeWidgetItem* root = nullptr);
     void set_main_window_name(QString name);
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
