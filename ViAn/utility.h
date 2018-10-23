@@ -1,10 +1,10 @@
 #ifndef UTILITY_H
 #define UTILITY_H
-#include <opencv2/core.hpp>
-#include <QSize>
-#include <QPoint>
+
+#include "opencv2/core/core.hpp"
+
 #include <QRect>
-#include <QDir>
+#include <QSize>
 
 namespace Utility{
      std::pair<double, double> size_ratio(QSize s1, QSize s2);

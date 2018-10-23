@@ -1,5 +1,13 @@
 #include "bookmarkcategory.h"
+
+#include "bookmarkitem.h"
+#include "bookmarklist.h"
+#include "Project/videoproject.h"
+
+#include <QBoxLayout>
 #include <QDebug>
+#include <QLineEdit>
+#include <QScrollArea>
 
 BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem(nullptr, type) {
     m_name = name;

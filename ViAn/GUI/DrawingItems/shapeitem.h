@@ -1,8 +1,8 @@
 #ifndef SHAPEITEM_H
 #define SHAPEITEM_H
 #include <QTreeWidgetItem>
-#include "Video/shapes/shapes.h"
 
+class Shapes;
 enum DRAWING_ITEM {FRAME_ITEM = 2001, RECT_ITEM, CIRCLE_ITEM, LINE_ITEM, ARROW_ITEM, PEN_ITEM, TEXT_ITEM};
 class ShapeItem : public QTreeWidgetItem {
 public:

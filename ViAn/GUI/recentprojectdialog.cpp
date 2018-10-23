@@ -1,8 +1,15 @@
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QHeaderView>
 #include "recentprojectdialog.h"
+
+#include "Project/recentproject.h"
+
+#include <QBoxLayout>
 #include <QDebug>
+#include <QFileDialog>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QTreeWidget>
+
 
 RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint));
@@ -130,5 +137,4 @@ void RecentProjectDialog::on_remove_btn_clicked() {
         }
         delete recent_list->currentItem();
     }
-
 }

@@ -1,8 +1,12 @@
 #ifndef MOTIONDETECTION_H
 #define MOTIONDETECTION_H
-#include "Project/Analysis/detectionbox.h"
+
 #include "analysismethod.h"
-#include <string>
+
+#include "opencv2/video/background_segm.hpp"
+#include "opencv2/core/core.hpp"
+
+class DetectionBox;
 
 /**
  * @brief The MotionDetection class
@@ -12,7 +16,7 @@
 class MotionDetection : public AnalysisMethod {
 public:
     MotionDetection(const std::string& source_file, const std::string& save_file, AnalysisSettings *settings);
-    ~MotionDetection();
+    ~MotionDetection() override;
 
 private:
     cv::Mat foreground_mask, result, dilation_kernel, temp;

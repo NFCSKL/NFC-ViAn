@@ -1,7 +1,9 @@
 #ifndef TAGITEM_H
 #define TAGITEM_H
+
 #include "treeitem.h"
-#include "Project/Analysis/tag.h"
+
+class Tag;
 class TagItem : public TreeItem {
     Tag* m_tag;
 public:

@@ -1,10 +1,9 @@
 #ifndef BOOKMARKITEM_H
 #define BOOKMARKITEM_H
-#include "Project/bookmark.h"
-#include <QListWidgetItem>
-#include <QMenu>
-#include <QObject>
 
+#include <QListWidgetItem>
+
+class Bookmark;
 class BookmarkItem : public QListWidgetItem {
     QString hover_text;
 public:

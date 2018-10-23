@@ -1,4 +1,7 @@
 #include "analysisitem.h"
+
+#include "Project/Analysis/analysisproxy.h"
+
 /**
  * @brief AnalysisItem::AnalysisItem
  * @param analysis

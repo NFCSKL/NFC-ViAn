@@ -1,4 +1,5 @@
 #include "shapeitem.h"
+#include "Video/shapes/shapes.h"
 #include <QDebug>
 
 ShapeItem::ShapeItem(int type) : QTreeWidgetItem(type){

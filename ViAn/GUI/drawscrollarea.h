@@ -1,7 +1,6 @@
 #ifndef DRAWSCROLLAREA_H
 #define DRAWSCROLLAREA_H
 
-#include <QWidget>
 #include <QScrollArea>
 
 class DrawScrollArea : public QScrollArea

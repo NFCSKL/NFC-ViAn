@@ -1,6 +1,14 @@
 #include "textdialog.h"
+
+#include "Video/shapes/text.h"
+
 #include <QBoxLayout>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QFormLayout>
+#include <QLineEdit>
 #include <QPushButton>
+
 
 TextDialog::TextDialog(QWidget* parent) : QDialog(parent) {
     setWindowTitle("Vian - New Text");

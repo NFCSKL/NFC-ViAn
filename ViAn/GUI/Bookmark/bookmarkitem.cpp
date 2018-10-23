@@ -1,5 +1,8 @@
 #include "bookmarkitem.h"
-#include <opencv2/highgui/highgui.hpp>
+
+#include "Project/bookmark.h"
+#include "Project/videoproject.h"
+
 #include <QDebug>
 
 /**

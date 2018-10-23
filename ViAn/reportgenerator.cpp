@@ -1,5 +1,15 @@
 #include "reportgenerator.h"
 
+#include "GUI/Bookmark/bookmarkitem.h"
+#include "Project/bookmark.h"
+#include "utility.h"
+
+#include <ActiveQt/QAxObject>
+#include <QDir>
+#include <QTextStream>
+
+#include <ctime>
+
 /**
  * @brief ReportGenerator::ReportGenerator
  * The constructor will assign parameters to the class members.
@@ -57,8 +67,9 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
     QString time = QString("Time: %1").arg(bm->get_time());
     QString brightness = QString("Brightness: %1").arg(bm->get_bookmark()->get_state().brightness);
     QString contrast = QString("Contrast: %1").arg(bm->get_bookmark()->get_state().contrast);
+    QString gamma = QString("Gamma: %1").arg(bm->get_bookmark()->get_state().gamma);
     QString description = bm->get_description();
-    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast;
+    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast + " " + gamma;
     if (description != "") {
         bm_description = description + QString("\v") + bm_description;
     }
@@ -274,7 +285,7 @@ QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABL
  * @return string, the current time and date.
  */
 std::string ReportGenerator::date_time_generator() {
-    time_t now = time(0);
+    time_t now = time(nullptr);
     std::string dt = ctime(&now);
     std::replace( dt.begin(), dt.end(), ':', '-');
     std::replace( dt.begin(), dt.end(), ' ' , '_');

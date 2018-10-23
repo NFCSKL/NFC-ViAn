@@ -8,8 +8,8 @@ class LineItem : public ShapeItem {
     Line* m_line;
 public:
     LineItem(Line* line);
-    Line* get_shape();
-    void remove();
+    Line* get_shape() override;
+    void remove() override;
     ~LineItem() override;
 };
 

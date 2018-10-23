@@ -1,11 +1,12 @@
 #ifndef ANALYSISPROXY_H
 #define ANALYSISPROXY_H
+
 #include "basicanalysis.h"
-#include "analysis.h"
-#include "tag.h"
-#include "Filehandler/saveable.h"
-#include "Analysis/analysissettings.h"
-#include <iostream>
+
+#include <QJsonObject>
+
+class Analysis;
+class AnalsysSettings;
 
 /**
  * @brief The AnalysisProxy class

@@ -1,16 +1,16 @@
 #ifndef ANASETTINGWIDGET_H
 #define ANASETTINGWIDGET_H
-#include <QWidget>
-#include <QFormLayout>
-#include <QLineEdit>
-#include <QLabel>
-#include "Analysis/analysissettings.h"
 
+#include <QWidget>
+
+class AnalysisSettings;
+class QFormLayout;
+class QLabel;
 class AnaSettingWidget : public QWidget
 {
     Q_OBJECT
 public:
-    AnaSettingWidget(AnalysisSettings *settings, QWidget* parent = 0);
+    AnaSettingWidget(AnalysisSettings *settings, QWidget* parent = nullptr);
     AnalysisSettings* m_settings = nullptr;
     
     QFormLayout* form_layout;

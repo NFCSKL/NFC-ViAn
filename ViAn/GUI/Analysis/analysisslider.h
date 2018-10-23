@@ -1,12 +1,13 @@
 #ifndef ANALYSISSLIDER_H
 #define ANALYSISSLIDER_H
 
-#include <QWidget>
 #include <QSlider>
-#include <vector>
-#include <set>
-#include "Project/Analysis/analysisproxy.h"
-#include "Project/Analysis/tag.h"
+
+class Analysis;
+class AnalysisProxy;
+class BasicAnalysis;
+class Tag;
+
 /**
  * @brief The AnalysisSlider class
  * This class represents a conventional slider
@@ -28,7 +29,7 @@ class AnalysisSlider : public QSlider {
     const int JUMP_INTERVAL = 0;    //Change this to set how many frames the POI buttons should ignore
 
 public:
-    explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
+    explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = nullptr);
 
     int last_poi_end = -1;
 

@@ -1,8 +1,15 @@
 #include "project.h"
+
+#include "videoproject.h"
+
+#include <QDebug>
+#include <QDir>
+#include <QFileInfoList>
+#include <QJsonArray>
+#include <QTemporaryDir>
+
 #include <chrono>
 #include <ctime>
-#include <string>
-#include <QDebug>
 
 const std::string Project::BOOKMARK_FOLDER = "Bookmarks/";
 const std::string Project::THUMBNAIL_FOLDER = "_thumbnails/";

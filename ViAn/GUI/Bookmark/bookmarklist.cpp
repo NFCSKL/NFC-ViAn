@@ -1,17 +1,22 @@
-#include "bookmarkwidget.h"
-#include "bookmarkitem.h"
 #include "bookmarklist.h"
-#include "imagegenerator.h"
+
+#include "bookmarkcategory.h"
 #include "bookmarkdialog.h"
-#include <QAction>
-#include <QMenu>
-#include <QMimeData>
-#include <QDrag>
+#include "bookmarkitem.h"
+#include "bookmarkwidget.h"
+#include "imagegenerator.h"
+#include "Project/video.h"
+#include "Project/videoproject.h"
+
 #include <QApplication>
-#include <algorithm>
-#include <QShortcut>
-#include <QMessageBox>
 #include <QDebug>
+#include <QDrag>
+#include <QDropEvent>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMimeData>
+#include <QShortcut>
+
 
 BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* parent) : QListWidget(parent) {
     m_accept_container = accept_container;

@@ -1,5 +1,7 @@
 #include "drawingtagitem.h"
 
+#include"Project/Analysis/tag.h"
+
 DrawingTagItem::DrawingTagItem(Tag *tag) : TreeItem(DRAWING_TAG_ITEM) {
     m_tag = tag;
     setText(0, QString::fromStdString(tag->get_name()));

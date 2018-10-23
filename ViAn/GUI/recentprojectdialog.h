@@ -2,16 +2,13 @@
 #define RECENTPROJECTDIALOG_H
 
 #include <QDialog>
-#include <QWidget>
-#include <QObject>
-#include <QBoxLayout>
-#include <QPushButton>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QLabel>
 
-#include "Project/recentproject.h"
-#include "GUI/projectdialog.h"
+class QHBoxLayout;
+class QPushButton;
+class QTreeWidget;
+class QTreeWidgetItem;
+class QVBoxLayout;
+
 /**
  * @brief The RecentProjectDialog class
  * Startup dialog used to open recently used projects

@@ -9,8 +9,8 @@ public:
     FrameItem(int frame);
 
     int get_frame();
-    void remove();
-    Shapes* get_shape();
+    void remove() override;
+    Shapes* get_shape() override;
     ~FrameItem() override;
 };
 

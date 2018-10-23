@@ -1,11 +1,22 @@
-#include <QHeaderView>
 #include "drawingwidget.h"
-#include <QMenu>
-#include <QDebug>
-#include <QDropEvent>
-#include <QShortcut>
+
+#include "DrawingItems/arrowitem.h"
+#include "DrawingItems/circleitem.h"
+#include "DrawingItems/frameitem.h"
+#include "DrawingItems/lineitem.h"
+#include "DrawingItems/penitem.h"
+#include "DrawingItems/rectitem.h"
+#include "DrawingItems/textitem.h"
+#include "Project/videoproject.h"
+#include "Video/overlay.h"
+
 #include <QColorDialog>
+#include <QDebug>
+#include <QHeaderView>
+#include <QMenu>
 #include <QMessageBox>
+#include <QShortcut>
+
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -143,7 +154,7 @@ void DrawingWidget::add_drawings_to_frame(FrameItem* f_item) {
  * @param frame_nr
  */
 void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
-    QObject::blockSignals(true);
+    blockSignals(true);
     FrameItem* frame_item;
     QList<QTreeWidgetItem*> list = findItems(QString::number(frame_nr), Qt::MatchFixedString);
 
@@ -199,7 +210,7 @@ void DrawingWidget::add_drawing(Shapes *shape, int frame_nr) {
     default:
         break;
     }
-    QObject::blockSignals(false);
+    blockSignals(false);
 }
 
 /**
@@ -256,9 +267,9 @@ void DrawingWidget::set_current_selected(Shapes* shape, int frame_nr) {
     for (int i = 0; i != frame_item->childCount(); ++i) {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(frame_item->child(i));
         if (shape_item->get_shape() == shape) {
-            QObject::blockSignals(true);
+            blockSignals(true);
             setCurrentItem(shape_item);
-            QObject::blockSignals(false);
+            blockSignals(false);
             return;
         }
     }
