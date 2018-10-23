@@ -110,6 +110,7 @@ public slots:
     void update_analysis_settings();
     void advanced_analysis();
     bool prompt_save();
+    void update_tooltip(std::string path);
 private slots:
     void context_menu(const QPoint& point);
     void open_video_in_widget();

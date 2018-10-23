@@ -32,7 +32,7 @@ PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path)
     browse_layout->addWidget(browse_btn);
 
     QFormLayout* layout = new QFormLayout;
-    QLabel* text = new QLabel("Video was not found in the saved path.\nIt might have been moved.\nEnter the new path to the video.");
+    QLabel* text = new QLabel("File was not found in the saved path.\nIt might have been moved.\nEnter the new path to the file.");
     layout->addWidget(text);
     layout->addRow("Path:", browse_layout);
 

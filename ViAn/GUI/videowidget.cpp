@@ -1127,6 +1127,7 @@ void VideoWidget::capture_failed() {
             new_video.store(true);
         }
         player_con.notify_all();
+        emit update_tooltip(m_video_path);
     }
 }
 

@@ -1391,6 +1391,10 @@ void ProjectWidget::set_main_window_name(QString name) {
     parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
 }
 
+void ProjectWidget::update_tooltip(std::string path) {
+    currentItem()->setToolTip(0, QString::fromStdString(path));
+}
+
 /**
  * @brief ProjectWidget::message_box
  * Creates a popup yes/no message box with the inputed text

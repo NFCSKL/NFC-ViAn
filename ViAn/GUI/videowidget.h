@@ -116,6 +116,7 @@ signals:
     void delete_sc_activated();
     void zoom_preview(cv::Mat preview_frame);
     void update_manipulator_wgt(int, double);
+    void update_tooltip(std::string);
 public slots:
     void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
