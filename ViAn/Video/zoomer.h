@@ -1,10 +1,11 @@
 #ifndef ZOOMER_H
 #define ZOOMER_H
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include <QPoint>
 #include <QSize>
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
 
 /**
  * @brief The Zoomer class
@@ -12,7 +13,7 @@
  * which updates it's scaling and anchor implicitly on requsts given that
  * it's settings are updated properly
  */
-class Zoomer{
+class Zoomer {
     static const double DEGREES_TO_RADIANS_FACTOR;
 
     // Viewport rectangle and size

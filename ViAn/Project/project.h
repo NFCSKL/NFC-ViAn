@@ -1,26 +1,12 @@
 #ifndef PROJECT_H
 #define PROJECT_H
-#include <map>
-#include <string>
-#include <cstddef>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <utility>
-//QT
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QDir>
-#include <QFile>
-#include <QTemporaryDir>
-#include <QStandardPaths>
-// vian
-#include "videoproject.h"
-#include "video.h"
+
 #include "Filehandler/saveable.h"
-#include "Project/projecttreestate.h"
-#include "Project/Analysis/analysisproxy.h"
-#include "utility.h"
+
+#include <QJsonObject>
+#include <QStandardPaths>
+
+class VideoProject;
 
 using ID = int;
 /**

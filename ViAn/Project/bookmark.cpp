@@ -1,5 +1,8 @@
 #include "bookmark.h"
+
+#include "project.h"
 #include "utility.h"
+#include "videoproject.h"
 
 /**
  * @brief Bookmark::Bookmark
@@ -29,7 +32,7 @@ Bookmark::Bookmark(const Bookmark &bookmark) {
     m_file = bookmark.m_file;
     m_description = bookmark.m_description;
     m_time = bookmark.m_time;
-    m_container == bookmark.m_container;
+    m_container = bookmark.m_container;
     m_state = bookmark.m_state;
 }
 

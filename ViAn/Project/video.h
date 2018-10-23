@@ -1,16 +1,14 @@
 #ifndef VIDEO_H
 #define VIDEO_H
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <QJsonObject>
-#include <QString>
-#include <QPoint>
+
 #include "Filehandler/saveable.h"
 #include "Video/framemanipulator.h"
-#include <opencv2/opencv.hpp>
 
-class ImageSequence;
+#include "opencv2/core/core.hpp"
+
+#include <QJsonObject>
+#include <QPoint>
+
 struct VideoState {
     int frame = 0;
     double contrast = FrameManipulator().CONTRAST_DEFAULT;

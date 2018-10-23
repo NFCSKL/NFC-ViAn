@@ -1,5 +1,14 @@
 #include "videoproject.h"
+
+#include "bookmark.h"
+#include "imagesequence.h"
+#include "project.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/basicanalysis.h"
+#include "Project/Analysis/tag.h"
+
 #include <QDebug>
+#include <QJsonArray>
 
 /**
  * @brief VideoProject::VideoProject
@@ -116,9 +125,10 @@ void VideoProject::read(const QJsonObject& json){
     if (vid->is_sequence()) {
         ImageSequence* seq = new ImageSequence("");
         seq->read(json);
-        this->m_video = seq;
-    } else
-        this->m_video = vid;
+        m_video = seq;
+    } else {
+        m_video = vid;
+    }
 
 
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
@@ -136,7 +146,7 @@ void VideoProject::read(const QJsonObject& json){
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();        
-        BasicAnalysis* analysis;
+        BasicAnalysis* analysis = nullptr;
         ANALYSIS_TYPE save_type = (ANALYSIS_TYPE)json_analysis["analysis_type"].toInt();
         switch(save_type){
         case TAG:
@@ -165,7 +175,7 @@ void VideoProject::read(const QJsonObject& json){
  */
 void VideoProject::write(QJsonObject& json){
     json["tree_index"] = QString::fromStdString(m_tree_index);
-    this->m_video->write(json);
+    m_video->write(json);
     // Write bookmarks to json
     QJsonArray json_bookmarks;
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
@@ -186,7 +196,7 @@ void VideoProject::write(QJsonObject& json){
     }
     json["analyses"] = json_analyses;
     QJsonObject json_overlay;
-    this->m_overlay->write(json_overlay);
+    m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
     m_unsaved_changes = false;
 }

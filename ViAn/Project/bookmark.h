@@ -1,15 +1,10 @@
 #ifndef BOOKMARK_H
 #define BOOKMARK_H
-#include <QJsonObject>
-#include <QString>
-#include <QImage>
-#include <QImageWriter>
-#include <QFile>
-#include <string>
-#include <iostream>
+
 #include "Filehandler/saveable.h"
-#include "videoproject.h"
 #include "video.h"
+
+#include <QJsonObject>
 
 enum BOOKMARK_TYPE {UNSORTED, DISPUTED, REFERENCE};
 using ID = int;

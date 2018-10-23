@@ -1,33 +1,44 @@
 #ifndef VIDEOWIDGET_H
 #define VIDEOWIDGET_H
 
-#include <QWidget>
-#include <QTime>
-#include <QScrollArea>
-#include <QLabel>
-#include <QSize>
-#include <QBoxLayout>
-#include <QCheckBox>
-#include <QPushButton>
-#include <QSlider>
-#include <QShortcut>
-#include <QCloseEvent>
-
-#include <vector>
-#include <atomic>
-#include <mutex>
-#include <condition_variable>
-
-#include "doubleclickbutton.h"
-#include "framewidget.h"
-#include "GUI/Analysis/analysisslider.h"
-#include "Video/video_player.h"
-#include "Project/videoproject.h"
-#include "GUI/drawscrollarea.h"
-#include "Project/Analysis/tag.h"
-#include "Video/videocontroller.h"
+#include "Project/video.h"
 #include "Video/videoplayer.h"
+#include "Video/shapes/shapes.h"
 #include "Video/framemanipulator.h"
+#include "Video/frameprocessor.h"
+
+#include "opencv2/core/core.hpp"
+
+#include <QTime>
+#include <QWidget>
+
+// TODO Might not need
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <vector>
+
+class AnalysisSettings;
+class AnalysisSlider;
+class BasicAnalysis;
+class DoubleClickButton;
+class DrawScrollArea;
+class FrameWidget;
+class QCheckBox;
+class QColor;
+class QGridLayout;
+class QHBoxLayout;
+class QLabel;
+class QLineEdit;
+class QPushButton;
+class QScrollBar;
+class QShortcut;
+class QSlider;
+class QVBoxLayout;
+class Tag;
+class TagFrame;
+class VideoController;
+class VideoProject;
 
 class VideoWidget : public QWidget
 {
@@ -81,7 +92,7 @@ private:
     QThread* processing_thread;
 public:
     explicit VideoWidget(QWidget *parent = nullptr, bool floating = false);
-    ~VideoWidget();
+    ~VideoWidget() override;
 
     QVBoxLayout* vertical_layout;
 
@@ -117,7 +128,7 @@ signals:
     void zoom_preview(cv::Mat preview_frame);
     void update_manipulator_wgt(int, double);
 public slots:
-    void quick_analysis(AnalysisSettings*settings);
+    void quick_analysis(AnalysisSettings* settings);
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);

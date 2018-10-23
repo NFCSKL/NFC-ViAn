@@ -2,8 +2,8 @@
 #define STATUSBAR_H
 
 #include <QStatusBar>
-#include <QProgressBar>
 
+class QProgressBar;
 class StatusBar : public QStatusBar
 {
     Q_OBJECT

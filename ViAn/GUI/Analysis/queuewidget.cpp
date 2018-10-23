@@ -1,4 +1,11 @@
 #include "queuewidget.h"
+
+#include "Analysis/analysismethod.h"
+#include "analysislistitem.h"
+
+#include <QLabel>
+#include <QLayout>
+#include <QProgressBar>
 #include <QPushButton>
 
 /**
@@ -75,4 +82,3 @@ void QueueWidget::enqueue(AnalysisMethod *method) {
 void QueueWidget::update_progress(int i) {
     progressbar->setValue(i);
 }
-

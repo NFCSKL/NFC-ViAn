@@ -1,5 +1,11 @@
 #include "motiondetection.h"
-#include <vector>
+
+#include "analysissettings.h"
+#include "Project/Analysis/detectionbox.h"
+#include "utility.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 /**
  * @brief MotionDetection::MotionDetection

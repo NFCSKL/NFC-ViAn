@@ -1,17 +1,11 @@
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QString>
-#include <QObject>
-#include <vector>
-#include <map>
-#include <set>
-#include "Filehandler/saveable.h"
-#include "poi.h"
-#include "detectionbox.h"
+
 #include "basicanalysis.h"
-#include "Analysis/analysissettings.h"
+
+#include "opencv2/core/core.hpp"
+
+#include <QJsonObject>
 
 /**
  * @brief The Analysis class

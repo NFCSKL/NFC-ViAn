@@ -1,5 +1,9 @@
 #include "tagdialog.h"
+
 #include <QBoxLayout>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLineEdit>
 #include <QPushButton>
 
 /**

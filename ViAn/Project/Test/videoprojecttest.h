@@ -1,8 +1,8 @@
 #ifndef VIDEOPROJECTTEST_H
 #define VIDEOPROJECTTEST_H
+
 #include <QObject>
-#include <QTest>
-#include "Project/videoproject.h"
+
 class VideoProjectTest : public QObject
 {
     Q_OBJECT

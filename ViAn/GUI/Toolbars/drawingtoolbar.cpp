@@ -1,5 +1,9 @@
 #include "drawingtoolbar.h"
+
 #include "GUI/textdialog.h"
+
+#include <QColorDialog>
+#include <QLabel>
 
 /**
  * @brief DrawingToolbar::DrawingToolbar

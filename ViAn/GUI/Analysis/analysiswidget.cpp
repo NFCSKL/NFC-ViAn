@@ -1,9 +1,16 @@
 #include "analysiswidget.h"
+
+#include "Analysis/analysismethod.h"
 #include "GUI/TreeItems/analysisitem.h"
-#include "GUI/videowidget.h"
+#include "GUI/TreeItems/videoitem.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/videoproject.h"
+#include "queuewidget.h"
+
 #include <QDebug>
-#include <QTreeWidgetItem>
-#include <tuple>
+#include <QThreadPool>
+
+
 AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
 
 }

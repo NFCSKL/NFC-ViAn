@@ -1,12 +1,14 @@
 #ifndef TAG_H
 #define TAG_H
-#include "basicanalysis.h"
-#include "Project/video.h"
-#include "tagframe.h"
-#include <map>
 
-class BasicAnalysis;
-class Video;
+#include "basicanalysis.h"
+
+#include <QJsonObject>
+
+#include <map>
+#include <vector>
+
+class TagFrame;
 
 class Tag : public BasicAnalysis {
     bool m_drawing_tag = false;

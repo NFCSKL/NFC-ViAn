@@ -1,15 +1,8 @@
 #ifndef SAVABLE_H
 #define SAVABLE_H
-#include <QJsonObject>
-#include <iostream>
-// QT
-#include <QJsonObject>
-#include <QFile>
-#include <QDir>
-#include <QTextStream>
-#include <QJsonDocument>
-#include <QDebug>
+
 #include "writeable.h"
+
 /**
  * @brief The Saveable class
  * The saveable class is an abstract class

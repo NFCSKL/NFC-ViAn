@@ -1,7 +1,12 @@
 #include "imageexporter.h"
 
-#include <QDebug>
+#include "utility.h"
+
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/videoio/videoio.hpp"
+
 #include <QCoreApplication>
+#include <QDebug>
 
 /**
  * @brief ImageExporter::ImageExporter

@@ -1,25 +1,31 @@
 #include "videowidget.h"
-#include "utility.h"
-#include "GUI/drawscrollarea.h"
+
+#include "Analysis/analysissettings.h"
+#include "doubleclickbutton.h"
+#include "framewidget.h"
+#include "GUI/Analysis/analysisslider.h"
 #include "GUI/Analysis/tagdialog.h"
 #include "GUI/Bookmark/bookmarkdialog.h"
+#include "GUI/drawscrollarea.h"
+#include "GUI/TreeItems/treeitem.h"
+#include "Project/Analysis/analysisinterval.h"
+#include "Project/Analysis/tag.h"
+#include "Project/Analysis/tagframe.h"
+#include "Project/videoproject.h"
+#include "Video/videocontroller.h"
 
-#include <QTime>
+#include <QBoxLayout>
+#include <QCheckBox>
+#include <QCloseEvent>
 #include <QDebug>
-#include <QShortcut>
+#include <QGridLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QScrollBar>
-#include <QProgressDialog>
-#include <algorithm>
-
-#include "GUI/frameexporterdialog.h"
-#include "Video/video_player.h"
-#include "imageexporter.h"
-
-#include <opencv2/videoio.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/video/video.hpp>
-
+#include <QShortcut>
+#include <QSlider>
+#include <QThread>
 
 
 VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scroll_area(new DrawScrollArea) {
@@ -565,7 +571,7 @@ void VideoWidget::prev_frame_clicked(){
  * @param checked
  */
 void VideoWidget::on_interpolate_toggled(bool checked) {
-    int method = cv::INTER_CUBIC ? checked : cv::INTER_NEAREST;
+    int method = checked ? cv::INTER_CUBIC : cv::INTER_NEAREST;
     set_interpolation_method(method);
 }
 
@@ -612,7 +618,7 @@ int VideoWidget::get_current_frame() {
  */
 void VideoWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
-    zoom_label->setText(QString::number(((int)(10000*m_scale_factor))/(double)100) +"%");
+    zoom_label->setText(QString::number((static_cast<int>((10000*m_scale_factor)))/100.) +"%");
 }
 
 /**
@@ -698,7 +704,6 @@ void VideoWidget::delete_interval() {
     playback_slider->clear_interval();
     playback_slider->update();
 }
-
 
 /**
  * @brief VideoWidget::play_btn_toggled
@@ -1490,9 +1495,9 @@ void VideoWidget::zoom_label_finished() {
         emit set_status_bar("Error! Input is not a number!");
     } else if (converted < 0) {
         emit set_status_bar("Error! Input is negative!");
-    } else if (converted < (double)ZOOM_LABEL_MIN / PERCENT_INT_CONVERT) {
+    } else if (converted < static_cast<double>(ZOOM_LABEL_MIN) / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too small");
-    } else if (converted > (double)ZOOM_LABEL_MAX / PERCENT_INT_CONVERT) {
+    } else if (converted > static_cast<double>(ZOOM_LABEL_MAX) / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too large");
     } else {
         set_zoom_factor(converted);

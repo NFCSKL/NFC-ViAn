@@ -1,9 +1,11 @@
 #ifndef ANALYSAREA_H
 #define ANALYSAREA_H
 
-#include "opencv2/opencv.hpp"
-#include "shapes.h"
+#include "opencv2/core/core.hpp"
 
+#include <vector>
+
+class QPoint;
 class AnalysArea {
 public:
     AnalysArea();

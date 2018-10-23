@@ -1,21 +1,22 @@
 #ifndef ANALYSISMETHOD_H
 #define ANALYSISMETHOD_H
-#include <QThread>
-#include <QMutex>
-#include <QWaitCondition>
-#include <QRunnable>
-#include "opencv2/opencv.hpp"
+
+#include "Project/Analysis/analysis.h"
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
-#include "Project/Analysis/analysis.h"
-#include "analysissettings.h"
-#include "Project/Analysis/analysisproxy.h"
-#include "Filehandler/saveable.h"
-#include <atomic>
-#include "utility.h"
+#include "Project/Analysis/detectionbox.h"
+
+#include <QObject>
+#include <QRunnable>
+
+#include <map>
 
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
+
+class AnalysisProxy;
+class AnalysisSettings;
 
 /**
  * @brief The AnalysisMethod class
@@ -23,7 +24,7 @@ using SettingsDescr = std::map<std::string,std::string>;
  * It's implementation is limited to saving rectangles and time intervals for
  * detection.
  */
-class AnalysisMethod : public QObject, public QRunnable{
+class AnalysisMethod : public QObject, public QRunnable {
     Q_OBJECT    
     std::string m_save_path;            // Save path for finished analysis
     std::string m_source_file;          // Source video file used by opencv capture

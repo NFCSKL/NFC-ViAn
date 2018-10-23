@@ -1,7 +1,9 @@
 #ifndef ANALYSISITEM_H
 #define ANALYSISITEM_H
+
 #include "treeitem.h"
-#include "Project/Analysis/analysisproxy.h"
+
+class AnalysisProxy;
 class AnalysisItem : public TreeItem {
     AnalysisProxy* m_analysis = nullptr;
     bool finished = false;

@@ -1,14 +1,15 @@
 #ifndef DRAWINGTOOLBAR_H
 #define DRAWINGTOOLBAR_H
 
-#include <QToolBar>
-#include <QPushButton>
-#include <QLabel>
-#include <QAction>
-#include <QActionGroup>
-#include <QIcon>
-#include <QColorDialog>
 #include "Video/shapes/shapes.h"
+
+#include <QToolBar>
+
+class QAction;
+class QActionGroup;
+class QColor;
+class QLabel;
+class QPixmap;
 
 /**
  * @brief The DrawingToolbar class

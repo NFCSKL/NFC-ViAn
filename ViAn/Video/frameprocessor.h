@@ -1,20 +1,21 @@
 #ifndef FRAMEPROCESSOR_H
 #define FRAMEPROCESSOR_H
 
+#include "framemanipulator.h"
+#include "shapes/shapes.h"
+#include "zoomer.h"
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include <QObject>
-#include <QImage>
+#include <QPoint>
 #include <QSize>
 
-#include <mutex>
-#include <condition_variable>
+class FrameManipulator;
+class Overlay;
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/videoio/videoio.hpp>
-
-#include "zoomer.h"
-#include "framemanipulator.h"
-#include "overlay.h"
-#include "Video/videoplayer.h"
+struct video_sync;
 
 /**
  * @brief The zoomer_settings struct

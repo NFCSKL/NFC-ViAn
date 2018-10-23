@@ -1,6 +1,20 @@
 #include "frameexporterdialog.h"
 
+#include <QBoxLayout>
 #include <QDebug>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSpinBox>
+
+#include "imageexporter.h"
+#include "Project/video.h"
+#include "Project/project.h"
+
+
 FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
                                          const int& max_frame, const std::pair<int, int>& interval,
                                          QWidget* parent) : QDialog(parent){
