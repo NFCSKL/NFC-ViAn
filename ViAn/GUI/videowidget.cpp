@@ -1082,6 +1082,9 @@ void VideoWidget::clear_current_video() {
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
     set_total_time(0);
+    fps_label->setText("Fps: -");
+    max_frames->setText("/ -");
+    zoom_label->setText("100%");
 
     frame_wgt->close();
 }
@@ -1430,11 +1433,13 @@ void VideoWidget::rotate_ccw(){
  * @param lambda function where the variable is changed
  */
 void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
-    v_sync.lock.lock();
-    lambda();
-    settings_changed.store(true);
-    v_sync.lock.unlock();
-    v_sync.con_var.notify_all();
+    if (!frame_wgt->isHidden()) {
+        v_sync.lock.lock();
+        lambda();
+        settings_changed.store(true);
+        v_sync.lock.unlock();
+        v_sync.con_var.notify_all();
+    }
 }
 
 void VideoWidget::update_playback_speed(int speed) {
