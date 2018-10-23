@@ -51,10 +51,7 @@ private:
 
     int proj_tree_item = 1001;      // Default is VIDEO_ITEM, based on ITEM_TYPE on treeitem
     int prev_frame_idx;
-    int POI_end;
     double m_scale_factor = 1;
-    int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
-    double contrast = FrameManipulator().CONTRAST_DEFAULT;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -111,9 +108,6 @@ public:
     void set_clear_drawings(int frame);
     void set_delete_drawing(Shapes* shape);
 
-    int get_brightness();
-    double get_contrast();
-
 signals:
     void close_video_widget(VideoWidget*);
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
@@ -126,7 +120,7 @@ signals:
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
     void zoom_preview(cv::Mat preview_frame);
-    void update_manipulator_wgt(int, double);
+    void update_manipulator_wgt(int, double, double);
 public slots:
     void quick_analysis(AnalysisSettings* settings);
     void set_current_time(int time);
@@ -135,7 +129,7 @@ public slots:
     void set_zoom_state(QPoint, double, int);
     void play_btn_toggled(bool status);
     void update_tag();
-    void update_tag_color(int b, double c);
+    void update_tag_color(int b, double c, double g);
     void tag_frame();
     void remove_tag_frame(void);
     void new_tag_clicked();
@@ -197,12 +191,12 @@ public slots:
     void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
-    void update_brightness_contrast(int c_val, double v_val, bool update);
+    void update_brightness_contrast(int c_val, double v_val, double g_val, bool update);
     void rotate_cw(void);
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);
     void update_playback_speed(int speed);
-    void set_brightness_contrast(int bri, double cont);
+    void set_brightness_contrast(int bri, double cont, double gamma);
     void update_zoom_preview_size(QSize s);
 private:
     const QSize BTN_SIZE = QSize(30, 30);

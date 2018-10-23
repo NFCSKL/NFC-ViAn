@@ -63,6 +63,7 @@ struct zoomer_settings {
 struct manipulation_settings {
     int brightness = 0;
     double contrast = 1;
+    double gamma = 1;
     bool update_state = true;
 
     // -1 LEFT(CCW), 0 NONE, 1 RIGHT(CW)
@@ -188,7 +189,7 @@ signals:
     void set_anchor(QPoint);
     void set_zoom_state(QPoint, double, int);
     void set_play_btn(bool);
-    void set_bri_cont(int, double);
+    void set_bri_cont(int, double, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
     void zoom_preview(cv::Mat preview_frame);
 private:

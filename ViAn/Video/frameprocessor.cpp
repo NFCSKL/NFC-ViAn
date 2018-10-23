@@ -298,6 +298,7 @@ void FrameProcessor::update_zoomer_settings() {
 void FrameProcessor::update_manipulator_settings() {
     m_manipulator.set_brightness(m_man_settings->brightness);
     m_manipulator.set_contrast(m_man_settings->contrast);
+    m_manipulator.set_gamma(m_man_settings->gamma);
 
     int rotate_direction = m_rotate_direction;
     if (m_man_settings->rotate == 1) {
@@ -308,7 +309,7 @@ void FrameProcessor::update_manipulator_settings() {
     update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
     emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
-    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
+    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast(), m_manipulator.get_gamma());
 }
 
 /**
