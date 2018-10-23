@@ -1,10 +1,13 @@
 #ifndef ANALYSISSETTINGS_H
 #define ANALYSISSETTINGS_H
-#include "Project/Analysis/analysis.h"
-#include <opencv2/core.hpp>
+
+#include "Project/Analysis/basicanalysis.h"
+
+#include <opencv2/core/core.hpp>
 
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
+
 
 /**
  * @brief The AnalysisSettings class

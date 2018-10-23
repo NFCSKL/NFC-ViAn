@@ -1,15 +1,10 @@
 #ifndef REPORTGENERERATOR_H
 #define REPORTGENERERATOR_H
 
-#include <iostream>
-#include <ActiveQt/QAxObject>
-#include <ActiveQt/QAxWidget>
-#include <QString>
-#include "Project/project.h"
-#include "dirent.h"
-#include "GUI/Bookmark/bookmarkitem.h"
-#include <ctime>
-#include "utility.h"
+#include <QObject>
+
+class BookmarkItem;
+class QAxObject;
 
 enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
 using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;

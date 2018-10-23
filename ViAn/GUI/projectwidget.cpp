@@ -1,22 +1,48 @@
 #include "projectwidget.h"
-#include "projectdialog.h"
-#include <QFileDialog>
-#include <QHeaderView>
-#include <QDebug>
-#include <QMenu>
-#include <QFileInfo>
-#include <QDirIterator>
-#include <QShortcut>
-#include <QMessageBox>
-#include <QtConcurrent/QtConcurrent>
-#include <QThread>
-#include <QProgressDialog>
-#include <iostream>
-#include <algorithm>
-#include <sstream>
+
+#include "Analysis/analysisdialog.h"
+#include "Analysis/motiondetection.h"
+#include "GUI/TreeItems/analysisitem.h"
+#include "GUI/TreeItems/drawingtagitem.h"
+#include "GUI/TreeItems/folderitem.h"
+#include "GUI/TreeItems/sequenceitem.h"
+#include "GUI/TreeItems/tagframeitem.h"
+#include "GUI/TreeItems/tagitem.h"
+#include "GUI/TreeItems/videoitem.h"
+#include "imageimporter.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/tag.h"
+#include "Project/Analysis/tagframe.h"
+#include "Project/imagesequence.h"
+#include "Project/project.h"
 #include "Project/projecttreestate.h"
 #include "Project/recentproject.h"
-#include "imageimporter.h"
+#include "Project/videoproject.h"
+#include "projectdialog.h"
+
+
+#include <QAction>
+#include <QDebug>
+#include <QDir>
+#include <QDirIterator>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMimeData>
+#include <QProgressDialog>
+#include <QShortcut>
+#include <QThread>
+
+#include <sstream>
+#include <string>
+#include <vector>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -193,7 +219,7 @@ void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    AnalysisMethod* method;
+    AnalysisMethod* method = nullptr;
     switch (settings->get_type()) {
     case MOTION_DETECTION:
         method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
@@ -259,7 +285,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
  * @param item
  */
 void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
-    Tag* tag;
+    Tag* tag = nullptr;
     if (item->type() == TAG_ITEM) {
         tag = dynamic_cast<TagItem*>(item)->get_tag();
     } else if (item->type() == DRAWING_TAG_ITEM) {
@@ -372,7 +398,6 @@ void ProjectWidget::file_dropped(QString path) {
         insertTopLevelItem(topLevelItemCount(), v_item);
         vid_proj->set_tree_index(get_index_path(v_item));
     }
-
 }
 
 /**
@@ -384,10 +409,12 @@ void ProjectWidget::folder_dropped(QString path) {
     QDirIterator d_iter(path);
     while (d_iter.hasNext()) {
         QFileInfo tmp(d_iter.next());
-        if (tmp.isDir() && tmp.absoluteFilePath().length() > path.length())
+        if (tmp.isDir() && tmp.absoluteFilePath().length() > path.length()) {
             folder_dropped(tmp.absoluteFilePath());
-        else
+        }
+        else {
             file_dropped(tmp.absoluteFilePath());
+        }
     }
 }
 
@@ -637,7 +664,6 @@ bool ProjectWidget::prompt_save() {
  * @param prev_item     : previous tree item
  */
 void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
-    qDebug() << "item changed";
     Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){
@@ -812,11 +838,11 @@ void ProjectWidget::update_current_tag(VideoItem *v_item) {
  */
 void ProjectWidget::check_selection(){
     if (selectedItems().count() <= 1) return;
-    this->blockSignals(true);
+    blockSignals(true);
     for (auto i : selectedItems()) {
         if (i->parent() != selection_parent) i->setSelected(false);
     }
-    this->blockSignals(false);
+    blockSignals(false);
 }
 
 /**
@@ -1041,6 +1067,7 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
         break;
     case TAG_FRAME_ITEM:
         remove_tag_frame_item(item);
+        break;
     default:
         break;
     }
@@ -1379,7 +1406,7 @@ void ProjectWidget::remove_project() {
     emit set_status_bar("Removing project and associated files");
 
     m_proj->remove_files();
-    this->clear();
+    clear();
     delete m_proj;
     m_proj = nullptr;
     emit project_closed();

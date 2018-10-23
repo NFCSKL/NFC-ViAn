@@ -1,10 +1,12 @@
 #include "imagegenerator.h"
-#include <QDebug>
-#include <iostream>
-#include <QDir>
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+
 #include "Project/project.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
+#include <QDebug>
+#include <QDir>
 
 const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
 
@@ -117,5 +119,3 @@ std::string ImageGenerator::export_image(std::string requested_path, int ext, co
     tmp.release();
     return saved_path;
 }
-
-

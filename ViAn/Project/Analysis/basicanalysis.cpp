@@ -1,6 +1,7 @@
 #include "basicanalysis.h"
-#include "tag.h"
-#include "analysis.h"
+
+#include <QJsonArray>
+#include <QJsonObject>
 
 BasicAnalysis::BasicAnalysis() {}
 

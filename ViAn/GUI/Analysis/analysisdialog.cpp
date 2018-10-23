@@ -1,6 +1,15 @@
 #include "analysisdialog.h"
-#include <QPushButton>
+
+#include "Analysis/analysissettings.h"
+#include "GUI/TreeItems/videoitem.h"
+#include "Project/videoproject.h"
+#include "videolistitem.h"
+
 #include <QCheckBox>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QPushButton>
 
 AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSettings *analysis_settings)
     : m_analysis_settings(analysis_settings) {

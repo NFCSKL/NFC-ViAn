@@ -13,8 +13,8 @@ DetectionBox::~DetectionBox(){}
  * @param down_right
  */
 DetectionBox::DetectionBox(std::pair<int, int> upper_left, std::pair<int, int> down_right){
-    this->upper_left = upper_left;
-    this->lower_right = down_right;
+    m_upper_left = upper_left;
+    m_lower_right = down_right;
 }
 
 /**
@@ -24,8 +24,8 @@ DetectionBox::DetectionBox(std::pair<int, int> upper_left, std::pair<int, int> d
  * @param width
  */
 DetectionBox::DetectionBox(std::pair<int, int> upper_left, int height, int width){
-    this->upper_left = upper_left;
-    this->lower_right = std::make_pair(upper_left.second + width, upper_left.second + height);
+    m_upper_left = upper_left;
+    m_lower_right = std::make_pair(upper_left.second + width, upper_left.second + height);
 }
 
 /**
@@ -34,8 +34,8 @@ DetectionBox::DetectionBox(std::pair<int, int> upper_left, int height, int width
  * @param rect
  */
 DetectionBox::DetectionBox(cv::Rect rect) {
-    upper_left = std::make_pair(rect.x, rect.y);
-    lower_right = std::make_pair(rect.x + rect.width, rect.y + rect.height);
+    m_upper_left = std::make_pair(rect.x, rect.y);
+    m_lower_right = std::make_pair(rect.x + rect.width, rect.y + rect.height);
 }
 
 /**
@@ -44,11 +44,11 @@ DetectionBox::DetectionBox(cv::Rect rect) {
  * @param json
  */
 void DetectionBox::read(const QJsonObject &json){
-    this->upper_left.first = json["UL_X"].toInt();
-    this->upper_left.second = json["UL_Y"].toInt();
+    m_upper_left.first = json["UL_X"].toInt();
+    m_upper_left.second = json["UL_Y"].toInt();
 
-    this->lower_right.first = json["LR_X"].toInt();
-    this->lower_right.second = json["LR_Y"].toInt();
+    m_lower_right.first = json["LR_X"].toInt();
+    m_lower_right.second = json["LR_Y"].toInt();
 }
 
 /**
@@ -57,11 +57,11 @@ void DetectionBox::read(const QJsonObject &json){
  * @param json
  */
 void DetectionBox::write(QJsonObject &json){
-    json["UL_X"] = this->upper_left.first;
-    json["UL_Y"] = this->upper_left.second;
+    json["UL_X"] = m_upper_left.first;
+    json["UL_Y"] = m_upper_left.second;
 
-    json["LR_X"] = this->lower_right.first;
-    json["LR_Y"] = this->lower_right.second;
+    json["LR_X"] = m_lower_right.first;
+    json["LR_Y"] = m_lower_right.second;
 }
 
 /**
@@ -70,8 +70,8 @@ void DetectionBox::write(QJsonObject &json){
  * @return
  */
 cv::Rect DetectionBox::get_rect() {
-    return cv::Rect(upper_left.first, upper_left.second, lower_right.first - upper_left.first,
-                      lower_right.second - upper_left.second);
+    return cv::Rect(m_upper_left.first, m_upper_left.second, m_lower_right.first - m_upper_left.first,
+                      m_lower_right.second - m_upper_left.second);
 }
 
 /**
@@ -80,8 +80,8 @@ cv::Rect DetectionBox::get_rect() {
  * @param scale_ratio
  */
 void DetectionBox::scale_coordinates(float scale_ratio) {
-    this->upper_left.first *= scale_ratio;
-    this->upper_left.second *= scale_ratio;
-    this->lower_right.first *= scale_ratio;
-    this->lower_right.second *= scale_ratio;
+    m_upper_left.first *= scale_ratio;
+    m_upper_left.second *= scale_ratio;
+    m_lower_right.first *= scale_ratio;
+    m_lower_right.second *= scale_ratio;
 }

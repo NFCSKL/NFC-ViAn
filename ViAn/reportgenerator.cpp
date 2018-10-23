@@ -1,5 +1,15 @@
 #include "reportgenerator.h"
 
+#include "GUI/Bookmark/bookmarkitem.h"
+#include "Project/bookmark.h"
+#include "utility.h"
+
+#include <ActiveQt/QAxObject>
+#include <QDir>
+#include <QTextStream>
+
+#include <ctime>
+
 /**
  * @brief ReportGenerator::ReportGenerator
  * The constructor will assign parameters to the class members.
@@ -275,7 +285,7 @@ QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABL
  * @return string, the current time and date.
  */
 std::string ReportGenerator::date_time_generator() {
-    time_t now = time(0);
+    time_t now = time(nullptr);
     std::string dt = ctime(&now);
     std::replace( dt.begin(), dt.end(), ':', '-');
     std::replace( dt.begin(), dt.end(), ' ' , '_');

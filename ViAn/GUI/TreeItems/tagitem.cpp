@@ -1,4 +1,7 @@
 #include "tagitem.h"
+
+#include "Project/Analysis/tag.h"
+
 TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     m_tag = tag;
     setText(0, QString::fromStdString(tag->get_name()));

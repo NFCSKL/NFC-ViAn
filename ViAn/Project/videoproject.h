@@ -1,27 +1,27 @@
 #ifndef VIDEOPROJECT_H
 #define VIDEOPROJECT_H
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <QJsonArray>
-#include <QFile>
-#include "Video/overlay.h"
-#include "bookmark.h"
+
+#include "Filehandler/saveable.h"
 #include "video.h"
-#include "project.h"
-#include "Project/Analysis/analysisproxy.h" // TODO Include basic instead
-#include "Project/report.h"
+#include "Video/overlay.h"
+
+#include <QJsonObject>
+
+#include <map>
 #include <stack>
+
+using ID = int;
 
 /**
  * @brief The VideoProject class
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
-class Project;
+class BasicAnalysis;
 class Bookmark;
-class VideoProject : public Saveable{
+class Project;
+class Video;
+class VideoProject : public Saveable {
     friend class VideoProjectTest;
     std::map<ID,Bookmark*> m_bookmarks;
     std::string m_tree_index = "";
@@ -78,8 +78,6 @@ public:
     bool is_saved();
     bool is_current();
     void set_current(bool);
-
 };
-
 
 #endif // VIDEOPROJECT_H

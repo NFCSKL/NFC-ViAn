@@ -3,7 +3,8 @@
 
 #include <opencv2/core/core.hpp>
 
-class FrameManipulator {
+class FrameManipulator
+{
     double alpha = 1;   // Contrast, value in range CONTRAST_MIN to CONTRAST_MAX.
     int beta = 0;       // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
     double gamma = 1;   // Gamma, value in range GAMMA_MIN to GAMMA_MAX.

@@ -1,15 +1,16 @@
 #ifndef ANALYSISWIDGET_H
 #define ANALYSISWIDGET_H
 
-#include "GUI/videowidget.h"
 #include <QWidget>
-#include <QTreeWidgetItem>
+
 #include <ctime>
-#include "GUI/TreeItems/videoitem.h"
-#include "Project/videoproject.h"
-#include "queuewidget.h"
-#include <QThreadPool>
-#include <map>
+#include <deque>
+#include <tuple>
+
+class AnalysisMethod;
+class AnalysisProxy;
+class QTreeWidgetItem;
+class QueueWidget;
 
 /**
  * @brief The AnalysisWidget class

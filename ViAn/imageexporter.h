@@ -3,10 +3,6 @@
 
 #include <QObject>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/videoio/videoio.hpp>
-
-#include "utility.h"
 
 class ImageExporter : public QObject {
     Q_OBJECT

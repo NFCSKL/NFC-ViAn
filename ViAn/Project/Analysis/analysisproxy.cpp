@@ -1,7 +1,14 @@
 #include "analysisproxy.h"
-#include <QJsonObject>
-#include <QString>
+
+#include "analysis.h"
+#include "Analysis/analysissettings.h"
+#include "poi.h"
 #include "utility.h"
+
+#include "opencv2/core/core.hpp"
+
+#include <QJsonArray>
+#include <QJsonObject>
 
 /**
  * @brief AnalysisProxy::AnalysisProxy

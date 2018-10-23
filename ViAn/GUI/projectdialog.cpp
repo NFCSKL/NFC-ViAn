@@ -1,12 +1,14 @@
 #include "projectdialog.h"
-#include <QSize>
-#include <QPushButton>
-#include <QBoxLayout>
-#include <QFormLayout>
-#include <QFileDialog>
-#include <QMessageBox>
 
+#include <QBoxLayout>
 #include <QDebug>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+
 
 /**
  * @brief ProjectDialog::ProjectDialog

@@ -1,13 +1,12 @@
 #ifndef SHAPES_H
 #define SHAPES_H
 
-#include <QImage>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <qpainter.h>
-#include <algorithm>
+#include "opencv2/core/core.hpp"
 
-#include "opencv2/opencv.hpp"
+#include <QColor>
+#include <QJsonObject>
+
+class QPoint;
 
 enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT, EDIT, ZOOM, MOVE, ANALYSIS_BOX};
 

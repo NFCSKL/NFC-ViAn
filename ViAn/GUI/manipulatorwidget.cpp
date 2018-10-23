@@ -1,6 +1,11 @@
 #include "manipulatorwidget.h"
-#include <QPushButton>
+
 #include <QDebug>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSlider>
 
 /**
  * @brief ManipulatorWidget::ManipulatorWidget

@@ -1,12 +1,17 @@
 #include "imagesequence.h"
 
+#include "project.h"
+#include "utility.h"
+
+#include <QJsonArray>
+
 /**
  * @brief ImageSequence::ImageSequence
  * @param name: name of the sequence
  */
 ImageSequence::ImageSequence(const std::string& path) : Video(true){
     seq_path = path;
-    int index = path.find_last_of('/') + 1;
+    auto index = path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
 }
 
@@ -18,7 +23,7 @@ ImageSequence::ImageSequence(const std::string& path) : Video(true){
 ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string> &images)
     : Video(true) {
     seq_path = path;
-    int index = path.find_last_of('/') + 1;
+    auto index = path.find_last_of('/') + 1;
     m_name = path.substr(index);
     m_images = images;
     file_path = seq_path + "/" + get_pattern_name();
@@ -39,7 +44,7 @@ std::vector<std::string> ImageSequence::get_images(){
 std::vector<std::string> ImageSequence::get_image_names() {
     std::vector<std::string> names;
     for (auto image_path : m_images){
-        int index = image_path.find_last_of('/') + 1;
+        auto index = image_path.find_last_of('/') + 1;
         names.push_back(image_path.substr(index));
     }
     return names;

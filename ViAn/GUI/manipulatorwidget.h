@@ -1,13 +1,15 @@
 #ifndef MANIPULATORWIDGET_H
 #define MANIPULATORWIDGET_H
 
-#include <QObject>
-#include <QWidget>
-#include <QFormLayout>
-#include <QSlider>
-#include <QLabel>
-#include <QDialogButtonBox>
 #include <Video/framemanipulator.h>
+
+#include <QWidget>
+
+class QDialogButtonBox;
+class QFormLayout;
+class QLabel;
+class QPushButton;
+class QSlider;
 
 class ManipulatorWidget : public QWidget {
     Q_OBJECT

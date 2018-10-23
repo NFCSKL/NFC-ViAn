@@ -1,18 +1,13 @@
 #ifndef VIDEOCONTROLLER_H
 #define VIDEOCONTROLLER_H
 
-#include <QObject>
 #include <QThread>
-#include <QImage>
-#include <QPoint>
-#include <QSize>
-#include <QTimer>
-#include <atomic>
+#include <condition_variable>
 #include <mutex>
-#include <opencv2/core/core.hpp>
-#include "videoplayer.h"
-#include "Video/frameprocessor.h"
-#include "Project/video.h"
+
+
+class VideoPlayer;
+struct video_sync;
 
 /**
  * @brief The VideoController class

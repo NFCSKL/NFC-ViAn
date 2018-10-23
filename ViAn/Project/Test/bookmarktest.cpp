@@ -1,5 +1,6 @@
 #include "bookmarktest.h"
 
+#include <QTest>
 
 void BookmarkTest::initTestCase(){
     m_temp_dir.setAutoRemove(true);

@@ -1,5 +1,10 @@
 #include "zoompreviewwidget.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include <QDebug>
+#include <QPainter>
+#include <QResizeEvent>
 
 /**
  * @brief zoompreviewwidget::center_image
@@ -75,5 +80,3 @@ void ZoomPreviewWidget::frame_update(cv::Mat preview_image) {
 void ZoomPreviewWidget::on_floating_changed(const bool is_floating) {
     center_along_xy = is_floating;
 }
-
-

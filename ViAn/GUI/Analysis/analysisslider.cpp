@@ -1,10 +1,12 @@
 #include "analysisslider.h"
-#include <QSlider>
-#include <QBrush>
-#include <QPaintEvent>
-#include <QStylePainter>
-#include <QStyleOptionSlider>
+
+#include "Analysis/analysissettings.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/tag.h"
+
 #include <QDebug>
+#include <QStyleOptionSlider>
+#include <QStylePainter>
 
 
 AnalysisSlider::AnalysisSlider(Qt::Orientation orientation, QWidget * parent) : QSlider(parent) {
@@ -29,7 +31,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
     //Get one frame's width of the slider
-    double frame_width = (double)(groove_rect.right()-groove_rect.left())/maximum();
+    double frame_width = static_cast<double>((groove_rect.right()-groove_rect.left()))/maximum();
 
     QBrush brush = Qt::red;
 
@@ -37,7 +39,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Checks if tag is a nullptr and if the tag should be shown on the slider
     if (m_show_tags && show_on_slider && m_tag) {
         for (int frame : m_tag->get_frames()) {
-            double first = (double)(groove_rect.left() + (frame) * frame_width);
+            int first = static_cast<int>((groove_rect.left() + (frame) * frame_width));
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);
         }
@@ -48,12 +50,12 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
         brush = Qt::yellow;
 
         for (auto it = rects.begin(); it != rects.end(); ++it) {
-            double first_frame = (double)(*it).first;
-            double second_frame = (double)(*it).second;
+            double first_frame = static_cast<double>((*it).first);
+            double second_frame = static_cast<double>((*it).second);
 
             //Walk first/second_frame number of frames in on the slider
-            double first = (groove_rect.left()+first_frame*frame_width);
-            double second = (groove_rect.left()+second_frame*frame_width);
+            int first = static_cast<int>((groove_rect.left()+first_frame*frame_width));
+            int second = static_cast<int>((groove_rect.left()+second_frame*frame_width));
 
             //Draw the rects, +1 so it's not too small
             //QRect(int x, int y, int width, int height)
@@ -88,8 +90,8 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @param interval
  */
 void AnalysisSlider::draw_interval(std::pair<int, int> interval, QRect groove, double frame_width) {
-    double first = (groove.left()+(double)interval.first*frame_width);
-    double second = (groove.left()+(double)interval.second*frame_width);
+    int first = static_cast<int>(groove.left()+interval.first*frame_width);
+    int second = static_cast<int>(groove.left()+interval.second*frame_width);
     interval_rects.clear();
 
     // Draw the interval

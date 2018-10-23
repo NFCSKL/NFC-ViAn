@@ -1,5 +1,10 @@
 #include "recentproject.h"
 
+#include <QDir>
+#include <QFile>
+#include <QJsonArray>
+#include <QStandardPaths>
+
 const std::string RecentProject::FILE_NAME = "recent_projects";
 const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString()+ "/ViAn/";
 
@@ -66,6 +71,3 @@ void RecentProject::write(QJsonObject &json) {
     }
     json["recent"] = j_array;
 }
-
-
-

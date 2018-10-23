@@ -1,5 +1,10 @@
 #include "saveable.h"
 
+#include <QDebug>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 const Saveable::SAVE_FORMAT Saveable::DEFAULT_SAVE_FORMAT;
 
 
@@ -20,7 +25,7 @@ Saveable::~Saveable(){
 
 /**
  * @brief FileHandler::save_saveable
- * @param savable
+ * @param file_name
  * @param dir_path
  * @param save_format
  * @return Saves a Json file to provided directory with file_name and save_format
@@ -42,7 +47,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
     m_full_path = full_path;
     QFile save_file(QString::fromStdString(full_path));
     if(!save_file.open(QIODevice::WriteOnly)){  // Attempt to open full_path
-        qWarning() << "Couldn't open save file", save_file.fileName().toStdString().c_str();   // Send warning if unsuccessful
+        qWarning() << "Couldn't open save file" << save_file.fileName().toStdString().c_str();   // Send warning if unsuccessful
         return false;
     }
     QJsonObject json_saveable;                  // Data to be saved
@@ -95,7 +100,7 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
     QJsonDocument load_doc(save_format == JSON          // Decide format to decode to
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
-    this->read(load_doc.object());                      // Read data to be loaded, OBS! Implement this when inheriting
+    this->read(load_doc.object());                            // Read data to be loaded, OBS! Implement this when inheriting
 
     return true;
 }

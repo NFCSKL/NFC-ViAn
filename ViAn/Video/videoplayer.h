@@ -1,19 +1,15 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
-#include <QObject>
-#include <QCoreApplication>
+#include "opencv2/core/core.hpp"
+#include "opencv2/videoio/videoio.hpp"
 
-#include <stack>
-#include "Project/video.h"
-#include <mutex>
+#include <QObject>
+
 #include <atomic>
 #include <condition_variable>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/videoio/videoio.hpp>
-#include <opencv2/video/video.hpp>
-#include <opencv2/core/core.hpp>
+#include <mutex>
+
 
 /**
  * @brief The video_sync struct
