@@ -4,7 +4,9 @@
 
 #include <QDebug>
 #include <QDialogButtonBox>
+#include <QFormLayout>
 #include <QFileDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -29,12 +31,17 @@ PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path)
     browse_layout->addWidget(path_text);
     browse_layout->addWidget(browse_btn);
 
+    QFormLayout* layout = new QFormLayout;
+    QLabel* text = new QLabel("Video was not found in the saved path.\nIt might have been moved.\nEnter the new path to the video.");
+    layout->addWidget(text);
+    layout->addRow("Path:", browse_layout);
+
     btn_box = new QDialogButtonBox(Qt::Horizontal);
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
     //enable_ok_btn(false);
 
-    vertical_layout->addLayout(browse_layout);
+    vertical_layout->addLayout(layout);
     vertical_layout->addWidget(btn_box);
     setLayout(vertical_layout);
 

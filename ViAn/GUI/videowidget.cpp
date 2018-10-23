@@ -1121,8 +1121,12 @@ void VideoWidget::capture_failed() {
     int status = dialog->exec();
 
     if (status == dialog->Accepted) {
-        m_vid_proj->get_video()->file_path = m_video_path;
-        qDebug() << "Updated";
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            m_vid_proj->get_video()->file_path = m_video_path;
+            new_video.store(true);
+        }
+        player_con.notify_all();
     }
 }
 
