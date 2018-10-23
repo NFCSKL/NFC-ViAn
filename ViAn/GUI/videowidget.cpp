@@ -1087,6 +1087,7 @@ void VideoWidget::clear_current_video() {
     zoom_label->setText("100%");
 
     frame_wgt->close();
+    emit clean_zoom_preview();
 }
 
 void VideoWidget::set_video_btns(bool b) {
