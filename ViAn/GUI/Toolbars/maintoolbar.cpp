@@ -21,7 +21,7 @@ void MainToolbar::create_actions() {
     add_video_act = new QAction(QIcon("../ViAn/Icons/add_video.png"), tr("Import video"), this);
     add_img_seq_act = new QAction(QIcon("../ViAn/Icons/image_sequence.png"), tr("Import images"), this);
     open_recent_act = new QAction(QIcon("../ViAn/Icons/home.png"), tr("Open recent projects dialog"), this);
-    open_folder_act = new QAction(QIcon("../ViAn/Icons/computer.png"), tr("Open project folder"), this);
+    open_folder_act = new QAction(QIcon("../ViAn/Icons/new_folder.png"), tr("Open project folder"), this);
 }
 
 /**

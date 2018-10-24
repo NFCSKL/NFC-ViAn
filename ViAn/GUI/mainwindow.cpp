@@ -286,7 +286,7 @@ void MainWindow::init_file_menu() {
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
     recent_project_act->setIcon(QIcon("../ViAn/Icons/home.png"));
-    open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/computer.png"));
+    open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/new_folder.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     add_seq_act->setIcon(QIcon("../ViAn/Icons/image_sequence.png"));
