@@ -65,10 +65,12 @@ void BookmarkWidget::generate_report() {
             bmark_list.push_back(bmark);
         }
     }
-    processing_thread = new QThread;    
+    processing_thread = new QThread;
+    setCursor(Qt::WaitCursor);
     ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
     rp_gen->uncat_bmarks = bmark_list;
     rp_gen->create_report();
+    setCursor(Qt::ArrowCursor);
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, std::string> *container) {

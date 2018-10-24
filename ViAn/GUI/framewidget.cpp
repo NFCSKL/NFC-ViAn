@@ -504,7 +504,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             repaint();
         } else {
             if (zoom_rect.contains(scaled_pos) && mark_rect) {
-                setCursor(QCursor(QPixmap("../ViAn/Icons/zoom_in.png")));
+                setCursor(QCursor(QPixmap("../ViAn/Icons/new_zoom.png")));
             } else {
                 unsetCursor();
             }
