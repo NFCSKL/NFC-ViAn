@@ -1093,6 +1093,7 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
         m_proj->get_videos().erase(it);
+        m_proj->set_unsaved(true);
     }
     delete v_proj;
     emit item_removed(v_proj);
