@@ -41,7 +41,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
-    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     QDockWidget* zoom_preview_dock = new QDockWidget(tr("Zoom preview"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
@@ -122,6 +122,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     analysis_wgt->set_queue_wgt(queue_wgt);
 
     connect(video_wgt, &VideoWidget::new_bookmark, bookmark_wgt, &BookmarkWidget::create_bookmark);
+    connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
     connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, video_wgt, &VideoWidget::load_marked_video_state);
@@ -802,5 +803,11 @@ void MainWindow::show_analysis_dock(bool show) {
 void MainWindow::show_ana_settings_dock(bool show) {
     if (show) {
         ana_settings_dock->show();
+    }
+}
+
+void MainWindow::show_bookmark_dock(bool show) {
+    if (show) {
+        bookmark_dock->show();
     }
 }

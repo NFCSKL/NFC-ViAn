@@ -663,7 +663,6 @@ void VideoWidget::on_bookmark_clicked() {
     bmark_description = dialog.textValue();
     if (!ok) return;
     quick_bookmark();
-
 }
 
 void VideoWidget::quick_bookmark() {

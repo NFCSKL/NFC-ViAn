@@ -113,10 +113,14 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description.toStdString(), state, time);
     bookmark->set_thumbnail_path(thumbnail_path);
     vid_proj->add_bookmark(bookmark);
-
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
     bm_list->addItem(bm_item);
+
+    // If just added the first bookmark
+    if (bm_list->count() == 1) {
+        emit show_bm_dock(true);
+    }
 }
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
