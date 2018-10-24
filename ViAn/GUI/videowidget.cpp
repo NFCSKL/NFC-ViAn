@@ -256,7 +256,7 @@ void VideoWidget::set_btn_icons() {
     zoom_label->setMaximumWidth(60);
     zoom_label->setEnabled(false);
     connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
-    fps_label = new QLabel("Fps: 0", this);
+    fps_label = new QLabel("0fps", this);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
 
@@ -1143,7 +1143,7 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
 
     set_total_time((last_frame + 1) / frame_rate);
     set_current_time(current_frame_index / m_frame_rate);
-    fps_label->setText("Fps: " + QString::number(m_frame_rate));
+    fps_label->setText(QString::number(m_frame_rate) + "fps");
     max_frames->setText("/ " + QString::number(last_frame));
 
     on_new_frame();
@@ -1443,13 +1443,7 @@ void VideoWidget::update_playback_speed(int speed) {
         m_speed_step.store(speed);
         player_con.notify_one();
     }
-    if (speed > 0) {
-        fps_label->setText("Fps: " + QString::number(m_frame_rate*speed*2));
-    } else if (speed < 0) {
-        fps_label->setText("Fps: " + QString::number(m_frame_rate/std::abs(speed*2)));
-    } else {
-        fps_label->setText("Fps: " + QString::number(m_frame_rate));
-    }
+    fps_label->setText(QString::number(m_frame_rate) + "fps");
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {
