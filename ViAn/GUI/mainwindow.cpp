@@ -178,6 +178,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->add_img_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
+    connect(main_toolbar->open_recent_act, &QAction::triggered, this, &MainWindow::open_rp_dialog);
     connect(main_toolbar->open_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
     //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
@@ -283,7 +284,7 @@ void MainWindow::init_file_menu() {
     // Set icons
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
-    recent_project_act->setIcon(QIcon("../ViAn/Icons/recent.png"));
+    recent_project_act->setIcon(QIcon("../ViAn/Icons/home.png"));
     open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/computer.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
