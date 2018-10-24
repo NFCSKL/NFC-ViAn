@@ -214,6 +214,8 @@ private:
     QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
     QLabel* fps_label;
+    QLabel* size_label;
+    QLabel* rotation_label;
 
     //Buttons
     QPushButton* play_btn;

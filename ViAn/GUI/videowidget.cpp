@@ -257,6 +257,8 @@ void VideoWidget::set_btn_icons() {
     zoom_label->setEnabled(false);
     connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
     fps_label = new QLabel("0fps", this);
+    size_label = new QLabel("(0x0)", this);
+    rotation_label = new QLabel("0°", this);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
 
@@ -289,6 +291,8 @@ void VideoWidget::set_btn_tool_tip() {
     interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation: N");
 
     fps_label->setToolTip("The frame rate of the video");
+    size_label->setToolTip("The size of  the video");
+    rotation_label->setToolTip("The current rotation of the video");
     set_start_interval_btn->setToolTip("Set left interval point: I");
     set_end_interval_btn->setToolTip("Set right interval point: O");
 }
@@ -449,6 +453,8 @@ void VideoWidget::add_btns_to_layouts() {
     control_row->addLayout(zoom_btns);
 
     interval_btns->addWidget(fps_label);
+    interval_btns->addWidget(size_label);
+    interval_btns->addWidget(rotation_label);
     interval_btns->addWidget(set_start_interval_btn);
     interval_btns->addWidget(set_end_interval_btn);
 
@@ -637,6 +643,13 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
         video->state.center = center;
         video->state.scale_factor = scale;
         video->state.rotation = angle;
+
+        if (angle == 90 || angle == 270) {
+            size_label->setText("(" + QString::number(m_video_height) + "x" + QString::number(m_video_width) + ")");
+        } else {
+            size_label->setText("(" + QString::number(m_video_width) + "x" + QString::number(m_video_height) + ")");
+        }
+        rotation_label->setText(QString::number(angle) + "°");
     }
 }
 
@@ -1144,6 +1157,7 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     set_total_time((last_frame + 1) / frame_rate);
     set_current_time(current_frame_index / m_frame_rate);
     fps_label->setText(QString::number(m_frame_rate) + "fps");
+    size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
     max_frames->setText("/ " + QString::number(last_frame));
 
     on_new_frame();
