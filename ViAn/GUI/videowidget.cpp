@@ -542,10 +542,19 @@ void VideoWidget::stop_btn_clicked() {
 /**
  * @brief VideoWidget::next_frame_clicked
  */
-void VideoWidget::next_frame_clicked(){
+void VideoWidget::next_frame_clicked() {
+    if (analysis_only) {
+        if (playback_slider->is_poi_end(frame_index.load())) {
+            next_poi_btn_clicked();
+            return;
+        }
+    }
     if (playback_slider->value() + 1 < m_frame_length) {
         set_status_bar("Stepping to the next frame");
-        frame_index.store(playback_slider->value() + 1);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(playback_slider->value() +1);
+        }
         on_new_frame();
     } else {
         set_status_bar("Already at the last frame");
@@ -555,10 +564,25 @@ void VideoWidget::next_frame_clicked(){
 /**
  * @brief VideoWidget::prev_frame_clicked
  */
-void VideoWidget::prev_frame_clicked(){
+void VideoWidget::prev_frame_clicked() {
+    int current_frame = frame_index.load();
+    if (analysis_only) {
+        if (playback_slider->is_poi_start(current_frame)) {
+            int new_frame = playback_slider->get_prev_poi_end(current_frame);
+            {
+                std::lock_guard<std::mutex> p_lock(player_lock);
+                frame_index.store(new_frame);
+            }
+            on_new_frame();
+            return;
+        }
+    }
     if (playback_slider->value() - 1 > -1) {
         set_status_bar("Stepping to the previous frame");
-        frame_index.store(playback_slider->value() - 1);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(playback_slider->value() - 1);
+        }
         on_new_frame();
     } else {
         set_status_bar("Already at the first frame");
@@ -865,6 +889,14 @@ void VideoWidget::clear_tag() {
 
 void VideoWidget::analysis_play_btn_toggled(bool value) {
     analysis_only = value;
+    if (analysis_only) {
+        int new_frame = playback_slider->get_closest_poi(frame_index.load());
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(new_frame);
+        }
+        on_new_frame();
+    }
 }
 
 /**
@@ -872,14 +904,18 @@ void VideoWidget::analysis_play_btn_toggled(bool value) {
  * Jump to next detection aren on the slider
  */
 void VideoWidget::next_poi_btn_clicked() {
-    int new_frame = playback_slider->get_next_poi_start(frame_index.load());
-    if (new_frame != frame_index.load()) {
+    int current_frame = frame_index.load();
+    int new_frame = playback_slider->get_next_poi_start(current_frame);
+    if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
             state = playback_slider->m_tag->tag_map[new_frame]->m_state;
             load_marked_video_state(m_vid_proj, state);
         }
-        frame_index.store(new_frame);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(new_frame);
+        }
         on_new_frame();
         emit set_status_bar("Jumped to next POI");
     } else {
@@ -892,14 +928,18 @@ void VideoWidget::next_poi_btn_clicked() {
  * * Jump to orevious detection aren on the slider
  */
 void VideoWidget::prev_poi_btn_clicked() {
-    int new_frame = playback_slider->get_prev_poi_start(frame_index.load());
-    if (new_frame != frame_index.load()) {
+    int current_frame = frame_index.load();
+    int new_frame = playback_slider->get_prev_poi_start(current_frame);
+    if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
             state = playback_slider->m_tag->tag_map[new_frame]->m_state;
             load_marked_video_state(m_vid_proj, state);
         }
-        frame_index.store(new_frame);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(new_frame);
+        }
         on_new_frame();
         emit set_status_bar("Jumped to previous POI");
     } else {
@@ -949,7 +989,7 @@ void VideoWidget::on_new_frame() {
     }
 
     if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
-    frame_line_edit->setText(QString::number(frame_index.load()));
+    frame_line_edit->setText(QString::number(frame_num));
 
     if (!m_floating) {
         if (proj_tree_item == VIDEO_ITEM) {
@@ -975,7 +1015,14 @@ void VideoWidget::on_playback_slider_pressed() {
  */
 void VideoWidget::on_playback_slider_released() {
     playback_slider->set_blocked(false);
-    frame_index.store(playback_slider->value());
+    int new_frame = playback_slider->value();
+    if (analysis_only) {
+        new_frame = playback_slider->get_closest_poi(new_frame);
+    }
+    {
+        std::lock_guard<std::mutex> p_lock(player_lock);
+        frame_index.store(new_frame);
+    }
     on_new_frame();
 }
 

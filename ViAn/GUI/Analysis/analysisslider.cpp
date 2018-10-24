@@ -238,8 +238,7 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
     }
     return curr_frame;
 
-
-
+    {
 //      TODO Might need for when adding interval
 //    } else if (!frames.empty()) {
 //        int edge_frame = curr_frame;
@@ -252,27 +251,66 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
 //        }
 //    }
 //    return curr_frame;
+    }
+}
+
+/**
+ * @brief AnalysisSlider::is_poi_start
+ * Return true if the curr_frame is the end frame of a poi
+ * @param curr_frame
+ * @return
+ */
+bool AnalysisSlider::is_poi_start(int curr_frame) {
+    if (!show_on_slider) return false;
+    if (m_show_pois) {
+        for (std::pair<int, int> rect : rects) {
+            if (rect.first == curr_frame) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief AnalysisSlider::get_current_poi_end
+ * Return true if the curr_frame is the end frame of a poi
+ * @param curr_frame
+ * @return
+ */
+bool AnalysisSlider::is_poi_end(int curr_frame) {
+    if (!show_on_slider) return false;
+
+    // If analysis pois on slider get the next poi end after current frame
+    if (m_show_pois) {
+        for (std::pair<int, int> rect : rects) {
+            if (rect.second == curr_frame) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /**
  * @brief AnalysisSlider::get_prev_poi_start
- * Return the start frame of the POI before frame
+ * Return the closest start frame before frame
  * @param frame     : current frame
  * @return
  */
 int AnalysisSlider::get_prev_poi_start(int curr_frame) {
     if (!show_on_slider) return curr_frame;
 
-    // If tags on slider get next frame after current
+    // If tags on slider get previous frame from current
     if (m_show_tags) {
         return m_tag->previous_frame(curr_frame);
     }
 
-    // If analysis pois on slider get next start of next poi after current
+    // If analysis pois on slider get start of previous poi before current
     if (m_show_pois) {
         int new_frame = curr_frame;
         for (std::pair<int, int> rect : rects) {
-            if (rect.second >= curr_frame) {
+            if (rect.first >= curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
@@ -280,9 +318,7 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
     }
     return curr_frame;
 
-
-
-
+    {
 //      TODO Might need for when adding interval
 //    } else if (!frames.empty()) {
 //        int edge_frame = curr_frame;
@@ -296,6 +332,54 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
 //        }
 //    }
 //    return new_frame;
+    }
+}
+
+/**
+ * @brief AnalysisSlider::get_prev_poi_end
+ * Return the end frame of the poi before frame
+ * @param curr_frame
+ * @return
+ */
+int AnalysisSlider::get_prev_poi_end(int curr_frame) {
+    if (!show_on_slider) return curr_frame;
+
+    // If tags on slider get previous frame from current
+    if (m_show_tags) {
+        return m_tag->previous_frame(curr_frame);
+    }
+
+    // If analysis pois on slider get start of previous poi before current
+    if (m_show_pois) {
+        int new_frame = curr_frame;
+        for (std::pair<int, int> rect : rects) {
+            if (rect.second >= curr_frame) {
+                break;
+            } else new_frame = rect.second;
+        }
+        return new_frame;
+    }
+    return curr_frame;
+}
+
+/**
+ * @brief AnalysisSlider::get_closest_poi
+ * Return the frame closest to to frame that is inside a poi.
+ * @param frame
+ * @return
+ */
+int AnalysisSlider::get_closest_poi(int frame) {
+    if (is_in_POI(frame)) {
+        return frame;
+    } else {
+        int prev = get_prev_poi_end(frame);
+        int next = get_next_poi_start(frame);
+        if (frame - prev <= next - frame) {
+            return prev;
+        } else {
+            return next;
+        }
+    }
 }
 
 /**
@@ -306,7 +390,7 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
  */
 bool AnalysisSlider::is_in_POI(int frame) {
     for (std::pair<int, int> rect : rects) {
-        if (frame >= rect.first && frame < rect.second) {
+        if (frame >= rect.first && frame <= rect.second) {
             return true;
         }
     }return false;
