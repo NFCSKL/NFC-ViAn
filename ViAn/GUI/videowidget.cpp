@@ -726,7 +726,10 @@ void VideoWidget::delete_interval() {
  * @param status
  */
 void VideoWidget::play_btn_toggled(bool status) {
-    is_playing.store(status);
+    {
+        std::lock_guard<std::mutex> lk(player_lock);
+        is_playing.store(status);
+    }
     if (status) {
         set_status_bar("Play");
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
@@ -1240,6 +1243,9 @@ void VideoWidget::mouse_double_clicked(QPoint pos) {
 }
 
 void VideoWidget::mouse_pressed(QPoint pos, bool right_click) {
+    if (is_playing.load()) {
+        play_btn_toggled(false);
+    }
     update_overlay_settings([&](){
         o_settings.mouse_clicked = true;
         o_settings.pos = pos;
