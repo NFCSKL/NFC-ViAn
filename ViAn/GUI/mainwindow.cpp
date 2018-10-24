@@ -707,6 +707,7 @@ void MainWindow::init_rp_dialog() {
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
+    connect(rp_dialog, &RecentProjectDialog::exit, this, &QWidget::close);
 }
 
 void MainWindow::open_rp_dialog() {
