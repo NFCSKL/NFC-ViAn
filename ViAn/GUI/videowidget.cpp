@@ -734,6 +734,7 @@ void VideoWidget::play_btn_toggled(bool status) {
         set_status_bar("Play");
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
     } else {
+        play_btn->setChecked(false);
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         set_status_bar("Pause");
     }

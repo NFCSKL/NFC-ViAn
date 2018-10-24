@@ -650,6 +650,7 @@ void MainWindow::init_export_menu() {
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
+    connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }
 
 /**
