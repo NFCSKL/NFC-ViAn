@@ -120,7 +120,7 @@ signals:
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
     void zoom_preview(cv::Mat preview_frame);
-    void update_tooltip(std::string);
+    void update_videoitem(std::string);
     void update_manipulator_wgt(int, double, double);
 public slots:
     void quick_analysis(AnalysisSettings* settings);

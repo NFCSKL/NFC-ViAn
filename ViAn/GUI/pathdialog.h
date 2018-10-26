@@ -10,6 +10,7 @@ class PathDialog : public QDialog
 {
     Q_OBJECT
     std::string* m_path;
+    QString m_q_path;
     QString m_dir;
     QString m_name;
     QLineEdit* path_text;

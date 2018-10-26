@@ -19,6 +19,7 @@
 #include "Project/recentproject.h"
 #include "Project/videoproject.h"
 #include "projectdialog.h"
+#include "utility.h"
 
 
 #include <QAction>
@@ -1419,8 +1420,13 @@ void ProjectWidget::set_main_window_name(QString name) {
     parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
 }
 
-void ProjectWidget::update_tooltip(std::string path) {
+void ProjectWidget::update_videoitem(std::string path) {
+    if (currentItem()->type() != VIDEO_ITEM) return;
+    std::string name = Utility::name_from_path(path);
+    currentItem()->setText(0, QString::fromStdString(name));
     currentItem()->setToolTip(0, QString::fromStdString(path));
+    VideoItem* vid_proj = dynamic_cast<VideoItem*>(currentItem());
+    vid_proj->get_video_project()->get_video()->set_name(name);
 }
 
 /**

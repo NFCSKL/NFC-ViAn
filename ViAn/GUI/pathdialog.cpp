@@ -12,34 +12,34 @@
 #include <QVBoxLayout>
 
 PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path) : QDialog(parent) {
-    setWindowTitle("ViAn - Update video path");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setMinimumWidth(MIN_WIDTH);
 
     m_path = path;
-    QString q_path = QString::fromStdString(*path);
-    m_dir = q_path.left(q_path.lastIndexOf('/') + 1);
+    m_q_path = QString::fromStdString(*path);
+    m_dir = m_q_path.left(m_q_path.lastIndexOf('/') + 1);
     m_name = QString::fromStdString(Utility::name_from_path(*path));
     m_default_path = default_path;
+
+    setWindowTitle("Where is file " + m_name + "?");
 
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     QHBoxLayout* browse_layout = new QHBoxLayout;
 
-    path_text = new QLineEdit(m_dir, this);
+    path_text = new QLineEdit(m_q_path, this);
     QPushButton* browse_btn = new QPushButton(tr("Browse"), this);
 
     browse_layout->addWidget(path_text);
     browse_layout->addWidget(browse_btn);
 
     QFormLayout* layout = new QFormLayout;
-    QLabel* text = new QLabel("File was not found in the saved path.\nIt might have been moved.\nEnter the new path to the file.");
+    QLabel* text = new QLabel("File was not found in the saved path or could not be read.\nIt might have been moved.\nEnter the new path to the file.");
     layout->addWidget(text);
     layout->addRow("Path:", browse_layout);
 
     btn_box = new QDialogButtonBox(Qt::Horizontal);
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::Cancel);
-    //enable_ok_btn(false);
 
     vertical_layout->addLayout(layout);
     vertical_layout->addWidget(btn_box);
@@ -58,15 +58,16 @@ void PathDialog::enable_ok_btn(const bool& enable) {
 void PathDialog::browse_btn_clicked() {
     QDir standard;
     standard.mkpath(m_default_path);
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose project path"),
-                                                    m_default_path);
-    if(!dir.isEmpty()) {
-        path_text->setText(dir);
+    QString file = QFileDialog::getOpenFileName(this,
+                                                tr("Choose project path"),
+                                                m_q_path);
+    if(!file.isEmpty()) {
+        path_text->setText(file);
     }
 }
 
 void PathDialog::ok_btn_clicked() {
-    *m_path = (path_text->text() + "/" + m_name).toStdString();
+    *m_path = path_text->text().toStdString();
     accept();
 }
 
