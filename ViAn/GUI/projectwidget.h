@@ -58,6 +58,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void set_zoom_tool();
     void set_show_analysis_details(bool);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);

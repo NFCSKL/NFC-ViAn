@@ -730,6 +730,7 @@ void VideoWidget::play_btn_toggled(bool status) {
         is_playing.store(status);
     }
     if (status) {
+        emit set_zoom_tool();
         set_status_bar("Play");
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
     } else {

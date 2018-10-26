@@ -109,6 +109,7 @@ public:
     void set_delete_drawing(Shapes* shape);
 
 signals:
+    void set_zoom_tool();
     void close_video_widget(VideoWidget*);
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
     void set_detections_on_frame(int);

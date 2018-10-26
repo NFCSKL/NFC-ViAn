@@ -189,6 +189,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
     connect(drawing_wgt, &DrawingWidget::set_tool_edit, draw_toolbar->edit_tool_act, &QAction::trigger);
     connect(drawing_wgt, &DrawingWidget::set_tool_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
+    connect(video_wgt, &VideoWidget::set_zoom_tool, draw_toolbar->zoom_tool_act, &QAction::trigger);
+    connect(project_wgt, &ProjectWidget::set_zoom_tool, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
     connect(video_wgt->frame_wgt, &FrameWidget::set_toolbar_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
 
