@@ -15,8 +15,8 @@ public:
     QAction* open_act;
     QAction* add_video_act;
     QAction* add_img_seq_act;
-    QAction* open_recent_act;
     QAction* open_folder_act;
+    QAction* open_recent_act;
 
 signals:
 };

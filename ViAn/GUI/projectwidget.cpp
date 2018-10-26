@@ -897,9 +897,13 @@ void ProjectWidget::context_menu(const QPoint &point) {
     if (item_count == 0) {
         // Clicked on root tree
         menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("Import Video", this, SLOT(add_video()));
+        menu.addAction("Import Images", this, SLOT(add_images()));
     } else if (item_count == 1) {
         // Clicked on item
         menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("Import Video", this, SLOT(add_video()));
+        menu.addAction("Import Images", this, SLOT(add_images()));
         menu.addSeparator();
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
