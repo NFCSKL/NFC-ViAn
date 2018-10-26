@@ -1,14 +1,11 @@
 #ifndef TEXTDIALOG_H
 #define TEXTDIALOG_H
-#include <QWidget>
+
 #include <QDialog>
-#include <QLineEdit>
-#include <QDialogButtonBox>
-#include <QFormLayout>
-#include <QDoubleSpinBox>
 
-#include "Video/shapes/text.h"
-
+class QDialogButtonBox;
+class QDoubleSpinBox;
+class QLineEdit;
 class TextDialog : public QDialog
 {
     Q_OBJECT

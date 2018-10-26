@@ -1,22 +1,20 @@
 #ifndef BOOKMARKWIDGET_H
 #define BOOKMARKWIDGET_H
 
+#include "Project/video.h"
+
+#include <opencv2/core/core.hpp>
+
 #include <QWidget>
-#include <QVBoxLayout>
-#include <QListWidget>
-#include <QPushButton>
-#include <QDebug>
-#include <QScrollArea>
-#include <QDockWidget>
-#include <opencv2/opencv.hpp>
-#include "Project/videoproject.h"
-#include "bookmarkitem.h"
-#include "bookmarkcategory.h"
-#include "bookmarklist.h"
-#include "reportgenerator.h"
-#include <QThread>
 
 class BookmarkCategory;
+class BookmarkItem;
+class BookmarkList;
+class QDockWidget;
+class QScrollArea;
+class QVBoxLayout;
+class VideoProject;
+
 enum list_types {BOOKMARK, CONTAINER};
 class BookmarkWidget : public QWidget
 {

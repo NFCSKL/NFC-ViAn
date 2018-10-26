@@ -1,25 +1,31 @@
 #include "videowidget.h"
-#include "utility.h"
-#include "GUI/drawscrollarea.h"
+
+#include "Analysis/analysissettings.h"
+#include "doubleclickbutton.h"
+#include "framewidget.h"
+#include "GUI/Analysis/analysisslider.h"
 #include "GUI/Analysis/tagdialog.h"
 #include "GUI/Bookmark/bookmarkdialog.h"
+#include "GUI/drawscrollarea.h"
+#include "GUI/TreeItems/treeitem.h"
+#include "Project/Analysis/analysisinterval.h"
+#include "Project/Analysis/tag.h"
+#include "Project/Analysis/tagframe.h"
+#include "Project/videoproject.h"
+#include "Video/videocontroller.h"
 
-#include <QTime>
+#include <QBoxLayout>
+#include <QCheckBox>
+#include <QCloseEvent>
 #include <QDebug>
-#include <QShortcut>
+#include <QGridLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QScrollBar>
-#include <QProgressDialog>
-#include <algorithm>
-
-#include "GUI/frameexporterdialog.h"
-#include "Video/video_player.h"
-#include "imageexporter.h"
-
-#include <opencv2/videoio.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/video/video.hpp>
-
+#include <QShortcut>
+#include <QSlider>
+#include <QThread>
 
 #include "pathdialog.h"
 
@@ -568,7 +574,7 @@ void VideoWidget::prev_frame_clicked(){
  * @param checked
  */
 void VideoWidget::on_interpolate_toggled(bool checked) {
-    int method = cv::INTER_CUBIC ? checked : cv::INTER_NEAREST;
+    int method = checked ? cv::INTER_CUBIC : cv::INTER_NEAREST;
     set_interpolation_method(method);
 }
 
@@ -615,7 +621,7 @@ int VideoWidget::get_current_frame() {
  */
 void VideoWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
-    zoom_label->setText(QString::number(((int)(10000*m_scale_factor))/(double)100) +"%");
+    zoom_label->setText(QString::number((static_cast<int>((10000*m_scale_factor)))/100.) +"%");
 }
 
 /**
@@ -702,7 +708,6 @@ void VideoWidget::delete_interval() {
     playback_slider->update();
 }
 
-
 /**
  * @brief VideoWidget::play_btn_toggled
  * Slot function called when the play/pause button is toggled.
@@ -731,6 +736,7 @@ void VideoWidget::update_tag() {
         t_frame->m_state = state;
         t_frame->m_state.brightness = m_settings.brightness;
         t_frame->m_state.contrast = m_settings.contrast;
+        t_frame->m_state.gamma = m_settings.gamma;
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } catch (const std::out_of_range) {
         qWarning() << "Can't update. No tag found on current frame";
@@ -738,12 +744,12 @@ void VideoWidget::update_tag() {
     }
 }
 
-void VideoWidget::update_tag_color(int b, double c) {
+void VideoWidget::update_tag_color(int b, double c, double g) {
     if (proj_tree_item == TAG_FRAME_ITEM) {
-        m_tag->update_color_correction(playback_slider->value(), b, c);
+        m_tag->update_color_correction(playback_slider->value(), b, c, g);
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } else if (proj_tree_item == TAG_ITEM || proj_tree_item == DRAWING_TAG_ITEM) {
-        m_tag->update_color_whole_tag(b, c);
+        m_tag->update_color_whole_tag(b, c, g);
         emit set_status_bar("Whole tag '"+ QString::fromStdString(m_tag->get_name()) +"' updated");
     }
 }
@@ -1021,6 +1027,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
             z_settings.rotation = state.rotation;
             m_settings.brightness = state.brightness;
             m_settings.contrast = state.contrast;
+            m_settings.gamma = state.gamma;
             o_settings.overlay = m_vid_proj->get_overlay();
         }
 
@@ -1043,7 +1050,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);
-    emit update_manipulator_wgt(state.brightness, state.contrast);
+    emit update_manipulator_wgt(state.brightness, state.contrast, state.gamma);
 }
 
 /**
@@ -1382,6 +1389,7 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.skip_frame_refresh = frame_index.load() != state.frame;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
+        m_settings.gamma = state.gamma;
         frame_index.store(state.frame);
     });
 }
@@ -1408,11 +1416,12 @@ void VideoWidget::on_original_size(){
  * @param b_val brightness value
  * @param c_val contrast value
  */
-void VideoWidget::update_brightness_contrast(int b_val, double c_val, bool update) {
+void VideoWidget::update_brightness_contrast(int b_val, double c_val, double g_val, bool update) {
     if (proj_tree_item == VIDEO_ITEM) update = true;
     update_processing_settings([&](){
         m_settings.brightness = b_val;
         m_settings.contrast = c_val;
+        m_settings.gamma = g_val;
         m_settings.update_state = update;
     });
 }
@@ -1509,9 +1518,9 @@ void VideoWidget::zoom_label_finished() {
         emit set_status_bar("Error! Input is not a number!");
     } else if (converted < 0) {
         emit set_status_bar("Error! Input is negative!");
-    } else if (converted < (double)ZOOM_LABEL_MIN / PERCENT_INT_CONVERT) {
+    } else if (converted < static_cast<double>(ZOOM_LABEL_MIN) / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too small");
-    } else if (converted > (double)ZOOM_LABEL_MAX / PERCENT_INT_CONVERT) {
+    } else if (converted > static_cast<double>(ZOOM_LABEL_MAX) / PERCENT_INT_CONVERT) {
         emit set_status_bar("Error! Input is too large");
     } else {
         set_zoom_factor(converted);
@@ -1523,22 +1532,16 @@ void VideoWidget::zoom_label_finished() {
     zoom_label->clearFocus();
 }
 
-int VideoWidget::get_brightness() {
-    return m_vid_proj->get_video()->state.brightness;
-}
-
-double VideoWidget::get_contrast() {
-    return m_vid_proj->get_video()->state.contrast;
-}
-
-void VideoWidget::set_brightness_contrast(int bri, double cont) {
+void VideoWidget::set_brightness_contrast(int bri, double cont, double gamma) {
     if (!m_vid_proj) return;
     if (proj_tree_item == VIDEO_ITEM) {
         m_vid_proj->state.brightness = bri;
         m_vid_proj->state.contrast = cont;
+        m_vid_proj->state.gamma = gamma;
     }
     m_vid_proj->get_video()->state.brightness = bri;
     m_vid_proj->get_video()->state.contrast = cont;
+    m_vid_proj->get_video()->state.gamma = gamma;
 }
 
 void VideoWidget::update_zoom_preview_size(QSize s) {

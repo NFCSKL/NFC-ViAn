@@ -1,6 +1,6 @@
 #include "videocontroller.h"
 
-
+#include "videoplayer.h"
 #include <QDebug>
 
 VideoController::VideoController(std::atomic<int>* frame_index, std::atomic_bool* is_playing,

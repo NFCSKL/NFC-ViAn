@@ -1,8 +1,9 @@
 #ifndef DRAWINGTAGITEM_H
 #define DRAWINGTAGITEM_H
-#include "treeitem.h"
-#include"Project/Analysis/tag.h"
 
+#include "treeitem.h"
+
+class Tag;
 class DrawingTagItem : public TreeItem {
     Tag* m_tag;
 

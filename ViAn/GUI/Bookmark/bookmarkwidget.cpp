@@ -1,7 +1,18 @@
 #include "bookmarkwidget.h"
-#include <imagegenerator.h>
-#include <QString>
-#include <QMenu>
+
+#include "bookmarkcategory.h"
+#include "bookmarkitem.h"
+#include "bookmarklist.h"
+#include "imagegenerator.h"
+#include "Project/videoproject.h"
+#include "reportgenerator.h"
+
+#include <QBoxLayout>
+#include <QDebug>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QThread>
+
 
 BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     QPushButton* generate_btn = new QPushButton(tr("Generate report"));
@@ -107,7 +118,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
     std::string file_name = vid_proj->get_video()->file_path;
-    int index = file_name.find_last_of('/') + 1;
+    auto index = file_name.find_last_of('/') + 1;
     file_name = file_name.substr(index);
     file_name += "_" + std::to_string(frame_nbr);
     ImageGenerator im_gen(frame, m_path);

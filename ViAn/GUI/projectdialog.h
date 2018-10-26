@@ -1,12 +1,11 @@
 #ifndef PROJECTDIALOG_H
 #define PROJECTDIALOG_H
 
-#include <QWidget>
 #include <QDialog>
-#include <QLineEdit>
-#include <QDialogButtonBox>
-#include <QString>
 #include <QDir>
+
+class QDialogButtonBox;
+class QLineEdit;
 
 class ProjectDialog : public QDialog
 {

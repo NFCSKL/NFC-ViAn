@@ -1,8 +1,14 @@
-#include <qdebug.h>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/videoio/videoio.hpp>
-#include "Analysis/analysismethod.h"
-#include "imagegenerator.h"
+#include "analysismethod.h"
+
+#include "analysissettings.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/poi.h"
+#include "utility.h"
+
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QDebug>
 
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path, AnalysisSettings* settings) {
     analysis_settings = settings;
@@ -113,7 +119,7 @@ void AnalysisMethod::run() {
         capture.release();
         m_analysis.settings = analysis_settings;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
-        int index = new_path.find_last_of('/') + 1;
+        auto index = new_path.find_last_of('/') + 1;
         m_ana_name = new_path.substr(index);
         m_analysis.save_saveable(new_path);
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());

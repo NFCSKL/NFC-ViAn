@@ -1,7 +1,7 @@
 #ifndef IMAGEGENERATOR_H
 #define IMAGEGENERATOR_H
 
-#include <opencv2/core/core.hpp>
+#include "opencv2/core/core.hpp"
 
 /**
  * @brief The ImageGenerator class

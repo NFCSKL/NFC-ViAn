@@ -1,17 +1,16 @@
 #ifndef ANALYSISDIALOG_H
 #define ANALYSISDIALOG_H
+
 #include <QDialog>
-#include <QLayout>
-#include <QFormLayout>
-#include <QDialogButtonBox>
-#include <QListWidget>
-#include <QLineEdit>
-#include <QAbstractItemView>
-#include "GUI/TreeItems/videoitem.h"
-#include "GUI/TreeItems/analysisitem.h"
-#include "Analysis/motiondetection.h"
-#include "videolistitem.h"
+
+
+class AnalysisSettings;
+class MotionDetection;
+class QDialogButtonBox;
+class QFormLayout;
+class QListWidget;
 class VideoItem;
+class VideoProject;
 /**
  * @brief The AnalysisDialog class
  *  This Dialog is used for advanced analysis

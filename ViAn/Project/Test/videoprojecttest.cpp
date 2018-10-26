@@ -1,5 +1,18 @@
 #include "videoprojecttest.h"
 
+//#include "Filehandler/saveable.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/basicanalysis.h"
+#include "Project/bookmark.h"
+#include "Project/project.h"
+#include "Project/videoproject.h"
+
+#include <QDir>
+#include <QJsonObject>
+#include <QTest>
+
+#include <memory>
+
 VideoProjectTest::VideoProjectTest(QObject *parent) : QObject(parent)
 {
 

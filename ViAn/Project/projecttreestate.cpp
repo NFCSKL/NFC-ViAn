@@ -1,5 +1,11 @@
 #include "projecttreestate.h"
+
+#include "GUI/TreeItems/folderitem.h"
+#include "GUI/TreeItems/treeitem.h"
+#include "GUI/TreeItems/videoitem.h"
 #include "utility.h"
+
+#include <QTreeWidgetItem>
 
 
 ProjectTreeState::ProjectTreeState() {

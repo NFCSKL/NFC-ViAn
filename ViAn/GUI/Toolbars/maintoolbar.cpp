@@ -1,4 +1,6 @@
 #include "maintoolbar.h"
+
+#include <QAction>
 #include <QIcon>
 
 /**

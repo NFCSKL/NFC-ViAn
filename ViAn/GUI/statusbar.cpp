@@ -1,4 +1,5 @@
 #include "statusbar.h"
+
 #include <QDebug>
 #include <QProgressBar>
 

@@ -93,10 +93,8 @@ std::string AnalysisSettings::get_type_string() {
     switch (type) {
     case MOTION_DETECTION:
         return MOTION_DET_STR;
-        break;
     default:
         return "";
-        break;
     }
 }
 

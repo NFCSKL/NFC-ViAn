@@ -1,5 +1,7 @@
 #include "poi.h"
 
+#include <QJsonArray>
+
 /**
  * @brief POI::POI
  */
@@ -54,8 +56,8 @@ std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
  * @param json
  */
 void POI::read(const QJsonObject& json) {
-    this->m_start = json["start"].toInt();
-    this->m_end = json["end"].toInt();
+    m_start = json["start"].toInt();
+    m_end = json["end"].toInt();
     for(int i = m_start; i != m_end; i++){
         QJsonArray json_frame_OOIs = json[QString::number(i)].toArray();
         std::vector<DetectionBox> oois;
@@ -64,7 +66,7 @@ void POI::read(const QJsonObject& json) {
             ooi.read(json_frame_OOIs[j].toObject());
             oois.push_back(ooi);
         }
-        this->OOIs.insert(std::make_pair(i, oois));
+        OOIs.insert(std::make_pair(i, oois));
     }
 }
 
@@ -88,4 +90,3 @@ void POI::write(QJsonObject& json) {
         json[QString::number(frame)] = json_frame_OOIs;
     }
 }
-

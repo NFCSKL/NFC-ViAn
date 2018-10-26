@@ -1,22 +1,16 @@
 #ifndef FRAMEEXPORTERDIALOG_H
 #define FRAMEEXPORTERDIALOG_H
 
-#include <QBoxLayout>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QDir>
-#include <QFileDialog>
-#include <QFormLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QObject>
-#include <QPushButton>
-#include <QSpinBox>
 
-#include "imageexporter.h"
-#include "Project/video.h"
-#include "Project/project.h"
+class QDialogButtonBox;
+class QFormLayout;
+class QHBoxLayout;
+class ImageExporter;
+class QLabel;
+class QPushButton;
+class QSpinBox;
+class Video;
 
 class FrameExporterDialog : public QDialog {
     Q_OBJECT

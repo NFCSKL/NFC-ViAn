@@ -8,8 +8,8 @@ class PenItem : public ShapeItem {
     Pen* m_pen;
 public:
     PenItem(Pen* pen);
-    Pen* get_shape();
-    void remove();
+    Pen* get_shape() override;
+    void remove() override;
     ~PenItem() override;
 };
 

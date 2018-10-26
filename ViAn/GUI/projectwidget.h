@@ -1,33 +1,26 @@
 #ifndef PROJECTWIDGET_H
 #define PROJECTWIDGET_H
 
-#include <QWidget>
-#include <QTreeWidget>
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QMimeData>
-#include <QAction>
-#include <QStandardPaths>
-#include <vector>
-#include "Project/imagesequence.h"
-#include "Project/project.h"
-#include "GUI/TreeItems/tagitem.h"
-#include "GUI/TreeItems/analysisitem.h"
-#include "GUI/TreeItems/drawingtagitem.h"
-#include "GUI/TreeItems/tagframeitem.h"
-#include <stack>
-#include "Project/Analysis/analysis.h"
-#include "Project/Analysis/tag.h"
-#include "Project/videoproject.h"
-#include "Analysis/analysismethod.h"
-#include "Analysis/motiondetection.h"
-#include "Analysis/analysisdialog.h"
-#include "Analysis/anasettingwidget.h"
+#include "Analysis/analysissettings.h"
+#include "Project/video.h"
 
-class Project;
-class VideoItem;
-class FolderItem;
+#include <QAction>
+#include <QPointer>
+#include <QStandardPaths>
+#include <QTreeWidget>
+
+#include <stack>
+
+class AnalysisItem;
+class AnalysisMethod;
 class AnalysisProxy;
+class BasicAnalysis;
+class Project;
+class Tag;
+class TagFrame;
+class TagItem;
+class TreeItem;
+class VideoItem;
 class VideoProject;
 class ProjectWidget : public QTreeWidget
 {

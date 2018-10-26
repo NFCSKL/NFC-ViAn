@@ -1,29 +1,44 @@
 #include "mainwindow.h"
-#include <iostream>
-#include <sstream>
-#include <QCloseEvent>
-#include <QColorDialog>
-#include <QMessageBox>
-#include <QMenuBar>
-#include <QTime>
-#include <QTimer>
-#include <QDebug>
-#include <QProgressDialog>
-#include <QTemporaryDir>
-#include <QDesktopServices>
-#include <chrono>
-#include <thread>
-#include "Video/shapes/shapes.h"
-#include "Analysis/motiondetection.h"
-#include "Analysis/analysismethod.h"
-#include "GUI/frameexporterdialog.h"
 
+#include "Analysis/analysisslider.h"
+#include "framewidget.h"
+#include "GUI/Analysis/analysiswidget.h"
+#include "GUI/Analysis/anasettingwidget.h"
+#include "GUI/Analysis/queuewidget.h"
+#include "GUI/Bookmark/bookmarkwidget.h"
+#include "GUI/drawingwidget.h"
+#include "GUI/frameexporterdialog.h"
+#include "GUI/manipulatorwidget.h"
+#include "GUI/projectwidget.h"
+#include "GUI/recentprojectdialog.h"
+#include "GUI/zoompreviewwidget.h"
+#include "imageexporter.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/tag.h"
+#include "Project/Analysis/tagframe.h"
+#include "Project/project.h"
+#include "Project/videoproject.h"
+#include "Toolbars/drawingtoolbar.h"
+#include "Toolbars/maintoolbar.h"
+#include "statusbar.h"
+#include "videowidget.h"
+
+
+#include <QCloseEvent>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QDockWidget>
+#include <QFileDialog>
+#include <QMenuBar>
+#include <QProgressDialog>
+#include <QThread>
+#include <QTimer>
 
 /**
  * @brief MainWindow::MainWindow
  * @param parent a QWidget variable
  */
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
     QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);

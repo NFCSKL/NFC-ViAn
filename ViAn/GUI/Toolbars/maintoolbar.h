@@ -2,7 +2,8 @@
 #define MAINTOOLBAR_H
 
 #include <QToolBar>
-#include <QAction>
+
+class QAction;
 
 class MainToolbar : public QToolBar
 {

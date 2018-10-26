@@ -1,20 +1,19 @@
 #ifndef VIDEO_H
 #define VIDEO_H
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <QJsonObject>
-#include <QString>
-#include <QPoint>
+
 #include "Filehandler/saveable.h"
 #include "Video/framemanipulator.h"
-#include <opencv2/opencv.hpp>
 
-class ImageSequence;
+#include "opencv2/core/core.hpp"
+
+#include <QJsonObject>
+#include <QPoint>
+
 struct VideoState {
     int frame = 0;
     double contrast = FrameManipulator().CONTRAST_DEFAULT;
     int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
+    double gamma = FrameManipulator().GAMMA_DEFAULT;
     int rotation = 0;
     double scale_factor = 1;
     QPoint anchor = QPoint(0,0);
@@ -27,6 +26,7 @@ struct VideoState {
         frame = rh.frame;
         contrast = rh.contrast;
         brightness = rh.brightness;
+        gamma = rh.gamma;
         rotation = rh.rotation;
         scale_factor = rh.scale_factor;
         anchor = rh.anchor;

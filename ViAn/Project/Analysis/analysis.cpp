@@ -1,5 +1,15 @@
 #include "analysis.h"
+
+#include "Analysis/analysissettings.h"
+#include "poi.h"
+
+#include "opencv2/core/core.hpp"
+
 #include <QDebug>
+#include <QJsonObject>
+#include <QJsonArray>
+
+//#include "Filehandler/saveable.h"
 
 Analysis::~Analysis() {
     for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
@@ -25,7 +35,7 @@ void Analysis::read(const QJsonObject &json){
     settings = new_settings;
 
 
-    this->type = (ANALYSIS_TYPE)json["type"].toInt();
+    this->type = static_cast<ANALYSIS_TYPE>(json["type"].toInt());
     this->m_name = json["name"].toString().toStdString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
@@ -77,4 +87,3 @@ std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
     }
     return res;
 }
-
