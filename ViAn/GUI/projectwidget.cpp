@@ -1189,14 +1189,6 @@ void ProjectWidget::create_folder_item() {
             int index = p_item->indexOfChild(s_item);
             p_item->insertChild(index + 1, item);
         }
-    } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
-        QTreeWidgetItem* p_item = s_item->parent();
-        if (p_item == nullptr) {
-            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
-        } else {
-            int index = p_item->indexOfChild(s_item);
-            p_item->insertChild(index + 1, item);
-        }
     } else {        // Tag frame item
         insertTopLevelItem(topLevelItemCount(), item);
     }
