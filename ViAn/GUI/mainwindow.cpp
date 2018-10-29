@@ -11,6 +11,7 @@
 #include "GUI/manipulatorwidget.h"
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
+#include "GUI/viewpathdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
 #include "Project/Analysis/analysisproxy.h"
@@ -29,6 +30,7 @@
 #include <QDesktopServices>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QListWidget>
 #include <QMenuBar>
 #include <QProgressDialog>
 #include <QThread>
@@ -279,6 +281,7 @@ void MainWindow::init_file_menu() {
     QAction* save_project_act = new QAction(tr("&Save project"), this);
     QAction* add_vid_act = new QAction(tr("&Import video..."), this);
     QAction* add_seq_act = new QAction(tr("&Import images"), this);
+    QAction* view_paths = new QAction(tr("&View paths"), this);
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
     // Set icons
@@ -289,6 +292,7 @@ void MainWindow::init_file_menu() {
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     add_seq_act->setIcon(QIcon("../ViAn/Icons/image_sequence.png"));
+    view_paths->setIcon(QIcon("../ViAn/Icons/path.png"));
     quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
 
     // Add actions to the menu
@@ -300,6 +304,8 @@ void MainWindow::init_file_menu() {
     file_menu->addAction(add_vid_act);
     file_menu->addAction(add_seq_act);
     file_menu->addSeparator();
+    file_menu->addAction(view_paths);
+    file_menu->addSeparator();
     file_menu->addAction(quit_act);
 
     // Set shortcuts
@@ -310,6 +316,7 @@ void MainWindow::init_file_menu() {
     save_project_act->setShortcut(QKeySequence::Save);     //Ctrl + S
     add_vid_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));     //Ctrl + I
     // TODO    add_seq_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
+    // TODO    view_paths->setShortcuts(Q);     //Ctrl + smth
     quit_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     // Set status tips
@@ -320,6 +327,7 @@ void MainWindow::init_file_menu() {
     save_project_act->setStatusTip(tr("Save project"));
     add_vid_act->setStatusTip(tr("Add video"));
     add_vid_act->setStatusTip(tr("Import images"));
+    view_paths->setStatusTip(tr("View all paths in project"));
     quit_act->setStatusTip(tr("Quit the application"));
 
     // Connect with signals and slots
@@ -330,6 +338,7 @@ void MainWindow::init_file_menu() {
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(add_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
+    connect(view_paths, &QAction::triggered, this, &MainWindow::view_paths);
     connect(quit_act, &QAction::triggered, this, &QWidget::close);
 }
 
@@ -787,6 +796,16 @@ void MainWindow::open_project_folder() {
     if (!project_wgt->m_proj) return;
     std::string dir = project_wgt->m_proj->get_dir();
     QDesktopServices::openUrl(QUrl("file:///"+QString::fromStdString(dir), QUrl::TolerantMode));
+}
+
+void MainWindow::view_paths() {
+    ViewPathDialog* path_dialog = new ViewPathDialog(project_wgt->video_list, this);
+
+    int status = path_dialog->exec();
+
+    if (status == path_dialog->Accepted) {
+
+    }
 }
 
 void MainWindow::show_analysis_dock(bool show) {

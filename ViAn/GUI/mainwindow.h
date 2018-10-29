@@ -59,6 +59,7 @@ public slots:
     void options(void);
     void open_project_dialog();
     void open_project_folder();
+    void view_paths();
     void show_analysis_dock(bool);
     void show_ana_settings_dock(bool);
 

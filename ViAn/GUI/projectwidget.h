@@ -43,6 +43,8 @@ public:
     QPointer<QAction> show_settings_act = nullptr;
     QString get_default_path();
 
+    std::vector<Video*> video_list;
+    //std::vector<std::string> path_list;
     std::vector<std::string> remove_list;
 
 signals:

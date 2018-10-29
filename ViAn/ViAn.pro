@@ -84,7 +84,9 @@ SOURCES += main.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
     GUI/pathdialog.cpp \
-    GUI/Analysis/analysislistitem.cpp
+    GUI/Analysis/analysislistitem.cpp \
+    GUI/viewpathdialog.cpp \
+    GUI/viewpathitem.cpp
 
 #
 # TEST
@@ -158,7 +160,9 @@ HEADERS += reportgenerator.h\
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
     GUI/pathdialog.h \
-    GUI/Analysis/analysislistitem.h
+    GUI/Analysis/analysislistitem.h \
+    GUI/viewpathdialog.h \
+    GUI/viewpathitem.h
 
 #
 # LIBRARY

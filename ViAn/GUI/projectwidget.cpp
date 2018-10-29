@@ -1321,6 +1321,9 @@ bool ProjectWidget::open_project(QString project_path) {
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
+
+        if (vid_proj->get_video()->is_sequence()) break;
+        video_list.push_back(vid_proj->get_video());
     }
     return true;
 }
