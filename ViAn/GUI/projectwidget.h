@@ -44,7 +44,6 @@ public:
     QString get_default_path();
 
     std::vector<Video*> video_list;
-    //std::vector<std::string> path_list;
     std::vector<std::string> remove_list;
 
 signals:

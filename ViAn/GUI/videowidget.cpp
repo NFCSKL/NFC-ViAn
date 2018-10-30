@@ -1122,6 +1122,11 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     }
 }
 
+/**
+ * @brief VideoWidget::capture_failed
+ * Open a dialog where the user can enter a new path to the video.
+ * Will then try to open the video again.
+ */
 void VideoWidget::capture_failed() {
     PathDialog* dialog = new PathDialog(&m_video_path);
 
