@@ -57,12 +57,12 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     // Create togglable action in the context menu for analysis details
     show_details_act = new QAction("Show/hide anlaysis details", this);
     show_details_act->setCheckable(true);
-    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+    connect(show_details_act, &QAction::triggered, this, &ProjectWidget::toggle_analysis_details);
 
     // Create togglable action in the context menu for analysis settings
     show_settings_act = new QAction("Show/hide analysis info", this);
     show_settings_act->setCheckable(true);
-    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+    connect(show_settings_act, &QAction::triggered, this, &ProjectWidget::toggle_settings_details);
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_changed);
@@ -85,7 +85,6 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
-
     connect(this, &ProjectWidget::itemChanged, this, &ProjectWidget::update_item_data);
 }
 
@@ -896,43 +895,43 @@ void ProjectWidget::context_menu(const QPoint &point) {
     const int item_count = selectedItems().count();
     if (item_count == 0) {
         // Clicked on root tree
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("New Folder", this, &ProjectWidget::create_folder_item);
     } else if (item_count == 1) {
         // Clicked on item
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("New Folder", this, &ProjectWidget::create_folder_item);
         menu.addSeparator();
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
             case TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Rename", this, &ProjectWidget::rename_item);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
             case DRAWING_TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Update", this, SLOT(drawing_tag()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Rename", this, &ProjectWidget::rename_item);
+                menu.addAction("Update", this, &ProjectWidget::drawing_tag);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
             case ANALYSIS_ITEM:
                 if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
-                    menu.addAction("Rename", this, SLOT(rename_item()));
+                    menu.addAction("Rename", this, &ProjectWidget::rename_item);
                     menu.addAction(show_details_act);
                     menu.addAction(show_settings_act);
-                    menu.addAction("Delete", this, SLOT(remove_item()));
+                    menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 }
                 break;
             case FOLDER_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Rename", this, &ProjectWidget::rename_item);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
             case VIDEO_ITEM:
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
-                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                menu.addAction("Open video in widget", this, &ProjectWidget::open_video_in_widget);
+                menu.addAction("Tag drawings", this, &ProjectWidget::drawing_tag);
                 break;
             case TAG_FRAME_ITEM:
-                menu.addAction("Update", this, SIGNAL(update_tag()));
+                menu.addAction("Update", this, &ProjectWidget::update_tag);
                 if (item->parent()->type() == TAG_ITEM) {
-                    menu.addAction("Delete", this, SLOT(remove_item()));
+                    menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 }
                 break;
             default:
@@ -940,7 +939,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
         }
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
-        menu.addAction("Delete", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, &ProjectWidget::remove_item);
     }
     menu.exec(mapToGlobal(point));
 }

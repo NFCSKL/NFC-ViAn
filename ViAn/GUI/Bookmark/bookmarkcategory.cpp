@@ -19,7 +19,6 @@ BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem
     folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
     m_title = new QLineEdit(QString::fromStdString(name));
-    connect(m_title, SIGNAL(textChanged(QString)), this, SLOT(on_text_edited(QString)));
     layout->addWidget(m_title);
     layout->addLayout(container);
 
@@ -28,8 +27,11 @@ BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem
     ref_list = new BookmarkList(false, REFERENCE);
     disp_list->set_parent_name(m_name);
     ref_list->set_parent_name(m_name);
-    connect(m_title, SIGNAL(textChanged(QString)), disp_list, SLOT(on_parent_name_edited(QString)));
-    connect(m_title, SIGNAL(textChanged(QString)), ref_list, SLOT(on_parent_name_edited(QString)));
+
+    // Connect
+    connect(m_title, &QLineEdit::textChanged, this, &BookmarkCategory::on_text_edited);
+    connect(m_title, &QLineEdit::textChanged, disp_list, &BookmarkList::on_parent_name_edited);
+    connect(m_title, &QLineEdit::textChanged, ref_list, &BookmarkList::on_parent_name_edited);
     connect(disp_list, &BookmarkList::set_bookmark_video, this, &BookmarkCategory::set_bookmark_video);
     connect(ref_list, &BookmarkList::set_bookmark_video, this, &BookmarkCategory::set_bookmark_video);
 
