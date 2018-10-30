@@ -19,6 +19,7 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, double g, QWidget* parent)
     setWindowTitle("Vian - Color Correction");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setAttribute(Qt::WA_DeleteOnClose);
+    setMinimumSize(300,130);
 
     brightness = b;
     contrast = c;

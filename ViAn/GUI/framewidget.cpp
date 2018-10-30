@@ -573,6 +573,7 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
 void FrameWidget::set_analysis_settings() {
     QMessageBox msg_box;
     msg_box.setText("Quick analysis");
+    msg_box.setMinimumSize(240,130);
     msg_box.setInformativeText("Do you wanna start an analysis on the marked area?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     int reply = msg_box.exec();
