@@ -904,47 +904,47 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Import Images", this, SLOT(add_images()));
     } else if (item_count == 1) {
         // Clicked on item
+        QTreeWidgetItem* item = selectedItems().front();
+        switch (item->type()) {
+        case TAG_ITEM:
+            menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case DRAWING_TAG_ITEM:
+            menu.addAction("Update", this, SLOT(drawing_tag()));
+            menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case ANALYSIS_ITEM:
+            if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
+                menu.addAction("Rename", this, SLOT(rename_item()));
+                menu.addAction("Delete", this, SLOT(remove_item()));
+            }
+            break;
+        case FOLDER_ITEM:
+            menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case VIDEO_ITEM:
+            menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
+            menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case TAG_FRAME_ITEM:
+            menu.addAction("Update", this, SIGNAL(update_tag()));
+            if (item->parent()->type() == TAG_ITEM) {
+                menu.addAction("Delete", this, SLOT(remove_item()));
+            }
+            break;
+        default:
+            break;
+        }
+        menu.addSeparator();
         menu.addAction("New Folder", this, SLOT(create_folder_item()));
         menu.addAction("Import Video", this, SLOT(add_video()));
         menu.addAction("Import Images", this, SLOT(add_images()));
-        menu.addSeparator();
-        QTreeWidgetItem* item = selectedItems().front();
-        switch (item->type()) {
-            case TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case DRAWING_TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Update", this, SLOT(drawing_tag()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case ANALYSIS_ITEM:
-                if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
-                    menu.addAction("Rename", this, SLOT(rename_item()));
-                    menu.addAction(show_details_act);
-                    menu.addAction(show_settings_act);
-                    menu.addAction("Delete", this, SLOT(remove_item()));
-                }
-                break;
-            case FOLDER_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case VIDEO_ITEM:
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
-                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
-                break;
-            case TAG_FRAME_ITEM:
-                menu.addAction("Update", this, SIGNAL(update_tag()));
-                if (item->parent()->type() == TAG_ITEM) {
-                    menu.addAction("Delete", this, SLOT(remove_item()));
-                }
-                break;
-            default:
-                break;
-        }
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
         menu.addAction("Delete", this, SLOT(remove_item()));
