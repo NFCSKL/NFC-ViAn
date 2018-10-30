@@ -245,7 +245,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::add_tag, project_wgt, &ProjectWidget::add_tag);
     connect(video_wgt, &VideoWidget::tag_new_frame, project_wgt, &ProjectWidget::add_new_frame_to_tag_item);
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
-    connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_videoitem);
+    connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
+    connect(this, &MainWindow::update_videoitems,project_wgt, &ProjectWidget::update_videoitems);
 
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
     connect(project_wgt, &ProjectWidget::update_slider, video_wgt->playback_slider, &AnalysisSlider::update);
@@ -804,7 +805,7 @@ void MainWindow::view_paths() {
     int status = path_dialog->exec();
 
     if (status == path_dialog->Accepted) {
-
+        emit update_videoitems();
     }
 }
 

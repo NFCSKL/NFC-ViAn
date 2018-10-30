@@ -66,6 +66,7 @@ public slots:
 signals:
     void set_status_bar(QString);
     void open_project(QString proj_path);
+    void update_videoitems();
 
 private:
     QDockWidget* queue_dock;

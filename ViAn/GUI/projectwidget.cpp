@@ -1423,13 +1423,24 @@ void ProjectWidget::set_main_window_name(QString name) {
     parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
 }
 
-void ProjectWidget::update_videoitem(std::string path) {
+void ProjectWidget::update_current_videoitem(std::string path) {
     if (currentItem()->type() != VIDEO_ITEM) return;
     std::string name = Utility::name_from_path(path);
     currentItem()->setText(0, QString::fromStdString(name));
     currentItem()->setToolTip(0, QString::fromStdString(path));
     VideoItem* vid_proj = dynamic_cast<VideoItem*>(currentItem());
     vid_proj->get_video_project()->get_video()->set_name(name);
+}
+
+void ProjectWidget::update_videoitems() {
+    for (auto item : findItems(".", Qt::MatchContains, 0)) {
+        if (item->type() == VIDEO_ITEM) {
+            auto v_item = dynamic_cast<VideoItem*>(item);
+            Video* video = v_item->get_video_project()->get_video();
+            v_item->setText(0, QString::fromStdString(video->get_name()));
+            v_item->setToolTip(0, QString::fromStdString(video->file_path));
+        }
+    }
 }
 
 /**

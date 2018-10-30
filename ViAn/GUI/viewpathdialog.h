@@ -29,9 +29,9 @@ public:
 private:
     void add_paths(QTreeWidget *tree);
     void set_icon(ViewPathItem *item);
-    void folder_btn_clicked();
-    void browse_btn_clicked();
-    void path_btn_clicked();
+    void open_folder_btn_clicked();
+    void update_path_btn_clicked();
+    void update_folder_btn_clicked();
     void ok_btn_clicked();
     void cancel_btn_clicked();
 };

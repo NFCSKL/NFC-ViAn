@@ -2,8 +2,6 @@
 
 #include "Project/video.h"
 
-#include <QDebug>
-
 ViewPathItem::ViewPathItem(Video* video, QTreeWidget* parent) : QTreeWidgetItem (parent) {
     m_video = video;
     set_path(QString::fromStdString(video->file_path));
