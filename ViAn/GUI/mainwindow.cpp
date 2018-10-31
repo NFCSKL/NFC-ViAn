@@ -11,6 +11,7 @@
 #include "GUI/manipulatorwidget.h"
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
+#include "GUI/settingsdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
 #include "Project/Analysis/analysisproxy.h"
@@ -392,6 +393,7 @@ void MainWindow::init_edit_menu() {
     connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
     connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
     connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
+    connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 
 /**
@@ -771,6 +773,8 @@ void MainWindow::export_images(){
  */
 void MainWindow::options() {
     emit set_status_bar("Opening options");
+    SettingsDialog* dialog = new SettingsDialog(this);
+    dialog->exec();
 }
 
 void MainWindow::open_project_dialog(){
