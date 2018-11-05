@@ -15,6 +15,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint));
     setWindowTitle("ViAn - Recent projects");
     setWindowIcon(QIcon("../ViAn/Icons/home.png"));
+    setMinimumSize(500,300);
     h_layout = new QHBoxLayout();
     v_main_layout = new QVBoxLayout(this);
     v_btn_layout = new QVBoxLayout();
@@ -127,6 +128,7 @@ void RecentProjectDialog::on_open_btn_clicked() {
 void RecentProjectDialog::on_remove_btn_clicked() {
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(370, 110);
     msg_box.setText("Are you sure you want to remove the selected projects?");
     msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

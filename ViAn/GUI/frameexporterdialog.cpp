@@ -148,6 +148,7 @@ bool FrameExporterDialog::check_path() {
     if (QDir(m_path_label->text()).exists()) return true;
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(500,120);
     msg_box.setText("Path '" + m_path_label->text() + "' doesn't exist");
     msg_box.setInformativeText("Do you wish to create it?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

@@ -636,6 +636,7 @@ bool ProjectWidget::prompt_save() {
 
     QMessageBox delete_box(this);
     delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setMinimumSize(260,130);
     delete_box.setText("There are unsaved changes.");
     delete_box.setInformativeText("Do you wish to save before continuing?");
     delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
@@ -1224,6 +1225,7 @@ bool ProjectWidget::is_analysis_running(QTreeWidgetItem* root) {
         QString text = "One or more analyses are currently running";
         QString info_text = "Let them finish or stop them before continuing";
         QMessageBox msg_box;
+        msg_box.setMinimumSize(300,120);
         msg_box.setText(text);
         msg_box.setInformativeText(info_text);
         msg_box.setStandardButtons(QMessageBox::Ok);
@@ -1444,6 +1446,7 @@ void ProjectWidget::set_main_window_name(QString name) {
 bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
     QMessageBox msg_box;
     if (warning) msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(310,125);
     msg_box.setText(text);
     msg_box.setInformativeText(info_text);
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

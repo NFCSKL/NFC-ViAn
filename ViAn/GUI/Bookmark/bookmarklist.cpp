@@ -215,6 +215,7 @@ void BookmarkList::rename_item(){
 void BookmarkList::remove_item() {
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(315,125);
     msg_box.setText("Deleting item\n"
                     "this will delete all bookmarks in the categories");
     msg_box.setInformativeText("Are you sure?");
