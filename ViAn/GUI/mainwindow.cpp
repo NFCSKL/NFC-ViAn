@@ -109,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     zoom_preview_dock->setWidget(zoom_wgt);
     addDockWidget(Qt::RightDockWidgetArea, zoom_preview_dock);
 
+    connect(video_wgt, &VideoWidget::clean_zoom_preview, zoom_wgt, &ZoomPreviewWidget::clean_zoom_widget);
     connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
     connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
     connect(zoom_preview_dock, &QDockWidget::topLevelChanged, zoom_wgt, &ZoomPreviewWidget::on_floating_changed);
