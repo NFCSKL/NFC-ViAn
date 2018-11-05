@@ -110,6 +110,8 @@ public:
     void set_delete_drawing(Shapes* shape);
 
 signals:
+    void set_zoom_tool();
+    void clean_zoom_preview();
     void close_video_widget(VideoWidget*);
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
     void set_detections_on_frame(int);
@@ -218,6 +220,8 @@ private:
     QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
     QLabel* fps_label;
+    QLabel* size_label;
+    QLabel* rotation_label;
 
     //Buttons
     QPushButton* play_btn;

@@ -40,10 +40,13 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     open_btn->setToolTip(tr("Open selected project"));
     remove_btn = new QPushButton(tr("Remove"));
     remove_btn->setToolTip("Remove selected project");
+    exit_btn = new QPushButton(tr("Exit"));
+    exit_btn->setToolTip("Exit Vian");
     v_btn_layout->addWidget(new_btn);                           // Second row second col first row
     v_btn_layout->addWidget(browse_btn);                          // Second row second col second row
     v_btn_layout->addWidget(open_btn);                          // Second row second col third row
     v_btn_layout->addWidget(remove_btn);
+    v_btn_layout->addWidget(exit_btn);
 
     for (auto project : RecentProject().load_recent()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(recent_list);
@@ -59,6 +62,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     connect(browse_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_browse_btn_clicked);
     connect(open_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_open_btn_clicked);
     connect(remove_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_remove_btn_clicked);
+    connect(exit_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_exit_btn_clicked);
 }
 
 RecentProjectDialog::~RecentProjectDialog() {
@@ -137,4 +141,9 @@ void RecentProjectDialog::on_remove_btn_clicked() {
         }
         delete recent_list->currentItem();
     }
+}
+
+void RecentProjectDialog::on_exit_btn_clicked() {
+    emit exit();
+    accept();
 }
