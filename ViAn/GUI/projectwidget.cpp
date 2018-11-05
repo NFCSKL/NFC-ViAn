@@ -57,12 +57,12 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     // Create togglable action in the context menu for analysis details
     show_details_act = new QAction("Show/hide anlaysis details", this);
     show_details_act->setCheckable(true);
-    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+    connect(show_details_act, &QAction::triggered, this, &ProjectWidget::toggle_analysis_details);
 
     // Create togglable action in the context menu for analysis settings
     show_settings_act = new QAction("Show/hide analysis info", this);
     show_settings_act->setCheckable(true);
-    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+    connect(show_settings_act, &QAction::triggered, this, &ProjectWidget::toggle_settings_details);
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_changed);
@@ -85,7 +85,6 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
-
     connect(this, &ProjectWidget::itemChanged, this, &ProjectWidget::update_item_data);
 }
 
@@ -637,6 +636,7 @@ bool ProjectWidget::prompt_save() {
 
     QMessageBox delete_box(this);
     delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setMinimumSize(260,130);
     delete_box.setText("There are unsaved changes.");
     delete_box.setInformativeText("Do you wish to save before continuing?");
     delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
@@ -899,43 +899,43 @@ void ProjectWidget::context_menu(const QPoint &point) {
     const int item_count = selectedItems().count();
     if (item_count == 0) {
         // Clicked on root tree
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
-        menu.addAction("Import Video", this, SLOT(add_video()));
-        menu.addAction("Import Images", this, SLOT(add_images()));
+        menu.addAction("New Folder", this, &ProjectWidget::create_folder_item);
+        menu.addAction("Import Video", this, &ProjectWidget::add_video);
+        menu.addAction("Import Images", this, &ProjectWidget::add_images);
     } else if (item_count == 1) {
         // Clicked on item
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
         case TAG_ITEM:
-            menu.addAction("Rename", this, SLOT(rename_item()));
-            menu.addAction("Delete", this, SLOT(remove_item()));
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
         case DRAWING_TAG_ITEM:
-            menu.addAction("Update", this, SLOT(drawing_tag()));
-            menu.addAction("Rename", this, SLOT(rename_item()));
-            menu.addAction("Delete", this, SLOT(remove_item()));
+            menu.addAction("Update", this, &ProjectWidget::drawing_tag);
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
         case ANALYSIS_ITEM:
             if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Rename", this, &ProjectWidget::rename_item);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
         case FOLDER_ITEM:
-            menu.addAction("Rename", this, SLOT(rename_item()));
-            menu.addAction("Delete", this, SLOT(remove_item()));
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
         case VIDEO_ITEM:
-            menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
-            menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
-            menu.addAction("Delete", this, SLOT(remove_item()));
+            menu.addAction("Open video in widget", this, &ProjectWidget::open_video_in_widget);
+            menu.addAction("Tag drawings", this, &ProjectWidget::drawing_tag);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
         case TAG_FRAME_ITEM:
-            menu.addAction("Update", this, SIGNAL(update_tag()));
+            menu.addAction("Update", this, &ProjectWidget::update_tag);
             if (item->parent()->type() == TAG_ITEM) {
-                menu.addAction("Delete", this, SLOT(remove_item()));
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
         default:
@@ -947,7 +947,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
         menu.addAction("Import Images", this, SLOT(add_images()));
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
-        menu.addAction("Delete", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, &ProjectWidget::remove_item);
     }
     menu.exec(mapToGlobal(point));
 }
@@ -1225,6 +1225,7 @@ bool ProjectWidget::is_analysis_running(QTreeWidgetItem* root) {
         QString text = "One or more analyses are currently running";
         QString info_text = "Let them finish or stop them before continuing";
         QMessageBox msg_box;
+        msg_box.setMinimumSize(300,120);
         msg_box.setText(text);
         msg_box.setInformativeText(info_text);
         msg_box.setStandardButtons(QMessageBox::Ok);
@@ -1445,6 +1446,7 @@ void ProjectWidget::set_main_window_name(QString name) {
 bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
     QMessageBox msg_box;
     if (warning) msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(310,125);
     msg_box.setText(text);
     msg_box.setInformativeText(info_text);
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "Analysis/analysismethod.h"
 #include "Analysis/analysisslider.h"
 #include "framewidget.h"
 #include "GUI/Analysis/analysiswidget.h"
@@ -77,24 +78,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
-
-    connect(analysis_wgt, SIGNAL(show_analysis_queue(bool)), this, SLOT(show_analysis_dock(bool)));
-    connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
-    connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
-    connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
-            analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
+    connect(analysis_wgt, &AnalysisWidget::show_analysis_queue, this, &MainWindow::show_analysis_dock);
+    connect(video_wgt, &VideoWidget::start_analysis, project_wgt, &ProjectWidget::start_analysis);
+    connect(video_wgt->frame_wgt, &FrameWidget::quick_analysis, video_wgt, &VideoWidget::quick_analysis);
+    connect(project_wgt, &ProjectWidget::begin_analysis, analysis_wgt, &AnalysisWidget::start_analysis);
     connect(project_wgt, &ProjectWidget::abort_all_analysis, analysis_wgt, &AnalysisWidget::abort_all_analysis);
 
     // Initialize drawing widget
     drawing_wgt = new DrawingWidget();
     drawing_dock->setWidget(drawing_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, drawing_dock);
-    //connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), drawing_wgt, SLOT(add_drawing(Shapes*, int)));
     connect(drawing_wgt, &DrawingWidget::jump_to_frame, video_wgt, &VideoWidget::load_marked_video_state);
-    connect(drawing_wgt, SIGNAL(set_current_drawing(Shapes*)), video_wgt, SLOT(set_current_drawing(Shapes*)));
-    connect(drawing_wgt, SIGNAL(delete_drawing(Shapes*)), this, SLOT(delete_drawing(Shapes*)));
-    connect(drawing_wgt, SIGNAL(clear_frame(int)), this, SLOT(clear(int)));
-    connect(drawing_wgt, SIGNAL(update_text(QString, Shapes*)), this, SLOT(update_text(QString, Shapes*)));
+    connect(drawing_wgt, &DrawingWidget::set_current_drawing, video_wgt, &VideoWidget::set_current_drawing);
+    connect(drawing_wgt, &DrawingWidget::delete_drawing, this, &MainWindow::delete_drawing);
+    connect(drawing_wgt, &DrawingWidget::clear_frame, this, &MainWindow::clear);
+    connect(drawing_wgt, &DrawingWidget::update_text, this, &MainWindow::update_text);
+
     connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
     connect(video_wgt, &VideoWidget::delete_sc_activated, drawing_wgt, &DrawingWidget::delete_item);
 
@@ -124,8 +123,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(video_wgt, &VideoWidget::new_bookmark, bookmark_wgt, &BookmarkWidget::create_bookmark);
     connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
-    connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
-    connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
+    connect(project_wgt, &ProjectWidget::proj_path, bookmark_wgt, &BookmarkWidget::set_path);
+    connect(project_wgt, &ProjectWidget::load_bookmarks, bookmark_wgt, &BookmarkWidget::load_bookmarks);
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, video_wgt, &VideoWidget::load_marked_video_state);
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     bookmark_dock->setWidget(bookmark_wgt);
@@ -175,86 +174,92 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     init_export_menu();
     init_help_menu();
 
-    // Toolbar connects
+    // Clicking toolbar connects
+
+    // Main toolbar
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->add_img_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
     connect(main_toolbar->open_recent_act, &QAction::triggered, this, &MainWindow::open_rp_dialog);
     connect(main_toolbar->open_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
-    //video_wgt->vertical_layout->insertWidget(0, draw_toolbar); <-- Add the toolbar to the 2nd video wgt
-    connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
-    connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
-    connect(draw_toolbar, SIGNAL(send_text(QString, float)), video_wgt, SLOT(set_tool_text(QString,float)));
+
+    // Drawing toolbar
+    connect(draw_toolbar, &DrawingToolbar::step_zoom, video_wgt, &VideoWidget::on_step_zoom);
+    connect(draw_toolbar, &DrawingToolbar::set_overlay_tool, video_wgt->frame_wgt, &FrameWidget::set_tool);;
+    connect(draw_toolbar, &DrawingToolbar::send_text, video_wgt, &VideoWidget::set_tool_text);
+    connect(draw_toolbar, &DrawingToolbar::set_color, video_wgt->frame_wgt, &FrameWidget::set_overlay_color);
     connect(draw_toolbar->delete_tool_act, &QAction::triggered, this, &MainWindow::delete_current_drawing);
-    connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
+
+    // Update the toolbar from other places
     connect(drawing_wgt, &DrawingWidget::set_tool_edit, draw_toolbar->edit_tool_act, &QAction::trigger);
     connect(drawing_wgt, &DrawingWidget::set_tool_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(video_wgt, &VideoWidget::set_zoom_tool, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(project_wgt, &ProjectWidget::set_zoom_tool, draw_toolbar->zoom_tool_act, &QAction::trigger);
-    connect(draw_toolbar, SIGNAL(step_zoom(double)), video_wgt, SLOT(on_step_zoom(double)));
     connect(video_wgt->frame_wgt, &FrameWidget::set_toolbar_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
+    connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
     draw_toolbar->zoom_tool_act->trigger();
 
     // Status bar
     status_bar = new StatusBar();
     setStatusBar(status_bar);
-    connect(this, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    connect(bookmark_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
+    connect(this, &MainWindow::set_status_bar, status_bar, &StatusBar::on_set_status_bar);
+    connect(video_wgt, &VideoWidget::set_status_bar, status_bar, &StatusBar::on_set_status_bar);
+    connect(project_wgt, &ProjectWidget::set_status_bar, status_bar, &StatusBar::on_set_status_bar);
+    connect(bookmark_wgt, &BookmarkWidget::set_status_bar, status_bar, &StatusBar::on_set_status_bar);
+    connect(draw_toolbar, &DrawingToolbar::set_status_bar, status_bar, &StatusBar::on_set_status_bar);
     connect(analysis_wgt, &AnalysisWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
     connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
-    connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
+    connect(analysis_wgt, &AnalysisWidget::show_progress, status_bar, &StatusBar::update_analysis_bar);
 
-    connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
-    connect(video_wgt,   &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
-    connect(project_wgt, &ProjectWidget::clear_slider, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
-    connect(project_wgt, &ProjectWidget::marked_video_state, video_wgt, &VideoWidget::load_marked_video_state);
-    connect(project_wgt, &ProjectWidget::item_type, video_wgt, &VideoWidget::set_item_type);
-    connect(video_wgt, &VideoWidget::update_manipulator_wgt, manipulator_wgt, &ManipulatorWidget::set_values);
-    connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
+    // Connects for settings video project, analysis etc when clicking the project tree
     connect(project_wgt, &ProjectWidget::set_video_project, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::set_video_project, drawing_wgt, &DrawingWidget::set_video_project);
-    connect(project_wgt, &ProjectWidget::update_tag, video_wgt, &VideoWidget::update_tag);
-
-    connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
-    connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
-    connect(project_wgt, SIGNAL(item_removed(VideoProject*)), video_wgt, SLOT(remove_item(VideoProject*)));
-
-    connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
-
+    connect(project_wgt, &ProjectWidget::marked_video_state, video_wgt, &VideoWidget::load_marked_video_state);
     connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->frame_wgt, &FrameWidget::set_analysis);
     connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->playback_slider, &AnalysisSlider::set_analysis_proxy);
-    connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
+    connect(project_wgt, &ProjectWidget::marked_basic_analysis, video_wgt->playback_slider, &AnalysisSlider::set_basic_analysis);
+    connect(project_wgt, &ProjectWidget::marked_basic_analysis, video_wgt, &VideoWidget::set_basic_analysis);
+
+    // Connects for showing/hiding widgets and info
     connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_details_checked);
     connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
     connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
-    connect(toggle_ana_settings_wgt, SIGNAL(toggled(bool)), project_wgt, SLOT(toggle_settings(bool)));
     connect(toggle_ana_settings_wgt, &QAction::toggled, project_wgt, &ProjectWidget::toggle_settings);
     connect(project_wgt, &ProjectWidget::toggle_analysis_details, ana_details_act, &QAction::toggle);
     connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
-
     connect(project_wgt, &ProjectWidget::set_show_analysis_details, video_wgt->frame_wgt, &FrameWidget::set_show_box);
     connect(project_wgt, &ProjectWidget::set_show_analysis_details, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
-    connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
-    connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
-    connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
-    connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
+    connect(project_wgt, &ProjectWidget::set_detections, video_wgt->frame_wgt, &FrameWidget::set_detections);
+    connect(project_wgt, &ProjectWidget::enable_poi_btns, video_wgt, &VideoWidget::enable_poi_btns);
+    connect(project_wgt, &ProjectWidget::set_poi_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
+    connect(project_wgt, &ProjectWidget::set_tag_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
 
-    connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt, SLOT(set_basic_analysis(BasicAnalysis*)));
+    // Tag connects
     connect(video_wgt, &VideoWidget::add_tag, project_wgt, &ProjectWidget::add_tag);
     connect(video_wgt, &VideoWidget::tag_new_frame, project_wgt, &ProjectWidget::add_new_frame_to_tag_item);
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
+    connect(project_wgt, &ProjectWidget::update_tag, video_wgt, &VideoWidget::update_tag);
+    connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
 
+    // Connects for removing, clearing or closing
+    connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
+    connect(project_wgt, &ProjectWidget::clear_slider, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
+    connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
+    connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
+    connect(project_wgt, &ProjectWidget::item_removed, video_wgt, &VideoWidget::remove_item);
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
+
+    // Other connects
     connect(project_wgt, &ProjectWidget::update_slider, video_wgt->playback_slider, &AnalysisSlider::update);
-    connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(project_wgt, &ProjectWidget::item_type, video_wgt, &VideoWidget::set_item_type);
+    connect(video_wgt, &VideoWidget::update_manipulator_wgt, manipulator_wgt, &ManipulatorWidget::set_values);
+    connect(video_wgt, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
+    connect(analysis_wgt, &AnalysisWidget::name_in_tree, project_wgt, &ProjectWidget::set_tree_item_name);
 
     // Open the recent project dialog
-    QTimer::singleShot(0, rp_dialog, SLOT(exec()));
+    QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
 }
 
 /**
@@ -492,7 +497,7 @@ void MainWindow::open_widget(VideoProject* vid_proj) {
 
         connect(widget_video, &VideoWidget::close_video_widget, this, &MainWindow::close_widget);
     } else {
-        set_status_bar("No more video widgets allowed");
+        emit set_status_bar("No more video widgets allowed");
     }
 }
 
@@ -736,7 +741,7 @@ void MainWindow::export_images(){
     std::pair<int, int> interval = video_wgt->get_frame_interval();
     VideoProject* vid_proj = video_wgt->get_current_video_project();
     if (vid_proj == nullptr){
-        set_status_bar("A video needs to be selected");
+        emit set_status_bar("A video needs to be selected");
         return;
     }
 
@@ -786,7 +791,7 @@ void MainWindow::open_project_dialog(){
                 tr("Open project"),
                 project_wgt->get_default_path(),
                 "*.vian");
-    emit open_project(project_path);
+    project_wgt->open_project(project_path);
 }
 
 void MainWindow::open_project_folder() {

@@ -63,8 +63,8 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
-    connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
-    connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+    connect(scroll_area, &DrawScrollArea::new_size, frame_wgt, &FrameWidget::set_scroll_area_size);
+    connect(this, &VideoWidget::set_detections_on_frame, frame_wgt, &FrameWidget::set_detections_on_frame);
 
     init_video_controller();
 
@@ -177,7 +177,7 @@ void VideoWidget::init_layouts() {
 void VideoWidget::init_video_controller(){
     // Video data
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
-    connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
+    connect(v_controller, &VideoController::display_index, this, &VideoWidget::on_new_frame);
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
     connect(v_controller, &VideoController::finished, v_controller, &VideoController::deleteLater);
 }
@@ -198,20 +198,19 @@ void VideoWidget::init_frame_processor() {
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
         connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
 
-
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
-        connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
-        connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+        connect(scroll_area, &DrawScrollArea::new_size, this, &VideoWidget::set_draw_area_size);
+        connect(frame_wgt, &FrameWidget::moved_xy, this, &VideoWidget::pan);
         connect(frame_wgt, &FrameWidget::move_viewport_center, this, &VideoWidget::center);
-        connect(frame_wgt, SIGNAL(mouse_double_click(QPoint)), this, SLOT(mouse_double_clicked(QPoint)));
-        connect(frame_wgt, SIGNAL(mouse_pressed(QPoint, bool)), this, SLOT(mouse_pressed(QPoint, bool)));
-        connect(frame_wgt, SIGNAL(mouse_released(QPoint, bool)), this, SLOT(mouse_released(QPoint, bool)));
-        connect(frame_wgt, SIGNAL(mouse_moved(QPoint,bool,bool)), this, SLOT(mouse_moved(QPoint,bool,bool)));
-        connect(frame_wgt, SIGNAL(mouse_scroll(QPoint)), this, SLOT(mouse_scroll(QPoint)));
-        connect(frame_wgt, SIGNAL(process_frame()), this, SLOT(process_frame()));
-        connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
-        connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
-        connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
+        connect(frame_wgt, &FrameWidget::mouse_double_click, this, &VideoWidget::mouse_double_clicked);
+        connect(frame_wgt, &FrameWidget::mouse_pressed, this, &VideoWidget::mouse_pressed);
+        connect(frame_wgt, &FrameWidget::mouse_released, this, &VideoWidget::mouse_released);
+        connect(frame_wgt, &FrameWidget::mouse_moved, this, &VideoWidget::mouse_moved);
+        connect(frame_wgt, &FrameWidget::mouse_scroll, this, &VideoWidget::mouse_scroll);
+        connect(frame_wgt, &FrameWidget::process_frame, this, &VideoWidget::process_frame);
+        connect(frame_wgt, &FrameWidget::send_tool, this, &VideoWidget::set_tool);
+        connect(frame_wgt, &FrameWidget::send_tool_text, this, &VideoWidget::set_tool_text);
+        connect(frame_wgt, &FrameWidget::send_color, this, &VideoWidget::set_color);
 
         connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
@@ -852,7 +851,7 @@ void VideoWidget::new_tag_clicked() {
     if (!m_vid_proj) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
+    connect(tag_dialog, &TagDialog::tag_name, this, &VideoWidget::new_tag);
     tag_dialog->exec();
 }
 
