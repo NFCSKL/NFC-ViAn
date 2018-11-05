@@ -30,6 +30,7 @@ signals:
 
 public slots:
     void frame_update(cv::Mat frame);
+    void clean_zoom_widget();
     void on_floating_changed(const bool is_floating);
 };
 

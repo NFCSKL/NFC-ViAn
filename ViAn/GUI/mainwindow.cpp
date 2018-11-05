@@ -42,7 +42,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
-    QDockWidget* bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
+    bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     QDockWidget* zoom_preview_dock = new QDockWidget(tr("Zoom preview"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
@@ -108,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     zoom_preview_dock->setWidget(zoom_wgt);
     addDockWidget(Qt::RightDockWidgetArea, zoom_preview_dock);
 
+    connect(video_wgt, &VideoWidget::clean_zoom_preview, zoom_wgt, &ZoomPreviewWidget::clean_zoom_widget);
     connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
     connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
     connect(zoom_preview_dock, &QDockWidget::topLevelChanged, zoom_wgt, &ZoomPreviewWidget::on_floating_changed);
@@ -121,6 +122,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     analysis_wgt->set_queue_wgt(queue_wgt);
 
     connect(video_wgt, &VideoWidget::new_bookmark, bookmark_wgt, &BookmarkWidget::create_bookmark);
+    connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
     connect(project_wgt, &ProjectWidget::proj_path, bookmark_wgt, &BookmarkWidget::set_path);
     connect(project_wgt, &ProjectWidget::load_bookmarks, bookmark_wgt, &BookmarkWidget::load_bookmarks);
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, video_wgt, &VideoWidget::load_marked_video_state);
@@ -179,6 +181,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->add_img_seq_act, &QAction::triggered, project_wgt, &ProjectWidget::add_images);
+    connect(main_toolbar->open_recent_act, &QAction::triggered, this, &MainWindow::open_rp_dialog);
     connect(main_toolbar->open_folder_act, &QAction::triggered, this, &MainWindow::open_project_folder);
 
     // Drawing toolbar
@@ -191,6 +194,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Update the toolbar from other places
     connect(drawing_wgt, &DrawingWidget::set_tool_edit, draw_toolbar->edit_tool_act, &QAction::trigger);
     connect(drawing_wgt, &DrawingWidget::set_tool_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
+    connect(video_wgt, &VideoWidget::set_zoom_tool, draw_toolbar->zoom_tool_act, &QAction::trigger);
+    connect(project_wgt, &ProjectWidget::set_zoom_tool, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(video_wgt->frame_wgt, &FrameWidget::set_toolbar_zoom, draw_toolbar->zoom_tool_act, &QAction::trigger);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
@@ -288,8 +293,8 @@ void MainWindow::init_file_menu() {
     // Set icons
     new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
     open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
-    recent_project_act->setIcon(QIcon("../ViAn/Icons/recent.png"));
-    open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/computer.png"));
+    recent_project_act->setIcon(QIcon("../ViAn/Icons/home.png"));
+    open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/new_folder.png"));
     save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
     add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
     add_seq_act->setIcon(QIcon("../ViAn/Icons/image_sequence.png"));
@@ -654,6 +659,7 @@ void MainWindow::init_export_menu() {
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
+    connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }
 
 /**
@@ -712,6 +718,7 @@ void MainWindow::init_rp_dialog() {
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
+    connect(rp_dialog, &RecentProjectDialog::exit, this, &QWidget::close);
 }
 
 void MainWindow::open_rp_dialog() {
@@ -804,5 +811,11 @@ void MainWindow::show_analysis_dock(bool show) {
 void MainWindow::show_ana_settings_dock(bool show) {
     if (show) {
         ana_settings_dock->show();
+    }
+}
+
+void MainWindow::show_bookmark_dock(bool show) {
+    if (show) {
+        bookmark_dock->show();
     }
 }
