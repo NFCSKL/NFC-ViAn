@@ -1,6 +1,22 @@
 #include "interval.h"
 
-interval::interval() {
+Interval::Interval(std::string name) {
+    m_name = name;
+}
+
+Interval::~Interval() {
+
+}
+
+ANALYSIS_TYPE Interval::get_type() const {
+    return INTERVAL;
+}
+
+void Interval::write(QJsonObject &json) {
+
+}
+
+void Interval::read(const QJsonObject &json) {
 
 }
 

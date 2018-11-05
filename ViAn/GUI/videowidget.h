@@ -24,6 +24,7 @@ class BasicAnalysis;
 class DoubleClickButton;
 class DrawScrollArea;
 class FrameWidget;
+class Interval;
 class QCheckBox;
 class QColor;
 class QGridLayout;
@@ -114,6 +115,7 @@ signals:
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_tag(VideoProject*, Tag*);
+    void add_interval(VideoProject*, Interval*);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);
@@ -134,6 +136,7 @@ public slots:
     void remove_tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
+    void new_interval(QString name);
     void tag_interval(void);
     void remove_tag_interval(void);
     void set_basic_analysis(BasicAnalysis*);
@@ -160,6 +163,7 @@ public slots:
     void quick_bookmark(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
+    void create_interval_clicked();
     void set_interval(int start, int end);
     void delete_interval(void);
     void frame_line_edit_finished();
@@ -231,6 +235,7 @@ private:
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
+    QPushButton* create_interval_btn;
 
     //Shortcuts
     QShortcut* bookmark_quick_sc;

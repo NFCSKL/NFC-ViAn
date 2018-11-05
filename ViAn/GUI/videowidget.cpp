@@ -9,6 +9,7 @@
 #include "GUI/drawscrollarea.h"
 #include "GUI/TreeItems/treeitem.h"
 #include "Project/Analysis/analysisinterval.h"
+#include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
 #include "Project/videoproject.h"
@@ -231,7 +232,7 @@ void VideoWidget::init_frame_processor() {
  * @brief VideoWidget::set_icons
  * Set icons on all buttons
  */
-void VideoWidget::set_btn_icons() {    
+void VideoWidget::set_btn_icons() {
     play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
@@ -259,6 +260,7 @@ void VideoWidget::set_btn_icons() {
     fps_label = new QLabel("Fps: 0", this);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
+    create_interval_btn = new QPushButton(QIcon("../ViAn/Icons/create_interval.png"), "", this);
 
     play_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
@@ -291,6 +293,7 @@ void VideoWidget::set_btn_tool_tip() {
     fps_label->setToolTip("The frame rate of the video");
     set_start_interval_btn->setToolTip("Set left interval point: I");
     set_end_interval_btn->setToolTip("Set right interval point: O");
+    create_interval_btn->setToolTip("Save the current marked interval: K");
 }
 
 /**
@@ -308,6 +311,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(original_size_btn);
     btns.push_back(set_start_interval_btn);
     btns.push_back(set_end_interval_btn);
+    btns.push_back(create_interval_btn);
     btns.push_back(export_frame_btn);
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
@@ -341,6 +345,7 @@ void VideoWidget::set_btn_tab_order() {
     setTabOrder(original_size_btn, interpolate_check);
     setTabOrder(interpolate_check, set_start_interval_btn);
     setTabOrder(set_start_interval_btn, set_end_interval_btn);
+    setTabOrder(set_end_interval_btn, create_interval_btn);
 }
 
 /**
@@ -360,6 +365,7 @@ void VideoWidget::set_btn_shortcuts() {
     export_frame_btn->setShortcut(QKeySequence(Qt::Key_X));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
+    create_interval_btn->setShortcut(QKeySequence(Qt::Key_K));
 
     bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
@@ -451,6 +457,7 @@ void VideoWidget::add_btns_to_layouts() {
     interval_btns->addWidget(fps_label);
     interval_btns->addWidget(set_start_interval_btn);
     interval_btns->addWidget(set_end_interval_btn);
+    interval_btns->addWidget(create_interval_btn);
 
     control_row->addLayout(interval_btns);
 
@@ -490,6 +497,7 @@ void VideoWidget::connect_btns() {
 
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
+    connect(create_interval_btn, &QPushButton::clicked, this, &VideoWidget::create_interval_clicked);
 }
 
 /**
@@ -682,12 +690,30 @@ void VideoWidget::set_interval_end_clicked() {
     playback_slider->update();
 }
 
+void VideoWidget::create_interval_clicked() {
+    if (m_interval.first == -1 || m_interval.second == -1 || m_interval.second < m_interval.first) {
+        emit set_status_bar("Select an interval");
+        return;
+    }
+    TagDialog* interval_dialog = new TagDialog("Interval");
+    interval_dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(interval_dialog, &TagDialog::tag_name, this, &VideoWidget::new_interval);
+    interval_dialog->exec();
+}
+
+void VideoWidget::new_interval(QString name) {
+    Interval* interval = new Interval(name.toStdString());
+    emit add_interval(m_vid_proj, interval);
+}
+
 /**
  * @brief VideoWidget::set_interval
  * Sets the interval from two ints
  * @param start
  * @param end
  */
+
+// TODO not used
 void VideoWidget::set_interval(int start, int end) {
     m_interval.first = start;
     m_interval.second = end;

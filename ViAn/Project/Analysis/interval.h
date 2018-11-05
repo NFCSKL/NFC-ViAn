@@ -1,11 +1,18 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "basicanalysis.h"
 
-class interval
+#include <QJsonObject>
+
+class Interval : public BasicAnalysis
 {
 public:
-    interval();
+    Interval(std::string name);
+    ~Interval() override;
+    virtual ANALYSIS_TYPE get_type() const override;
+    virtual void read(const QJsonObject& json) override;
+    virtual void write(QJsonObject& json) override;
 
 //public:
 //    void remove_interval(AnalysisInterval *rm_interval);

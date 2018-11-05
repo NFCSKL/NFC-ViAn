@@ -11,9 +11,9 @@
  * @param parent
  * Setup tag widget
  */
-TagDialog::TagDialog(QWidget *parent) : QDialog(parent) {
+TagDialog::TagDialog(QString string, QWidget *parent) : QDialog(parent) {
     // Set title
-    setWindowTitle("Vian - New Tag");
+    setWindowTitle("Vian - New " + string);
     // Remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -27,7 +27,7 @@ TagDialog::TagDialog(QWidget *parent) : QDialog(parent) {
 
     QFormLayout* tag_name_layout = new QFormLayout;
     tag_name_layout->deleteLater();
-    tag_name_layout->addRow("Tag name: ", name);
+    tag_name_layout->addRow(string + " name: ", name);
     vertical_layout->addLayout(tag_name_layout);
     vertical_layout->addWidget(btn_box);
 

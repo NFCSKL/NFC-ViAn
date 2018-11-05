@@ -4,7 +4,7 @@
 #include <QTreeWidgetItem>
 
 // ENUM needs to start at 1001, otherwise conflict with QTreeWidgetItems internal types
-enum ITEM_TYPE {VIDEO_ITEM=1001, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM, DRAWING_TAG_ITEM, TAG_FRAME_ITEM, SEQUENCE_ITEM};
+enum ITEM_TYPE {VIDEO_ITEM=1001, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM, DRAWING_TAG_ITEM, TAG_FRAME_ITEM, SEQUENCE_ITEM, INTERVAL_ITEM};
 
 class TreeItem : public QTreeWidgetItem {
 public:

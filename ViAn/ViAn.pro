@@ -83,7 +83,8 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
-    GUI/Analysis/analysislistitem.cpp
+    GUI/Analysis/analysislistitem.cpp \
+    GUI/TreeItems/intervalitem.cpp
 
 #
 # TEST
@@ -156,7 +157,8 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
-    GUI/Analysis/analysislistitem.h
+    GUI/Analysis/analysislistitem.h \
+    GUI/TreeItems/intervalitem.h
 
 #
 # LIBRARY
