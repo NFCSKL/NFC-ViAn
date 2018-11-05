@@ -15,7 +15,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint));
     setWindowTitle("ViAn - Recent projects");
     setWindowIcon(QIcon("../ViAn/Icons/home.png"));
-    setMinimumSize(200,200);
+    setMinimumSize(500,300);
     h_layout = new QHBoxLayout();
     v_main_layout = new QVBoxLayout(this);
     v_btn_layout = new QVBoxLayout();
