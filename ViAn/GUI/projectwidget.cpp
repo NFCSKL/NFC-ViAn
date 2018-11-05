@@ -677,6 +677,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -694,6 +695,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -715,6 +717,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(true);
         emit set_detections(true);
         emit set_poi_slider(true);
@@ -737,6 +740,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -769,6 +773,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -780,9 +785,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit set_video_project(vid_item->get_video_project());
 
-        // TODO set from state
-        // set brightness/contrast, rotation
-
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -897,47 +900,51 @@ void ProjectWidget::context_menu(const QPoint &point) {
     if (item_count == 0) {
         // Clicked on root tree
         menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("Import Video", this, SLOT(add_video()));
+        menu.addAction("Import Images", this, SLOT(add_images()));
     } else if (item_count == 1) {
         // Clicked on item
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
-        menu.addSeparator();
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
-            case TAG_ITEM:
+        case TAG_ITEM:
+            menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case DRAWING_TAG_ITEM:
+            menu.addAction("Update", this, SLOT(drawing_tag()));
+            menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case ANALYSIS_ITEM:
+            if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
                 menu.addAction("Rename", this, SLOT(rename_item()));
                 menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case DRAWING_TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Update", this, SLOT(drawing_tag()));
+            }
+            break;
+        case FOLDER_ITEM:
+            menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case VIDEO_ITEM:
+            menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
+            menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
+            menu.addAction("Delete", this, SLOT(remove_item()));
+            break;
+        case TAG_FRAME_ITEM:
+            menu.addAction("Update", this, SIGNAL(update_tag()));
+            if (item->parent()->type() == TAG_ITEM) {
                 menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case ANALYSIS_ITEM:
-                if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
-                    menu.addAction("Rename", this, SLOT(rename_item()));
-                    menu.addAction(show_details_act);
-                    menu.addAction(show_settings_act);
-                    menu.addAction("Delete", this, SLOT(remove_item()));
-                }
-                break;
-            case FOLDER_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case VIDEO_ITEM:
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
-                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
-                break;
-            case TAG_FRAME_ITEM:
-                menu.addAction("Update", this, SIGNAL(update_tag()));
-                if (item->parent()->type() == TAG_ITEM) {
-                    menu.addAction("Delete", this, SLOT(remove_item()));
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
+        menu.addSeparator();
+        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("Import Video", this, SLOT(add_video()));
+        menu.addAction("Import Images", this, SLOT(add_images()));
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
         menu.addAction("Delete", this, SLOT(remove_item()));
@@ -1179,14 +1186,6 @@ void ProjectWidget::create_folder_item() {
         s_item->setExpanded(true);
     } else if (s_item->type() == VIDEO_ITEM) {
         QTreeWidgetItem* p_item =  s_item->parent();
-        if (p_item == nullptr) {
-            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
-        } else {
-            int index = p_item->indexOfChild(s_item);
-            p_item->insertChild(index + 1, item);
-        }
-    } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
-        QTreeWidgetItem* p_item = s_item->parent();
         if (p_item == nullptr) {
             insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
         } else {

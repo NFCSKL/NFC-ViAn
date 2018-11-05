@@ -73,7 +73,7 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
     if (description != "") {
         bm_description = description + QString("\v") + bm_description;
     }
-    return bm_description;
+    return QString("\v") + bm_description;
 }
 
 /**
