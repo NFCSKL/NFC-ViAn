@@ -35,8 +35,8 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_to_box->setValue(interval.second);
     update_total();
 
-    connect(m_from_box, SIGNAL(editingFinished()), this, SLOT(from_value_changed()));
-    connect(m_to_box, SIGNAL(editingFinished()), this, SLOT(to_value_changed()));
+    connect(m_from_box, &QSpinBox::editingFinished, this, &FrameExporterDialog::from_value_changed);
+    connect(m_to_box, &QSpinBox::editingFinished, this, &FrameExporterDialog::to_value_changed);
     // Frame layout
     m_frame_input_layout = new QHBoxLayout();
     m_frame_input_layout->addWidget(new QLabel(tr("from:")));
