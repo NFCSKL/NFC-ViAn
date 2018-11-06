@@ -72,7 +72,6 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
         for (std::pair<int,int> area : m_interval_areas->m_area_list) {
             int first = static_cast<int>(groove_rect.left() + area.first * frame_width);
             int second = static_cast<int>(groove_rect.left() + area.second * frame_width);
-            qDebug() << "in draw" << first << second;
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }

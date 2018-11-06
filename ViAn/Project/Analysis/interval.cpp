@@ -16,7 +16,6 @@ void Interval::add_area(int start, int end) {
 }
 
 void Interval::add_area(std::pair<int, int> interval) {
-    qDebug() << "add area" << interval.first << interval.second;
     m_unsaved_changes = true;
     m_area_list.push_back(interval);
 }

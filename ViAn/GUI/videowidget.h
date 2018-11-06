@@ -100,7 +100,6 @@ public:
 
     VideoProject* get_current_video_project();
     std::pair<int, int> get_frame_interval();
-    int get_current_frame();
     VideoController* v_controller;
 
     int get_current_video_length();
@@ -140,15 +139,11 @@ public slots:
     void new_tag_clicked();
     void new_tag(QString name);
     void new_interval(QString name);
-    void tag_interval(void);
-    void remove_tag_interval(void);
     void set_basic_analysis(BasicAnalysis*);
     void clear_tag(void);
-    void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
     void analysis_play_btn_toggled(bool value);
-    void set_slider_max(int value);
     void on_new_frame();
     void on_playback_slider_pressed(void);
     void on_playback_slider_released(void);
@@ -160,14 +155,12 @@ public slots:
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
-    void set_current_frame_size(QSize size);
     void on_export_frame(void);
     void on_bookmark_clicked(void);
     void quick_bookmark(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
     void create_interval_clicked();
-    void set_interval(int start, int end);
     void delete_interval(void);
     void frame_line_edit_finished();
     void zoom_label_finished();
@@ -270,8 +263,6 @@ private:
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
     Interval* m_current_interval = nullptr;
-
-    BasicAnalysis* m_current_basic_ana = nullptr;
 
     bool m_floating = false;
     bool state_video = false;

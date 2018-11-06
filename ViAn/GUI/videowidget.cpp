@@ -618,14 +618,6 @@ void VideoWidget::set_total_time(int time) {
 }
 
 /**
- * @brief VideoWidget::get_current_frame
- * @return
- */
-int VideoWidget::get_current_frame() {
-    return frame_index.load();
-}
-
-/**
  * @brief VideoWidget::set_scale_factor
  * @param scale_factor
  */
@@ -724,21 +716,6 @@ void VideoWidget::create_interval_clicked() {
 void VideoWidget::new_interval(QString name) {
     Interval* interval = new Interval(name.toStdString());
     emit add_interval(m_vid_proj, interval);
-}
-
-/**
- * @brief VideoWidget::set_interval
- * Sets the interval from two ints
- * @param start
- * @param end
- */
-
-// TODO not used
-void VideoWidget::set_interval(int start, int end) {
-    m_interval.first = start;
-    m_interval.second = end;
-    playback_slider->set_interval(start, end);
-    playback_slider->update();
 }
 
 /**
@@ -874,42 +851,7 @@ void VideoWidget::new_tag(QString name) {
     emit add_tag(m_vid_proj, tag);
 }
 
-/**
- * @brief VideoWidget::tag_interval
- */
-// TODO not used
-void VideoWidget::tag_interval() {
-    if(m_tag == nullptr){
-        emit set_status_bar("Please select a tag");
-        return;
-    }
-    if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-        m_tag->add_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-        playback_slider->set_basic_analysis(m_tag);
-        delete_interval();
-    }
-}
-
-/**
- * @brief VideoWidget::remove_tag_interval
- * For each frame in the interval, un-tag it
- */
-// TODO Remove/change
-// Update for intervals
-void VideoWidget::remove_tag_interval() {
-    if (m_tag != nullptr) {
-//        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-//            m_tag->remove_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-//            playback_slider->set_basic_analysis(m_tag);
-//        }
-    } else {
-        emit set_status_bar("No tag selected");
-    }
-}
-
 void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
-    m_current_basic_ana = basic_analysis;
-
     if (basic_analysis->get_type() == INTERVAL) {
         m_current_interval = dynamic_cast<Interval*>(basic_analysis);
     } else {
@@ -963,22 +905,6 @@ void VideoWidget::prev_poi_btn_clicked() {
     } else {
         emit set_status_bar("Already at first POI");
     }
-}
-
-/**
- * @brief VideoWidget::zoom_out_clicked
- * zoom out button clicked.
- */
-void VideoWidget::zoom_out_clicked() {
-    set_status_bar("Zoom out");
-}
-
-/**
- * @brief sets the max value of the playback slider
- * @param value
- */
-void VideoWidget::set_slider_max(int value) {
-    playback_slider->setMaximum(value);
 }
 
 /**
@@ -1222,6 +1148,7 @@ void VideoWidget::on_playback_stopped(){
  *  Functions changing synchronized settings
  */
 
+// TODO unused
 void VideoWidget::set_overlay(Overlay *overlay) {
     update_overlay_settings([&](){
         o_settings.overlay = overlay;
@@ -1514,10 +1441,6 @@ void VideoWidget::update_playback_speed(int speed) {
         player_con.notify_one();
     }
     fps_label->setText(QString::number(m_frame_rate) + "fps");
-}
-
-void VideoWidget::set_current_frame_size(QSize size) {
-    current_frame_size = size;
 }
 
 void VideoWidget::on_export_frame() {
