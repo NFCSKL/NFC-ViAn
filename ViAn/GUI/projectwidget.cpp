@@ -878,9 +878,10 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         m_interval_item = interval_item;
 
         emit set_video_project(vid_item->get_video_project());
-        VideoState state;
-        state = vid_item->get_video_project()->get_video()->state;
-        emit marked_video_state(vid_item->get_video_project(), state);
+        qDebug() << "name" << QString::fromStdString(vid_item->get_video_project()->get_proj_path());
+//        VideoState state;
+//        state = vid_item->get_video_project()->get_video()->state;
+//        emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
         emit set_zoom_tool();
@@ -939,6 +940,7 @@ void ProjectWidget::update_current_tag(VideoItem *v_item) {
 
 void ProjectWidget::update_current_interval(VideoItem* v_item) {
     if (m_interval_item && dynamic_cast<VideoItem*>(m_interval_item->parent()) != v_item) {
+        emit marked_basic_analysis(nullptr);
         m_interval_item = nullptr;
     }
 }

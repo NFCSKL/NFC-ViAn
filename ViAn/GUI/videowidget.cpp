@@ -852,7 +852,10 @@ void VideoWidget::new_tag(QString name) {
 }
 
 void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
-    if (basic_analysis->get_type() == INTERVAL) {
+    if (!basic_analysis) {
+        m_current_interval = nullptr;
+        m_tag = nullptr;
+    } else if (basic_analysis->get_type() == INTERVAL) {
         m_current_interval = dynamic_cast<Interval*>(basic_analysis);
     } else {
         m_tag = dynamic_cast<Tag*>(basic_analysis);
@@ -1073,6 +1076,7 @@ void VideoWidget::clear_current_video() {
     frame_wgt->close();
     m_vid_proj = nullptr;
     m_tag = nullptr;
+    m_current_interval = nullptr;
     emit clean_zoom_preview();
 }
 

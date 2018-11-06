@@ -65,7 +65,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
         }
     }
     // Draws the intervals in the slider
-    // Checks if the interval is a nullpte and if the interval should be shown on the slider
+    // Checks if the interval is a nullptr and if the interval should be shown on the slider
     if (m_show_interval_areas && show_on_slider && m_interval_areas) {
         brush = Qt::cyan;
 
