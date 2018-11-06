@@ -702,14 +702,23 @@ void VideoWidget::set_interval_end_clicked() {
 }
 
 void VideoWidget::create_interval_clicked() {
-    if (m_interval.first == -1 || m_interval.second == -1 || m_interval.second < m_interval.first) {
+    int first = m_interval.first;
+    int second = m_interval.second;
+    if (first == -1 || second <= 0 || second < first) {
         emit set_status_bar("Select an interval");
         return;
     }
-    TagDialog* interval_dialog = new TagDialog("Interval");
-    interval_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(interval_dialog, &TagDialog::tag_name, this, &VideoWidget::new_interval);
-    interval_dialog->exec();
+    if (m_current_interval == nullptr) {
+        TagDialog* interval_dialog = new TagDialog("Interval");
+        interval_dialog->setAttribute(Qt::WA_DeleteOnClose);
+        connect(interval_dialog, &TagDialog::tag_name, this, &VideoWidget::new_interval);
+        interval_dialog->exec();
+    }
+    m_current_interval->add_area(first, second);
+    emit add_interval_area(first, second);
+    emit set_status_bar("Interval: " + QString::number(first) +
+                        QString::number(second) + " added");
+    playback_slider->update();
 }
 
 void VideoWidget::new_interval(QString name) {
@@ -868,6 +877,7 @@ void VideoWidget::new_tag(QString name) {
 /**
  * @brief VideoWidget::tag_interval
  */
+// TODO not used
 void VideoWidget::tag_interval() {
     if(m_tag == nullptr){
         emit set_status_bar("Please select a tag");
@@ -898,7 +908,13 @@ void VideoWidget::remove_tag_interval() {
 }
 
 void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
-    m_tag = dynamic_cast<Tag*>(basic_analysis);
+    m_current_basic_ana = basic_analysis;
+
+    if (basic_analysis->get_type() == INTERVAL) {
+        m_current_interval = dynamic_cast<Interval*>(basic_analysis);
+    } else {
+        m_tag = dynamic_cast<Tag*>(basic_analysis);
+    }
 }
 
 void VideoWidget::clear_tag() {
@@ -1085,7 +1101,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
             on_new_frame();
         }
     }
-    m_interval = std::make_pair(0,0);
+    m_interval = std::make_pair(-1,-1);
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     playback_slider->set_interval(-1, -1);

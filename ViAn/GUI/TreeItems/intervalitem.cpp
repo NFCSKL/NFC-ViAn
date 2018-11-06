@@ -14,3 +14,6 @@ void IntervalItem::remove() {}
 
 void IntervalItem::rename() {}
 
+Interval* IntervalItem::get_interval() {
+    return m_interval;
+}

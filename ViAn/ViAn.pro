@@ -84,7 +84,8 @@ SOURCES += main.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
     GUI/Analysis/analysislistitem.cpp \
-    GUI/TreeItems/intervalitem.cpp
+    GUI/TreeItems/intervalitem.cpp \
+    GUI/TreeItems/intervalareaitem.cpp
 
 #
 # TEST
@@ -158,7 +159,8 @@ HEADERS += reportgenerator.h\
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
     GUI/Analysis/analysislistitem.h \
-    GUI/TreeItems/intervalitem.h
+    GUI/TreeItems/intervalitem.h \
+    GUI/TreeItems/intervalareaitem.h
 
 #
 # LIBRARY

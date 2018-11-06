@@ -118,6 +118,7 @@ signals:
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_tag(VideoProject*, Tag*);
     void add_interval(VideoProject*, Interval*);
+    void add_interval_area(int start, int end);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);
@@ -268,6 +269,10 @@ private:
     QString convert_time(int time);
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
+    Interval* m_current_interval = nullptr;
+
+    BasicAnalysis* m_current_basic_ana = nullptr;
+
     bool m_floating = false;
     bool state_video = false;
 

@@ -3,6 +3,7 @@
 #include "Analysis/analysissettings.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/tag.h"
+#include "Project/Analysis/interval.h"
 
 #include <QDebug>
 #include <QStyleOptionSlider>
@@ -39,7 +40,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Checks if tag is a nullptr and if the tag should be shown on the slider
     if (m_show_tags && show_on_slider && m_tag) {
         for (int frame : m_tag->get_frames()) {
-            int first = static_cast<int>((groove_rect.left() + (frame) * frame_width));
+            int first = static_cast<int>(groove_rect.left() + frame * frame_width);
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);
         }
@@ -54,11 +55,24 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             double second_frame = static_cast<double>((*it).second);
 
             //Walk first/second_frame number of frames in on the slider
-            int first = static_cast<int>((groove_rect.left()+first_frame*frame_width));
-            int second = static_cast<int>((groove_rect.left()+second_frame*frame_width));
+            int first = static_cast<int>(groove_rect.left()+first_frame*frame_width);
+            int second = static_cast<int>(groove_rect.left()+second_frame*frame_width);
 
             //Draw the rects, +1 so it's not too small
             //QRect(int x, int y, int width, int height)
+            QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
+            painter.fillRect(rect, brush);
+        }
+    }
+    // Draws the intervals in the slider
+    // Checks if the interval is a nullpte and if the interval should be shown on the slider
+    if (m_show_interval_areas && show_on_slider && m_interval_areas) {
+        brush = Qt::cyan;
+
+        for (std::pair<int,int> area : m_interval_areas->m_area_list) {
+            int first = static_cast<int>(groove_rect.left() + area.first * frame_width);
+            int second = static_cast<int>(groove_rect.left() + area.second * frame_width);
+            qDebug() << "in draw" << first << second;
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
@@ -137,6 +151,10 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         case TAG:
         case DRAWING_TAG:
             m_tag = dynamic_cast<Tag*>(analysis);
+            repaint();
+            break;
+        case INTERVAL:
+            m_interval_areas = dynamic_cast<Interval*>(analysis);
             repaint();
             break;
         default:
@@ -326,6 +344,14 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
     m_show_tags = show_tags;
+}
+
+/**
+ * @brief AnalysisSlider::set_show_interval_areas
+ * @param show_interval_areas
+ */
+void AnalysisSlider::set_show_interval_areas(bool show_interval_areas) {
+    m_show_interval_areas = show_interval_areas;
 }
 
 /**

@@ -1,5 +1,7 @@
 #include "interval.h"
 
+#include <QDebug>
+
 Interval::Interval(std::string name) {
     m_name = name;
 }
@@ -8,36 +10,16 @@ Interval::~Interval() {
 
 }
 
-ANALYSIS_TYPE Interval::get_type() const {
-    return INTERVAL;
+void Interval::add_area(int start, int end) {
+    m_unsaved_changes = true;
+    m_area_list.push_back(std::make_pair(start, end));
 }
 
-void Interval::write(QJsonObject &json) {
-
+void Interval::add_area(std::pair<int, int> interval) {
+    qDebug() << "add area" << interval.first << interval.second;
+    m_unsaved_changes = true;
+    m_area_list.push_back(interval);
 }
-
-void Interval::read(const QJsonObject &json) {
-
-}
-
-// TODO FIX
-// Moved this code here since i need it for implementing intervals
-// intervals will be very close to what tags were before.
-// Tags don't need any of this code so they will get a new class.
-
-///**
-// * @brief Tag::add_frame
-// * @param frame
-// * Adds the newly tagged frame as a new poi
-// * unless it's at the edge of a current poi or that frame already is tagged
-// */
-//void Tag::add_frame(int frame) {
-//    add_interval(new AnalysisInterval(frame, frame));
-//}
-
-//void Tag::remove_frame(int frame) {
-//    remove_interval(new AnalysisInterval(frame, frame));
-//}
 
 //void Tag::add_interval(AnalysisInterval *an_interval){
 //    BasicAnalysis::add_interval(an_interval);
@@ -124,3 +106,16 @@ void Interval::read(const QJsonObject &json) {
 //    }
 //    return pair;
 //}
+
+
+ANALYSIS_TYPE Interval::get_type() const {
+    return INTERVAL;
+}
+
+void Interval::write(QJsonObject &json) {
+
+}
+
+void Interval::read(const QJsonObject &json) {
+
+}

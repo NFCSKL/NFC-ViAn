@@ -15,6 +15,7 @@
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
 #include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
 #include "Project/project.h"
@@ -235,6 +236,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::enable_poi_btns, video_wgt, &VideoWidget::enable_poi_btns);
     connect(project_wgt, &ProjectWidget::set_poi_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
     connect(project_wgt, &ProjectWidget::set_tag_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
+    connect(project_wgt, &ProjectWidget::set_interval_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_interval_areas);
 
     // Tag connects
     connect(video_wgt, &VideoWidget::add_tag, project_wgt, &ProjectWidget::add_tag);
@@ -242,6 +244,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
     connect(project_wgt, &ProjectWidget::update_tag, video_wgt, &VideoWidget::update_tag);
     connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
+
+    // Interval connects
+    connect(video_wgt, &VideoWidget::add_interval, project_wgt, &ProjectWidget::add_interval);
+    connect(video_wgt, &VideoWidget::add_interval_area, project_wgt, &ProjectWidget::add_interval_area);
 
     // Connects for removing, clearing or closing
     connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
