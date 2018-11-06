@@ -18,7 +18,7 @@ public:
 
     void add_area(int start, int end);
     void add_area(std::pair<int, int> interval);
-    //std::vector<std::pair<int, int>> get_area_list();
+    void remove_area(int frame);
 
     std::vector<std::pair<int, int>> m_area_list;
 

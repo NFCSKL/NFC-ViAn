@@ -574,7 +574,10 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM || child->type() == DRAWING_TAG_ITEM) {
+        } else if (child->type() == TAG_ITEM ||
+                   child->type() == ANALYSIS_ITEM ||
+                   child->type() == DRAWING_TAG_ITEM ||
+                   child->type() == INTERVAL_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
             r_item->rename();
         }
@@ -728,7 +731,6 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
-        emit set_interval_slider(false);
         emit set_interval_slider(false);
         emit enable_poi_btns(false,false);
 
@@ -977,22 +979,28 @@ void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
 
     std::string item_text = item->text(0).toStdString();
     switch(item->type()) {
-        case TAG_ITEM: {
-            auto tag_item = dynamic_cast<TagItem*>(item);
-            Tag* tag = tag_item->get_tag();
-            if (tag->get_name() != item_text) tag->set_name(item_text);
-            break;
-        } case ANALYSIS_ITEM: {
-            auto analysis_item = dynamic_cast<AnalysisItem*>(item);
-            AnalysisProxy* analysis = analysis_item->get_analysis();
-            // AnalysisItems are added when an analysis is started
-            // and the proxy can thusly be a nullptr
-            if (analysis == nullptr) break;
-            if (analysis->get_name() != item_text) analysis->set_name(item_text);
-            break;
-        } case FOLDER_ITEM: {
-            m_proj->set_unsaved(true);
-        }
+    case INTERVAL_ITEM: {
+        auto interval_item = dynamic_cast<IntervalItem*>(item);
+        Interval* interval = interval_item->get_interval();
+        if (interval->get_name() != item_text) interval->set_name(item_text);
+        break;
+    }
+    case TAG_ITEM: {
+        auto tag_item = dynamic_cast<TagItem*>(item);
+        Tag* tag = tag_item->get_tag();
+        if (tag->get_name() != item_text) tag->set_name(item_text);
+        break;
+    } case ANALYSIS_ITEM: {
+        auto analysis_item = dynamic_cast<AnalysisItem*>(item);
+        AnalysisProxy* analysis = analysis_item->get_analysis();
+        // AnalysisItems are added when an analysis is started
+        // and the proxy can thusly be a nullptr
+        if (analysis == nullptr) break;
+        if (analysis->get_name() != item_text) analysis->set_name(item_text);
+        break;
+    } case FOLDER_ITEM: {
+        m_proj->set_unsaved(true);
+    }
     }
 }
 
@@ -1016,6 +1024,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
         // Clicked on item
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
+        case INTERVAL_AREA_ITEM:
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
+        case INTERVAL_ITEM:
         case TAG_ITEM:
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1187,6 +1199,12 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     case TAG_FRAME_ITEM:
         remove_tag_frame_item(item);
         break;
+    case INTERVAL_ITEM:
+        remove_interval_item(item);
+        break;
+    case INTERVAL_AREA_ITEM:
+        remove_interval_area_item(item);
+        break;
     default:
         break;
     }
@@ -1269,6 +1287,23 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
     int frame = tf_item->get_frame();
     tag_item->get_tag()->remove_frame(frame);
+}
+
+void ProjectWidget::remove_interval_item(QTreeWidgetItem* item) {
+    emit set_interval_slider(false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    Interval* interval = dynamic_cast<IntervalItem*>(item)->get_interval();
+    vid_item->get_video_project()->remove_analysis(interval);
+    m_interval_item = nullptr;
+    emit marked_basic_analysis(nullptr);
+}
+
+void ProjectWidget::remove_interval_area_item(QTreeWidgetItem* item) {
+    IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
+    IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
+    int frame = ia_item->get_start();
+    interval_item->get_interval()->remove_area(frame);
 }
 
 /**

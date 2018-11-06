@@ -20,6 +20,14 @@ void Interval::add_area(std::pair<int, int> interval) {
     m_area_list.push_back(interval);
 }
 
+void Interval::remove_area(int frame) {
+    for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
+        if ((*it).first <= frame && (*it).second >= frame) {
+            m_area_list.erase(it);
+        }
+    }
+}
+
 //void Tag::add_interval(AnalysisInterval *an_interval){
 //    BasicAnalysis::add_interval(an_interval);
 //    merge_intervals();

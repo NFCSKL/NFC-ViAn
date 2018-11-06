@@ -105,6 +105,8 @@ public slots:
     void remove_drawing_tag_item(QTreeWidgetItem* item);
     void remove_analysis_item(QTreeWidgetItem* item);
     void remove_tag_frame_item(QTreeWidgetItem* item);
+    void remove_interval_item(QTreeWidgetItem* item);
+    void remove_interval_area_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void update_analysis_settings();
