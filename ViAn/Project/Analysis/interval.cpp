@@ -11,16 +11,100 @@ Interval::~Interval() {
 }
 
 void Interval::add_area(int start, int end) {
-    m_unsaved_changes = true;
-    m_area_list.push_back(std::make_pair(start, end));
+    add_area(std::make_pair(start, end));
 }
 
 void Interval::add_area(std::pair<int, int> interval) {
     m_unsaved_changes = true;
-    m_area_list.push_back(interval);
+    std::vector<std::pair<int, int>> new_list;
+
+    // Set is empty, simply add new interval
+    if (m_area_list.empty()) {
+        new_list.push_back(interval);
+        m_area_list = new_list;
+        return;
+    }
+
+    // Insert new interval first or last
+    if (interval.second < m_area_list.front().first || interval.first > m_area_list.back().second) {
+        if (interval.second < m_area_list.front().first) {
+            new_list.push_back(interval);
+        }
+
+        for (auto pair : m_area_list) {
+            new_list.push_back(pair);
+        }
+
+        if (interval.first > m_area_list.back().second) {
+            new_list.push_back(interval);
+        }
+        m_area_list = new_list;
+        return;
+    }
+
+    // New interval covers all. Clear and add new one
+    if (interval.first <= m_area_list.front().first &&
+            interval.second >= m_area_list.back().second) {
+        new_list.push_back(interval);
+        m_area_list = new_list;
+        return;
+    }
+
+    // New interval overlap
+    for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
+        bool overlap = does_overlap(*it, interval);
+        if (!overlap) {
+            new_list.push_back(*it);
+
+            // Check if new interval is between intervals
+            if (it != m_area_list.end() &&
+                    interval.first > (*it).second &&
+                    interval.second < (*(it+1)).first)
+            {
+                new_list.push_back(interval);
+            }
+
+        } else {
+            int start = std::min(interval.first, (*it).first);
+            int end = interval.second;
+
+
+        }
+
+
+    }
+
+
+    std::pair<int, int> current = *m_area_list.begin();
+    bool merging = false;
+
+    for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
+        if (interval.second < (*it).first) {
+            qDebug() << "no merge";
+            if (!merging) {
+                m_area_list.insert(it, interval);
+            }
+            return;
+        } else if (interval.first < (*it).second && interval.first > (*it).first) {
+            qDebug() << "merge start";
+            (*it).second = interval.second;
+            current = (*it);
+            merging = true;
+        } else if (interval.second > (*it).first && interval.second < (*it).second) {
+            qDebug() << "merge end";
+            if (merging) {
+                current.second = (*it).second;
+                remove_area(*it);
+            } else {
+                (*it).first = interval.first;
+                return;
+            }
+        }
+    }
+    if (!merging) m_area_list.push_back(interval);
 }
 
-void Interval::remove_area(int frame) {
+void Interval::remove_area_by_frame(int frame) {
     for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
         if ((*it).first <= frame && (*it).second >= frame) {
             m_area_list.erase(it);
@@ -28,10 +112,14 @@ void Interval::remove_area(int frame) {
     }
 }
 
-//void Tag::add_interval(AnalysisInterval *an_interval){
-//    BasicAnalysis::add_interval(an_interval);
-//    merge_intervals();
-//}
+void Interval::remove_area(std::pair<int, int> interval) {
+    auto p = std::find(m_area_list.begin(), m_area_list.end(), interval);
+    m_area_list.erase(p);
+}
+
+bool Interval::does_overlap(std::pair<int, int> a, std::pair<int, int> b) {
+    return (std::min(a.second, b.second) >= std::max(a.first, b.first));
+}
 
 //void Tag::remove_interval(AnalysisInterval *rm_interval) {
 //    std::set<AnalysisInterval*, interval_cmp> intervals = m_intervals;

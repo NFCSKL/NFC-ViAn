@@ -880,10 +880,9 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         m_interval_item = interval_item;
 
         emit set_video_project(vid_item->get_video_project());
-        qDebug() << "name" << QString::fromStdString(vid_item->get_video_project()->get_proj_path());
-//        VideoState state;
-//        state = vid_item->get_video_project()->get_video()->state;
-//        emit marked_video_state(vid_item->get_video_project(), state);
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
         emit set_zoom_tool();
@@ -1303,7 +1302,7 @@ void ProjectWidget::remove_interval_area_item(QTreeWidgetItem* item) {
     IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
     IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
     int frame = ia_item->get_start();
-    interval_item->get_interval()->remove_area(frame);
+    interval_item->get_interval()->remove_area_by_frame(frame);
 }
 
 /**
