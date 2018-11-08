@@ -13,6 +13,7 @@ public:
     IntervalAreaItem(int start, int end);
     int get_start();
     int get_end();
+    bool is_in_interval(int frame);
     void remove();
     void rename();
 };

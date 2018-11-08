@@ -247,7 +247,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Interval connects
     connect(video_wgt, &VideoWidget::add_interval, project_wgt, &ProjectWidget::add_interval);
-    connect(video_wgt, &VideoWidget::add_interval_area, project_wgt, &ProjectWidget::add_interval_area);
+    connect(video_wgt, &VideoWidget::set_interval_area, project_wgt, &ProjectWidget::set_interval_area);
 
     // Connects for removing, clearing or closing
     connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);

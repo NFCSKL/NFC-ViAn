@@ -356,28 +356,29 @@ void ProjectWidget::add_interval(VideoProject* vid_proj, Interval* interval) {
 
 
 /**
- * @brief ProjectWidget::add_interval_area
- * Create and add new interval area item
+ * @brief ProjectWidget::set_interval_area
+ * Clear the current IntervalAreaItems and creat new one for the current areas
  * @param start
  * @param end
  */
-void ProjectWidget::add_interval_area(int start, int end) {
-    IntervalAreaItem* ia_item = new IntervalAreaItem(start, end);
-    m_interval_item->setExpanded(true);
+void ProjectWidget::set_interval_area(std::vector<std::pair<int, int>> area_list, int new_area_start) {
+    blockSignals(true);
+    // Remove all current area items
+    for (int i = m_interval_item->childCount()-1; i >= 0; --i) {
+        //remove_interval_area_item(m_interval_item->child(i));
+        m_interval_item->removeChild(m_interval_item->child(i));
+    }
 
-
-    // TODO fix this sorting/inserting to merge intervals
-    for (int i = 0; i < m_interval_item->childCount(); ++i) {
-        IntervalAreaItem* temp = dynamic_cast<IntervalAreaItem*>(m_interval_item->child(i));
-        if (start < temp->get_start()) {
-            m_interval_item->insertChild(i, ia_item);
+    for (auto area : area_list) {
+        IntervalAreaItem* ia_item = new IntervalAreaItem(area.first, area.second);
+        m_interval_item->addChild(ia_item);
+        if (ia_item->is_in_interval(new_area_start)) {
             setCurrentItem(ia_item);
-            return;
         }
     }
 
-    m_interval_item->addChild(ia_item);
-    setCurrentItem(ia_item);
+    m_interval_item->setExpanded(true);
+    blockSignals(false);
 }
 
 /**

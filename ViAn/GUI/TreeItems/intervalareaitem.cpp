@@ -18,6 +18,10 @@ int IntervalAreaItem::get_end() {
     return m_end;
 }
 
+bool IntervalAreaItem::is_in_interval(int frame) {
+    return frame >= m_start && frame <= m_end;
+}
+
 void IntervalAreaItem::remove() {}
 
 void IntervalAreaItem::rename() {}

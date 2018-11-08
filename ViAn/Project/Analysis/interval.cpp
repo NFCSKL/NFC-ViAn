@@ -14,6 +14,12 @@ void Interval::add_area(int start, int end) {
     add_area(std::make_pair(start, end));
 }
 
+/**
+ * @brief Interval::add_area
+ * Adds a new area to the interval list and handle each case
+ * Cred: https://www.geeksforgeeks.org/insert-in-sorted-and-non-overlapping-interval-array/
+ * @param interval
+ */
 void Interval::add_area(std::pair<int, int> interval) {
     m_unsaved_changes = true;
     std::vector<std::pair<int, int>> new_list;
@@ -63,45 +69,26 @@ void Interval::add_area(std::pair<int, int> interval) {
             {
                 new_list.push_back(interval);
             }
-
-        } else {
-            int start = std::min(interval.first, (*it).first);
-            int end = interval.second;
-
+            continue;
 
         }
+        int start = std::min(interval.first, (*it).first);
+        int end = interval.second;
 
-
-    }
-
-
-    std::pair<int, int> current = *m_area_list.begin();
-    bool merging = false;
-
-    for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
-        if (interval.second < (*it).first) {
-            qDebug() << "no merge";
-            if (!merging) {
-                m_area_list.insert(it, interval);
-            }
-            return;
-        } else if (interval.first < (*it).second && interval.first > (*it).first) {
-            qDebug() << "merge start";
-            (*it).second = interval.second;
-            current = (*it);
-            merging = true;
-        } else if (interval.second > (*it).first && interval.second < (*it).second) {
-            qDebug() << "merge end";
-            if (merging) {
-                current.second = (*it).second;
-                remove_area(*it);
+        while (it != m_area_list.end() && overlap) {
+            end = std::max(interval.second, (*it).second);
+            if (it == m_area_list.end()-1) {
+                overlap = false;
             } else {
-                (*it).first = interval.first;
-                return;
+                overlap = does_overlap(*(it+1), interval);
             }
+            it++;
         }
+
+        it--;
+        new_list.push_back(std::make_pair(start, end));
     }
-    if (!merging) m_area_list.push_back(interval);
+    m_area_list = new_list;
 }
 
 void Interval::remove_area_by_frame(int frame) {

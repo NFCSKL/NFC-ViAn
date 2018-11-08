@@ -91,7 +91,7 @@ public slots:
     void add_new_frame_to_tag_item(int frame, TagFrame *t_frame);
     void remove_frame_from_tag_item(int frame);
     void add_interval(VideoProject*, Interval* interval);
-    void add_interval_area(int start, int end);
+    void set_interval_area(std::vector<std::pair<int, int> > area_list, int new_area_start);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void toggle_details(bool b);
     void toggle_settings(bool b);

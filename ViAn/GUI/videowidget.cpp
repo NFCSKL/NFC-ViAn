@@ -711,10 +711,10 @@ void VideoWidget::create_interval_clicked() {
         qDebug() << area.first << area.second;
     }
     qDebug() << "---------------------";
-    emit add_interval_area(first, second);
+    emit set_interval_area(m_current_interval->m_area_list, first);
     emit set_status_bar("Interval: " + QString::number(first) +
                         QString::number(second) + " added");
-    playback_slider->update();
+    delete_interval();
 }
 
 void VideoWidget::new_interval(QString name) {
