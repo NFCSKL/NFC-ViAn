@@ -253,22 +253,17 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
             }
         }
     }
+
+    // If interval areas on slider get next start of next poi after current
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.first > curr_frame) {
+                return  pair.first;
+            }
+        }
+    }
+
     return curr_frame;
-
-
-
-//      TODO Might need for when adding interval
-//    } else if (!frames.empty()) {
-//        int edge_frame = curr_frame;
-//        for (int frame : frames) {
-//            if (frame > edge_frame+JUMP_INTERVAL+1) {
-//                return frame;
-//            } else if (frame > edge_frame+JUMP_INTERVAL){
-//                edge_frame = frame;
-//            }
-//        }
-//    }
-//    return curr_frame;
 }
 
 /**
@@ -280,39 +275,34 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
 int AnalysisSlider::get_prev_poi_start(int curr_frame) {
     if (!show_on_slider) return curr_frame;
 
-    // If tags on slider get next frame after current
+    // If tags on slider get previous frame before current
     if (m_show_tags) {
         return m_tag->previous_frame(curr_frame);
     }
 
-    // If analysis pois on slider get next start of next poi after current
+    // If analysis pois on slider get previous start of poi before current
     if (m_show_pois) {
         int new_frame = curr_frame;
         for (std::pair<int, int> rect : rects) {
-            if (rect.second >= curr_frame) {
+            if (rect.first >= curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
         return new_frame;
     }
+
+    // If interval areas on slider get previous start of area before current
+    if (m_show_interval_areas) {
+        int new_frame = curr_frame;
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.first >= curr_frame) {
+                break;
+            } else new_frame = pair.first;
+        }
+        return new_frame;
+    }
+
     return curr_frame;
-
-
-
-
-//      TODO Might need for when adding interval
-//    } else if (!frames.empty()) {
-//        int edge_frame = curr_frame;
-//        for (int i = frames.size()-1; i >= 0; i--) {
-//            int frame = frames[i];
-//            if (frame < edge_frame-JUMP_INTERVAL-1) {
-//                return frame;
-//            } else if (frame < edge_frame-JUMP_INTERVAL){
-//                edge_frame = frame;
-//            }
-//        }
-//    }
-//    return new_frame;
 }
 
 /**

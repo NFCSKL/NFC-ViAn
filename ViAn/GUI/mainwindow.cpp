@@ -524,14 +524,10 @@ void MainWindow::close_all_widgets() {
 void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Tag/Interval"));
 
-    // Interval code is outcommented since intervals currently is not available
-    // Add the code back when intervals are re-added.
-
     QAction* new_label_act = new QAction(tr("New tag &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
-//    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
-//    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
+    QAction* tag_interval_act = new QAction(tr("&Tag interval"));
 //    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
     interval_act = new QAction(tr("&Interval"), this);
 
@@ -541,12 +537,12 @@ void MainWindow::init_interval_menu() {
     new_label_act->setIcon(QIcon("../ViAn/Icons/tag.png"));
     new_tag_act->setIcon(QIcon("../ViAn/Icons/tag_frame.png"));
     remove_tag_act->setIcon(QIcon("../ViAn/Icons/remove_frame.png"));
+    tag_interval_act->setIcon(QIcon("../ViAn/Icons/create_interval.png"));
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
     remove_tag_act->setShortcut(Qt::Key_U);
-//    tag_interval_act->setShortcut(tr("Shift+T"));
-//    rm_tag_interval_act->setShortcut(tr("Shift+R"));
+    tag_interval_act->setShortcut(Qt::Key_K);
 //    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
 
     new_label_act->setStatusTip(tr("Create new tag label"));
@@ -558,16 +554,15 @@ void MainWindow::init_interval_menu() {
     interval_menu->addAction(new_tag_act);
     interval_menu->addAction(remove_tag_act);
     interval_menu->addSeparator();
-//    interval_menu->addAction(tag_interval_act);
-//    interval_menu->addAction(rm_tag_interval_act);
+    interval_menu->addAction(tag_interval_act);
+    interval_menu->addSeparator();
 //    interval_menu->addAction(rm_interval_act);
     interval_menu->addAction(interval_act);
 
     connect(new_label_act, &QAction::triggered, video_wgt, &VideoWidget::new_tag_clicked);
     connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
     connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
-//    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
-//    connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
+    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::create_interval_clicked);
 //    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
