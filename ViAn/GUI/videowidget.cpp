@@ -693,6 +693,12 @@ void VideoWidget::set_interval_end_clicked() {
     playback_slider->update();
 }
 
+/**
+ * @brief VideoWidget::create_interval_clicked
+ * Slot function for create interval button
+ * Create a new interval if needed and then creates interval area
+ * from the interval on the slider
+ */
 void VideoWidget::create_interval_clicked() {
     int first = m_interval.first;
     int second = m_interval.second;

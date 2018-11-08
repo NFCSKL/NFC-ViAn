@@ -337,6 +337,12 @@ void ProjectWidget::remove_frame_from_tag_item(int frame) {
     }
 }
 
+/**
+ * @brief ProjectWidget::add_interval
+ * Adds a new interval item under the video project
+ * @param vid_proj
+ * @param interval
+ */
 void ProjectWidget::add_interval(VideoProject* vid_proj, Interval* interval) {
     vid_proj->add_analysis(interval);
     VideoItem* vid_item = get_video_item(vid_proj);
@@ -357,7 +363,8 @@ void ProjectWidget::add_interval(VideoProject* vid_proj, Interval* interval) {
 
 /**
  * @brief ProjectWidget::set_interval_area
- * Clear the current IntervalAreaItems and creat new one for the current areas
+ * Clear the current IntervalAreaItems and create new one for the current areas
+ * This since some intervals might have merged together
  * @param start
  * @param end
  */
@@ -374,6 +381,12 @@ void ProjectWidget::set_interval_area(int new_area_start) {
     blockSignals(false);
 }
 
+/**
+ * @brief ProjectWidget::add_interval_area_to_interval
+ * Add all interval areas under the interval item
+ * @param item
+ * @param current
+ */
 void ProjectWidget::add_interval_area_to_interval(TreeItem* item, int current) {
     Interval* interval = dynamic_cast<IntervalItem*>(item)->get_interval();
     for (auto area : interval->m_area_list) {
@@ -948,6 +961,11 @@ void ProjectWidget::update_current_tag(VideoItem *v_item) {
     }
 }
 
+/**
+ * @brief ProjectWidget::update_current_interval
+ * Change/clear the current interval when a different one is chosed or a different video is chosen
+ * @param v_item
+ */
 void ProjectWidget::update_current_interval(VideoItem* v_item) {
     if (m_interval_item && dynamic_cast<VideoItem*>(m_interval_item->parent()) != v_item) {
         emit marked_basic_analysis(nullptr);
@@ -1290,6 +1308,11 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
     emit clear_analysis();
 }
 
+/**
+ * @brief ProjectWidget::remove_tag_frame_item
+ * Remove and clean tagframe item
+ * @param item
+ */
 void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
@@ -1297,6 +1320,11 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     tag_item->get_tag()->remove_frame(frame);
 }
 
+/**
+ * @brief ProjectWidget::remove_interval_item
+ * Remove and clean interval item
+ * @param item
+ */
 void ProjectWidget::remove_interval_item(QTreeWidgetItem* item) {
     emit set_interval_slider(false);
 
@@ -1307,6 +1335,11 @@ void ProjectWidget::remove_interval_item(QTreeWidgetItem* item) {
     emit marked_basic_analysis(nullptr);
 }
 
+/**
+ * @brief ProjectWidget::remove_interval_area_item
+ * Remove and clean interval area item
+ * @param item
+ */
 void ProjectWidget::remove_interval_area_item(QTreeWidgetItem* item) {
     IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
     IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
