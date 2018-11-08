@@ -972,7 +972,7 @@ void VideoWidget::on_new_frame() {
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num == playback_slider->last_poi_end) {
+            if (frame_num >= playback_slider->last_poi_end) {
                 analysis_play_btn_toggled(false);
                 analysis_play_btn->setChecked(false);
                 play_btn->setChecked(false);
