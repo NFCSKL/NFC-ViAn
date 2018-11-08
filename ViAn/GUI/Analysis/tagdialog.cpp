@@ -48,7 +48,7 @@ TagDialog::~TagDialog() {
  */
 void TagDialog::ok_btn_clicked() {
     emit tag_name(name->text());
-    close();
+    accept();
 }
 
 /**
@@ -56,5 +56,5 @@ void TagDialog::ok_btn_clicked() {
  * Close widget
  */
 void TagDialog::cancel_btn_clicked() {    
-    close();
+    reject();
 }

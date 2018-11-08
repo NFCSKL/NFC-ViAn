@@ -117,7 +117,7 @@ signals:
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_tag(VideoProject*, Tag*);
     void add_interval(VideoProject*, Interval*);
-    void set_interval_area(std::vector<std::pair<int, int>> area_list, int new_area_start);
+    void set_interval_area(int new_area_start);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);

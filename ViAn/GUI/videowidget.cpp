@@ -708,11 +708,7 @@ void VideoWidget::create_interval_clicked() {
         if (result != TagDialog::Accepted) return;
     }
     m_current_interval->add_area(first, second);
-    for (auto area : m_current_interval->m_area_list) {
-        qDebug() << area.first << area.second;
-    }
-    qDebug() << "---------------------";
-    emit set_interval_area(m_current_interval->m_area_list, first);
+    emit set_interval_area(first);
     emit set_status_bar("Interval: " + QString::number(first) +
                         QString::number(second) + " added");
     delete_interval();

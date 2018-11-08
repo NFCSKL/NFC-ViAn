@@ -361,24 +361,28 @@ void ProjectWidget::add_interval(VideoProject* vid_proj, Interval* interval) {
  * @param start
  * @param end
  */
-void ProjectWidget::set_interval_area(std::vector<std::pair<int, int>> area_list, int new_area_start) {
+void ProjectWidget::set_interval_area(int new_area_start) {
     blockSignals(true);
     // Remove all current area items
-    for (int i = m_interval_item->childCount()-1; i >= 0; --i) {
-        //remove_interval_area_item(m_interval_item->child(i));
-        m_interval_item->removeChild(m_interval_item->child(i));
-    }
-
-    for (auto area : area_list) {
-        IntervalAreaItem* ia_item = new IntervalAreaItem(area.first, area.second);
-        m_interval_item->addChild(ia_item);
-        if (ia_item->is_in_interval(new_area_start)) {
-            setCurrentItem(ia_item);
+    if (m_interval_item) {
+        for (int i = m_interval_item->childCount()-1; i >= 0; --i) {
+            m_interval_item->removeChild(m_interval_item->child(i));
         }
     }
-
+    add_interval_area_to_interval(m_interval_item, new_area_start);
     m_interval_item->setExpanded(true);
     blockSignals(false);
+}
+
+void ProjectWidget::add_interval_area_to_interval(TreeItem* item, int current) {
+    Interval* interval = dynamic_cast<IntervalItem*>(item)->get_interval();
+    for (auto area : interval->m_area_list) {
+        IntervalAreaItem* ia_item = new IntervalAreaItem(area.first, area.second);
+        item->addChild(ia_item);
+        if (ia_item->is_in_interval(current)) {
+            setCurrentItem(item);
+        }
+    }
 }
 
 /**
@@ -604,6 +608,10 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else if (ana.second->get_type() == INTERVAL) {
+            IntervalItem* int_item = new IntervalItem(dynamic_cast<Interval*>(ana.second));
+            v_item->addChild(int_item);
+            add_interval_area_to_interval(int_item);
         } else {
             qWarning() << "Something went wrong while adding analyses to items.";
         }
