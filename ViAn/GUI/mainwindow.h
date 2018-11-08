@@ -62,6 +62,7 @@ public slots:
     void view_paths();
     void show_analysis_dock(bool);
     void show_ana_settings_dock(bool);
+    void show_bookmark_dock(bool);
 
 signals:
     void set_status_bar(QString);
@@ -69,6 +70,7 @@ signals:
     void update_videoitems();
 
 private:
+    QDockWidget* bookmark_dock;
     QDockWidget* queue_dock;
     QDockWidget* ana_settings_dock;
     QDockWidget* manipulator_dock;

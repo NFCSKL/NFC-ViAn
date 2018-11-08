@@ -59,6 +59,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void set_zoom_tool();
     void set_show_analysis_details(bool);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
@@ -120,6 +121,7 @@ private slots:
 
     void update_item_data(QTreeWidgetItem *item, int column);
 private:
+    bool is_analysis_running(QTreeWidgetItem* root = nullptr);
     void set_main_window_name(QString name);
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
