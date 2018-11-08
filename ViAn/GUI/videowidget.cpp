@@ -704,7 +704,8 @@ void VideoWidget::create_interval_clicked() {
         TagDialog* interval_dialog = new TagDialog("Interval");
         interval_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(interval_dialog, &TagDialog::tag_name, this, &VideoWidget::new_interval);
-        interval_dialog->exec();
+        int result = interval_dialog->exec();
+        if (result != TagDialog::Accepted) return;
     }
     m_current_interval->add_area(first, second);
     for (auto area : m_current_interval->m_area_list) {
