@@ -147,9 +147,11 @@ void ProjectWidget::add_video() {
         int index = video_path.lastIndexOf('/') + 1;
         QString vid_name = video_path.right(video_path.length() - index);
         // TODO Check if file is already added
-        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+        Video* video = new Video(video_path.toStdString());
+        VideoProject* vid_proj = new VideoProject(video);
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
+        video_list.push_back(video);
     }
 }
 
@@ -1102,6 +1104,8 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     // Remove the video from the list of videos
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
+        auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
+        video_list.erase(video_it);
         m_proj->get_videos().erase(it);
         m_proj->set_unsaved(true);
     }
@@ -1406,6 +1410,7 @@ bool ProjectWidget::close_project() {
     emit project_closed();
     emit remove_overlay();
 
+    video_list.clear();
     delete m_proj;
     m_proj = nullptr;
     m_tag_item = nullptr;
