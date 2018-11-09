@@ -368,7 +368,6 @@ void VideoWidget::set_btn_shortcuts() {
     export_frame_btn->setShortcut(QKeySequence(Qt::Key_X));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
-    create_interval_btn->setShortcut(QKeySequence(Qt::Key_K));
 
     bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
