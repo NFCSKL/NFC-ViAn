@@ -57,12 +57,12 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     // Create togglable action in the context menu for analysis details
     show_details_act = new QAction("Show/hide anlaysis details", this);
     show_details_act->setCheckable(true);
-    connect(show_details_act, SIGNAL(triggered()), this, SIGNAL(toggle_analysis_details()));
+    connect(show_details_act, &QAction::triggered, this, &ProjectWidget::toggle_analysis_details);
 
     // Create togglable action in the context menu for analysis settings
     show_settings_act = new QAction("Show/hide analysis info", this);
     show_settings_act->setCheckable(true);
-    connect(show_settings_act, SIGNAL(triggered()), this, SIGNAL(toggle_settings_details()));
+    connect(show_settings_act, &QAction::triggered, this, &ProjectWidget::toggle_settings_details);
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::tree_item_changed);
@@ -85,7 +85,6 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
     connect(this, &ProjectWidget::itemSelectionChanged, this , &ProjectWidget::check_selection);
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
-
     connect(this, &ProjectWidget::itemChanged, this, &ProjectWidget::update_item_data);
 }
 
@@ -637,6 +636,7 @@ bool ProjectWidget::prompt_save() {
 
     QMessageBox delete_box(this);
     delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setMinimumSize(260,130);
     delete_box.setText("There are unsaved changes.");
     delete_box.setInformativeText("Do you wish to save before continuing?");
     delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
@@ -677,6 +677,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -694,6 +695,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -715,6 +717,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(true);
         emit set_detections(true);
         emit set_poi_slider(true);
@@ -737,6 +740,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -769,6 +773,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -780,9 +785,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit set_video_project(vid_item->get_video_project());
 
-        // TODO set from state
-        // set brightness/contrast, rotation
-
+        emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -896,51 +899,55 @@ void ProjectWidget::context_menu(const QPoint &point) {
     const int item_count = selectedItems().count();
     if (item_count == 0) {
         // Clicked on root tree
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("New Folder", this, &ProjectWidget::create_folder_item);
+        menu.addAction("Import Video", this, &ProjectWidget::add_video);
+        menu.addAction("Import Images", this, &ProjectWidget::add_images);
     } else if (item_count == 1) {
         // Clicked on item
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
-        menu.addSeparator();
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
-            case TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case DRAWING_TAG_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Update", this, SLOT(drawing_tag()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case ANALYSIS_ITEM:
-                if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
-                    menu.addAction("Rename", this, SLOT(rename_item()));
-                    menu.addAction(show_details_act);
-                    menu.addAction(show_settings_act);
-                    menu.addAction("Delete", this, SLOT(remove_item()));
-                }
-                break;
-            case FOLDER_ITEM:
-                menu.addAction("Rename", this, SLOT(rename_item()));
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                break;
-            case VIDEO_ITEM:
-                menu.addAction("Delete", this, SLOT(remove_item()));
-                menu.addAction("Open video in widget", this, SLOT(open_video_in_widget()));
-                menu.addAction("Tag drawings", this, SLOT(drawing_tag()));
-                break;
-            case TAG_FRAME_ITEM:
-                menu.addAction("Update", this, SIGNAL(update_tag()));
-                if (item->parent()->type() == TAG_ITEM) {
-                    menu.addAction("Delete", this, SLOT(remove_item()));
-                }
-                break;
-            default:
-                break;
+        case TAG_ITEM:
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
+        case DRAWING_TAG_ITEM:
+            menu.addAction("Update", this, &ProjectWidget::drawing_tag);
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
+        case ANALYSIS_ITEM:
+            if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+                menu.addAction(show_details_act);
+                menu.addAction(show_settings_act);
+                menu.addAction("Rename", this, &ProjectWidget::rename_item);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            }
+            break;
+        case FOLDER_ITEM:
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
+        case VIDEO_ITEM:
+            menu.addAction("Open video in widget", this, &ProjectWidget::open_video_in_widget);
+            menu.addAction("Tag drawings", this, &ProjectWidget::drawing_tag);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
+        case TAG_FRAME_ITEM:
+            menu.addAction("Update", this, &ProjectWidget::update_tag);
+            if (item->parent()->type() == TAG_ITEM) {
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            }
+            break;
+        default:
+            break;
         }
+        menu.addSeparator();
+        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+        menu.addAction("Import Video", this, SLOT(add_video()));
+        menu.addAction("Import Images", this, SLOT(add_images()));
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
-        menu.addAction("Delete", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, &ProjectWidget::remove_item);
     }
     menu.exec(mapToGlobal(point));
 }
@@ -1027,8 +1034,10 @@ void ProjectWidget::update_settings() {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
-    if (!dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
+    if (currentItem()->type() == ANALYSIS_ITEM && !dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
         return;
+    } else if (currentItem()->type() == VIDEO_ITEM) {
+        if (is_analysis_running(currentItem())) return;
     }
 
     QString text = "Deleting item(s)\n"
@@ -1091,6 +1100,7 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
         m_proj->get_videos().erase(it);
+        m_proj->set_unsaved(true);
     }
     delete v_proj;
     emit item_removed(v_proj);
@@ -1182,14 +1192,6 @@ void ProjectWidget::create_folder_item() {
             int index = p_item->indexOfChild(s_item);
             p_item->insertChild(index + 1, item);
         }
-    } else if (s_item->type() == TAG_ITEM || s_item->type() == DRAWING_TAG_ITEM || s_item->type() == ANALYSIS_ITEM) {
-        QTreeWidgetItem* p_item = s_item->parent();
-        if (p_item == nullptr) {
-            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
-        } else {
-            int index = p_item->indexOfChild(s_item);
-            p_item->insertChild(index + 1, item);
-        }
     } else {        // Tag frame item
         insertTopLevelItem(topLevelItemCount(), item);
     }
@@ -1200,32 +1202,45 @@ void ProjectWidget::create_folder_item() {
 }
 
 /**
- * @brief ProjectWidget::save_project
- * Slot function to save the open project
+ * @brief ProjectWidget::is_analysis_running
+ * Searches for all analysisitems under root
+ * to see if anyone of them is currently running.
+ * @param root
+ * @return
  */
-bool ProjectWidget::save_project() {
-    if (m_proj == nullptr ) return false;
+bool ProjectWidget::is_analysis_running(QTreeWidgetItem* root) {
+    if (root == nullptr) { root = invisibleRootItem(); }
 
     std::vector<AnalysisItem*> a_items;
-    get_analysis_items(invisibleRootItem(), a_items);
+    get_analysis_items(root, a_items);
     bool analysis_running = false;
     for (AnalysisItem* item : a_items) {
         if (!item->is_finished()) {
             analysis_running = true;
+            break;
         }
     }
 
     if (analysis_running) {
         QString text = "One or more analyses are currently running";
-        QString info_text = "Let them finish or stop them before saving";
+        QString info_text = "Let them finish or stop them before continuing";
         QMessageBox msg_box;
+        msg_box.setMinimumSize(300,120);
         msg_box.setText(text);
         msg_box.setInformativeText(info_text);
         msg_box.setStandardButtons(QMessageBox::Ok);
         msg_box.setDefaultButton(QMessageBox::Ok);
         msg_box.exec();
-        return false;
     }
+    return analysis_running;
+}
+
+/**
+ * @brief ProjectWidget::save_project
+ * Slot function to save the open project
+ */
+bool ProjectWidget::save_project() {
+    if (m_proj == nullptr || is_analysis_running()) return false;
 
     for (std::string path : remove_list) {
         QFile file(QString::fromStdString(path));
@@ -1273,6 +1288,8 @@ bool ProjectWidget::save_project() {
     emit save_draw_wgt();
 
     // Mark all analysis as saved
+    std::vector<AnalysisItem*> a_items;
+    get_analysis_items(invisibleRootItem(), a_items);
     for (AnalysisItem* item : a_items) {
         item->saved = true;
     }
@@ -1429,6 +1446,7 @@ void ProjectWidget::set_main_window_name(QString name) {
 bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
     QMessageBox msg_box;
     if (warning) msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(310,125);
     msg_box.setText(text);
     msg_box.setInformativeText(info_text);
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

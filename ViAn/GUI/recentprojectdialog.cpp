@@ -15,6 +15,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint | Qt::WindowStaysOnTopHint));
     setWindowTitle("ViAn - Recent projects");
     setWindowIcon(QIcon("../ViAn/Icons/home.png"));
+    setMinimumSize(500,300);
     h_layout = new QHBoxLayout();
     v_main_layout = new QVBoxLayout(this);
     v_btn_layout = new QVBoxLayout();
@@ -40,10 +41,13 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     open_btn->setToolTip(tr("Open selected project"));
     remove_btn = new QPushButton(tr("Remove"));
     remove_btn->setToolTip("Remove selected project");
+    exit_btn = new QPushButton(tr("Exit"));
+    exit_btn->setToolTip("Exit Vian");
     v_btn_layout->addWidget(new_btn);                           // Second row second col first row
     v_btn_layout->addWidget(browse_btn);                          // Second row second col second row
     v_btn_layout->addWidget(open_btn);                          // Second row second col third row
     v_btn_layout->addWidget(remove_btn);
+    v_btn_layout->addWidget(exit_btn);
 
     for (auto project : RecentProject().load_recent()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(recent_list);
@@ -59,6 +63,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     connect(browse_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_browse_btn_clicked);
     connect(open_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_open_btn_clicked);
     connect(remove_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_remove_btn_clicked);
+    connect(exit_btn, &QPushButton::clicked, this, &RecentProjectDialog::on_exit_btn_clicked);
 }
 
 RecentProjectDialog::~RecentProjectDialog() {
@@ -123,6 +128,7 @@ void RecentProjectDialog::on_open_btn_clicked() {
 void RecentProjectDialog::on_remove_btn_clicked() {
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(370, 110);
     msg_box.setText("Are you sure you want to remove the selected projects?");
     msg_box.setInformativeText("This will delete all project files (images, reports, etc).");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -137,4 +143,9 @@ void RecentProjectDialog::on_remove_btn_clicked() {
         }
         delete recent_list->currentItem();
     }
+}
+
+void RecentProjectDialog::on_exit_btn_clicked() {
+    emit exit();
+    accept();
 }

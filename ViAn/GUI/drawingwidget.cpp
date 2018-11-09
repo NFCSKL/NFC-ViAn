@@ -20,8 +20,6 @@
 
 DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
-    connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
 
     setColumnCount(3);
     header()->resizeSection(0, 170);
@@ -37,8 +35,11 @@ DrawingWidget::DrawingWidget(QWidget *parent) : QTreeWidget(parent) {
     delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
     connect(delete_sc, &QShortcut::activated, this, &DrawingWidget::delete_item);
 
+    // Connects for items clicked or changed in tree
+    connect(this, &DrawingWidget::itemClicked, this, &DrawingWidget::tree_item_clicked);
+    connect(this, &DrawingWidget::customContextMenuRequested, this, &DrawingWidget::context_menu);
     connect(this, &DrawingWidget::currentItemChanged, this, [this]{ tree_item_clicked(currentItem());});
-    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(item_changed(QTreeWidgetItem*)));
+    connect(this, &DrawingWidget::itemChanged, this, &DrawingWidget::item_changed);
 }
 
 void DrawingWidget::set_overlay(Overlay* overlay) {
@@ -46,22 +47,22 @@ void DrawingWidget::set_overlay(Overlay* overlay) {
 
     m_overlay = overlay;
     update_from_overlay();
-    connect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
-    connect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
-    connect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
-    connect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
-    connect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
+    connect(m_overlay, &Overlay::new_drawing, this, &DrawingWidget::add_drawing);
+    connect(m_overlay, &Overlay::clean_overlay, this, &DrawingWidget::clear_overlay);
+    connect(m_overlay, &Overlay::select_current, this, &DrawingWidget::set_current_selected);
+    connect(m_overlay, &Overlay::set_tool_zoom, this, &DrawingWidget::set_tool_zoom);
+    connect(m_overlay, &Overlay::set_tool_edit, this, &DrawingWidget::set_tool_edit);
 }
 
 void DrawingWidget::clear_overlay() {
     if (m_overlay != nullptr) {
         m_overlay->set_current_drawing(nullptr);
         save_item_data();
-        disconnect(m_overlay, SIGNAL(new_drawing(Shapes*, int)), this, SLOT(add_drawing(Shapes*, int)));
-        disconnect(m_overlay, SIGNAL(clean_overlay()), this, SLOT(clear_overlay()));
-        disconnect(m_overlay, SIGNAL(select_current(Shapes*,int)), this, SLOT(set_current_selected(Shapes*,int)));
-        disconnect(m_overlay, SIGNAL(set_tool_zoom()), this, SIGNAL(set_tool_zoom()));
-        disconnect(m_overlay, SIGNAL(set_tool_edit()), this, SIGNAL(set_tool_edit()));
+        disconnect(m_overlay, &Overlay::new_drawing, this, &DrawingWidget::add_drawing);
+        disconnect(m_overlay, &Overlay::clean_overlay, this, &DrawingWidget::clear_overlay);
+        disconnect(m_overlay, &Overlay::select_current, this, &DrawingWidget::set_current_selected);
+        disconnect(m_overlay, &Overlay::set_tool_zoom, this, &DrawingWidget::set_tool_zoom);
+        disconnect(m_overlay, &Overlay::set_tool_edit, this, &DrawingWidget::set_tool_edit);
         m_overlay = nullptr;
     }
     clear();
@@ -399,6 +400,7 @@ void DrawingWidget::delete_item() {
         if (f_item->get_frame() == m_overlay->get_current_frame()) {
             QMessageBox msg_box;
             msg_box.setIcon(QMessageBox::Warning);
+            msg_box.setMinimumSize(300,130);
             msg_box.setText("Deleting drawings on frame "+QString::number(f_item->get_frame())+"\n"
                             "This will delete all drawings on this frame");
             msg_box.setInformativeText("Do you wish to continue?");
