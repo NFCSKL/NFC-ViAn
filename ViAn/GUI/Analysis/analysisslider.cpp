@@ -256,7 +256,7 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
 
 /**
  * @brief AnalysisSlider::is_poi_start
- * Return true if the curr_frame is the end frame of a poi
+ * Return true if the curr_frame is the start frame of a poi
  * @param curr_frame
  * @return
  */
@@ -374,9 +374,14 @@ int AnalysisSlider::get_closest_poi(int frame) {
     } else {
         int prev = get_prev_poi_end(frame);
         int next = get_next_poi_start(frame);
-        if (frame - prev <= next - frame) {
+
+        if (prev == frame) {
+            return next;
+        } else if (next == frame) {
             return prev;
-        } else {
+        } else if (frame - prev <= next - frame) {
+            return prev;
+        } else if (frame - prev > next -frame) {
             return next;
         }
     }

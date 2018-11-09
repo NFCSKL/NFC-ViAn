@@ -176,7 +176,7 @@ void VideoWidget::init_layouts() {
 void VideoWidget::init_video_controller(){
     // Video data
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
-    connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
+    connect(v_controller, &VideoController::display_index, this, &VideoWidget::display_index_slot);
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
     connect(v_controller, &VideoController::finished, v_controller, &VideoController::deleteLater);
 }
@@ -963,6 +963,18 @@ void VideoWidget::set_slider_max(int value) {
     playback_slider->setMaximum(value);
 }
 
+void VideoWidget::display_index_slot() {
+    int frame_num = frame_index.load();
+    if (analysis_only) {
+        if (!playback_slider->is_in_POI(frame_num)) {
+            if (frame_num < playback_slider->last_poi_end) {
+                next_poi_btn_clicked();
+            }
+        }
+    }
+    on_new_frame();
+}
+
 /**
  * @brief reacts to a new frame number. Updates the playback slider and current time label
  * @param frame_num
@@ -970,22 +982,22 @@ void VideoWidget::set_slider_max(int value) {
 void VideoWidget::on_new_frame() {
     int frame_num = frame_index.load();
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
-    if (analysis_only) {
-        if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num >= playback_slider->last_poi_end) {
-                analysis_play_btn_toggled(false);
-                analysis_play_btn->setChecked(false);
-                play_btn->setChecked(false);
-            } else {
-                next_poi_btn_clicked();
-            }
-        }
-    }
     if (!playback_slider->is_blocked()) {
         // Block signals to prevent value_changed signal to trigger
         playback_slider->blockSignals(true);
         playback_slider->setValue(frame_num);
         playback_slider->blockSignals(false);
+    }
+    if (analysis_only) {
+        if (!playback_slider->is_in_POI(frame_num)) {
+            if (frame_num >= playback_slider->last_poi_end) {
+                //analysis_play_btn_toggled(false);
+                //analysis_play_btn->setChecked(false);
+                play_btn->setChecked(false);
+            } else {
+                //next_poi_btn_clicked();
+            }
+        }
     }
 
     if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
