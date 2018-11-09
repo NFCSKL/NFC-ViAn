@@ -1,5 +1,7 @@
 #include "text.h"
 
+#include "utility.h"
+
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <QPoint>
