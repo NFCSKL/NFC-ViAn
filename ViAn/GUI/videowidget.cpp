@@ -980,6 +980,11 @@ void VideoWidget::set_slider_max(int value) {
     playback_slider->setMaximum(value);
 }
 
+/**
+ * @brief VideoWidget::display_index_slot
+ * Slot function for on_new_frame that will jump to next poi
+ * while analysis_only
+ */
 void VideoWidget::display_index_slot() {
     int frame_num = frame_index.load();
     if (analysis_only) {
@@ -1008,11 +1013,7 @@ void VideoWidget::on_new_frame() {
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
             if (frame_num >= playback_slider->last_poi_end) {
-                //analysis_play_btn_toggled(false);
-                //analysis_play_btn->setChecked(false);
                 play_btn->setChecked(false);
-            } else {
-                //next_poi_btn_clicked();
             }
         }
     }
