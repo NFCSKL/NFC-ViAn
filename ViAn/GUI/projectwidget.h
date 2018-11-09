@@ -1,33 +1,26 @@
 #ifndef PROJECTWIDGET_H
 #define PROJECTWIDGET_H
 
-#include <QWidget>
-#include <QTreeWidget>
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QMimeData>
-#include <QAction>
-#include <QStandardPaths>
-#include <vector>
-#include "Project/imagesequence.h"
-#include "Project/project.h"
-#include "GUI/TreeItems/tagitem.h"
-#include "GUI/TreeItems/analysisitem.h"
-#include "GUI/TreeItems/drawingtagitem.h"
-#include "GUI/TreeItems/tagframeitem.h"
-#include <stack>
-#include "Project/Analysis/analysis.h"
-#include "Project/Analysis/tag.h"
-#include "Project/videoproject.h"
-#include "Analysis/analysismethod.h"
-#include "Analysis/motiondetection.h"
-#include "Analysis/analysisdialog.h"
-#include "Analysis/anasettingwidget.h"
+#include "Analysis/analysissettings.h"
+#include "Project/video.h"
 
-class Project;
-class VideoItem;
-class FolderItem;
+#include <QAction>
+#include <QPointer>
+#include <QStandardPaths>
+#include <QTreeWidget>
+
+#include <stack>
+
+class AnalysisItem;
+class AnalysisMethod;
 class AnalysisProxy;
+class BasicAnalysis;
+class Project;
+class Tag;
+class TagFrame;
+class TagItem;
+class TreeItem;
+class VideoItem;
 class VideoProject;
 class ProjectWidget : public QTreeWidget
 {
@@ -65,6 +58,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void set_zoom_tool();
     void set_show_analysis_details(bool);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
@@ -124,6 +118,7 @@ private slots:
 
     void update_item_data(QTreeWidgetItem *item, int column);
 private:
+    bool is_analysis_running(QTreeWidgetItem* root = nullptr);
     void set_main_window_name(QString name);
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);

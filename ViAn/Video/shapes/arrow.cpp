@@ -1,5 +1,9 @@
 #include "arrow.h"
 
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QPoint>
+
 /**
  * @brief Arrow::Arrow
  */

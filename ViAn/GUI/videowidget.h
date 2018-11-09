@@ -1,33 +1,44 @@
 #ifndef VIDEOWIDGET_H
 #define VIDEOWIDGET_H
 
-#include <QWidget>
-#include <QTime>
-#include <QScrollArea>
-#include <QLabel>
-#include <QSize>
-#include <QBoxLayout>
-#include <QCheckBox>
-#include <QPushButton>
-#include <QSlider>
-#include <QShortcut>
-#include <QCloseEvent>
-
-#include <vector>
-#include <atomic>
-#include <mutex>
-#include <condition_variable>
-
-#include "doubleclickbutton.h"
-#include "framewidget.h"
-#include "GUI/Analysis/analysisslider.h"
-#include "Video/video_player.h"
-#include "Project/videoproject.h"
-#include "GUI/drawscrollarea.h"
-#include "Project/Analysis/tag.h"
-#include "Video/videocontroller.h"
+#include "Project/video.h"
 #include "Video/videoplayer.h"
+#include "Video/shapes/shapes.h"
 #include "Video/framemanipulator.h"
+#include "Video/frameprocessor.h"
+
+#include "opencv2/core/core.hpp"
+
+#include <QTime>
+#include <QWidget>
+
+// TODO Might not need
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <vector>
+
+class AnalysisSettings;
+class AnalysisSlider;
+class BasicAnalysis;
+class DoubleClickButton;
+class DrawScrollArea;
+class FrameWidget;
+class QCheckBox;
+class QColor;
+class QGridLayout;
+class QHBoxLayout;
+class QLabel;
+class QLineEdit;
+class QPushButton;
+class QScrollBar;
+class QShortcut;
+class QSlider;
+class QVBoxLayout;
+class Tag;
+class TagFrame;
+class VideoController;
+class VideoProject;
 
 class VideoWidget : public QWidget
 {
@@ -40,10 +51,7 @@ private:
 
     int proj_tree_item = 1001;      // Default is VIDEO_ITEM, based on ITEM_TYPE on treeitem
     int prev_frame_idx;
-    int POI_end;
     double m_scale_factor = 1;
-    int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
-    double contrast = FrameManipulator().CONTRAST_DEFAULT;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -83,7 +91,7 @@ private:
     QThread* processing_thread;
 public:
     explicit VideoWidget(QWidget *parent = nullptr, bool floating = false);
-    ~VideoWidget();
+    ~VideoWidget() override;
 
     QVBoxLayout* vertical_layout;
 
@@ -102,10 +110,9 @@ public:
     void set_clear_drawings(int frame);
     void set_delete_drawing(Shapes* shape);
 
-    int get_brightness();
-    double get_contrast();
-
 signals:
+    void set_zoom_tool();
+    void clean_zoom_preview();
     void close_video_widget(VideoWidget*);
     void new_bookmark(VideoProject*, VideoState, cv::Mat, cv::Mat, QString, QString);
     void set_detections_on_frame(int);
@@ -117,16 +124,16 @@ signals:
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
     void zoom_preview(cv::Mat preview_frame);
-    void update_manipulator_wgt(int, double);
+    void update_manipulator_wgt(int, double, double);
 public slots:
-    void quick_analysis(AnalysisSettings*settings);
+    void quick_analysis(AnalysisSettings* settings);
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);
     void set_zoom_state(QPoint, double, int);
     void play_btn_toggled(bool status);
     void update_tag();
-    void update_tag_color(int b, double c);
+    void update_tag_color(int b, double c, double g);
     void tag_frame();
     void remove_tag_frame(void);
     void new_tag_clicked();
@@ -188,12 +195,12 @@ public slots:
     void set_state(VideoState state);
     void on_fit_screen(void);
     void on_original_size(void);
-    void update_brightness_contrast(int c_val, double v_val, bool update);
+    void update_brightness_contrast(int c_val, double v_val, double g_val, bool update);
     void rotate_cw(void);
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);
     void update_playback_speed(int speed);
-    void set_brightness_contrast(int bri, double cont);
+    void set_brightness_contrast(int bri, double cont, double gamma);
     void update_zoom_preview_size(QSize s);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
@@ -211,6 +218,8 @@ private:
     QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
     QLabel* fps_label;
+    QLabel* size_label;
+    QLabel* rotation_label;
 
     //Buttons
     QPushButton* play_btn;

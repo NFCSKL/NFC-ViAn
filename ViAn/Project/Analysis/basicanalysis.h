@@ -1,14 +1,15 @@
 #ifndef BASICANALYSIS_H
 #define BASICANALYSIS_H
 
-#include <string>
-#include <utility>
-#include <set>
 #include "analysisinterval.h"
-#include "opencv2/core/core.hpp"
-#include <typeinfo>
-#include <QPoint>
-#include <QJsonArray>
+#include "Filehandler/saveable.h"
+
+#include <QJsonObject>
+#include <QMetaType>
+
+#include <map>
+#include <set>
+#include <string>
 
 class AnalysisSettings;
 
@@ -24,6 +25,7 @@ struct interval_cmp {
 };
 using interval_set = std::set<AnalysisInterval*, interval_cmp>;
 using ID = int;
+
 class BasicAnalysis : public Saveable
 {       
 public:

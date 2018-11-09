@@ -1,6 +1,8 @@
 #include "shapes.h"
-#include <iostream>
+
 #include <QDebug>
+#include <QPoint>
+
 
 /**
  * @brief Shape::Shape
@@ -219,17 +221,17 @@ bool Shapes::get_show() {
  */
 void Shapes::read_shape(const QJsonObject& json){
     int shape_i = json["shape"].toInt();
-    this->shape = static_cast<SHAPES>(shape_i);
-    this->color[0] = json["b"].toInt();
-    this->color[1] = json["g"].toInt();
-    this->color[2] = json["r"].toInt();
+    shape = static_cast<SHAPES>(shape_i);
+    color[0] = json["b"].toInt();
+    color[1] = json["g"].toInt();
+    color[2] = json["r"].toInt();
     q_color = QColor(color[2], color[1], color[0]);
-    this->draw_start.x = json["p1x"].toInt();
-    this->draw_start.y = json["p1y"].toInt();
-    this->draw_end.x = json["p2x"].toInt();
-    this->draw_end.y = json["p2y"].toInt();
-    this->frame = json["frame"].toInt();
-    this->show = json["show"].toBool();
+    draw_start.x = json["p1x"].toInt();
+    draw_start.y = json["p1y"].toInt();
+    draw_end.x = json["p2x"].toInt();
+    draw_end.y = json["p2y"].toInt();
+    frame = json["frame"].toInt();
+    show = json["show"].toBool();
 }
 
 /**
@@ -238,15 +240,14 @@ void Shapes::read_shape(const QJsonObject& json){
  * Writes a shape to a Json object.
  */
 void Shapes::write_shape(QJsonObject& json){
-    json["shape"] = this->shape;
-    json["b"] = this->color[0];
-    json["g"] = this->color[1];
-    json["r"] = this->color[2];
-    json["p1x"] = this->draw_start.x;
-    json["p1y"] = this->draw_start.y;
-    json["p2x"] = this->draw_end.x;
-    json["p2y"] = this->draw_end.y;
-    json["frame"] = this->frame;
-    json["show"] = this->show;
+    json["shape"] = shape;
+    json["b"] = color[0];
+    json["g"] = color[1];
+    json["r"] = color[2];
+    json["p1x"] = draw_start.x;
+    json["p1y"] = draw_start.y;
+    json["p2x"] = draw_end.x;
+    json["p2y"] = draw_end.y;
+    json["frame"] = frame;
+    json["show"] = show;
 }
-

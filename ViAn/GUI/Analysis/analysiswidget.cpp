@@ -1,9 +1,16 @@
 #include "analysiswidget.h"
+
+#include "Analysis/analysismethod.h"
 #include "GUI/TreeItems/analysisitem.h"
-#include "GUI/videowidget.h"
+#include "GUI/TreeItems/videoitem.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/videoproject.h"
+#include "queuewidget.h"
+
 #include <QDebug>
-#include <QTreeWidgetItem>
-#include <tuple>
+#include <QThreadPool>
+
+
 AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
 
 }
@@ -11,7 +18,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) : QWidget(parent){
 void AnalysisWidget::set_queue_wgt(QueueWidget *queue_wgt){
     m_queue_wgt = queue_wgt;
 
-    connect(m_queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
+    connect(m_queue_wgt, &QueueWidget::abort_analysis, this, &AnalysisWidget::abort_analysis);
 }
 
 /**
@@ -51,9 +58,8 @@ void AnalysisWidget::perform_analysis(std::tuple<AnalysisMethod*, QTreeWidgetIte
     abort_map.insert(std::make_pair(method,abort_bool));    
     current_method = method;
 
-    connect(method, &AnalysisMethod::analysis_aborted, this, &AnalysisWidget::on_analysis_aborted);
-    connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);       
-    connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
+    connect(method, &AnalysisMethod::analysis_aborted, this, &AnalysisWidget::on_analysis_aborted);   
+    connect(method, &AnalysisMethod::send_progress, this, &AnalysisWidget::send_progress);
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
     QThreadPool::globalInstance()->start(method);
     emit add_analysis_bar();

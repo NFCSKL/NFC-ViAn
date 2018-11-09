@@ -2,6 +2,7 @@
 #define SEQUENCEITEM_H
 
 #include "treeitem.h"
+
 class SequenceItem : public TreeItem {
 private:
     int m_index{};

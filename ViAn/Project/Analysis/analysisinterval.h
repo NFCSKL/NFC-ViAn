@@ -1,8 +1,12 @@
 #ifndef ANALYSISINTERVAL_H
 #define ANALYSISINTERVAL_H
-#include <QJsonArray>
-#include <QJsonObject>
+
+// TODO Should switch?
 #include "Filehandler/saveable.h"
+//#include "Filehandler/writeable.h"
+
+#include <QJsonObject>
+
 class AnalysisInterval : public Writeable
 {
     using interval = std::pair<int,int>;    

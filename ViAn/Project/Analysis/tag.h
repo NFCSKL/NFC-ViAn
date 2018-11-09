@@ -1,12 +1,14 @@
 #ifndef TAG_H
 #define TAG_H
-#include "basicanalysis.h"
-#include "Project/video.h"
-#include "tagframe.h"
-#include <map>
 
-class BasicAnalysis;
-class Video;
+#include "basicanalysis.h"
+
+#include <QJsonObject>
+
+#include <map>
+#include <vector>
+
+class TagFrame;
 
 class Tag : public BasicAnalysis {
     bool m_drawing_tag = false;
@@ -20,8 +22,8 @@ public:
     void add_frame(int frame, TagFrame *t_frame);
     bool find_frame(int);
     void remove_frame(int);
-    void update_color_correction(int frame, int b_value, double c_value);
-    void update_color_whole_tag(int b, double c);
+    void update_color_correction(int frame, int b_value, double c_value, double g_value);
+    void update_color_whole_tag(int b, double c, double g);
     int next_frame(int);
     int previous_frame(int);
     std::vector<int> get_frames();

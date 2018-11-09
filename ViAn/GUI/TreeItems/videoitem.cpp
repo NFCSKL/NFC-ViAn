@@ -1,5 +1,15 @@
 #include "videoitem.h"
+
 #include "imagegenerator.h"
+#include "Project/imagesequence.h"
+#include "Project/project.h"
+#include "Project/videoproject.h"
+#include "sequenceitem.h"
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/videoio/videoio.hpp"
+
+#include <QTreeWidgetItem>
 
 //const QString VideoItem::SEQUENCE_CONTAINER_NAME = "Image";
 

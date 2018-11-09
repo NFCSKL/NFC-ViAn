@@ -2,7 +2,8 @@
 #define MAINTOOLBAR_H
 
 #include <QToolBar>
-#include <QAction>
+
+class QAction;
 
 class MainToolbar : public QToolBar
 {
@@ -12,6 +13,7 @@ public:
     MainToolbar();
     QAction* save_act;
     QAction* open_act;
+    QAction* open_recent_act;
     QAction* add_video_act;
     QAction* add_img_seq_act;
     QAction* open_folder_act;

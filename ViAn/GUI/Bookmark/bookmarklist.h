@@ -1,13 +1,9 @@
 #ifndef BOOKMARKLIST_H
 #define BOOKMARKLIST_H
 
-#include <QListWidget>
-#include <QBoxLayout>
-#include <QMouseEvent>
-#include <QDropEvent>
-#include <QPoint>
-
 #include "Project/bookmark.h"
+
+#include <QListWidget>
 
 /**
  * @brief The BookmarkList class
@@ -23,7 +19,7 @@ class BookmarkList : public QListWidget{
     int category_cnt = 1;
 public:
     BookmarkList(bool accept_container = true, int container_type = UNSORTED, QWidget* parent = nullptr);
-    ~BookmarkList();
+    ~BookmarkList() override;
 
     QListWidgetItem* get_clicked_item();
 

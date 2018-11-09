@@ -1,36 +1,23 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QHBoxLayout>
-#include <QDockWidget>
 #include <QMainWindow>
-#include <QBasicTimer>
-#include <QCloseEvent>
-#include <QWindow>
-#include <QSlider>
-#include <QFileDialog>
-#include <QDragEnterEvent>
 
-#include <string>
-
-#include "reportgenerator.h"
-
-#include "GUI/recentprojectdialog.h"
-#include "Project/Analysis/analysisproxy.h"
-
-#include "videowidget.h"
-#include "projectwidget.h"
-#include "zoompreviewwidget.h"
-#include "Analysis/analysiswidget.h"
-#include "Bookmark/bookmarkwidget.h"
-#include "drawingwidget.h"
-#include "Analysis/anasettingwidget.h"
-#include "manipulatorwidget.h"
-#include "statusbar.h"
-#include "Toolbars/drawingtoolbar.h"
-#include "Toolbars/maintoolbar.h"
-
-class AnalysisWindow;
+class AnalysisWidget;
+class AnaSettingWidget;
+class BookmarkWidget;
+class DrawingToolbar;
+class DrawingWidget;
+class MainToolbar;
+class ManipulatorWidget;
+class ProjectWidget;
+class QueueWidget;
+class RecentProjectDialog;
+class Shapes;
+class StatusBar;
+class VideoProject;
+class VideoWidget;
+class ZoomPreviewWidget;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -39,8 +26,8 @@ public:
     const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
     const int VIDEO_WGT_HEIGHT = 9;
     const unsigned int FLOATING_WIDGET_MAX = 3;
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
     StatusBar* status_bar;
     DrawingToolbar* draw_toolbar;
@@ -74,12 +61,14 @@ public slots:
     void open_project_folder();
     void show_analysis_dock(bool);
     void show_ana_settings_dock(bool);
+    void show_bookmark_dock(bool);
 
 signals:
     void set_status_bar(QString);
     void open_project(QString proj_path);
 
 private:
+    QDockWidget* bookmark_dock;
     QDockWidget* queue_dock;
     QDockWidget* ana_settings_dock;
     QDockWidget* manipulator_dock;
@@ -103,8 +92,6 @@ private:
     QAction* toggle_manipulator_wgt;
     QAction* toggle_main_toolbar;
     QAction* toggle_drawing_toolbar;
-
-    AnalysisWindow *analysis_window;
 
     std::vector<VideoWidget*> video_widgets;
 

@@ -1,5 +1,11 @@
 #include "analysarea.h"
 
+#include "shapes.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QPoint>
+
 /**
  * @brief AnalysArea::AnalysArea
  */

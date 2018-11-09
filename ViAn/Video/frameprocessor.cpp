@@ -1,7 +1,12 @@
 #include "frameprocessor.h"
-#include <QDebug>
-#include <QTime>
+
+#include "overlay.h"
 #include "utility.h"
+#include "Video/videoplayer.h"
+
+#include <QDebug>
+
+#include <mutex>
 
 const int FrameProcessor::DEGREES_0 = 0;
 const int FrameProcessor::DEGREES_90 = 90;
@@ -295,6 +300,7 @@ void FrameProcessor::update_zoomer_settings() {
 void FrameProcessor::update_manipulator_settings() {
     m_manipulator.set_brightness(m_man_settings->brightness);
     m_manipulator.set_contrast(m_man_settings->contrast);
+    m_manipulator.set_gamma(m_man_settings->gamma);
 
     int rotate_direction = m_rotate_direction;
     if (m_man_settings->rotate == 1) {
@@ -305,7 +311,7 @@ void FrameProcessor::update_manipulator_settings() {
     update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
     emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
-    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast());
+    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast(), m_manipulator.get_gamma());
 }
 
 /**
@@ -397,5 +403,4 @@ void FrameProcessor::reset_settings() {
 
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
-
 }

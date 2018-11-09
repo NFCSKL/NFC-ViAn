@@ -1,21 +1,17 @@
 #ifndef FRAMEWIDGET_H
 #define FRAMEWIDGET_H
 
-#include <QWidget>
-#include <QPainter>
-#include <QImage>
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QSize>
+#include "Video/shapes/shapes.h"
 
-#include "opencv2/opencv.hpp"
+#include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
-#include "Video/shapes/zoomrectangle.h"
-#include "Project/Analysis/analysisproxy.h"
-#include "Project/videoproject.h"
-#include "Analysis/analysissettings.h"
-#include "imagegenerator.h"
+#include <QWidget>
+
+class Analysis;
+class AnalysisProxy;
+class AnalysisSettings;
+class VideoProject;
 
 class FrameWidget : public QWidget
 {

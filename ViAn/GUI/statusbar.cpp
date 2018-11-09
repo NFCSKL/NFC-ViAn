@@ -1,4 +1,5 @@
 #include "statusbar.h"
+
 #include <QDebug>
 #include <QProgressBar>
 
@@ -17,8 +18,8 @@ StatusBar::StatusBar() {
  * @param timer Duration of the status bar message
  * Set status to the status bar for timer duration.
  */
-void StatusBar::on_set_status_bar(QString status, int timer) {
-    showMessage(status, timer);
+void StatusBar::on_set_status_bar(QString status) {
+    showMessage(status, TIMER);
 }
 
 void StatusBar::add_analysis_bar() {

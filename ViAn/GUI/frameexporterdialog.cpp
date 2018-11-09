@@ -1,6 +1,20 @@
 #include "frameexporterdialog.h"
 
+#include <QBoxLayout>
 #include <QDebug>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSpinBox>
+
+#include "imageexporter.h"
+#include "Project/video.h"
+#include "Project/project.h"
+
+
 FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
                                          const int& max_frame, const std::pair<int, int>& interval,
                                          QWidget* parent) : QDialog(parent){
@@ -21,8 +35,8 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_to_box->setValue(interval.second);
     update_total();
 
-    connect(m_from_box, SIGNAL(editingFinished()), this, SLOT(from_value_changed()));
-    connect(m_to_box, SIGNAL(editingFinished()), this, SLOT(to_value_changed()));
+    connect(m_from_box, &QSpinBox::editingFinished, this, &FrameExporterDialog::from_value_changed);
+    connect(m_to_box, &QSpinBox::editingFinished, this, &FrameExporterDialog::to_value_changed);
     // Frame layout
     m_frame_input_layout = new QHBoxLayout();
     m_frame_input_layout->addWidget(new QLabel(tr("from:")));
@@ -134,6 +148,7 @@ bool FrameExporterDialog::check_path() {
     if (QDir(m_path_label->text()).exists()) return true;
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(500,120);
     msg_box.setText("Path '" + m_path_label->text() + "' doesn't exist");
     msg_box.setInformativeText("Do you wish to create it?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

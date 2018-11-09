@@ -8,8 +8,8 @@ class TextItem : public ShapeItem {
     Text* m_text = nullptr;
 public:
     TextItem(Text* text);
-    Text* get_shape();
-    void remove();
+    Text* get_shape() override;
+    void remove() override;
     ~TextItem() override;
 };
 

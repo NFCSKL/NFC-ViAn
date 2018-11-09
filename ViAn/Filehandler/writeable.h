@@ -1,6 +1,8 @@
 #ifndef WRITEABLE_H
 #define WRITEABLE_H
+
 #include <QJsonObject>
+
 class Writeable
 {
 public:

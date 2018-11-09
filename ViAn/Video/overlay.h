@@ -1,25 +1,14 @@
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
-#include <iostream>
-#include <QImage>
-#include <QColor>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QInputDialog>
-#include <algorithm>
-#include "shapes/shapes.h"
-#include "shapes/rectangle.h"
-#include "shapes/circle.h"
-#include "shapes/line.h"
-#include "shapes/arrow.h"
-#include "shapes/pen.h"
-#include "shapes/text.h"
-#include "shapes/zoomrectangle.h"
-#include "shapes/analysarea.h"
-#include "opencv2/opencv.hpp"
 #include "Filehandler/writeable.h"
+#include "shapes/shapes.h"
+
+#include "opencv2/core/core.hpp"
+
+#include <QJsonObject>
+#include <QObject>
+#include <QPoint>
 
 /**
  * @brief The Overlay class

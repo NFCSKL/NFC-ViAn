@@ -1,7 +1,9 @@
 #include "videoplayer.h"
-#include <QThread>
+
+#include "opencv2/highgui/highgui.hpp"
+
 #include <QDebug>
-#include <QTime>
+
 #include <chrono>
 #include <cmath>
 
@@ -170,8 +172,8 @@ bool VideoPlayer::synced_read(){
             return false;
         }
 
-        int ncols = m_capture.get(CV_CAP_PROP_FRAME_WIDTH);
-        int nrows = m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+        int ncols = static_cast<int>(m_capture.get(CV_CAP_PROP_FRAME_WIDTH));
+        int nrows = static_cast<int>(m_capture.get(CV_CAP_PROP_FRAME_HEIGHT));
         if (ncols != ccols || nrows != crows) {
             // New frame is not equal in size to the previous one
             try {

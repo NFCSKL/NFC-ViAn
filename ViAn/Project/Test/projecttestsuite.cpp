@@ -1,5 +1,20 @@
 #include "projecttestsuite.h"
 
+//#include <QJsonObject>
+////vian
+#include "Project/Analysis/basicanalysis.h"
+#include "Project/bookmark.h"
+#include "Project/project.h"
+#include "Project/video.h"
+#include "Project/videoproject.h"
+
+////QT
+#include <QDir>
+#include <QTemporaryDir>
+#include <QTest>
+
+#include <memory>
+
 ProjectTestsuite::ProjectTestsuite(QObject *parent) : QObject(parent) {
 }
 

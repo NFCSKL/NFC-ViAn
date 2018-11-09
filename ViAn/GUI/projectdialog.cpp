@@ -1,12 +1,14 @@
 #include "projectdialog.h"
-#include <QSize>
-#include <QPushButton>
-#include <QBoxLayout>
-#include <QFormLayout>
-#include <QFileDialog>
-#include <QMessageBox>
 
+#include <QBoxLayout>
 #include <QDebug>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+
 
 /**
  * @brief ProjectDialog::ProjectDialog
@@ -15,6 +17,7 @@
  */
 ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent, QString default_path) : QDialog(parent) {
     setWindowTitle("Save project as");
+    setMinimumSize(400,110);
     setModal(true);
     m_name = name;
     m_path = path;
@@ -84,6 +87,7 @@ void ProjectDialog::ok_btn_clicked() {
     if (pathFile.exists()) {
         // Create confirmation dialog since the path already exists
         QMessageBox msg_box;
+        msg_box.setMinimumSize(370,120);
         msg_box.setModal(true);
         msg_box.setText("This project already exist. Are you sure you want to continue?");
         msg_box.setInformativeText("Open will open the existing project.");

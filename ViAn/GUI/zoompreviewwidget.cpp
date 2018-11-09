@@ -1,5 +1,10 @@
 #include "zoompreviewwidget.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include <QDebug>
+#include <QPainter>
+#include <QResizeEvent>
 
 /**
  * @brief zoompreviewwidget::center_image
@@ -69,11 +74,21 @@ void ZoomPreviewWidget::frame_update(cv::Mat preview_image) {
 }
 
 /**
+ * @brief ZoomPreviewWidget::clean_zoom_widget
+ * Clean the zoom preview widget from the last image and paint in to the background color
+ */
+void ZoomPreviewWidget::clean_zoom_widget() {
+    _qimage = QImage(_tmp.cols, _tmp.rows, QImage::Format_RGB32);
+    _qimage.fill(QColor(240, 240, 240));
+    QSize s = _qimage.size();
+    center_image(s);
+    update();
+}
+
+/**
  * @brief ZoomPreviewWidget::on_floating_changed
  * @param is_floating
  */
 void ZoomPreviewWidget::on_floating_changed(const bool is_floating) {
     center_along_xy = is_floating;
 }
-
-

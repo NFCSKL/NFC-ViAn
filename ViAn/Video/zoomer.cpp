@@ -1,7 +1,8 @@
 #include "zoomer.h"
-#include "utility.h"
-#include <math.h>
+
 #include <QDebug>
+#include <cmath>
+
 
 const double Zoomer::DEGREES_TO_RADIANS_FACTOR = M_PI / 180;
 

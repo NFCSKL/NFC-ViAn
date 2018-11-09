@@ -1,10 +1,10 @@
 #ifndef TAGDIALOG_H
 #define TAGDIALOG_H
-#include <QWidget>
+
 #include <QDialog>
-#include <QLineEdit>
-#include <QDialogButtonBox>
-#include <QFormLayout>
+
+class QDialogButtonBox;
+class QLineEdit;
 
 /**
  * @brief The TagDialog class

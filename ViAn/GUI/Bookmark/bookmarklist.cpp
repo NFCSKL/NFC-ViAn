@@ -1,17 +1,22 @@
-#include "bookmarkwidget.h"
-#include "bookmarkitem.h"
 #include "bookmarklist.h"
-#include "imagegenerator.h"
+
+#include "bookmarkcategory.h"
 #include "bookmarkdialog.h"
-#include <QAction>
-#include <QMenu>
-#include <QMimeData>
-#include <QDrag>
+#include "bookmarkitem.h"
+#include "bookmarkwidget.h"
+#include "imagegenerator.h"
+#include "Project/video.h"
+#include "Project/videoproject.h"
+
 #include <QApplication>
-#include <algorithm>
-#include <QShortcut>
-#include <QMessageBox>
 #include <QDebug>
+#include <QDrag>
+#include <QDropEvent>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMimeData>
+#include <QShortcut>
+
 
 BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* parent) : QListWidget(parent) {
     m_accept_container = accept_container;
@@ -210,6 +215,7 @@ void BookmarkList::rename_item(){
 void BookmarkList::remove_item() {
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
+    msg_box.setMinimumSize(315,125);
     msg_box.setText("Deleting item\n"
                     "this will delete all bookmarks in the categories");
     msg_box.setInformativeText("Are you sure?");

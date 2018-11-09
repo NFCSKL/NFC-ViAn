@@ -1,5 +1,7 @@
 #include "utility.h"
 
+#include <QDir>
+
 /**
  * @brief Utility::size_ratio
  * calculates and returns the height and width ratios between the two QSize objects

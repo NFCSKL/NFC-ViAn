@@ -1,18 +1,14 @@
 #ifndef DRAWINGWIDGET_H
 #define DRAWINGWIDGET_H
 
-#include <QWidget>
-#include <QTreeWidget>
-#include "Video/overlay.h"
-#include "Project/project.h"
-#include "DrawingItems/frameitem.h"
-#include "DrawingItems/rectitem.h"
-#include "DrawingItems/circleitem.h"
-#include "DrawingItems/lineitem.h"
-#include "DrawingItems/arrowitem.h"
-#include "DrawingItems/textitem.h"
-#include "DrawingItems/penitem.h"
+#include "Project/video.h"
 
+#include <QTreeWidget>
+
+class FrameItem;
+class Overlay;
+class Shapes;
+class VideoProject;
 
 class DrawingWidget : public QTreeWidget
 {
