@@ -15,7 +15,6 @@ private:
     QPoint anchor{0, 0};
 
     bool center_along_xy{false}; // If false the image will only be centered along the x-axis
-
     void center_image(const QSize& s);
 
 public:
@@ -24,6 +23,8 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent * event) override;
 
 signals:
     void window_size(QSize s);

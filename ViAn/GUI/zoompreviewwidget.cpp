@@ -19,6 +19,10 @@ void ZoomPreviewWidget::center_image(const QSize &s) {
     }
 }
 
+void ZoomPreviewWidget::handle_mouse(const QPoint &pos) {
+    qDebug() << pos;
+}
+
 ZoomPreviewWidget::ZoomPreviewWidget(QWidget *parent) : QWidget(parent) {
     setMinimumSize(QSize(200,100));
 }
@@ -41,6 +45,14 @@ void ZoomPreviewWidget::paintEvent(QPaintEvent *event) {
  */
 void ZoomPreviewWidget::resizeEvent(QResizeEvent *event) {
     emit window_size(event->size());
+}
+
+void ZoomPreviewWidget::mousePressEvent(QMouseEvent *event) {
+    handle_mouse(event->pos());
+}
+
+void ZoomPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
+    handle_mouse(event->pos());
 }
 
 /**
