@@ -54,6 +54,7 @@ public:
 
     void read(const QJsonObject& json) override;
     void write(QJsonObject& json) override;
+    void reset_root_dir(const std::string &dir);
 };
 
 #endif // IMAGESEQUENCE_H

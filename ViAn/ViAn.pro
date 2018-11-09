@@ -30,7 +30,6 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarklist.cpp \
     GUI/statusbar.cpp \
     GUI/Analysis/analysiswidget.cpp \
-    GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
     Project/projecttreestate.cpp \
     GUI/Analysis/tagdialog.cpp \
@@ -72,24 +71,19 @@ SOURCES += main.cpp \
     GUI/DrawingItems/shapeitem.cpp \
     GUI/DrawingItems/textitem.cpp \
     GUI/DrawingItems/penitem.cpp \
-    Project/Analysis/drawingtag.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
     Project/Test/bookmarktest.cpp \
     GUI/textdialog.cpp \
     GUI/TreeItems/tagframeitem.cpp \
     Project/Analysis/interval.cpp \
     Project/Analysis/tagframe.cpp \
-    Project/imagesequence.cpp \
     GUI/TreeItems/sequenceitem.cpp \
     GUI/Analysis/anasettingwidget.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
     GUI/Analysis/analysislistitem.cpp \
-    GUI/Bookmark/myinputdialog.cpp \
-    GUI/Analysis/anasettingwidget.cpp \
     Project/imagesequence.cpp \
-    GUI/TreeItems/sequenceitem.cpp \
     GUI/TreeItems/sequencecontaineritem.cpp
 
 #
@@ -111,7 +105,6 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
     GUI/Analysis/analysiswidget.h \
-    GUI/manipulatordialog.h \
     Video/frameprocessor.h \
     Project/projecttreestate.h \
     GUI/Analysis/tagdialog.h \
@@ -152,25 +145,20 @@ HEADERS += reportgenerator.h\
     GUI/DrawingItems/shapeitem.h \
     GUI/DrawingItems/textitem.h \
     GUI/DrawingItems/penitem.h \
-    Project/Analysis/drawingtag.h \
     GUI/TreeItems/drawingtagitem.h \
     Project/Test/bookmarktest.h \
     GUI/textdialog.h \
     GUI/TreeItems/tagframeitem.h \
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
-    Project/imagesequence.h \
     GUI/TreeItems/sequenceitem.h \
     GUI/Analysis/anasettingwidget.h \
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
     GUI/Analysis/analysislistitem.h \
-    GUI/Bookmark/myinputdialog.h \
-    GUI/Analysis/anasettingwidget.h \
     Project/imagesequence.h \
     Project/video.h \
-    GUI/TreeItems/sequenceitem.h \
     GUI/TreeItems/sequencecontaineritem.h
 
 #
@@ -207,7 +195,6 @@ SOURCES += \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
     Video/shapes/text.cpp \
-    Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
 HEADERS += \
@@ -218,7 +205,6 @@ HEADERS += \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
     Video/shapes/text.h \
-    Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h \
     Video/framemanipulator.h
 

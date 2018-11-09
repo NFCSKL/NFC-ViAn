@@ -1,5 +1,7 @@
 #include "imagesequence.h"
+#include "project.h"
 #include <algorithm>
+#include <QDebug>
 
 /**
  * @brief ImageSequence::update
@@ -15,7 +17,7 @@ void ImageSequence::update() {
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
         if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
             if (!remove_image_from_disc((*it).first))
-                qWarning() << "failed to remove";
+                qDebug() << "failed to remove";
         }
     }
     m_saved_order = m_unsaved_order;
@@ -290,4 +292,9 @@ void ImageSequence::reorder_elem(const int &from, const int &to) {
     Q_UNUSED(from);
     Q_UNUSED(to);
     Q_UNIMPLEMENTED();
+}
+
+void ImageSequence::reset_root_dir(const std::string &dir) {
+    m_seq_path = dir + Project::SEQUENCE_FOLDER +  Utility::name_from_path(m_seq_path);
+    file_path = m_seq_path + "/" + get_pattern_name();
 }
