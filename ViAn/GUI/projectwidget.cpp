@@ -314,12 +314,16 @@ void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (frame < temp->get_frame()) {
             m_tag_item->insertChild(i, tf_item);
+            blockSignals(true);
             setCurrentItem(tf_item);
+            blockSignals(false);
             return;
         }
     }
     m_tag_item->addChild(tf_item);
+    blockSignals(true);
     setCurrentItem(tf_item);
+    blockSignals(false);
 }
 
 /**
@@ -896,7 +900,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
     } case INTERVAL_ITEM: {
         IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
-
+        update_current_tag(vid_item);
         emit marked_basic_analysis(interval_item->get_interval());
 
         m_interval_item = interval_item;
@@ -919,6 +923,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
     } case INTERVAL_AREA_ITEM: {
         IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        update_current_tag(vid_item);
+
         emit set_video_project(vid_item->get_video_project());
 
         emit set_zoom_tool();

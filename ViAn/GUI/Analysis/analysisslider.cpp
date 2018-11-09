@@ -197,15 +197,6 @@ void AnalysisSlider::set_show_ana_interval(bool show) {
 }
 
 /**
- * @brief AnalysisSlider::set_interval
- * @param start
- * @param end
- */
-void AnalysisSlider::set_interval(int start, int end) {
-    m_interval = std::make_pair(start, end);
-}
-
-/**
  * @brief AnalysisSlider::clear_interval
  */
 void AnalysisSlider::clear_interval() {

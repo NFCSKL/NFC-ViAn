@@ -714,7 +714,7 @@ void VideoWidget::create_interval_clicked() {
     }
     m_current_interval->add_area(first, second);
     emit set_interval_area(first);
-    emit set_status_bar("Interval: " + QString::number(first) +
+    emit set_status_bar("Interval: " + QString::number(first) + " - " +
                         QString::number(second) + " added");
     delete_interval();
 }
@@ -1006,6 +1006,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
+        delete_interval();
 
         // Set state variables but don't update the processor
         {
@@ -1036,10 +1037,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
             on_new_frame();
         }
     }
-    m_interval = std::make_pair(-1,-1);
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
-    playback_slider->set_interval(-1, -1);
     emit update_manipulator_wgt(state.brightness, state.contrast, state.gamma);
 }
 
@@ -1073,7 +1072,7 @@ void VideoWidget::clear_current_video() {
     playback_slider->setValue(frame);
     playback_slider->blockSignals(false);
     play_btn->setChecked(false);
-    playback_slider->set_interval(-1, -1);
+    delete_interval();
     set_total_time(0);
     fps_label->setText("Fps: -");
     max_frames->setText("/ -");
