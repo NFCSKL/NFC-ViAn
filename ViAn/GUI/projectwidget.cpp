@@ -1177,7 +1177,6 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
 }
 
 void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
-    qDebug() << "Removing sequnce item";
     SequenceItem* seq_item = dynamic_cast<SequenceItem*>(item);
     if (seq_item) {
         seq_item->remove();
@@ -1310,7 +1309,6 @@ bool ProjectWidget::save_project() {
 
     for (auto v_proj : removed_sequences) {
         auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
-        qDebug() << "deleting " << QString::fromStdString(seq->get_search_path());
         QDir directory(QString::fromStdString(seq->get_search_path()));
         directory.removeRecursively();
         delete v_proj;
@@ -1434,7 +1432,6 @@ bool ProjectWidget::close_project() {
                 auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
                 if (sequence->never_saved()) {
                     // Remove sequences that have never been saved
-                    qDebug() << "deleting " << QString::fromStdString(sequence->get_search_path());
                     QDir directory(QString::fromStdString(sequence->get_search_path()));
                     directory.removeRecursively();
                 } else if (!sequence->is_saved()) {
@@ -1450,7 +1447,6 @@ bool ProjectWidget::close_project() {
     if (!m_proj->is_saved()) {
         for (auto v_proj : removed_sequences) {
             auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
-            qDebug() << "Reverting changes made on " << QString::fromStdString(seq->get_search_path());
             seq->revert();
             delete v_proj;
         }

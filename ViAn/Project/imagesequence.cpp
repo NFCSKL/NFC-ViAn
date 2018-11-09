@@ -2,17 +2,20 @@
 #include <algorithm>
 
 /**
- * @brief ImageSequence::on_save
- * Should be called when the sequence is saved.
- * Updates the order tracking variables
+ * @brief ImageSequence::update
+ * Updates the variables that keeps track of sequence changes.
+ * If a file hash is stored in the saved order but not in the unsaved order
+ * that file will be removed.
+ *
+ * This function is meant to be called before saving to file
  */
 void ImageSequence::update() {
     // If a hash from the saved order no longer exists in the unsaved order the file should be removed.
+    // If this happens the file should be saved as its hash instead of index
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
         if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
-            qDebug() << QString::fromStdString((*it).first);
-            if (!remove_image_from_disc(Utility::zfill((*it).first, INDEX_LENGTH)))
-                qDebug() << "failed to remove";
+            if (!remove_image_from_disc((*it).first))
+                qWarning() << "failed to remove";
         }
     }
     m_saved_order = m_unsaved_order;
@@ -50,6 +53,7 @@ ImageSequence::ImageSequence(const std::string& path, const std::vector<std::str
 
 /**
  * @brief ImageSequence::get_search_path
+ * Returns the absolute path to the parent folder of the images.
  * @return std::string with the actual disc path to the folder containing the images
  */
 std::string ImageSequence::get_search_path() const {
@@ -87,6 +91,7 @@ std::map<std::string, int> ImageSequence::get_unsaved_order() const {
 
 /**
  * @brief ImageSequence::get_unsaved_hashes
+ * CURRENTLY NOT USED
  * Returns a vector of all checksums for the files that has been added but are unsaved.
  * @return
  */
@@ -102,6 +107,7 @@ std::vector<std::string> ImageSequence::get_unsaved_hashes() const {
 
 /**
  * @brief ImageSequence::get_index_of_hash
+ * Returns the image index for the given file hash
  * @param hash: file hash/checksum
  * @return int the index in of the hash in the unsaved order
  */
@@ -110,7 +116,7 @@ int ImageSequence::get_index_of_hash(const std::string &hash) const {
 }
 
 /**
- * @brief ImageSequence::get_hash_origin
+ * @brief ImageSequence::get_original_name_from_hash
  * Returns the path to the original file mapped to the hash/checksum
  * @param hash
  * @return std::string containing original image path
@@ -203,7 +209,6 @@ int ImageSequence::length(){
  * If the sequence never has been saved all files will be removed.
  */
 void ImageSequence::revert() {
-    qDebug() << "Reverting sequence changes";
     QString base_path = QString::fromStdString(m_seq_path + "/");
     // Rename all files currently in the sequence to their file hash
     for (auto it = m_unsaved_order.begin(); it != m_unsaved_order.end(); ++it) {
@@ -212,14 +217,13 @@ void ImageSequence::revert() {
 
         // Remove file if it does not exist in the saved order
         // i.e remove unsaved files
-            qDebug() << "Checking file with hash: " << QString::fromStdString((*it).first);
         if (m_saved_order.find((*it).first) == m_saved_order.end())
-            qDebug() << "Removed: " << QFile::remove(base_path + QString::fromStdString((*it).first));
+            QFile::remove(base_path + QString::fromStdString((*it).first));
     }
 
     // Rename all file to the indices stored in the saved order
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
-        qDebug() << QFile::rename(base_path + QString::fromStdString((*it).first),
+        QFile::rename(base_path + QString::fromStdString((*it).first),
                       base_path + QString::fromStdString(Utility::zfill((*it).second, INDEX_LENGTH)));
     }
 

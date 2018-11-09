@@ -48,10 +48,11 @@ int Utility::number_of_digits(int n) {
  */
 std::string Utility::zfill(std::string number, int length) {
     length -= number.length();
-    if (length)
+    if (length){
         return std::string(length, '0').append(number);
-    else
+    } else {
         return number;
+    }
 }
 
 std::string Utility::zfill(const int& number, int length){
