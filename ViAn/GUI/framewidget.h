@@ -53,6 +53,12 @@ class FrameWidget : public QWidget
     double m_scale_factor = 1;
     int m_rotation = 0;
 
+    const int DEGREE_MIN = 0;
+    const int DEGREE_90 = 90;
+    const int DEGREE_180 = 180;
+    const int DEGREE_270 = 270;
+    const int DEGREE_MAX = 360;
+
     std::pair<double, double> panning_tracker {}; // Track when to actually pan. Based on current zoom level
 
 public:

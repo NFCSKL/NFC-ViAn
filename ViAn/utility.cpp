@@ -165,7 +165,6 @@ QRect Utility::from_cvrect(cv::Rect rect) {
  * @return              : Rotated point
  */
 QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
-    const double DEGREE_TO_RADIAN_FACTOR = M_PI / 180;
     double angle = rotation*DEGREE_TO_RADIAN_FACTOR;
 
     // Translate by negative pivot of old frame size
