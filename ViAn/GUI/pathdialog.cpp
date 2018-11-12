@@ -1,6 +1,7 @@
 #include "pathdialog.h"
 
 #include "utility.h"
+#include "viewpathdialog.h"
 
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -36,6 +37,8 @@ PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path)
     QLabel* text = new QLabel("File was not found in the saved path or could not be read.\nIt might have been moved.\nEnter the new path to the file.");
     layout->addWidget(text);
     layout->addRow("Path:", browse_layout);
+    QPushButton* path_btn = new QPushButton(tr("Mange paths..."), this);
+    layout->addWidget(path_btn);
 
     btn_box = new QDialogButtonBox(Qt::Horizontal);
     btn_box->addButton(QDialogButtonBox::Ok);
@@ -47,6 +50,7 @@ PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path)
 
     connect(browse_btn, &QPushButton::clicked, this, &PathDialog::browse_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &PathDialog::ok_btn_clicked);
+    connect(path_btn, &QPushButton::clicked, this, &PathDialog::path_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &PathDialog::cancel_btn_clicked);
 }
 
@@ -64,6 +68,11 @@ void PathDialog::browse_btn_clicked() {
     if(!file.isEmpty()) {
         path_text->setText(file);
     }
+}
+
+void PathDialog::path_btn_clicked() {
+    close();
+    emit open_view_path_dialog();
 }
 
 void PathDialog::ok_btn_clicked() {

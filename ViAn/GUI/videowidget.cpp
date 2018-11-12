@@ -1152,6 +1152,7 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  */
 void VideoWidget::capture_failed() {
     PathDialog* dialog = new PathDialog(&m_video_path);
+    connect(dialog, &PathDialog::open_view_path_dialog, this, &VideoWidget::open_view_path_dialog);
 
     int status = dialog->exec();
 

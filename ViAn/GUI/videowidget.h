@@ -121,6 +121,7 @@ signals:
     void set_status_bar(QString);
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
+    void open_view_path_dialog();
     void zoom_preview(cv::Mat preview_frame);
     void update_videoitem(std::string);
     void update_manipulator_wgt(int, double, double);

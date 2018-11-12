@@ -26,7 +26,10 @@ public:
 private slots:
     void ok_btn_clicked();
     void browse_btn_clicked();
+    void path_btn_clicked();
     void cancel_btn_clicked();
+signals:
+    void open_view_path_dialog();
 };
 
 #endif // PATHDIALOG_H

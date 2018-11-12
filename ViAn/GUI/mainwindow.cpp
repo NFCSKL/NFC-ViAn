@@ -261,6 +261,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::update_manipulator_wgt, manipulator_wgt, &ManipulatorWidget::set_values);
     connect(video_wgt, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
     connect(analysis_wgt, &AnalysisWidget::name_in_tree, project_wgt, &ProjectWidget::set_tree_item_name);
+    connect(video_wgt, &VideoWidget::open_view_path_dialog, this, &MainWindow::view_paths);
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
