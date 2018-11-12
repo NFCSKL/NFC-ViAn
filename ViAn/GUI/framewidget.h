@@ -19,14 +19,12 @@ class FrameWidget : public QWidget
     Q_OBJECT
     QPainter* painter;
     QSize m_scroll_area_size;
-    cv::Rect original_rect; // Contains the size of the unmodified frame
 
     std::vector<cv::Rect> ooi_rects;
     cv::Rect bounding_box;
 
     SHAPES m_tool = ZOOM;
     QColor overlay_color = Qt::red;
-    cv::Mat current_frame;
     Shapes* copied_item = nullptr;
     Analysis* m_analysis = nullptr;
     AnalysisProxy* current_analysis = nullptr;
@@ -53,6 +51,13 @@ class FrameWidget : public QWidget
 
     int current_frame_nr = 0;
     double m_scale_factor = 1;
+    int m_rotation = 0;
+
+    const int DEGREE_MIN = 0;
+    const int DEGREE_90 = 90;
+    const int DEGREE_180 = 180;
+    const int DEGREE_270 = 270;
+    const int DEGREE_MAX = 360;
 
     std::pair<double, double> panning_tracker {}; // Track when to actually pan. Based on current zoom level
 
@@ -101,6 +106,7 @@ public slots:
     void set_overlay_color(QColor color);
     void set_anchor(QPoint);
     void set_scale_factor(double scale_factor);
+    void set_rotation(int rotation);
     void update();
 protected:
     QImage _qimage;
@@ -121,10 +127,12 @@ private:
     void set_rect_start(QPoint pos);
     void set_analysis_settings();
     void panning(QPoint pos);
+    QPoint rotate(QPoint pos, int rotation, bool swap);
     QPoint rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
-    QPoint scale_point(QPoint pos);
+    QPoint scale_to_video(QPoint pos);
+    QPoint scale_to_view(QPoint pos, bool rotate = true);
 };
 
 #endif // FRAMEWIDGET_H

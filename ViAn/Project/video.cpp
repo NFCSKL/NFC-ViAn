@@ -34,6 +34,19 @@ bool Video::is_sequence() {
     return m_is_sequence;
 }
 
+int Video::get_width() {
+    return m_width;
+}
+
+int Video::get_height() {
+    return m_height;
+}
+
+void Video::set_size(int width, int height) {
+    m_width = width;
+    m_height = height;
+}
+
 /**
  * @brief operator ==
  * @param v1

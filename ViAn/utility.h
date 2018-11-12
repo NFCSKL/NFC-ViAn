@@ -22,6 +22,10 @@ namespace Utility{
      cv::Point from_qpoint(QPoint point);
      cv::Rect from_qrect(QRect rect);
      QRect from_cvrect(cv::Rect rect);
+
+     QPoint rotate(QPoint pos, int rotation, int width, int height);
+
+     const double DEGREE_TO_RADIAN_FACTOR = M_PI / 180;
 }
 
 #endif // UTILITY_H

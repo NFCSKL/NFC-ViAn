@@ -1,5 +1,7 @@
 #include "text.h"
 
+#include "utility.h"
+
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <QPoint>
@@ -41,10 +43,12 @@ cv::Mat Text::draw(cv::Mat &frame) {
     return frame;
 }
 
-cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
-    Q_UNUSED (anchor)
-    Q_UNUSED (scale_factor)
-    return draw(frame);
+cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+    Q_UNUSED(anchor) Q_UNUSED(scale_factor)
+    QPoint rot_start = Utility::rotate(Utility::from_cvpoint(draw_start), angle, width, height);
+    cv::putText(frame, m_name.toStdString(), Utility::from_qpoint(rot_start), cv::FONT_HERSHEY_SIMPLEX, font_scale,
+                color, thickness);
+    return frame;
 }
 
 /**

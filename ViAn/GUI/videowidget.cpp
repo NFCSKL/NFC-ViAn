@@ -214,6 +214,7 @@ void VideoWidget::init_frame_processor() {
         connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+        connect(f_processor, &FrameProcessor::set_rotation, frame_wgt, &FrameWidget::set_rotation);
         connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
         connect(f_processor, &FrameProcessor::set_zoom_state, this, &VideoWidget::set_zoom_state);
         connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
@@ -1152,6 +1153,7 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
+    m_vid_proj->get_video()->set_size(video_width, video_height);
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;
