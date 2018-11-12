@@ -20,6 +20,7 @@
 #include "Project/videoproject.h"
 #include "projectdialog.h"
 #include "utility.h"
+#include "viewpathdialog.h"
 
 
 #include <QAction>
@@ -1345,6 +1346,15 @@ bool ProjectWidget::open_project(QString project_path) {
 
         if (vid_proj->get_video()->is_sequence()) break;
         video_list.push_back(vid_proj->get_video());
+    }
+    ViewPathDialog* path_dialog = new ViewPathDialog(video_list);
+    // If not all paths in the project are valid, open the Viewpathdialog
+    if (!path_dialog->all_valid()) {
+        int status = path_dialog->exec();
+
+        if (status == path_dialog->Accepted) {
+            update_videoitems();
+        }
     }
     return true;
 }

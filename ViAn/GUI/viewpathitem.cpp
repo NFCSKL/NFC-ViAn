@@ -28,6 +28,10 @@ void ViewPathItem::set_name(QString name) {
     is_changed = true;
 }
 
+void ViewPathItem::set_valid(bool valid) {
+    m_valid = valid;
+}
+
 QString ViewPathItem::get_path() {
     return m_full_path;
 }
@@ -42,6 +46,10 @@ QString ViewPathItem::get_name() {
 
 bool ViewPathItem::is_item_changed() {
     return is_changed;
+}
+
+bool ViewPathItem::is_valid() {
+    return m_valid;
 }
 
 void ViewPathItem::update_video() {

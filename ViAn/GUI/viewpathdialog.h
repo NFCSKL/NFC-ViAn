@@ -26,6 +26,8 @@ class ViewPathDialog : public QDialog
 public:
     ViewPathDialog(std::vector<Video*> video_list, QWidget* parent = nullptr);
 
+    bool all_valid();
+
 private:
     void add_paths(QTreeWidget *tree);
     void set_icon(ViewPathItem *item);

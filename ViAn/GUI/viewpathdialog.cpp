@@ -3,6 +3,7 @@
 #include "Project/video.h"
 #include "viewpathitem.h"
 
+#include <QDebug>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QFile>
@@ -92,9 +93,25 @@ void ViewPathDialog::set_icon(ViewPathItem* item) {
     QFile load_file(item->get_path());
     if (load_file.open(QIODevice::ReadOnly)) {     // Attempt to open file
         item->setIcon(0, check_icon);
+        item->set_valid(true);
     } else {
         item->setIcon(0, cross_icon);
+        item->set_valid(false);
     }
+}
+
+/**
+ * @brief ViewPathDialog::all_valid
+ * Returns if all the videopaths are valid
+ * That means the video file in the path can be read.
+ * @return
+ */
+bool ViewPathDialog::all_valid() {
+    for (auto i = 0; i < path_list->topLevelItemCount(); ++i) {
+        ViewPathItem* vp_item = dynamic_cast<ViewPathItem*>(path_list->topLevelItem(i));
+        if (!vp_item->is_valid()) return false;
+    }
+    return true;
 }
 
 /**
