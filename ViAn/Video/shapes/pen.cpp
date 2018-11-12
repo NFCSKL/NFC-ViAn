@@ -1,5 +1,7 @@
 #include "pen.h"
 
+#include "utility.h"
+
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <QJsonArray>
@@ -49,14 +51,16 @@ cv::Mat Pen::draw(cv::Mat &frame) {
  * @param scale_factor - Zoom factor, used to scale drawing.
  * @return Returns the frame with drawing.
  */
-cv::Mat Pen::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) {
+cv::Mat Pen::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
     cv::Point p(-1, -1);
     for (auto point : points) {
         if (p.x < 0 || p.y < 0) {
             p = point;
             continue;
         }
-        cv::line(frame, (p-anchor)*scale_factor, (point-anchor)*scale_factor, color, thickness);
+        QPoint rot_start = Utility::rotate(Utility::from_cvpoint(p), angle, width, height);
+        QPoint rot_end = Utility::rotate(Utility::from_cvpoint(point), angle, width, height);
+        cv::line(frame, (Utility::from_qpoint(rot_start)-anchor)*scale_factor, (Utility::from_qpoint(rot_end)-anchor)*scale_factor, color, thickness);
         p = point;
     }
     return frame;
