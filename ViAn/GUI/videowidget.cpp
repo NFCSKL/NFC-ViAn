@@ -660,6 +660,7 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
  * @brief VideoWidget::on_bookmark_clicked
  */
 void VideoWidget::on_bookmark_clicked() {
+    if (frame_is_clean) return;
     BookmarkDialog dialog;
     bool ok = dialog.exec();
     bmark_description = dialog.textValue();
@@ -668,6 +669,7 @@ void VideoWidget::on_bookmark_clicked() {
 }
 
 void VideoWidget::quick_bookmark() {
+    if (frame_is_clean) return;
     cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
     cv::Mat org_frame = frame_wgt->get_org_frame();
     QString time = current_time->text();
@@ -781,7 +783,7 @@ void VideoWidget::tag_frame() {
         new_tag_clicked();
     }
 
-    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
+    if (m_tag != nullptr && !m_tag->is_drawing_tag() && !frame_is_clean) {
         if (m_tag->find_frame(playback_slider->value())) {
             QMessageBox msg_box;
             msg_box.setText("Do you wanna overwrite the tag?");
@@ -826,7 +828,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
-    if (!m_vid_proj) return;
+    if (!m_vid_proj || frame_is_clean) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, &TagDialog::tag_name, this, &VideoWidget::new_tag);
@@ -1033,6 +1035,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
+        frame_is_clean = false;
 
         // Set state variables but don't update the processor
         {
@@ -1166,6 +1169,7 @@ void VideoWidget::capture_failed() {
         emit update_videoitem(m_video_path);
     } else {
         frame_wgt->clear_frame();
+        frame_is_clean = true;
     }
 }
 
@@ -1507,6 +1511,7 @@ void VideoWidget::set_current_frame_size(QSize size) {
 }
 
 void VideoWidget::on_export_frame() {
+    if (frame_is_clean) return;
     int frame = frame_index.load();
     emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
     emit set_status_bar(QString("Frame %1 exported").arg(frame));

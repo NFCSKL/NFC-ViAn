@@ -268,6 +268,7 @@ private:
     Tag* m_tag = nullptr;
     bool m_floating = false;
     bool state_video = false;
+    bool frame_is_clean = false;
 
     bool tag_clicked = false;
 
