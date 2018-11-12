@@ -213,7 +213,7 @@ void FrameWidget::set_scale_factor(double scale_factor) {
 /**
  * @brief FrameWidget::set_rotation
  * Slot function for updating framewidget after rotation have been done
- * This will update the zoom rect coordinates
+ * Updates the zoom rectangle coordinates as well as the rotation held by the current video project state
  * @param rotation
  */
 void FrameWidget::set_rotation(int rotation) {
