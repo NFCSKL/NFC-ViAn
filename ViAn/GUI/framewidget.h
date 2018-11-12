@@ -50,6 +50,7 @@ class FrameWidget : public QWidget
     bool m_detections = false;
     bool show_detections = true;
     bool pan_rect = false;
+    bool frame_is_clear = false;
 
     int current_frame_nr = 0;
     double m_scale_factor = 1;
@@ -62,6 +63,7 @@ public:
     cv::Mat get_modified_frame() const;
     cv::Mat get_org_frame() const;
     void set_current_frame_nr(int);
+    void clear_frame();
 
 signals:
     void quick_analysis(AnalysisSettings* settings);

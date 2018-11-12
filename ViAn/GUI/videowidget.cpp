@@ -1164,6 +1164,8 @@ void VideoWidget::capture_failed() {
         }
         player_con.notify_all();
         emit update_videoitem(m_video_path);
+    } else {
+        frame_wgt->clear_frame();
     }
 }
 

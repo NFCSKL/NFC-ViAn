@@ -154,6 +154,7 @@ void FrameWidget::clear_analysis() {
 
 void FrameWidget::set_video_project(VideoProject* vid_proj) {
     m_vid_proj = vid_proj;
+    frame_is_clear = false;
 }
 
 /**
@@ -279,6 +280,7 @@ cv::Mat FrameWidget::get_org_frame() const {
 }
 
 void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_index) {
+    if (frame_is_clear) return;
     current_frame_nr = frame_index;
     current_frame = mod_image;
     m_org_image = org_image;
@@ -316,6 +318,11 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
 void FrameWidget::paintEvent(QPaintEvent *event) {
     Q_UNUSED (event)
     QPainter painter(this);
+    if (frame_is_clear) {
+        _qimage = QImage(m_scroll_area_size, QImage::Format_RGB32);
+        setFixedSize(_qimage.size());
+        _qimage.fill(QColor(0, 0, 0));
+    }
     painter.drawImage(QPoint(0,0), _qimage);
     // Draw the zoom box
     if (mark_rect) {
@@ -395,6 +402,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+    if (frame_is_clear) return;
     QPoint scaled_pos = scale_point(event->pos());
     emit mouse_double_click(scaled_pos);
 }
@@ -404,6 +412,7 @@ void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
+    if (frame_is_clear) return;
     // Pos when the frame is at 100%
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
@@ -454,6 +463,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
+    if (frame_is_clear) return;
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
@@ -478,6 +488,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
+    if (frame_is_clear) return;
     QPoint scaled_pos = scale_point(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
@@ -531,6 +542,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
+    if (frame_is_clear) return;
     QPoint scaled_pos = scale_point(event->pos());
     QPoint num_degree = event->angleDelta() / 8;
     QPoint num_steps = num_degree / 15;
@@ -666,4 +678,10 @@ void FrameWidget::end_panning() {
 void FrameWidget::end_zoom() {
     repaint();
     emit zoom_points(rect_start, rect_end);
+}
+
+void FrameWidget::clear_frame() {
+    frame_is_clear = true;
+    show_detections = false;
+    repaint();
 }
