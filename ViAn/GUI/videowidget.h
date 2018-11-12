@@ -78,8 +78,10 @@ private:
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
 
+    // TODO not really used
     int m_video_width = 0;
     int m_video_height = 0;
+
     int m_frame_rate = 0;
     int m_frame_length = 0;
 
