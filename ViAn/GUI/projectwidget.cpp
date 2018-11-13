@@ -396,11 +396,13 @@ void ProjectWidget::file_dropped(QString path) {
         int index = path.lastIndexOf('/') + 1;
         QString vid_name = path.right(path.length() - index);
 
-        VideoProject* vid_proj = new VideoProject(new Video(path.toStdString()));
+        Video* video = new Video(path.toStdString());
+        VideoProject* vid_proj = new VideoProject(video);
         m_proj->add_video_project(vid_proj);
         VideoItem* v_item = new VideoItem(vid_proj);
         insertTopLevelItem(topLevelItemCount(), v_item);
         vid_proj->set_tree_index(get_index_path(v_item));
+        video_list.push_back(video);
     }
 }
 
