@@ -819,6 +819,8 @@ void MainWindow::view_paths() {
 
     if (status == path_dialog->Accepted) {
         emit update_videoitems();
+        video_wgt->get_current_video_project()->set_current(false);
+        project_wgt->currentItemChanged(project_wgt->currentItem(), project_wgt->currentItem());
     }
 }
 

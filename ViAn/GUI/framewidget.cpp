@@ -154,7 +154,6 @@ void FrameWidget::clear_analysis() {
 
 void FrameWidget::set_video_project(VideoProject* vid_proj) {
     m_vid_proj = vid_proj;
-    frame_is_clear = false;
 }
 
 /**
@@ -346,7 +345,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     if (frame_is_clear) {
         _qimage = QImage(m_scroll_area_size, QImage::Format_RGB32);
         setFixedSize(_qimage.size());
-        _qimage.fill(QColor(0, 0, 0));
     }
     painter.drawImage(QPoint(0,0), _qimage);
     // Draw the zoom box
@@ -745,8 +743,6 @@ void FrameWidget::end_zoom() {
     emit zoom_points(rect_start, rect_end);
 }
 
-void FrameWidget::clear_frame() {
-    frame_is_clear = true;
-    show_detections = false;
-    repaint();
+void FrameWidget::clear_frame(bool value) {
+    frame_is_clear = value;
 }

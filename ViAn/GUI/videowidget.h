@@ -186,6 +186,7 @@ public slots:
     void mouse_moved(QPoint pos, bool shift, bool ctrl);
     void mouse_scroll(QPoint pos);
     void set_current_drawing(Shapes* shape);
+    void set_no_video();
     void process_frame();
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);

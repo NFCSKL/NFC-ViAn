@@ -60,6 +60,7 @@ void FrameProcessor::check_events() {
 
         // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
+            m_o_settings->no_video = false;
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
@@ -159,7 +160,12 @@ void FrameProcessor::process_frame() {
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame;
     try {
-        manipulated_frame = m_frame.clone();
+        if (m_o_settings->no_video) {
+            cv::Mat image(m_frame.rows, m_frame.cols, CV_8UC3, cv::Scalar(0,0,0));
+            manipulated_frame = image;
+        } else {
+            manipulated_frame = m_frame.clone();
+        }
     } catch (cv::Exception& e) {
         qWarning() << "Failed to copy new frame in processor";
         return;

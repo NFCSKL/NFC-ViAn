@@ -68,7 +68,7 @@ public:
     cv::Mat get_modified_frame() const;
     cv::Mat get_org_frame() const;
     void set_current_frame_nr(int);
-    void clear_frame();
+    void clear_frame(bool value);
 
 signals:
     void quick_analysis(AnalysisSettings* settings);

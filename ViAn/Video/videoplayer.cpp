@@ -55,6 +55,7 @@ void VideoPlayer::load_video() {
 
     if (!m_capture.open(*m_video_path)) {
         emit capture_failed();
+        emit video_info(0,0,0,0);
         qWarning() << "Failed to open video at " << m_video_path->c_str();
         return;
     }

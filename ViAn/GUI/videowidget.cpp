@@ -1037,6 +1037,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
         frame_is_clean = false;
+        frame_wgt->clear_frame(false);
 
         // Set state variables but don't update the processor
         {
@@ -1066,6 +1067,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (state.frame > -1) {
             on_new_frame();
         }
+        set_video_btns(!frame_is_clean);
     }
     m_interval = std::make_pair(0,0);
     set_status_bar("Video loaded");
@@ -1169,8 +1171,12 @@ void VideoWidget::capture_failed() {
         player_con.notify_all();
         emit update_videoitem(m_video_path);
     } else {
-        frame_wgt->clear_frame();
+        frame_wgt->clear_frame(true);
         frame_is_clean = true;
+        set_video_btns(false);
+
+        // Set variable and send to processor
+        set_no_video();
     }
 }
 
@@ -1197,9 +1203,14 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     playback_slider->setValue(current_frame_index);
     playback_slider->blockSignals(false);
 
-    set_total_time((last_frame + 1) / frame_rate);
-    set_current_time(current_frame_index / m_frame_rate);
-    fps_label->setText(QString::number(m_frame_rate) + "fps");
+    if (frame_rate != 0) {
+        set_total_time((last_frame + 1) / frame_rate);
+        set_current_time(current_frame_index / frame_rate);
+    } else {
+        set_total_time(0);
+        set_current_time(0);
+    }
+    fps_label->setText(QString::number(frame_rate) + "fps");
     size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
     max_frames->setText("/ " + QString::number(last_frame));
 
@@ -1320,6 +1331,12 @@ void VideoWidget::set_current_drawing(Shapes* shape) {
     update_overlay_settings([&](){
         o_settings.set_current_drawing = true;
         o_settings.shape = shape;
+    });
+}
+
+void VideoWidget::set_no_video() {
+    update_overlay_settings([&](){
+        o_settings.no_video = true;
     });
 }
 
