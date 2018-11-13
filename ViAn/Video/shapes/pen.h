@@ -9,7 +9,7 @@ public:
     Pen(QColor col, QPoint pos);
     ~Pen() override;
     cv::Mat draw(cv::Mat &frame) override;
-    cv::Mat draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor) override;
+    cv::Mat draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) override;
     void handle_new_pos(QPoint pos) override;
     void move_shape(QPoint p) override;
     void write(QJsonObject& json) override;

@@ -79,8 +79,10 @@ private:
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
 
+    // TODO not really used
     int m_video_width = 0;
     int m_video_height = 0;
+
     int m_frame_rate = 0;
     int m_frame_length = 0;
 
@@ -144,6 +146,7 @@ public slots:
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
     void analysis_play_btn_toggled(bool value);
+    void display_index_slot();
     void on_new_frame();
     void on_playback_slider_pressed(void);
     void on_playback_slider_released(void);
