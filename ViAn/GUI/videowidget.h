@@ -149,6 +149,7 @@ public slots:
     void prev_poi_btn_clicked(void);
     void analysis_play_btn_toggled(bool value);
     void set_slider_max(int value);
+    void display_index_slot();
     void on_new_frame();
     void on_playback_slider_pressed(void);
     void on_playback_slider_released(void);

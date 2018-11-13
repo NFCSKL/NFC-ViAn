@@ -57,8 +57,11 @@ public:
     // POI functions
     bool is_in_POI(int frame);
     int get_next_poi_start(int curr_frame);
-    int get_next_poi_end(int frame);
+    bool is_poi_start(int frame);
+    bool is_poi_end(int frame);
     int get_prev_poi_start(int curr_frame);
+    int get_prev_poi_end(int curr_frame);
+    int get_closest_poi(int curr_frame);
 
     const int PAGE_STEP = 10;
 
