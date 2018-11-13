@@ -16,7 +16,7 @@ Video::Video(const bool& is_sequence){
 Video::Video(std::string file_path, const bool& is_sequence){
     m_is_sequence = is_sequence;
     this->file_path = file_path;
-    int index = file_path.find_last_of('/') + 1;
+    auto index = file_path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
 }
 

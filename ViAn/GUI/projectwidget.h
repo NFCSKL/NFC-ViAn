@@ -80,6 +80,7 @@ public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
+    void create_video(QString path);
     void add_images();
     void create_sequence(QStringList image_paths, std::string path);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);

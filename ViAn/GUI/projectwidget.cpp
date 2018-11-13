@@ -145,15 +145,24 @@ void ProjectWidget::add_video() {
                 extensions);
 
     for (auto video_path : video_paths){
-        int index = video_path.lastIndexOf('/') + 1;
-        QString vid_name = video_path.right(video_path.length() - index);
-        // TODO Check if file is already added
-        Video* video = new Video(video_path.toStdString());
-        VideoProject* vid_proj = new VideoProject(video);
-        m_proj->add_video_project(vid_proj);
-        tree_add_video(vid_proj, vid_name);
-        video_list.push_back(video);
+        create_video(video_path);
     }
+}
+
+/**
+ * @brief ProjectWidget::create_video
+ * Create the video object and add it to the tree
+ * @param path
+ */
+void ProjectWidget::create_video(QString path) {
+    int index = path.lastIndexOf('/') + 1;
+    QString vid_name = path.right(path.length() - index);
+    // TODO Check if file is already added
+    Video* video = new Video(path.toStdString());
+    VideoProject* vid_proj = new VideoProject(video);
+    m_proj->add_video_project(vid_proj);
+    tree_add_video(vid_proj, vid_name);
+    video_list.push_back(video);
 }
 
 /**
@@ -393,16 +402,7 @@ void ProjectWidget::file_dropped(QString path) {
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (allowed_vid_exts.find(ext) != allowed_vid_exts.end()) {
         // Add file
-        int index = path.lastIndexOf('/') + 1;
-        QString vid_name = path.right(path.length() - index);
-
-        Video* video = new Video(path.toStdString());
-        VideoProject* vid_proj = new VideoProject(video);
-        m_proj->add_video_project(vid_proj);
-        VideoItem* v_item = new VideoItem(vid_proj);
-        insertTopLevelItem(topLevelItemCount(), v_item);
-        vid_proj->set_tree_index(get_index_path(v_item));
-        video_list.push_back(video);
+        create_video(path);
     }
 }
 
