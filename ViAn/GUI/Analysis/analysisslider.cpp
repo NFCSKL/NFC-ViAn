@@ -272,6 +272,13 @@ bool AnalysisSlider::is_poi_start(int curr_frame) {
             }
         }
     }
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.first == curr_frame) {
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -288,6 +295,14 @@ bool AnalysisSlider::is_poi_end(int curr_frame) {
     if (m_show_pois) {
         for (std::pair<int, int> rect : rects) {
             if (rect.second == curr_frame) {
+                return true;
+            }
+        }
+    }
+
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.second == curr_frame) {
                 return true;
             }
         }
@@ -358,6 +373,16 @@ int AnalysisSlider::get_prev_poi_end(int curr_frame) {
         }
         return new_frame;
     }
+
+    if (m_show_interval_areas) {
+        int new_frame = curr_frame;
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.second >= curr_frame) {
+                break;
+            } else new_frame = pair.second;
+        }
+        return new_frame;
+    }
     return curr_frame;
 }
 
@@ -382,6 +407,8 @@ int AnalysisSlider::get_closest_poi(int frame) {
             return prev;
         } else if (frame - prev > next -frame) {
             return next;
+        } else {
+            return frame;
         }
     }
 }
@@ -393,11 +420,22 @@ int AnalysisSlider::get_closest_poi(int frame) {
  * @return
  */
 bool AnalysisSlider::is_in_POI(int frame) {
-    for (std::pair<int, int> rect : rects) {
-        if (frame >= rect.first && frame <= rect.second) {
-            return true;
+    if (m_show_pois) {
+        for (std::pair<int, int> rect : rects) {
+            if (frame >= rect.first && frame <= rect.second) {
+                return true;
+            }
         }
-    }return false;
+    }
+
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (frame >= pair.first && frame <= pair.second) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /**
