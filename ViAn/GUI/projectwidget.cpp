@@ -1473,6 +1473,7 @@ void ProjectWidget::update_videoitems() {
             Video* video = v_item->get_video_project()->get_video();
             v_item->setText(0, QString::fromStdString(video->get_name()));
             v_item->setToolTip(0, QString::fromStdString(video->file_path));
+            v_item->set_thumbnail();
         }
     }
 }

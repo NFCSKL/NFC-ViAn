@@ -17,8 +17,8 @@ public:
     void remove();
     void rename();
 
-private:
     void set_thumbnail();
+private:
     void load_thumbnail();
 };
 #endif // VIDEOITEM_H
