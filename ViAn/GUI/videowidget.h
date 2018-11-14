@@ -123,8 +123,11 @@ signals:
     void set_status_bar(QString);
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
+    void open_view_path_dialog();
     void zoom_preview(cv::Mat preview_frame);
+    void update_videoitem(std::string);
     void update_manipulator_wgt(int, double, double);
+    void update_thumbnail();
 public slots:
     void quick_analysis(AnalysisSettings* settings);
     void set_current_time(int time);
@@ -170,6 +173,7 @@ public slots:
     void frame_line_edit_finished();
     void zoom_label_finished();
     void enable_poi_btns(bool, bool);
+    void capture_failed();
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
@@ -184,6 +188,7 @@ public slots:
     void mouse_moved(QPoint pos, bool shift, bool ctrl);
     void mouse_scroll(QPoint pos);
     void set_current_drawing(Shapes* shape);
+    void set_no_video();
     void process_frame();
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
@@ -268,6 +273,7 @@ private:
     Tag* m_tag = nullptr;
     bool m_floating = false;
     bool state_video = false;
+    bool frame_is_clean = false;
 
     bool tag_clicked = false;
 
