@@ -28,6 +28,8 @@
 #include <QSlider>
 #include <QThread>
 
+#include "pathdialog.h"
+
 
 VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scroll_area(new DrawScrollArea) {
     m_floating = floating;
@@ -176,6 +178,7 @@ void VideoWidget::init_layouts() {
  */
 void VideoWidget::init_video_controller(){
     // Video data
+    connect(v_controller, &VideoController::capture_failed, this, &VideoWidget::capture_failed);
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, &VideoController::display_index, this, &VideoWidget::display_index_slot);
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
@@ -680,6 +683,7 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
  * @brief VideoWidget::on_bookmark_clicked
  */
 void VideoWidget::on_bookmark_clicked() {
+    if (frame_is_clean) return;
     BookmarkDialog dialog;
     bool ok = dialog.exec();
     bmark_description = dialog.textValue();
@@ -688,6 +692,7 @@ void VideoWidget::on_bookmark_clicked() {
 }
 
 void VideoWidget::quick_bookmark() {
+    if (frame_is_clean) return;
     cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
     cv::Mat org_frame = frame_wgt->get_org_frame();
     QString time = current_time->text();
@@ -820,7 +825,7 @@ void VideoWidget::tag_frame() {
         new_tag_clicked();
     }
 
-    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
+    if (m_tag != nullptr && !m_tag->is_drawing_tag() && !frame_is_clean) {
         if (m_tag->find_frame(playback_slider->value())) {
             QMessageBox msg_box;
             msg_box.setText("Do you wanna overwrite the tag?");
@@ -865,7 +870,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
-    if (!m_vid_proj) return;
+    if (!m_vid_proj || frame_is_clean) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, &TagDialog::tag_name, this, &VideoWidget::new_tag);
@@ -1068,6 +1073,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
         delete_interval();
+        frame_is_clean = false;
+        frame_wgt->clear_frame(false);
 
         // Set state variables but don't update the processor
         {
@@ -1097,6 +1104,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (state.frame > -1) {
             on_new_frame();
         }
+        set_video_btns(!frame_is_clean);
     }
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
@@ -1180,6 +1188,35 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
 }
 
 /**
+ * @brief VideoWidget::capture_failed
+ * Open a dialog where the user can enter a new path to the video.
+ * Will then try to open the video again.
+ */
+void VideoWidget::capture_failed() {
+    PathDialog* dialog = new PathDialog(&m_video_path);
+    connect(dialog, &PathDialog::open_view_path_dialog, this, &VideoWidget::open_view_path_dialog);
+
+    int status = dialog->exec();
+
+    if (status == dialog->Accepted) {
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            m_vid_proj->get_video()->file_path = m_video_path;
+            new_video.store(true);
+        }
+        player_con.notify_all();
+    } else {
+        frame_wgt->clear_frame(true);
+        frame_is_clean = true;
+        set_video_btns(false);
+
+        // Set variable and send to processor
+        set_no_video();
+    }
+    emit update_videoitem(m_video_path);
+}
+
+/**
  * @brief VideoWidget::on_video_info
  * @param video_width
  * @param video_height
@@ -1202,9 +1239,14 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     playback_slider->setValue(current_frame_index);
     playback_slider->blockSignals(false);
 
-    set_total_time((last_frame + 1) / frame_rate);
-    set_current_time(current_frame_index / m_frame_rate);
-    fps_label->setText(QString::number(m_frame_rate) + "fps");
+    if (frame_rate != 0) {
+        set_total_time((last_frame + 1) / frame_rate);
+        set_current_time(current_frame_index / frame_rate);
+    } else {
+        set_total_time(0);
+        set_current_time(0);
+    }
+    fps_label->setText(QString::number(frame_rate) + "fps");
     size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
     max_frames->setText("/ " + QString::number(last_frame));
 
@@ -1326,6 +1368,12 @@ void VideoWidget::set_current_drawing(Shapes* shape) {
     update_overlay_settings([&](){
         o_settings.set_current_drawing = true;
         o_settings.shape = shape;
+    });
+}
+
+void VideoWidget::set_no_video() {
+    update_overlay_settings([&](){
+        o_settings.no_video = true;
     });
 }
 
@@ -1515,6 +1563,7 @@ void VideoWidget::update_playback_speed(int speed) {
 }
 
 void VideoWidget::on_export_frame() {
+    if (frame_is_clean) return;
     int frame = frame_index.load();
     emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
     emit set_status_bar(QString("Frame %1 exported").arg(frame));

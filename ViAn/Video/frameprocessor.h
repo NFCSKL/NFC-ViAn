@@ -97,6 +97,8 @@ struct overlay_settings {
     bool set_current_drawing = false;
     bool create_text = false;
 
+    bool no_video = false;
+
     SHAPES tool = ZOOM;
     QColor color = Qt::red;
     QString text = "";

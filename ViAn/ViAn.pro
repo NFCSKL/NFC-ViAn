@@ -85,7 +85,10 @@ SOURCES += main.cpp \
     GUI/manipulatorwidget.cpp \
     GUI/Analysis/analysislistitem.cpp \
     GUI/TreeItems/intervalitem.cpp \
-    GUI/TreeItems/intervalareaitem.cpp
+    GUI/TreeItems/intervalareaitem.cpp \
+    GUI/pathdialog.cpp \
+    GUI/viewpathdialog.cpp \
+    GUI/viewpathitem.cpp
 
 #
 # TEST
@@ -160,7 +163,10 @@ HEADERS += reportgenerator.h\
     GUI/manipulatorwidget.h \
     GUI/Analysis/analysislistitem.h \
     GUI/TreeItems/intervalitem.h \
-    GUI/TreeItems/intervalareaitem.h
+    GUI/TreeItems/intervalareaitem.h \
+    GUI/pathdialog.h \
+    GUI/viewpathdialog.h \
+    GUI/viewpathitem.h
 
 #
 # LIBRARY

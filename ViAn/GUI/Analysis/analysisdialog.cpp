@@ -6,7 +6,9 @@
 #include "videolistitem.h"
 
 #include <QCheckBox>
+#include <QDebug>
 #include <QDialogButtonBox>
+#include <QFile>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -30,11 +32,15 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
         // Windows-like file selection
         m_v_proj_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
         for(VideoItem* v : vid_projs) {
-            VideoListItem* item = new VideoListItem(v->get_video_project());
-            m_v_proj_list->addItem(item);
-            if (v->get_video_project()->is_current()) {
-                item->setSelected(true);
-                m_v_proj_list->setCurrentItem(item);
+            QString path = QString::fromStdString(v->get_video_project()->get_video()->file_path);
+            QFile load_file(path);
+            if (load_file.open(QIODevice::ReadOnly)) {
+                VideoListItem* item = new VideoListItem(v->get_video_project());
+                m_v_proj_list->addItem(item);
+                if (v->get_video_project()->is_current()) {
+                    item->setSelected(true);
+                    m_v_proj_list->setCurrentItem(item);
+                }
             }
         }
         v_lay->addWidget(m_v_proj_list);
