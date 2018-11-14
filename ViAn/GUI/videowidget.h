@@ -127,6 +127,7 @@ signals:
     void zoom_preview(cv::Mat preview_frame);
     void update_videoitem(std::string);
     void update_manipulator_wgt(int, double, double);
+    void update_thumbnail();
 public slots:
     void quick_analysis(AnalysisSettings* settings);
     void set_current_time(int time);

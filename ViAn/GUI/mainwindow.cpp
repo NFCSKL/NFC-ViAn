@@ -244,8 +244,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
     connect(project_wgt, &ProjectWidget::update_tag, video_wgt, &VideoWidget::update_tag);
     connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
-    connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
-    connect(this, &MainWindow::update_videoitems,project_wgt, &ProjectWidget::update_videoitems);
 
     // Connects for removing, clearing or closing
     connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
@@ -262,6 +260,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
     connect(analysis_wgt, &AnalysisWidget::name_in_tree, project_wgt, &ProjectWidget::set_tree_item_name);
     connect(video_wgt, &VideoWidget::open_view_path_dialog, this, &MainWindow::view_paths);
+    connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
@@ -818,7 +817,7 @@ void MainWindow::view_paths() {
     int status = path_dialog->exec();
 
     if (status == path_dialog->Accepted) {
-        emit update_videoitems();
+        project_wgt->update_videoitems();
         if(video_wgt->get_current_video_project()) {
             video_wgt->get_current_video_project()->set_current(false);
             project_wgt->currentItemChanged(project_wgt->currentItem(), project_wgt->currentItem());

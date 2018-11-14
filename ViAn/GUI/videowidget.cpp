@@ -1229,7 +1229,6 @@ void VideoWidget::capture_failed() {
             new_video.store(true);
         }
         player_con.notify_all();
-        emit update_videoitem(m_video_path);
     } else {
         frame_wgt->clear_frame(true);
         frame_is_clean = true;
@@ -1238,6 +1237,7 @@ void VideoWidget::capture_failed() {
         // Set variable and send to processor
         set_no_video();
     }
+    emit update_videoitem(m_video_path);
 }
 
 /**

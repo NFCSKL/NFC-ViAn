@@ -1462,14 +1462,15 @@ void ProjectWidget::update_current_videoitem(std::string path) {
     std::string name = Utility::name_from_path(path);
     currentItem()->setText(0, QString::fromStdString(name));
     currentItem()->setToolTip(0, QString::fromStdString(path));
-    VideoItem* vid_proj = dynamic_cast<VideoItem*>(currentItem());
-    vid_proj->get_video_project()->get_video()->set_name(name);
+    VideoItem* v_item = dynamic_cast<VideoItem*>(currentItem());
+    v_item->get_video_project()->get_video()->set_name(name);
+    v_item->set_thumbnail();
 }
 
 void ProjectWidget::update_videoitems() {
     for (auto item : findItems(".", Qt::MatchContains, 0)) {
         if (item->type() == VIDEO_ITEM) {
-            auto v_item = dynamic_cast<VideoItem*>(item);
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
             Video* video = v_item->get_video_project()->get_video();
             v_item->setText(0, QString::fromStdString(video->get_name()));
             v_item->setToolTip(0, QString::fromStdString(video->file_path));
