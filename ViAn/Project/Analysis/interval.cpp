@@ -102,6 +102,7 @@ void Interval::remove_area_by_frame(int frame) {
     for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
         if ((*it).first <= frame && (*it).second >= frame) {
             m_area_list.erase(it);
+            return;
         }
     }
 }
