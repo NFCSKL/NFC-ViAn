@@ -9,7 +9,6 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
-#include <QDebug>
 #include <QTreeWidgetItem>
 
 //const QString VideoItem::SEQUENCE_CONTAINER_NAME = "Image";
