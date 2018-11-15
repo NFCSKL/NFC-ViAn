@@ -154,7 +154,9 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
             break;
         case INTERVAL:
             m_interval_areas = dynamic_cast<Interval*>(analysis);
-            last_poi_end = m_interval_areas->m_area_list.back().second;
+            if (m_interval_areas->m_area_list.size() > 0) {
+                last_poi_end = m_interval_areas->m_area_list.back().second;
+            }
             repaint();
             break;
         default:
