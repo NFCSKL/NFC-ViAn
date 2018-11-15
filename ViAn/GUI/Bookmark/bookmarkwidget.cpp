@@ -46,6 +46,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 
 void BookmarkWidget::generate_report() {
     emit set_status_bar("Generating report. Please wait.");
+    emit play_video(false);
     ReportContainer rp_cont;
     std::vector<BookmarkItem*> bmark_list;
     for(int i = 0; i != bm_list->count(); ++i){
@@ -64,10 +65,12 @@ void BookmarkWidget::generate_report() {
             bmark_list.push_back(bmark);
         }
     }
-    processing_thread = new QThread;    
+    processing_thread = new QThread;
+    setCursor(Qt::WaitCursor);
     ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
     rp_gen->uncat_bmarks = bmark_list;
     rp_gen->create_report();
+    setCursor(Qt::ArrowCursor);
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, std::string> *container) {
@@ -110,10 +113,14 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description.toStdString(), state, time);
     bookmark->set_thumbnail_path(thumbnail_path);
     vid_proj->add_bookmark(bookmark);
-
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
     bm_list->addItem(bm_item);
+
+    // If just added the first bookmark
+    if (bm_list->count() == 1) {
+        emit show_bm_dock(true);
+    }
 }
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {

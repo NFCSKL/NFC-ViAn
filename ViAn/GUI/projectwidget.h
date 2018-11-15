@@ -43,6 +43,7 @@ public:
     QPointer<QAction> show_settings_act = nullptr;
     QString get_default_path();
 
+    std::vector<Video*> video_list;
     std::vector<std::string> remove_list;
 
 signals:
@@ -58,6 +59,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void set_zoom_tool();
     void set_show_analysis_details(bool);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
@@ -78,6 +80,7 @@ public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
+    void create_video(QString path);
     void add_images();
     void create_sequence(QStringList image_paths, std::string path);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
@@ -103,6 +106,8 @@ public slots:
     void update_analysis_settings();
     void advanced_analysis();
     bool prompt_save();
+    void update_current_videoitem(std::string path);
+    void update_videoitems();
 private slots:
     void context_menu(const QPoint& point);
     void open_video_in_widget();
@@ -117,6 +122,7 @@ private slots:
 
     void update_item_data(QTreeWidgetItem *item, int column);
 private:
+    bool is_analysis_running(QTreeWidgetItem* root = nullptr);
     void set_main_window_name(QString name);
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);

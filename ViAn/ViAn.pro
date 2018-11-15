@@ -83,9 +83,12 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
-    GUI/Analysis/analysislistitem.cpp \
     GUI/settingsdialog.cpp \
-    Project/settings.cpp
+    Project/settings.cpp \
+    GUI/pathdialog.cpp \
+    GUI/Analysis/analysislistitem.cpp \
+    GUI/viewpathdialog.cpp \
+    GUI/viewpathitem.cpp
 
 #
 # TEST
@@ -158,9 +161,12 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
-    GUI/Analysis/analysislistitem.h \
     GUI/settingsdialog.h \
-    Project/settings.h
+    Project/settings.h \
+    GUI/pathdialog.h \
+    GUI/Analysis/analysislistitem.h \
+    GUI/viewpathdialog.h \
+    GUI/viewpathitem.h
 
 #
 # LIBRARY

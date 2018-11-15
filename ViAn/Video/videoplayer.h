@@ -80,6 +80,7 @@ public:
 signals:
     void display(cv::Mat frame, int frame_index);
     void display_index();
+    void capture_failed();
     void video_info(int video_width, int video_height, int frame_rate, int m_last_frame);
     void playback_stopped(void);
 

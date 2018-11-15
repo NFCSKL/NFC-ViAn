@@ -60,6 +60,7 @@ void FrameProcessor::check_events() {
 
         // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
+            m_o_settings->no_video = false;
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
@@ -75,7 +76,6 @@ void FrameProcessor::check_events() {
         if (m_overlay == nullptr || m_o_settings->overlay_removed) {
             m_overlay_changed->store(false);
         }
-
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
@@ -160,7 +160,12 @@ void FrameProcessor::process_frame() {
     if (m_frame.empty()) return;
     cv::Mat manipulated_frame;
     try {
-        manipulated_frame = m_frame.clone();
+        if (m_o_settings->no_video) {
+            cv::Mat image(m_frame.rows, m_frame.cols, CV_8UC3, cv::Scalar(0,0,0));
+            manipulated_frame = image;
+        } else {
+            manipulated_frame = m_frame.clone();
+        }
     } catch (cv::Exception& e) {
         qWarning() << "Failed to copy new frame in processor";
         return;
@@ -186,15 +191,17 @@ void FrameProcessor::process_frame() {
                   view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
     int frame_num = m_frame_index->load();
+    int width = m_width->load();
+    int height = m_height->load();
 
     // Draws the text drawings on the overlay
-    m_overlay->draw_overlay(manipulated_frame, frame_num);
+    m_overlay->draw_overlay(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
 
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
 
     // Draws the other drawings on the overlay
-    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor);
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
@@ -235,6 +242,7 @@ void FrameProcessor::emit_zoom_data() {
     emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_rotation(m_zoomer.get_angle());
 }
 
 /**
@@ -322,7 +330,6 @@ void FrameProcessor::update_overlay_settings() {
     m_overlay->set_tool(m_o_settings->tool);
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
-
 
     // Update text action
     if (m_o_settings->update_text) {

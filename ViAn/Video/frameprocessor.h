@@ -97,6 +97,8 @@ struct overlay_settings {
     bool set_current_drawing = false;
     bool create_text = false;
 
+    bool no_video = false;
+
     SHAPES tool = ZOOM;
     QColor color = Qt::red;
     QString text = "";
@@ -187,6 +189,7 @@ public slots:
 signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
+    void set_rotation(int);
     void set_zoom_state(QPoint, double, int);
     void set_play_btn(bool);
     void set_bri_cont(int, double, double);
