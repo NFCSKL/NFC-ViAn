@@ -30,6 +30,9 @@ VideoProject::VideoProject(){
 VideoProject::~VideoProject(){
     delete m_overlay;
     delete m_video;
+    m_overlay = nullptr;
+    m_video = nullptr;
+    qDebug() << "vp is kill";
 }
 
 /**

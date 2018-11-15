@@ -1154,6 +1154,7 @@ void VideoWidget::remove_item(VideoProject* vid_proj) {
  * Removes the video from the videoplayer
  */
 void VideoWidget::clear_current_video() {
+    qDebug() << "clear current video";
     int frame = -1;
     if (video_btns_enabled) set_video_btns(false);
 
