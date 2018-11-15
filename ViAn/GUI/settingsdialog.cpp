@@ -1,5 +1,7 @@
 #include "settingsdialog.h"
 
+#include "constants.h"
+
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QIcon>
@@ -19,6 +21,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     // Add thickness
     thickness_layout = new QFormLayout();
     thickness_slider = new QSlider(Qt::Horizontal, this);
+    thickness_slider->setValue(Constants::LINE_THICKNESS);
     thickness_label = new QLabel(this);
     thickness_label->setMinimumWidth(25);
     thickness_label->setText(QString::number(thickness_slider->value()));

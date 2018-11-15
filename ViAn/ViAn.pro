@@ -88,7 +88,8 @@ SOURCES += main.cpp \
     GUI/pathdialog.cpp \
     GUI/Analysis/analysislistitem.cpp \
     GUI/viewpathdialog.cpp \
-    GUI/viewpathitem.cpp
+    GUI/viewpathitem.cpp \
+    constants.cpp
 
 #
 # TEST
@@ -166,7 +167,8 @@ HEADERS += reportgenerator.h\
     GUI/pathdialog.h \
     GUI/Analysis/analysislistitem.h \
     GUI/viewpathdialog.h \
-    GUI/viewpathitem.h
+    GUI/viewpathitem.h \
+    constants.h
 
 #
 # LIBRARY

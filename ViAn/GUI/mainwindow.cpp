@@ -407,7 +407,6 @@ void MainWindow::init_edit_menu() {
     options_act->setStatusTip(tr("Program options"));
 
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    connect(options_act, &QAction::triggered, this, &MainWindow::options);
     connect(cw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_cw);
     connect(ccw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_ccw);
     connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);

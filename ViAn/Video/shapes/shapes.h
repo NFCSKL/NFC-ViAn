@@ -1,6 +1,8 @@
 #ifndef SHAPES_H
 #define SHAPES_H
 
+#include "constants.h"
+
 #include "opencv2/core/core.hpp"
 
 #include <QColor>
@@ -34,6 +36,7 @@ public:
     static cv::Point qpoint_to_point(QPoint pnt);
 
     static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
+    //static const int LINE_THICKNESS = Constants::LINE_THICKNESS;
     static constexpr double ALPHA = 0.6; // Costant used for the opacity.
 
     cv::Point get_draw_start();
@@ -59,7 +62,7 @@ protected:
     SHAPES shape = ZOOM;
     cv::Scalar color;
     QColor q_color;
-    int thickness = 2;
+    int thickness = Constants::LINE_THICKNESS;
     cv::Point draw_start;
     cv::Point draw_end;
     bool anchor; // true = draw start -- false = draw end; TODO 4 corners
