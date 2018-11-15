@@ -1053,9 +1053,7 @@ void ProjectWidget::remove_item() {
     QString info_text = "Do you wish to continue?";
     if (message_box(text, info_text, true)) {
         for (auto item : selectedItems()) {
-            qDebug() << "------------------";
             remove_tree_item(item);
-            qDebug() << "selected size" << selectedItems().size();
         }
     }
 }
@@ -1090,7 +1088,10 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     default:
         break;
     }
+    blockSignals(true);
     delete item;
+    blockSignals(false);
+    setCurrentItem(nullptr);
 }
 
 /**
@@ -1112,11 +1113,10 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
         auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
         if (video_it != video_list.end()) video_list.erase(video_it);
         m_proj->get_videos().erase(it);
-        qDebug() << "lists size" << video_list.size() << m_proj->get_videos().size();
         m_proj->set_unsaved(true);
     }
     delete v_proj;
-    //emit item_removed(v_proj);
+    emit item_removed(v_proj);
     emit remove_overlay();
 }
 

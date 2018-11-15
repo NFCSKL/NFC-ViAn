@@ -74,7 +74,6 @@ void FrameProcessor::check_events() {
         }
 
         if (m_overlay == nullptr || m_o_settings->overlay_removed) {
-            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
         }
 
