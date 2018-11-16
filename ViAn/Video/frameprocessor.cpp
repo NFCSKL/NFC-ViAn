@@ -166,6 +166,7 @@ void FrameProcessor::process_frame() {
         qWarning() << "Failed to copy new frame in processor";
         return;
     }
+    m_z_settings->frame_size = QSize(m_frame.cols, m_frame.rows);
 
     // Rotates the frame, according to the choosen direction.
     // TODO: Computation heavy.. Will cause lag on larger images.
@@ -203,6 +204,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
+    m_z_settings->center = m_zoomer.get_center();
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }

@@ -1649,6 +1649,28 @@ void VideoWidget::update_zoom_preview_size(QSize s) {
     });
 }
 
+/**
+ * @brief VideoWidget::translate_zoom_from_preview_click
+ * Scales the click coordinates (from zoom preview) to new coordinates in the original frame
+ * and updates the frame processor so that the viewport will center around that position.
+ * @param click_pos:    The coordinate where the click occured (zoom preview coordinates)
+ */
+void VideoWidget::translate_zoom_from_preview_click(QPoint click_pos, bool pan) {
+    update_processing_settings([&](){
+        double scale_factor =  z_settings.frame_size.width() / static_cast<double>(z_settings.preview_window_size.width());
+        QPoint scaled = click_pos * scale_factor;
+        if (pan){
+            z_settings.x_movement = scaled.x();
+            z_settings.y_movement = scaled.y();
+        }
+//        } else {
+//            z_settings.center = scaled;
+//            z_settings.zoom_step = 0;
+//            z_settings.do_point_zoom =true;
+//        }
+    });
+}
+
 void VideoWidget::speed_up_activate() {
     if (speed_slider->value() == speed_slider->maximum()) return;
     speed_slider->setValue(speed_slider->value() +1);

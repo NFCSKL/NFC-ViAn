@@ -13,9 +13,12 @@ private:
     cv::Mat _tmp;
     QImage _qimage;
     QPoint anchor{0, 0};
+    QPoint start_point{0,0};
 
+    bool panning{false};
     bool center_along_xy{false}; // If false the image will only be centered along the x-axis
     void center_image(const QSize& s);
+    void handle_mouse(const QPoint& pos);
 
 public:
     explicit ZoomPreviewWidget(QWidget *parent = nullptr);
@@ -28,6 +31,8 @@ protected:
 
 signals:
     void window_size(QSize s);
+    void pan_translation(QPoint pos, bool pan);
+    void new_center(QPoint pos);
 
 public slots:
     void frame_update(cv::Mat frame);

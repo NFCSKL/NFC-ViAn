@@ -48,11 +48,22 @@ void ZoomPreviewWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void ZoomPreviewWidget::mousePressEvent(QMouseEvent *event) {
-    handle_mouse(event->pos());
+    if (event->button() == Qt::LeftButton) {
+        panning = false;
+        emit pan_translation(event->pos(), false);
+    } else if (event->button() == Qt::RightButton) {
+        panning = true;
+        start_point = event->pos();
+    } else {
+        panning = false;
+    }
 }
 
 void ZoomPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
-    handle_mouse(event->pos());
+    if (!panning) return;
+    QPoint movement = event->pos() - start_point;
+    start_point = event->pos();
+    emit pan_translation(movement, true);
 }
 
 /**

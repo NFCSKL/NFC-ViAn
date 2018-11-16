@@ -118,6 +118,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::clean_zoom_preview, zoom_wgt, &ZoomPreviewWidget::clean_zoom_widget);
     connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
     connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
+    connect(zoom_wgt, &ZoomPreviewWidget::pan_translation, video_wgt, &VideoWidget::translate_zoom_from_preview_click);
     connect(zoom_preview_dock, &QDockWidget::topLevelChanged, zoom_wgt, &ZoomPreviewWidget::on_floating_changed);
     
     // Initialize analysis queue widget
