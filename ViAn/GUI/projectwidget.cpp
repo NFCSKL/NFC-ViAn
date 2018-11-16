@@ -1377,7 +1377,7 @@ bool ProjectWidget::open_project(QString project_path) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
 
-        if (vid_proj->get_video()->is_sequence()) break;
+        if (vid_proj->get_video()->is_sequence()) continue;
         video_list.push_back(vid_proj->get_video());
     }
     ViewPathDialog* path_dialog = new ViewPathDialog(video_list);
