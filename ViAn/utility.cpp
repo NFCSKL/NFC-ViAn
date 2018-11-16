@@ -1,4 +1,5 @@
 #include "utility.h"
+
 #include <QDir>
 #include <QDebug>
 #include <QDirIterator>
@@ -57,10 +58,11 @@ std::string Utility::zfill(std::string number, int length) {
 
 std::string Utility::zfill(const int& number, int length){
     length -= std::to_string(number).length();
-    if (length)
+    if (length) {
         return std::string(length, '0').append(std::to_string(number));
-    else
+    } else {
         return std::to_string(number);
+    }
 }
 
 /**

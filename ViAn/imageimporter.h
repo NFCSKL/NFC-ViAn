@@ -2,10 +2,6 @@
 #define IMAGEIMPORTER_H
 
 #include <QObject>
-#include <QFileInfo>
-#include <QStringList>
-
-#include "utility.h"
 
 class ImageImporter : public QObject
 {

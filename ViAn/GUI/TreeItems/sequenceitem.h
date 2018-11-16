@@ -2,9 +2,8 @@
 #define SEQUENCEITEM_H
 
 #include "treeitem.h"
-#include "videoitem.h"
-#include "Project/imagesequence.h"
 
+class ImageSequence;
 class SequenceItem : public TreeItem {
 private:
     std::string m_hash{};
