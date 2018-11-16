@@ -19,6 +19,8 @@
 #include "Project/recentproject.h"
 #include "Project/videoproject.h"
 #include "projectdialog.h"
+#include "utility.h"
+#include "viewpathdialog.h"
 
 
 #include <QAction>
@@ -143,13 +145,24 @@ void ProjectWidget::add_video() {
                 extensions);
 
     for (auto video_path : video_paths){
-        int index = video_path.lastIndexOf('/') + 1;
-        QString vid_name = video_path.right(video_path.length() - index);
-        // TODO Check if file is already added
-        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
-        m_proj->add_video_project(vid_proj);
-        tree_add_video(vid_proj, vid_name);
+        create_video(video_path);
     }
+}
+
+/**
+ * @brief ProjectWidget::create_video
+ * Create the video object and add it to the tree
+ * @param path
+ */
+void ProjectWidget::create_video(QString path) {
+    int index = path.lastIndexOf('/') + 1;
+    QString vid_name = path.right(path.length() - index);
+    // TODO Check if file is already added
+    Video* video = new Video(path.toStdString());
+    VideoProject* vid_proj = new VideoProject(video);
+    m_proj->add_video_project(vid_proj);
+    tree_add_video(vid_proj, vid_name);
+    video_list.push_back(video);
 }
 
 /**
@@ -355,6 +368,7 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid_item = new VideoItem(vid_proj);
+    vid_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
 
     // If there only is one selected item and it's a folder,
     // add the new video to that folder otherwise to the top level
@@ -391,14 +405,7 @@ void ProjectWidget::file_dropped(QString path) {
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (allowed_vid_exts.find(ext) != allowed_vid_exts.end()) {
         // Add file
-        int index = path.lastIndexOf('/') + 1;
-        QString vid_name = path.right(path.length() - index);
-
-        VideoProject* vid_proj = new VideoProject(new Video(path.toStdString()));
-        m_proj->add_video_project(vid_proj);
-        VideoItem* v_item = new VideoItem(vid_proj);
-        insertTopLevelItem(topLevelItemCount(), v_item);
-        vid_proj->set_tree_index(get_index_path(v_item));
+        create_video(path);
     }
 }
 
@@ -506,6 +513,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
         // Create and add VideoItem
         if (item != nullptr && item->type() == VIDEO_ITEM) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            v_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
             auto vid = vid_proj->get_video();
@@ -1109,6 +1117,8 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     // Remove the video from the list of videos
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
+        auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
+        video_list.erase(video_it);
         m_proj->get_videos().erase(it);
         // TODO store folder for deletion if project saved
         if (v_proj->get_video()->is_sequence()) {
@@ -1332,7 +1342,6 @@ bool ProjectWidget::save_project() {
     m_proj->save_project();
 
     RecentProject rp;
-    rp.load_recent();
     rp.update_recent(m_proj->get_name(), m_proj->get_file(), m_proj->get_last_changed());
     set_status_bar("Project saved");
     return true;
@@ -1367,6 +1376,18 @@ bool ProjectWidget::open_project(QString project_path) {
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
+
+        if (vid_proj->get_video()->is_sequence()) break;
+        video_list.push_back(vid_proj->get_video());
+    }
+    ViewPathDialog* path_dialog = new ViewPathDialog(video_list);
+    // If not all paths in the project are valid, open the Viewpathdialog
+    if (!path_dialog->all_valid()) {
+        int status = path_dialog->exec();
+
+        if (status == path_dialog->Accepted) {
+            update_videoitems();
+        }
     }
     return true;
 }
@@ -1461,6 +1482,7 @@ bool ProjectWidget::close_project() {
     emit project_closed();
     emit remove_overlay();
 
+    video_list.clear();
     delete m_proj;
     m_proj = nullptr;
     m_tag_item = nullptr;
@@ -1493,6 +1515,28 @@ void ProjectWidget::remove_project() {
 
 void ProjectWidget::set_main_window_name(QString name) {
     parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
+}
+
+void ProjectWidget::update_current_videoitem(std::string path) {
+    if (currentItem()->type() != VIDEO_ITEM) return;
+    std::string name = Utility::name_from_path(path);
+    currentItem()->setText(0, QString::fromStdString(name));
+    currentItem()->setToolTip(0, QString::fromStdString(path));
+    VideoItem* v_item = dynamic_cast<VideoItem*>(currentItem());
+    v_item->get_video_project()->get_video()->set_name(name);
+    v_item->set_thumbnail();
+}
+
+void ProjectWidget::update_videoitems() {
+    for (auto item : findItems(".", Qt::MatchContains, 0)) {
+        if (item->type() == VIDEO_ITEM) {
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            Video* video = v_item->get_video_project()->get_video();
+            v_item->setText(0, QString::fromStdString(video->get_name()));
+            v_item->setToolTip(0, QString::fromStdString(video->file_path));
+            v_item->set_thumbnail();
+        }
+    }
 }
 
 /**

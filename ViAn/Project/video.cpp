@@ -16,7 +16,7 @@ Video::Video(const bool& is_sequence){
 Video::Video(std::string file_path, const bool& is_sequence){
     m_is_sequence = is_sequence;
     this->file_path = file_path;
-    int index = file_path.find_last_of('/') + 1;
+    auto index = file_path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
     m_is_saved = !is_sequence; // Ordinary videos can't be changed thus are allways "saved"
 }
@@ -37,6 +37,19 @@ bool Video::is_sequence() {
 
 bool Video::is_saved() {
     return m_is_saved;
+}
+
+int Video::get_width() {
+    return m_width;
+}
+
+int Video::get_height() {
+    return m_height;
+}
+
+void Video::set_size(int width, int height) {
+    m_width = width;
+    m_height = height;
 }
 
 /**

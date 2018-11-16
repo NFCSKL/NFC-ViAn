@@ -49,6 +49,7 @@ public:
 signals:
     // FROM VIDEO PLAYER
     void display_index();
+    void capture_failed();
     void video_info(int frame_width, int frame_height, int frame_rate, int last_frame);
     void playback_stopped(void);
 protected:

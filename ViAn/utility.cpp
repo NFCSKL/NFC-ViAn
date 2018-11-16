@@ -205,3 +205,33 @@ bool Utility::remove_checksum_files(const QString& parent_folder, const QStringL
     }
     return removed;
 }
+
+/**
+ * @brief Utility::rotate
+ * Rotate the given point by the given rotation
+ * @param pos           : Point to be rotated
+ * @param rotation      : Wanted rotation
+ * @param width         : Width of frame
+ * @param height        : Height of frame
+ * @return              : Rotated point
+ */
+QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
+    double angle = rotation*DEGREE_TO_RADIAN_FACTOR;
+
+    // Translate by negative pivot of old frame size
+    double translated_x{pos.x() - static_cast<double>(width) / 2};
+    double translated_y{pos.y() - static_cast<double>(height) / 2};
+
+    // Rotate around pivot
+    double rotated_x{translated_x * std::cos(angle) - translated_y * std::sin(angle)};
+    double rotated_y{translated_x * std::sin(angle) + translated_y * std::cos(angle)};
+
+    if (rotation == 90 || rotation == 270) {
+        std::swap(width,height);
+    }
+    // Translate back using the new frame size
+    translated_x = rotated_x + width / 2;
+    translated_y = rotated_y + height / 2;
+
+    return QPoint(translated_x, translated_y);
+}

@@ -78,8 +78,10 @@ private:
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
 
+    // TODO not really used
     int m_video_width = 0;
     int m_video_height = 0;
+
     int m_frame_rate = 0;
     int m_frame_length = 0;
 
@@ -121,8 +123,11 @@ signals:
     void set_status_bar(QString);
     void export_original_frame(VideoProject*, const int, cv::Mat);
     void delete_sc_activated();
+    void open_view_path_dialog();
     void zoom_preview(cv::Mat preview_frame);
+    void update_videoitem(std::string);
     void update_manipulator_wgt(int, double, double);
+    void update_thumbnail();
 public slots:
     void quick_analysis(AnalysisSettings* settings);
     void set_current_time(int time);
@@ -145,6 +150,7 @@ public slots:
     void prev_poi_btn_clicked(void);
     void analysis_play_btn_toggled(bool value);
     void set_slider_max(int value);
+    void display_index_slot();
     void on_new_frame();
     void on_playback_slider_pressed(void);
     void on_playback_slider_released(void);
@@ -167,6 +173,7 @@ public slots:
     void frame_line_edit_finished();
     void zoom_label_finished();
     void enable_poi_btns(bool, bool);
+    void capture_failed();
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
@@ -181,6 +188,7 @@ public slots:
     void mouse_moved(QPoint pos, bool shift, bool ctrl);
     void mouse_scroll(QPoint pos);
     void set_current_drawing(Shapes* shape);
+    void set_no_video();
     void process_frame();
     void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
@@ -265,6 +273,7 @@ private:
     Tag* m_tag = nullptr;
     bool m_floating = false;
     bool state_video = false;
+    bool frame_is_clean = false;
 
     bool tag_clicked = false;
 

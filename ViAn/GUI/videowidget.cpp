@@ -27,6 +27,8 @@
 #include <QSlider>
 #include <QThread>
 
+#include "pathdialog.h"
+
 
 VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scroll_area(new DrawScrollArea) {
     m_floating = floating;
@@ -175,8 +177,9 @@ void VideoWidget::init_layouts() {
  */
 void VideoWidget::init_video_controller(){
     // Video data
+    connect(v_controller, &VideoController::capture_failed, this, &VideoWidget::capture_failed);
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
-    connect(v_controller, &VideoController::display_index, this, &VideoWidget::on_new_frame);
+    connect(v_controller, &VideoController::display_index, this, &VideoWidget::display_index_slot);
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
     connect(v_controller, &VideoController::finished, v_controller, &VideoController::deleteLater);
 }
@@ -214,6 +217,7 @@ void VideoWidget::init_frame_processor() {
         connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
+        connect(f_processor, &FrameProcessor::set_rotation, frame_wgt, &FrameWidget::set_rotation);
         connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
         connect(f_processor, &FrameProcessor::set_zoom_state, this, &VideoWidget::set_zoom_state);
         connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
@@ -548,10 +552,19 @@ void VideoWidget::stop_btn_clicked() {
 /**
  * @brief VideoWidget::next_frame_clicked
  */
-void VideoWidget::next_frame_clicked(){
+void VideoWidget::next_frame_clicked() {
+    if (analysis_only) {
+        if (playback_slider->is_poi_end(frame_index.load())) {
+            next_poi_btn_clicked();
+            return;
+        }
+    }
     if (playback_slider->value() + 1 < m_frame_length) {
         set_status_bar("Stepping to the next frame");
-        frame_index.store(playback_slider->value() + 1);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(playback_slider->value() +1);
+        }
         on_new_frame();
     } else {
         set_status_bar("Already at the last frame");
@@ -561,10 +574,25 @@ void VideoWidget::next_frame_clicked(){
 /**
  * @brief VideoWidget::prev_frame_clicked
  */
-void VideoWidget::prev_frame_clicked(){
+void VideoWidget::prev_frame_clicked() {
+    int current_frame = frame_index.load();
+    if (analysis_only) {
+        if (playback_slider->is_poi_start(current_frame)) {
+            int new_frame = playback_slider->get_prev_poi_end(current_frame);
+            {
+                std::lock_guard<std::mutex> p_lock(player_lock);
+                frame_index.store(new_frame);
+            }
+            on_new_frame();
+            return;
+        }
+    }
     if (playback_slider->value() - 1 > -1) {
         set_status_bar("Stepping to the previous frame");
-        frame_index.store(playback_slider->value() - 1);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(playback_slider->value() - 1);
+        }
         on_new_frame();
     } else {
         set_status_bar("Already at the first frame");
@@ -657,6 +685,7 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
  * @brief VideoWidget::on_bookmark_clicked
  */
 void VideoWidget::on_bookmark_clicked() {
+    if (frame_is_clean) return;
     BookmarkDialog dialog;
     bool ok = dialog.exec();
     bmark_description = dialog.textValue();
@@ -665,6 +694,7 @@ void VideoWidget::on_bookmark_clicked() {
 }
 
 void VideoWidget::quick_bookmark() {
+    if (frame_is_clean) return;
     cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
     cv::Mat org_frame = frame_wgt->get_org_frame();
     QString time = current_time->text();
@@ -778,7 +808,7 @@ void VideoWidget::tag_frame() {
         new_tag_clicked();
     }
 
-    if (m_tag != nullptr && !m_tag->is_drawing_tag()) {
+    if (m_tag != nullptr && !m_tag->is_drawing_tag() && !frame_is_clean) {
         if (m_tag->find_frame(playback_slider->value())) {
             QMessageBox msg_box;
             msg_box.setText("Do you wanna overwrite the tag?");
@@ -823,7 +853,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
-    if (!m_vid_proj) return;
+    if (!m_vid_proj || frame_is_clean) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(tag_dialog, &TagDialog::tag_name, this, &VideoWidget::new_tag);
@@ -882,6 +912,14 @@ void VideoWidget::clear_tag() {
 
 void VideoWidget::analysis_play_btn_toggled(bool value) {
     analysis_only = value;
+    if (analysis_only) {
+        int new_frame = playback_slider->get_closest_poi(frame_index.load());
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(new_frame);
+        }
+        on_new_frame();
+    }
 }
 
 /**
@@ -889,14 +927,18 @@ void VideoWidget::analysis_play_btn_toggled(bool value) {
  * Jump to next detection aren on the slider
  */
 void VideoWidget::next_poi_btn_clicked() {
-    int new_frame = playback_slider->get_next_poi_start(frame_index.load());
-    if (new_frame != frame_index.load()) {
+    int current_frame = frame_index.load();
+    int new_frame = playback_slider->get_next_poi_start(current_frame);
+    if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
             state = playback_slider->m_tag->tag_map[new_frame]->m_state;
             load_marked_video_state(m_vid_proj, state);
         }
-        frame_index.store(new_frame);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(new_frame);
+        }
         on_new_frame();
         emit set_status_bar("Jumped to next POI");
     } else {
@@ -909,14 +951,18 @@ void VideoWidget::next_poi_btn_clicked() {
  * * Jump to orevious detection aren on the slider
  */
 void VideoWidget::prev_poi_btn_clicked() {
-    int new_frame = playback_slider->get_prev_poi_start(frame_index.load());
-    if (new_frame != frame_index.load()) {
+    int current_frame = frame_index.load();
+    int new_frame = playback_slider->get_prev_poi_start(current_frame);
+    if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
             state = playback_slider->m_tag->tag_map[new_frame]->m_state;
             load_marked_video_state(m_vid_proj, state);
         }
-        frame_index.store(new_frame);
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            frame_index.store(new_frame);
+        }
         on_new_frame();
         emit set_status_bar("Jumped to previous POI");
     } else {
@@ -941,32 +987,45 @@ void VideoWidget::set_slider_max(int value) {
 }
 
 /**
+ * @brief VideoWidget::display_index_slot
+ * Slot function for on_new_frame that will jump to next poi
+ * while analysis_only
+ */
+void VideoWidget::display_index_slot() {
+    int frame_num = frame_index.load();
+    if (analysis_only) {
+        if (!playback_slider->is_in_POI(frame_num)) {
+            if (frame_num < playback_slider->last_poi_end) {
+                next_poi_btn_clicked();
+            }
+        }
+    }
+    on_new_frame();
+}
+
+/**
  * @brief reacts to a new frame number. Updates the playback slider and current time label
  * @param frame_num
  */
 void VideoWidget::on_new_frame() {
     int frame_num = frame_index.load();
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
-    if (analysis_only) {
-        if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num == playback_slider->last_poi_end) {
-                analysis_play_btn_toggled(false);
-                analysis_play_btn->setChecked(false);
-                play_btn->setChecked(false);
-            } else {
-                next_poi_btn_clicked();
-            }
-        }
-    }
     if (!playback_slider->is_blocked()) {
         // Block signals to prevent value_changed signal to trigger
         playback_slider->blockSignals(true);
         playback_slider->setValue(frame_num);
         playback_slider->blockSignals(false);
     }
+    if (analysis_only) {
+        if (!playback_slider->is_in_POI(frame_num)) {
+            if (frame_num >= playback_slider->last_poi_end) {
+                play_btn->setChecked(false);
+            }
+        }
+    }
 
     if (m_frame_rate) set_current_time(frame_num / m_frame_rate);
-    frame_line_edit->setText(QString::number(frame_index.load()));
+    frame_line_edit->setText(QString::number(frame_num));
 
     if (!m_floating) {
         if (proj_tree_item == VIDEO_ITEM) {
@@ -992,7 +1051,14 @@ void VideoWidget::on_playback_slider_pressed() {
  */
 void VideoWidget::on_playback_slider_released() {
     playback_slider->set_blocked(false);
-    frame_index.store(playback_slider->value());
+    int new_frame = playback_slider->value();
+    if (analysis_only) {
+        new_frame = playback_slider->get_closest_poi(new_frame);
+    }
+    {
+        std::lock_guard<std::mutex> p_lock(player_lock);
+        frame_index.store(new_frame);
+    }
     on_new_frame();
 }
 
@@ -1030,6 +1096,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
+        frame_is_clean = false;
+        frame_wgt->clear_frame(false);
 
         // Set state variables but don't update the processor
         {
@@ -1059,6 +1127,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (state.frame > -1) {
             on_new_frame();
         }
+        set_video_btns(!frame_is_clean);
     }
     m_interval = std::make_pair(0,0);
     set_status_bar("Video loaded");
@@ -1143,6 +1212,35 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
 }
 
 /**
+ * @brief VideoWidget::capture_failed
+ * Open a dialog where the user can enter a new path to the video.
+ * Will then try to open the video again.
+ */
+void VideoWidget::capture_failed() {
+    PathDialog* dialog = new PathDialog(&m_video_path);
+    connect(dialog, &PathDialog::open_view_path_dialog, this, &VideoWidget::open_view_path_dialog);
+
+    int status = dialog->exec();
+
+    if (status == dialog->Accepted) {
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            m_vid_proj->get_video()->file_path = m_video_path;
+            new_video.store(true);
+        }
+        player_con.notify_all();
+    } else {
+        frame_wgt->clear_frame(true);
+        frame_is_clean = true;
+        set_video_btns(false);
+
+        // Set variable and send to processor
+        set_no_video();
+    }
+    emit update_videoitem(m_video_path);
+}
+
+/**
  * @brief VideoWidget::on_video_info
  * @param video_width
  * @param video_height
@@ -1152,6 +1250,7 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
+    m_vid_proj->get_video()->set_size(video_width, video_height);
     m_video_width = video_width;
     m_video_height = video_height;
     m_frame_rate = frame_rate;
@@ -1164,9 +1263,14 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     playback_slider->setValue(current_frame_index);
     playback_slider->blockSignals(false);
 
-    set_total_time((last_frame + 1) / frame_rate);
-    set_current_time(current_frame_index / m_frame_rate);
-    fps_label->setText(QString::number(m_frame_rate) + "fps");
+    if (frame_rate != 0) {
+        set_total_time((last_frame + 1) / frame_rate);
+        set_current_time(current_frame_index / frame_rate);
+    } else {
+        set_total_time(0);
+        set_current_time(0);
+    }
+    fps_label->setText(QString::number(frame_rate) + "fps");
     size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
     max_frames->setText("/ " + QString::number(last_frame));
 
@@ -1287,6 +1391,12 @@ void VideoWidget::set_current_drawing(Shapes* shape) {
     update_overlay_settings([&](){
         o_settings.set_current_drawing = true;
         o_settings.shape = shape;
+    });
+}
+
+void VideoWidget::set_no_video() {
+    update_overlay_settings([&](){
+        o_settings.no_video = true;
     });
 }
 
@@ -1480,6 +1590,7 @@ void VideoWidget::set_current_frame_size(QSize size) {
 }
 
 void VideoWidget::on_export_frame() {
+    if (frame_is_clean) return;
     int frame = frame_index.load();
     emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
     emit set_status_bar(QString("Frame %1 exported").arg(frame));

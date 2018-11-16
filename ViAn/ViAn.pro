@@ -82,7 +82,10 @@ SOURCES += main.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
+    GUI/pathdialog.cpp \
     GUI/Analysis/analysislistitem.cpp \
+    GUI/viewpathdialog.cpp \
+    GUI/viewpathitem.cpp \
     Project/imagesequence.cpp \
     GUI/TreeItems/sequencecontaineritem.cpp
 
@@ -156,7 +159,10 @@ HEADERS += reportgenerator.h\
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
+    GUI/pathdialog.h \
     GUI/Analysis/analysislistitem.h \
+    GUI/viewpathdialog.h \
+    GUI/viewpathitem.h \
     Project/imagesequence.h \
     Project/video.h \
     GUI/TreeItems/sequencecontaineritem.h

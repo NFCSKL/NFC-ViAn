@@ -43,6 +43,7 @@ public:
     QPointer<QAction> show_settings_act = nullptr;
     QString get_default_path();
 
+    std::vector<Video*> video_list;
     std::vector<std::string> remove_list;
 
 signals:
@@ -79,6 +80,7 @@ public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
+    void create_video(QString path);
     void add_images();
     void create_sequence(QStringList image_paths, QStringList checksums, std::string path);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
@@ -105,6 +107,8 @@ public slots:
     void update_analysis_settings();
     void advanced_analysis();
     bool prompt_save();
+    void update_current_videoitem(std::string path);
+    void update_videoitems();
 private slots:
     void context_menu(const QPoint& point);
     void open_video_in_widget();

@@ -8,6 +8,7 @@ const double Zoomer::DEGREES_TO_RADIANS_FACTOR = M_PI / 180;
 
 Zoomer::Zoomer() {}
 
+// TODO not used?
 Zoomer::Zoomer(cv::Size frame_size) {
     set_frame_size(frame_size);
     reset();
@@ -20,20 +21,22 @@ Zoomer::Zoomer(cv::Size frame_size) {
  */
 void Zoomer::enforce_frame_boundaries() {
     cv::RotatedRect temp(m_viewport.center,
-                         cv::Size(m_viewport.size.width / m_scale_factor, m_viewport.size.height / m_scale_factor),
+                         cv::Size(m_viewport.size.width / m_scale_factor,
+                                  m_viewport.size.height / m_scale_factor),
                          0);
+
     cv::Point2f p[4];
     temp.points(p);
     cv::Point2f tl = p[1];
     cv::Point2f br = p[3];
 
     double dx{}, dy{};
-    if ((tl.x) < 0 && (br.x ) > m_transformed_frame_rect.width) {
+    if ((tl.x) < 0 && (br.x) > m_transformed_frame_rect.width) {
         dx = 0;
     } else if ((tl.x) < 0) {
         // Frame is being cropped on the left side, move center to the right
         dx = std::abs(tl.x);
-    } else if ((br.x ) > m_transformed_frame_rect.width) {
+    } else if ((br.x) > m_transformed_frame_rect.width) {
         // Frame is being cropped on the right side, move center to the left
         dx = m_transformed_frame_rect.width - br.x;
     }
@@ -76,12 +79,8 @@ void Zoomer::area_zoom(QPoint p1, QPoint p2) {
     int end_y = (p1.y() < p2.y()) ? p2.y() : p1.y();
 
     cv::Point2f new_center(start_x + (end_x - start_x) / 2, start_y + (end_y - start_y) / 2);
-    m_viewport = cv::RotatedRect(new_center,
-                                 m_viewport.size,
-                                 m_angle);
-
+    m_viewport = cv::RotatedRect(new_center, m_viewport.size, m_angle);
     update_scale(end_x - start_x, end_y - start_y);
-    update_anchor();
 }
 
 /**
@@ -230,7 +229,7 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
 
     // Check for default state
     if (center_point.x() == -1 && center_point.y() == -1) {
-        if (scale_factor == 1) {
+        if (scale_factor == 1.) {
             fit_viewport();
         } else {
             center();
@@ -258,7 +257,7 @@ void Zoomer::fit_viewport() {
  * Updates the zooming factor based on viewport and zoom rectangle sizes
  */
 void Zoomer::update_scale(const double& width, const double& height) {
-    if (width * height == 0) return;
+    if (width * height == 0.) return;
     set_scale_factor(std::min(m_viewport_size.width() / width,
                               m_viewport_size.height() / height));
 }

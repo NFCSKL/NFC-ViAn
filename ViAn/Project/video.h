@@ -19,7 +19,6 @@ struct VideoState {
     QPoint anchor = QPoint(0,0);
     // Center point is relative the rotation
     QPoint center = QPoint(-1,-1);
-    cv::Rect zoom_rect;
     bool video = false;
     VideoState(){}
     VideoState(VideoState&rh){
@@ -31,7 +30,6 @@ struct VideoState {
         scale_factor = rh.scale_factor;
         anchor = rh.anchor;
         center = rh.center;
-        zoom_rect = rh.zoom_rect;
         video = rh.video;
     }
 };
@@ -42,6 +40,7 @@ protected:
     std::string m_name;
     bool m_is_sequence;
     bool m_is_saved{false};
+    int m_width, m_height = 0;
 public:
     VideoState state;
 public:
@@ -53,6 +52,9 @@ public:
     void set_name(const std::string& new_name);
     bool is_sequence();
     bool is_saved();
+    int get_width();
+    int get_height();
+    void set_size(int width, int height);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

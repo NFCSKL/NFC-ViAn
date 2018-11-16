@@ -159,8 +159,8 @@ void VideoProject::read(const QJsonObject& json){
             analysis = new Tag();
             break;
         default:
-            qWarning("Undefined analysis");
-            break;
+            qWarning("Something went wrong. Undefined analysis");
+            return;
         }
         analysis->read(json_analysis);
         add_analysis(analysis);
