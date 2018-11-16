@@ -154,9 +154,6 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
             break;
         case INTERVAL:
             m_interval_areas = dynamic_cast<Interval*>(analysis);
-            if (m_interval_areas->m_area_list.size() > 0) {
-                last_poi_end = m_interval_areas->m_area_list.back().second;
-            }
             repaint();
             break;
         default:
@@ -175,7 +172,6 @@ void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
     if (analysis) {
         m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
         rects = analysis->m_slider_interval;
-        last_poi_end = rects.back().second;
     }
 }
 
@@ -414,6 +410,17 @@ int AnalysisSlider::get_closest_poi(int frame) {
             return frame;
         }
     }
+}
+
+/**
+ * @brief AnalysisSlider::get_last_poi_end
+ * Returns the end point of the last poi interval
+ * @return
+ */
+int AnalysisSlider::get_last_poi_end() {
+    if (m_show_pois && rects.size() > 0) return rects.back().second;
+    if (m_show_interval_areas && m_interval_areas->m_area_list.size() > 0) return m_interval_areas->m_area_list.back().second;
+    return 0;
 }
 
 /**

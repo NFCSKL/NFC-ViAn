@@ -33,8 +33,6 @@ class AnalysisSlider : public QSlider {
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = nullptr);
 
-    int last_poi_end = -1;
-
     Analysis* m_analysis = nullptr;
     Tag* m_tag = nullptr;
     Interval* m_interval_areas = nullptr;
@@ -66,6 +64,7 @@ public:
     int get_prev_poi_start(int curr_frame);
     int get_prev_poi_end(int curr_frame);
     int get_closest_poi(int curr_frame);
+    int get_last_poi_end();
 
     const int PAGE_STEP = 10;
 

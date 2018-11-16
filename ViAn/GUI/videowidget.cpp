@@ -971,7 +971,7 @@ void VideoWidget::display_index_slot() {
     int frame_num = frame_index.load();
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num < playback_slider->last_poi_end) {
+            if (frame_num < playback_slider->get_last_poi_end()) {
                 next_poi_btn_clicked();
             }
         }
@@ -994,7 +994,7 @@ void VideoWidget::on_new_frame() {
     }
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num >= playback_slider->last_poi_end) {
+            if (frame_num >= playback_slider->get_last_poi_end()) {
                 play_btn->setChecked(false);
             }
         }
