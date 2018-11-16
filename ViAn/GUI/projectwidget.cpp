@@ -696,6 +696,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         break;
     } case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+        if (vid_item->get_video_project() == nullptr) return;
         emit set_video_project(vid_item->get_video_project());
         VideoState state;
         vid_item->get_video_project()->state.video = true;
