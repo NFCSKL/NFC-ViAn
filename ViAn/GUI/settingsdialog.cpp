@@ -21,7 +21,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     // Add thickness
     thickness_layout = new QFormLayout();
     thickness_slider = new QSlider(Qt::Horizontal, this);
-    thickness_slider->setValue(Constants::LINE_THICKNESS);
+    thickness_slider->setValue(Singleton::get_instance()->LINE_THICKNESS);
     thickness_label = new QLabel(this);
     thickness_label->setMinimumWidth(25);
     thickness_label->setText(QString::number(thickness_slider->value()));

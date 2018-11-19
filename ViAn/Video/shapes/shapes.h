@@ -62,7 +62,8 @@ protected:
     SHAPES shape = ZOOM;
     cv::Scalar color;
     QColor q_color;
-    int thickness = Constants::LINE_THICKNESS;
+    //int thickness = Constants
+    int thickness = Singleton::get_instance()->LINE_THICKNESS;
     cv::Point draw_start;
     cv::Point draw_end;
     bool anchor; // true = draw start -- false = draw end; TODO 4 corners
