@@ -17,8 +17,6 @@ public:
     QAction* add_video_act;
     QAction* add_img_seq_act;
     QAction* open_folder_act;
-
-signals:
 };
 
 #endif // MAINTOOLBAR_H

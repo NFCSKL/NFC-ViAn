@@ -13,13 +13,23 @@ class SettingsDialog : public QDialog
 
     QFormLayout* layout;
     QFormLayout* thickness_layout;
+    QFormLayout* page_step_layout;
+
+    QSlider* thickness_slider;
+    QSlider* page_step_slider;
 
     QLabel* thickness_label;
-    QSlider* thickness_slider;
+    QLabel* page_step_label;
 
     QDialogButtonBox* btn_box;
 public:
     SettingsDialog(QWidget* parent = nullptr);
+
+private slots:
+    void thickness_changed(int value);
+    void page_step_changed(int value);
+    void ok_btn_clicked();
+    void restore_btn_clicked();
 };
 
 #endif // SETTINGSDIALOG_H

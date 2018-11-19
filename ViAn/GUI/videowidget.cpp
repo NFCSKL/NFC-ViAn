@@ -1690,10 +1690,13 @@ void VideoWidget::set_video_end() {
 void VideoWidget::page_step_front() {
     if (!video_btns_enabled) return;
     int value = playback_slider->value();
-    if (value + playback_slider->PAGE_STEP > playback_slider->maximum()) {
+    Singleton* s = Singleton::get_instance();
+
+    qDebug() << "front" << s->PAGE_STEP;
+    if (value + s->PAGE_STEP > playback_slider->maximum()) {
         frame_index.store(playback_slider->maximum());
     } else {
-        frame_index.store(value + playback_slider->PAGE_STEP);
+        frame_index.store(value + s->PAGE_STEP);
     }
     on_new_frame();
 }
@@ -1701,10 +1704,11 @@ void VideoWidget::page_step_front() {
 void VideoWidget::page_step_back() {
     if (!video_btns_enabled) return;
     int value = playback_slider->value();
-    if (value - playback_slider->PAGE_STEP < playback_slider->minimum()) {
+    Singleton* s = Singleton::get_instance();
+    if (value - s->PAGE_STEP < playback_slider->minimum()) {
         frame_index.store(playback_slider->minimum());
     } else {
-        frame_index.store(value - playback_slider->PAGE_STEP);
+        frame_index.store(value - s->PAGE_STEP);
     }
     on_new_frame();
 }

@@ -1,6 +1,7 @@
 #include "analysismethod.h"
 
 #include "analysissettings.h"
+#include "constants.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/poi.h"
 #include "utility.h"
@@ -152,8 +153,8 @@ void AnalysisMethod::calculate_scaling_factor() {
     m_scaling_done = true;
     int video_width = analysis_frame.cols;
     int video_height = analysis_frame.rows;
-    float height_ratio = float(FULL_HD_HEIGHT)/float(video_height);
-    float width_ratio = float(FULL_HD_WIDTH)/float(video_width);
+    float height_ratio = float(Constants::FULL_HD_HEIGHT)/float(video_height);
+    float width_ratio = float(Constants::FULL_HD_WIDTH)/float(video_width);
     if (height_ratio >= 1 && width_ratio >= 1) return;
 
     scaling_needed = true;
@@ -161,10 +162,10 @@ void AnalysisMethod::calculate_scaling_factor() {
     if (width_ratio >= height_ratio) {
         scaling_ratio = height_ratio;
         scaled_width = int(video_width * scaling_ratio);
-        scaled_height = FULL_HD_HEIGHT;
+        scaled_height = Constants::FULL_HD_HEIGHT;
     } else {
         scaling_ratio = width_ratio;
-        scaled_width = FULL_HD_WIDTH;
+        scaled_width = Constants::FULL_HD_WIDTH;
         scaled_height = int(video_height * scaling_ratio);
     }
 }

@@ -36,7 +36,6 @@ public:
     static cv::Point qpoint_to_point(QPoint pnt);
 
     static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
-    //static const int LINE_THICKNESS = Constants::LINE_THICKNESS;
     static constexpr double ALPHA = 0.6; // Costant used for the opacity.
 
     cv::Point get_draw_start();

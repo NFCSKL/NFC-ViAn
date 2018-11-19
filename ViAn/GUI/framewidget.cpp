@@ -1,6 +1,7 @@
 #include "framewidget.h"
 
 #include "Analysis/analysissettings.h"
+#include "constants.h"
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/videoproject.h"
@@ -604,23 +605,23 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
         if (event->modifiers() == Qt::ShiftModifier) {
             init_panning(event->pos());
             if (num_steps.y() < 0) {
-                panning(event->pos()+QPoint(-PAN_FACTOR*m_scale_factor,0));
+                panning(event->pos()+QPoint(-Constants::PAN_FACTOR*m_scale_factor,0));
             } else {
-                panning(event->pos()+QPoint(PAN_FACTOR*m_scale_factor,0));
+                panning(event->pos()+QPoint(Constants::PAN_FACTOR*m_scale_factor,0));
             }
         }
         else if (event->modifiers() == Qt::ControlModifier) {
             if (num_steps.y() < 0) {
-                emit move_viewport_center(scaled_pos, 1/ZOOM_STEP);
+                emit move_viewport_center(scaled_pos, 1/Constants::ZOOM_STEP);
             } else {
-                emit move_viewport_center(scaled_pos, ZOOM_STEP);
+                emit move_viewport_center(scaled_pos, Constants::ZOOM_STEP);
             }
         } else {
             init_panning(event->pos());
             if (num_steps.y() < 0) {
-                panning(event->pos()+QPoint(0,-PAN_FACTOR*m_scale_factor));
+                panning(event->pos()+QPoint(0,-Constants::PAN_FACTOR*m_scale_factor));
             } else {
-                panning(event->pos()+QPoint(0,PAN_FACTOR*m_scale_factor));
+                panning(event->pos()+QPoint(0,Constants::PAN_FACTOR*m_scale_factor));
             }
         }
     default:
