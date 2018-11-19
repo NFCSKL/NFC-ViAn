@@ -5,8 +5,8 @@
 DrawingTagItem::DrawingTagItem(Tag *tag) : TreeItem(DRAWING_TAG_ITEM) {
     m_tag = tag;
     setText(0, QString::fromStdString(tag->get_name()));
-    const QIcon folder_icon("../Vian/Icons/pen.png");
-    setIcon(0, folder_icon);
+    const QIcon draw_tag_icon("../Vian/Icons/pen.png");
+    setIcon(0, draw_tag_icon);
 }
 
 DrawingTagItem::~DrawingTagItem() {

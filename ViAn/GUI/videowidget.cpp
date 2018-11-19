@@ -9,6 +9,7 @@
 #include "GUI/drawscrollarea.h"
 #include "GUI/TreeItems/treeitem.h"
 #include "Project/Analysis/analysisinterval.h"
+#include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
 #include "Project/videoproject.h"
@@ -234,7 +235,7 @@ void VideoWidget::init_frame_processor() {
  * @brief VideoWidget::set_icons
  * Set icons on all buttons
  */
-void VideoWidget::set_btn_icons() {    
+void VideoWidget::set_btn_icons() {
     play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
@@ -250,6 +251,7 @@ void VideoWidget::set_btn_icons() {
     new_label_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
+    create_interval_btn = new QPushButton(QIcon("../ViAn/Icons/create_interval.png"), "", this);
 
     interpolate_check = new QCheckBox("Interpolate", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/resize.png"), "", this);
@@ -289,6 +291,7 @@ void VideoWidget::set_btn_tool_tip() {
     new_label_btn->setToolTip(tr("Create a new tag label: Ctrl + T"));
     set_start_interval_btn->setToolTip("Set left interval point: I");
     set_end_interval_btn->setToolTip("Set right interval point: O");
+    create_interval_btn->setToolTip("Save the current marked interval: K");
 
     fit_btn->setToolTip(tr("Scale video to screen: Ctrl + F"));
     original_size_btn->setToolTip(tr("Reset zoom: Ctrl + H"));
@@ -314,6 +317,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(new_label_btn);
     btns.push_back(set_start_interval_btn);
     btns.push_back(set_end_interval_btn);
+    btns.push_back(create_interval_btn);
     btns.push_back(fit_btn);
     btns.push_back(original_size_btn);
     for (QPushButton* btn : btns) {
@@ -345,10 +349,10 @@ void VideoWidget::set_btn_tab_order() {
     setTabOrder(tag_btn, new_label_btn);
     setTabOrder(new_label_btn, set_start_interval_btn);
     setTabOrder(set_start_interval_btn, set_end_interval_btn);
-    setTabOrder(set_end_interval_btn, fit_btn);
+    setTabOrder(set_end_interval_btn, create_interval_btn);
+    setTabOrder(create_interval_btn, fit_btn);
     setTabOrder(fit_btn, original_size_btn);
     setTabOrder(original_size_btn, interpolate_check);
-
 }
 
 /**
@@ -448,6 +452,7 @@ void VideoWidget::add_btns_to_layouts() {
     other_btns->addWidget(new_label_btn);
     other_btns->addWidget(set_start_interval_btn);
     other_btns->addWidget(set_end_interval_btn);
+    other_btns->addWidget(create_interval_btn);
 
     control_row->addLayout(other_btns);
 
@@ -500,6 +505,7 @@ void VideoWidget::connect_btns() {
 
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
+    connect(create_interval_btn, &QPushButton::clicked, this, &VideoWidget::create_interval_clicked);
 }
 
 /**
@@ -639,14 +645,6 @@ void VideoWidget::set_total_time(int time) {
 }
 
 /**
- * @brief VideoWidget::get_current_frame
- * @return
- */
-int VideoWidget::get_current_frame() {
-    return frame_index.load();
-}
-
-/**
  * @brief VideoWidget::set_scale_factor
  * @param scale_factor
  */
@@ -725,16 +723,35 @@ void VideoWidget::set_interval_end_clicked() {
 }
 
 /**
- * @brief VideoWidget::set_interval
- * Sets the interval from two ints
- * @param start
- * @param end
+ * @brief VideoWidget::create_interval_clicked
+ * Slot function for create interval button
+ * Create a new interval if needed and then creates interval area
+ * from the interval on the slider
  */
-void VideoWidget::set_interval(int start, int end) {
-    m_interval.first = start;
-    m_interval.second = end;
-    playback_slider->set_interval(start, end);
-    playback_slider->update();
+void VideoWidget::create_interval_clicked() {
+    int first = m_interval.first;
+    int second = m_interval.second;
+    if (first == -1 || second <= 0 || second < first) {
+        emit set_status_bar("Select an interval");
+        return;
+    }
+    if (m_current_interval == nullptr) {
+        TagDialog* interval_dialog = new TagDialog("Interval");
+        interval_dialog->setAttribute(Qt::WA_DeleteOnClose);
+        connect(interval_dialog, &TagDialog::tag_name, this, &VideoWidget::new_interval);
+        int result = interval_dialog->exec();
+        if (result != TagDialog::Accepted) return;
+    }
+    m_current_interval->add_area(first, second);
+    emit set_interval_area(first);
+    emit set_status_bar("Interval: " + QString::number(first) + " - " +
+                        QString::number(second) + " added");
+    delete_interval();
+}
+
+void VideoWidget::new_interval(QString name) {
+    Interval* interval = new Interval(name.toStdString());
+    emit add_interval(m_vid_proj, interval);
 }
 
 /**
@@ -870,40 +887,15 @@ void VideoWidget::new_tag(QString name) {
     emit add_tag(m_vid_proj, tag);
 }
 
-/**
- * @brief VideoWidget::tag_interval
- */
-void VideoWidget::tag_interval() {
-    if(m_tag == nullptr){
-        emit set_status_bar("Please select a tag");
-        return;
-    }
-    if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-        m_tag->add_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-        playback_slider->set_basic_analysis(m_tag);
-        delete_interval();
-    }
-}
-
-/**
- * @brief VideoWidget::remove_tag_interval
- * For each frame in the interval, un-tag it
- */
-// TODO Remove/change
-// Update for intervals
-void VideoWidget::remove_tag_interval() {
-    if (m_tag != nullptr) {
-//        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-//            m_tag->remove_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-//            playback_slider->set_basic_analysis(m_tag);
-//        }
-    } else {
-        emit set_status_bar("No tag selected");
-    }
-}
-
 void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
-    m_tag = dynamic_cast<Tag*>(basic_analysis);
+    if (!basic_analysis) {
+        m_current_interval = nullptr;
+        m_tag = nullptr;
+    } else if (basic_analysis->get_type() == INTERVAL) {
+        m_current_interval = dynamic_cast<Interval*>(basic_analysis);
+    } else {
+        m_tag = dynamic_cast<Tag*>(basic_analysis);
+    }
 }
 
 void VideoWidget::clear_tag() {
@@ -971,22 +963,6 @@ void VideoWidget::prev_poi_btn_clicked() {
 }
 
 /**
- * @brief VideoWidget::zoom_out_clicked
- * zoom out button clicked.
- */
-void VideoWidget::zoom_out_clicked() {
-    set_status_bar("Zoom out");
-}
-
-/**
- * @brief sets the max value of the playback slider
- * @param value
- */
-void VideoWidget::set_slider_max(int value) {
-    playback_slider->setMaximum(value);
-}
-
-/**
  * @brief VideoWidget::display_index_slot
  * Slot function for on_new_frame that will jump to next poi
  * while analysis_only
@@ -995,7 +971,7 @@ void VideoWidget::display_index_slot() {
     int frame_num = frame_index.load();
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num < playback_slider->last_poi_end) {
+            if (frame_num < playback_slider->get_last_poi_end()) {
                 next_poi_btn_clicked();
             }
         }
@@ -1018,7 +994,7 @@ void VideoWidget::on_new_frame() {
     }
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
-            if (frame_num >= playback_slider->last_poi_end) {
+            if (frame_num >= playback_slider->get_last_poi_end()) {
                 play_btn->setChecked(false);
             }
         }
@@ -1096,6 +1072,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
+        delete_interval();
         frame_is_clean = false;
         frame_wgt->clear_frame(false);
 
@@ -1129,10 +1106,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         }
         set_video_btns(!frame_is_clean);
     }
-    m_interval = std::make_pair(0,0);
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
-    playback_slider->set_interval(-1, -1);
     emit update_manipulator_wgt(state.brightness, state.contrast, state.gamma);
 }
 
@@ -1166,7 +1141,7 @@ void VideoWidget::clear_current_video() {
     playback_slider->setValue(frame);
     playback_slider->blockSignals(false);
     play_btn->setChecked(false);
-    playback_slider->set_interval(-1, -1);
+    delete_interval();
     set_total_time(0);
     fps_label->setText("Fps: -");
     max_frames->setText("/ -");
@@ -1175,6 +1150,7 @@ void VideoWidget::clear_current_video() {
     frame_wgt->close();
     m_vid_proj = nullptr;
     m_tag = nullptr;
+    m_current_interval = nullptr;
     emit clean_zoom_preview();
 }
 
@@ -1285,6 +1261,7 @@ void VideoWidget::on_playback_stopped(){
  *  Functions changing synchronized settings
  */
 
+// TODO unused
 void VideoWidget::set_overlay(Overlay *overlay) {
     update_overlay_settings([&](){
         o_settings.overlay = overlay;
@@ -1583,10 +1560,6 @@ void VideoWidget::update_playback_speed(int speed) {
         player_con.notify_one();
     }
     fps_label->setText(QString::number(m_frame_rate) + "fps");
-}
-
-void VideoWidget::set_current_frame_size(QSize size) {
-    current_frame_size = size;
 }
 
 void VideoWidget::on_export_frame() {

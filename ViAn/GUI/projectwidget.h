@@ -15,6 +15,8 @@ class AnalysisItem;
 class AnalysisMethod;
 class AnalysisProxy;
 class BasicAnalysis;
+class Interval;
+class IntervalItem;
 class Project;
 class Tag;
 class TagFrame;
@@ -38,6 +40,7 @@ public:
     ~ProjectWidget();
     Project* m_proj = nullptr;
     TagItem* m_tag_item = nullptr;
+    IntervalItem* m_interval_item = nullptr;
     AnalysisSettings* analysis_settings = new AnalysisSettings();
     QPointer<QAction> show_details_act = nullptr;
     QPointer<QAction> show_settings_act = nullptr;
@@ -65,6 +68,7 @@ signals:
     void enable_poi_btns(bool, bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
+    void set_interval_slider(bool);
     void set_video_project(VideoProject*);
     void clear_tag();
     void clear_slider();
@@ -88,6 +92,9 @@ public slots:
     void add_frames_to_tag_item(TreeItem *item);
     void add_new_frame_to_tag_item(int frame, TagFrame *t_frame);
     void remove_frame_from_tag_item(int frame);
+    void add_interval(VideoProject*, Interval* interval);
+    void add_interval_area_to_interval(TreeItem* item, int current = -1);
+    void set_interval_area(int new_area_start);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void toggle_details(bool b);
     void toggle_settings(bool b);
@@ -101,6 +108,8 @@ public slots:
     void remove_drawing_tag_item(QTreeWidgetItem* item);
     void remove_analysis_item(QTreeWidgetItem* item);
     void remove_tag_frame_item(QTreeWidgetItem* item);
+    void remove_interval_item(QTreeWidgetItem* item);
+    void remove_interval_area_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
     void update_analysis_settings();
@@ -137,6 +146,7 @@ private:
     void save_item_data(QTreeWidgetItem* item = nullptr);
     void add_analyses_to_item(VideoItem* v_item);
     void update_current_tag(VideoItem* v_item);
+    void update_current_interval(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
 signals:
     void close_all_widgets();
