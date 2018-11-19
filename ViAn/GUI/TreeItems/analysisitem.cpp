@@ -9,16 +9,16 @@
 AnalysisItem::AnalysisItem(AnalysisProxy* analysis) : TreeItem(ANALYSIS_ITEM) {
     m_analysis = analysis;
     finished = true;
-    const QIcon folder_icon("../ViAn/Icons/analysis.png");
-    setIcon(0, folder_icon);
+    const QIcon analysis_icon("../ViAn/Icons/analysis.png");
+    setIcon(0, analysis_icon);
     setText(0, QString::fromStdString(m_analysis->get_name()));
 }
 /**
  * @brief AnalysisItem::AnalysisItem
  */
 AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
-    const QIcon folder_icon("../ViAn/Icons/analysis.png");
-    setIcon(0, folder_icon);
+    const QIcon analysis_icon("../ViAn/Icons/analysis.png");
+    setIcon(0, analysis_icon);
     setText(0, "Analysis");
 }
 /**

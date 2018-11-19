@@ -6,6 +6,7 @@
 class Analysis;
 class AnalysisProxy;
 class BasicAnalysis;
+class Interval;
 class Tag;
 
 /**
@@ -21,6 +22,7 @@ class AnalysisSlider : public QSlider {
     bool m_was_paused = false;
     bool m_show_pois = false;
     bool m_show_tags = false;
+    bool m_show_interval_areas = false;
     bool show_on_slider = true;
     bool show_interval = true;
     bool show_ana_interval = false;
@@ -31,10 +33,9 @@ class AnalysisSlider : public QSlider {
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = nullptr);
 
-    int last_poi_end = -1;
-
     Analysis* m_analysis = nullptr;
     Tag* m_tag = nullptr;
+    Interval* m_interval_areas = nullptr;
 
     std::pair<int, int> m_interval = std::make_pair(-1, -1);
     std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
@@ -49,6 +50,7 @@ public:
     // Interval settings
     int set_interval_first();
     int set_interval_second();
+    void clear_interval(void);
 
     // Drawing interval functions
     void draw_interval(std::pair<int, int> interval, QRect groove, double frame_width);
@@ -62,6 +64,7 @@ public:
     int get_prev_poi_start(int curr_frame);
     int get_prev_poi_end(int curr_frame);
     int get_closest_poi(int curr_frame);
+    int get_last_poi_end();
 
     const int PAGE_STEP = 10;
 
@@ -76,13 +79,10 @@ public slots:
     // Wrapped repaint
     void update();
 
-    // Interval slots
-    void set_interval(int start, int end);
-    void clear_interval(void);
-
     // Control slots
     void set_show_pois(bool);
     void set_show_tags(bool);
+    void set_show_interval_areas(bool);
     void set_show_on_slider(bool);
     void set_show_interval(bool);
     void set_show_ana_interval(bool);

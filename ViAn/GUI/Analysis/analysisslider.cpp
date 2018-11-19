@@ -3,6 +3,7 @@
 #include "Analysis/analysissettings.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/tag.h"
+#include "Project/Analysis/interval.h"
 
 #include <QDebug>
 #include <QStyleOptionSlider>
@@ -39,7 +40,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     // Checks if tag is a nullptr and if the tag should be shown on the slider
     if (m_show_tags && show_on_slider && m_tag) {
         for (int frame : m_tag->get_frames()) {
-            int first = static_cast<int>((groove_rect.left() + (frame) * frame_width));
+            int first = static_cast<int>(groove_rect.left() + frame * frame_width);
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
             painter.fillRect(rect, brush);
         }
@@ -54,11 +55,23 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             double second_frame = static_cast<double>((*it).second);
 
             //Walk first/second_frame number of frames in on the slider
-            int first = static_cast<int>((groove_rect.left()+first_frame*frame_width));
-            int second = static_cast<int>((groove_rect.left()+second_frame*frame_width));
+            int first = static_cast<int>(groove_rect.left()+first_frame*frame_width);
+            int second = static_cast<int>(groove_rect.left()+second_frame*frame_width);
 
             //Draw the rects, +1 so it's not too small
             //QRect(int x, int y, int width, int height)
+            QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
+            painter.fillRect(rect, brush);
+        }
+    }
+    // Draws the intervals in the slider
+    // Checks if the interval is a nullptr and if the interval should be shown on the slider
+    if (m_show_interval_areas && show_on_slider && m_interval_areas) {
+        brush = Qt::cyan;
+
+        for (std::pair<int,int> area : m_interval_areas->m_area_list) {
+            int first = static_cast<int>(groove_rect.left() + area.first * frame_width);
+            int second = static_cast<int>(groove_rect.left() + area.second * frame_width);
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
@@ -139,6 +152,10 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
             m_tag = dynamic_cast<Tag*>(analysis);
             repaint();
             break;
+        case INTERVAL:
+            m_interval_areas = dynamic_cast<Interval*>(analysis);
+            repaint();
+            break;
         default:
             break;
         }
@@ -155,7 +172,6 @@ void AnalysisSlider::set_analysis_proxy(AnalysisProxy *analysis) {
     if (analysis) {
         m_ana_interval = std::make_pair(analysis->settings->interval.first, analysis->settings->interval.second);
         rects = analysis->m_slider_interval;
-        last_poi_end = rects.back().second;
     }
 }
 
@@ -177,15 +193,6 @@ void AnalysisSlider::set_details_checked(bool b) {
  */
 void AnalysisSlider::set_show_ana_interval(bool show) {
     show_ana_interval = show;
-}
-
-/**
- * @brief AnalysisSlider::set_interval
- * @param start
- * @param end
- */
-void AnalysisSlider::set_interval(int start, int end) {
-    m_interval = std::make_pair(start, end);
 }
 
 /**
@@ -236,22 +243,17 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
             }
         }
     }
-    return curr_frame;
 
-    {
-//      TODO Might need for when adding interval
-//    } else if (!frames.empty()) {
-//        int edge_frame = curr_frame;
-//        for (int frame : frames) {
-//            if (frame > edge_frame+JUMP_INTERVAL+1) {
-//                return frame;
-//            } else if (frame > edge_frame+JUMP_INTERVAL){
-//                edge_frame = frame;
-//            }
-//        }
-//    }
-//    return curr_frame;
+    // If interval areas on slider get next start of next poi after current
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.first > curr_frame) {
+                return  pair.first;
+            }
+        }
     }
+
+    return curr_frame;
 }
 
 /**
@@ -265,6 +267,13 @@ bool AnalysisSlider::is_poi_start(int curr_frame) {
     if (m_show_pois) {
         for (std::pair<int, int> rect : rects) {
             if (rect.first == curr_frame) {
+                return true;
+            }
+        }
+    }
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.first == curr_frame) {
                 return true;
             }
         }
@@ -289,6 +298,14 @@ bool AnalysisSlider::is_poi_end(int curr_frame) {
             }
         }
     }
+
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.second == curr_frame) {
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -301,7 +318,7 @@ bool AnalysisSlider::is_poi_end(int curr_frame) {
 int AnalysisSlider::get_prev_poi_start(int curr_frame) {
     if (!show_on_slider) return curr_frame;
 
-    // If tags on slider get previous frame from current
+    // If tags on slider get previous frame before current
     if (m_show_tags) {
         return m_tag->previous_frame(curr_frame);
     }
@@ -316,23 +333,19 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
         }
         return new_frame;
     }
-    return curr_frame;
 
-    {
-//      TODO Might need for when adding interval
-//    } else if (!frames.empty()) {
-//        int edge_frame = curr_frame;
-//        for (int i = frames.size()-1; i >= 0; i--) {
-//            int frame = frames[i];
-//            if (frame < edge_frame-JUMP_INTERVAL-1) {
-//                return frame;
-//            } else if (frame < edge_frame-JUMP_INTERVAL){
-//                edge_frame = frame;
-//            }
-//        }
-//    }
-//    return new_frame;
+    // If interval areas on slider get previous start of area before current
+    if (m_show_interval_areas) {
+        int new_frame = curr_frame;
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.first >= curr_frame) {
+                break;
+            } else new_frame = pair.first;
+        }
+        return new_frame;
     }
+
+    return curr_frame;
 }
 
 /**
@@ -356,6 +369,16 @@ int AnalysisSlider::get_prev_poi_end(int curr_frame) {
             if (rect.second >= curr_frame) {
                 break;
             } else new_frame = rect.second;
+        }
+        return new_frame;
+    }
+
+    if (m_show_interval_areas) {
+        int new_frame = curr_frame;
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (pair.second >= curr_frame) {
+                break;
+            } else new_frame = pair.second;
         }
         return new_frame;
     }
@@ -383,8 +406,21 @@ int AnalysisSlider::get_closest_poi(int frame) {
             return prev;
         } else if (frame - prev > next -frame) {
             return next;
+        } else {
+            return frame;
         }
     }
+}
+
+/**
+ * @brief AnalysisSlider::get_last_poi_end
+ * Returns the end point of the last poi interval
+ * @return
+ */
+int AnalysisSlider::get_last_poi_end() {
+    if (m_show_pois && rects.size() > 0) return rects.back().second;
+    if (m_show_interval_areas && m_interval_areas->m_area_list.size() > 0) return m_interval_areas->m_area_list.back().second;
+    return 0;
 }
 
 /**
@@ -394,11 +430,22 @@ int AnalysisSlider::get_closest_poi(int frame) {
  * @return
  */
 bool AnalysisSlider::is_in_POI(int frame) {
-    for (std::pair<int, int> rect : rects) {
-        if (frame >= rect.first && frame <= rect.second) {
-            return true;
+    if (m_show_pois) {
+        for (std::pair<int, int> rect : rects) {
+            if (frame >= rect.first && frame <= rect.second) {
+                return true;
+            }
         }
-    }return false;
+    }
+
+    if (m_show_interval_areas) {
+        for (auto pair : m_interval_areas->m_area_list) {
+            if (frame >= pair.first && frame <= pair.second) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /**
@@ -415,6 +462,14 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
     m_show_tags = show_tags;
+}
+
+/**
+ * @brief AnalysisSlider::set_show_interval_areas
+ * @param show_interval_areas
+ */
+void AnalysisSlider::set_show_interval_areas(bool show_interval_areas) {
+    m_show_interval_areas = show_interval_areas;
 }
 
 /**

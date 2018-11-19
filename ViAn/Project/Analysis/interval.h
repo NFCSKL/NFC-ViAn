@@ -1,23 +1,29 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "basicanalysis.h"
 
-class interval
+#include <QJsonObject>
+
+#include <vector>
+
+class Interval : public BasicAnalysis
 {
 public:
-    interval();
+    Interval(std::string name = "");
+    ~Interval() override;
+    virtual ANALYSIS_TYPE get_type() const override;
+    virtual void read(const QJsonObject& json) override;
+    virtual void write(QJsonObject& json) override;
 
-//public:
-//    void remove_interval(AnalysisInterval *rm_interval);
-//    void add_frame(int frame);
-//    void remove_frame(int frame);
-//    void add_interval(AnalysisInterval *an_interval) override;
-//
-//private:
-//    void merge_intervals();
-//    bool is_interval(int start, int end);
-//    std::pair<int, int> get_overlap(AnalysisInterval *intval1, AnalysisInterval *intval2);
-//    std::pair<AnalysisInterval *, AnalysisInterval *> remove_overlap(AnalysisInterval *interval, std::pair<int, int> overlap);
+    void add_area(int start, int end);
+    void add_area(std::pair<int, int> interval);
+    void remove_area_by_frame(int frame);
+    void remove_area(std::pair<int, int> interval);
+
+    bool does_overlap(std::pair<int, int> a, std::pair<int, int> b);
+
+    std::vector<std::pair<int, int>> m_area_list;
 };
 
 #endif // INTERVAL_H
