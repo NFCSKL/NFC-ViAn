@@ -13,7 +13,6 @@ class QSlider;
 
 class ManipulatorWidget : public QWidget {
     Q_OBJECT
-    const double DOUBLE_TO_INT = 100;
     int brightness;
     double contrast;
     double gamma;

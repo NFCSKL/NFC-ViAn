@@ -17,9 +17,6 @@ using ID = int;
 class Project : public Saveable{
     friend class ProjectTestsuite;
 
-    const std::string DEFAULT_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString();
-
-
     std::string m_name = "";            // Simply the project name
     std::string m_dir_bookmarks = "";   // Project directory + /Bookmarks
     std::string m_file = "";            // Full path to the project file: project path + project name + .vian
@@ -36,11 +33,6 @@ public:
     ~Project();
 
     std::string m_dir = "";             // Path to the project folder: choosen path + project name
-
-    static const std::string BOOKMARK_FOLDER;
-    static const std::string THUMBNAIL_FOLDER;
-    static const std::string STILLS_FOLDER;
-    static const std::string SEQUENCE_FOLDER;
 
     ID add_video_project(VideoProject *vid_proj);
     void remove_video_project(VideoProject* vid_proj);

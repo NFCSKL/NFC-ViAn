@@ -1,5 +1,6 @@
 #include "pathdialog.h"
 
+#include "constants.h"
 #include "utility.h"
 #include "viewpathdialog.h"
 
@@ -14,7 +15,7 @@
 
 PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path) : QDialog(parent) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setMinimumWidth(MIN_WIDTH);
+    setMinimumWidth(Constants::DIALOG_MIN_WIDTH);
 
     m_path = path;
     m_q_path = QString::fromStdString(*path);

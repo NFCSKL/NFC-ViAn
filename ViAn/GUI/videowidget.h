@@ -208,10 +208,6 @@ public slots:
     void update_zoom_preview_size(QSize s);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
-    const int PERCENT_INT_CONVERT = 100;
-    const int ZOOM_LABEL_MIN = 1;
-    const int ZOOM_LABEL_MAX = 10000;
-    const int FIVE_SEC = 5000;
 
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;

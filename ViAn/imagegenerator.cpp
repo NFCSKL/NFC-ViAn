@@ -1,5 +1,6 @@
 #include "imagegenerator.h"
 
+#include "constants.h"
 #include "Project/project.h"
 
 #include "opencv2/imgproc/imgproc.hpp"
@@ -20,21 +21,21 @@ ImageGenerator::~ImageGenerator() {
 }
 
 std::string ImageGenerator::create_thumbnail(std::string name) {
-    std::string save_path = m_path + Project::THUMBNAIL_FOLDER;
+    std::string save_path = m_path + Constants::THUMBNAIL_FOLDER.toStdString();
     if (!create_directory(save_path)) return "";
     return export_image(save_path + name, PNG, THUMBNAIL_SIZE);
 
 }
 
 std::string ImageGenerator::create_tiff(std::string name) {
-    std::string save_path = m_path + Project::STILLS_FOLDER;
+    std::string save_path = m_path + Constants::STILLS_FOLDER.toStdString();
     if (!create_directory(save_path)) return "";    
     return export_image(save_path + name, TIFF);
 }
 
 
 std::string ImageGenerator::create_bookmark(std::string name) {
-    std::string save_path = m_path + Project::BOOKMARK_FOLDER;
+    std::string save_path = m_path + Constants::BOOKMARK_FOLDER.toStdString();
     if (!create_directory(save_path)) return "";
     return export_image(save_path + name, TIFF);
 }

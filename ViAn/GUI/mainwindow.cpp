@@ -2,6 +2,7 @@
 
 #include "Analysis/analysismethod.h"
 #include "Analysis/analysisslider.h"
+#include "constants.h"
 #include "framewidget.h"
 #include "GUI/Analysis/analysiswidget.h"
 #include "GUI/Analysis/anasettingwidget.h"
@@ -68,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize video widget
     video_wgt = new VideoWidget();
-    video_wgt->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT * SIZE_MULTIPLIER); // width and height sets aspect ratio
+    video_wgt->setMinimumSize(Constants::VIDEO_WGT_WIDTH * Constants::SIZE_MULTIPLIER,
+                              Constants::VIDEO_WGT_HEIGHT * Constants::SIZE_MULTIPLIER); // width and height sets aspect ratio
     setCentralWidget(video_wgt);
 
     // Initialize project widget
@@ -503,9 +505,10 @@ void MainWindow::init_analysis_menu() {
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    if (video_widgets.size() < FLOATING_WIDGET_MAX) {
+    if (video_widgets.size() < Singleton::get_instance()->FLOATING_WIDGET_MAX) {
         VideoWidget* widget_video = new VideoWidget(nullptr, true);
-        widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
+        widget_video->setMinimumSize(Constants::VIDEO_WGT_WIDTH * Constants::SIZE_MULTIPLIER,
+                                     Constants::VIDEO_WGT_HEIGHT *Constants::SIZE_MULTIPLIER);
         widget_video->show();
         video_widgets.push_back(widget_video);
 
@@ -804,7 +807,7 @@ void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(
                 this,
                 tr("Open project"),
-                project_wgt->get_default_path(),
+                Constants::DEFAULT_PATH,
                 "*.vian");
     project_wgt->open_project(project_path);
 }

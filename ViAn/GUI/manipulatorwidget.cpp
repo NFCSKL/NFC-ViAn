@@ -1,5 +1,7 @@
 #include "manipulatorwidget.h"
 
+#include "constants.h"
+
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -45,17 +47,17 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, double g, QWidget* parent)
     brightness_slider->setValue(brightness);
     brightness_value_label->setText(QString::number(brightness_slider->value()));
 
-    contrast_slider->setSingleStep(static_cast<int>(FrameManipulator().CONTRAST_STEP*DOUBLE_TO_INT));
-    contrast_slider->setMaximum(static_cast<int>(FrameManipulator().CONTRAST_MAX*DOUBLE_TO_INT));
-    contrast_slider->setMinimum(static_cast<int>(FrameManipulator().CONTRAST_MIN*DOUBLE_TO_INT));
-    contrast_slider->setValue(static_cast<int>(contrast*DOUBLE_TO_INT));
-    contrast_value_label->setText(QString::number(contrast_slider->value()/DOUBLE_TO_INT));
+    contrast_slider->setSingleStep(static_cast<int>(FrameManipulator().CONTRAST_STEP*Constants::DOUBLE_TO_INT));
+    contrast_slider->setMaximum(static_cast<int>(FrameManipulator().CONTRAST_MAX*Constants::DOUBLE_TO_INT));
+    contrast_slider->setMinimum(static_cast<int>(FrameManipulator().CONTRAST_MIN*Constants::DOUBLE_TO_INT));
+    contrast_slider->setValue(static_cast<int>(contrast*Constants::DOUBLE_TO_INT));
+    contrast_value_label->setText(QString::number(contrast_slider->value()/Constants::DOUBLE_TO_INT));
 
-    gamma_slider->setSingleStep(static_cast<int>(FrameManipulator().GAMMA_STEP*DOUBLE_TO_INT));
-    gamma_slider->setMaximum(static_cast<int>(FrameManipulator().GAMMA_MAX*DOUBLE_TO_INT));
-    gamma_slider->setMinimum(static_cast<int>(FrameManipulator().GAMMA_MIN*DOUBLE_TO_INT));
-    gamma_slider->setValue(static_cast<int>(gamma*DOUBLE_TO_INT));
-    gamma_value_label->setText(QString::number(gamma_slider->value()/DOUBLE_TO_INT));
+    gamma_slider->setSingleStep(static_cast<int>(FrameManipulator().GAMMA_STEP*Constants::DOUBLE_TO_INT));
+    gamma_slider->setMaximum(static_cast<int>(FrameManipulator().GAMMA_MAX*Constants::DOUBLE_TO_INT));
+    gamma_slider->setMinimum(static_cast<int>(FrameManipulator().GAMMA_MIN*Constants::DOUBLE_TO_INT));
+    gamma_slider->setValue(static_cast<int>(gamma*Constants::DOUBLE_TO_INT));
+    gamma_value_label->setText(QString::number(gamma_slider->value()/Constants::DOUBLE_TO_INT));
 
     connect(brightness_slider, &QSlider::valueChanged, this, &ManipulatorWidget::b_changed);
     connect(contrast_slider, &QSlider::valueChanged, this, &ManipulatorWidget::c_changed);
@@ -96,8 +98,8 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, double g, QWidget* parent)
  */
 void ManipulatorWidget::ok_clicked() {
     int b = brightness_slider->value();
-    double c = contrast_slider->value()/DOUBLE_TO_INT;
-    double g = gamma_slider->value()/DOUBLE_TO_INT;
+    double c = contrast_slider->value()/Constants::DOUBLE_TO_INT;
+    double g = gamma_slider->value()/Constants::DOUBLE_TO_INT;
     apply_btn->setDisabled(true);
     emit values(b, c, g, true);
     emit update_tag(b, c, g);
@@ -110,9 +112,9 @@ void ManipulatorWidget::ok_clicked() {
  */
 void ManipulatorWidget::default_clicked() {
     brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
-    contrast_slider->setValue(static_cast<int>(FrameManipulator().CONTRAST_DEFAULT*DOUBLE_TO_INT));
-    gamma_slider->setValue(static_cast<int>(FrameManipulator().GAMMA_DEFAULT*DOUBLE_TO_INT));
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, gamma_slider->value()/DOUBLE_TO_INT, true);
+    contrast_slider->setValue(static_cast<int>(FrameManipulator().CONTRAST_DEFAULT*Constants::DOUBLE_TO_INT));
+    gamma_slider->setValue(static_cast<int>(FrameManipulator().GAMMA_DEFAULT*Constants::DOUBLE_TO_INT));
+    emit values(brightness_slider->value(), contrast_slider->value()/Constants::DOUBLE_TO_INT, gamma_slider->value()/Constants::DOUBLE_TO_INT, true);
 }
 
 /**
@@ -124,7 +126,7 @@ void ManipulatorWidget::default_clicked() {
 void ManipulatorWidget::b_changed(int value) {
     brightness_value_label->setText(QString::number(value));
     apply_btn->setDisabled(false);
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, gamma_slider->value()/DOUBLE_TO_INT, false);
+    emit values(brightness_slider->value(), contrast_slider->value()/Constants::DOUBLE_TO_INT, gamma_slider->value()/Constants::DOUBLE_TO_INT, false);
 }
 
 /**
@@ -134,10 +136,10 @@ void ManipulatorWidget::b_changed(int value) {
  * @param value
  */
 void ManipulatorWidget::c_changed(int value) {
-    QString text = QString::number(value/DOUBLE_TO_INT);
+    QString text = QString::number(value/Constants::DOUBLE_TO_INT);
     contrast_value_label->setText(text);
     apply_btn->setDisabled(false);
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, gamma_slider->value()/DOUBLE_TO_INT, false);
+    emit values(brightness_slider->value(), contrast_slider->value()/Constants::DOUBLE_TO_INT, gamma_slider->value()/Constants::DOUBLE_TO_INT, false);
 }
 
 /**
@@ -147,10 +149,10 @@ void ManipulatorWidget::c_changed(int value) {
  * @param value
  */
 void ManipulatorWidget::g_changed(int value) {
-    QString text = QString::number(value/DOUBLE_TO_INT);
+    QString text = QString::number(value/Constants::DOUBLE_TO_INT);
     gamma_value_label->setText(text);
     apply_btn->setDisabled(false);
-    emit values(brightness_slider->value(), contrast_slider->value()/DOUBLE_TO_INT, gamma_slider->value()/DOUBLE_TO_INT, false);
+    emit values(brightness_slider->value(), contrast_slider->value()/Constants::DOUBLE_TO_INT, gamma_slider->value()/Constants::DOUBLE_TO_INT, false);
 }
 
 /**
@@ -163,8 +165,8 @@ void ManipulatorWidget::g_changed(int value) {
 void ManipulatorWidget::set_values(int b_value, double c_value, double g_value) {
     blockSignals(true);
     brightness_slider->setValue(b_value);
-    contrast_slider->setValue(static_cast<int>(c_value*DOUBLE_TO_INT));
-    gamma_slider->setValue(static_cast<int>(g_value*DOUBLE_TO_INT));
+    contrast_slider->setValue(static_cast<int>(c_value*Constants::DOUBLE_TO_INT));
+    gamma_slider->setValue(static_cast<int>(g_value*Constants::DOUBLE_TO_INT));
     blockSignals(false);
     apply_btn->setDisabled(true);
 }

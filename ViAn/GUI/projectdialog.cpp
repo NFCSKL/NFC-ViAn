@@ -1,5 +1,7 @@
 #include "projectdialog.h"
 
+#include "constants.h"
+
 #include <QBoxLayout>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -17,7 +19,7 @@
  */
 ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent, QString default_path) : QDialog(parent) {
     setWindowTitle("Save project as");
-    setMinimumSize(400,110);
+    setMinimumSize(Constants::DIALOG_MIN_WIDTH,110);
     setModal(true);
     m_name = name;
     m_path = path;
@@ -25,7 +27,6 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent, QStr
 
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setMinimumWidth(MIN_WIDTH);
     setWindowIcon(QIcon("../ViAn/Icons/save.png"));
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(m_default_path, this);

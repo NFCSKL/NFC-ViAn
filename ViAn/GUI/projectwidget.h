@@ -28,7 +28,6 @@ class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
     QTreeWidgetItem* selection_parent = nullptr;
-    const QString DEFAULT_PATH = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ViAn Projects";
     std::set<std::string> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
                                 "264", "263", "mjpeg", "avc", "m2ts",
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",
@@ -44,7 +43,6 @@ public:
     AnalysisSettings* analysis_settings = new AnalysisSettings();
     QPointer<QAction> show_details_act = nullptr;
     QPointer<QAction> show_settings_act = nullptr;
-    QString get_default_path();
 
     std::vector<Video*> video_list;
     std::vector<std::string> remove_list;

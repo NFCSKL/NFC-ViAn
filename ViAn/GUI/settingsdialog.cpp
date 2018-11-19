@@ -50,6 +50,21 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     page_step_layout->addRow(page_step_label, page_step_slider);
     layout->addRow("Page step", page_step_layout);
 
+    // Add widget max
+    widget_max_layout = new QFormLayout();
+    // Add slider
+    widget_max_slider = new QSlider(Qt::Horizontal, this);
+    widget_max_slider->setValue(s->FLOATING_WIDGET_MAX);
+    widget_max_slider->setMaximum(Constants::FLOATING_WIDGET_LIMIT_MAX);
+    widget_max_slider->setMinimum(Constants::FLOATING_WIDGET_LIMIT_MIN);
+    // Add label
+    widget_max_label = new QLabel(this);
+    widget_max_label->setMinimumWidth(25);
+    widget_max_label->setText(QString::number(widget_max_slider->value()));
+
+    widget_max_layout->addRow(widget_max_label, widget_max_slider);
+    layout->addRow("Page step", widget_max_layout);
+
     btn_box = new QDialogButtonBox(Qt::Horizontal, this);
     btn_box->addButton(QDialogButtonBox::Ok);
     btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
@@ -57,6 +72,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     // Connects
     connect(thickness_slider, &QSlider::valueChanged, this, &SettingsDialog::thickness_changed);
     connect(page_step_slider, &QSlider::valueChanged, this, &SettingsDialog::page_step_changed);
+    connect(widget_max_slider, &QSlider::valueChanged, this, &SettingsDialog::widget_max_changed);
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &SettingsDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &SettingsDialog::restore_btn_clicked);
 
@@ -73,10 +89,15 @@ void SettingsDialog::page_step_changed(int value) {
     page_step_label->setText(QString::number(value));
 }
 
+void SettingsDialog::widget_max_changed(int value) {
+    widget_max_label->setText(QString::number(value));
+}
+
 void SettingsDialog::ok_btn_clicked() {
     Singleton* s = Singleton::get_instance();
     s->LINE_THICKNESS = thickness_slider->value();
     s->PAGE_STEP = page_step_slider->value(); // TODO update slider
+    s->FLOATING_WIDGET_MAX = widget_max_slider->value();
     close();
 }
 

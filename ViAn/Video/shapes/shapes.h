@@ -35,7 +35,7 @@ public:
     static cv::Scalar qcolor_to_scalar(QColor col);
     static cv::Point qpoint_to_point(QPoint pnt);
 
-    static const int LINE_THICKNESS = 2; // Constant used for the thickness of the drawn shapes.
+    // TODO Remove after analysis area is removed
     static constexpr double ALPHA = 0.6; // Costant used for the opacity.
 
     cv::Point get_draw_start();
@@ -61,7 +61,6 @@ protected:
     SHAPES shape = ZOOM;
     cv::Scalar color;
     QColor q_color;
-    //int thickness = Constants
     int thickness = Singleton::get_instance()->LINE_THICKNESS;
     cv::Point draw_start;
     cv::Point draw_end;
