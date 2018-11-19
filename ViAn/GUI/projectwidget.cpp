@@ -1248,7 +1248,10 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     default:
         break;
     }
+    blockSignals(true);
     delete item;
+    blockSignals(false);
+    setCurrentItem(nullptr);
 }
 
 /**
