@@ -273,12 +273,8 @@ private:
     Interval* m_current_interval = nullptr;
 
     bool m_floating = false;
-    bool state_video = false;
     bool frame_is_clean = false;
 
-    bool tag_clicked = false;
-
-    bool slider_is_blocked = false;
     bool video_btns_enabled = false;
     bool analysis_only = false;
 
