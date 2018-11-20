@@ -801,8 +801,12 @@ void MainWindow::export_images(){
 void MainWindow::options() {
     emit set_status_bar("Opening options");
     SettingsDialog* dialog = new SettingsDialog(this);
-    dialog->exec();
-    if (project_wgt) project_wgt->setIconSize(Singleton::get_instance()->PROJ_THUMBNAIL_SIZE);
+    int status = dialog->exec();
+    if (status) {
+        Singleton* s = Singleton::get_instance();
+        if (project_wgt) project_wgt->setIconSize(s->PROJ_THUMBNAIL_SIZE);
+        if (video_wgt && video_wgt->playback_slider) video_wgt->playback_slider->setPageStep(s->PAGE_STEP);
+    }
 }
 
 void MainWindow::open_project_dialog(){

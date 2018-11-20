@@ -21,7 +21,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
 
     btn_box = new QDialogButtonBox(Qt::Horizontal, this);
     btn_box->addButton(QDialogButtonBox::Ok);
-    btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
+    //btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
+    btn_box->addButton(QDialogButtonBox::Cancel);
 
     // Connects
     connect(thickness_slider, &QSlider::valueChanged, this, &SettingsDialog::thickness_changed);
@@ -29,7 +30,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     connect(widget_max_slider, &QSlider::valueChanged, this, &SettingsDialog::widget_max_changed);
     connect(thumbnail_size_slider, &QSlider::valueChanged, this, &SettingsDialog::thumbnail_size_changed);
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &SettingsDialog::ok_btn_clicked);
-    connect(btn_box->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &SettingsDialog::restore_btn_clicked);
+    connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &SettingsDialog::cancel_btn_clicked);
 
     layout->addWidget(btn_box);
     setLayout(layout);
@@ -125,6 +126,6 @@ void SettingsDialog::ok_btn_clicked() {
     accept();
 }
 
-void SettingsDialog::restore_btn_clicked() {
-    // Reset;
+void SettingsDialog::cancel_btn_clicked() {
+    reject();
 }

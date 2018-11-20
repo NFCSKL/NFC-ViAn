@@ -39,7 +39,7 @@ private slots:
     void widget_max_changed(int value);
     void thumbnail_size_changed(int value);
     void ok_btn_clicked();
-    void restore_btn_clicked();
+    void cancel_btn_clicked();
 };
 
 #endif // SETTINGSDIALOG_H
