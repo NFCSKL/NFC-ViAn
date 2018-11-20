@@ -78,6 +78,8 @@ private:
     QColor current_colour = Qt::red;
     QString current_string = "Enter text";
     float current_font_scale = 1;
+    const int DRAW_RECT_MIN = 10;
+    const int DRAW_RECT_MARGIN = 7;
 
     std::map<int, std::vector<Shapes*>> overlays;
 

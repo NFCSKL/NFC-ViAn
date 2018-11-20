@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     project_wgt->new_project();
+    project_wgt->setIconSize(Singleton::get_instance()->PROJ_THUMBNAIL_SIZE);
 
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
     connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
@@ -801,7 +802,7 @@ void MainWindow::options() {
     emit set_status_bar("Opening options");
     SettingsDialog* dialog = new SettingsDialog(this);
     dialog->exec();
-    if (project_wgt) project_wgt->update_videoitems();
+    if (project_wgt) project_wgt->setIconSize(Singleton::get_instance()->PROJ_THUMBNAIL_SIZE);
 }
 
 void MainWindow::open_project_dialog(){

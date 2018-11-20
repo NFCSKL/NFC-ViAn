@@ -1,7 +1,5 @@
 #include "projectdialog.h"
 
-#include "constants.h"
-
 #include <QBoxLayout>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -19,7 +17,7 @@
  */
 ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent, QString default_path) : QDialog(parent) {
     setWindowTitle("Save project as");
-    setMinimumSize(Constants::DIALOG_MIN_WIDTH,110);
+    setMinimumSize(400,110);
     setModal(true);
     m_name = name;
     m_path = path;

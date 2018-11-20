@@ -42,9 +42,9 @@ void SettingsDialog::add_widgets() {
     thickness_layout = new QFormLayout();
     // Add slider
     thickness_slider = new QSlider(Qt::Horizontal, this);
-    thickness_slider->setValue(s->LINE_THICKNESS);
     thickness_slider->setMaximum(Constants::LINE_THICKNESS_MAX);
     thickness_slider->setMinimum(Constants::LINE_THICKNESS_MIN);
+    thickness_slider->setValue(s->LINE_THICKNESS);
     // Add label
     thickness_label = new QLabel(this);
     thickness_label->setMinimumWidth(25);
@@ -57,9 +57,9 @@ void SettingsDialog::add_widgets() {
     page_step_layout = new QFormLayout();
     // Add slider
     page_step_slider = new QSlider(Qt::Horizontal, this);
-    page_step_slider->setValue(s->PAGE_STEP);
     page_step_slider->setMaximum(Constants::PAGE_STEP_MAX);
     page_step_slider->setMinimum(Constants::PAGE_STEP_MIN);
+    page_step_slider->setValue(s->PAGE_STEP);
     // Add label
     page_step_label = new QLabel(this);
     page_step_label->setMinimumWidth(25);
@@ -72,9 +72,9 @@ void SettingsDialog::add_widgets() {
     widget_max_layout = new QFormLayout();
     // Add slider
     widget_max_slider = new QSlider(Qt::Horizontal, this);
-    widget_max_slider->setValue(s->FLOATING_WIDGET_MAX);
     widget_max_slider->setMaximum(Constants::FLOATING_WIDGET_LIMIT_MAX);
     widget_max_slider->setMinimum(Constants::FLOATING_WIDGET_LIMIT_MIN);
+    widget_max_slider->setValue(s->FLOATING_WIDGET_MAX);
     // Add label
     widget_max_label = new QLabel(this);
     widget_max_label->setMinimumWidth(25);
@@ -87,9 +87,9 @@ void SettingsDialog::add_widgets() {
     thumbnail_size_layout = new QFormLayout();
     // Add slider
     thumbnail_size_slider = new QSlider(Qt::Horizontal, this);
-    thumbnail_size_slider->setValue(s->THUMBNAIL_SIZE);
-    thumbnail_size_slider->setMaximum(Constants::THUMBNAIL_SIZE_MAX);
-    thumbnail_size_slider->setMinimum(Constants::THUMBNAIL_SIZE_MIN);
+    thumbnail_size_slider->setMaximum(Constants::PROJ_THUMBNAIL_MAX);
+    thumbnail_size_slider->setMinimum(Constants::PROJ_THUMBNAIL_MIN);
+    thumbnail_size_slider->setValue(s->PROJ_THUMBNAIL_SIZE.width());
     // Add label
     thumbnail_size_label = new QLabel(this);
     thumbnail_size_label->setMinimumWidth(25);
@@ -121,7 +121,7 @@ void SettingsDialog::ok_btn_clicked() {
     s->LINE_THICKNESS = thickness_slider->value();
     s->PAGE_STEP = page_step_slider->value(); // TODO update slider
     s->FLOATING_WIDGET_MAX = widget_max_slider->value();
-    s->THUMBNAIL_SIZE = thumbnail_size_slider->value();
+    s->PROJ_THUMBNAIL_SIZE = QSize(thumbnail_size_slider->value(),thumbnail_size_slider->value());
     accept();
 }
 
