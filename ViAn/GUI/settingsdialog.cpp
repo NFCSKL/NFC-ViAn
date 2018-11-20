@@ -14,7 +14,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     setWindowTitle("Vian - Settings");
     setWindowIcon(QIcon("../ViAn/Icons/settings.png"));
     setAttribute(Qt::WA_DeleteOnClose);
-    setMinimumSize(500,100);
+    setMinimumSize(400,100);
 
     layout = new QFormLayout();
     add_widgets();
@@ -82,7 +82,7 @@ void SettingsDialog::add_widgets() {
     widget_max_label->setText(QString::number(widget_max_slider->value()));
 
     widget_max_layout->addRow(widget_max_label, widget_max_slider);
-    layout->addRow("Max number of floating widgets", widget_max_layout);
+    layout->addRow("Floating widgets max", widget_max_layout);
 
     // Add widget max
     thumbnail_size_layout = new QFormLayout();
