@@ -801,6 +801,7 @@ void MainWindow::options() {
     emit set_status_bar("Opening options");
     SettingsDialog* dialog = new SettingsDialog(this);
     dialog->exec();
+    if (project_wgt) project_wgt->update_videoitems();
 }
 
 void MainWindow::open_project_dialog(){

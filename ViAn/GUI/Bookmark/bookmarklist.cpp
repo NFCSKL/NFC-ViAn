@@ -26,7 +26,8 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setDragDropMode(QAbstractItemView::DragDrop);
     setAcceptDrops(true);
     setDropIndicatorShown(true);
-    setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
+    Singleton* s = Singleton::get_instance();
+    setIconSize(QSize(s->THUMBNAIL_SIZE, s->THUMBNAIL_SIZE));
 
     // Shortcut for deleting item
     QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);

@@ -41,21 +41,21 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, double g, QWidget* parent)
     contrast_value_label->setMinimumWidth(25);
     gamma_value_label->setMinimumWidth(25);
 
-    brightness_slider->setSingleStep(FrameManipulator().BRIGHTNESS_STEP);
-    brightness_slider->setMaximum(FrameManipulator().BRIGHTNESS_MAX);
-    brightness_slider->setMinimum(FrameManipulator().BRIGHTNESS_MIN);
+    brightness_slider->setSingleStep(Constants::BRIGHTNESS_STEP);
+    brightness_slider->setMaximum(Constants::BRIGHTNESS_MAX);
+    brightness_slider->setMinimum(Constants::BRIGHTNESS_MIN);
     brightness_slider->setValue(brightness);
     brightness_value_label->setText(QString::number(brightness_slider->value()));
 
-    contrast_slider->setSingleStep(static_cast<int>(FrameManipulator().CONTRAST_STEP*Constants::DOUBLE_TO_INT));
-    contrast_slider->setMaximum(static_cast<int>(FrameManipulator().CONTRAST_MAX*Constants::DOUBLE_TO_INT));
-    contrast_slider->setMinimum(static_cast<int>(FrameManipulator().CONTRAST_MIN*Constants::DOUBLE_TO_INT));
+    contrast_slider->setSingleStep(static_cast<int>(Constants::CONTRAST_STEP*Constants::DOUBLE_TO_INT));
+    contrast_slider->setMaximum(static_cast<int>(Constants::CONTRAST_MAX*Constants::DOUBLE_TO_INT));
+    contrast_slider->setMinimum(static_cast<int>(Constants::CONTRAST_MIN*Constants::DOUBLE_TO_INT));
     contrast_slider->setValue(static_cast<int>(contrast*Constants::DOUBLE_TO_INT));
     contrast_value_label->setText(QString::number(contrast_slider->value()/Constants::DOUBLE_TO_INT));
 
-    gamma_slider->setSingleStep(static_cast<int>(FrameManipulator().GAMMA_STEP*Constants::DOUBLE_TO_INT));
-    gamma_slider->setMaximum(static_cast<int>(FrameManipulator().GAMMA_MAX*Constants::DOUBLE_TO_INT));
-    gamma_slider->setMinimum(static_cast<int>(FrameManipulator().GAMMA_MIN*Constants::DOUBLE_TO_INT));
+    gamma_slider->setSingleStep(static_cast<int>(Constants::GAMMA_STEP*Constants::DOUBLE_TO_INT));
+    gamma_slider->setMaximum(static_cast<int>(Constants::GAMMA_MAX*Constants::DOUBLE_TO_INT));
+    gamma_slider->setMinimum(static_cast<int>(Constants::GAMMA_MIN*Constants::DOUBLE_TO_INT));
     gamma_slider->setValue(static_cast<int>(gamma*Constants::DOUBLE_TO_INT));
     gamma_value_label->setText(QString::number(gamma_slider->value()/Constants::DOUBLE_TO_INT));
 
@@ -79,7 +79,9 @@ ManipulatorWidget::ManipulatorWidget(int b, double c, double g, QWidget* parent)
     btn_box->addButton(QDialogButtonBox::RestoreDefaults)->setText("Default");
 
     apply_btn->setDisabled(true);
-    QString default_tool_tip = "Brightness: "+QString::number(FrameManipulator().BRIGHTNESS_DEFAULT)+"\nContrast: "+QString::number(FrameManipulator().CONTRAST_DEFAULT)+"\nGamma: "+QString::number(FrameManipulator().GAMMA_DEFAULT);
+    QString default_tool_tip = "Brightness: "+QString::number(Constants::BRIGHTNESS_DEFAULT)+
+            "\nContrast: "+QString::number(Constants::CONTRAST_DEFAULT)+
+            "\nGamma: "+QString::number(Constants::GAMMA_DEFAULT);
     btn_box->button(QDialogButtonBox::RestoreDefaults)->setToolTip(default_tool_tip);
 
     connect(apply_btn, &QPushButton::clicked, this, &ManipulatorWidget::ok_clicked);
@@ -111,9 +113,9 @@ void ManipulatorWidget::ok_clicked() {
  * Resets the changes to default and saves them in the video state.
  */
 void ManipulatorWidget::default_clicked() {
-    brightness_slider->setValue(FrameManipulator().BRIGHTNESS_DEFAULT);
-    contrast_slider->setValue(static_cast<int>(FrameManipulator().CONTRAST_DEFAULT*Constants::DOUBLE_TO_INT));
-    gamma_slider->setValue(static_cast<int>(FrameManipulator().GAMMA_DEFAULT*Constants::DOUBLE_TO_INT));
+    brightness_slider->setValue(Constants::BRIGHTNESS_DEFAULT);
+    contrast_slider->setValue(static_cast<int>(Constants::CONTRAST_DEFAULT*Constants::DOUBLE_TO_INT));
+    gamma_slider->setValue(static_cast<int>(Constants::GAMMA_DEFAULT*Constants::DOUBLE_TO_INT));
     emit values(brightness_slider->value(), contrast_slider->value()/Constants::DOUBLE_TO_INT, gamma_slider->value()/Constants::DOUBLE_TO_INT, true);
 }
 

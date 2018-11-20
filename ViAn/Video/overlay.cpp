@@ -236,14 +236,14 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
         int br_x = shape->get_draw_end().x;
         int br_y = shape->get_draw_end().y;
 
-        if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
-            tl_y += -DRAW_RECT_MARGIN;
-            br_y += DRAW_RECT_MARGIN;
+        if (tl_y - br_y <= Constants::DRAW_RECT_MIN && tl_y - br_y >= -Constants::DRAW_RECT_MIN) {
+            tl_y += -Constants::DRAW_RECT_MARGIN;
+            br_y += Constants::DRAW_RECT_MARGIN;
         }
 
-        if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
-            tl_x += -DRAW_RECT_MARGIN;
-            br_x += DRAW_RECT_MARGIN;
+        if (tl_x - br_x <= Constants::DRAW_RECT_MIN && tl_x - br_x >= -Constants::DRAW_RECT_MIN) {
+            tl_x += -Constants::DRAW_RECT_MARGIN;
+            br_x += Constants::DRAW_RECT_MARGIN;
         }
         drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     }

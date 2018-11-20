@@ -9,8 +9,6 @@
 #include <QDebug>
 #include <QDir>
 
-const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
-
 ImageGenerator::ImageGenerator(cv::Mat frame, std::string proj_path){
     m_frame = frame.clone();
     m_path = proj_path;
@@ -23,7 +21,7 @@ ImageGenerator::~ImageGenerator() {
 std::string ImageGenerator::create_thumbnail(std::string name) {
     std::string save_path = m_path + Constants::THUMBNAIL_FOLDER.toStdString();
     if (!create_directory(save_path)) return "";
-    return export_image(save_path + name, PNG, THUMBNAIL_SIZE);
+    return export_image(save_path + name, PNG, Singleton::get_instance()->THUMBNAIL_SIZE);
 
 }
 

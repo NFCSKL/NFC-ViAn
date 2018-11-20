@@ -20,6 +20,7 @@ public:
     int LINE_THICKNESS = 2;
     int PAGE_STEP = 10;
     int FLOATING_WIDGET_MAX = 3;
+    unsigned int THUMBNAIL_SIZE = 100;
 };
 
 namespace Constants {
@@ -31,6 +32,9 @@ namespace Constants {
 
     const int FLOATING_WIDGET_LIMIT_MIN = 0;
     const int FLOATING_WIDGET_LIMIT_MAX = 20;
+
+    const unsigned int THUMBNAIL_SIZE_MIN = 50;
+    const unsigned int THUMBNAIL_SIZE_MAX = 120;
 
 
     const double DEGREE_TO_RADIAN_FACTOR = M_PI / 180;
@@ -80,6 +84,20 @@ namespace Constants {
 
     const int RECENT_MAX = 10;
 
+    // Constants describing the limit and precision of the font scale value.
+    const double FONT_SCALE_MIN = 0.5;
+    const double FONT_SCALE_MAX = 5.0;
+    const double FONT_SCALE_STEP = 0.1;
+    const int FONT_SCALE_DECIMALS = 1;
+
+    // Constants for the limits and the precision of contrast and brightness values.
+    const double CONTRAST_MIN = 0.5, CONTRAST_MAX = 5, CONTRAST_DEFAULT = 1, CONTRAST_STEP = 0.01;
+    const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
+    const double GAMMA_MIN = 0.01, GAMMA_MAX = 4, GAMMA_DEFAULT = 1, GAMMA_STEP = 0.01;
+
+    const int DRAW_RECT_MIN = 10;
+    const int DRAW_RECT_MARGIN = 7;
+
 
     // enums
     // Save_format - savable
@@ -89,6 +107,8 @@ namespace Constants {
     // analysis_type - basic analysis
     // bookmark_type - bookmark
     // shapes - shapes
+    // extensions - imagegenerator
+    // table_style - reportgenerator
 }
 
 
