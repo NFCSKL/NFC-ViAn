@@ -17,7 +17,7 @@ void ImageSequence::update() {
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
         if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
             if (!remove_image_from_disc((*it).first))
-                qDebug() << "failed to remove";
+                qWarning() << "failed to remove";
         }
     }
     m_saved_order = m_unsaved_order;

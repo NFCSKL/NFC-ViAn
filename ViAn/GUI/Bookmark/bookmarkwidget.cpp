@@ -4,6 +4,7 @@
 #include "bookmarkitem.h"
 #include "bookmarklist.h"
 #include "imagegenerator.h"
+#include "Project/video.h"
 #include "Project/videoproject.h"
 #include "reportgenerator.h"
 
@@ -124,9 +125,9 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
 }
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
-    std::string file_name = vid_proj->get_video()->file_path;
-    auto index = file_name.find_last_of('/') + 1;
-    file_name = file_name.substr(index);
+    std::string file_name;
+    Video* vid = vid_proj->get_video();
+    file_name = vid->get_name();
     file_name += "_" + std::to_string(frame_nbr);
     ImageGenerator im_gen(frame, m_path);
     im_gen.create_tiff(file_name);
