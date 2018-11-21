@@ -21,7 +21,7 @@ ImageGenerator::~ImageGenerator() {
 std::string ImageGenerator::create_thumbnail(std::string name) {
     std::string save_path = m_path + Constants::THUMBNAIL_FOLDER.toStdString();
     if (!create_directory(save_path)) return "";
-    return export_image(save_path + name, PNG, Singleton::get_instance()->THUMBNAIL_SIZE);
+    return export_image(save_path + name, PNG, Constants::THUMBNAIL_SIZE);
 
 }
 

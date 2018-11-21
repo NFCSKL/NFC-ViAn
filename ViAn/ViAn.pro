@@ -90,7 +90,6 @@ SOURCES += main.cpp \
     GUI/viewpathdialog.cpp \
     GUI/viewpathitem.cpp \
     GUI/settingsdialog.cpp \
-    Project/settings.cpp \
     constants.cpp
 
 #
@@ -171,7 +170,6 @@ HEADERS += reportgenerator.h\
     GUI/viewpathdialog.h \
     GUI/viewpathitem.h \
     GUI/settingsdialog.h \
-    Project/settings.h \
     constants.h
 
 #
