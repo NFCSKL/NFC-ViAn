@@ -120,7 +120,7 @@ void SettingsDialog::thumbnail_size_changed(int value) {
 void SettingsDialog::ok_btn_clicked() {
     Singleton* s = Singleton::get_instance();
     s->LINE_THICKNESS = thickness_slider->value();
-    s->PAGE_STEP = page_step_slider->value(); // TODO update slider
+    s->PAGE_STEP = page_step_slider->value();
     s->FLOATING_WIDGET_MAX = widget_max_slider->value();
     s->PROJ_THUMBNAIL_SIZE = QSize(thumbnail_size_slider->value(),thumbnail_size_slider->value());
     accept();

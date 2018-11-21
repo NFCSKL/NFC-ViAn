@@ -4,8 +4,7 @@
 //#include <iostream>
 
 FrameManipulator::FrameManipulator() {
-    //Singleton* s = Singleton::get_instance();
-    // TODO Move alpha beta gamma to constants
+    // TODO Move alpha beta gamma to constants?
     reset();
 }
 
