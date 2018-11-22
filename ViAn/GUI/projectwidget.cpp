@@ -368,6 +368,11 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid_item = new VideoItem(vid_proj);
+
+    if (vid_proj->get_video()->is_sequence()) {
+        ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
+        vid_item->setToolTip(0, QString::fromStdString(sequence->get_search_path()));
+    }
     vid_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
 
     // If there only is one selected item and it's a folder,
