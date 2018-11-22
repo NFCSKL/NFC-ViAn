@@ -780,6 +780,13 @@ void VideoWidget::play_btn_toggled(bool status) {
         set_status_bar("Play");
         play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
     } else {
+        if (analysis_only) {
+            int new_frame = playback_slider->get_closest_poi(playback_slider->value());
+            {
+                std::lock_guard<std::mutex> lk(player_lock);
+                frame_index.store(new_frame);
+            }
+        }
         play_btn->setChecked(false);
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         set_status_bar("Pause");
@@ -1042,7 +1049,14 @@ void VideoWidget::on_playback_slider_released() {
  * @brief VideoWidget::on_playback_slider_value_changed
  */
 void VideoWidget::on_playback_slider_value_changed() {
-    frame_index.store(playback_slider->value());
+    int new_frame = playback_slider->value();
+    if (analysis_only && !playback_slider->is_blocked()) {
+        new_frame = playback_slider->get_closest_poi(new_frame);
+    }
+    {
+        std::lock_guard<std::mutex> p_lock(player_lock);
+        frame_index.store(new_frame);
+    }
     on_new_frame();
 }
 
