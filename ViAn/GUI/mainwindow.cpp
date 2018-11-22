@@ -2,6 +2,7 @@
 
 #include "Analysis/analysismethod.h"
 #include "Analysis/analysisslider.h"
+#include "constants.h"
 #include "framewidget.h"
 #include "GUI/Analysis/analysiswidget.h"
 #include "GUI/Analysis/anasettingwidget.h"
@@ -12,6 +13,7 @@
 #include "GUI/manipulatorwidget.h"
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
+#include "GUI/settingsdialog.h"
 #include "GUI/viewpathdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
@@ -67,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize video widget
     video_wgt = new VideoWidget();
-    video_wgt->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT * SIZE_MULTIPLIER); // width and height sets aspect ratio
+    video_wgt->setMinimumSize(Constants::VIDEO_WGT_WIDTH * Constants::SIZE_MULTIPLIER,
+                              Constants::VIDEO_WGT_HEIGHT * Constants::SIZE_MULTIPLIER); // width and height sets aspect ratio
     setCentralWidget(video_wgt);
 
     // Initialize project widget
@@ -75,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     project_wgt->new_project();
+    project_wgt->setIconSize(Singleton::get_instance()->PROJ_THUMBNAIL_SIZE);
 
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
     connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
@@ -412,13 +416,13 @@ void MainWindow::init_edit_menu() {
     options_act->setStatusTip(tr("Program options"));
 
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    connect(options_act, &QAction::triggered, this, &MainWindow::options);
     connect(cw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_cw);
     connect(ccw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_ccw);
     connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);
     connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
     connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
     connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
+    connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 
 /**
@@ -502,9 +506,10 @@ void MainWindow::init_analysis_menu() {
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    if (video_widgets.size() < FLOATING_WIDGET_MAX) {
+    if (video_widgets.size() < Singleton::get_instance()->FLOATING_WIDGET_MAX) {
         VideoWidget* widget_video = new VideoWidget(nullptr, true);
-        widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
+        widget_video->setMinimumSize(Constants::VIDEO_WGT_WIDTH * Constants::SIZE_MULTIPLIER,
+                                     Constants::VIDEO_WGT_HEIGHT *Constants::SIZE_MULTIPLIER);
         widget_video->show();
         video_widgets.push_back(widget_video);
 
@@ -795,13 +800,20 @@ void MainWindow::export_images(){
  */
 void MainWindow::options() {
     emit set_status_bar("Opening options");
+    SettingsDialog* dialog = new SettingsDialog(this);
+    int status = dialog->exec();
+    if (status) {
+        Singleton* s = Singleton::get_instance();
+        if (project_wgt) project_wgt->setIconSize(s->PROJ_THUMBNAIL_SIZE);
+        if (video_wgt && video_wgt->playback_slider) video_wgt->playback_slider->setPageStep(s->PAGE_STEP);
+    }
 }
 
 void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(
                 this,
                 tr("Open project"),
-                project_wgt->get_default_path(),
+                Constants::DEFAULT_PATH,
                 "*.vian");
     project_wgt->open_project(project_path);
 }

@@ -1,5 +1,7 @@
 #include "analysissettings.h"
 
+#include "constants.h"
+
 AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
                                    std::pair<int, int> interval,
                                    cv::Rect bounding_box)
@@ -29,9 +31,7 @@ AnalysisSettings::AnalysisSettings(AnalysisSettings* as) {
 }
 
 
-AnalysisSettings::~AnalysisSettings() {
-
-}
+AnalysisSettings::~AnalysisSettings() {}
 
 void AnalysisSettings::reset_settings() {
     use_bounding_box = false;
@@ -92,7 +92,7 @@ std::string AnalysisSettings::get_type_string() {
     // for the correct string ending
     switch (type) {
     case MOTION_DETECTION:
-        return MOTION_DET_STR;
+        return Constants::MOTION_DET_STR;
     default:
         return "";
     }

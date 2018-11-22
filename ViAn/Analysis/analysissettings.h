@@ -49,8 +49,6 @@ public:
 
 protected:
     void add_setting(const std::string& var, int value_default, const std::string& descr);
-
-    const std::string MOTION_DET_STR = "-motion_analysis";
 };
 
 #endif // ANALYSISSETTINGS_H

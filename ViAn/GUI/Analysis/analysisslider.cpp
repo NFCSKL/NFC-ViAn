@@ -1,6 +1,7 @@
 #include "analysisslider.h"
 
 #include "Analysis/analysissettings.h"
+#include "constants.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/interval.h"
@@ -12,7 +13,7 @@
 
 AnalysisSlider::AnalysisSlider(Qt::Orientation orientation, QWidget * parent) : QSlider(parent) {
     setOrientation(orientation);
-    setPageStep(PAGE_STEP);
+    setPageStep(Singleton::get_instance()->PAGE_STEP);
 }
 
 /**

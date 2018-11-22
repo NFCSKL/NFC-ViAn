@@ -88,7 +88,9 @@ SOURCES += main.cpp \
     GUI/TreeItems/intervalareaitem.cpp \
     GUI/pathdialog.cpp \
     GUI/viewpathdialog.cpp \
-    GUI/viewpathitem.cpp
+    GUI/viewpathitem.cpp \
+    GUI/settingsdialog.cpp \
+    constants.cpp
 
 #
 # TEST
@@ -166,7 +168,9 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/intervalareaitem.h \
     GUI/pathdialog.h \
     GUI/viewpathdialog.h \
-    GUI/viewpathitem.h
+    GUI/viewpathitem.h \
+    GUI/settingsdialog.h \
+    constants.h
 
 #
 # LIBRARY

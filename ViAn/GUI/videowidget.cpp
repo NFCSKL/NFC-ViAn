@@ -81,7 +81,7 @@ VideoWidget::~VideoWidget(){
     if (processing_thread->isRunning()) {
         processing_thread->deleteLater();
         processing_thread->exit();
-        if (!processing_thread->wait(FIVE_SEC)) {
+        if (!processing_thread->wait(Constants::FIVE_SEC)) {
             processing_thread->terminate();
             processing_thread->wait();
         }
@@ -92,7 +92,7 @@ VideoWidget::~VideoWidget(){
         m_abort_playback.store(true);
         player_con.notify_all();
         v_controller->exit();
-        if (!v_controller->wait(FIVE_SEC)) {
+        if (!v_controller->wait(Constants::FIVE_SEC)) {
             // Controller did not finish in time. Force shutdown
             v_controller->terminate();
             v_controller->wait();
@@ -1615,22 +1615,22 @@ void VideoWidget::zoom_label_finished() {
     std::string text = zoom_label->text().toStdString();
     text.erase(std::remove(text.begin(), text.end(), '%'), text.end());
     char* p;
-    double converted = strtod(text.c_str(), &p)/PERCENT_INT_CONVERT;
+    double converted = strtod(text.c_str(), &p)/Constants::DOUBLE_TO_INT;
     if (*p != 0) {
         emit set_status_bar("Error! Input is not a number!");
     } else if (converted < 0) {
         emit set_status_bar("Error! Input is negative!");
-    } else if (converted < static_cast<double>(ZOOM_LABEL_MIN) / PERCENT_INT_CONVERT) {
+    } else if (converted < static_cast<double>(Constants::ZOOM_LABEL_MIN) / Constants::DOUBLE_TO_INT) {
         emit set_status_bar("Error! Input is too small");
-    } else if (converted > static_cast<double>(ZOOM_LABEL_MAX) / PERCENT_INT_CONVERT) {
+    } else if (converted > static_cast<double>(Constants::ZOOM_LABEL_MAX) / Constants::DOUBLE_TO_INT) {
         emit set_status_bar("Error! Input is too large");
     } else {
         set_zoom_factor(converted);
-        zoom_label->setText(QString::number(converted*PERCENT_INT_CONVERT) + "%");
+        zoom_label->setText(QString::number(converted*Constants::DOUBLE_TO_INT) + "%");
         zoom_label->clearFocus();
         return;
     }
-    zoom_label->setText(QString::number(m_scale_factor*PERCENT_INT_CONVERT) + "%");
+    zoom_label->setText(QString::number(m_scale_factor*Constants::DOUBLE_TO_INT) + "%");
     zoom_label->clearFocus();
 }
 
@@ -1677,10 +1677,11 @@ void VideoWidget::set_video_end() {
 void VideoWidget::page_step_front() {
     if (!video_btns_enabled) return;
     int value = playback_slider->value();
-    if (value + playback_slider->PAGE_STEP > playback_slider->maximum()) {
+    Singleton* s = Singleton::get_instance();
+    if (value + s->PAGE_STEP > playback_slider->maximum()) {
         frame_index.store(playback_slider->maximum());
     } else {
-        frame_index.store(value + playback_slider->PAGE_STEP);
+        frame_index.store(value + s->PAGE_STEP);
     }
     on_new_frame();
 }
@@ -1688,10 +1689,11 @@ void VideoWidget::page_step_front() {
 void VideoWidget::page_step_back() {
     if (!video_btns_enabled) return;
     int value = playback_slider->value();
-    if (value - playback_slider->PAGE_STEP < playback_slider->minimum()) {
+    Singleton* s = Singleton::get_instance();
+    if (value - s->PAGE_STEP < playback_slider->minimum()) {
         frame_index.store(playback_slider->minimum());
     } else {
-        frame_index.store(value - playback_slider->PAGE_STEP);
+        frame_index.store(value - s->PAGE_STEP);
     }
     on_new_frame();
 }

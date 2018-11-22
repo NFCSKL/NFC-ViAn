@@ -26,7 +26,7 @@ BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* p
     setDragDropMode(QAbstractItemView::DragDrop);
     setAcceptDrops(true);
     setDropIndicatorShown(true);
-    setIconSize(QSize(ImageGenerator::THUMBNAIL_SIZE, ImageGenerator::THUMBNAIL_SIZE));
+    setIconSize(QSize(Constants::THUMBNAIL_SIZE, Constants::THUMBNAIL_SIZE));
 
     // Shortcut for deleting item
     QShortcut* delete_sc = new QShortcut(QKeySequence::Delete, this);
@@ -131,7 +131,7 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
 
     BookmarkItem* bm_item = cast_item->copy();
     bm_item->get_bookmark()->set_container(m_par_cont_name, m_container_type);
-    int index = row(itemAt(event->pos()+QPoint(0, BookmarkItem::BOOKMARK_THUMBNAIL_HEIGHT/2)));
+    int index = row(itemAt(event->pos()+QPoint(0, Constants::BOOKMARK_THUMBNAIL_HEIGHT/2)));
     if (index == -1) {
         addItem(bm_item);
     } else {
@@ -157,7 +157,7 @@ void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
     auto cast_item = dynamic_cast<BookmarkCategory*>(item);
 
     BookmarkCategory* cat_item = cast_item->copy();
-    int index = row(itemAt(event->pos()+QPoint(0, BookmarkItem::BOOKMARK_THUMBNAIL_HEIGHT/2)));
+    int index = row(itemAt(event->pos()+QPoint(0, Constants::BOOKMARK_THUMBNAIL_HEIGHT/2)));
     if (index == -1) {
         addItem(cat_item);
     } else {
