@@ -39,6 +39,7 @@ public:
     std::vector<std::string> get_unsaved_hashes() const;
     int get_index_of_hash(const std::string& hash) const;
     std::string get_original_name_from_hash(const std::string& hash) const;
+    std::string get_original_name_from_index(const int& index) const;
     bool never_saved() const;
 
 

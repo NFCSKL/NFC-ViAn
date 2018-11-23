@@ -127,6 +127,23 @@ std::string ImageSequence::get_original_name_from_hash(const std::string &hash) 
     return Utility::name_from_path(m_original_images.at(hash));
 }
 
+std::string ImageSequence::get_original_name_from_index(const int& index) const {
+    std::string hash = "Invalid path";
+    bool found_hash = false;
+    for (auto elem : m_unsaved_order) {
+        if (elem.second == index) {
+            hash = elem.first;
+            found_hash = true;
+            break;
+        }
+    }
+    if (found_hash) {
+        return m_original_images.at(hash);
+    } else {
+        return hash;
+    }
+}
+
 bool ImageSequence::never_saved() const {
     return is_new;
 }
