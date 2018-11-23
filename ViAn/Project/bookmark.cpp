@@ -12,13 +12,13 @@
  * @param frame_nbr Frame number associated with the bookmark.
  * @param time The time in the video associated with the bookmark (format "mm:ss").
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const std::string &file_name, const std::string &text, const VideoState &state, const QString &time){
+Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name, const QString &text, const VideoState &state, const QString &time){
     m_vid_proj = vid_proj;
     m_file = file_name;
     m_description = text;
     m_state = state;
     m_time = time;
-    std::pair<int, std::string> _tmp(UNSORTED, "");
+    std::pair<int, QString> _tmp(UNSORTED, "");
     m_container = _tmp;
 }
 
@@ -58,9 +58,9 @@ void Bookmark::set_id(ID new_id) {
     id = new_id;
 }
 
-void Bookmark::reset_root_dir(const std::string &dir){    
-    m_file = dir + Constants::BOOKMARK_FOLDER.toStdString() + Utility::name_from_path(m_file);
-    m_thumbnail_path = dir + Constants::THUMBNAIL_FOLDER.toStdString() + Utility::name_from_path(m_thumbnail_path);
+void Bookmark::reset_root_dir(const QString &dir) {
+    m_file = dir + Constants::BOOKMARK_FOLDER + Utility::name_from_path(m_file);
+    m_thumbnail_path = dir + Constants::THUMBNAIL_FOLDER + Utility::name_from_path(m_thumbnail_path);
     m_unsaved_changes = true;
 }
 
@@ -84,7 +84,7 @@ VideoState Bookmark::get_state() {
     return m_state;
 }
 
-std::pair<int, std::string> Bookmark::get_container(){
+std::pair<int, QString> Bookmark::get_container(){
     return m_container;
 }
 
@@ -96,7 +96,7 @@ VideoProject *Bookmark::get_video_project() {
  * @brief Bookmark::get_description
  * @return Returns the description associated with the bookmark.
  */
-std::string Bookmark::get_description() {
+QString Bookmark::get_description() {
     return m_description;
 }
 
@@ -105,13 +105,13 @@ std::string Bookmark::get_description() {
  * Sets the text description of the bookmark to the specified string.
  * @param text
  */
-void Bookmark::set_description(const std::string& text) {
+void Bookmark::set_description(const QString& text) {
     m_description = text;
     m_unsaved_changes = true;
 }
 
-void Bookmark::set_container(std::string name, int type) {
-    std::pair<int, std::string> container(type, name);
+void Bookmark::set_container(QString name, int type) {
+    std::pair<int, QString> container(type, name);
     m_container = container;
     m_unsaved_changes = true;
 }
@@ -122,7 +122,7 @@ void Bookmark::set_container(std::string name, int type) {
  * @param old_name
  * @param new_name
  */
-void Bookmark::rename_container(std::string old_name, std::string new_name) {
+void Bookmark::rename_container(QString old_name, QString new_name) {
     if (m_container.second == old_name) {
         m_container.second = new_name;
     }
@@ -134,11 +134,11 @@ void Bookmark::rename_container(std::string old_name, std::string new_name) {
  * Saves the path where the thumbnail for the bookmark is saved.
  * @param path
  */
-void Bookmark::set_thumbnail_path(std::string path) {
+void Bookmark::set_thumbnail_path(QString path) {
     m_thumbnail_path = path;
 }
 
-std::string Bookmark::get_thumbnail_path() {
+QString Bookmark::get_thumbnail_path() {
     return m_thumbnail_path;
 }
 
@@ -173,10 +173,10 @@ bool Bookmark::remove() {
  */
 void Bookmark::read(const QJsonObject& json){
     m_time = json["time"].toString();
-    m_file = json["path"].toString().toStdString();
-    m_thumbnail_path = json["thumbnail path"].toString().toStdString();
-    m_description = json["description"].toString().toStdString();
-    std::pair<int, std::string> pair(json["type"].toInt(), json["container"].toString().toStdString());
+    m_file = json["path"].toString();
+    m_thumbnail_path = json["thumbnail path"].toString();
+    m_description = json["description"].toString();
+    std::pair<int, QString> pair(json["type"].toInt(), json["container"].toString());
     m_container = pair;
 
     VideoState state;
@@ -205,10 +205,10 @@ void Bookmark::read(const QJsonObject& json){
 void Bookmark::write(QJsonObject& json){
     json["time"] = m_time;
     json["frame"] = m_state.frame;
-    json["path"] = QString::fromStdString(m_file);
-    json["thumbnail path"] = QString::fromStdString(m_thumbnail_path);
-    json["description"] = QString::fromStdString(m_description);
-    json["container"] =QString::fromStdString( m_container.second);
+    json["path"] = m_file;
+    json["thumbnail path"] = m_thumbnail_path;
+    json["description"] = m_description;
+    json["container"] = m_container.second;
     json["type"] = m_container.first;
 
     json["scale_factor"] = m_state.scale_factor;

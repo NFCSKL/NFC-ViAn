@@ -219,7 +219,7 @@ void VideoProject::set_project(Project *proj){
     m_project = proj;
 }
 
-void VideoProject::reset_root_dir(const std::string &dir) {
+void VideoProject::reset_root_dir(const QString &dir) {
     if (m_video->is_sequence()) {
         auto seq = dynamic_cast<ImageSequence*>(m_video);
         if (seq) {
@@ -303,7 +303,7 @@ std::string VideoProject::get_index_path() {
     return m_tree_index;
 }
 
-std::string VideoProject::get_proj_path() {
+QString VideoProject::get_proj_path() {
     return m_project->get_dir();
 }
 

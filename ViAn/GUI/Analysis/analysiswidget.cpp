@@ -35,8 +35,8 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
     emit show_analysis_queue(true);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
-        std::string name = "Queued #"+std::to_string(analysis_queue.size()-1);
-        emit name_in_tree(item, QString::fromStdString(name));
+        QString name = "Queued #" + QString::number(analysis_queue.size()-1);
+        emit name_in_tree(item, name);
     } else {
         m_queue_wgt->next();
         analysis_queue.push_back(analys);
@@ -133,8 +133,8 @@ void AnalysisWidget::on_analysis_aborted() {
  */
 void AnalysisWidget::move_queue() {
     for (unsigned int i = 0; i < analysis_queue.size(); i++) {
-        std::string name = "Queued #"+std::to_string(i);
-        emit name_in_tree(std::get<1>(analysis_queue.at(i)), QString::fromStdString(name));
+        QString name = "Queued #" + QString::number(i);
+        emit name_in_tree(std::get<1>(analysis_queue.at(i)), name);
     }
 }
 
@@ -154,7 +154,7 @@ void AnalysisWidget::send_progress(int progress) {
         }
     }
     m_queue_wgt->update_progress(progress);
-    std::string name = "Loading " + std::to_string(progress) + "%" + dots;
-    emit name_in_tree(current_analysis_item, QString::fromStdString(name));
+    QString name = "Loading " + QString::number(progress) + "%" + dots;
+    emit name_in_tree(current_analysis_item, name);
     emit show_progress(progress);
 }

@@ -27,7 +27,7 @@ class AnalysisWidget : public QWidget
      */
     std::map<AnalysisMethod*, bool*> abort_map;
 
-    std::string dots = "";
+    QString dots = "";
     std::clock_t start;
     int duration = 0;
     bool abort_all = false;

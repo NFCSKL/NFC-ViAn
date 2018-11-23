@@ -99,7 +99,7 @@ void ProjectTestsuite::save_status_test(){
     directory.setAutoRemove(true);
     QVERIFY(directory.isValid());
 
-    std::string project_path = directory.path().toStdString();
+    QString project_path = directory.path();
     std::unique_ptr<Project> project(new Project("testproject", project_path));
     QVERIFY(!project->is_saved());
 

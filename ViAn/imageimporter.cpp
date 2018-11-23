@@ -10,7 +10,7 @@
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
     m_images(images),
-    m_dest(QString::fromStdString(Utility::add_serial_number(dest.toStdString(), ""))),
+    m_dest(Utility::add_serial_number(dest, "")),
     QObject(parent) {}
 
 /**
@@ -49,7 +49,7 @@ void ImageImporter::import_images() {
     }
 
     if (!m_abort)
-        emit imported_sequence(m_images, m_dest.toStdString());
+        emit imported_sequence(m_images, m_dest);
     emit update_progress(m_images.size());
     emit finished();
 }

@@ -750,7 +750,7 @@ void VideoWidget::create_interval_clicked() {
 }
 
 void VideoWidget::new_interval(QString name) {
-    Interval* interval = new Interval(name.toStdString());
+    Interval* interval = new Interval(name);
     emit add_interval(m_vid_proj, interval);
 }
 
@@ -818,7 +818,7 @@ void VideoWidget::update_tag_color(int b, double c, double g) {
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } else if (proj_tree_item == TAG_ITEM || proj_tree_item == DRAWING_TAG_ITEM) {
         m_tag->update_color_whole_tag(b, c, g);
-        emit set_status_bar("Whole tag '"+ QString::fromStdString(m_tag->get_name()) +"' updated");
+        emit set_status_bar("Whole tag '"+ m_tag->get_name() +"' updated");
     }
 }
 
@@ -890,7 +890,7 @@ void VideoWidget::new_tag_clicked() {
  * @param name
  */
 void VideoWidget::new_tag(QString name) {
-    Tag* tag = new Tag(name.toStdString());
+    Tag* tag = new Tag(name);
     emit add_tag(m_vid_proj, tag);
 }
 

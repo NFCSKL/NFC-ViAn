@@ -27,7 +27,7 @@ void ProjectTreeState::write(QJsonObject &json) {
  * @brief ProjectTreeState::save_state
  * @param path
  */
-void ProjectTreeState::save_state(const std::string& path) {
+void ProjectTreeState::save_state(const QString& path) {
     save_saveable(path);
 }
 
@@ -35,7 +35,7 @@ void ProjectTreeState::save_state(const std::string& path) {
  * @brief ProjectTreeState::load_state
  * @param path
  */
-void ProjectTreeState::load_state(const std::string& path) {
+void ProjectTreeState::load_state(const QString &path) {
     load_saveable(path);
 }
 

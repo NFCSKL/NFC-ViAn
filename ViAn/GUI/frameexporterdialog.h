@@ -32,7 +32,7 @@ class FrameExporterDialog : public QDialog {
     QString m_video_name;
     QString m_old_path_text = "C:/";
 public:
-    FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
+    FrameExporterDialog(ImageExporter* im_exp, Video* video, QString proj_path,
                         const int& max_frame, const std::pair<int, int>& interval, QWidget* parent = nullptr);
 private:
     void update_total();

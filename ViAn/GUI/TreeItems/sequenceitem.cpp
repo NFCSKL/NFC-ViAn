@@ -1,8 +1,8 @@
 #include "sequenceitem.h"
 
-SequenceItem::SequenceItem(const std::string& name, const int& index) : TreeItem(SEQUENCE_ITEM) {
+SequenceItem::SequenceItem(const QString& name, const int& index) : TreeItem(SEQUENCE_ITEM) {
     m_index = index;
-    setText(0, QString::fromStdString(name));
+    setText(0, name);
 //    setFlags(flags() | Qt::ItemIsDragEnabled);
 }
 

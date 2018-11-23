@@ -12,7 +12,7 @@ AnalysisItem::AnalysisItem(AnalysisProxy* analysis) : TreeItem(ANALYSIS_ITEM) {
     finished = true;
     const QIcon analysis_icon("../ViAn/Icons/analysis.png");
     setIcon(0, analysis_icon);
-    setText(0, QString::fromStdString(m_analysis->get_name()));
+    setText(0, m_analysis->get_name());
 }
 /**
  * @brief AnalysisItem::AnalysisItem
@@ -63,9 +63,9 @@ void AnalysisItem::remove(){}
  */
 void AnalysisItem::rename(){
     if (is_new) {
-        m_analysis->m_name = text(0).remove(Constants::NEW_STR).toStdString();
+        m_analysis->m_name = text(0).remove(Constants::NEW_STR);
     } else {
-        m_analysis->m_name = text(0).toStdString();
+        m_analysis->m_name = text(0);
     }
 }
 

@@ -65,6 +65,12 @@ std::string Utility::name_from_path(const std::string full_path) {
     return res;
 }
 
+QString Utility::name_from_path(const QString full_path) {
+    int name_length = full_path.size() - (full_path.lastIndexOf("/")+1);
+    QString res = full_path.right(name_length);
+    return res;
+}
+
 /**
  * @brief Utility::add_serial_number
  * @param name
@@ -84,6 +90,18 @@ std::string Utility::add_serial_number(std::string name, std::string file_end) {
         res = qname + QString("(%1)"+ qend).arg(i);
     }
     return res.toStdString();
+}
+
+QString Utility::add_serial_number(QString name, QString file_end) {
+    QString res = name + file_end;
+    int i = 0;
+    if(QFile::exists(res)){
+        res = name + QString("(%1)"+ file_end).arg(i);
+    }
+    while(QFile::exists(res) && ++i){
+        res = name + QString("(%1)"+ file_end).arg(i);
+    }
+    return res;
 }
 
 std::string Utility::remove_serial_number(std::string file) {

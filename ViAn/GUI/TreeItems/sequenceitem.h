@@ -7,7 +7,7 @@ class SequenceItem : public TreeItem {
 private:
     int m_index{};
 public:
-    SequenceItem(const std::string& name, const int& index);
+    SequenceItem(const QString &name, const int& index);
     int get_index();
     void remove();
     void rename();

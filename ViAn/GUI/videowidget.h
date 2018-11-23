@@ -59,7 +59,7 @@ private:
     overlay_settings o_settings;
     video_sync v_sync;
 
-    std::string m_video_path;
+    QString m_video_path;
 
     std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
     std::atomic_int video_width{0};
@@ -127,7 +127,7 @@ signals:
     void delete_sc_activated();
     void open_view_path_dialog();
     void zoom_preview(cv::Mat preview_frame);
-    void update_videoitem(std::string);
+    void update_videoitem(QString);
     void update_manipulator_wgt(int, double, double);
     void update_thumbnail();
 public slots:

@@ -12,7 +12,9 @@ namespace Utility{
      int number_of_digits(int n);
      std::string zfill(std::string number, int length);
      std::string name_from_path(const std::string full_path);
+     QString name_from_path(const QString full_path);
      std::string add_serial_number(std::string name, std::string file_end);
+     QString add_serial_number(QString name, QString file_end);
      std::string remove_serial_number(std::string file);
 
      cv::Rect scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor);

@@ -4,7 +4,7 @@
 
 #include <QJsonArray>
 
-Tag::Tag(std::string name, bool drawing_tag) {
+Tag::Tag(QString name, bool drawing_tag) {
     m_name = name;
     m_drawing_tag = drawing_tag;
 }
@@ -105,7 +105,7 @@ ANALYSIS_TYPE Tag::get_type() const {
 }
 
 void Tag::write(QJsonObject &json) {
-    json["name"] = QString::fromStdString(m_name);
+    json["name"] = m_name;
     json["drawing_tag"] = m_drawing_tag;
     QJsonArray frames;
     for (auto tag_frame : tag_map) {
@@ -118,7 +118,7 @@ void Tag::write(QJsonObject &json) {
 }
 
 void Tag::read(const QJsonObject &json) {
-    m_name = json["name"].toString().toStdString();
+    m_name = json["name"].toString();
     m_drawing_tag = json["drawing_tag"].toBool();
     QJsonArray json_intervals = json["frames"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {

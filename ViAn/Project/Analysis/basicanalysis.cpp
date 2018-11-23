@@ -39,7 +39,7 @@ ANALYSIS_TYPE BasicAnalysis::get_type() const {
  * @param json
  */
 void BasicAnalysis::read(const QJsonObject &json){
-    m_name = json["name"].toString().toStdString();
+    m_name = json["name"].toString();
     QJsonArray json_intervals = json["POI:s"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_interval = json_intervals[i].toObject();
@@ -56,7 +56,7 @@ void BasicAnalysis::read(const QJsonObject &json){
  * @param json
  */
 void BasicAnalysis::write(QJsonObject &json){
-    json["name"] = QString::fromStdString(m_name);
+    json["name"] = m_name;
     QJsonArray json_ais;
     for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
         QJsonObject json_ai;
@@ -76,7 +76,7 @@ void BasicAnalysis::set_id(ID new_id) {
     id = new_id;
 }
 
-std::string BasicAnalysis::get_name() const {
+QString BasicAnalysis::get_name() const {
     return m_name;
 }
 
@@ -84,7 +84,7 @@ interval_set BasicAnalysis::get_intervals() const {
     return m_intervals;
 }
 
-void BasicAnalysis::set_name(const std::string &new_name){
+void BasicAnalysis::set_name(const QString &new_name){
     m_name = new_name;
     m_unsaved_changes = true;
 }

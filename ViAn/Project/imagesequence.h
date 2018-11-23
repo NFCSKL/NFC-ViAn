@@ -7,19 +7,19 @@
 
 class ImageSequence : public Video {
 private:
-    std::vector<std::string> m_images{};
-    std::string seq_path{}; // Path to the folder containing the images
+    std::vector<QString> m_images{};
+    QString seq_path{}; // Path to the folder containing the images
 public:
-    ImageSequence(const std::string& name);
-    ImageSequence(const std::string& name, const std::vector<std::string>& images);
+    ImageSequence(const QString &name);
+    ImageSequence(const QString &name, const std::vector<QString> &images);
 
-    std::vector<std::string> get_images();
-    std::vector<std::string> get_image_names();
-    std::string get_pattern_name();
+    std::vector<QString> get_images();
+    std::vector<QString> get_image_names();
+    QString get_pattern_name();
 
-    void add_image(const std::string &image_path, const int& index=-1);
+    void add_image(const QString &image_path, const int& index=-1);
     void reorder_elem(const int& from, const int& to);
-    void reset_root_dir(const std::string &dir);
+    void reset_root_dir(const QString &dir);
     int length();
 
     void read(const QJsonObject& json) override;

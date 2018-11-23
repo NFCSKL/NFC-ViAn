@@ -16,7 +16,7 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(std::string proj_path, ReportContainer report_container) {
+ReportGenerator::ReportGenerator(QString proj_path, ReportContainer report_container) {
     m_path = proj_path;
     m_rep_cont = report_container;
     word = new QAxObject("Word.Application");
@@ -61,15 +61,14 @@ void ReportGenerator::create_report() {
  * @return
  */
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
-    std::string f_name = Utility::name_from_path(bm->get_file_path().toStdString());
-    f_name = Utility::remove_serial_number(f_name);
-    QString img_file = QString::fromStdString(f_name);
+    QString f_name = Utility::name_from_path(bm->get_file_path());
+    f_name = QString::fromStdString(Utility::remove_serial_number(f_name.toStdString()));
     QString time = QString("Time: %1").arg(bm->get_time());
     QString brightness = QString("Brightness: %1").arg(bm->get_bookmark()->get_state().brightness);
     QString contrast = QString("Contrast: %1").arg(bm->get_bookmark()->get_state().contrast);
     QString gamma = QString("Gamma: %1").arg(bm->get_bookmark()->get_state().gamma);
     QString description = bm->get_description();
-    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast + " " + gamma;
+    QString bm_description = f_name + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast + " " + gamma;
     if (description != "") {
         bm_description = description + QString("\v") + bm_description;
     }
@@ -283,12 +282,13 @@ QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABL
  * to save file names that have a colon in the name.
  * @return string, the current time and date.
  */
-std::string ReportGenerator::date_time_generator() {
+QString ReportGenerator::date_time_generator() {
     time_t now = time(nullptr);
-    std::string dt = ctime(&now);
-    std::replace( dt.begin(), dt.end(), ':', '-');
-    std::replace( dt.begin(), dt.end(), ' ' , '_');
-    dt.erase(std::remove(dt.begin(), dt.end(), '\n'), dt.end());
+    QString dt = ctime(&now);
+    dt.replace(':', '-');
+    dt.replace(' ' , '_');
+    dt.remove('\n');
+    //dt.erase(std::remove(dt.begin(), dt.end(), '\n'), dt.end());
     return dt;
 }
 
@@ -299,12 +299,12 @@ std::string ReportGenerator::date_time_generator() {
  * @param active_document, the document that is selected
  */
 QString ReportGenerator::save_report(QAxObject* active_document) {
-    std::string dt = date_time_generator();
-    std::string proj_name = m_path.substr(0, m_path.find_last_of("/")); // Strip away last "/"
-    proj_name = proj_name.substr(proj_name.find_last_of("/"), proj_name.size());
-    std::string path = m_path.append(proj_name).append("_").append(dt).append(".docx");
-    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
-    return QString::fromStdString(path);
+    QString dt = date_time_generator();
+    QString proj_name = m_path.left(m_path.lastIndexOf("/"));   // Strip away last "/"
+    proj_name = Utility::name_from_path(proj_name);
+    QString path = m_path.append(proj_name).append("_").append(dt).append(".docx");
+    active_document->dynamicCall("SaveAs (const QString&)", path);
+    return path;
 }
 
 /**

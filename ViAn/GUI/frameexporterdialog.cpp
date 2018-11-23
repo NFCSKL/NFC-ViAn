@@ -15,12 +15,12 @@
 #include "Project/project.h"
 
 
-FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
+FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, QString proj_path,
                                          const int& max_frame, const std::pair<int, int>& interval,
                                          QWidget* parent) : QDialog(parent){
     m_exporter = im_exp;
-    m_video_name = QString::fromStdString(video->get_name());
-    m_old_path_text = QString::fromStdString(proj_path) + Constants::STILLS_FOLDER;
+    m_video_name = video->get_name();
+    m_old_path_text = proj_path + Constants::STILLS_FOLDER;
     setWindowTitle("ViAn - Image exporter");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowIcon(QIcon("../ViAn/Icons/folder_interval.png"));
@@ -61,7 +61,7 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_btn_box->addButton(m_export_btn, QDialogButtonBox::AcceptRole);
     connect(m_btn_box, &QDialogButtonBox::accepted, this, &FrameExporterDialog::save_values);
     connect(m_btn_box, &QDialogButtonBox::rejected, this, &FrameExporterDialog::reject);
-    m_video_path = new QLabel(QString::fromStdString(video->file_path));
+    m_video_path = new QLabel(video->file_path);
     // Input layout
     m_input_layout = new QFormLayout(this);
     m_input_layout->addRow(new QLabel(tr("Video"), this), m_video_path);
