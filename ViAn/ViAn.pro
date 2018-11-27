@@ -87,7 +87,9 @@ SOURCES += main.cpp \
     GUI/viewpathdialog.cpp \
     GUI/viewpathitem.cpp \
     Project/imagesequence.cpp \
-    GUI/TreeItems/sequencecontaineritem.cpp
+    GUI/TreeItems/sequencecontaineritem.cpp \
+    GUI/sequencedialog.cpp \
+    GUI/TreeItems/sequencetagitem.cpp
 
 #
 # TEST
@@ -165,7 +167,9 @@ HEADERS += reportgenerator.h\
     GUI/viewpathitem.h \
     Project/imagesequence.h \
     Project/video.h \
-    GUI/TreeItems/sequencecontaineritem.h
+    GUI/TreeItems/sequencecontaineritem.h \
+    GUI/sequencedialog.h \
+    GUI/TreeItems/sequencetagitem.h
 
 #
 # LIBRARY

@@ -34,23 +34,26 @@ struct VideoState {
     }
 };
 
+enum VIDEO_TYPE {VIDEO, VIDEO_SEQUENCE, TAG_SEQUENCE};
+
 typedef int ID;
 class Video : Writeable{
 protected:
     std::string m_name;
-    bool m_is_sequence;
+    VIDEO_TYPE m_sequence_type;
     bool m_is_saved{false};
     int m_width, m_height = 0;
 public:
     VideoState state;
 public:
-    Video(const bool& is_sequence=false);
-    Video(std::string file_path, const bool& is_sequence=false);
+    Video(const VIDEO_TYPE &sequence_type=VIDEO);
+    Video(std::string file_path, const VIDEO_TYPE &sequence_type=VIDEO);
     ~Video();
     std::string file_path;
     std::string get_name();
     void set_name(const std::string& new_name);
     bool is_sequence();
+    VIDEO_TYPE get_sequence_type();
     bool is_saved();
     int get_width();
     int get_height();

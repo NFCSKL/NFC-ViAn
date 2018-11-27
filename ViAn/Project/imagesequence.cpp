@@ -28,7 +28,7 @@ void ImageSequence::update() {
  * @brief ImageSequence::ImageSequence
  * @param name: name of the sequence
  */
-ImageSequence::ImageSequence(const std::string& path) : Video(true){
+ImageSequence::ImageSequence(const std::string& path, VIDEO_TYPE seq_type) : Video(seq_type){
     m_seq_path = path;
     int index = path.find_last_of('/') + 1;
     m_name = file_path.substr(index);
@@ -39,8 +39,9 @@ ImageSequence::ImageSequence(const std::string& path) : Video(true){
  * @param name: name of the sequence
  * @param images: vector of paths to images
  */
-ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string>& images, const std::vector<std::string>& checksums)
-    : Video(path, true) {
+ImageSequence::ImageSequence(const std::string& path, const std::vector<std::string>& images,
+                             const std::vector<std::string>& checksums, VIDEO_TYPE seq_type)
+    : Video(path, seq_type) {
 
     // Store image order and original file paths
     for (size_t i = 0; i < checksums.size(); ++i) {
@@ -51,6 +52,10 @@ ImageSequence::ImageSequence(const std::string& path, const std::vector<std::str
     m_seq_path = path;
     file_path = path + "/" + get_pattern_name();
     is_new = true;
+}
+
+std::map<std::string, std::string> ImageSequence::get_paths() const {
+    return m_original_images;
 }
 
 /**

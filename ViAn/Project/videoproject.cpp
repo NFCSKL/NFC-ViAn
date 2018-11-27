@@ -147,7 +147,7 @@ void VideoProject::read(const QJsonObject& json){
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();        
         BasicAnalysis* analysis = nullptr;
-        ANALYSIS_TYPE save_type = (ANALYSIS_TYPE)json_analysis["analysis_type"].toInt();
+        ANALYSIS_TYPE save_type = static_cast<ANALYSIS_TYPE>(json_analysis["analysis_type"].toInt());
         switch(save_type){
         case TAG:
             analysis = new Tag();

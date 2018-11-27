@@ -1,11 +1,16 @@
 #include "videoitem.h"
-#include "sequencecontaineritem.h"
 
 #include "imagegenerator.h"
+#include "Project/Analysis/tag.h"
+#include "Project/Analysis/tagframe.h"
 #include "Project/imagesequence.h"
 #include "Project/project.h"
 #include "Project/videoproject.h"
+#include "sequencecontaineritem.h"
 #include "sequenceitem.h"
+#include "sequencetagitem.h"
+#include "tagframeitem.h"
+#include "tagitem.h"
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
@@ -85,7 +90,7 @@ void VideoItem::load_thumbnail() {
 void VideoItem::load_sequence_items() {
     if (m_vid_proj == nullptr ) return;
     auto seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
-    if (seq) {
+    if (seq && seq->get_sequence_type() == VIDEO_SEQUENCE) {
         // Create container item for all SequenceItems
         SequenceContainerItem* container = new SequenceContainerItem();
         addChild(container);
@@ -104,15 +109,14 @@ void VideoItem::load_sequence_items() {
                 bool added{false};
                 for (auto i = 0; i < container->childCount(); ++i) {
                     auto child_item = dynamic_cast<SequenceItem*>(container->child(i));
-                    if (child_item) {
-                        if (child_item->get_index() > seq_item_index) {
-                            container->insertChild(i, seq_item);
-                            added = true;
-                            break;
-                        }
+                    if (!child_item) {
+                        continue;
+                    } else if (child_item->get_index() > seq_item_index) {
+                        container->insertChild(i, seq_item);
+                        added = true;
+                        break;
                     }
                 }
-
                 if (!added) {
                     // Item should be added at the end
                     container->addChild(seq_item);
@@ -120,5 +124,41 @@ void VideoItem::load_sequence_items() {
             }
         }
         container->update_text();
+    } else if (seq && seq->get_sequence_type() == TAG_SEQUENCE) {
+        int i{};
+        Tag* sequence = new Tag();
+        TagItem* t_item = new TagItem(sequence);
+        addChild(t_item);
+        for (auto item : seq->get_paths()) {
+            VideoState state;
+            int index = seq->get_index_of_hash(item.first);
+            //index = i;
+            state.frame = index;
+            TagFrame* frame = new TagFrame(index, state);
+            std::string name = Utility::name_from_path(item.second);
+            SequenceTagItem* st_item = new SequenceTagItem(name, index, frame);
+            sequence->add_frame(index, frame);
+            // ----------
+            bool added{false};
+            for (auto i = 0; i < t_item->childCount(); ++i) {
+                auto child_item = dynamic_cast<SequenceTagItem*>(t_item->child(i));
+                if (!child_item) {
+                    continue;
+                } else if (child_item->get_index() > index) {
+                    t_item->insertChild(i, st_item);
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                // Item should be added at the end
+                t_item->addChild(st_item);
+            }
+
+            // ------------
+            //t_item->addChild(st_item);
+
+            i++;
+        }
     }
 }

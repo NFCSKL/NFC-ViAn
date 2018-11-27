@@ -2,10 +2,11 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
+ImageImporter::ImageImporter(const QStringList& images, const QString& dest, const int &sequence_type, QObject *parent) :
+    QObject(parent),
     m_images(images),
     m_dest(QString::fromStdString(Utility::add_serial_number(dest.toStdString(), ""))),
-    QObject(parent) {}
+    m_type(sequence_type) {}
 
 /**
  * @brief ImageImporter::import_images
@@ -48,7 +49,7 @@ void ImageImporter::import_images() {
     }
 
     if (!m_abort)
-        emit imported_sequence(m_images, checksums, m_dest.toStdString());
+        emit imported_sequence(m_images, checksums, m_dest.toStdString(), m_type);
     emit update_progress(m_images.size());
     emit finished();
 }

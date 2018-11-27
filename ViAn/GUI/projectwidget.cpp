@@ -6,6 +6,7 @@
 #include "GUI/TreeItems/drawingtagitem.h"
 #include "GUI/TreeItems/folderitem.h"
 #include "GUI/TreeItems/sequenceitem.h"
+#include "GUI/TreeItems/sequencetagitem.h"
 #include "GUI/TreeItems/tagframeitem.h"
 #include "GUI/TreeItems/tagitem.h"
 #include "GUI/TreeItems/videoitem.h"
@@ -19,6 +20,7 @@
 #include "Project/recentproject.h"
 #include "Project/videoproject.h"
 #include "projectdialog.h"
+#include "sequencedialog.h"
 #include "utility.h"
 #include "viewpathdialog.h"
 
@@ -183,25 +185,31 @@ void ProjectWidget::add_images() {
         return;
     }
 
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Import image sequence"),
-                                         tr("Sequence name:"), QLineEdit::Normal,
-                                         "Sequence", &ok,
-                                         Qt::WindowCloseButtonHint);
+//    bool ok;
+//    QString text = QInputDialog::getText(this, tr("Import image sequence"),
+//                                         tr("Sequence name:"), QLineEdit::Normal,
+//                                         "Sequence", &ok,
+//                                         Qt::WindowCloseButtonHint);
+
+    QString text{};
+    int sequence_type;
+    SequenceDialog* seq_dialog = new SequenceDialog(&text, &sequence_type, this);
+
+    bool reply = seq_dialog->exec();
 
     // Check if dialog was accepted and that proper name was used
     QString seq_name{"sequence"};
-    if (ok && !text.isEmpty())
+    if (reply && !text.isEmpty()) {
         seq_name = text;
-    else
+    } else {
         return;
-
+    }
 
     QString path = QString::fromStdString(m_proj->get_dir()) + "Sequences/" + seq_name;
 
     QProgressDialog* progress = new QProgressDialog(
                 "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
-    ImageImporter* importer = new ImageImporter(image_paths, path);
+    ImageImporter* importer = new ImageImporter(image_paths, path, sequence_type);
     QThread* copy_thread = new QThread();
     importer->moveToThread(copy_thread);
 
@@ -217,13 +225,14 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, std::string path){
+void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, std::string path, int seq_type){
     std::vector<std::string> images, hashes;
     for (auto i = 0; i < image_paths.size(); i++) {
         images.push_back(image_paths.at(i).toStdString());
         hashes.push_back(checksums.at(i).toStdString());
     }
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes));
+    VIDEO_TYPE type = static_cast<VIDEO_TYPE>(seq_type);
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes, type));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -694,6 +703,29 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
+
+        update_current_tag(vid_item);
+        break;
+    } case SEQUENCE_TAG_ITEM:  {
+        auto seq_item = dynamic_cast<SequenceTagItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        VideoState  state;
+        state = seq_item->get_state();
+        state.frame = seq_item->get_index();
+        emit set_video_project(vid_item->get_video_project());
+        emit marked_video_state(vid_item->get_video_project(), state);
+
+        TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
+        emit marked_basic_analysis(tag_item->get_tag());
+
+        emit set_zoom_tool();
+        emit set_show_analysis_details(false);
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true,false);
+
+        emit item_type(item->type());
 
         update_current_tag(vid_item);
         break;

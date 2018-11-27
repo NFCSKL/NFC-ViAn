@@ -1,7 +1,6 @@
 #include "tagframeitem.h"
 
 #include "Project/Analysis/tagframe.h"
-#include "tagitem.h"
 
 TagFrameItem::TagFrameItem(int frame) : TreeItem(TAG_FRAME_ITEM) {
     m_frame = frame;
