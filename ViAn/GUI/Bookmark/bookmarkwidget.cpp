@@ -110,6 +110,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     if (vid_proj->get_video()->is_sequence()) {
         ImageSequence* seq = dynamic_cast<ImageSequence*>(vid_proj->get_video());
         file_name = Utility::name_from_path(seq->get_original_name_from_index(state.frame));
+        file_name = Utility::remove_suffix(file_name);
     } else {
        file_name = vid_proj->get_video()->get_name();
        file_name += "_" + std::to_string(state.frame);
