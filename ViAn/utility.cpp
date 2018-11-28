@@ -105,17 +105,6 @@ std::string Utility::remove_serial_number(std::string file) {
 }
 
 /**
- * @brief Utility::remove_suffix
- * Remove the file ending (.xxx) from a file
- * @param file
- * @return
- */
-std::string Utility::remove_suffix(std::string file) {
-    std::string file_type = file.substr(file.find_last_of("."), file.size());
-    return file.substr(0, file.size() - file_type.size());
-}
-
-/**
  * @brief Utility::scale_rect
  * @param rect
  * @param scale_factor

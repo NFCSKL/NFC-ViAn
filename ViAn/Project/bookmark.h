@@ -29,7 +29,8 @@ class Bookmark : public Writeable {
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
     ID id = 0;
 public:
-    std::string m_file;
+    std::string m_file;             // Path for the frame in the bookmark
+    std::string m_image_name;
     Bookmark(VideoProject* vid_proj, const std::string &file_name, const std::string& text, const VideoState& state, const QString &m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
