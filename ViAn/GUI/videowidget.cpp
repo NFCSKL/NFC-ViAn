@@ -662,6 +662,11 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
     if (!m_floating) {
+        if (proj_tree_item == SEQUENCE_TAG_ITEM) {
+            qDebug() << "I'm in mister";
+            // TODO Update the state in the sequence tag item
+        }
+
         if (proj_tree_item == VIDEO_ITEM) {
             m_vid_proj->state.center = center;
             m_vid_proj->state.scale_factor = scale;
@@ -1126,6 +1131,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         player_con.notify_all();
 
     } else {
+        qDebug() << "state scale" << state.scale_factor;
+        qDebug() << "con bri" << state.contrast << state.brightness;
         set_state(state);
         if (state.frame > -1) {
             on_new_frame();

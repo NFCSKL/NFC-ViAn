@@ -709,7 +709,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
     } case SEQUENCE_TAG_ITEM:  {
         auto seq_item = dynamic_cast<SequenceTagItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        VideoState  state;
+        VideoState state;
         state = seq_item->get_state();
         state.frame = seq_item->get_index();
         emit set_video_project(vid_item->get_video_project());
