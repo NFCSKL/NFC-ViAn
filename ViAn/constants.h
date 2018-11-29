@@ -85,7 +85,7 @@ namespace Constants {
     const int BRIGHTNESS_MIN = -100, BRIGHTNESS_MAX = 100, BRIGHTNESS_DEFAULT = 0, BRIGHTNESS_STEP = 1;
     const double GAMMA_MIN = 0.01, GAMMA_MAX = 4, GAMMA_DEFAULT = 1, GAMMA_STEP = 0.01;
 
-    const unsigned int THUMBNAIL_SIZE = 80;
+    const unsigned int THUMBNAIL_SIZE = 60;
 }
 
 

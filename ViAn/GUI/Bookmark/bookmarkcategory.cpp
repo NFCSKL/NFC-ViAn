@@ -16,7 +16,6 @@ BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem
     layout->setAlignment(Qt::AlignTop);
     layout->setMargin(5);
     layout->setSpacing(0);
-    folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
     m_title = new QLineEdit(QString::fromStdString(name));
     layout->addWidget(m_title);
@@ -42,7 +41,7 @@ BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem
     container->addWidget(reference);
 
     folder->setLayout(layout);
-    setSizeHint(folder->sizeHint());
+    setSizeHint(QSize(Constants::THUMBNAIL_SIZE*3, Constants::THUMBNAIL_SIZE*3));
 }
 
 BookmarkCategory::~BookmarkCategory() {

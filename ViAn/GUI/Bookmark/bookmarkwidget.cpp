@@ -18,7 +18,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     QPushButton* generate_btn = new QPushButton(tr("Generate report"));
     QPushButton* new_folder_btn = new QPushButton(tr("Create new category"));
 
-    bm_list = new BookmarkList(this);
+    bm_list = new BookmarkList(true, UNSORTED, this);
     scroll_area = new QScrollArea();
 
     scroll_area->setWidget(bm_list);
@@ -32,7 +32,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(generate_btn);   
     layout->setMargin(5);
     layout->setSpacing(5);
-    setMinimumWidth(bm_list->sizeHint().width()*2); // Should be 2*thumbnail + margin
+    setMinimumWidth(Constants::THUMBNAIL_SIZE*3); // Should be 2*thumbnail + margin
     setLayout(layout);
 
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
