@@ -51,6 +51,7 @@ private:
     QString get_bookmark_descr(BookmarkItem *bm);
     void create_bookmark_table(QAxObject *para);
 
+    void add_category(QAxObject *table, size_t i);
     QAxObject* add_table(QAxObject* range, int rows, int cols, TABLE_STYLE style = NO_BORDER);
     QAxObject* get_cell(QAxObject* table, int row, int cols);
 
