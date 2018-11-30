@@ -1,5 +1,6 @@
 #include "imageimporter.h"
 #include <QCoreApplication>
+#include <QDataStream>
 #include <QDebug>
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
@@ -33,8 +34,26 @@ void ImageImporter::import_images() {
             bool copied = QFile().copy(m_images[i], new_path);
             if (!copied)
                 m_images.erase(m_images.begin() + i);
-            else
-                checksums.append(Utility::checksum(new_path));
+            else {
+                int counter = 0;
+                QByteArray c_sum = Utility::checksum(new_path);
+
+                // In order to avoid key duplicates in ImageSequences,
+                // the checksum will be appended with a counter value
+                // (key duplicates occur when importing duplicates of images)
+                while (true) {
+                    if (std::find(checksums.begin(), checksums.end(), c_sum) == checksums.end()) {
+                        checksums.append(c_sum);
+                        break;
+                    }
+
+                    // Append counter in hex to original checksum
+                    if (c_sum.size() > 64) c_sum.truncate(64);
+                    c_sum.append(QString::number(counter, 16));
+                    counter += 1;
+                }
+
+            }
 
             emit update_progress(i + 1);
             QCoreApplication::processEvents(); // Process thread event loop. Needed for abort flag to update
