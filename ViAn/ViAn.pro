@@ -53,7 +53,6 @@ SOURCES += main.cpp \
     GUI/TreeItems/folderitem.cpp \
     GUI/TreeItems/tagitem.cpp \
     GUI/TreeItems/analysisitem.cpp \
-    GUI/fpsdialog.cpp \
     GUI/frameexporterdialog.cpp \
     GUI/framewidget.cpp \
     GUI/videowidget.cpp \
@@ -133,7 +132,6 @@ HEADERS += reportgenerator.h\
     GUI/projectdialog.h \
     GUI/projectwidget.h \
     GUI/recentprojectdialog.h \
-    GUI/fpsdialog.h \
     GUI/frameexporterdialog.h \
     GUI/framewidget.h \
     GUI/videowidget.h \
@@ -178,8 +176,8 @@ HEADERS += reportgenerator.h\
 #
 # LIBRARY
 #
-SOURCES += Library/customdialog.cpp
-HEADERS += Library/customdialog.h
+SOURCES +=
+HEADERS +=
 
 #
 # GUI
@@ -209,7 +207,6 @@ SOURCES += \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
     Video/shapes/text.cpp \
-    Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
 HEADERS += \
     Video/overlay.h \
@@ -219,7 +216,6 @@ HEADERS += \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
     Video/shapes/text.h \
-    Video/shapes/analysarea.h \
     Video/framemanipulator.h
 
 win32 {

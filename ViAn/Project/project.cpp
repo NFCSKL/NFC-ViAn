@@ -262,17 +262,6 @@ std::vector<VideoProject*> &Project::get_videos(){
     return m_videos;
 }
 
-/**
- * @brief Project::get_video
- * @param id
- * @return Returns the video with the specified id.
- *
- * TODO Unused
- */
-VideoProject* Project::get_video(const int& v_pos) {
-    return m_videos.at(v_pos);
-}
-
 QString Project::get_dir() const {
     return m_dir;
 }

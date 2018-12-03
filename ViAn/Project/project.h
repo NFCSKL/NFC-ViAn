@@ -53,7 +53,6 @@ public:
     QString generate_tmp_directory();
 
     std::vector<VideoProject *>& get_videos();
-    VideoProject* get_video(const int& v_pos);
     QString get_dir() const;
     QString get_name() const;
     QString get_file() const;

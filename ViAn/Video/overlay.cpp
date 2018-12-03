@@ -172,7 +172,8 @@ Shapes* Overlay::get_empty_shape(SHAPES shape_type) {
  */
 void Overlay::add_drawing(Shapes* shape, int frame_nr) {
     if (shape->get_shape() == TEXT) {
-        shape->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        Text* temp_text = dynamic_cast<Text*>(shape);
+        temp_text->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
     }
     shape->set_frame(frame_nr);
     overlays[frame_nr].push_back(shape);
@@ -211,10 +212,11 @@ bool Overlay::get_show_overlay() {
 
 void Overlay::update_text(QString text, Shapes* shape) {
     if (shape->get_shape() == TEXT) {
-        dynamic_cast<Text*>(shape)->set_name(text);
-        double font_scale = dynamic_cast<Text*>(shape)->get_font_scale();
-        shape->set_text_size(cv::getTextSize(shape->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
-        shape->update_text_draw_end();
+        shape->set_name(text);
+        Text* temp_text = dynamic_cast<Text*>(shape);
+        double font_scale = temp_text->get_font_scale();
+        temp_text->set_text_size(cv::getTextSize(text.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        temp_text->update_text_draw_end();
     }
 }
 
@@ -389,9 +391,10 @@ void Overlay::mouse_moved(QPoint pos, int frame_nr, bool shift, bool ctrl) {
 void Overlay::mouse_scroll(QPoint pos, int frame_nr) {
     if (!current_drawing) return;
     if (current_drawing->get_shape() == TEXT) {
-        double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(pos);
-        current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
-        current_drawing->update_text_draw_end();
+        Text* temp_text = dynamic_cast<Text*>(current_drawing);
+        double font_scale = temp_text->set_font_scale(pos);
+        temp_text->set_text_size(cv::getTextSize(temp_text->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        temp_text->update_text_draw_end();
         m_unsaved_changes = true;
         return;
     }
@@ -414,9 +417,10 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
             if (current_drawing == nullptr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;
-                double font_scale = dynamic_cast<Text*>(current_drawing)->set_font_scale(diff_point);
-                current_drawing->set_text_size(cv::getTextSize(current_drawing->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
-                current_drawing->update_text_draw_end();
+                Text* temp_text = dynamic_cast<Text*>(current_drawing);
+                double font_scale = temp_text->set_font_scale(diff_point);
+                temp_text->set_text_size(cv::getTextSize(temp_text->get_name().toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+                temp_text->update_text_draw_end();
                 prev_point = pos;
                 m_unsaved_changes = true;
                 return;
@@ -432,7 +436,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
             current_drawing->move_shape(diff_point);
             prev_point = pos;
         } else if (current_shape == TEXT) {
-            overlays[frame_nr].back()->update_text_pos(pos);
+            dynamic_cast<Text*>(overlays[frame_nr].back())->update_text_pos(pos);
         } else {
             if (current_shape != PEN && shift) {
                 // When the shift modifier is used draw a symmetric drawing

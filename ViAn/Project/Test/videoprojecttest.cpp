@@ -54,14 +54,18 @@ void VideoProjectTest::add_bookmark_test(){
 void VideoProjectTest::delete_analysis(){
     VideoProject* vid_proj = new VideoProject();
 
-    int id1  = vid_proj->add_analysis(new AnalysisProxy());
-    int id2  = vid_proj->add_analysis(new AnalysisProxy());
-    int id3  = vid_proj->add_analysis(new AnalysisProxy());
+    AnalysisProxy* ana1 = new AnalysisProxy();
+    AnalysisProxy* ana2 = new AnalysisProxy();
+    AnalysisProxy* ana3 = new AnalysisProxy();
+
+    vid_proj->add_analysis(ana1);
+    vid_proj->add_analysis(ana2);
+    vid_proj->add_analysis(ana3);
     QCOMPARE(vid_proj->m_analyses.size(), unsigned(3));
 
-    vid_proj->delete_analysis(id1);
-    vid_proj->delete_analysis(id2);
-    vid_proj->delete_analysis(id3);
+    vid_proj->remove_analysis(ana1);
+    vid_proj->remove_analysis(ana2);
+    vid_proj->remove_analysis(ana3);
     QCOMPARE(vid_proj->m_analyses.size(), unsigned(0));
 }
 
@@ -73,14 +77,18 @@ void VideoProjectTest::delete_analysis(){
 void VideoProjectTest::delete_bookmark(){
     VideoProject* vid_proj = new VideoProject();
 
-    int id1  = vid_proj->add_bookmark(new Bookmark());
-    int id2  = vid_proj->add_bookmark(new Bookmark());
-    int id3  = vid_proj->add_bookmark(new Bookmark());
+    Bookmark* bmark1 = new Bookmark();
+    Bookmark* bmark2 = new Bookmark();
+    Bookmark* bmark3 = new Bookmark();
+
+    vid_proj->add_bookmark(bmark1);
+    vid_proj->add_bookmark(bmark2);
+    vid_proj->add_bookmark(bmark3);
     QCOMPARE(vid_proj->m_bookmarks.size(), unsigned(3));
 
-    vid_proj->delete_bookmark(id1);
-    vid_proj->delete_bookmark(id2);
-    vid_proj->delete_bookmark(id3);
+    vid_proj->remove_bookmark(bmark1);
+    vid_proj->remove_bookmark(bmark2);
+    vid_proj->remove_bookmark(bmark3);
     QCOMPARE(vid_proj->m_analyses.size(), unsigned(0));
 }
 
@@ -151,12 +159,12 @@ void VideoProjectTest::save_status_test() {
     video_project->m_unsaved_changes = false;
 
     BasicAnalysis* analysis = new BasicAnalysis();
-    int analysis_id = video_project->add_analysis(analysis);
+    video_project->add_analysis(analysis);
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 
     Bookmark* bookmark = new Bookmark();
-    int bookmark_id = video_project->add_bookmark(bookmark);
+    video_project->add_bookmark(bookmark);
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 
@@ -173,19 +181,11 @@ void VideoProjectTest::save_status_test() {
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 
-    video_project->delete_analysis(analysis_id);
+    video_project->remove_analysis(analysis);
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 
-    video_project->delete_bookmark(bookmark_id);
-    QVERIFY(!video_project->is_saved());
-    video_project->m_unsaved_changes = false;
-
-    video_project->delete_artifacts();
-    QVERIFY(!video_project->is_saved());
-    video_project->m_unsaved_changes = false;
-
-    video_project->remove_from_project();
+    video_project->remove_bookmark(bookmark);
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 }

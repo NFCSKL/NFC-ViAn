@@ -65,7 +65,8 @@ void FrameWidget::copy() {
     case TEXT: {
         Text* text = dynamic_cast<Text*>(current_drawing);
         copied_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
-        copied_item->set_text_size(text->get_text_size());
+        Text* copied_item_text = dynamic_cast<Text*>(copied_item);
+        copied_item_text->set_text_size(text->get_text_size());
         break;
     }
     default:
@@ -108,7 +109,8 @@ void FrameWidget::paste() {
     case TEXT: {
         Text* text = dynamic_cast<Text*>(copied_item);
         new_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
-        new_item->set_text_size(text->get_text_size());
+        Text* new_text = dynamic_cast<Text*>(new_item);
+        new_text->set_text_size(text->get_text_size());
         break;
     }
     default:

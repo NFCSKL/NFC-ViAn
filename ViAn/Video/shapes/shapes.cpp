@@ -1,5 +1,7 @@
 #include "shapes.h"
 
+#include "utility.h"
+
 #include <QDebug>
 #include <QPoint>
 
@@ -25,8 +27,8 @@ Shapes::Shapes(SHAPES s, QColor col, QPoint pos) {
     shape = s;
     color = qcolor_to_scalar(col);
     q_color = col;
-    draw_start = qpoint_to_point(pos);
-    draw_end = qpoint_to_point(pos);
+    draw_start = Utility::from_qpoint(pos);
+    draw_end = Utility::from_qpoint(pos);
 }
 
 Shapes::~Shapes() {}
@@ -53,7 +55,7 @@ void Shapes::set_anchor(QPoint pos) {
  * Edits the shape, which point is edited is based on the anchor
  */
 void Shapes::edit_shape(QPoint diff_point) {
-    (anchor) ? (draw_start += qpoint_to_point(diff_point)) : draw_end += qpoint_to_point(diff_point);
+    (anchor) ? (draw_start += Utility::from_qpoint(diff_point)) : draw_end += Utility::from_qpoint(diff_point);
 }
 
 /**
@@ -64,27 +66,11 @@ void Shapes::edit_shape(QPoint diff_point) {
 void Shapes::update_drawing_pos(QPoint pos) {
     // Call handle_new_pos first because it might need the old draw_end value. Only in pen
     handle_new_pos(pos);
-    draw_end = qpoint_to_point(pos);
+    draw_end = Utility::from_qpoint(pos);
 }
 
 void Shapes::update_drawing_sym(int dx, int dy) {
     draw_end = cv::Point(draw_start.x + dx, draw_start.y + dy);
-}
-
-/**
- * @brief Shape::update_text_pos
- * Updates the start and end point of the text-drawing
- * @param pos
- */
-void Shapes::update_text_pos(QPoint pos) {
-    draw_start = qpoint_to_point(pos);
-    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
-    draw_end = p;
-}
-
-void Shapes::update_text_draw_end() {
-    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
-    draw_end = p;
 }
 
 /**
@@ -93,8 +79,8 @@ void Shapes::update_text_draw_end() {
  * Adds the diff_pointer to the shape and therefore moves it that much
  */
 void Shapes::move_shape(QPoint diff_point) {
-    draw_start += qpoint_to_point(diff_point);
-    draw_end += qpoint_to_point(diff_point);
+    draw_start += Utility::from_qpoint(diff_point);
+    draw_end += Utility::from_qpoint(diff_point);
 }
 
 /**
@@ -107,16 +93,6 @@ cv::Scalar Shapes::qcolor_to_scalar(QColor col) {
     int r,g,b;
     col.getRgb(&r, &g, &b);
     return cv::Scalar(b,g,r); // swap RGB-->BGR
-}
-
-/**
- * @brief Shape::qpoint_to_point
- * Converts QPoint to OpenCV Point.
- * @param pnt QPoint to be converted.
- * @return Returns converted Point.
- */
-cv::Point Shapes::qpoint_to_point(QPoint pnt) {
-    return cv::Point(pnt.x(), pnt.y());
 }
 
 /**
@@ -158,14 +134,6 @@ QColor Shapes::get_color() {
 void Shapes::set_color(QColor col) {
     q_color = col;
     color = qcolor_to_scalar(col);
-}
-
-cv::Size Shapes::get_text_size() {
-    return text_size;
-}
-
-void Shapes::set_text_size(cv::Size size) {
-    text_size = size;
 }
 
 /**
@@ -232,6 +200,7 @@ void Shapes::read_shape(const QJsonObject& json){
     draw_end.y = json["p2y"].toInt();
     frame = json["frame"].toInt();
     show = json["show"].toBool();
+    m_name = json["name"].toString();
 }
 
 /**
@@ -250,4 +219,5 @@ void Shapes::write_shape(QJsonObject& json){
     json["p2y"] = draw_end.y;
     json["frame"] = frame;
     json["show"] = show;
+    json["name"] = m_name;
 }

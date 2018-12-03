@@ -78,34 +78,6 @@ bool VideoProject::is_saved() {
 }
 
 /**
- * @brief VideoProject::delete_analysis
- * @param id of the analysis
- */
-//TODO only used in tests, remove?
-void VideoProject::delete_analysis(const int& id) {
-    BasicAnalysis* am = m_analyses.at(id);
-    m_analyses.erase(id);
-    am->delete_saveable();
-    delete am;
-    m_unsaved_changes = true;
-}
-
-/**
- * @brief VideoProject::delete_bookmark
- * @param id
- */
-//TODO only used in tests, remove?
-void VideoProject::delete_bookmark(const int &id) {
-    Bookmark* bm = m_bookmarks.at(id);
-    bool remove = bm->remove(); // the bookmark should only be deleted if this return true
-    if (!remove) return;
-    m_bookmarks.erase(id);
-    bm->remove_exported_image();
-    delete bm;
-    m_unsaved_changes = true;
-}
-
-/**
  * @brief VideoProject::get_analyses
  * @return analyses
  * return all analyses.
@@ -274,29 +246,6 @@ void VideoProject::remove_bookmark(Bookmark *bookmark) {
     m_unsaved_changes = true;
     bookmark->remove_exported_image();
     delete bookmark;
-}
-
-/**
- * @brief VideoProject::delete_artifacts
- * Delete bookmark files.
- * TODO "UNUSED" only used in tests
- */
-void VideoProject::delete_artifacts(){
-    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
-        Bookmark* temp = it->second;
-        temp->remove_exported_image();
-    }
-    for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
-        BasicAnalysis* temp = it2->second;
-        temp->delete_saveable();
-    }
-    m_unsaved_changes = true;
-}
-
-// TODO, only used in tests
-void VideoProject::remove_from_project() {
-    m_project->remove_video_project(this);
-    m_unsaved_changes = true;
 }
 
 std::string VideoProject::get_index_path() {
