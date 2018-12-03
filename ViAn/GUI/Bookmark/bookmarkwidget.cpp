@@ -21,7 +21,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     QPushButton* generate_btn = new QPushButton(tr("Generate report"));
     QPushButton* new_folder_btn = new QPushButton(tr("Create new category"));
 
-    bm_list = new BookmarkList(this);
+    bm_list = new BookmarkList();
     scroll_area = new QScrollArea();
 
     scroll_area->setWidget(bm_list);
@@ -56,7 +56,7 @@ void BookmarkWidget::generate_report() {
         QListWidgetItem* item = bm_list->item(i);
         if (item->type() == CONTAINER) {
             BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
-            QString cat_name = QString::fromStdString(_tmp_cat->get_name());
+            QString cat_name = _tmp_cat->get_name();
 
             std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
             std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
@@ -70,13 +70,13 @@ void BookmarkWidget::generate_report() {
     }
     processing_thread = new QThread;
     setCursor(Qt::WaitCursor);
-    ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
+    ReportGenerator* rp_gen = new ReportGenerator(m_path, rp_cont);
     rp_gen->uncat_bmarks = bmark_list;
     rp_gen->create_report();
     setCursor(Qt::ArrowCursor);
 }
 
-BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, std::string> *container) {
+BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, QString> *container) {
     BookmarkCategory* bm_cat = nullptr;
     for (int i = 0; i < bm_list->count(); i++) {
         QListWidgetItem* item = bm_list->item(i);
@@ -107,19 +107,19 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
 
 void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description) {
     export_original_frame(vid_proj, state.frame, org_frame);
-    std::string file_name;
+    QString file_name;
     if (vid_proj->get_video()->is_sequence()) {
         ImageSequence* seq = dynamic_cast<ImageSequence*>(vid_proj->get_video());
         file_name = Utility::name_from_path(seq->get_original_name_from_index(state.frame));
     } else {
        file_name = vid_proj->get_video()->get_name();
-       file_name += "_" + std::to_string(state.frame);
+       file_name += "_" + QString::number(state.frame);
     }
 
     ImageGenerator im_gen(bookmark_frame, m_path);
-    std::string thumbnail_path = im_gen.create_thumbnail(file_name);
-    std::string bm_file = im_gen.create_bookmark(file_name);
-    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description.toStdString(), state, time);
+    QString thumbnail_path = im_gen.create_thumbnail(file_name);
+    QString bm_file = im_gen.create_bookmark(file_name);
+    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description, state, time);
     bookmark->m_image_name = file_name;
     bookmark->set_thumbnail_path(thumbnail_path);
     vid_proj->add_bookmark(bookmark);
@@ -134,32 +134,31 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
 }
 
 void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
-    std::string file_name;
+    QString file_name;
     if (vid_proj->get_video()->is_sequence()) {
         ImageSequence* seq = dynamic_cast<ImageSequence*>(vid_proj->get_video());
         ImageGenerator im_gen(frame, m_path);
-        std::string path = seq->get_original_name_from_index(frame_nbr);
-        std::string name = Utility::name_from_path(path);
+        QString path = seq->get_original_name_from_index(frame_nbr);
+        QString name = Utility::name_from_path(path);
         im_gen.create_tiff(name);
     } else {
         Video* vid = vid_proj->get_video();
         file_name = vid->get_name();
-        file_name += "_" + std::to_string(frame_nbr);
+        file_name += "_" + QString::number(frame_nbr);
         ImageGenerator im_gen(frame, m_path);
         im_gen.create_tiff(file_name);
     }
-
 }
 
 void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;
         // Load thumbnail TODO add check for file
-        std::string t_path = bm->get_thumbnail_path();
-        std::pair<int, std::string> new_container = bm->get_container();
+        QString t_path = bm->get_thumbnail_path();
+        std::pair<int, QString> new_container = bm->get_container();
         BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
         bm_item->set_thumbnail(t_path);
-        if (new_container.second.empty()) {
+        if (new_container.second.isEmpty()) {
             // No container name. Add it to the main list
             bm_list->addItem(bm_item);
         } else {
@@ -168,7 +167,7 @@ void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     }
 }
 
-void BookmarkWidget::set_path(std::string path) {
+void BookmarkWidget::set_path(QString path) {
     m_path = path;
 }
 

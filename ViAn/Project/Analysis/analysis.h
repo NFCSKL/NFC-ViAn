@@ -21,7 +21,7 @@ public:
     virtual void write(QJsonObject& json) override;
     virtual ANALYSIS_TYPE get_type() const override;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
-    std::string get_name() const;
+    QString get_name() const;
 
 };
 

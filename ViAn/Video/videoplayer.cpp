@@ -10,7 +10,7 @@
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, std::atomic_bool *new_frame_video, std::atomic_bool *video_loaded, video_sync* v_sync, std::condition_variable* player_con,
-                         std::mutex* player_lock, std::string* video_path,
+                         std::mutex* player_lock, QString *video_path,
                          std::atomic_int* speed_step, std::atomic_bool* abort_playback, QObject *parent) : QObject(parent) {
 
 
@@ -52,11 +52,10 @@ void VideoPlayer::load_video() {
 
     current_frame = 0;
     m_is_playing->store(false);
-
-    if (!m_capture.open(*m_video_path)) {
+    if (!m_capture.open((*m_video_path).toStdString())) {
         emit capture_failed();
         emit video_info(0,0,0,0);
-        qWarning() << "Failed to open video at " << m_video_path->c_str();
+        qWarning() << "Failed to open video at " << m_video_path;
         return;
     }
     load_video_info();

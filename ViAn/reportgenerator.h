@@ -29,12 +29,12 @@ using ReportContainer = std::vector<Category>;
  */
 class ReportGenerator : public QObject {
     Q_OBJECT
-    std::string m_path;
+    QString m_path;
     QAxObject* word;
     ReportContainer m_rep_cont;
 public:
     friend class test_report_generator;
-    explicit ReportGenerator(std::string proj_path, ReportContainer report_container);
+    explicit ReportGenerator(QString proj_path, ReportContainer report_container);
     ~ReportGenerator();
     void create_report();
 
@@ -66,7 +66,7 @@ private:
     void close_report(QAxObject* doc);
 
     // Formatting methods
-    std::string date_time_generator();
+    QString date_time_generator();
 signals:
     void done(void);
 };

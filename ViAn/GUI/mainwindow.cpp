@@ -815,8 +815,8 @@ void MainWindow::open_project_dialog(){
 
 void MainWindow::open_project_folder() {
     if (!project_wgt->m_proj) return;
-    std::string dir = project_wgt->m_proj->get_dir();
-    QDesktopServices::openUrl(QUrl("file:///"+QString::fromStdString(dir), QUrl::TolerantMode));
+    QString dir = project_wgt->m_proj->get_dir();
+    QDesktopServices::openUrl(QUrl("file:///"+dir, QUrl::TolerantMode));
 }
 
 void MainWindow::view_paths() {

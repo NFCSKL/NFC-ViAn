@@ -38,7 +38,7 @@ struct VideoState {
 typedef int ID;
 class Video : Writeable{
 protected:
-    std::string m_name;
+    QString m_name;
     bool m_is_sequence;
     bool m_is_saved{false};
     int m_width, m_height = 0;
@@ -46,11 +46,11 @@ public:
     VideoState state;
 public:
     Video(const bool& is_sequence=false);
-    Video(std::string file_path, const bool& is_sequence=false);
+    Video(QString file_path, const bool& is_sequence=false);
     ~Video();
-    std::string file_path;
-    std::string get_name();
-    void set_name(const std::string& new_name);
+    QString file_path;
+    QString get_name();
+    void set_name(const QString &new_name);
     bool is_sequence();
     bool is_saved();
     int get_width();

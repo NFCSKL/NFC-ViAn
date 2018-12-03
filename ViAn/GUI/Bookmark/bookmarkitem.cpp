@@ -10,11 +10,11 @@
  * @param bookmark Bookmark to be saved in the item.
  * @param type Type of bookmark item.
  */
-BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(QString::fromStdString(bookmark->get_description()), nullptr, type) {
+BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(bookmark->get_description(), nullptr, type) {
     QString frame = QString::number(bookmark->get_frame_number());
-    QString v_name = QString::fromStdString(bookmark->get_video_project()->get_video()->get_name());
+    QString v_name = bookmark->get_video_project()->get_video()->get_name();
     hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + bookmark->get_time();
-    QString description = QString::fromStdString(bookmark->get_description());
+    QString description = bookmark->get_description();
     if (description != "") {
         setToolTip(hover_text + "\nDescription: " + description);
     } else {
@@ -35,8 +35,8 @@ BookmarkItem::~BookmarkItem() {
  * Creates and adds a thumbnail.
  * @param frame The image for the thumbnail.
  */
-void BookmarkItem::set_thumbnail(std::string thum_path) {
-    QIcon icon(QString::fromStdString(thum_path));
+void BookmarkItem::set_thumbnail(QString thum_path) {
+    QIcon icon(thum_path);
     setIcon(icon);
 }
 
@@ -68,11 +68,11 @@ int BookmarkItem::get_frame_number() {
 }
 
 QString BookmarkItem::get_file_path() {
-    return QString::fromStdString(m_bookmark->m_file);
+    return m_bookmark->m_file;
 }
 
 QString BookmarkItem::get_description() const {
-    return QString::fromStdString(m_bookmark->get_description());
+    return m_bookmark->get_description();
 }
 
 QString BookmarkItem::get_time() const {
@@ -86,7 +86,7 @@ QString BookmarkItem::get_time() const {
  * @param text
  */
 void BookmarkItem::update_description(const QString& text) {
-    m_bookmark->set_description(text.toStdString());
+    m_bookmark->set_description(text);
     setText(text);
     if (text != "") {
         setToolTip(hover_text + "\nDescription: " + text);

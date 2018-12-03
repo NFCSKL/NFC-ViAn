@@ -10,7 +10,7 @@
 class Interval : public BasicAnalysis
 {
 public:
-    Interval(std::string name = "");
+    Interval(QString name = "");
     ~Interval() override;
     virtual ANALYSIS_TYPE get_type() const override;
     virtual void read(const QJsonObject& json) override;

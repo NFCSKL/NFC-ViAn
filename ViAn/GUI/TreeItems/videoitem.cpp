@@ -17,7 +17,7 @@
 VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     m_vid_proj = video_project;
     setFlags(flags() | Qt::ItemIsDragEnabled);
-    setText(0, QString::fromStdString(video_project->get_video()->get_name()));
+    setText(0, video_project->get_video()->get_name());
 
     auto vid = m_vid_proj->get_video();
     if (vid && vid->is_sequence()) {
@@ -44,7 +44,7 @@ VideoProject* VideoItem::get_video_project() {
 
 void VideoItem::set_video_project(VideoProject *vid_proj) {
     m_vid_proj = vid_proj;
-    setText(0, QString::fromStdString(vid_proj->get_video()->get_name()));
+    setText(0, vid_proj->get_video()->get_name());
     load_thumbnail();
 }
 
@@ -53,7 +53,7 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
  * Create a thumbnail from the video and set it as icon.
  */
 void VideoItem::set_thumbnail() {
-    std::string path = m_vid_proj->get_video()->file_path;
+    std::string path = m_vid_proj->get_video()->file_path.toStdString();
     cv::VideoCapture cap(path);
     if (!cap.isOpened()) {
         setIcon(0, error_icon);
@@ -62,8 +62,8 @@ void VideoItem::set_thumbnail() {
     cv::Mat frame;
     cap >> frame;
     ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());
-    std::string thumbnail_path = im_gen.create_thumbnail(m_vid_proj->get_video()->get_name());
-    const QIcon icon(QString::fromStdString(thumbnail_path));
+    QString thumbnail_path = im_gen.create_thumbnail(m_vid_proj->get_video()->get_name());
+    const QIcon icon(thumbnail_path);
     setIcon(0, icon);
 }
 
@@ -72,8 +72,8 @@ void VideoItem::set_thumbnail() {
  * Loads the thumbnail path and sets it as icon
  */
 void VideoItem::load_thumbnail() {
-    std::string path = m_vid_proj->get_proj_path() + Constants::THUMBNAIL_FOLDER.toStdString() + m_vid_proj->get_video()->get_name() + ".png";
-    const QIcon icon(QString::fromStdString(path));
+    QString path = m_vid_proj->get_proj_path() + Constants::THUMBNAIL_FOLDER + m_vid_proj->get_video()->get_name() + ".png";
+    const QIcon icon(path);
     setIcon(0, icon);
 }
 

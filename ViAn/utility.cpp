@@ -49,21 +49,21 @@ int Utility::number_of_digits(int n) {
  * @param length    :   specifies how long the return string should be
  * @return
  */
-std::string Utility::zfill(std::string number, int length) {
+QString Utility::zfill(QString number, int length) {
     length -= number.length();
     if (length){
-        return std::string(length, '0').append(number);
+        return QString(length, '0').append(number);
     } else {
         return number;
     }
 }
 
-std::string Utility::zfill(const int& number, int length){
-    length -= std::to_string(number).length();
+QString Utility::zfill(const int& number, int length){
+    length -= QString::number(number).length();
     if (length) {
-        return std::string(length, '0').append(std::to_string(number));
+        return QString(length, '0').append(QString::number(number));
     } else {
-        return std::to_string(number);
+        return QString::number(number);
     }
 }
 
@@ -74,6 +74,12 @@ std::string Utility::zfill(const int& number, int length){
  */
 std::string Utility::name_from_path(const std::string full_path) {
     std::string res = full_path.substr(full_path.find_last_of("/")+1, full_path.size());
+    return res;
+}
+
+QString Utility::name_from_path(const QString full_path) {
+    int name_length = full_path.size() - (full_path.lastIndexOf("/")+1);
+    QString res = full_path.right(name_length);
     return res;
 }
 
@@ -96,6 +102,18 @@ std::string Utility::add_serial_number(std::string name, std::string file_end) {
         res = qname + QString("(%1)"+ qend).arg(i);
     }
     return res.toStdString();
+}
+
+QString Utility::add_serial_number(QString name, QString file_end) {
+    QString res = name + file_end;
+    int i = 0;
+    if(QFile::exists(res)){
+        res = name + QString("(%1)"+ file_end).arg(i);
+    }
+    while(QFile::exists(res) && ++i){
+        res = name + QString("(%1)"+ file_end).arg(i);
+    }
+    return res;
 }
 
 std::string Utility::remove_serial_number(std::string file) {

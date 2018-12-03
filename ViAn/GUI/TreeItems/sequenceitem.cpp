@@ -15,11 +15,9 @@ ImageSequence* SequenceItem::get_img_sequence() {
     return nullptr;
 }
 
-
-
-SequenceItem::SequenceItem(const std::string& name, const std::string& hash) : TreeItem(SEQUENCE_ITEM) {
+SequenceItem::SequenceItem(const QString& name, const QString& hash) : TreeItem(SEQUENCE_ITEM) {
     m_hash = hash;
-    setText(0, QString::fromStdString(name));
+    setText(0, name);
 }
 
 /**
@@ -39,7 +37,7 @@ int SequenceItem::get_index() {
  * Returns the hash/checksum of the image file belonging to the item
  * @return
  */
-std::string SequenceItem::get_hash() const {
+QString SequenceItem::get_hash() const {
     return m_hash;
 }
 

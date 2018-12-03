@@ -9,7 +9,7 @@
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
     m_images(images),
-    m_dest(QString::fromStdString(Utility::add_serial_number(dest.toStdString(), ""))),
+    m_dest(Utility::add_serial_number(dest, "")),
     QObject(parent) {}
 
 /**
@@ -32,7 +32,7 @@ void ImageImporter::import_images() {
     if (QDir().mkpath(m_dest)) {
         for (int i = 0; i < m_images.size(); ++i) {
             QFileInfo file_info(m_images[i]);
-            QString padded_num = QString::fromStdString(Utility::zfill(std::to_string(i), num_digits));
+            QString padded_num = Utility::zfill(QString::number(i), num_digits);
             QString new_path = m_dest + "/" + padded_num;
 
             bool copied = QFile().copy(m_images[i], new_path);
@@ -70,8 +70,7 @@ void ImageImporter::import_images() {
         m_abort = true;
     }
 
-    if (!m_abort)
-        emit imported_sequence(m_images, checksums, m_dest.toStdString());
+    if (!m_abort) {emit imported_sequence(m_images, checksums, m_dest);}
     emit update_progress(m_images.size());
     emit finished();
 }

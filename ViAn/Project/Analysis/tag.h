@@ -14,7 +14,7 @@ class Tag : public BasicAnalysis {
     bool m_drawing_tag = false;
 
 public:
-    Tag(std::string name = "", bool drawing_tag = false);
+    Tag(QString name = "", bool drawing_tag = false);
     ~Tag() override;
     virtual ANALYSIS_TYPE get_type() const override;
     virtual void read(const QJsonObject& json) override;

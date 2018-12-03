@@ -9,7 +9,7 @@
 #include <QLineEdit>
 #include <QScrollArea>
 
-BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem(nullptr, type) {
+BookmarkCategory::BookmarkCategory(QString name, int type) : QListWidgetItem(nullptr, type) {
     m_name = name;
     // Setup layout
     layout = new QVBoxLayout();
@@ -18,7 +18,7 @@ BookmarkCategory::BookmarkCategory(std::string name, int type) : QListWidgetItem
     layout->setSpacing(0);
     folder->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     QHBoxLayout* container = new QHBoxLayout();
-    m_title = new QLineEdit(QString::fromStdString(name));
+    m_title = new QLineEdit(name);
     layout->addWidget(m_title);
     layout->addLayout(container);
 
@@ -50,7 +50,7 @@ BookmarkCategory::~BookmarkCategory() {
     delete ref_list;
 }
 
-std::string BookmarkCategory::get_name() {
+QString BookmarkCategory::get_name() {
     return m_name;
 }
 
@@ -126,7 +126,7 @@ QScrollArea *BookmarkCategory::make_scrollable_container(BookmarkList* container
  * @param name
  */
 void BookmarkCategory::on_text_edited(QString name){
-    m_name = name.toStdString();
+    m_name = name;
 }
 
 

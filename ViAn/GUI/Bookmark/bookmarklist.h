@@ -13,7 +13,7 @@ class BookmarkList : public QListWidget{
     QPoint drag_start_pos;
     QListWidgetItem* clicked_item = nullptr;
 
-    std::string m_par_cont_name = "";
+    QString m_par_cont_name = "";
     int m_container_type = UNSORTED;
     bool m_accept_container = true;
     int category_cnt = 1;
@@ -23,8 +23,8 @@ public:
 
     QListWidgetItem* get_clicked_item();
 
-    std::string get_parent_name();
-    void set_parent_name(std::string &name);
+    QString get_parent_name();
+    void set_parent_name(QString &name);
 public slots:
     void on_parent_name_edited(QString name);
     void add_new_folder();
