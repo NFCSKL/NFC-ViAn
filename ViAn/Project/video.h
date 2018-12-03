@@ -40,6 +40,7 @@ class Video : Writeable{
 protected:
     std::string m_name;
     bool m_is_sequence;
+    bool m_is_saved{false};
     int m_width, m_height = 0;
 public:
     VideoState state;
@@ -51,6 +52,7 @@ public:
     std::string get_name();
     void set_name(const std::string& new_name);
     bool is_sequence();
+    bool is_saved();
     int get_width();
     int get_height();
     void set_size(int width, int height);

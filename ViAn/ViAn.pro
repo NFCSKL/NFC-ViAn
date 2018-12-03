@@ -79,6 +79,7 @@ SOURCES += main.cpp \
     Project/Analysis/tagframe.cpp \
     Project/imagesequence.cpp \
     GUI/TreeItems/sequenceitem.cpp \
+    GUI/TreeItems/sequencecontaineritem.cpp \
     GUI/Analysis/anasettingwidget.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
@@ -158,7 +159,9 @@ HEADERS += reportgenerator.h\
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
     Project/imagesequence.h \
+    Project/video.h \
     GUI/TreeItems/sequenceitem.h \
+    GUI/TreeItems/sequencecontaineritem.h \
     GUI/Analysis/anasettingwidget.h \
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \

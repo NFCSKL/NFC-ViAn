@@ -221,10 +221,13 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
-    std::vector<std::string> images;
-    for (auto image : image_paths) {images.push_back(image.toStdString());}
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
+void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, std::string path){
+    std::vector<std::string> images, hashes;
+    for (auto i = 0; i < image_paths.size(); i++) {
+        images.push_back(image_paths.at(i).toStdString());
+        hashes.push_back(checksums.at(i).toStdString());
+    }
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -1102,6 +1105,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
+        case SEQUENCE_ITEM:
+            if (item->parent()->type() == SEQUENCE_CONTAINER_ITEM) {
+                menu.addAction("Remove", this, SLOT(remove_item()));
+            }
         default:
             break;
         }
@@ -1241,6 +1248,9 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     case TAG_FRAME_ITEM:
         remove_tag_frame_item(item);
         break;
+    case SEQUENCE_ITEM:
+        remove_sequence_item(item);
+        break;
     case INTERVAL_ITEM:
         remove_interval_item(item);
         break;
@@ -1272,12 +1282,18 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     // Remove the video from the list of videos
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
-        auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
-        video_list.erase(video_it);
         m_proj->get_videos().erase(it);
+        // TODO store folder for deletion if project saved
+        if (v_proj->get_video()->is_sequence()) {
+            // Will be deleted in close
+            removed_sequences.push_back(v_proj);
+        } else {
+            auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
+            video_list.erase(video_it);
+            delete v_proj;
+        }
         m_proj->set_unsaved(true);
     }
-    delete v_proj;
     emit item_removed(v_proj);
     emit remove_overlay();
 }
@@ -1339,6 +1355,13 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
     int frame = tf_item->get_frame();
     tag_item->get_tag()->remove_frame(frame);
+}
+
+void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
+    SequenceItem* seq_item = dynamic_cast<SequenceItem*>(item);
+    if (seq_item) {
+        seq_item->remove();
+    }
 }
 
 /**
@@ -1492,6 +1515,14 @@ bool ProjectWidget::save_project() {
         }
     }
 
+    for (auto v_proj : removed_sequences) {
+        auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
+        QDir directory(QString::fromStdString(seq->get_search_path()));
+        directory.removeRecursively();
+        delete v_proj;
+    }
+    removed_sequences.clear();
+
     save_item_data();
     emit save_draw_wgt();
 
@@ -1544,7 +1575,7 @@ bool ProjectWidget::open_project(QString project_path) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
 
-        if (vid_proj->get_video()->is_sequence()) break;
+        if (vid_proj->get_video()->is_sequence()) continue;
         video_list.push_back(vid_proj->get_video());
     }
     ViewPathDialog* path_dialog = new ViewPathDialog(video_list);
@@ -1611,6 +1642,35 @@ bool ProjectWidget::close_project() {
     emit set_tag_slider(false);
     emit set_interval_slider(false);
     emit enable_poi_btns(false, false);
+
+    // If the user chose not to save
+    // Restore changes on all image sequences that are unsaved but not removed
+    if (!m_proj->is_saved()) {
+        for (auto vid_proj : m_proj->get_videos()) {
+            // Remove folder if sequence has been removed (never added) from the project
+            if (vid_proj->get_video()->is_sequence()) {
+                auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
+                if (sequence->never_saved()) {
+                    // Remove sequences that have never been saved
+                    QDir directory(QString::fromStdString(sequence->get_search_path()));
+                    directory.removeRecursively();
+                } else if (!sequence->is_saved()) {
+                    // Revert changes done to sequences
+                    sequence->revert();
+                }
+            }
+        }
+    }
+
+    // If the user chose to save, remove all folders of the removed image sequences
+    // Otherwise, revert the changes made
+    if (!m_proj->is_saved()) {
+        for (auto v_proj : removed_sequences) {
+            auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
+            seq->revert();
+            delete v_proj;
+        }
+    }
 
     // Remove project if temporary
     if (m_proj->is_temporary()) {

@@ -84,7 +84,7 @@ public slots:
     void add_video();
     void create_video(QString path);
     void add_images();
-    void create_sequence(QStringList image_paths, std::string path);
+    void create_sequence(QStringList image_paths, QStringList checksums, std::string path);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_tag(VideoProject*, Tag *tag);
     void add_frames_to_tag_item(TreeItem *item);
@@ -106,6 +106,7 @@ public slots:
     void remove_drawing_tag_item(QTreeWidgetItem* item);
     void remove_analysis_item(QTreeWidgetItem* item);
     void remove_tag_frame_item(QTreeWidgetItem* item);
+    void remove_sequence_item(QTreeWidgetItem* item);
     void remove_interval_item(QTreeWidgetItem* item);
     void remove_interval_area_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
@@ -146,6 +147,7 @@ private:
     void update_current_tag(VideoItem* v_item);
     void update_current_interval(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
+    std::vector<VideoProject*> removed_sequences;
 signals:
     void close_all_widgets();
     void project_closed();

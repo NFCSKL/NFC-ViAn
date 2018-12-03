@@ -3,6 +3,8 @@
 #include "constants.h"
 
 #include <QDir>
+#include <QDebug>
+#include <QDirIterator>
 
 /**
  * @brief Utility::size_ratio
@@ -49,10 +51,19 @@ int Utility::number_of_digits(int n) {
  */
 std::string Utility::zfill(std::string number, int length) {
     length -= number.length();
-    if (length)
+    if (length){
         return std::string(length, '0').append(number);
-    else
+    } else {
         return number;
+    }
+}
+
+std::string Utility::zfill(const int& number, int length){
+    length -= std::to_string(number).length();
+    if (length)
+        return std::string(length, '0').append(std::to_string(number));
+    else
+        return std::to_string(number);
 }
 
 /**
@@ -155,6 +166,47 @@ cv::Rect Utility::from_qrect(QRect rect) {
  */
 QRect Utility::from_cvrect(cv::Rect rect) {
     return QRect(from_cvpoint(rect.tl()), from_cvpoint(rect.br()));
+}
+
+QByteArray Utility::checksum(const QString &file, QCryptographicHash::Algorithm hash_algorithm) {
+    QFile f(file);
+    if (f.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(hash_algorithm);
+        if (hash.addData(&f)) {
+            return hash.result().toHex();
+        }
+        f.close();
+    }
+    return QByteArray().toHex();
+}
+
+/**
+ * @brief Utility::remove_checksum_file
+ * Iterates through the given directory and hashes each file.
+ * When a hash is found that matched checksum the corresponding file is removed and the iteration aborted.
+ * @param parent_folder :   Directory/path to search in
+ * @param checksum      :   Hash to search for
+ * @return
+ */
+bool Utility::remove_checksum_files(const QString& parent_folder, const QStringList& hashes) {
+    bool removed{false};
+    QDirIterator it(parent_folder);
+    while (it.hasNext()) {
+        auto path = it.next();
+        auto current_hash = checksum(path);
+        for (auto hash : hashes) {
+            if (current_hash == hash) {
+                QFile(path).remove();
+                break;
+            }
+        }
+//        if (checksum(path) == hash) {
+//            QFile f(path);
+//            removed = f.remove();
+//            break;
+//        }
+    }
+    return removed;
 }
 
 /**
