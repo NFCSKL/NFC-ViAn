@@ -1282,14 +1282,14 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     // Remove the video from the list of videos
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
-        auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
-        video_list.erase(video_it);
         m_proj->get_videos().erase(it);
         // TODO store folder for deletion if project saved
         if (v_proj->get_video()->is_sequence()) {
             // Will be deleted in close
             removed_sequences.push_back(v_proj);
         } else {
+            auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
+            video_list.erase(video_it);
             delete v_proj;
         }
         m_proj->set_unsaved(true);
