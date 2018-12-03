@@ -1,10 +1,10 @@
 #include "videoitem.h"
-#include "sequencecontaineritem.h"
 
 #include "imagegenerator.h"
 #include "Project/imagesequence.h"
 #include "Project/project.h"
 #include "Project/videoproject.h"
+#include "sequencecontaineritem.h"
 #include "sequenceitem.h"
 
 #include "opencv2/core/core.hpp"
@@ -96,7 +96,7 @@ void VideoItem::load_sequence_items() {
 
             // Insert in order
             if (!container->childCount()) {
-                // First item to be addded
+                // First item to be added
                 container->addChild(seq_item);
             } else {
                 // Insert item before items with larger index

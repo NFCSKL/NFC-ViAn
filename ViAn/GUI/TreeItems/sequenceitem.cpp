@@ -1,5 +1,8 @@
 #include "sequenceitem.h"
+
+#include "Project/imagesequence.h"
 #include "Project/videoproject.h"
+#include "videoitem.h"
 
 ImageSequence* SequenceItem::get_img_sequence() {
     auto vid_item = dynamic_cast<VideoItem*>(this->parent()->parent());

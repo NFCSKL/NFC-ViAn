@@ -1107,15 +1107,16 @@ void ProjectWidget::context_menu(const QPoint &point) {
             break;
         case SEQUENCE_ITEM:
             if (item->parent()->type() == SEQUENCE_CONTAINER_ITEM) {
-                menu.addAction("Remove", this, SLOT(remove_item()));
+                menu.addAction("Remove", this, &ProjectWidget::remove_item);
             }
+            break;
         default:
             break;
         }
         menu.addSeparator();
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
-        menu.addAction("Import Video", this, SLOT(add_video()));
-        menu.addAction("Import Images", this, SLOT(add_images()));
+        menu.addAction("New Folder", this, &ProjectWidget::create_folder_item);
+        menu.addAction("Import Video", this, &ProjectWidget::add_video);
+        menu.addAction("Import Images", this, &ProjectWidget::add_images);
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
         menu.addAction("Delete", this, &ProjectWidget::remove_item);

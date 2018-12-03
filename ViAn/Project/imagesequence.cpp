@@ -1,7 +1,10 @@
 #include "imagesequence.h"
+
 #include "project.h"
-#include <algorithm>
+#include "utility.h"
 #include <QDebug>
+#include <QFile>
+#include <algorithm>
 
 /**
  * @brief ImageSequence::update

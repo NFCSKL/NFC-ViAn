@@ -3,10 +3,10 @@
 
 #include "opencv2/core/core.hpp"
 
+#include <QCryptographicHash>
+#include <QDir>
 #include <QRect>
 #include <QSize>
-#include <QDir>
-#include <QCryptographicHash>
 
 namespace Utility{
      std::pair<double, double> size_ratio(QSize s1, QSize s2);

@@ -1,7 +1,11 @@
 #include "imageimporter.h"
+
+#include "utility.h"
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 
 ImageImporter::ImageImporter(const QStringList& images, const QString& dest, QObject *parent) :
     m_images(images),
