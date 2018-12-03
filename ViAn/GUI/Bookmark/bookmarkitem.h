@@ -18,8 +18,6 @@ public:
     QString get_description() const;
     QString get_time() const;
 
-   static const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
-
 private:
     Bookmark* m_bookmark = nullptr;
 };

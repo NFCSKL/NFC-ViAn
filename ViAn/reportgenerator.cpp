@@ -76,8 +76,7 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
 
 /**
  * @brief ReportGenerator::resize_picture
- * This method will make all images to be of the same size with a width
- * that is based on the constant IMAGE_WIDTH_REFERENCE. All images will keep
+ * This method will make all images to be of the same size. All images will keep
  * its aspect ratio.
  * @param pic_path, path to the bookmark that is to be resized.
  * @param inline_shape, A word specific object that is a shape where its

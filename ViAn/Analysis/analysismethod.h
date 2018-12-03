@@ -31,15 +31,11 @@ class AnalysisMethod : public QObject, public QRunnable {
     std::string m_ana_name;             // The name of the analysis
 
     bool m_scaling_done = false;        // Control states
-    int prev_detection_frame = -1;
     bool detecting = false;
     bool paused = false;
 
 protected:
     bool scaling_needed = false;
-
-    const int FULL_HD_WIDTH = 1920;
-    const int FULL_HD_HEIGHT = 1080;
 
     int num_frames = -1;            // Total number of video frames
     unsigned int sample_freq = 1;   // Sample frequency of analysis

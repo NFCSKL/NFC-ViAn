@@ -1,8 +1,7 @@
 #ifndef MANIPULATORWIDGET_H
 #define MANIPULATORWIDGET_H
 
-#include <Video/framemanipulator.h>
-
+#include "constants.h"
 #include <QWidget>
 
 class QDialogButtonBox;
@@ -13,7 +12,6 @@ class QSlider;
 
 class ManipulatorWidget : public QWidget {
     Q_OBJECT
-    const double DOUBLE_TO_INT = 100;
     int brightness;
     double contrast;
     double gamma;
@@ -36,9 +34,9 @@ signals:
     void update_tag(int b_value, double c_value, double g_value);
 
 public:
-    ManipulatorWidget(int b = FrameManipulator().BRIGHTNESS_DEFAULT,
-                      double c = FrameManipulator().CONTRAST_DEFAULT,
-                      double g = FrameManipulator().GAMMA_DEFAULT,
+    ManipulatorWidget(int b = Constants::BRIGHTNESS_DEFAULT,
+                      double c = Constants::CONTRAST_DEFAULT,
+                      double g = Constants::GAMMA_DEFAULT,
                       QWidget* parent = nullptr);
 
     QFormLayout* form_layout;

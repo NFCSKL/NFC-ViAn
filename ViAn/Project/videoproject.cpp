@@ -6,6 +6,7 @@
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/basicanalysis.h"
 #include "Project/Analysis/tag.h"
+#include "Project/Analysis/interval.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -157,6 +158,9 @@ void VideoProject::read(const QJsonObject& json){
             break;
         case DRAWING_TAG:
             analysis = new Tag();
+            break;
+        case INTERVAL:
+            analysis = new Interval();
             break;
         default:
             qWarning("Something went wrong. Undefined analysis");

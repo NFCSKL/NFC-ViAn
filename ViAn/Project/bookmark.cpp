@@ -59,8 +59,8 @@ void Bookmark::set_id(ID new_id) {
 }
 
 void Bookmark::reset_root_dir(const std::string &dir){    
-    m_file = dir + Project::BOOKMARK_FOLDER + Utility::name_from_path(m_file);
-    m_thumbnail_path = dir + Project::THUMBNAIL_FOLDER + Utility::name_from_path(m_thumbnail_path);
+    m_file = dir + Constants::BOOKMARK_FOLDER.toStdString() + Utility::name_from_path(m_file);
+    m_thumbnail_path = dir + Constants::THUMBNAIL_FOLDER.toStdString() + Utility::name_from_path(m_thumbnail_path);
     m_unsaved_changes = true;
 }
 

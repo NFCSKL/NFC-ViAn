@@ -17,8 +17,6 @@ class VideoProject;
 class Bookmark : public Writeable {
     friend class BookmarkTest;
     VideoProject* m_vid_proj;
-//    int m_type = UNSORTED;
-//    std::string m_container_name = "";
     std::pair<int, std::string> m_container;
 
     QString m_time = "";               // Time of the bookmark (format "mm:ss")
@@ -56,7 +54,6 @@ public:
     void write(QJsonObject& json);
     bool is_saved() const;
     void remove_exported_image();
-private:
 
 };
 

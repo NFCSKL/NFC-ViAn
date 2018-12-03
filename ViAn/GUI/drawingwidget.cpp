@@ -342,7 +342,7 @@ void DrawingWidget::context_menu(const QPoint &point) {
     if (item == nullptr) return;
     switch (item->type()) {
     case FRAME_ITEM:
-        menu.addAction("Delete", this, SLOT(remove_item()));
+        menu.addAction("Delete", this, &DrawingWidget::remove_item);
         break;
     case RECT_ITEM:
     case CIRCLE_ITEM:
@@ -350,8 +350,8 @@ void DrawingWidget::context_menu(const QPoint &point) {
     case ARROW_ITEM:
     case PEN_ITEM:
     case TEXT_ITEM:
-        menu.addAction("Rename", this, SLOT(rename_item()));
-        menu.addAction("Delete", this, SLOT(remove_item()));
+        menu.addAction("Rename", this, &DrawingWidget::rename_item);
+        menu.addAction("Delete", this, &DrawingWidget::remove_item);
         break;
     default:
         break;

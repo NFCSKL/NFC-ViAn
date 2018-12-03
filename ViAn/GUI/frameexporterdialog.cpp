@@ -21,7 +21,7 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
                                          QWidget* parent) : QDialog(parent){
     m_exporter = im_exp;
     m_video_name = QString::fromStdString(video->get_name());
-    m_old_path_text = QString::fromStdString(proj_path + Project::STILLS_FOLDER);
+    m_old_path_text = QString::fromStdString(proj_path) + Constants::STILLS_FOLDER;
     setWindowTitle("ViAn - Image exporter");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowIcon(QIcon("../ViAn/Icons/folder_interval.png"));

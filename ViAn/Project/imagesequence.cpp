@@ -1,7 +1,10 @@
 #include "imagesequence.h"
+
 #include "project.h"
-#include <algorithm>
+#include "utility.h"
 #include <QDebug>
+#include <QFile>
+#include <algorithm>
 
 /**
  * @brief ImageSequence::update
@@ -312,6 +315,6 @@ void ImageSequence::reorder_elem(const int &from, const int &to) {
 }
 
 void ImageSequence::reset_root_dir(const std::string &dir) {
-    m_seq_path = dir + Project::SEQUENCE_FOLDER +  Utility::name_from_path(m_seq_path);
+    m_seq_path = dir + Constants::SEQUENCE_FOLDER.toStdString() +  Utility::name_from_path(m_seq_path);
     file_path = m_seq_path + "/" + get_pattern_name();
 }

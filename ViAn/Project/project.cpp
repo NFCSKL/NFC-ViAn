@@ -11,11 +11,6 @@
 #include <chrono>
 #include <ctime>
 
-const std::string Project::BOOKMARK_FOLDER = "Bookmarks/";
-const std::string Project::THUMBNAIL_FOLDER = "_thumbnails/";
-const std::string Project::STILLS_FOLDER = "Stills/";
-const std::string Project::SEQUENCE_FOLDER = "Sequences/";
-
 /**
  * @brief Project::Project
  * Empty private constructor, used for Project::fromFile
@@ -26,12 +21,6 @@ Project* Project::fromFile(const std::string &full_path){
     Project* proj = new Project();
     proj->m_temporary = false;
     proj->load_saveable(full_path);
-    // TODO
-
-    // ensure changes to paths are saved
-    // TODO Needed?
-    // Will overwrite saved data which causes problems when failing to load the correct data.
-    //proj->save_saveable(full_path);
     return proj;
 }
 
@@ -106,10 +95,10 @@ void Project::set_name_and_path(const std::string& name, const std::string& path
         // Attempts to generate a temporary path
         // Use default path on failure
         std::string tmp_dir = generate_tmp_directory();
-        m_dir = !tmp_dir.empty() ? (tmp_dir + "/") : (DEFAULT_PATH + "/temporary" + std::to_string(std::rand()) + "/");
+        m_dir = !tmp_dir.empty() ? (tmp_dir + "/") : (Constants::DEFAULT_TEMP_PATH.toStdString() + "/temporary" + std::to_string(std::rand()) + "/");
     }
     m_file = m_dir + m_name + ".vian";
-    m_dir_bookmarks = m_dir + BOOKMARK_FOLDER;
+    m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER.toStdString();
 }
 
 /**
@@ -144,7 +133,7 @@ void Project::read(const QJsonObject& json){
     m_name = json["name"].toString().toStdString();
     m_file = full_path();
     m_dir = m_file.substr(0,m_file.find_last_of("/")+1);
-    m_dir_bookmarks = m_dir + BOOKMARK_FOLDER;
+    m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER.toStdString();
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {

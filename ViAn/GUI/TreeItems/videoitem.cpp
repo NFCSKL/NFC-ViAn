@@ -1,10 +1,10 @@
 #include "videoitem.h"
-#include "sequencecontaineritem.h"
 
 #include "imagegenerator.h"
 #include "Project/imagesequence.h"
 #include "Project/project.h"
 #include "Project/videoproject.h"
+#include "sequencecontaineritem.h"
 #include "sequenceitem.h"
 
 #include "opencv2/core/core.hpp"
@@ -72,7 +72,7 @@ void VideoItem::set_thumbnail() {
  * Loads the thumbnail path and sets it as icon
  */
 void VideoItem::load_thumbnail() {
-    std::string path = m_vid_proj->get_proj_path() + Project::THUMBNAIL_FOLDER + m_vid_proj->get_video()->get_name() + ".png";
+    std::string path = m_vid_proj->get_proj_path() + Constants::THUMBNAIL_FOLDER.toStdString() + m_vid_proj->get_video()->get_name() + ".png";
     const QIcon icon(QString::fromStdString(path));
     setIcon(0, icon);
 }
@@ -96,7 +96,7 @@ void VideoItem::load_sequence_items() {
 
             // Insert in order
             if (!container->childCount()) {
-                // First item to be addded
+                // First item to be added
                 container->addChild(seq_item);
             } else {
                 // Insert item before items with larger index

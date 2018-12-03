@@ -1,8 +1,12 @@
 #include "framemanipulator.h"
+#include "constants.h"
 #include <QDebug>
 //#include <iostream>
 
-FrameManipulator::FrameManipulator() {}
+FrameManipulator::FrameManipulator() {
+    // TODO Move alpha beta gamma to constants?
+    reset();
+}
 
 /**
  * @brief FrameManipulator::set_brightness
@@ -10,7 +14,7 @@ FrameManipulator::FrameManipulator() {}
  * @param value
  */
 void FrameManipulator::set_brightness(int value){
-    beta = std::min(BRIGHTNESS_MAX, std::max(BRIGHTNESS_MIN, value));
+    beta = std::min(Constants::BRIGHTNESS_MAX, std::max(Constants::BRIGHTNESS_MIN, value));
 }
 
 /**
@@ -19,7 +23,7 @@ void FrameManipulator::set_brightness(int value){
  * @param value
  */
 void FrameManipulator::set_contrast(double value) {
-    alpha = std::min(CONTRAST_MAX, std::max(CONTRAST_MIN, value));
+    alpha = std::min(Constants::CONTRAST_MAX, std::max(Constants::CONTRAST_MIN, value));
 }
 
 /**
@@ -28,7 +32,7 @@ void FrameManipulator::set_contrast(double value) {
  * @param value
  */
 void FrameManipulator::set_gamma(double value) {
-    gamma = std::min(GAMMA_MAX, std::max(GAMMA_MIN, value));
+    gamma = std::min(Constants::GAMMA_MAX, std::max(Constants::GAMMA_MIN, value));
 }
 
 int FrameManipulator::get_brightness() {
@@ -74,7 +78,7 @@ cv::Mat FrameManipulator::correct_gamma(cv::Mat& img, double gamma) {
  * Reset the alpha and beta values to default
  */
 void FrameManipulator::reset() {
-    alpha = CONTRAST_DEFAULT;
-    beta = BRIGHTNESS_DEFAULT;
-    gamma = GAMMA_DEFAULT;
+    alpha = Constants::CONTRAST_DEFAULT;
+    beta = Constants::BRIGHTNESS_DEFAULT;
+    gamma = Constants::GAMMA_DEFAULT;
 }

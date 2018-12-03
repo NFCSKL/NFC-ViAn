@@ -14,7 +14,7 @@
 
 PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path) : QDialog(parent) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setMinimumWidth(MIN_WIDTH);
+    setMinimumWidth(400);
 
     m_path = path;
     m_q_path = QString::fromStdString(*path);
