@@ -12,7 +12,6 @@ class TextDialog : public QDialog
     QLineEdit* name;
     QDialogButtonBox* btn_box;
     QDoubleSpinBox* double_box;
-    float current_font_scale = 1;
 public:
     TextDialog(QWidget *parent = nullptr);
 signals:

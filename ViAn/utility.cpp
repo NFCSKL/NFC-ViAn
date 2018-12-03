@@ -1,4 +1,7 @@
 #include "utility.h"
+
+#include "constants.h"
+
 #include <QDir>
 #include <QDebug>
 #include <QDirIterator>
@@ -216,7 +219,7 @@ bool Utility::remove_checksum_files(const QString& parent_folder, const QStringL
  * @return              : Rotated point
  */
 QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
-    double angle = rotation*DEGREE_TO_RADIAN_FACTOR;
+    double angle = rotation*Constants::DEGREE_TO_RADIAN_FACTOR;
 
     // Translate by negative pivot of old frame size
     double translated_x{pos.x() - static_cast<double>(width) / 2};

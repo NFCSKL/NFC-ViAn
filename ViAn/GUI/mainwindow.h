@@ -22,10 +22,6 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:    
-    const int SIZE_MULTIPLIER = 40;
-    const int VIDEO_WGT_WIDTH = 16; // 16:9 aspect ratio
-    const int VIDEO_WGT_HEIGHT = 9;
-    const unsigned int FLOATING_WIDGET_MAX = 3;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 

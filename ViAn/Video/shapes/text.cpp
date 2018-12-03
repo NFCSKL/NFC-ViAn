@@ -1,5 +1,6 @@
 #include "text.h"
 
+#include "constants.h"
 #include "utility.h"
 
 #include "opencv2/imgproc/imgproc.hpp"
@@ -63,10 +64,10 @@ void Text::handle_new_pos(QPoint pos) {
 
 double Text::set_font_scale(QPoint diff_point) {
     int diff_sum = diff_point.x() + diff_point.y();
-    if (diff_sum > 0 && font_scale < FONT_SCALE_MAX) {
-        font_scale += FONT_SCALE_STEP;
-    } else if (diff_sum < 0 && font_scale > FONT_SCALE_MIN) {
-        font_scale += -FONT_SCALE_STEP;
+    if (diff_sum > 0 && font_scale < Constants::FONT_SCALE_MAX) {
+        font_scale += Constants::FONT_SCALE_STEP;
+    } else if (diff_sum < 0 && font_scale > Constants::FONT_SCALE_MIN) {
+        font_scale += -Constants::FONT_SCALE_STEP;
     }
     return font_scale;
 }

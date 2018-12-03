@@ -36,7 +36,6 @@ public:
     void enqueue(AnalysisMethod *method);
     // Update progressbar
     void update_progress(int i);
-public slots:
 
 signals:
     // Analysis aborted
