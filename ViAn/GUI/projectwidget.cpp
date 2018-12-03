@@ -2,15 +2,19 @@
 
 #include "Analysis/analysisdialog.h"
 #include "Analysis/motiondetection.h"
+#include "constants.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/TreeItems/drawingtagitem.h"
 #include "GUI/TreeItems/folderitem.h"
+#include "GUI/TreeItems/intervalareaitem.h"
+#include "GUI/TreeItems/intervalitem.h"
 #include "GUI/TreeItems/sequenceitem.h"
 #include "GUI/TreeItems/tagframeitem.h"
 #include "GUI/TreeItems/tagitem.h"
 #include "GUI/TreeItems/videoitem.h"
 #include "imageimporter.h"
 #include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
 #include "Project/imagesequence.h"
@@ -327,12 +331,16 @@ void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
         if (frame < temp->get_frame()) {
             m_tag_item->insertChild(i, tf_item);
+            blockSignals(true);
             setCurrentItem(tf_item);
+            blockSignals(false);
             return;
         }
     }
     m_tag_item->addChild(tf_item);
+    blockSignals(true);
     setCurrentItem(tf_item);
+    blockSignals(false);
 }
 
 /**
@@ -346,6 +354,67 @@ void ProjectWidget::remove_frame_from_tag_item(int frame) {
         if (tf_item->get_frame() == frame) {
             m_tag_item->removeChild(tf_item);
             return;
+        }
+    }
+}
+
+/**
+ * @brief ProjectWidget::add_interval
+ * Adds a new interval item under the video project
+ * @param vid_proj
+ * @param interval
+ */
+void ProjectWidget::add_interval(VideoProject* vid_proj, Interval* interval) {
+    vid_proj->add_analysis(interval);
+    VideoItem* vid_item = get_video_item(vid_proj);
+    if (vid_item == nullptr) {
+        set_status_bar("Something went wrong when adding interval: " + QString::fromStdString(interval->get_name()));
+        return;
+    }
+
+    IntervalItem* item = new IntervalItem(interval);
+    vid_item->addChild(item);
+    clearSelection();
+    item->setSelected(true);
+    setCurrentItem(item);
+    tree_item_changed(item);
+    vid_item->setExpanded(true);
+}
+
+
+/**
+ * @brief ProjectWidget::set_interval_area
+ * Clear the current IntervalAreaItems and create new one for the current areas
+ * This since some intervals might have merged together
+ * @param start
+ * @param end
+ */
+void ProjectWidget::set_interval_area(int new_area_start) {
+    blockSignals(true);
+    // Remove all current area items
+    if (m_interval_item) {
+        for (int i = m_interval_item->childCount()-1; i >= 0; --i) {
+            m_interval_item->removeChild(m_interval_item->child(i));
+        }
+    }
+    add_interval_area_to_interval(m_interval_item, new_area_start);
+    m_interval_item->setExpanded(true);
+    blockSignals(false);
+}
+
+/**
+ * @brief ProjectWidget::add_interval_area_to_interval
+ * Add all interval areas under the interval item
+ * @param item
+ * @param current
+ */
+void ProjectWidget::add_interval_area_to_interval(TreeItem* item, int current) {
+    Interval* interval = dynamic_cast<IntervalItem*>(item)->get_interval();
+    for (auto area : interval->m_area_list) {
+        IntervalAreaItem* ia_item = new IntervalAreaItem(area.first, area.second);
+        item->addChild(ia_item);
+        if (ia_item->is_in_interval(current)) {
+            setCurrentItem(item);
         }
     }
 }
@@ -539,7 +608,10 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM || child->type() == ANALYSIS_ITEM || child->type() == DRAWING_TAG_ITEM) {
+        } else if (child->type() == TAG_ITEM ||
+                   child->type() == ANALYSIS_ITEM ||
+                   child->type() == DRAWING_TAG_ITEM ||
+                   child->type() == INTERVAL_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
             r_item->rename();
         }
@@ -565,6 +637,10 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else if (ana.second->get_type() == INTERVAL) {
+            IntervalItem* int_item = new IntervalItem(dynamic_cast<Interval*>(ana.second));
+            v_item->addChild(int_item);
+            add_interval_area_to_interval(int_item);
         } else {
             qWarning() << "Something went wrong while adding analyses to items.";
         }
@@ -693,12 +769,15 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
+        emit set_interval_slider(false);
         emit enable_poi_btns(false,false);
 
         update_current_tag(vid_item);
+        update_current_interval(vid_item);
         break;
     } case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
+        if (vid_item->get_video_project() == nullptr) return;
         emit set_video_project(vid_item->get_video_project());
         VideoState state;
         vid_item->get_video_project()->state.video = true;
@@ -711,9 +790,11 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
+        emit set_interval_slider(false);
         emit enable_poi_btns(false,false);
 
         update_current_tag(vid_item);
+        update_current_interval(vid_item);
         break;
     } case ANALYSIS_ITEM: {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
@@ -733,9 +814,11 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(true);
         emit set_poi_slider(true);
         emit set_tag_slider(false);
+        emit set_interval_slider(false);
         emit enable_poi_btns(true, true);
 
         update_current_tag(vid_item);
+        update_current_interval(vid_item);
 
         AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
         emit update_settings_wgt(settings);
@@ -756,6 +839,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
+        emit set_interval_slider(false);
         emit enable_poi_btns(true, false);
 
         if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
@@ -789,6 +873,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
+        emit set_interval_slider(false);
         emit enable_poi_btns(true, false);
         break;
     } case TAG_FRAME_ITEM: {
@@ -801,6 +886,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(true);
+        emit set_interval_slider(false);
         emit enable_poi_btns(true, false);
 
         VideoState state;
@@ -824,6 +910,54 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
             m_tag_item = nullptr;
         }
         break;
+    } case INTERVAL_ITEM: {
+        IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+        update_current_tag(vid_item);
+        emit marked_basic_analysis(interval_item->get_interval());
+
+        m_interval_item = interval_item;
+
+        emit set_video_project(vid_item->get_video_project());
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
+
+        emit set_zoom_tool();
+        emit set_show_analysis_details(false);
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(false);
+        emit set_interval_slider(true);
+        emit enable_poi_btns(true, true);
+
+        break;
+    } case INTERVAL_AREA_ITEM: {
+        IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        update_current_tag(vid_item);
+
+        emit set_video_project(vid_item->get_video_project());
+
+        emit set_zoom_tool();
+        emit set_show_analysis_details(false);
+        emit set_detections(false);
+        emit set_poi_slider(false);
+        emit set_tag_slider(false);
+        emit set_interval_slider(true);
+        emit enable_poi_btns(true, true);
+
+        VideoState state;
+        state = vid_item->get_video_project()->get_video()->state;
+        state.frame = ia_item->get_start();
+        emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
+
+        IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
+        emit marked_basic_analysis(interval_item->get_interval());
+        m_interval_item = interval_item;
+        break;
     } case FOLDER_ITEM: {
         emit item_type(item->type());
         break;
@@ -843,6 +977,18 @@ void ProjectWidget::update_current_tag(VideoItem *v_item) {
         m_tag_item->setCheckState(0, Qt::Unchecked);
         emit marked_basic_analysis(nullptr);
         m_tag_item = nullptr;
+    }
+}
+
+/**
+ * @brief ProjectWidget::update_current_interval
+ * Change/clear the current interval when a different one is chosed or a different video is chosen
+ * @param v_item
+ */
+void ProjectWidget::update_current_interval(VideoItem* v_item) {
+    if (m_interval_item && dynamic_cast<VideoItem*>(m_interval_item->parent()) != v_item) {
+        emit marked_basic_analysis(nullptr);
+        m_interval_item = nullptr;
     }
 }
 
@@ -878,22 +1024,28 @@ void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
 
     std::string item_text = item->text(0).toStdString();
     switch(item->type()) {
-        case TAG_ITEM: {
-            auto tag_item = dynamic_cast<TagItem*>(item);
-            Tag* tag = tag_item->get_tag();
-            if (tag->get_name() != item_text) tag->set_name(item_text);
-            break;
-        } case ANALYSIS_ITEM: {
-            auto analysis_item = dynamic_cast<AnalysisItem*>(item);
-            AnalysisProxy* analysis = analysis_item->get_analysis();
-            // AnalysisItems are added when an analysis is started
-            // and the proxy can thusly be a nullptr
-            if (analysis == nullptr) break;
-            if (analysis->get_name() != item_text) analysis->set_name(item_text);
-            break;
-        } case FOLDER_ITEM: {
-            m_proj->set_unsaved(true);
-        }
+    case INTERVAL_ITEM: {
+        auto interval_item = dynamic_cast<IntervalItem*>(item);
+        Interval* interval = interval_item->get_interval();
+        if (interval->get_name() != item_text) interval->set_name(item_text);
+        break;
+    }
+    case TAG_ITEM: {
+        auto tag_item = dynamic_cast<TagItem*>(item);
+        Tag* tag = tag_item->get_tag();
+        if (tag->get_name() != item_text) tag->set_name(item_text);
+        break;
+    } case ANALYSIS_ITEM: {
+        auto analysis_item = dynamic_cast<AnalysisItem*>(item);
+        AnalysisProxy* analysis = analysis_item->get_analysis();
+        // AnalysisItems are added when an analysis is started
+        // and the proxy can thusly be a nullptr
+        if (analysis == nullptr) break;
+        if (analysis->get_name() != item_text) analysis->set_name(item_text);
+        break;
+    } case FOLDER_ITEM: {
+        m_proj->set_unsaved(true);
+    }
     }
 }
 
@@ -917,6 +1069,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
         // Clicked on item
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
+        case INTERVAL_AREA_ITEM:
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
+        case INTERVAL_ITEM:
         case TAG_ITEM:
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1096,10 +1252,19 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     case SEQUENCE_ITEM:
         remove_sequence_item(item);
         break;
+    case INTERVAL_ITEM:
+        remove_interval_item(item);
+        break;
+    case INTERVAL_AREA_ITEM:
+        remove_interval_area_item(item);
+        break;
     default:
         break;
     }
+    blockSignals(true);
     delete item;
+    blockSignals(false);
+    setCurrentItem(nullptr);
 }
 
 /**
@@ -1118,14 +1283,14 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     // Remove the video from the list of videos
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
-        auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
-        video_list.erase(video_it);
         m_proj->get_videos().erase(it);
         // TODO store folder for deletion if project saved
         if (v_proj->get_video()->is_sequence()) {
             // Will be deleted in close
             removed_sequences.push_back(v_proj);
         } else {
+            auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
+            video_list.erase(video_it);
             delete v_proj;
         }
         m_proj->set_unsaved(true);
@@ -1170,6 +1335,7 @@ void ProjectWidget::remove_drawing_tag_item(QTreeWidgetItem* item) {
 void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
     emit set_detections(false);
     emit set_poi_slider(false);
+    emit set_interval_slider(false);
     emit enable_poi_btns(false, false);
 
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
@@ -1180,6 +1346,11 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
     emit clear_analysis();
 }
 
+/**
+ * @brief ProjectWidget::remove_tag_frame_item
+ * Remove and clean tagframe item
+ * @param item
+ */
 void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
@@ -1192,6 +1363,33 @@ void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
     if (seq_item) {
         seq_item->remove();
     }
+}
+
+/**
+ * @brief ProjectWidget::remove_interval_item
+ * Remove and clean interval item
+ * @param item
+ */
+void ProjectWidget::remove_interval_item(QTreeWidgetItem* item) {
+    emit set_interval_slider(false);
+
+    VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
+    Interval* interval = dynamic_cast<IntervalItem*>(item)->get_interval();
+    vid_item->get_video_project()->remove_analysis(interval);
+    m_interval_item = nullptr;
+    emit marked_basic_analysis(nullptr);
+}
+
+/**
+ * @brief ProjectWidget::remove_interval_area_item
+ * Remove and clean interval area item
+ * @param item
+ */
+void ProjectWidget::remove_interval_area_item(QTreeWidgetItem* item) {
+    IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
+    IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
+    int frame = ia_item->get_start();
+    interval_item->get_interval()->remove_area_by_frame(frame);
 }
 
 /**
@@ -1288,7 +1486,7 @@ bool ProjectWidget::save_project() {
     // i.e. has not been saved yet
     if (m_proj->is_temporary()) {
         QString name{}, path{};
-        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, DEFAULT_PATH);
+        ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, Constants::DEFAULT_PATH);
         connect(project_dialog, &ProjectDialog::open_project, this, &ProjectWidget::open_project);
         int status = project_dialog->exec();
 
@@ -1378,7 +1576,7 @@ bool ProjectWidget::open_project(QString project_path) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
 
-        if (vid_proj->get_video()->is_sequence()) break;
+        if (vid_proj->get_video()->is_sequence()) continue;
         video_list.push_back(vid_proj->get_video());
     }
     ViewPathDialog* path_dialog = new ViewPathDialog(video_list);
@@ -1443,6 +1641,7 @@ bool ProjectWidget::close_project() {
     emit set_detections(false);
     emit set_poi_slider(false);
     emit set_tag_slider(false);
+    emit set_interval_slider(false);
     emit enable_poi_btns(false, false);
 
     // If the user chose not to save
@@ -1558,8 +1757,4 @@ bool ProjectWidget::message_box(QString text, QString info_text, bool warning) {
     msg_box.setDefaultButton(QMessageBox::No);
     int reply = msg_box.exec();
     return reply == QMessageBox::Yes;
-}
-
-QString ProjectWidget::get_default_path() {
-    return DEFAULT_PATH;
 }

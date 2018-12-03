@@ -1,8 +1,9 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
+#include "constants.h"
 #include "Filehandler/saveable.h"
-#include "Video/framemanipulator.h"
+//#include "Video/framemanipulator.h"
 
 #include "opencv2/core/core.hpp"
 
@@ -11,9 +12,9 @@
 
 struct VideoState {
     int frame = 0;
-    double contrast = FrameManipulator().CONTRAST_DEFAULT;
-    int brightness = FrameManipulator().BRIGHTNESS_DEFAULT;
-    double gamma = FrameManipulator().GAMMA_DEFAULT;
+    double contrast = Constants::CONTRAST_DEFAULT;
+    int brightness = Constants::BRIGHTNESS_DEFAULT;
+    double gamma = Constants::GAMMA_DEFAULT;
     int rotation = 0;
     double scale_factor = 1;
     QPoint anchor = QPoint(0,0);

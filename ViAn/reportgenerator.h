@@ -31,7 +31,6 @@ class ReportGenerator : public QObject {
     Q_OBJECT
     std::string m_path;
     QAxObject* word;
-    const double IMAGE_WIDTH_REFERENCE = 136.0;
     ReportContainer m_rep_cont;
 public:
     friend class test_report_generator;

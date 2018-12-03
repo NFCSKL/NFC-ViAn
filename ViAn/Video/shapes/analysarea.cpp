@@ -78,11 +78,11 @@ cv::Mat AnalysArea::draw(cv::Mat &frame) {
             cv::addWeighted(area, Shapes::ALPHA, frame, 1.0 - Shapes::ALPHA, 0.0, frame);
         }
         // Draw contour of the polygon.
-        cv::polylines(frame, ppt, npt, 1, true, cv::Scalar(255, 0, 0), Shapes::LINE_THICKNESS);
+        cv::polylines(frame, ppt, npt, 1, true, cv::Scalar(255, 0, 0), 2);
 
         // Draw a circle indicating the last choosen point.
         int RADIUS = 8;
-        cv::circle(frame, points->back(), RADIUS, cv::Scalar(0, 255, 255), Shapes::LINE_THICKNESS);
+        cv::circle(frame, points->back(), RADIUS, cv::Scalar(0, 255, 255), 2);
     }
     return frame;
 }

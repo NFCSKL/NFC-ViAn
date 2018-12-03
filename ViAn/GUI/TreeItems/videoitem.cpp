@@ -72,7 +72,7 @@ void VideoItem::set_thumbnail() {
  * Loads the thumbnail path and sets it as icon
  */
 void VideoItem::load_thumbnail() {
-    std::string path = m_vid_proj->get_proj_path() + Project::THUMBNAIL_FOLDER + m_vid_proj->get_video()->get_name() + ".png";
+    std::string path = m_vid_proj->get_proj_path() + Constants::THUMBNAIL_FOLDER.toStdString() + m_vid_proj->get_video()->get_name() + ".png";
     const QIcon icon(QString::fromStdString(path));
     setIcon(0, icon);
 }

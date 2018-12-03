@@ -1,10 +1,8 @@
 #include "zoomer.h"
 
+#include "constants.h"
 #include <QDebug>
 #include <cmath>
-
-
-const double Zoomer::DEGREES_TO_RADIANS_FACTOR = M_PI / 180;
 
 Zoomer::Zoomer() {}
 
@@ -137,7 +135,7 @@ void Zoomer::set_angle(const int &angle) {
  * @param angle :   Desired rotation
  */
 void Zoomer::update_rotation(const int &angle) {
-    double angle_diff{(angle - m_angle) * DEGREES_TO_RADIANS_FACTOR};
+    double angle_diff{(angle - m_angle) * Constants::DEGREE_TO_RADIAN_FACTOR};
 
     // Translate by negative pivot of old frame size
     double translated_x{m_viewport.center.x - m_transformed_frame_rect.width / 2};

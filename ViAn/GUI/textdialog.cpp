@@ -1,5 +1,6 @@
 #include "textdialog.h"
 
+#include "constants.h"
 #include "Video/shapes/text.h"
 
 #include <QBoxLayout>
@@ -18,10 +19,10 @@ TextDialog::TextDialog(QWidget* parent) : QDialog(parent) {
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     name = new QLineEdit(this);
     double_box = new QDoubleSpinBox;
-    double_box->setMaximum(Text::FONT_SCALE_MAX);
-    double_box->setMinimum(Text::FONT_SCALE_MIN);
-    double_box->setDecimals(Text::FONT_SCALE_DECIMALS);
-    double_box->setSingleStep(Text::FONT_SCALE_STEP);
+    double_box->setMaximum(Constants::FONT_SCALE_MAX);
+    double_box->setMinimum(Constants::FONT_SCALE_MIN);
+    double_box->setDecimals(Constants::FONT_SCALE_DECIMALS);
+    double_box->setSingleStep(Constants::FONT_SCALE_STEP);
     double_box->setValue(1);
 
     btn_box = new QDialogButtonBox(Qt::Horizontal);

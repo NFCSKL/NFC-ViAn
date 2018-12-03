@@ -19,7 +19,7 @@ class TagDialog : public QDialog
     // ok,cancel btns
     QDialogButtonBox* btn_box;
 public:
-    explicit TagDialog(QWidget *parent = nullptr);
+    explicit TagDialog(QString string = "Tag", QWidget *parent = nullptr);
     ~TagDialog();
 signals:
     // Send tag name

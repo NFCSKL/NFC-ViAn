@@ -25,7 +25,6 @@ ProjectDialog::ProjectDialog(QString* name, QString* path, QWidget *parent, QStr
 
     // remove question mark from the title bar
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setMinimumWidth(MIN_WIDTH);
     setWindowIcon(QIcon("../ViAn/Icons/save.png"));
     QVBoxLayout* vertical_layout = new QVBoxLayout;
     path_text = new QLineEdit(m_default_path, this);

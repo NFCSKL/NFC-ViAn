@@ -1,5 +1,6 @@
 #include "analysisitem.h"
 
+#include "constants.h"
 #include "Project/Analysis/analysisproxy.h"
 
 /**
@@ -9,16 +10,16 @@
 AnalysisItem::AnalysisItem(AnalysisProxy* analysis) : TreeItem(ANALYSIS_ITEM) {
     m_analysis = analysis;
     finished = true;
-    const QIcon folder_icon("../ViAn/Icons/analysis.png");
-    setIcon(0, folder_icon);
+    const QIcon analysis_icon("../ViAn/Icons/analysis.png");
+    setIcon(0, analysis_icon);
     setText(0, QString::fromStdString(m_analysis->get_name()));
 }
 /**
  * @brief AnalysisItem::AnalysisItem
  */
 AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
-    const QIcon folder_icon("../ViAn/Icons/analysis.png");
-    setIcon(0, folder_icon);
+    const QIcon analysis_icon("../ViAn/Icons/analysis.png");
+    setIcon(0, analysis_icon);
     setText(0, "Analysis");
 }
 /**
@@ -34,7 +35,7 @@ void AnalysisItem::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis;
     finished = true;
     is_new = true;
-    setText(0, text(0) + NEW_STR);
+    setText(0, text(0) + Constants::NEW_STR);
     setBackgroundColor(0, "#FFFDAB");
 }
 
@@ -62,7 +63,7 @@ void AnalysisItem::remove(){}
  */
 void AnalysisItem::rename(){
     if (is_new) {
-        m_analysis->m_name = text(0).remove(NEW_STR).toStdString();
+        m_analysis->m_name = text(0).remove(Constants::NEW_STR).toStdString();
     } else {
         m_analysis->m_name = text(0).toStdString();
     }
@@ -70,7 +71,7 @@ void AnalysisItem::rename(){
 
 void AnalysisItem::set_not_new() {
     if (is_new) {
-        setText(0, text(0).remove(NEW_STR));
+        setText(0, text(0).remove(Constants::NEW_STR));
         setBackgroundColor(0, Qt::white);
         is_new = false;
     }

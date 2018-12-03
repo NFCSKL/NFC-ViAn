@@ -30,8 +30,6 @@ namespace Utility{
      bool remove_checksum_files(const QString& parent_folder, const QStringList& hashes);
 
      QPoint rotate(QPoint pos, int rotation, int width, int height);
-
-     const double DEGREE_TO_RADIAN_FACTOR = M_PI / 180;
 }
 
 #endif // UTILITY_H

@@ -26,7 +26,6 @@ class BookmarkWidget : public QWidget
     QScrollArea* scroll_area;
     QDockWidget* folder_dock;
     QThread* processing_thread;
-    const int TEXT_EDIT_MIN_HEIGHT = 64;
 
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);

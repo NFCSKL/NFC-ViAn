@@ -13,16 +13,14 @@
 
 class AnalysisSettings;
 
-enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG = 2, BASIC_ANALYSIS = 3, DRAWING_TAG = 4};
+enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG = 2, BASIC_ANALYSIS = 3, DRAWING_TAG = 4, INTERVAL = 5};
 
-// TODO remove?
-const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
-                                                                     std::make_pair("Tag",TAG)};
 struct interval_cmp {
     bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {
         return lhs->get_start() <= rhs->get_start();
     }
 };
+
 using interval_set = std::set<AnalysisInterval*, interval_cmp>;
 using ID = int;
 
