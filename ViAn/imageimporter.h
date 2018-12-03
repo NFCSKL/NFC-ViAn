@@ -17,7 +17,7 @@ public slots:
     void abort();
 signals:
     void finished();
-    void imported_sequence(QStringList images, QString path);
+    void imported_sequence(QStringList images, QStringList checksums, QString path);
     void update_progress(int progress);
 };
 

@@ -114,10 +114,6 @@ VideoProject *VideoWidget::get_current_video_project(){
     return m_vid_proj;
 }
 
-std::pair<int, int> VideoWidget::get_frame_interval(){
-    return m_interval;
-}
-
 /**
  * @brief VideoWidget::get_current_video_length
  * @return The length of the current video in frames
@@ -1579,7 +1575,8 @@ void VideoWidget::update_playback_speed(int speed) {
 void VideoWidget::on_export_frame() {
     if (frame_is_clean) return;
     int frame = frame_index.load();
-    emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
+    // Get sequence item and send that one to get the hash
+    emit export_original_frame(m_vid_proj, frame, frame_wgt->get_org_frame());
     emit set_status_bar(QString("Frame %1 exported").arg(frame));
 }
 

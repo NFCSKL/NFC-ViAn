@@ -61,14 +61,13 @@ void ReportGenerator::create_report() {
  * @return
  */
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
-    QString f_name = Utility::name_from_path(bm->get_file_path());
-    f_name = QString::fromStdString(Utility::remove_serial_number(f_name.toStdString()));
+    QString img_file = bm->get_bookmark()->m_image_name;
     QString time = QString("Time: %1").arg(bm->get_time());
     QString brightness = QString("Brightness: %1").arg(bm->get_bookmark()->get_state().brightness);
     QString contrast = QString("Contrast: %1").arg(bm->get_bookmark()->get_state().contrast);
     QString gamma = QString("Gamma: %1").arg(bm->get_bookmark()->get_state().gamma);
     QString description = bm->get_description();
-    QString bm_description = f_name + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast + " " + gamma;
+    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast + " " + gamma;
     if (description != "") {
         bm_description = description + QString("\v") + bm_description;
     }

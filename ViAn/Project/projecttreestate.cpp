@@ -59,11 +59,11 @@ QJsonObject ProjectTreeState::recursive_scan(QTreeWidgetItem *item) {
     for (auto i = 0; i < item->childCount(); ++i) {
         auto child = item->child(i);
         if (child->type() == FOLDER_ITEM) {
-            folder[QString::fromStdString(Utility::zfill(std::to_string(i),
-                                                         Utility::number_of_digits(item->childCount())))] = recursive_scan(child);
+            folder[Utility::zfill(QString::number(i),
+                                  Utility::number_of_digits(item->childCount()))] = recursive_scan(child);
         } else {
-            folder[QString::fromStdString(Utility::zfill(std::to_string(i),
-                                                         Utility::number_of_digits(item->childCount())))] = child->type();
+            folder[Utility::zfill(QString::number(i),
+                                  Utility::number_of_digits(item->childCount()))] = child->type();
         }
     }
     return folder;

@@ -27,8 +27,9 @@ class Bookmark : public Writeable {
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
     ID id = 0;
 public:
-    QString m_file;
-    Bookmark(VideoProject* vid_proj, const QString &file_name, const QString &text, const VideoState& state, const QString &m_time);
+    QString m_file;             // Path for the frame in the bookmark
+    QString m_image_name;
+    Bookmark(VideoProject* vid_proj, const QString &file_name, const QString& text, const VideoState& state, const QString &m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
     ~Bookmark();

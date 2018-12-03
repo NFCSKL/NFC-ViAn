@@ -754,18 +754,13 @@ void MainWindow::cont_bri() {
     manipulator_dock->show();
 }
 
-void MainWindow::export_images(){
-    std::pair<int, int> interval = video_wgt->get_frame_interval();
+void MainWindow::export_images() {
+    if (!video_wgt || !video_wgt->playback_slider) return;
+    std::pair<int, int> interval = video_wgt->playback_slider->get_valid_interval();
     VideoProject* vid_proj = video_wgt->get_current_video_project();
     if (vid_proj == nullptr){
         emit set_status_bar("A video needs to be selected");
         return;
-    }
-
-    if (interval.first > interval.second) {
-        int tmp = interval.second;
-        interval.second = interval.first;
-        interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
     FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_dir(),
