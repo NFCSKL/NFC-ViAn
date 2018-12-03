@@ -4,7 +4,6 @@
 #include "Video/shapes/shapes.h"
 
 #include "opencv2/core/core.hpp"
-//#include "opencv2/videoio/videoio.hpp"
 
 #include <QWidget>
 

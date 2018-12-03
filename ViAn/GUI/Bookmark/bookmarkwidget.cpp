@@ -8,6 +8,7 @@
 #include "Project/video.h"
 #include "Project/videoproject.h"
 #include "reportgenerator.h"
+#include "utility.h"
 
 #include <QBoxLayout>
 #include <QDebug>
