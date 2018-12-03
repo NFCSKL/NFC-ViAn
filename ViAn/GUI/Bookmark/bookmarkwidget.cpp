@@ -32,7 +32,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(generate_btn);   
     layout->setMargin(5);
     layout->setSpacing(5);
-    setMinimumWidth(Constants::THUMBNAIL_SIZE*3); // Should be 2*thumbnail + margin
+    setMinimumWidth(Constants::THUMBNAIL_SIZE*3);
     setLayout(layout);
 
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);

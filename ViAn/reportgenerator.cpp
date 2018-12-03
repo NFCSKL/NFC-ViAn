@@ -105,24 +105,24 @@ void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) 
  * @param para, document to add the bookmarks to
  */
 void ReportGenerator::create_bookmark_table(QAxObject* para) {
-    // Space to use for table
+    // The end of the previous range
     int end = 0;
     for (size_t i = 0; i != m_rep_cont.size(); i++) {
         // 3 rows for the title, category name and the category
         auto table_rows = 3;
-
+        // Space to use for table
         QAxObject* range = para->querySubObject("Range()");
         range->dynamicCall("SetRange(int,int)", end, end+2000);
 
-        QAxObject* tables1 = range->querySubObject("Tables");
-
-        QAxObject* table = tables1->querySubObject("Add(QVariant,int,int)",range->asVariant(), table_rows,2,1,1);
+        QAxObject* tables = range->querySubObject("Tables");
+        QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), table_rows,2,1,1);
         table->dynamicCall("AutoFormat(QVariant)", BORDER);
         table->dynamicCall("SetTitle(QString)", "Title");
-
         range->dynamicCall("Collapse(int)", 0);
+        // Add the category to the space
         add_category(table, i);
 
+        // Insert empty line and update the end position
         range->dynamicCall("InsertParagraphAfter()");
         end = range->dynamicCall("End()").toInt();
     }
@@ -142,11 +142,10 @@ void ReportGenerator::create_bookmark_table(QAxObject* para) {
         // Insert the bookmark description, divider line and bookmark image as a stack
         // because they are all inserted at the same position
         bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm));
-
-
         QAxObject* p_shapes = para->querySubObject("InlineShapes()");
         p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
                      file_name, false, true, bmark_range->asVariant());
+        end = bmark_range->dynamicCall("End()").toInt();
     }
 }
 
@@ -226,7 +225,6 @@ void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row,
     QAxObject* cell = table->querySubObject("Cell(int,int)",row,col);
     // Access area to add image to
     QAxObject* range = cell->querySubObject("Range");
-
     // Access list of shapes
     QAxObject* shapes = range->querySubObject("InlineShapes");
     //Fix to make path work with windows word
