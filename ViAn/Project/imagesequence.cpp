@@ -20,7 +20,7 @@ void ImageSequence::update() {
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
         if (m_unsaved_order.find((*it).first) == m_unsaved_order.end()){
             if (!remove_image_from_disc((*it).first))
-                qDebug() << "failed to remove";
+                qWarning() << "failed to remove";
         }
     }
     m_saved_order = m_unsaved_order;
@@ -128,6 +128,23 @@ int ImageSequence::get_index_of_hash(const std::string &hash) const {
  */
 std::string ImageSequence::get_original_name_from_hash(const std::string &hash) const {
     return Utility::name_from_path(m_original_images.at(hash));
+}
+
+std::string ImageSequence::get_original_name_from_index(const int& index) const {
+    std::string hash = "Invalid path";
+    bool found_hash = false;
+    for (auto elem : m_unsaved_order) {
+        if (elem.second == index) {
+            hash = elem.first;
+            found_hash = true;
+            break;
+        }
+    }
+    if (found_hash) {
+        return m_original_images.at(hash);
+    } else {
+        return hash;
+    }
 }
 
 bool ImageSequence::never_saved() const {

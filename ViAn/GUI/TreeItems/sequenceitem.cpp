@@ -29,13 +29,8 @@ SequenceItem::SequenceItem(const std::string& name, const std::string& hash) : T
  */
 int SequenceItem::get_index() {
     int index = 0;
-    auto vid_item = dynamic_cast<VideoItem*>(this->parent()->parent());
-    if (vid_item) {
-        auto sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
-        if (sequence) {
-            index = sequence->get_index_of_hash(m_hash);
-        }
-    }
+    auto sequence = get_img_sequence();
+    if (sequence) index = sequence->get_index_of_hash(m_hash);
     return index;
 }
 

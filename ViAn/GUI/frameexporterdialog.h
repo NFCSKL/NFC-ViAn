@@ -30,6 +30,7 @@ class FrameExporterDialog : public QDialog {
     // and as such deleted outside of this class
     ImageExporter* m_exporter = nullptr;
     QString m_video_name;
+    std::string m_path;
     QString m_old_path_text = "C:/";
 public:
     FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,

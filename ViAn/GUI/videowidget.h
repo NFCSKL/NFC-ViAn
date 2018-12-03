@@ -101,7 +101,6 @@ public:
     AnalysisSlider* playback_slider;
 
     VideoProject* get_current_video_project();
-    std::pair<int, int> get_frame_interval();
     VideoController* v_controller;
 
     int get_current_video_length();

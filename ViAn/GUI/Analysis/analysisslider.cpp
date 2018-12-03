@@ -114,12 +114,12 @@ void AnalysisSlider::draw_interval(std::pair<int, int> interval, QRect groove, d
         interval_rects.push_back(rect);
     }
     // Draw the interval start marker
-    if (interval.first != -1) {
+    if (interval.first != INTERVAL_DEFAULT) {
         QRect rect(first, groove.top(), 1, groove.height());
         interval_rects.push_back(rect);
     }
     // Draw the interval end marker
-    if (interval.second != -1) {
+    if (interval.second != INTERVAL_DEFAULT) {
         QRect rect(second, groove.top(), 1, groove.height());
         interval_rects.push_back(rect);
     }
@@ -132,7 +132,21 @@ void AnalysisSlider::draw_interval(std::pair<int, int> interval, QRect groove, d
  */
 bool AnalysisSlider::valid_interval(std::pair<int, int> interval) {
     // Checks if both ends of the interval is set and the end is larger than the start
-    return interval.first != -1 && interval.second != -1 && interval.first <= interval.second;
+    return interval.first != INTERVAL_DEFAULT && interval.second != INTERVAL_DEFAULT && interval.first <= interval.second;
+}
+
+/**
+ * @brief AnalysisSlider::get_valid_interval
+ * Returns the current interval if it is a valid one
+ * otherwise return an interval consisting of the current frame.
+ * @return
+ */
+std::pair<int,int> AnalysisSlider::get_valid_interval() {
+    if (!valid_interval(m_interval)) {
+        return std::make_pair(value(), value());
+    } else {
+        return m_interval;
+    }
 }
 
 void AnalysisSlider::update(){
@@ -200,8 +214,8 @@ void AnalysisSlider::set_show_ana_interval(bool show) {
  * @brief AnalysisSlider::clear_interval
  */
 void AnalysisSlider::clear_interval() {
-    m_interval.first = -1;
-    m_interval.second = -1;
+    m_interval.first = INTERVAL_DEFAULT;
+    m_interval.second = INTERVAL_DEFAULT;
 }
 
 /**
@@ -495,7 +509,7 @@ void AnalysisSlider::set_show_interval(bool show) {
  */
 void AnalysisSlider::clear_slider() {
     rects.clear();
-    m_ana_interval = std::make_pair(-1, -1);
+    clear_interval();
 }
 
 void AnalysisSlider::set_blocked(bool value) {

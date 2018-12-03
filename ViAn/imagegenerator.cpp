@@ -27,7 +27,7 @@ std::string ImageGenerator::create_thumbnail(std::string name) {
 
 std::string ImageGenerator::create_tiff(std::string name) {
     std::string save_path = m_path + Constants::STILLS_FOLDER.toStdString();
-    if (!create_directory(save_path)) return "";    
+    if (!create_directory(save_path)) return "";
     return export_image(save_path + name, TIFF);
 }
 

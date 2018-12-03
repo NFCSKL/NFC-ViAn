@@ -11,8 +11,9 @@
 #include <QSpinBox>
 
 #include "imageexporter.h"
-#include "Project/video.h"
+#include "Project/imagesequence.h"
 #include "Project/project.h"
+#include "Project/video.h"
 
 
 FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
@@ -61,7 +62,13 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_btn_box->addButton(m_export_btn, QDialogButtonBox::AcceptRole);
     connect(m_btn_box, &QDialogButtonBox::accepted, this, &FrameExporterDialog::save_values);
     connect(m_btn_box, &QDialogButtonBox::rejected, this, &FrameExporterDialog::reject);
-    m_video_path = new QLabel(QString::fromStdString(video->file_path));
+    if (video->is_sequence()) {
+        ImageSequence* sequence = dynamic_cast<ImageSequence*>(video);
+        m_video_path = new QLabel(QString::fromStdString(sequence->get_search_path()));
+    } else {
+        m_video_path = new QLabel(QString::fromStdString(video->file_path));
+    }
+    m_path = video->file_path;
     // Input layout
     m_input_layout = new QFormLayout(this);
     m_input_layout->addRow(new QLabel(tr("Video"), this), m_video_path);
@@ -134,7 +141,7 @@ void FrameExporterDialog::save_values() {
     QString e_path = m_path_label->text() + "/" + m_video_name + "_";
     m_exporter->set_interval(std::make_pair(m_from_box->value(), m_to_box->value()));
     m_exporter->set_export_path(e_path.toStdString());
-    m_exporter->set_file_path(m_video_path->text().toStdString());
+    m_exporter->set_file_path(m_path);
     accept();
 }
 
