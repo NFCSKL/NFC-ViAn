@@ -38,10 +38,6 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
     connect(new_folder_btn, &QPushButton::clicked, bm_list, &BookmarkList::add_new_folder);
     connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
-
-    //Context menu for list items
-//    bm_list->setContextMenuPolicy(Qt::CustomContextMenu);
-//    connect(bm_list, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(item_context_menu(QPoint)));
 }
 
 void BookmarkWidget::generate_report() {

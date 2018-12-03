@@ -134,14 +134,13 @@ void ReportGenerator::create_bookmark_table(QAxObject* para) {
         QString file_name = bm->get_file_path();
         file_name.replace("/", "\\\\");
 
-        // Get the range "table" occupy
         QAxObject* bmark_range = para->querySubObject("Range()");
         bmark_range->dynamicCall("SetRange(int,int)", end, end+100);
         // Get the last position of that range
 
         // Insert the bookmark description, divider line and bookmark image as a stack
         // because they are all inserted at the same position
-        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm));
+        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm) + QString("\v"));
         QAxObject* p_shapes = para->querySubObject("InlineShapes()");
         p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
                      file_name, false, true, bmark_range->asVariant());
