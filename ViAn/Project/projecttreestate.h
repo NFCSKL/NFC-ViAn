@@ -15,8 +15,8 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject &json);
 
-    void save_state(const std::string& path);
-    void load_state(const std::string& path);
+    void save_state(const QString &path);
+    void load_state(const QString& path);
 
     void set_tree(QTreeWidgetItem *item);
 

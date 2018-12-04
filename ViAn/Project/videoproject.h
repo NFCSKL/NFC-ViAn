@@ -58,7 +58,7 @@ public:
     void set_project(Project* proj);
 
     // used to update path if project was moved and opened
-    void reset_root_dir(const std::string& dir);
+    void reset_root_dir(const QString &dir);
 
     void delete_analysis(const int& id);
     void delete_bookmark(const int& id);
@@ -68,7 +68,7 @@ public:
     void remove_from_project();
 
     std::string get_index_path();
-    std::string get_proj_path();
+    QString get_proj_path();
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();

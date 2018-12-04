@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QJsonArray>
 
-Interval::Interval(std::string name) {
+Interval::Interval(QString name) {
     m_name = name;
 }
 
@@ -121,7 +121,7 @@ ANALYSIS_TYPE Interval::get_type() const {
 }
 
 void Interval::write(QJsonObject &json) {
-    json["name"] = QString::fromStdString(m_name);
+    json["name"] = m_name;
     QJsonArray interval_areas;
     for (auto areas : m_area_list) {
         QJsonObject area;
@@ -135,7 +135,7 @@ void Interval::write(QJsonObject &json) {
 
 void Interval::read(const QJsonObject &json) {
     std::vector<std::pair<int, int>> new_list;
-    m_name = json["name"].toString().toStdString();
+    m_name = json["name"].toString();
     QJsonArray json_intervals = json["areas"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_frame = json_intervals[i].toObject();

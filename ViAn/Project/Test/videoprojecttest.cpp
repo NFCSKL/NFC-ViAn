@@ -130,7 +130,7 @@ void VideoProjectTest::save_load_delete_test(){
 
     QDir dir;
     dir.mkpath("C:/TEST/VID_PROJ_TEST/");
-    std::string file_path("C:/TEST/VID_PROJ_TEST/test");
+    QString file_path("C:/TEST/VID_PROJ_TEST/test");
     vid_proj->save_saveable(file_path, Saveable::JSON);
 
     VideoProject* vid_proj2 = new VideoProject();

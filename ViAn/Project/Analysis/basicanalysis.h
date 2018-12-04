@@ -28,7 +28,7 @@ class BasicAnalysis : public Saveable
 {       
 public:
     // TODO Should probably not all be public
-    std::string m_name = "2";
+    QString m_name = "2";
     bool m_unsaved_changes = true;
     interval_set m_intervals;
     AnalysisSettings* settings = nullptr;
@@ -51,10 +51,10 @@ public:
     void set_id(ID id);
 
     void clear_intervals();
-    std::string get_name() const;
+    QString get_name() const;
     interval_set get_intervals() const;
 
-    void set_name(const std::string& new_name);
+    void set_name(const QString& new_name);
 
     bool is_saved() const;
 };

@@ -3,12 +3,16 @@
 
 #include "treeitem.h"
 
+class ImageSequence;
 class SequenceItem : public TreeItem {
 private:
-    int m_index{};
+    QString m_hash{};
+
+    ImageSequence* get_img_sequence();
 public:
-    SequenceItem(const std::string& name, const int& index);
+    SequenceItem(const QString& name, const QString& hash);
     int get_index();
+    QString get_hash() const;
     void remove();
     void rename();
 };

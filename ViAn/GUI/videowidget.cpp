@@ -114,10 +114,6 @@ VideoProject *VideoWidget::get_current_video_project(){
     return m_vid_proj;
 }
 
-std::pair<int, int> VideoWidget::get_frame_interval(){
-    return m_interval;
-}
-
 /**
  * @brief VideoWidget::get_current_video_length
  * @return The length of the current video in frames
@@ -750,7 +746,7 @@ void VideoWidget::create_interval_clicked() {
 }
 
 void VideoWidget::new_interval(QString name) {
-    Interval* interval = new Interval(name.toStdString());
+    Interval* interval = new Interval(name);
     emit add_interval(m_vid_proj, interval);
 }
 
@@ -818,7 +814,7 @@ void VideoWidget::update_tag_color(int b, double c, double g) {
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } else if (proj_tree_item == TAG_ITEM || proj_tree_item == DRAWING_TAG_ITEM) {
         m_tag->update_color_whole_tag(b, c, g);
-        emit set_status_bar("Whole tag '"+ QString::fromStdString(m_tag->get_name()) +"' updated");
+        emit set_status_bar("Whole tag '"+ m_tag->get_name() +"' updated");
     }
 }
 
@@ -890,7 +886,7 @@ void VideoWidget::new_tag_clicked() {
  * @param name
  */
 void VideoWidget::new_tag(QString name) {
-    Tag* tag = new Tag(name.toStdString());
+    Tag* tag = new Tag(name);
     emit add_tag(m_vid_proj, tag);
 }
 
@@ -1579,7 +1575,8 @@ void VideoWidget::update_playback_speed(int speed) {
 void VideoWidget::on_export_frame() {
     if (frame_is_clean) return;
     int frame = frame_index.load();
-    emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
+    // Get sequence item and send that one to get the hash
+    emit export_original_frame(m_vid_proj, frame, frame_wgt->get_org_frame());
     emit set_status_bar(QString("Frame %1 exported").arg(frame));
 }
 

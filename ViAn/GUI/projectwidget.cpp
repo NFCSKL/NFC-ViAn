@@ -117,12 +117,9 @@ void ProjectWidget::new_project() {
 void ProjectWidget::add_project(const QString project_name, const QString project_path) {
     if (!close_project()) return;
 
-    std::string name = project_name.toStdString();
-    std::string path = project_path.toStdString();
-    Project* new_proj = new Project(name, path);
+    Project* new_proj = new Project(project_name, project_path);
     set_main_window_name(project_name);
     m_proj = new_proj;
-    path.append(name);
     emit proj_path(m_proj->get_dir());
 }
 
@@ -137,7 +134,7 @@ void ProjectWidget::add_video() {
     //Build string to limit file selection
     QString extensions = "Videos (";
     for (auto it = allowed_vid_exts.begin(); it != allowed_vid_exts.end(); ++it){
-        extensions += "*." + QString::fromStdString(*it) + " ";
+        extensions += "*." + *it + " ";
     }
     extensions += ")";
 
@@ -145,7 +142,7 @@ void ProjectWidget::add_video() {
     QStringList video_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add video"),
-                m_proj->get_dir().c_str(),
+                m_proj->get_dir(),
                 extensions);
 
     for (auto video_path : video_paths){
@@ -162,7 +159,7 @@ void ProjectWidget::create_video(QString path) {
     int index = path.lastIndexOf('/') + 1;
     QString vid_name = path.right(path.length() - index);
     // TODO Check if file is already added
-    Video* video = new Video(path.toStdString());
+    Video* video = new Video(path);
     VideoProject* vid_proj = new VideoProject(video);
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, vid_name);
@@ -180,7 +177,7 @@ void ProjectWidget::add_images() {
     QStringList image_paths = QFileDialog().getOpenFileNames(
                 this,
                 tr("Add images"),
-                m_proj->get_dir().c_str());
+                m_proj->get_dir());
 
     // Assert that user selected files
     if (!image_paths.size()){
@@ -201,7 +198,7 @@ void ProjectWidget::add_images() {
         return;
 
 
-    QString path = QString::fromStdString(m_proj->get_dir()) + "Sequences/" + seq_name;
+    QString path = m_proj->get_dir() + "Sequences/" + seq_name;
 
     QProgressDialog* progress = new QProgressDialog(
                 "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
@@ -221,10 +218,13 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
-    std::vector<std::string> images;
-    for (auto image : image_paths) {images.push_back(image.toStdString());}
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images));
+void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, QString path) {
+    std::vector<QString> images, hashes;
+    for (auto i = 0; i < image_paths.size(); i++) {
+        images.push_back(image_paths.at(i));
+        hashes.push_back(checksums.at(i));
+    }
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -237,9 +237,12 @@ void ProjectWidget::create_sequence(QStringList image_paths, std::string path){
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
     AnalysisMethod* method = nullptr;
     switch (settings->get_type()) {
-    case MOTION_DETECTION:
-        method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->m_dir, settings);
+    case MOTION_DETECTION: {
+        std::string path = vid_proj->get_video()->file_path.toStdString();
+        std::string dir = m_proj->m_dir.toStdString();
+        method = new MotionDetection(path, dir, settings);
         break;
+    }
     default:
         break;
     }
@@ -267,7 +270,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
     vid_proj->add_analysis(tag);
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
-        set_status_bar("Something went wrong when adding tag: " + QString::fromStdString(tag->get_name()));
+        set_status_bar("Something went wrong when adding tag: " + tag->get_name());
         return;
     }
 
@@ -365,7 +368,7 @@ void ProjectWidget::add_interval(VideoProject* vid_proj, Interval* interval) {
     vid_proj->add_analysis(interval);
     VideoItem* vid_item = get_video_item(vid_proj);
     if (vid_item == nullptr) {
-        set_status_bar("Something went wrong when adding interval: " + QString::fromStdString(interval->get_name()));
+        set_status_bar("Something went wrong when adding interval: " + interval->get_name());
         return;
     }
 
@@ -434,7 +437,12 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid_item = new VideoItem(vid_proj);
-    vid_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
+
+    if (vid_proj->get_video()->is_sequence()) {
+        ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
+        vid_item->setToolTip(0, sequence->get_search_path());
+    }
+    vid_item->setToolTip(0, vid_proj->get_video()->file_path);
 
     // If there only is one selected item and it's a folder,
     // add the new video to that folder otherwise to the top level
@@ -469,7 +477,7 @@ void ProjectWidget::file_dropped(QString path) {
     QFileInfo tmp(path);
     std::string ext = tmp.suffix().toStdString();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (allowed_vid_exts.find(ext) != allowed_vid_exts.end()) {
+    if (allowed_vid_exts.find(QString::fromStdString(ext)) != allowed_vid_exts.end()) {
         // Add file
         create_video(path);
     }
@@ -579,7 +587,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
         // Create and add VideoItem
         if (item != nullptr && item->type() == VIDEO_ITEM) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
-            v_item->setToolTip(0, QString::fromStdString(vid_proj->get_video()->file_path));
+            v_item->setToolTip(0, vid_proj->get_video()->file_path);
             v_item->set_video_project(vid_proj);
             add_analyses_to_item(v_item);
             auto vid = vid_proj->get_video();
@@ -1019,7 +1027,7 @@ void ProjectWidget::check_selection_level(QTreeWidgetItem*, QTreeWidgetItem*) {
 void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
     Q_UNUSED(column);
 
-    std::string item_text = item->text(0).toStdString();
+    QString item_text = item->text(0);
     switch(item->type()) {
     case INTERVAL_ITEM: {
         auto interval_item = dynamic_cast<IntervalItem*>(item);
@@ -1102,13 +1110,18 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
+        case SEQUENCE_ITEM:
+            if (item->parent()->type() == SEQUENCE_CONTAINER_ITEM) {
+                menu.addAction("Remove", this, &ProjectWidget::remove_item);
+            }
+            break;
         default:
             break;
         }
         menu.addSeparator();
-        menu.addAction("New Folder", this, SLOT(create_folder_item()));
-        menu.addAction("Import Video", this, SLOT(add_video()));
-        menu.addAction("Import Images", this, SLOT(add_images()));
+        menu.addAction("New Folder", this, &ProjectWidget::create_folder_item);
+        menu.addAction("Import Video", this, &ProjectWidget::add_video);
+        menu.addAction("Import Images", this, &ProjectWidget::add_images);
     } else if (item_count > 1) {
         // Clicked whilst multiple items were selected
         menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1241,6 +1254,9 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     case TAG_FRAME_ITEM:
         remove_tag_frame_item(item);
         break;
+    case SEQUENCE_ITEM:
+        remove_sequence_item(item);
+        break;
     case INTERVAL_ITEM:
         remove_interval_item(item);
         break;
@@ -1272,12 +1288,18 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
     // Remove the video from the list of videos
     auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
     if (it != m_proj->get_videos().end()) {
-        auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
-        video_list.erase(video_it);
         m_proj->get_videos().erase(it);
+        // TODO store folder for deletion if project saved
+        if (v_proj->get_video()->is_sequence()) {
+            // Will be deleted in close
+            removed_sequences.push_back(v_proj);
+        } else {
+            auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
+            video_list.erase(video_it);
+            delete v_proj;
+        }
         m_proj->set_unsaved(true);
     }
-    delete v_proj;
     emit item_removed(v_proj);
     emit remove_overlay();
 }
@@ -1339,6 +1361,13 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
     int frame = tf_item->get_frame();
     tag_item->get_tag()->remove_frame(frame);
+}
+
+void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
+    SequenceItem* seq_item = dynamic_cast<SequenceItem*>(item);
+    if (seq_item) {
+        seq_item->remove();
+    }
 }
 
 /**
@@ -1450,8 +1479,8 @@ bool ProjectWidget::is_analysis_running(QTreeWidgetItem* root) {
 bool ProjectWidget::save_project() {
     if (m_proj == nullptr || is_analysis_running()) return false;
 
-    for (std::string path : remove_list) {
-        QFile file(QString::fromStdString(path));
+    for (QString path : remove_list) {
+        QFile file(path);
         if(file.exists()) {
             file.remove();
         }
@@ -1469,14 +1498,14 @@ bool ProjectWidget::save_project() {
         if (status == project_dialog->Accepted) {
             // User clicked ok, dialog checked for proper path & name
             // Update project path
-            m_proj->copy_directory_files(QString::fromStdString(m_proj->get_dir()), path + name, true, std::vector<std::string>{"vian"});
+            m_proj->copy_directory_files(m_proj->get_dir(), path + name, true, std::vector<QString>{"vian"});
             m_proj->remove_files();
-            m_proj->set_name_and_path(name.toStdString(), path.toStdString());
+            m_proj->set_name_and_path(name, path);
             m_proj->set_temporary(false);
             set_main_window_name(name);
             emit proj_path(m_proj->get_dir());
             QDir dir;
-            dir.mkpath(QString::fromStdString(m_proj->get_dir()));
+            dir.mkpath(m_proj->get_dir());
 
             // If the current video is a sequence then it needs to be reloaded
             // since the images path will have changed
@@ -1491,6 +1520,14 @@ bool ProjectWidget::save_project() {
             return false;
         }
     }
+
+    for (auto v_proj : removed_sequences) {
+        auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
+        QDir directory(seq->get_search_path());
+        directory.removeRecursively();
+        delete v_proj;
+    }
+    removed_sequences.clear();
 
     save_item_data();
     emit save_draw_wgt();
@@ -1526,7 +1563,7 @@ bool ProjectWidget::open_project(QString project_path) {
         return false;
 
     set_status_bar("Opening project");
-    auto new_proj = Project::fromFile(project_path.toStdString());
+    auto new_proj = Project::fromFile(project_path);
     if (new_proj == nullptr) {
         qWarning() << "Something went wrong while creating the temporary folder.";
         return false;
@@ -1538,13 +1575,13 @@ bool ProjectWidget::open_project(QString project_path) {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
-    set_main_window_name(QString::fromStdString(m_proj->get_name()));
+    set_main_window_name(m_proj->get_name());
     emit proj_path(m_proj->get_dir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);
 
-        if (vid_proj->get_video()->is_sequence()) break;
+        if (vid_proj->get_video()->is_sequence()) continue;
         video_list.push_back(vid_proj->get_video());
     }
     ViewPathDialog* path_dialog = new ViewPathDialog(video_list);
@@ -1612,6 +1649,35 @@ bool ProjectWidget::close_project() {
     emit set_interval_slider(false);
     emit enable_poi_btns(false, false);
 
+    // If the user chose not to save
+    // Restore changes on all image sequences that are unsaved but not removed
+    if (!m_proj->is_saved()) {
+        for (auto vid_proj : m_proj->get_videos()) {
+            // Remove folder if sequence has been removed (never added) from the project
+            if (vid_proj->get_video()->is_sequence()) {
+                auto sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
+                if (sequence->never_saved()) {
+                    // Remove sequences that have never been saved
+                    QDir directory(sequence->get_search_path());
+                    directory.removeRecursively();
+                } else if (!sequence->is_saved()) {
+                    // Revert changes done to sequences
+                    sequence->revert();
+                }
+            }
+        }
+    }
+
+    // If the user chose to save, remove all folders of the removed image sequences
+    // Otherwise, revert the changes made
+    if (!m_proj->is_saved()) {
+        for (auto v_proj : removed_sequences) {
+            auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
+            seq->revert();
+            delete v_proj;
+        }
+    }
+
     // Remove project if temporary
     if (m_proj->is_temporary()) {
         m_proj->remove_files();
@@ -1656,11 +1722,11 @@ void ProjectWidget::set_main_window_name(QString name) {
     parentWidget()->parentWidget()->setWindowTitle("ViAn  -  " + name);
 }
 
-void ProjectWidget::update_current_videoitem(std::string path) {
+void ProjectWidget::update_current_videoitem(QString path) {
     if (currentItem()->type() != VIDEO_ITEM) return;
-    std::string name = Utility::name_from_path(path);
-    currentItem()->setText(0, QString::fromStdString(name));
-    currentItem()->setToolTip(0, QString::fromStdString(path));
+    QString name = Utility::name_from_path(path);
+    currentItem()->setText(0, name);
+    currentItem()->setToolTip(0, path);
     VideoItem* v_item = dynamic_cast<VideoItem*>(currentItem());
     v_item->get_video_project()->get_video()->set_name(name);
     v_item->set_thumbnail();
@@ -1671,8 +1737,8 @@ void ProjectWidget::update_videoitems() {
         if (item->type() == VIDEO_ITEM) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
             Video* video = v_item->get_video_project()->get_video();
-            v_item->setText(0, QString::fromStdString(video->get_name()));
-            v_item->setToolTip(0, QString::fromStdString(video->file_path));
+            v_item->setText(0, video->get_name());
+            v_item->setToolTip(0, video->file_path);
             v_item->set_thumbnail();
         }
     }

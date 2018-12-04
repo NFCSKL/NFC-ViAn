@@ -1,5 +1,5 @@
 #include "zoomrectangle.h"
-
+#include <QPoint>
 /**
  * @brief ZoomRectangle::ZoomRectangle
  */

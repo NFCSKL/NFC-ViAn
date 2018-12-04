@@ -13,7 +13,7 @@ public:
     int get_frame_number();
     QString get_file_path();
     void update_description(const QString &text);
-    void set_thumbnail(std::string thum_path);
+    void set_thumbnail(QString thum_path);
     BookmarkItem* copy();
     QString get_description() const;
     QString get_time() const;

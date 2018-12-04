@@ -15,7 +15,7 @@ MotionDetection::MotionDetection(const std::string& source_file, const std::stri
     m_analysis.type = MOTION_DETECTION; 
 }
 
-MotionDetection::~MotionDetection() {  
+MotionDetection::~MotionDetection() {
     background_subtractor.release();
     dilation_kernel.release();
 }

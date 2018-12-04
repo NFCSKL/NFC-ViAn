@@ -51,7 +51,7 @@ BookmarkList::~BookmarkList() {
 }
 
 void BookmarkList::add_new_folder() {
-    BookmarkCategory* new_category = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), CONTAINER);
+    BookmarkCategory* new_category = new BookmarkCategory("Category " +  QString::number(category_cnt++), CONTAINER);
     addItem(new_category);
     setItemWidget(new_category, new_category->get_folder());
     connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
@@ -70,7 +70,7 @@ QListWidgetItem *BookmarkList::get_clicked_item() {
  * Stores the name of the parent container that the widget resides in
  * @param name : name of parent container
  */
-void BookmarkList::set_parent_name(std::string& name) {
+void BookmarkList::set_parent_name(QString& name) {
     m_par_cont_name = name;
 }
 
@@ -79,7 +79,7 @@ void BookmarkList::set_parent_name(std::string& name) {
  * Returns the name of the parent container that the widget resides in.
  * @return m_par_cont_name : name of parent container
  */
-std::string BookmarkList::get_parent_name() {
+QString BookmarkList::get_parent_name() {
     return m_par_cont_name;
 }
 
@@ -94,10 +94,10 @@ void BookmarkList::on_parent_name_edited(QString name) {
         if (item->type() == 0) {
             // BookmarkItem. Update container name
             auto bm_item = dynamic_cast<BookmarkItem*>(item);
-            bm_item->get_bookmark()->rename_container(m_par_cont_name, name.toStdString());
+            bm_item->get_bookmark()->rename_container(m_par_cont_name, name);
         }
     }
-    m_par_cont_name = name.toStdString();
+    m_par_cont_name = name;
 }
 
 /**
@@ -108,11 +108,11 @@ void BookmarkList::on_parent_name_edited(QString name) {
 void BookmarkList::item_right_clicked(const QPoint pos) {
     QMenu* menu = new QMenu;
     QString rename = (clicked_item->type() == BOOKMARK) ? "Change description" : "Change title";
-    menu->addAction(rename, this, SLOT(rename_item()));
-    menu->addAction("Delete", this, SLOT(remove_item()));
+    menu->addAction(rename, this, &BookmarkList::rename_item);
+    menu->addAction("Delete", this, &BookmarkList::remove_item);
     menu->addSeparator();
     if (m_container_type == UNSORTED) {
-        menu->addAction("New category", this, SLOT(add_new_folder()));
+        menu->addAction("New category", this, &BookmarkList::add_new_folder);
     }
     menu->exec(mapToGlobal(pos));
     delete menu;
@@ -179,7 +179,7 @@ void BookmarkList::rename_item(){
         auto item = dynamic_cast<BookmarkItem*>(currentItem());
         BookmarkDialog dialog;
 
-        dialog.setTextValue(QString::fromStdString(item->get_bookmark()->get_description()));
+        dialog.setTextValue(item->get_bookmark()->get_description());
         dialog.setLabelText("Enter a new description");
         dialog.setWindowTitle("Change description");
         ok = dialog.exec();
@@ -193,7 +193,7 @@ void BookmarkList::rename_item(){
         auto item = dynamic_cast<BookmarkCategory*>(currentItem());
 
         BookmarkDialog dialog;
-        dialog.setTextValue(QString::fromStdString(item->get_name()));
+        dialog.setTextValue(item->get_name());
         dialog.setLabelText("Enter a new category name");
         dialog.setWindowTitle("Category name");
         ok = dialog.exec();
@@ -274,12 +274,12 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
         // currentItem so remove_item() can remove it.
     } else if (m_container_type != UNSORTED && event->button() == Qt::RightButton) {
 //        QMenu* menu = new QMenu;
-//        menu->addAction("Delete", this, SLOT(remove_item()));
+//        menu->addAction("Delete", this, &BookmarkList::remove_item);
 //        menu->exec(mapToGlobal(event->pos()));
 //        delete menu;
     } else if (event->button() == Qt::RightButton) {
         QMenu* menu = new QMenu;
-        menu->addAction("New category", this, SLOT(add_new_folder()));
+        menu->addAction("New category", this, &BookmarkList::add_new_folder);
         menu->exec(mapToGlobal(event->pos()));
         delete menu;
     } else {

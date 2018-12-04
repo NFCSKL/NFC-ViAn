@@ -28,7 +28,7 @@ class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
     QTreeWidgetItem* selection_parent = nullptr;
-    std::set<std::string> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
+    std::set<QString> allowed_vid_exts {"mkv", "flv", "vob", "ogv", "ogg",
                                 "264", "263", "mjpeg", "avc", "m2ts",
                                 "mts", "avi", "mov", "qt", "wmv", "mp4",
                                 "m4p", "m4v", "mpg", "mp2", "mpeg",
@@ -45,12 +45,12 @@ public:
     QPointer<QAction> show_settings_act = nullptr;
 
     std::vector<Video*> video_list;
-    std::vector<std::string> remove_list;
+    std::vector<QString> remove_list;
 
 signals:
     void selected_media();
     void marked_video_state(VideoProject *vid_proj, VideoState state);
-    void proj_path(std::string);
+    void proj_path(QString);
     void load_bookmarks(VideoProject* vid_proj);
 
     void marked_analysis(AnalysisProxy*);
@@ -84,7 +84,7 @@ public slots:
     void add_video();
     void create_video(QString path);
     void add_images();
-    void create_sequence(QStringList image_paths, std::string path);
+    void create_sequence(QStringList image_paths, QStringList checksums, QString path);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_tag(VideoProject*, Tag *tag);
     void add_frames_to_tag_item(TreeItem *item);
@@ -106,6 +106,7 @@ public slots:
     void remove_drawing_tag_item(QTreeWidgetItem* item);
     void remove_analysis_item(QTreeWidgetItem* item);
     void remove_tag_frame_item(QTreeWidgetItem* item);
+    void remove_sequence_item(QTreeWidgetItem* item);
     void remove_interval_item(QTreeWidgetItem* item);
     void remove_interval_area_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
@@ -113,7 +114,7 @@ public slots:
     void update_analysis_settings();
     void advanced_analysis();
     bool prompt_save();
-    void update_current_videoitem(std::string path);
+    void update_current_videoitem(QString path);
     void update_videoitems();
 private slots:
     void context_menu(const QPoint& point);
@@ -146,6 +147,7 @@ private:
     void update_current_tag(VideoItem* v_item);
     void update_current_interval(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
+    std::vector<VideoProject*> removed_sequences;
 signals:
     void close_all_widgets();
     void project_closed();

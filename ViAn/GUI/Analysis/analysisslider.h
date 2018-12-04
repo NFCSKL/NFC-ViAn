@@ -28,6 +28,8 @@ class AnalysisSlider : public QSlider {
     bool show_ana_interval = false;
     bool details_checked = false;
 
+    const int INTERVAL_DEFAULT = -1;
+
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = nullptr);
 
@@ -35,8 +37,8 @@ public:
     Tag* m_tag = nullptr;
     Interval* m_interval_areas = nullptr;
 
-    std::pair<int, int> m_interval = std::make_pair(-1, -1);
-    std::pair<int, int> m_ana_interval = std::make_pair(-1, -1);
+    std::pair<int, int> m_interval = std::make_pair(INTERVAL_DEFAULT, INTERVAL_DEFAULT);
+    std::pair<int, int> m_ana_interval = std::make_pair(INTERVAL_DEFAULT, INTERVAL_DEFAULT);
 
     // Control functions
     void set_blocked(bool value);
@@ -53,6 +55,7 @@ public:
     // Drawing interval functions
     void draw_interval(std::pair<int, int> interval, QRect groove, double frame_width);
     bool valid_interval(std::pair<int, int> interval);
+    std::pair<int,int> get_valid_interval();
 
     // POI functions
     bool is_in_POI(int frame);
