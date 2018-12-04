@@ -6,6 +6,8 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
+class Bookmark;
+class BookmarkCategory;
 class VideoProject;
 
 using ID = int;
@@ -23,8 +25,10 @@ class Project : public Saveable{
     QString last_changed = "";      // Date and time when the project was last saved
 
     std::vector<VideoProject*> m_videos;
+    std::vector<Bookmark*> m_bookmarks;
+    std::vector<BookmarkCategory*> m_categories;
+
     int m_vid_count = 0;
-    int m_rp_count = 0;
     bool m_temporary = true;
     bool m_unsaved_changes = false;
 public:

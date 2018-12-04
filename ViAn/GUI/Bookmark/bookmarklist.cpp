@@ -256,6 +256,7 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (itemAt(event->pos())) {
         clicked_item = itemAt(event->pos());
         setCurrentItem(clicked_item);
+        qDebug() << "clicked item" << this->row(clicked_item);
         switch (event->button()) {
             case Qt::RightButton:
                 // Create context menu

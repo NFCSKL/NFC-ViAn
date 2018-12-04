@@ -23,6 +23,7 @@ class Bookmark : public Writeable {
     QString m_description = "";    // Description for the bookmark, given by user
     VideoState m_state;                 // Contains the state of the video, eg frame, zoom rect and scale factor
     QString m_thumbnail_path = "";        // Contains the path to the thumbnail for the bookmark
+    int m_index;                            // contains the bookmarks index in the qlistwidget, updates when saved
 
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
     ID id = 0;
@@ -35,6 +36,8 @@ public:
     ~Bookmark();
     ID get_id();
     void set_id(ID id);
+    int get_index();
+    void set_index(int index);
     void reset_root_dir(const QString &dir);
     QString get_time();
     int get_frame_number();

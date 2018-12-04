@@ -95,7 +95,7 @@ BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::p
 
     if (container->first == DISPUTED) {
         bm_cat->add_disp_item(bm_item);
-    } else {
+    } else if (container->first == REFERENCE) {
         bm_cat->add_ref_item(bm_item);
     }
     return bm_cat;
@@ -149,16 +149,35 @@ void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int fra
 void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;
+        int index = bm->get_index();
         // Load thumbnail TODO add check for file
         QString t_path = bm->get_thumbnail_path();
         std::pair<int, QString> new_container = bm->get_container();
         BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
         bm_item->set_thumbnail(t_path);
         if (new_container.second.isEmpty()) {
-            // No container name. Add it to the main list
-            bm_list->addItem(bm_item);
+            // No container name. Insert it to the main list
+            bm_list->insertItem(index, bm_item);
         } else {
             add_to_container(bm_item, &new_container);
+        }
+    }
+}
+
+void BookmarkWidget::save_item_data() {
+    for (int i = 0; i < bm_list->count(); ++i) {
+        QListWidgetItem* item = bm_list->item(i);
+        int index = bm_list->row(item);
+        switch (item->type()) {
+        case CONTAINER:
+            break;
+        case BOOKMARK: {
+            BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
+            b_item->get_bookmark()->set_index(index);
+            break;
+        }
+        default:
+            break;
         }
     }
 }

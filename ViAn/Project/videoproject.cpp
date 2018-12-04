@@ -131,7 +131,6 @@ void VideoProject::read(const QJsonObject& json){
         m_video = vid;
     }
 
-
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     // Read bookmarks from json
     for(int i = 0; i != json_bookmarks.size(); i++){

@@ -134,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::load_bookmarks, bookmark_wgt, &BookmarkWidget::load_bookmarks);
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, video_wgt, &VideoWidget::load_marked_video_state);
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
+    connect(project_wgt, &ProjectWidget::save_bmark_wgt, bookmark_wgt, &BookmarkWidget::save_item_data);
     bookmark_dock->setWidget(bookmark_wgt);
 
     // Initialize analysis settings widget

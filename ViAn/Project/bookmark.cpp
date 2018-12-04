@@ -58,6 +58,14 @@ void Bookmark::set_id(ID new_id) {
     id = new_id;
 }
 
+int Bookmark::get_index() {
+    return m_index;
+}
+
+void Bookmark::set_index(int index) {
+    m_index = index;
+}
+
 void Bookmark::reset_root_dir(const QString &dir) {
     m_file = dir + Constants::BOOKMARK_FOLDER + Utility::name_from_path(m_file);
     m_thumbnail_path = dir + Constants::THUMBNAIL_FOLDER + Utility::name_from_path(m_thumbnail_path);
@@ -176,6 +184,7 @@ void Bookmark::read(const QJsonObject& json){
     m_file = json["path"].toString();
     m_thumbnail_path = json["thumbnail path"].toString();
     m_description = json["description"].toString();
+    m_index = json["index"].toInt();
     std::pair<int, QString> pair(json["type"].toInt(), json["container"].toString());
     m_container = pair;
 
@@ -208,6 +217,7 @@ void Bookmark::write(QJsonObject& json){
     json["path"] = m_file;
     json["thumbnail path"] = m_thumbnail_path;
     json["description"] = m_description;
+    json["index"] = m_index;
     json["container"] = m_container.second;
     json["type"] = m_container.first;
 

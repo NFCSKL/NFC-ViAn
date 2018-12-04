@@ -1531,6 +1531,7 @@ bool ProjectWidget::save_project() {
 
     save_item_data();
     emit save_draw_wgt();
+    emit save_bmark_wgt();
 
     // Mark all analysis as saved
     std::vector<AnalysisItem*> a_items;
