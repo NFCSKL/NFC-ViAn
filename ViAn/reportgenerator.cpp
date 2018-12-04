@@ -138,7 +138,8 @@ void ReportGenerator::create_bookmark_table(QAxObject* para) {
 
         // Insert the bookmark description, divider line and bookmark image as a stack
         // because they are all inserted at the same position
-        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm) + QString("\v"));
+        bmark_range->dynamicCall("InsertAfter(QString Text)", get_bookmark_descr(bm));
+        bmark_range->dynamicCall("InsertParagraphAfter()");
         QAxObject* p_shapes = para->querySubObject("InlineShapes()");
         p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
                      file_name, false, true, bmark_range->asVariant());
@@ -150,12 +151,6 @@ void ReportGenerator::add_category(QAxObject* table, size_t i) {
     // Table indexed from 1, begin after title.
     int cell_row = 1;
 
-    // Add title text
-    cell_add_text(table, "Omstritt", cell_row, 1);
-    cell_add_text(table, "Referens", cell_row, 2);
-
-    cell_row++;
-
     // Access duplicate category title cells and merge them together
     QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
     QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
@@ -164,6 +159,12 @@ void ReportGenerator::add_category(QAxObject* table, size_t i) {
     cell_add_text(table, m_rep_cont.at(i).first, cell_row, 1);
 
     // Go to next table row
+    cell_row++;
+
+    // Add title text
+    cell_add_text(table, "Omstritt", cell_row, 1);
+    cell_add_text(table, "Referens", cell_row, 2);
+
     cell_row++;
 
     // Access disputed and reference bookmarks
