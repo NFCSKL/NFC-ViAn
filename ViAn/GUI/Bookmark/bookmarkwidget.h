@@ -10,6 +10,7 @@
 class BookmarkCategory;
 class BookmarkItem;
 class BookmarkList;
+class Project;
 class QDockWidget;
 class QScrollArea;
 class QVBoxLayout;
@@ -19,7 +20,7 @@ enum list_types {BOOKMARK, CONTAINER};
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT
-    QString m_path;
+    Project* m_proj = nullptr;
     BookmarkList* bm_list;
     QVBoxLayout* bm_list_layout;
     QVBoxLayout* layout;
@@ -39,7 +40,7 @@ public slots:
     void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
     void save_item_data();
-    void set_path(QString path);
+    void set_project(Project* proj);
     void clear_bookmarks();
     void generate_report();
 

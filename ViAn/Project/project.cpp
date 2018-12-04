@@ -1,5 +1,7 @@
 #include "project.h"
 
+#include "bookmark.h"
+#include "GUI/Bookmark/bookmarkcategory.h"
 #include "videoproject.h"
 
 #include <QDebug>
@@ -48,7 +50,7 @@ Project::~Project(){
 }
 
 /**
- * @brief Project::add_video
+ * @brief Project::add_video_project
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video_project(VideoProject *vid_proj){
@@ -59,21 +61,50 @@ ID Project::add_video_project(VideoProject *vid_proj){
 }
 
 /**
- * @brief Project::remove_video
- * @param id
+ * @brief Project::remove_video_project
+ * @param vid_proj
  * Remove video from videos and delete its contents.
- * TODO, not used
+ * TODO, use it!
  */
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
     delete *it;
     m_videos.erase(it);
+    *it = nullptr;
+    m_unsaved_changes = true;
+}
+
+void Project::add_bookmark(Bookmark* bmark) {
+    m_bookmarks.push_back(bmark);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_bookmark(Bookmark* bmark) {
+    auto it = std::find(m_bookmarks.begin(), m_bookmarks.end(), bmark);
+    if (it == m_bookmarks.end()) return;
+    delete *it;
+    m_bookmarks.erase(it);
+    *it = nullptr;
+    m_unsaved_changes = true;
+}
+
+void Project::add_category(BookmarkCategory* cat) {
+    m_categories.push_back(cat);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_category(BookmarkCategory* cat) {
+    auto it = std::find(m_categories.begin(), m_categories.end(), cat);
+    if (it == m_categories.end()) return;
+    delete *it;
+    m_categories.erase(it);
+    *it = nullptr;
     m_unsaved_changes = true;
 }
 
 /**
- * @brief Project::set_saved_status
+ * @brief Project::set_unsaved
  * Set unsaved status
  * Should be used by video_project and analysis
  * @param changed
@@ -258,8 +289,16 @@ QString Project::generate_tmp_directory() {
  * @brief Project::get_videos
  * @return videos&
  */
-std::vector<VideoProject*> &Project::get_videos(){
+std::vector<VideoProject*> &Project::get_videos() {
     return m_videos;
+}
+
+std::vector<Bookmark*> &Project::get_bookmarks() {
+    return m_bookmarks;
+}
+
+std::vector<BookmarkCategory*> &Project::get_categories() {
+    return m_categories;
 }
 
 /**

@@ -50,11 +50,18 @@ BookmarkList::~BookmarkList() {
     clear();
 }
 
-void BookmarkList::add_new_folder() {
-    BookmarkCategory* new_category = new BookmarkCategory("Category " +  QString::number(category_cnt++), CONTAINER);
+/**
+ * @brief BookmarkList::add_new_folder
+ * Add a new category to the list with the name "name"
+ * @param name
+ * @return
+ */
+BookmarkCategory* BookmarkList::add_new_folder(QString name) {
+    BookmarkCategory* new_category = new BookmarkCategory(name, CONTAINER);
     addItem(new_category);
     setItemWidget(new_category, new_category->get_folder());
     connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
+    return new_category;
 }
 
 /**
@@ -112,7 +119,7 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
     menu->addAction("Delete", this, &BookmarkList::remove_item);
     menu->addSeparator();
     if (m_container_type == UNSORTED) {
-        menu->addAction("New category", this, &BookmarkList::add_new_folder);
+        menu->addAction("New category", this, [this]{ add_new_folder("Category " +  QString::number(category_cnt++));});
     }
     menu->exec(mapToGlobal(pos));
     delete menu;

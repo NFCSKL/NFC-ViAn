@@ -5,6 +5,8 @@
 
 #include <QListWidget>
 
+class BookmarkCategory;
+
 /**
  * @brief The BookmarkList class
  */
@@ -27,7 +29,7 @@ public:
     void set_parent_name(QString &name);
 public slots:
     void on_parent_name_edited(QString name);
-    void add_new_folder();
+    BookmarkCategory *add_new_folder(QString name);
 private:
     void item_right_clicked(const QPoint pos);
     void bookmark_drop(BookmarkList* source, QDropEvent *event);

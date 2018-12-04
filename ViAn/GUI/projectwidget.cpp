@@ -120,7 +120,7 @@ void ProjectWidget::add_project(const QString project_name, const QString projec
     Project* new_proj = new Project(project_name, project_path);
     set_main_window_name(project_name);
     m_proj = new_proj;
-    emit proj_path(m_proj->get_dir());
+    emit set_project(m_proj);
 }
 
 /**
@@ -1503,7 +1503,7 @@ bool ProjectWidget::save_project() {
             m_proj->set_name_and_path(name, path);
             m_proj->set_temporary(false);
             set_main_window_name(name);
-            emit proj_path(m_proj->get_dir());
+            emit set_project(m_proj);
             QDir dir;
             dir.mkpath(m_proj->get_dir());
 
@@ -1577,7 +1577,7 @@ bool ProjectWidget::open_project(QString project_path) {
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
     set_main_window_name(m_proj->get_name());
-    emit proj_path(m_proj->get_dir());
+    emit set_project(m_proj);
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
         emit load_bookmarks(vid_proj);

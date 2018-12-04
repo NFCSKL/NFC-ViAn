@@ -41,6 +41,12 @@ public:
     ID add_video_project(VideoProject *vid_proj);
     void remove_video_project(VideoProject* vid_proj);
 
+    void add_bookmark(Bookmark* bmark);
+    void remove_bookmark(Bookmark* bmark);
+
+    void add_category(BookmarkCategory* cat);
+    void remove_category(BookmarkCategory* cat);
+
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
@@ -57,6 +63,8 @@ public:
     QString generate_tmp_directory();
 
     std::vector<VideoProject *>& get_videos();
+    std::vector<Bookmark *>& get_bookmarks();
+    std::vector<BookmarkCategory *>& get_categories();
     VideoProject* get_video(const int& v_pos);
     QString get_dir() const;
     QString get_name() const;

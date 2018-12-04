@@ -10,6 +10,7 @@
 #include <QScrollArea>
 
 BookmarkCategory::BookmarkCategory(QString name, int type) : QListWidgetItem(nullptr, type) {
+
     m_name = name;
     // Setup layout
     layout = new QVBoxLayout();
