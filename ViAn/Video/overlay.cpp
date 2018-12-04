@@ -6,6 +6,7 @@
 #include "shapes/pen.h"
 #include "shapes/rectangle.h"
 #include "shapes/text.h"
+#include "utility.h"
 
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -248,17 +249,7 @@ bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
         }
         drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     }
-    return shape->get_show() && drawing.contains(qpoint_to_point(pos));
-}
-
-/**
- * @brief Shape::qpoint_to_point
- * Converts QPoint to OpenCV Point.
- * @param pnt QPoint to be converted.
- * @return Returns converted Point.
- */
-cv::Point Overlay::qpoint_to_point(QPoint pnt) {
-    return cv::Point(pnt.x(), pnt.y());
+    return shape->get_show() && drawing.contains(Utility::from_qpoint(pos));
 }
 
 void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
