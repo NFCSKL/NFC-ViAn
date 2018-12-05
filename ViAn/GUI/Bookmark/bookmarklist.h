@@ -18,18 +18,17 @@ class BookmarkList : public QListWidget{
     QString m_par_cont_name = "";
     int m_container_type = UNSORTED;
     bool m_accept_container = true;
-    int category_cnt = 1;
 public:
     BookmarkList(bool accept_container = true, int container_type = UNSORTED, QWidget* parent = nullptr);
     ~BookmarkList() override;
 
     QListWidgetItem* get_clicked_item();
 
+    int category_cnt = 1;
     QString get_parent_name();
     void set_parent_name(QString &name);
 public slots:
     void on_parent_name_edited(QString name);
-    BookmarkCategory *add_new_folder(QString name);
 private:
     void item_right_clicked(const QPoint pos);
     void bookmark_drop(BookmarkList* source, QDropEvent *event);
@@ -47,6 +46,7 @@ protected:
     void dropEvent(QDropEvent* event) override;
 signals:
     void set_bookmark_video(VideoProject* vid_proj, VideoState state);
+    void add_category(QString name);
 };
 
 #endif // BOOKMARKLIST_H

@@ -12,14 +12,15 @@
  * @param frame_nbr Frame number associated with the bookmark.
  * @param time The time in the video associated with the bookmark (format "mm:ss").
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name, const QString &text, const VideoState &state, const QString &time){
+Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name,
+                   const QString &text, const VideoState &state,
+                   const QString &time, const int &type){
     m_vid_proj = vid_proj;
     m_file = file_name;
     m_description = text;
     m_state = state;
     m_time = time;
-    std::pair<int, QString> _tmp(UNSORTED, "");
-    m_container = _tmp;
+    m_type = type;
 }
 
 /**
@@ -29,11 +30,17 @@ Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name, const QStri
  */
 Bookmark::Bookmark(const Bookmark &bookmark) {
     m_vid_proj = bookmark.m_vid_proj;
-    m_file = bookmark.m_file;
-    m_description = bookmark.m_description;
+    m_proj = bookmark.m_proj;
     m_time = bookmark.m_time;
-    m_container = bookmark.m_container;
+    m_description = bookmark.m_description;
     m_state = bookmark.m_state;
+    m_thumbnail_path = bookmark.m_thumbnail_path;
+    m_index = bookmark.m_index;
+    m_type = bookmark.m_type;
+    m_container_name = bookmark.m_container_name;
+
+    m_file = bookmark.m_file;
+    m_image_name = bookmark.m_image_name;
 }
 
 /**
@@ -66,6 +73,10 @@ void Bookmark::set_index(int index) {
     m_index = index;
 }
 
+int Bookmark::get_type() {
+    return m_type;
+}
+
 void Bookmark::reset_root_dir(const QString &dir) {
     m_file = dir + Constants::BOOKMARK_FOLDER + Utility::name_from_path(m_file);
     m_thumbnail_path = dir + Constants::THUMBNAIL_FOLDER + Utility::name_from_path(m_thumbnail_path);
@@ -92,12 +103,16 @@ VideoState Bookmark::get_state() {
     return m_state;
 }
 
-std::pair<int, QString> Bookmark::get_container(){
-    return m_container;
+QString Bookmark::get_container_name() {
+    return m_container_name;
 }
 
 VideoProject *Bookmark::get_video_project() {
     return m_vid_proj;
+}
+
+Project* Bookmark::get_project() {
+    return m_proj;
 }
 
 /**
@@ -119,8 +134,8 @@ void Bookmark::set_description(const QString& text) {
 }
 
 void Bookmark::set_container(QString name, int type) {
-    std::pair<int, QString> container(type, name);
-    m_container = container;
+    m_container_name = name;
+    m_type = type;
     m_unsaved_changes = true;
 }
 
@@ -131,8 +146,8 @@ void Bookmark::set_container(QString name, int type) {
  * @param new_name
  */
 void Bookmark::rename_container(QString old_name, QString new_name) {
-    if (m_container.second == old_name) {
-        m_container.second = new_name;
+    if (m_container_name == old_name) {
+        m_container_name = new_name;
     }
     m_unsaved_changes = true;
 }
@@ -144,6 +159,7 @@ void Bookmark::rename_container(QString old_name, QString new_name) {
  */
 void Bookmark::set_thumbnail_path(QString path) {
     m_thumbnail_path = path;
+    m_unsaved_changes = true;
 }
 
 QString Bookmark::get_thumbnail_path() {
@@ -154,13 +170,16 @@ QString Bookmark::get_thumbnail_path() {
  * @brief Bookmark::set_video_project
  * Sets the video project that the bookmark belongs to
  * @param vid_proj
+ *
+ *  TODO remove
  */
 void Bookmark::set_video_project(VideoProject *vid_proj){
     m_vid_proj = vid_proj;
 }
 
-void Bookmark::add_to_video_project() {
-    m_vid_proj->add_bookmark(this);
+void Bookmark::set_project(Project* proj) {
+    m_proj = proj;
+    m_unsaved_changes = true;
 }
 
 /**
@@ -185,8 +204,8 @@ void Bookmark::read(const QJsonObject& json){
     m_thumbnail_path = json["thumbnail path"].toString();
     m_description = json["description"].toString();
     m_index = json["index"].toInt();
-    std::pair<int, QString> pair(json["type"].toInt(), json["container"].toString());
-    m_container = pair;
+    m_type = json["type"].toInt();
+    m_container_name = json["container"].toString();
 
     VideoState state;
     state.frame = json["frame"].toInt();
@@ -213,14 +232,14 @@ void Bookmark::read(const QJsonObject& json){
  */
 void Bookmark::write(QJsonObject& json){
     json["time"] = m_time;
-    json["frame"] = m_state.frame;
     json["path"] = m_file;
     json["thumbnail path"] = m_thumbnail_path;
     json["description"] = m_description;
     json["index"] = m_index;
-    json["container"] = m_container.second;
-    json["type"] = m_container.first;
+    json["container"] = m_container_name;
+    json["type"] = m_type;
 
+    json["frame"] = m_state.frame;
     json["scale_factor"] = m_state.scale_factor;
     json["anchor x"] = m_state.anchor.x();
     json["anchor y"] = m_state.anchor.y();

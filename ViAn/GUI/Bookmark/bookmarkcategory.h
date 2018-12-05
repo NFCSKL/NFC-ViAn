@@ -8,6 +8,7 @@
 
 class BookmarkItem;
 class BookmarkList;
+class Project;
 class QScrollArea;
 class QVBoxLayout;
 class VideoProject;
@@ -15,7 +16,7 @@ class VideoProject;
 /**
  * @brief The BookmarkCategory class
  * This class is inteded to store two scrollable lists
- * containing bookmarks or images.
+ * containing bookmarks.
  */
 class BookmarkCategory : public QObject, public QListWidgetItem {
     Q_OBJECT
@@ -23,12 +24,16 @@ class BookmarkCategory : public QObject, public QListWidgetItem {
     QLineEdit* m_title = nullptr;
     // Category name
     QString m_name = "";
+    // Index in list
+    int m_index;
+    // Project holding category
+    Project* m_proj = nullptr;
     // Widget layout
     QVBoxLayout* layout = nullptr;
-    // Scroll areas for disp_ref
+    // Scroll areas for disp & ref
     QScrollArea* disputed = nullptr;
     QScrollArea* reference = nullptr;
-    // Disp ref lists
+    // Disp & ref lists
     BookmarkList* disp_list = nullptr;
     BookmarkList* ref_list = nullptr;
 
@@ -37,12 +42,17 @@ class BookmarkCategory : public QObject, public QListWidgetItem {
 public:
     explicit BookmarkCategory(QString name, int type = 0);
     ~BookmarkCategory();
-    // Add item to disp list
+    // Add item to disp or ref list
     void add_disp_item(BookmarkItem* bm);
-    // Add item to ref list
     void add_ref_item(BookmarkItem* bm);
 
+    void update_index(int index);
+    void set_index(int index);
+    void set_project(Project* proj);
+
     QString get_name();
+    Project* get_project();
+    int get_index();
     std::vector<BookmarkItem*> get_disputed();
     std::vector<BookmarkItem*> get_references();
     QWidget* get_folder();

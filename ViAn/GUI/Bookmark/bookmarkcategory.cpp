@@ -10,7 +10,6 @@
 #include <QScrollArea>
 
 BookmarkCategory::BookmarkCategory(QString name, int type) : QListWidgetItem(nullptr, type) {
-
     m_name = name;
     // Setup layout
     layout = new QVBoxLayout();
@@ -50,8 +49,42 @@ BookmarkCategory::~BookmarkCategory() {
     delete ref_list;
 }
 
+void BookmarkCategory::update_index(int index) {
+    set_index(index);
+    // Update all indexes in the disp_list
+    for (int i = 0; i < disp_list->count(); ++i) {
+        QListWidgetItem* item = disp_list->item(i);
+        int list_index = disp_list->row(item);
+        BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
+        b_item->get_bookmark()->set_index(list_index);
+    }
+    // Update all indexes in the ref_list
+    for (int i = 0; i < ref_list->count(); ++i) {
+        QListWidgetItem* item = ref_list->item(i);
+        int list_index = ref_list->row(item);
+        BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
+        b_item->get_bookmark()->set_index(list_index);
+    }
+}
+
+void BookmarkCategory::set_index(int index) {
+    m_index = index;
+}
+
+void BookmarkCategory::set_project(Project* proj) {
+    m_proj = proj;
+}
+
 QString BookmarkCategory::get_name() {
     return m_name;
+}
+
+Project* BookmarkCategory::get_project() {
+    return m_proj;
+}
+
+int BookmarkCategory::get_index() {
+    return m_index;
 }
 
 std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
@@ -106,10 +139,12 @@ BookmarkCategory *BookmarkCategory::copy() {
 
 void BookmarkCategory::add_disp_item(BookmarkItem *bm_item) {
     disp_list->addItem(bm_item);
+    disp_list->sortItems();
 }
 
 void BookmarkCategory::add_ref_item(BookmarkItem *bm_item) {
     ref_list->addItem(bm_item);
+    disp_list->sortItems();
 }
 
 QScrollArea *BookmarkCategory::make_scrollable_container(BookmarkList* container) {

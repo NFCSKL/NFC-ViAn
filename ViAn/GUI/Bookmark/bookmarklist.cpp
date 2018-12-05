@@ -5,6 +5,7 @@
 #include "bookmarkitem.h"
 #include "bookmarkwidget.h"
 #include "imagegenerator.h"
+#include "Project/project.h"
 #include "Project/video.h"
 #include "Project/videoproject.h"
 
@@ -48,20 +49,6 @@ BookmarkList::~BookmarkList() {
         }
     }
     clear();
-}
-
-/**
- * @brief BookmarkList::add_new_folder
- * Add a new category to the list with the name "name"
- * @param name
- * @return
- */
-BookmarkCategory* BookmarkList::add_new_folder(QString name) {
-    BookmarkCategory* new_category = new BookmarkCategory(name, CONTAINER);
-    addItem(new_category);
-    setItemWidget(new_category, new_category->get_folder());
-    connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
-    return new_category;
 }
 
 /**
@@ -119,7 +106,7 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
     menu->addAction("Delete", this, &BookmarkList::remove_item);
     menu->addSeparator();
     if (m_container_type == UNSORTED) {
-        menu->addAction("New category", this, [this]{ add_new_folder("Category " +  QString::number(category_cnt++));});
+        menu->addAction("New category", this, [this]{ add_category("Category " +  QString::number(category_cnt++));});
     }
     menu->exec(mapToGlobal(pos));
     delete menu;
@@ -128,7 +115,7 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
 /**
  * @brief BookmarkList::bookmark_drop
  * Creates the new bookmark item and inserts it in the correct index in the bookmark list
- * @param source : The source list where the bookmark awas located before. Used to get current item
+ * @param source : The source list where the bookmark was located before. Used to get current item
  * @param event
  */
 void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
@@ -224,7 +211,7 @@ void BookmarkList::remove_item() {
     msg_box.setIcon(QMessageBox::Warning);
     msg_box.setMinimumSize(315,125);
     msg_box.setText("Deleting item\n"
-                    "this will delete all bookmarks in the categories");
+                    "This will delete all bookmarks in the categories");
     msg_box.setInformativeText("Are you sure?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msg_box.setDefaultButton(QMessageBox::No);
@@ -234,20 +221,27 @@ void BookmarkList::remove_item() {
     if (currentItem()->type() == BOOKMARK) {
         BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
         Bookmark* b_mark = bm_item->get_bookmark();
+        // TODO remove
         b_mark->get_video_project()->remove_bookmark(b_mark);
+        b_mark->get_project()->remove_bookmark(b_mark);
         delete bm_item;
     } else if (currentItem()->type() == CONTAINER) {
         BookmarkCategory* cat_item = dynamic_cast<BookmarkCategory*>(currentItem());
         // Remove all bookmarks from the disputed list
         for (auto bm_item : cat_item->get_disputed()) {
             Bookmark* b_mark = bm_item->get_bookmark();
+            // TODO remove
             b_mark->get_video_project()->remove_bookmark(b_mark);
+            b_mark->get_project()->remove_bookmark(b_mark);
         }
         // Remove all bookmarks from the references list
         for (auto bm_item : cat_item->get_references()) {
             Bookmark* b_mark = bm_item->get_bookmark();
+            // TODO remove
             b_mark->get_video_project()->remove_bookmark(b_mark);
+            b_mark->get_project()->remove_bookmark(b_mark);
         }
+        cat_item->get_project()->remove_category(cat_item);
         delete currentItem();
     }
 }
@@ -287,7 +281,7 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
 //        delete menu;
     } else if (event->button() == Qt::RightButton) {
         QMenu* menu = new QMenu;
-        menu->addAction("New category", this, &BookmarkList::add_new_folder);
+        menu->addAction("New category", this, [this]{ add_category("Category " +  QString::number(category_cnt++));});
         menu->exec(mapToGlobal(event->pos()));
         delete menu;
     } else {

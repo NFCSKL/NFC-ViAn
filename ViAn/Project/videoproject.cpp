@@ -259,6 +259,8 @@ void VideoProject::remove_analysis(BasicAnalysis *analysis) {
  * @brief VideoProject::add_bookmark
  * @param bookmark
  * Add new bookmark.
+ *
+ * TODO remove
  */
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));

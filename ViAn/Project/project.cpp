@@ -76,6 +76,7 @@ void Project::remove_video_project(VideoProject* vid_proj){
 }
 
 void Project::add_bookmark(Bookmark* bmark) {
+    bmark->set_project(this);
     m_bookmarks.push_back(bmark);
     m_unsaved_changes = true;
 }
@@ -90,6 +91,7 @@ void Project::remove_bookmark(Bookmark* bmark) {
 }
 
 void Project::add_category(BookmarkCategory* cat) {
+    cat->set_project(this);
     m_categories.push_back(cat);
     m_unsaved_changes = true;
 }
@@ -165,6 +167,7 @@ void Project::read(const QJsonObject& json){
     m_file = full_path();
     m_dir = m_file.left(m_file.lastIndexOf("/")+1);
     m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER;
+
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -173,7 +176,30 @@ void Project::read(const QJsonObject& json){
         v->read(json_vid_proj);
         add_video_project(v);
         v->reset_root_dir(m_dir);
-    }    
+    }
+
+    // Read bookmarks from json
+    QJsonArray json_bookmarks = json["bookmarks"].toArray();
+    for (int i = 0; i < json_bookmarks.size(); ++i) {
+        QJsonObject json_bmark = json_bookmarks[i].toObject();
+        Bookmark* bmark = new Bookmark();
+        bmark->read(json_bmark);
+        add_bookmark(bmark);
+        bmark->reset_root_dir(m_dir);
+    }
+
+    // Read categories from json
+    QJsonArray json_cats = json["categories"].toArray();
+    for (int i = 0; i < json_cats.size(); ++i) {
+        QJsonObject json_category = json_cats[i].toObject();
+
+        QString name = json["name"].toString();
+        int index = json["index"].toInt();
+
+        BookmarkCategory* new_category = new BookmarkCategory(name, 1);
+        new_category->set_index(index);
+        add_category(new_category);
+    }
     m_unsaved_changes = false;
 }
 
@@ -184,15 +210,36 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     json["name"] = m_name;
-    json["root_dir"] =  m_dir;
-    QJsonArray json_proj;
+    json["root_dir"] = m_dir;
+
     // Write Videos to json
+    QJsonArray json_proj;
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         QJsonObject json_vid_proj;
         (*it)->write(json_vid_proj);
         json_proj.append(json_vid_proj);
     }
     json["videos"] = json_proj;
+
+    // Write Bookmarks to json
+    QJsonArray json_bmarks;
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
+        QJsonObject json_bmark;
+        (*it)->write(json_bmark);
+        json_bmarks.append(json_bmark);
+    }
+    json["bookmarks"] = json_bmarks;
+
+    // Write Categories to json
+    QJsonArray json_cats;
+    for(auto it = m_categories.begin(); it != m_categories.end(); it++){
+        QJsonObject json_categories;
+        json["name"] = (*it)->get_name();
+        json["index"] = (*it)->get_index();
+        json_cats.append(json_categories);
+    }
+    json["categories"] = json_cats;
+
     m_unsaved_changes = false;
 }
 

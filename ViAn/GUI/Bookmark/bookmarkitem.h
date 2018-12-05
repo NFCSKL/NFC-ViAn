@@ -8,7 +8,7 @@ class BookmarkItem : public QListWidgetItem {
     QString hover_text;
 public:
     BookmarkItem(Bookmark *bookmark, int type = 1);
-    ~BookmarkItem();
+    ~BookmarkItem() override;
     Bookmark* get_bookmark();
     int get_frame_number();
     QString get_file_path();
@@ -19,6 +19,7 @@ public:
     QString get_time() const;
 
 private:
+    friend bool operator<(const QListWidgetItem& other);
     Bookmark* m_bookmark = nullptr;
 };
 

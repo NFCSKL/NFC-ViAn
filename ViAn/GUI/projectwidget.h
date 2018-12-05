@@ -51,7 +51,6 @@ signals:
     void selected_media();
     void marked_video_state(VideoProject *vid_proj, VideoState state);
     void set_project(Project*);
-    void load_bookmarks(VideoProject* vid_proj);
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);

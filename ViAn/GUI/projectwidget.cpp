@@ -1571,7 +1571,7 @@ bool ProjectWidget::open_project(QString project_path) {
     }
     m_proj = new_proj;
     set_status_bar("Opening project");
-\
+
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
@@ -1580,7 +1580,6 @@ bool ProjectWidget::open_project(QString project_path) {
     emit set_project(m_proj);
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
-        emit load_bookmarks(vid_proj);
 
         if (vid_proj->get_video()->is_sequence()) continue;
         video_list.push_back(vid_proj->get_video());
