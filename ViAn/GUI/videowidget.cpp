@@ -1655,19 +1655,12 @@ void VideoWidget::update_zoom_preview_size(QSize s) {
  * and updates the frame processor so that the viewport will center around that position.
  * @param click_pos:    The coordinate where the click occured (zoom preview coordinates)
  */
-void VideoWidget::translate_zoom_from_preview_click(QPoint click_pos, bool pan) {
+void VideoWidget::translate_zoom_from_preview_click(QPoint click_pos) {
     update_processing_settings([&](){
         double scale_factor =  z_settings.frame_size.width() / static_cast<double>(z_settings.preview_window_size.width());
         QPoint scaled = click_pos * scale_factor;
-        if (pan){
-            z_settings.x_movement = scaled.x();
-            z_settings.y_movement = scaled.y();
-        }
-//        } else {
-//            z_settings.center = scaled;
-//            z_settings.zoom_step = 0;
-//            z_settings.do_point_zoom =true;
-//        }
+        z_settings.x_movement = scaled.x();
+        z_settings.y_movement = scaled.y();
     });
 }
 

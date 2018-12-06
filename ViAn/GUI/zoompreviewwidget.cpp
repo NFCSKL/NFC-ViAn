@@ -19,10 +19,6 @@ void ZoomPreviewWidget::center_image(const QSize &s) {
     }
 }
 
-void ZoomPreviewWidget::handle_mouse(const QPoint &pos) {
-    qDebug() << pos;
-}
-
 ZoomPreviewWidget::ZoomPreviewWidget(QWidget *parent) : QWidget(parent) {
     setMinimumSize(QSize(200,100));
 }
@@ -47,11 +43,13 @@ void ZoomPreviewWidget::resizeEvent(QResizeEvent *event) {
     emit window_size(event->size());
 }
 
+/**
+ * @brief ZoomPreviewWidget::mousePressEvent
+ * Event for when the widget is clicked
+ * @param event
+ */
 void ZoomPreviewWidget::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
-        panning = false;
-        emit pan_translation(event->pos(), false);
-    } else if (event->button() == Qt::RightButton) {
         panning = true;
         start_point = event->pos();
     } else {
@@ -59,11 +57,16 @@ void ZoomPreviewWidget::mousePressEvent(QMouseEvent *event) {
     }
 }
 
+/**
+ * @brief ZoomPreviewWidget::mouseMoveEvent
+ * Event for when the mouse (pressed) is dragged inside the widget
+ * @param event
+ */
 void ZoomPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
     if (!panning) return;
     QPoint movement = event->pos() - start_point;
     start_point = event->pos();
-    emit pan_translation(movement, true);
+    emit pan_translation(movement);
 }
 
 /**
