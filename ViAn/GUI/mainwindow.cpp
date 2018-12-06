@@ -164,6 +164,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize videoedit widget
     VideoEditWidget *videoedit_wgt = new VideoEditWidget;
+//    VideoEditList *videoedit_wgt = new VideoEditList;
     videoedit_dock->setWidget(videoedit_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
 

@@ -8,7 +8,8 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
 {
 
 
-    QPushButton* generate_video = new QPushButton(tr("Generate video"));
+
+    QPushButton* generate_video_btn = new QPushButton(tr("Generate video"));
 
     videoedit_list = new VideoEditList();
     scroll_area = new QScrollArea();
@@ -20,6 +21,7 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
     layout = new QVBoxLayout();
     layout->setAlignment(Qt::AlignBottom);
     layout->addWidget(scroll_area);
-    layout->addWidget(generate_video);
+    layout->addWidget(generate_video_btn);
+    setLayout(layout);
 
 }
