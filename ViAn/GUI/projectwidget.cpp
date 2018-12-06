@@ -1295,7 +1295,8 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
             removed_sequences.push_back(v_proj);
         } else {
             auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
-            video_list.erase(video_it);
+            if (video_it != video_list.end())
+                video_list.erase(video_it);
             delete v_proj;
         }
         m_proj->set_unsaved(true);
