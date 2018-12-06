@@ -131,6 +131,7 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
     } else {
         insertItem(index, bm_item);
     }
+    sortItems();
     event->acceptProposedAction();
 }
 

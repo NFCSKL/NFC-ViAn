@@ -95,10 +95,12 @@ void BookmarkItem::update_description(const QString& text) {
     }
 }
 
-bool QListWidgetItem::operator<(const QListWidgetItem& other) {
-    BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(&other));
-    qDebug() << this->m_bookmark->get_index() << b_item->get_bookmark()->get_index();
-    bool res = this->m_bookmark->get_index() < b_item->get_bookmark()->get_index();
-    qDebug() << "result" << res;
-    return res;
-}
+//bool QListWidgetItem::operator<(const QListWidgetItem& other) const {
+//    qDebug() << "item";
+//    BookmarkItem* b_item1 = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(this));
+//    BookmarkItem* b_item2 = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(&other));
+//    int index1 = b_item1->get_bookmark()->get_index();
+//    int index2 = b_item2->get_bookmark()->get_index();
+//    bool res = index1 < index2;
+//    return res;
+//}

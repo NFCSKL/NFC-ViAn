@@ -40,7 +40,7 @@ class BookmarkCategory : public QObject, public QListWidgetItem {
     QWidget* folder = new QWidget();
 
 public:
-    explicit BookmarkCategory(QString name, int type = 0);
+    explicit BookmarkCategory(QString name, int type = 1);
     ~BookmarkCategory();
     // Add item to disp or ref list
     void add_disp_item(BookmarkItem* bm);

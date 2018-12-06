@@ -98,6 +98,7 @@ void BookmarkWidget::add_to_container(BookmarkItem *bm_item, int type) {
             } else if (type == REFERENCE) {
                 cat->add_ref_item(bm_item);
             }
+            return;
         }
     }
 }
@@ -167,7 +168,6 @@ void BookmarkWidget::load_bookmarks() {
     }
 
     for (Bookmark* bm : m_proj->get_bookmarks()) {
-        int index = bm->get_index();
         // Load thumbnail TODO add check for file
         QString t_path = bm->get_thumbnail_path();
         BookmarkItem* bm_item = new BookmarkItem(bm, BOOKMARK);
@@ -176,8 +176,6 @@ void BookmarkWidget::load_bookmarks() {
         switch (bm->get_type()) {
         case UNSORTED:
             bm_list->addItem(bm_item);
-            //bm_list->insertItem(index, bm_item);
-            bm_list->sortItems();
             break;
         case DISPUTED:
             add_to_container(bm_item, DISPUTED);
@@ -187,6 +185,7 @@ void BookmarkWidget::load_bookmarks() {
             break;
         }
     }
+    bm_list->sortItems();
 }
 
 void BookmarkWidget::save_item_data() {

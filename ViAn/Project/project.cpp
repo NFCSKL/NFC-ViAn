@@ -193,8 +193,8 @@ void Project::read(const QJsonObject& json){
     for (int i = 0; i < json_cats.size(); ++i) {
         QJsonObject json_category = json_cats[i].toObject();
 
-        QString name = json["name"].toString();
-        int index = json["index"].toInt();
+        QString name = json_category["name"].toString();
+        int index = json_category["index"].toInt();
 
         BookmarkCategory* new_category = new BookmarkCategory(name, 1);
         new_category->set_index(index);
@@ -233,10 +233,10 @@ void Project::write(QJsonObject& json){
     // Write Categories to json
     QJsonArray json_cats;
     for(auto it = m_categories.begin(); it != m_categories.end(); it++){
-        QJsonObject json_categories;
-        json["name"] = (*it)->get_name();
-        json["index"] = (*it)->get_index();
-        json_cats.append(json_categories);
+        QJsonObject json_category;
+        json_category["name"] = (*it)->get_name();
+        json_category["index"] = (*it)->get_index();
+        json_cats.append(json_category);
     }
     json["categories"] = json_cats;
 

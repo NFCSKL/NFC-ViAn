@@ -164,4 +164,25 @@ void BookmarkCategory::on_text_edited(QString name){
     m_name = name;
 }
 
+bool QListWidgetItem::operator<(const QListWidgetItem& other) const {
+    qDebug() << "category";
+    int index1, index2;
+    if (this->type() == 1) {    // Type = container
+        BookmarkCategory* c_item1 = dynamic_cast<BookmarkCategory*>(const_cast<QListWidgetItem*>(this));
+        index1 = c_item1->get_index();
+    } else {
+        BookmarkItem* b_item1 = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(this));
+        index1 = b_item1->get_bookmark()->get_index();
+    }
 
+    if (other.type() == 1) {    // Type = container
+        BookmarkCategory* c_item1 = dynamic_cast<BookmarkCategory*>(const_cast<QListWidgetItem*>(&other));
+        index2 = c_item1->get_index();
+    } else {
+        BookmarkItem* b_item1 = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(&other));
+        index2 = b_item1->get_bookmark()->get_index();
+    }
+
+    bool res = index1 < index2;
+    return res;
+}

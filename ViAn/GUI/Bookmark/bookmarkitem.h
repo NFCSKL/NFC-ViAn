@@ -19,7 +19,6 @@ public:
     QString get_time() const;
 
 private:
-    friend bool operator<(const QListWidgetItem& other);
     Bookmark* m_bookmark = nullptr;
 };
 
