@@ -7,8 +7,6 @@
 VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
 {
 
-
-
     QPushButton* generate_video_btn = new QPushButton(tr("Generate video"));
 
     videoedit_list = new VideoEditList();
