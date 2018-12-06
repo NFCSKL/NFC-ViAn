@@ -14,6 +14,7 @@
 
 class FrameManipulator;
 class Overlay;
+class VideoState;
 
 struct video_sync;
 
@@ -169,6 +170,7 @@ class FrameProcessor : public QObject {
     FrameManipulator m_manipulator;
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
+    VideoState* current_state = new VideoState;
 
     bool has_new_zoom_state{false};
     std::atomic_bool* m_abort;
@@ -200,6 +202,7 @@ private:
     void reset_settings();
     void load_zoomer_state();
     void emit_zoom_data();
+    void update_current_state();
 };
 
 #endif // FRAMEPROCESSOR_H

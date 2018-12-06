@@ -91,7 +91,8 @@ SOURCES += main.cpp \
     GUI/viewpathdialog.cpp \
     GUI/viewpathitem.cpp \
     GUI/settingsdialog.cpp \
-    constants.cpp
+    constants.cpp \
+    Project/videostate.cpp
 
 #
 # TEST
@@ -173,7 +174,8 @@ HEADERS += reportgenerator.h\
     GUI/viewpathdialog.h \
     GUI/viewpathitem.h \
     GUI/settingsdialog.h \
-    constants.h
+    constants.h \
+    Project/videostate.h
 
 #
 # LIBRARY

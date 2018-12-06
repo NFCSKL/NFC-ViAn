@@ -1,15 +1,11 @@
-#ifndef VIDEO_H
-#define VIDEO_H
+#ifndef VIDEOSTATE_H
+#define VIDEOSTATE_H
 
 #include "constants.h"
 #include "Filehandler/saveable.h"
 
-#include "opencv2/core/core.hpp"
-
-#include <QJsonObject>
-#include <QPoint>
-
-struct VideoState {
+struct VideoState : Writeable
+{
     int frame = 0;
     double contrast = Constants::CONTRAST_DEFAULT;
     int brightness = Constants::BRIGHTNESS_DEFAULT;
@@ -20,6 +16,7 @@ struct VideoState {
     // Center point is relative the rotation
     QPoint center = QPoint(-1,-1);
     bool video = false;
+    // Some kind of video
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;
@@ -32,34 +29,8 @@ struct VideoState {
         center = rh.center;
         video = rh.video;
     }
-};
-
-class VideoState;
-
-typedef int ID;
-class Video : Writeable{
-protected:
-    QString m_name;
-    bool m_is_sequence;
-    bool m_is_saved{false};
-    int m_width, m_height = 0;
-public:
-    VideoState* state;
-public:
-    Video(const bool& is_sequence=false);
-    Video(QString file_path, const bool& is_sequence=false);
-    ~Video();
-    QString file_path;
-    QString get_name();
-    void set_name(const QString &new_name);
-    bool is_sequence();
-    bool is_saved();
-    int get_width();
-    int get_height();
-    void set_size(int width, int height);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
-    friend bool operator==(Video v1, Video v2);
 };
 
-#endif // VIDEO_H
+#endif // VIDEOSTATE_H

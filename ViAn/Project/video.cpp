@@ -1,4 +1,5 @@
 #include "video.h"
+#include "Project/videostate.h"
 #include "utility.h"
 
 /**
