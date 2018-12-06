@@ -86,6 +86,7 @@ BookmarkCategory* BookmarkWidget::add_new_folder(QString name) {
     bm_list->setItemWidget(new_category, new_category->get_folder());
     m_proj->add_category(new_category);
     connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
+    bm_list->update_index();
     return new_category;
 }
 
@@ -134,6 +135,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
     bm_list->addItem(bm_item);
+    bm_list->update_index();
 
     // If just added the first bookmark
     if (bm_list->count() == 1) {
@@ -189,24 +191,7 @@ void BookmarkWidget::load_bookmarks() {
 }
 
 void BookmarkWidget::save_item_data() {
-    for (int i = 0; i < bm_list->count(); ++i) {
-        QListWidgetItem* item = bm_list->item(i);
-        int index = bm_list->row(item);
-        switch (item->type()) {
-        case CONTAINER: {
-            BookmarkCategory* cat_item = dynamic_cast<BookmarkCategory*>(item);
-            cat_item->update_index(index);
-            break;
-        }
-        case BOOKMARK: {
-            BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
-            b_item->get_bookmark()->set_index(index);
-            break;
-        }
-        default:
-            break;
-        }
-    }
+    bm_list->update_index();
 }
 
 void BookmarkWidget::set_project(Project* proj) {

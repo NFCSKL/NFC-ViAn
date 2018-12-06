@@ -16,7 +16,7 @@ class BookmarkList : public QListWidget{
     QListWidgetItem* clicked_item = nullptr;
 
     QString m_par_cont_name = "";
-    int m_container_type = UNSORTED;
+    int m_list_type = UNSORTED;
     bool m_accept_container = true;
 public:
     BookmarkList(bool accept_container = true, int container_type = UNSORTED, QWidget* parent = nullptr);
@@ -27,12 +27,13 @@ public:
     int category_cnt = 1;
     QString get_parent_name();
     void set_parent_name(QString &name);
+    void update_index();
 public slots:
     void on_parent_name_edited(QString name);
 private:
     void item_right_clicked(const QPoint pos);
-    void bookmark_drop(BookmarkList* source, QDropEvent *event);
-    void container_drop(BookmarkList* source, QDropEvent *event);
+    bool bookmark_drop(QDropEvent *event);
+    bool container_drop(QDropEvent *event);
     void bookmark_copy(BookmarkList* source, QDropEvent* event);
 private slots:
     void rename_item();

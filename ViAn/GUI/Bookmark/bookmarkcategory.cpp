@@ -51,20 +51,9 @@ BookmarkCategory::~BookmarkCategory() {
 
 void BookmarkCategory::update_index(int index) {
     set_index(index);
-    // Update all indexes in the disp_list
-    for (int i = 0; i < disp_list->count(); ++i) {
-        QListWidgetItem* item = disp_list->item(i);
-        int list_index = disp_list->row(item);
-        BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
-        b_item->get_bookmark()->set_index(list_index);
-    }
-    // Update all indexes in the ref_list
-    for (int i = 0; i < ref_list->count(); ++i) {
-        QListWidgetItem* item = ref_list->item(i);
-        int list_index = ref_list->row(item);
-        BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
-        b_item->get_bookmark()->set_index(list_index);
-    }
+    // Update all indexes in the disp and ref list
+    disp_list->update_index();
+    ref_list->update_index();
 }
 
 void BookmarkCategory::set_index(int index) {
@@ -165,7 +154,6 @@ void BookmarkCategory::on_text_edited(QString name){
 }
 
 bool QListWidgetItem::operator<(const QListWidgetItem& other) const {
-    qDebug() << "category";
     int index1, index2;
     if (this->type() == 1) {    // Type = container
         BookmarkCategory* c_item1 = dynamic_cast<BookmarkCategory*>(const_cast<QListWidgetItem*>(this));

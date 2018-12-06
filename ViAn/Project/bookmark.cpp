@@ -206,6 +206,7 @@ void Bookmark::read(const QJsonObject& json){
     m_index = json["index"].toInt();
     m_type = json["type"].toInt();
     m_container_name = json["container"].toString();
+    m_image_name = json["image name"].toString();
 
     VideoState state;
     state.frame = json["frame"].toInt();
@@ -238,6 +239,7 @@ void Bookmark::write(QJsonObject& json){
     json["index"] = m_index;
     json["container"] = m_container_name;
     json["type"] = m_type;
+    json["image name"] = m_image_name;
 
     json["frame"] = m_state.frame;
     json["scale_factor"] = m_state.scale_factor;

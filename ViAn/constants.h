@@ -46,7 +46,6 @@ namespace Constants {
 
     const std::string MOTION_DET_STR = "-motion_analysis";
     const QString NEW_STR = " (NEW!)";
-    const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
 
     const int PAN_FACTOR = 20;
     const double ZOOM_STEP = 1.1;
