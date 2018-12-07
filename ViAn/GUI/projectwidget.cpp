@@ -595,6 +595,7 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
                 v_item->load_sequence_items();
             }
         }
+        setCurrentItem(item);
     }
 }
 

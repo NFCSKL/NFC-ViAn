@@ -382,7 +382,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     }
     // TODO This is to prevent crash when clicking bookmark before loading video
     // This should get a better fix later
-    if (!m_vid_proj) {
+    if (!m_vid_proj || !m_vid_proj->get_overlay()) {
         painter.end();
         return;
     }
