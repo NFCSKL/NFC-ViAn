@@ -2,18 +2,21 @@
 
 #include "constants.h"
 #include "overlay.h"
-#include "Project/videostate.h"
 #include "utility.h"
 #include "Video/videoplayer.h"
+#include "Project/video.h"
 
 #include <QDebug>
 
 #include <mutex>
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
-                               zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                               std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
+                               zoomer_settings* z_settings, std::atomic_int* width,
+                               std::atomic_int* height, std::atomic_bool* new_frame_video,
+                               manipulation_settings* m_settings, video_sync* v_sync,
+                               std::atomic_int* frame_index, overlay_settings* o_settings,
+                               std::atomic_bool* overlay_changed, std::atomic_bool *abort,
+                               VideoState *state) {
     m_new_frame = new_frame;
 
     m_overlay_changed = overlay_changed;
@@ -29,6 +32,9 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     m_abort = abort;
+    m_state = state;
+
+    current_state = new VideoState();
 }
 
 FrameProcessor::~FrameProcessor() {
@@ -208,6 +214,7 @@ void FrameProcessor::process_frame() {
     update_current_state();
 
     // Emit manipulated frame and current frame number
+    emit send_current_state(current_state);
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
@@ -216,7 +223,6 @@ void FrameProcessor::process_frame() {
  * @brief FrameProcessor::load_zoomer_state
  */
 void FrameProcessor::load_zoomer_state() {
-    m_z_settings->set_state = false;
     m_zoomer.load_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation);
 
     if (m_z_settings->rotation == Constants::DEGREE_MIN) {
@@ -259,6 +265,7 @@ void FrameProcessor::update_zoomer_settings() {
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
     else if (m_z_settings->set_state) {
         load_zoomer_state();
+        m_z_settings->set_state = false;
     }
     // Center the zoom rect
     else if (m_z_settings->do_point_zoom) {

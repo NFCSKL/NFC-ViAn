@@ -1,26 +1,24 @@
 #include "tagframe.h"
 
-#include "Project/videostate.h"
-
 #include <QDebug>
 
 TagFrame::TagFrame(int frame) {
     m_frame = frame;
 }
 
-TagFrame::TagFrame(int frame, VideoState *state) {
+TagFrame::TagFrame(int frame, VideoState state) {
     m_frame = frame;
     m_state = state;
 }
 
 TagFrame::~TagFrame() {
-    delete m_state;
+
 }
 
 void TagFrame::update_color_correction(int b, double c, double g) {
-    m_state->brightness = b;
-    m_state->contrast = c;
-    m_state->gamma = g;
+    m_state.brightness = b;
+    m_state.contrast = c;
+    m_state.gamma = g;
 }
 
 void TagFrame::read(const QJsonObject &json) {

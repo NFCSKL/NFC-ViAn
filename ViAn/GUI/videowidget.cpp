@@ -187,7 +187,9 @@ void VideoWidget::init_video_controller(){
  */
 void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed, &m_abort_processor);
+                                     &video_height, &new_frame_video, &m_settings, &v_sync,
+                                     &frame_index, &o_settings, &overlay_changed, &m_abort_processor,
+                                     m_state);
 
     try {
         processing_thread = new QThread(this);
@@ -196,6 +198,7 @@ void VideoWidget::init_frame_processor() {
         connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
         connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
+        connect(f_processor, &FrameProcessor::send_current_state, this, &VideoWidget::set_current_state);
 
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
         connect(scroll_area, &DrawScrollArea::new_size, this, &VideoWidget::set_draw_area_size);
@@ -555,6 +558,8 @@ void VideoWidget::stop_btn_clicked() {
  * @brief VideoWidget::next_frame_clicked
  */
 void VideoWidget::next_frame_clicked() {
+    qDebug() << "anchor" << current_state->anchor;
+    qDebug() << "frame" << current_state->frame;
     if (analysis_only) {
         if (playback_slider->is_poi_end(frame_index.load())) {
             next_poi_btn_clicked();
@@ -1485,6 +1490,7 @@ void VideoWidget::set_zoom_factor(double scale_factor) {
  * @param state
  */
 void VideoWidget::set_state(VideoState state) {
+    qDebug() << "Set state";
     update_processing_settings([&](){
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;
@@ -1496,6 +1502,9 @@ void VideoWidget::set_state(VideoState state) {
         m_settings.contrast = state.contrast;
         m_settings.gamma = state.gamma;
         frame_index.store(state.frame);
+
+        m_state = &state;
+
     });
 }
 
@@ -1647,6 +1656,10 @@ void VideoWidget::update_zoom_preview_size(QSize s) {
     update_processing_settings([&](){
         z_settings.preview_window_size = s;
     });
+}
+
+void VideoWidget::set_current_state(VideoState* state) {
+    current_state = state;
 }
 
 void VideoWidget::speed_up_activate() {

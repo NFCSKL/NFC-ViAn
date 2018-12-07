@@ -41,6 +41,8 @@ class TagFrame;
 class VideoController;
 class VideoProject;
 
+struct VideoState;
+
 class VideoWidget : public QWidget
 {
     Q_OBJECT
@@ -58,6 +60,8 @@ private:
     manipulation_settings m_settings;
     overlay_settings o_settings;
     video_sync v_sync;
+
+    VideoState* m_state;
 
     QString m_video_path;
 
@@ -205,6 +209,7 @@ public slots:
     void update_playback_speed(int speed);
     void set_brightness_contrast(int bri, double cont, double gamma);
     void update_zoom_preview_size(QSize s);
+    void set_current_state(VideoState* state);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
@@ -266,6 +271,7 @@ private:
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
     Interval* m_current_interval = nullptr;
+    VideoState* current_state = nullptr;
 
     bool m_floating = false;
     bool frame_is_clean = false;

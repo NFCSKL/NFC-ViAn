@@ -14,8 +14,8 @@
 
 class FrameManipulator;
 class Overlay;
-class VideoState;
 
+struct VideoState;
 struct video_sync;
 
 /**
@@ -156,6 +156,8 @@ class FrameProcessor : public QObject {
     // VIDEO SYNC
     video_sync* m_v_sync;
 
+    VideoState* m_state;
+
     // Constants for the directions of the rotation.
     int const ROTATE_90 = 0, ROTATE_180 = 1, ROTATE_270 = 2, ROTATE_NONE = 3;
     // The limits of the rotation. This should not include the no-rotaion option.
@@ -170,15 +172,19 @@ class FrameProcessor : public QObject {
     FrameManipulator m_manipulator;
     // Overlay to draw on frame
     Overlay* m_overlay = nullptr;
-    VideoState* current_state = new VideoState;
+
+    VideoState* current_state = nullptr;
 
     bool has_new_zoom_state{false};
     std::atomic_bool* m_abort;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
-                   zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                   std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                   std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed, std::atomic_bool *abort);
+                   zoomer_settings* z_settings, std::atomic_int* width,
+                   std::atomic_int* height, std::atomic_bool* new_frame_video,
+                   manipulation_settings* m_settings, video_sync* v_sync,
+                   std::atomic_int* frame_index, overlay_settings *o_settings,
+                   std::atomic_bool *overlay_changed, std::atomic_bool *abort,
+                   VideoState* state);
     ~FrameProcessor();
 
 public slots:
@@ -192,6 +198,7 @@ signals:
     void set_bri_cont(int, double, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
     void zoom_preview(cv::Mat preview_frame);
+    void send_current_state(VideoState* state);
 private:
     void process_frame();
     void update_zoomer_settings();

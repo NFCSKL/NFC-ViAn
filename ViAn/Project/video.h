@@ -9,7 +9,7 @@
 #include <QJsonObject>
 #include <QPoint>
 
-struct VideoState {
+struct VideoState : Writeable{
     int frame = 0;
     double contrast = Constants::CONTRAST_DEFAULT;
     int brightness = Constants::BRIGHTNESS_DEFAULT;
@@ -20,6 +20,8 @@ struct VideoState {
     // Center point is relative the rotation
     QPoint center = QPoint(-1,-1);
     bool video = false;
+    // Some kind of video, either the v_proj or path
+
     VideoState(){}
     VideoState(VideoState&rh){
         frame = rh.frame;
@@ -32,9 +34,11 @@ struct VideoState {
         center = rh.center;
         video = rh.video;
     }
+    virtual void read(const QJsonObject& json);
+    virtual void write(QJsonObject& json);
 };
 
-class VideoState;
+//class VideoState;
 
 typedef int ID;
 class Video : Writeable{
@@ -44,7 +48,7 @@ protected:
     bool m_is_saved{false};
     int m_width, m_height = 0;
 public:
-    VideoState* state;
+    VideoState state;
 public:
     Video(const bool& is_sequence=false);
     Video(QString file_path, const bool& is_sequence=false);
