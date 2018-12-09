@@ -457,6 +457,8 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     emit set_status_bar("Video added: " + vid_name);
     // Add analysis and tag
     add_analyses_to_item(vid_item);
+
+    setCurrentItem(vid_item);
 }
 
 /**
