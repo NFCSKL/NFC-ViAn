@@ -22,4 +22,7 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
     layout->addWidget(generate_video_btn);
     setLayout(layout);
 
+    connect(generate_video_btn, &QPushButton::clicked, videoedit_list, &VideoEditList::generate_video);
+
+
 }
