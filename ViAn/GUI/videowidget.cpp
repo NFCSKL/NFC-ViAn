@@ -1271,13 +1271,6 @@ void VideoWidget::on_playback_stopped(){
  *  Functions changing synchronized settings
  */
 
-// TODO unused
-void VideoWidget::set_overlay(Overlay *overlay) {
-    update_overlay_settings([&](){
-        o_settings.overlay = overlay;
-    });
-}
-
 void VideoWidget::set_overlay_removed() {
     update_overlay_settings([&](){
         o_settings.overlay_removed = true;

@@ -7,6 +7,7 @@
 #include <QPoint>
 
 Circle::Circle() : Shapes(SHAPES::CIRCLE) {
+    m_name = "Circle";
 }
 
 /**
@@ -15,28 +16,10 @@ Circle::Circle() : Shapes(SHAPES::CIRCLE) {
  * @param pos Starting point for the new object
  */
 Circle::Circle(QColor col, QPoint pos) : Shapes(SHAPES::CIRCLE, col, pos) {
+    m_name = "Circle";
 }
 
 Circle::~Circle() {}
-
-/**
- * @brief Circle::draw
- * Draws the object on top of the specified frame.
- * @param frame Frame to draw on.
- * @return Returns the frame with drawing.
- */
-cv::Mat Circle::draw(cv::Mat &frame) {
-    int diff = draw_end.x - draw_start.x;
-    if (diff <= 2 && diff >= -2) {
-        draw_end = cv::Point(draw_end.x+(3-diff), draw_end.y);
-    }
-    cv::Rect rect(draw_start, draw_end);
-    cv::Size size = rect.size();
-    cv::Point center = (rect.br() + rect.tl())/2;
-    cv::RotatedRect bounding_rect(center, size, 0);
-    cv::ellipse(frame, bounding_rect, color, thickness);
-    return frame;
-}
 
 /**
  * @brief Circle::draw_scaled
@@ -67,14 +50,6 @@ void Circle::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
-QString Circle::get_name() {
-    return m_name;
-}
-
-void Circle::set_name(QString name) {
-    m_name = name;
-}
-
 /**
  * @brief Circle::write
  * @param json
@@ -82,7 +57,6 @@ void Circle::set_name(QString name) {
  */
 void Circle::write(QJsonObject& json) {
     write_shape(json);
-    json["name"] = m_name;
 }
 
 /**
@@ -92,5 +66,4 @@ void Circle::write(QJsonObject& json) {
  */
 void Circle::read(const QJsonObject& json) {
     read_shape(json);
-    m_name = json["name"].toString();
 }
