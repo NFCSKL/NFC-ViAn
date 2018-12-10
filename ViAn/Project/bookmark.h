@@ -19,6 +19,7 @@ class Bookmark : public Writeable {
     friend class BookmarkTest;
     VideoProject* m_vid_proj = nullptr;   // TODO need?
     Project* m_proj = nullptr;
+    int m_vid_proj_id;
 
     QString m_time = "";               // Time of the bookmark (format "mm:ss")
     QString m_description = "";    // Description for the bookmark, given by user
@@ -41,6 +42,8 @@ public:
     ~Bookmark();
     ID get_id();
     void set_id(ID id);
+    int get_vid_proj_id();
+    void set_vid_proj_id(int new_id);
     int get_index();
     void set_index(int index);
     int get_type();

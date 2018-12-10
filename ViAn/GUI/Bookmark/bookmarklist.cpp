@@ -150,7 +150,6 @@ bool BookmarkList::bookmark_drop(QDropEvent *event) {
     BookmarkItem* bm_item = cast_item->copy();
     int index = row(itemAt(event->pos()+QPoint(0, Constants::THUMBNAIL_SIZE/2)));
     bm_item->update_item(index, m_par_cont_name, m_list_type);
-    qDebug() << "new index" << index;
     insertItem(index, bm_item);
 
     event->acceptProposedAction();
@@ -176,7 +175,6 @@ bool BookmarkList::container_drop(QDropEvent *event) {
     BookmarkCategory* cat_item = cast_item->copy();
     int index = row(itemAt(event->pos()+QPoint(0, Constants::THUMBNAIL_SIZE/2)));
     cat_item->set_index(index);
-    qDebug() << "new index" << index;
     insertItem(index, cat_item);
 
     setItemWidget(cat_item, cat_item->get_folder());
@@ -282,7 +280,8 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
         clicked_item = itemAt(event->pos());
         setCurrentItem(clicked_item);
         if (clicked_item->type() == 0) {
-            qDebug() << dynamic_cast<BookmarkItem*>(clicked_item)->get_bookmark()->get_index();
+            auto item = dynamic_cast<BookmarkItem*>(clicked_item);
+            qDebug() << item->get_bookmark()->get_index() << item->get_bookmark()->get_vid_proj_id();
         } else {
             qDebug() << dynamic_cast<BookmarkCategory*>(clicked_item)->get_index();
         }
@@ -313,7 +312,6 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
         menu->exec(mapToGlobal(event->pos()));
         delete menu;
     } else {
-        qDebug() << "clear";
         setCurrentItem(nullptr);
     }
 }
@@ -328,12 +326,15 @@ void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     auto item = itemAt(event->pos());
     if (item->type() != BOOKMARK) return;
-    auto b_item = dynamic_cast<BookmarkItem*>(item);
+    BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
+    Bookmark* bmark = b_item->get_bookmark();
 
     // Start video at correct frame
     VideoState state;
-    state = b_item->get_bookmark()->get_state();
-    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), state);
+    state = bmark->get_state();
+
+    VideoProject* parent = bmark->get_project()->get_video_project(bmark->get_vid_proj_id());
+    emit set_bookmark_video(parent, state);
 }
 
 /**

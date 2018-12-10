@@ -56,8 +56,16 @@ Project::~Project(){
 ID Project::add_video_project(VideoProject *vid_proj){
     vid_proj->set_project(this);
     m_videos.push_back(vid_proj);
+    int id;
+    if (vid_proj->get_id() == -1) {
+        vid_proj->set_id(m_vid_count);
+        id = m_vid_count;
+        m_vid_count++;
+    } else {
+        id = vid_proj->get_id();
+    }
     m_unsaved_changes = true;
-    return m_vid_count++;
+    return id;
 }
 
 /**
@@ -167,6 +175,7 @@ void Project::read(const QJsonObject& json){
     m_file = full_path();
     m_dir = m_file.left(m_file.lastIndexOf("/")+1);
     m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER;
+    m_vid_count = json["vid_count"].toInt();
 
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
@@ -211,6 +220,7 @@ void Project::read(const QJsonObject& json){
 void Project::write(QJsonObject& json){
     json["name"] = m_name;
     json["root_dir"] = m_dir;
+    json["vid_count"] = m_vid_count;
 
     // Write Videos to json
     QJsonArray json_proj;
@@ -346,6 +356,22 @@ std::vector<Bookmark*> &Project::get_bookmarks() {
 
 std::vector<BookmarkCategory*> &Project::get_categories() {
     return m_categories;
+}
+
+/**
+ * @brief Project::get_video_project
+ * Get the videoproject with the ID fro mthe list of videoproject.
+ * If the videoproject is not found return nullptr.
+ * @param id
+ * @return
+ */
+VideoProject* Project::get_video_project(int id) {
+    for (auto vp : m_videos) {
+        if (vp->get_id() == id) {
+            return vp;
+        }
+    }
+    return nullptr;
 }
 
 /**

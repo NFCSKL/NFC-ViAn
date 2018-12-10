@@ -125,6 +125,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description, state, time);
     bookmark->m_image_name = file_name;
     bookmark->set_thumbnail_path(thumbnail_path);
+    bookmark->set_vid_proj_id(vid_proj->get_id());
 
     // TODO remove
     // should maybe not need this anymore, since project should hold bookmarks

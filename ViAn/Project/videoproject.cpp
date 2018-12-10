@@ -33,6 +33,14 @@ VideoProject::~VideoProject(){
     delete m_video;
 }
 
+int VideoProject::get_id() const {
+    return id;
+}
+
+void VideoProject::set_id(const int& new_id) {
+    id = new_id;
+}
+
 /**
  * @brief VideoProject::get_video
  * @return video
@@ -139,6 +147,7 @@ void VideoProject::read(const QJsonObject& json){
         new_bookmark->read(json_bookmark);
         add_bookmark(new_bookmark);
     }
+    id = json["ID"].toInt();
     QJsonObject json_overlay = json["overlay"].toObject();
     this->m_overlay->read(json_overlay);
     QJsonArray json_analyses = json["analyses"].toArray();
@@ -202,6 +211,7 @@ void VideoProject::write(QJsonObject& json){
     m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
     m_unsaved_changes = false;
+    json["ID"] = id;
 }
 
 void VideoProject::set_tree_index(std::stack<int> tree_index) {

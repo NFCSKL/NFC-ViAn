@@ -35,6 +35,7 @@ class VideoProject : public Saveable {
     bool m_unsaved_changes = true;
     bool current = false;
 
+    ID id = -1;
 public:
 
     VideoProject(Video* v); //Needs to have a video
@@ -43,7 +44,8 @@ public:
 
     VideoState state;
 
-    Q_DECL_DEPRECATED ID id;
+    int get_id() const;
+    void set_id(const int& new_id);
 
     void read(const QJsonObject& json);
     void write(QJsonObject& json);

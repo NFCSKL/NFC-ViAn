@@ -31,6 +31,7 @@ Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name,
 Bookmark::Bookmark(const Bookmark &bookmark) {
     m_vid_proj = bookmark.m_vid_proj;
     m_proj = bookmark.m_proj;
+    m_vid_proj_id = bookmark.m_vid_proj_id;
     m_time = bookmark.m_time;
     m_description = bookmark.m_description;
     m_state = bookmark.m_state;
@@ -63,6 +64,14 @@ ID Bookmark::get_id() {
 
 void Bookmark::set_id(ID new_id) {
     id = new_id;
+}
+
+int Bookmark::get_vid_proj_id() {
+    return m_vid_proj_id;
+}
+
+void Bookmark::set_vid_proj_id(int new_id) {
+    m_vid_proj_id = new_id;
 }
 
 int Bookmark::get_index() {
@@ -199,6 +208,7 @@ bool Bookmark::remove() {
  * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
+    m_vid_proj_id = json["vid_proj id"].toInt();
     m_time = json["time"].toString();
     m_file = json["path"].toString();
     m_thumbnail_path = json["thumbnail path"].toString();
@@ -232,6 +242,7 @@ void Bookmark::read(const QJsonObject& json){
  * Writes a bookmark to a Json object.
  */
 void Bookmark::write(QJsonObject& json){
+    json["vid_proj id"] = m_vid_proj_id;
     json["time"] = m_time;
     json["path"] = m_file;
     json["thumbnail path"] = m_thumbnail_path;
