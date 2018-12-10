@@ -6,16 +6,15 @@
 
 /**
  * @brief Bookmark::Bookmark
- * @param vid_proj video project for the bookmark
  * @param file_name file name for bookmark
  * @param text Text description of the bookmark.
- * @param frame_nbr Frame number associated with the bookmark.
+ * @param state State of the video containing info like frame number and zoom level.
  * @param time The time in the video associated with the bookmark (format "mm:ss").
+ * @param type The type of the bookmark, which list it is in.
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name,
-                   const QString &text, const VideoState &state,
-                   const QString &time, const int &type){
-    m_vid_proj = vid_proj;
+Bookmark::Bookmark(const QString &file_name, const QString &text,
+                   const VideoState &state, const QString &time,
+                   const int &type){
     m_file = file_name;
     m_description = text;
     m_state = state;
@@ -29,7 +28,6 @@ Bookmark::Bookmark(VideoProject *vid_proj, const QString &file_name,
  * @param bookmark
  */
 Bookmark::Bookmark(const Bookmark &bookmark) {
-    m_vid_proj = bookmark.m_vid_proj;
     m_proj = bookmark.m_proj;
     m_vid_proj_id = bookmark.m_vid_proj_id;
     m_time = bookmark.m_time;
@@ -38,7 +36,7 @@ Bookmark::Bookmark(const Bookmark &bookmark) {
     m_thumbnail_path = bookmark.m_thumbnail_path;
     m_index = bookmark.m_index;
     m_type = bookmark.m_type;
-    m_container_name = bookmark.m_container_name;
+    m_container_id = bookmark.m_container_id;
 
     m_file = bookmark.m_file;
     m_image_name = bookmark.m_image_name;
@@ -56,14 +54,6 @@ Bookmark::Bookmark() {
  * Destructor
  */
 Bookmark::~Bookmark(){
-}
-
-ID Bookmark::get_id() {
-    return id;
-}
-
-void Bookmark::set_id(ID new_id) {
-    id = new_id;
 }
 
 int Bookmark::get_vid_proj_id() {
@@ -112,12 +102,8 @@ VideoState Bookmark::get_state() {
     return m_state;
 }
 
-QString Bookmark::get_container_name() {
-    return m_container_name;
-}
-
-VideoProject *Bookmark::get_video_project() {
-    return m_vid_proj;
+int Bookmark::get_container_id() {
+    return m_container_id;
 }
 
 Project* Bookmark::get_project() {
@@ -142,22 +128,9 @@ void Bookmark::set_description(const QString& text) {
     m_unsaved_changes = true;
 }
 
-void Bookmark::set_container(QString name, int type) {
-    m_container_name = name;
+void Bookmark::set_container(int new_id, int type) {
+    m_container_id = new_id;
     m_type = type;
-    m_unsaved_changes = true;
-}
-
-/**
- * @brief Bookmark::rename_container
- * Changes the name of all the containers with old_name to new_name
- * @param old_name
- * @param new_name
- */
-void Bookmark::rename_container(QString old_name, QString new_name) {
-    if (m_container_name == old_name) {
-        m_container_name = new_name;
-    }
     m_unsaved_changes = true;
 }
 
@@ -175,31 +148,9 @@ QString Bookmark::get_thumbnail_path() {
     return m_thumbnail_path;
 }
 
-/**
- * @brief Bookmark::set_video_project
- * Sets the video project that the bookmark belongs to
- * @param vid_proj
- *
- *  TODO remove
- */
-void Bookmark::set_video_project(VideoProject *vid_proj){
-    m_vid_proj = vid_proj;
-}
-
 void Bookmark::set_project(Project* proj) {
     m_proj = proj;
     m_unsaved_changes = true;
-}
-
-/**
- * @brief Bookmark::remove
- * Returns a bool specifying if the bookmark should be deleted or not
- * @return
- */
-//TODO remove. Only used in functions only used in old tests
-bool Bookmark::remove() {
-    return false;
-
 }
 
 /**
@@ -215,7 +166,7 @@ void Bookmark::read(const QJsonObject& json){
     m_description = json["description"].toString();
     m_index = json["index"].toInt();
     m_type = json["type"].toInt();
-    m_container_name = json["container"].toString();
+    m_container_id = json["container"].toInt();
     m_image_name = json["image name"].toString();
 
     VideoState state;
@@ -248,7 +199,7 @@ void Bookmark::write(QJsonObject& json){
     json["thumbnail path"] = m_thumbnail_path;
     json["description"] = m_description;
     json["index"] = m_index;
-    json["container"] = m_container_name;
+    json["container"] = m_container_id;
     json["type"] = m_type;
     json["image name"] = m_image_name;
 

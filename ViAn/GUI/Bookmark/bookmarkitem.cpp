@@ -30,9 +30,9 @@ BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(bookm
 BookmarkItem::~BookmarkItem() {
 }
 
-void BookmarkItem::update_item(const int &index, const QString &cat_name, const int &type) {
+void BookmarkItem::update_item(const int &index, const int &cat_id, const int &type) {
     m_bookmark->set_index(index);
-    m_bookmark->set_container(cat_name, type);
+    m_bookmark->set_container(cat_id, type);
 }
 
 /**

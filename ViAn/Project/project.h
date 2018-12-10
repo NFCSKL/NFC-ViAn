@@ -29,6 +29,7 @@ class Project : public Saveable{
     std::vector<BookmarkCategory*> m_categories;
 
     int m_vid_count = 0;
+    int m_cat_count = 0;
     bool m_temporary = true;
     bool m_unsaved_changes = false;
 public:
@@ -44,7 +45,7 @@ public:
     void add_bookmark(Bookmark* bmark);
     void remove_bookmark(Bookmark* bmark);
 
-    void add_category(BookmarkCategory* cat);
+    ID add_category(BookmarkCategory* cat);
     void remove_category(BookmarkCategory* cat);
 
     // read and write operator for Projects

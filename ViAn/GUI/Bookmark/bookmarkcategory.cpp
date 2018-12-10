@@ -24,13 +24,11 @@ BookmarkCategory::BookmarkCategory(QString name, int type) : QListWidgetItem(nul
     // Add disputed and reference list
     disp_list = new BookmarkList(false, DISPUTED);
     ref_list = new BookmarkList(false, REFERENCE);
-    disp_list->set_parent_name(m_name);
-    ref_list->set_parent_name(m_name);
+    disp_list->set_parent_id(id);
+    ref_list->set_parent_id(id);
 
     // Connect
     connect(m_title, &QLineEdit::textChanged, this, &BookmarkCategory::on_text_edited);
-    connect(m_title, &QLineEdit::textChanged, disp_list, &BookmarkList::on_parent_name_edited);
-    connect(m_title, &QLineEdit::textChanged, ref_list, &BookmarkList::on_parent_name_edited);
     connect(disp_list, &BookmarkList::set_bookmark_video, this, &BookmarkCategory::set_bookmark_video);
     connect(ref_list, &BookmarkList::set_bookmark_video, this, &BookmarkCategory::set_bookmark_video);
 
@@ -54,6 +52,7 @@ void BookmarkCategory::update_index(int index) {
     // Update all indexes in the disp and ref list
     disp_list->update_index();
     ref_list->update_index();
+    m_unsaved_changes = true;
 }
 
 void BookmarkCategory::set_index(int index) {
@@ -62,6 +61,12 @@ void BookmarkCategory::set_index(int index) {
 
 void BookmarkCategory::set_project(Project* proj) {
     m_proj = proj;
+}
+
+void BookmarkCategory::set_id(const int& new_id) {
+    id = new_id;
+    disp_list->set_parent_id(new_id);
+    ref_list->set_parent_id(new_id);
 }
 
 QString BookmarkCategory::get_name() {
@@ -74,6 +79,10 @@ Project* BookmarkCategory::get_project() {
 
 int BookmarkCategory::get_index() {
     return m_index;
+}
+
+int BookmarkCategory::get_id() const {
+    return id;
 }
 
 std::vector<BookmarkItem *> BookmarkCategory::get_disputed() {
@@ -98,6 +107,7 @@ QWidget* BookmarkCategory::get_folder() {
 
 void BookmarkCategory::update_title(const QString &title){
     m_title->setText(title);
+    m_unsaved_changes = true;
 }
 
 /**
@@ -112,7 +122,7 @@ BookmarkCategory *BookmarkCategory::copy() {
     std::for_each(items.begin(), items.end(),
                   [new_bm_cat, this](BookmarkItem* bi){
         new_bm_cat->add_disp_item(bi->copy());
-        bi->get_bookmark()->set_container(m_name, DISPUTED);
+        bi->get_bookmark()->set_container(id, DISPUTED);
     });
 
     // Copy reference bookmarks
@@ -120,7 +130,7 @@ BookmarkCategory *BookmarkCategory::copy() {
     std::for_each(items.begin(), items.end(),
                   [new_bm_cat, this](BookmarkItem* bi){
         new_bm_cat->add_ref_item(bi->copy());
-        bi->get_bookmark()->set_container(m_name, REFERENCE);
+        bi->get_bookmark()->set_container(id, REFERENCE);
     });
     return new_bm_cat;
 
@@ -129,11 +139,13 @@ BookmarkCategory *BookmarkCategory::copy() {
 void BookmarkCategory::add_disp_item(BookmarkItem *bm_item) {
     disp_list->addItem(bm_item);
     disp_list->sortItems();
+    m_unsaved_changes = true;
 }
 
 void BookmarkCategory::add_ref_item(BookmarkItem *bm_item) {
     ref_list->addItem(bm_item);
     disp_list->sortItems();
+    m_unsaved_changes = true;
 }
 
 QScrollArea *BookmarkCategory::make_scrollable_container(BookmarkList* container) {
@@ -151,6 +163,11 @@ QScrollArea *BookmarkCategory::make_scrollable_container(BookmarkList* container
  */
 void BookmarkCategory::on_text_edited(QString name){
     m_name = name;
+    m_unsaved_changes = true;
+}
+
+bool BookmarkCategory::is_saved() const {
+    return !m_unsaved_changes;
 }
 
 bool QListWidgetItem::operator<(const QListWidgetItem& other) const {

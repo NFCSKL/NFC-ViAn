@@ -93,7 +93,7 @@ BookmarkCategory* BookmarkWidget::add_new_folder(QString name) {
 void BookmarkWidget::add_to_container(BookmarkItem *bm_item, int type) {
     for (BookmarkCategory* cat : m_proj->get_categories()) {
         Bookmark* bmark = bm_item->get_bookmark();
-        if (cat->get_name() == bmark->get_container_name()) {
+        if (cat->get_id() == bmark->get_container_id()) {
             if (type == DISPUTED) {
                 cat->add_disp_item(bm_item);
             } else if (type == REFERENCE) {
@@ -122,14 +122,10 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     QString thumbnail_path = im_gen.create_thumbnail(file_name);
     QString bm_file = im_gen.create_bookmark(file_name);
 
-    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, description, state, time);
+    Bookmark* bookmark = new Bookmark(bm_file, description, state, time);
     bookmark->m_image_name = file_name;
     bookmark->set_thumbnail_path(thumbnail_path);
     bookmark->set_vid_proj_id(vid_proj->get_id());
-
-    // TODO remove
-    // should maybe not need this anymore, since project should hold bookmarks
-    vid_proj->add_bookmark(bookmark);
 
     m_proj->add_bookmark(bookmark);
 
