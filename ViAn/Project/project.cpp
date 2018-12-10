@@ -360,7 +360,7 @@ std::vector<BookmarkCategory*> &Project::get_categories() {
 
 /**
  * @brief Project::get_video_project
- * Get the videoproject with the ID fro mthe list of videoproject.
+ * Get the videoproject with the ID from the list of videoproject.
  * If the videoproject is not found return nullptr.
  * @param id
  * @return
@@ -372,17 +372,6 @@ VideoProject* Project::get_video_project(int id) {
         }
     }
     return nullptr;
-}
-
-/**
- * @brief Project::get_video
- * @param id
- * @return Returns the video with the specified id.
- *
- * TODO Unused
- */
-VideoProject* Project::get_video(const int& v_pos) {
-    return m_videos.at(v_pos);
 }
 
 QString Project::get_dir() const {

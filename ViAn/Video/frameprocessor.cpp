@@ -163,6 +163,7 @@ void FrameProcessor::process_frame() {
             manipulated_frame = m_frame.clone();
         }
     } catch (cv::Exception& e) {
+        Q_UNUSED(e)
         qWarning() << "Failed to copy new frame in processor";
         return;
     }

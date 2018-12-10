@@ -66,7 +66,6 @@ public:
     std::vector<Bookmark *>& get_bookmarks();
     std::vector<BookmarkCategory *>& get_categories();
     VideoProject* get_video_project(int id);
-    VideoProject* get_video(const int& v_pos);
     QString get_dir() const;
     QString get_name() const;
     QString get_file() const;

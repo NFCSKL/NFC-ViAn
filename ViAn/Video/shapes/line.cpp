@@ -10,6 +10,7 @@
  * @brief Line::Line
  */
 Line::Line() : Shapes(SHAPES::LINE) {
+    m_name = "Line";
 }
 
 /**
@@ -18,20 +19,10 @@ Line::Line() : Shapes(SHAPES::LINE) {
  * @param pos Starting point for the new object
  */
 Line::Line(QColor col, QPoint pos) : Shapes(SHAPES::LINE, col, pos) {
+    m_name = "Line";
 }
 
 Line::~Line() {}
-
-/**
- * @brief Line::draw
- * Draws the object on top of the specified frame.
- * @param frame Frame to draw on.
- * @return Returns the frame with drawing.
- */
-cv::Mat Line::draw(cv::Mat &frame) {
-    cv::line(frame, draw_start, draw_end, color, thickness);
-    return frame;
-}
 
 /**
  * @brief Line::draw_scaled
@@ -58,14 +49,6 @@ void Line::handle_new_pos(QPoint pos) {
     Q_UNUSED( pos )
 }
 
-QString Line::get_name() {
-    return m_name;
-}
-
-void Line::set_name(QString name) {
-    m_name = name;
-}
-
 /**
  * @brief Line::write
  * @param json
@@ -73,7 +56,6 @@ void Line::set_name(QString name) {
  */
 void Line::write(QJsonObject& json) {
     write_shape(json);
-    json["name"] = m_name;
 }
 
 /**
@@ -83,5 +65,4 @@ void Line::write(QJsonObject& json) {
  */
 void Line::read(const QJsonObject& json) {
     read_shape(json);
-    m_name = json["name"].toString();
 }
