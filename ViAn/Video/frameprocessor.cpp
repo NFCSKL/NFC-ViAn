@@ -258,47 +258,57 @@ void FrameProcessor::emit_zoom_data() {
  * Modifies data from a shared pointer and should only be called after the v_sync_lock has been acquired
  */
 void FrameProcessor::update_zoomer_settings() {
-    // Viewport has changed size
-    if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
-        m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
-    }
+    qDebug() << "update zoomer settings";
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
-    else if (m_z_settings->set_state) {
+    if (m_z_settings->set_state) {
+        qDebug() << "set state";
         load_zoomer_state();
         m_z_settings->set_state = false;
     }
+    // Scale/zoom factor has been changed
+    if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
+        qDebug() << "set zoomfactor";
+        m_zoomer.set_scale_factor(m_z_settings->zoom_factor);
+    }
     // Center the zoom rect
-    else if (m_z_settings->do_point_zoom) {
+    if (m_z_settings->do_point_zoom) {
+        qDebug() << "do point zoom";
         m_z_settings->do_point_zoom = false;
         m_zoomer.point_zoom(m_z_settings->center, m_z_settings->zoom_step);
     }
-    // Scale/zoom factor has been changed
-    else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
-        m_zoomer.set_scale_factor(m_z_settings->zoom_factor);
-    }
     // Zoom rectangle has changed
-    else if (m_z_settings->has_new_zoom_area) {
+    if (m_z_settings->has_new_zoom_area) {
+        qDebug() << "set zoom area";
         m_zoomer.area_zoom(m_z_settings->zoom_area_tl, m_z_settings->zoom_area_br);
         m_z_settings->has_new_zoom_area = false;
     }
     // Panning occured
-    else if (m_z_settings->x_movement != 0 || m_z_settings->y_movement != 0) {
+    if (m_z_settings->x_movement != 0 || m_z_settings->y_movement != 0) {
+        qDebug() << "set panning";
         m_zoomer.translate_viewport_center(m_z_settings->x_movement, m_z_settings->y_movement);
         m_z_settings->x_movement = 0;
         m_z_settings->y_movement = 0;
     }
+    // Viewport has changed size
+    if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
+        qDebug() << "set viewport size";
+        m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
+    }
     // Fit to screen
-    else if (m_z_settings->fit) {
+    if (m_z_settings->fit) {
+        qDebug() << "fit to screen";
         m_z_settings->fit = false;
         m_zoomer.fit_viewport();
     }
     // Set original size (no zoom)
-    else if (m_z_settings->original) {
+    if (m_z_settings->original) {
+        qDebug() << "set original";
         m_z_settings->original = false;
         m_zoomer.reset();
     }
     // Set interpolation method
-    else if (m_zoomer.get_interpolation_method() != m_z_settings->interpolation){
+    if (m_zoomer.get_interpolation_method() != m_z_settings->interpolation){
+        qDebug() << "set interpolation";
         m_zoomer.set_interpolation_method(m_z_settings->interpolation);
     }
 

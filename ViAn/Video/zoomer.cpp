@@ -221,8 +221,8 @@ void Zoomer::point_zoom(QPoint original_point, double zoom_step) {
  * @param angle        :    image rotation
  */
 void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
-    set_scale_factor(scale_factor);
     m_angle = angle;
+    set_scale_factor(scale_factor);
     adjust_frame_rect_rotation();
 
     // Check for default state

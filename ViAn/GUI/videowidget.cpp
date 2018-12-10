@@ -35,7 +35,8 @@ VideoWidget::VideoWidget(QWidget *parent, bool floating) : QWidget(parent), scro
     m_floating = floating;
     // Init video controller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &new_frame_video, &video_loaded, &v_sync,
+                                       &video_width, &video_height, &new_video,
+                                       &new_frame_video, &video_loaded, &v_sync,
                                        &player_con, &player_lock, &m_video_path,
                                        &m_speed_step, &m_abort_playback);
 
