@@ -257,12 +257,6 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
     if (itemAt(event->pos())) {
         clicked_item = itemAt(event->pos());
         setCurrentItem(clicked_item);
-        if (clicked_item->type() == 0) {
-            auto item = dynamic_cast<BookmarkItem*>(clicked_item);
-            qDebug() << item->get_bookmark()->get_index() << item->get_bookmark()->get_vid_proj_id();
-        } else {
-            qDebug() << dynamic_cast<BookmarkCategory*>(clicked_item)->get_index();
-        }
         switch (event->button()) {
             case Qt::RightButton:
                 // Create context menu

@@ -72,7 +72,6 @@ ID Project::add_video_project(VideoProject *vid_proj){
  * @brief Project::remove_video_project
  * @param vid_proj
  * Remove video from videos and delete its contents.
- * TODO, use it!
  */
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
