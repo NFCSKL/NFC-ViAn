@@ -134,6 +134,9 @@ bool BookmarkList::bookmark_drop(QDropEvent *event) {
     // BookmarkItem. Copy and add
     BookmarkItem* bm_item = cast_item->copy();
     int index = row(itemAt(event->pos()+QPoint(0, Constants::THUMBNAIL_SIZE/2)));
+    if (index == -1) {
+        index = count();
+    }
     bm_item->update_item(index, m_par_cont_id, m_list_type);
     insertItem(index, bm_item);
 
@@ -159,6 +162,9 @@ bool BookmarkList::container_drop(QDropEvent *event) {
     BookmarkCategory* cast_item = dynamic_cast<BookmarkCategory*>(list->currentItem());
     BookmarkCategory* cat_item = cast_item->copy();
     int index = row(itemAt(event->pos()+QPoint(0, Constants::THUMBNAIL_SIZE/2)));
+    if (index == -1) {
+        index = count();
+    }
     cat_item->set_index(index);
     insertItem(index, cat_item);
 

@@ -13,7 +13,7 @@
 BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(bookmark->get_description(), nullptr, type) {
     QString frame = QString::number(bookmark->get_frame_number());
     hover_text = "Source: " + bookmark->m_image_name + "\nFrame: " + frame +
-            "\nTime: " + bookmark->get_time() + "\nIndex: " + QString::number(bookmark->get_index());
+            "\nTime: " + bookmark->get_time();
     QString description = bookmark->get_description();
     if (description != "") {
         setToolTip(hover_text + "\nDescription: " + description);
