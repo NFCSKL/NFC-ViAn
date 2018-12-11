@@ -5,6 +5,7 @@
 
 class BookmarkItem;
 class QAxObject;
+class QListWidgetItem;
 
 enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
 using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
@@ -31,14 +32,13 @@ class ReportGenerator : public QObject {
     Q_OBJECT
     QString m_path;
     QAxObject* word;
-    ReportContainer m_rep_cont;
 public:
     friend class test_report_generator;
-    explicit ReportGenerator(QString proj_path, ReportContainer report_container);
+    explicit ReportGenerator(QString proj_path, std::vector<QListWidgetItem *> items);
     ~ReportGenerator();
     void create_report();
 
-    std::vector<BookmarkItem*> uncat_bmarks;
+    std::vector<QListWidgetItem*> list_items;
 private:
     /**
      * Creates documentation for a given QAxObject*,
@@ -51,7 +51,8 @@ private:
     QString get_bookmark_descr(BookmarkItem *bm);
     void create_bookmark_table(QAxObject *para);
 
-    void add_category(QAxObject *table, size_t i);
+    int add_category(QAxObject *para, int end, QListWidgetItem *item);
+    int add_bookmark(QAxObject *para, int end, QListWidgetItem *item);
     QAxObject* add_table(QAxObject* range, int rows, int cols, TABLE_STYLE style = NO_BORDER);
     QAxObject* get_cell(QAxObject* table, int row, int cols);
 

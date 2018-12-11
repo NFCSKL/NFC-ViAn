@@ -48,28 +48,13 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 void BookmarkWidget::generate_report() {
     emit set_status_bar("Generating report. Please wait.");
     emit play_video(false);
-    ReportContainer rp_cont;
-    std::vector<BookmarkItem*> bmark_list;
+    std::vector<QListWidgetItem*> list_items;
     for(int i = 0; i != bm_list->count(); ++i){
-        QListWidgetItem* item = bm_list->item(i);
-        if (item->type() == CONTAINER) {
-            BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
-            QString cat_name = _tmp_cat->get_name();
-
-            std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
-            std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
-
-            RefDisp ref_disp = std::make_pair(_temp_disp, _temp_ref);
-            rp_cont.push_back(std::make_pair(cat_name, ref_disp));
-        } else if (item->type() == BOOKMARK) {
-            BookmarkItem* bmark = dynamic_cast<BookmarkItem*>(item);
-            bmark_list.push_back(bmark);
-        }
+        list_items.push_back(bm_list->item(i));
     }
     processing_thread = new QThread;
     setCursor(Qt::WaitCursor);
-    ReportGenerator* rp_gen = new ReportGenerator(m_proj->get_dir(), rp_cont);
-    rp_gen->uncat_bmarks = bmark_list;
+    ReportGenerator* rp_gen = new ReportGenerator(m_proj->get_dir(), list_items);
     rp_gen->create_report();
     setCursor(Qt::ArrowCursor);
 }
