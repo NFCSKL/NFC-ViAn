@@ -22,6 +22,8 @@ public:
     BookmarkList(bool accept_container = true, int container_type = UNSORTED, QWidget* parent = nullptr);
     ~BookmarkList() override;
 
+    void clear_lists();
+
     QListWidgetItem* get_clicked_item();
 
     int category_cnt = 1;

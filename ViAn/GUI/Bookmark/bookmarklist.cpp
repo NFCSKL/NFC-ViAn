@@ -51,6 +51,17 @@ BookmarkList::~BookmarkList() {
     clear();
 }
 
+void BookmarkList::clear_lists() {
+    for (int i = count()-1; i >= 0; --i) {
+        if (item(i)->type() == CONTAINER) {
+            BookmarkCategory* cat = dynamic_cast<BookmarkCategory*>(item(i));
+            cat->clear_lists();
+        } else if (item(i)->type() == BOOKMARK) {
+            delete item(i);
+        }
+    }
+}
+
 /**
  * @brief BookmarkList::get_clicked_item
  * @return last clicked item
@@ -232,7 +243,6 @@ void BookmarkList::remove_item() {
             b_mark->get_project()->remove_bookmark(b_mark);
         }
         cat_item->get_project()->remove_category(cat_item);
-        delete cat_item;
     }
 }
 

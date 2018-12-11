@@ -67,6 +67,7 @@ public:
     void update_title(const QString &title);
     BookmarkCategory* copy();
     bool is_saved() const;
+    void clear_lists();
 
 private:  
     QScrollArea* make_scrollable_container(BookmarkList* cont);

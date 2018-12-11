@@ -41,7 +41,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent) {
 
     connect(bm_list, &BookmarkList::set_bookmark_video, this, &BookmarkWidget::play_bookmark_video);
     connect(bm_list, &BookmarkList::add_category, this, &BookmarkWidget::add_new_folder);
-    connect(new_folder_btn, &QPushButton::clicked, this, [this]{ add_new_folder("Category " +  QString::number(bm_list->category_cnt++));});
+    connect(new_folder_btn, &QPushButton::clicked, this, [this]{ add_new_folder("New Category");});
     connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
 }
 
@@ -193,6 +193,7 @@ void BookmarkWidget::save_item_data() {
 
 void BookmarkWidget::set_project(Project* proj) {
     m_proj = proj;
+    bm_list->clear_lists();
     load_bookmarks();
 }
 

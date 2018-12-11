@@ -4,6 +4,8 @@
 #include "utility.h"
 #include "videoproject.h"
 
+#include <QDebug>
+
 /**
  * @brief Bookmark::Bookmark
  * @param file_name file name for bookmark

@@ -77,9 +77,9 @@ ID Project::add_video_project(VideoProject *vid_proj){
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
+    delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
-    delete *it;
     *it = nullptr; // Not need?
 }
 
@@ -92,10 +92,10 @@ void Project::add_bookmark(Bookmark* bmark) {
 void Project::remove_bookmark(Bookmark* bmark) {
     auto it = std::find(m_bookmarks.begin(), m_bookmarks.end(), bmark);
     if (it == m_bookmarks.end()) return;
+    delete *it;
     m_bookmarks.erase(it);
     m_unsaved_changes = true;
     bmark->remove_exported_image();
-    delete *it;
 }
 
 ID Project::add_category(BookmarkCategory* cat) {
@@ -116,9 +116,9 @@ ID Project::add_category(BookmarkCategory* cat) {
 void Project::remove_category(BookmarkCategory* cat) {
     auto it = std::find(m_categories.begin(), m_categories.end(), cat);
     if (it == m_categories.end()) return;
+    delete *it;
     m_categories.erase(it);
     m_unsaved_changes = true;
-    delete *it;
 }
 
 /**
@@ -139,6 +139,9 @@ void Project::set_name_and_path(const QString &name, const QString &path) {
         m_dir = path + name + "/";
         for (auto it = begin(m_videos); it != end(m_videos); ++it) {
             (*it)->reset_root_dir(m_dir);
+        }
+        for (auto bmark : m_bookmarks) {
+            bmark->reset_root_dir(m_dir);
         }
     } else {
         // Attempts to generate a temporary path

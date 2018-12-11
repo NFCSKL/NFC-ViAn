@@ -170,6 +170,11 @@ bool BookmarkCategory::is_saved() const {
     return !m_unsaved_changes;
 }
 
+void BookmarkCategory::clear_lists() {
+    disp_list->clear_lists();
+    ref_list->clear_lists();
+}
+
 bool QListWidgetItem::operator<(const QListWidgetItem& other) const {
     int index1, index2;
     if (this->type() == 1) {    // Type = container
