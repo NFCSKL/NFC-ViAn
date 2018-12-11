@@ -204,6 +204,7 @@ public slots:
     void update_playback_speed(int speed);
     void set_brightness_contrast(int bri, double cont, double gamma);
     void update_zoom_preview_size(QSize s);
+    void translate_zoom_from_preview_click(QPoint click_pos);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 

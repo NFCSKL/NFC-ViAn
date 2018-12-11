@@ -206,6 +206,8 @@ void Zoomer::point_zoom(QPoint original_point, double zoom_step) {
     double dx = (original_point.x() - m_viewport.center.x) * (zoom_step - 1);
     double dy = (original_point.y() - m_viewport.center.y) * (zoom_step - 1);
 
+
+
     // Translate center
     m_viewport = cv::RotatedRect(cv::Point2f(m_viewport.center.x + dx, m_viewport.center.y + dy),
                                  m_viewport.size,

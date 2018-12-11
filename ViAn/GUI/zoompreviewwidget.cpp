@@ -44,6 +44,32 @@ void ZoomPreviewWidget::resizeEvent(QResizeEvent *event) {
 }
 
 /**
+ * @brief ZoomPreviewWidget::mousePressEvent
+ * Event for when the widget is clicked
+ * @param event
+ */
+void ZoomPreviewWidget::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) {
+        panning = true;
+        start_point = event->pos();
+    } else {
+        panning = false;
+    }
+}
+
+/**
+ * @brief ZoomPreviewWidget::mouseMoveEvent
+ * Event for when the mouse (pressed) is dragged inside the widget
+ * @param event
+ */
+void ZoomPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
+    if (!panning) return;
+    QPoint movement = event->pos() - start_point;
+    start_point = event->pos();
+    emit pan_translation(movement);
+}
+
+/**
  * @brief zoompreviewwidget::frame_update
  * Converts and stores the provided image as a QImage.
  * This is later used when repainting the widget

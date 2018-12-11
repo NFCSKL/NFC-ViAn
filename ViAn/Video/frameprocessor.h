@@ -28,6 +28,7 @@ struct zoomer_settings {
 
     QSize draw_area_size = QSize(100,100);
     QSize preview_window_size = QSize(100, 50);
+    QSize frame_size = QSize(100, 100);
 
     QPoint zoom_area_tl = QPoint(0,0);
     QPoint zoom_area_br = QPoint(100,100);
