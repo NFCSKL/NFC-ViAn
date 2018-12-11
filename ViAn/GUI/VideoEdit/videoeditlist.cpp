@@ -7,12 +7,38 @@ VideoEditList::VideoEditList()
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
 
-    for(int i = 1; i < 10; ++i)
-        addItem(new QListWidgetItem(QString("Item %1").arg(i)));
+//    for(int i = 1; i < 10; ++i) {
+//        //QString iconpath = QString("E:\\screen\\%1.tif").arg(i-1);
+//        QString iconpath = "E:\\1.tif";
+//        QListWidgetItem *item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(i));
+//        //item->setSizeHint(QSize(100,100));
+//        addItem(item);
+//    }
+    QString iconpath = "E:\\still1.jpg";
+    QListWidgetItem *item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(1));
+    //item->setSizeHint(QSize(100,100));
+    addItem(item);
+    iconpath = "E:\\still2.png";
+    item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(2));
+    //item->setSizeHint(QSize(100,100));
+    addItem(item);
+    iconpath = "E:\\still3.png";
+    item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(3));
+    //item->setSizeHint(QSize(100,100));
+    addItem(item);
+    iconpath = "E:\\still4.jpg";
+    item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(4));
+    //item->setSizeHint(QSize(100,100));
+    addItem(item);
+
+
+
+
     setSelectionMode(QAbstractItemView::ExtendedSelection);
     setDragDropMode(QAbstractItemView::InternalMove);
     setFlow(QListView::TopToBottom);
     horizontalLayout = false;
+    setIconSize(QSize(50,50));
 
     connect(this, &VideoEditList::customContextMenuRequested, this, &VideoEditList::context_menu);
 
@@ -80,10 +106,13 @@ void VideoEditList::remove_item()
  */
 void VideoEditList::toggle_viewlayout()
 {
-    if(horizontalLayout)
+    if(horizontalLayout) {
         setFlow(QListView::TopToBottom);
-    else
+        setIconSize(QSize(50,50));
+    } else {
         setFlow(QListView::LeftToRight);
+        setIconSize(QSize(110,110));
+    }
 
     horizontalLayout = !horizontalLayout;
 
