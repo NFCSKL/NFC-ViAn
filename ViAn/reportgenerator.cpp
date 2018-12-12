@@ -127,7 +127,7 @@ int ReportGenerator::add_category(QAxObject* para, int end, QListWidgetItem* ite
     QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), table_rows,2,1,1);
     table->dynamicCall("AutoFormat(QVariant)", BORDER);
     table->dynamicCall("SetTitle(QString)", "Title");
-    range->dynamicCall("Collapse(int)", 0);
+
     // Add the category to the space
     // Table indexed from 1, begin after title.
     int cell_row = 1;
@@ -162,7 +162,7 @@ int ReportGenerator::add_category(QAxObject* para, int end, QListWidgetItem* ite
 
     // Insert empty line and update the end position
     range->dynamicCall("InsertParagraphAfter()");
-    return range->dynamicCall("End()").toInt();
+    return range->dynamicCall("End()").toInt()-1;
 }
 
 int ReportGenerator::add_bookmark(QAxObject* para, int end, QListWidgetItem* item) {
@@ -182,7 +182,7 @@ int ReportGenerator::add_bookmark(QAxObject* para, int end, QListWidgetItem* ite
     QAxObject* p_shapes = para->querySubObject("InlineShapes()");
     p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
                  file_name, false, true, bmark_range->asVariant());
-    return bmark_range->dynamicCall("End()").toInt();
+    return bmark_range->dynamicCall("End()").toInt()-1;
 }
 
 /**
