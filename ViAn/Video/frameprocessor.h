@@ -28,6 +28,7 @@ struct zoomer_settings {
 
     QSize draw_area_size = QSize(100,100);
     QSize preview_window_size = QSize(100, 50);
+    QSize frame_size = QSize(100, 100);
 
     QPoint zoom_area_tl = QPoint(0,0);
     QPoint zoom_area_br = QPoint(100,100);
@@ -162,11 +163,6 @@ class FrameProcessor : public QObject {
     // Number of directions.
     int const ROTATE_NUM = 4;
     int m_rotate_direction = ROTATE_NONE;
-
-    static const int DEGREES_0;
-    static const int DEGREES_90;
-    static const int DEGREES_180;
-    static const int DEGREES_270;
 
     // Used to zoom and scale frame
     Zoomer m_zoomer;

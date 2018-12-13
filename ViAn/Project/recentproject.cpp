@@ -1,12 +1,11 @@
 #include "recentproject.h"
 
+#include "constants.h"
+
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QStandardPaths>
-
-const std::string RecentProject::FILE_NAME = "recent_projects";
-const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation).toStdString()+ "/ViAn/";
 
 RecentProject::RecentProject(){}
 
@@ -16,12 +15,12 @@ RecentProject::RecentProject(){}
  * @param name  :   project name
  * @param project_path  : path to the project
  */
-void RecentProject::update_recent(const std::string& name, const std::string &project_path, const std::string &last_changed) {
-    std::tuple<std::string, std::string, std::string> new_proj = std::make_tuple(name, project_path, last_changed);
+void RecentProject::update_recent(const QString &name, const QString &project_path, const QString &last_changed) {
+    std::tuple<QString, QString, QString> new_proj = std::make_tuple(name, project_path, last_changed);
     remove_project(project_path);
-    if (recent_items.size() >= RECENT_MAX) recent_items.resize(RECENT_MAX);
+    if (recent_items.size() >= Constants::RECENT_MAX) recent_items.resize(Constants::RECENT_MAX);
     recent_items.push_front(new_proj);
-    QDir().mkpath(QString::fromStdString(PATH));
+    QDir().mkpath(Constants::RECENT_FILE_PATH);
     save();
 }
 
@@ -32,7 +31,7 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  * @param name
  * @return
  */
-bool RecentProject::remove_project(const std::string& project_path) {
+bool RecentProject::remove_project(const QString& project_path) {
     load_recent();
     for (auto item : recent_items) {
         if (std::get<1>(item) == project_path) {
@@ -49,8 +48,9 @@ bool RecentProject::remove_project(const std::string& project_path) {
  * Reads and returns recent projects
  * @return
  */
-std::list<std::tuple<std::string, std::string, std::string> > RecentProject::load_recent(){
-    load_saveable(PATH + FILE_NAME);
+std::list<std::tuple<QString, QString, QString> > RecentProject::load_recent(){
+    QString r_path = Constants::RECENT_FILE_PATH + Constants::RECENT_FILE_NAME;
+    load_saveable(r_path);
     return recent_items;
 }
 
@@ -59,7 +59,8 @@ std::list<std::tuple<std::string, std::string, std::string> > RecentProject::loa
  * Save the recent project file
  */
 void RecentProject::save() {
-    save_saveable(PATH + FILE_NAME);
+    QString r_path = Constants::RECENT_FILE_PATH + Constants::RECENT_FILE_NAME;
+    save_saveable(r_path);
 }
 /**
  * @brief RecentProject::read
@@ -68,13 +69,13 @@ void RecentProject::save() {
 void RecentProject::read(const QJsonObject &json) {
     for (auto j : json["recent"].toArray()) {
         QJsonObject tuple = j.toObject();
-        std::string name = tuple["name"].toString().toStdString();
-        std::string path = tuple["path"].toString().toStdString();
-        std::string last_changed = tuple["last changed"].toString().toStdString();
-        if (QFile(QString::fromStdString(path)).exists()) {
+        QString name = tuple["name"].toString();
+        QString path = tuple["path"].toString();
+        QString last_changed = tuple["last changed"].toString();
+        if (QFile(path).exists()) {
             recent_items.push_back(std::make_tuple(name, path, last_changed));
         } else {
-            qWarning("Failed to load file %s ", path.c_str());
+            qWarning("Failed to load file %s ", path.toStdString().c_str());
         }
     }
 }
@@ -87,9 +88,9 @@ void RecentProject::write(QJsonObject &json) {
     QJsonArray j_array;
     for (auto p : recent_items){
         QJsonObject tuple;
-        tuple["name"] = QString::fromStdString(std::get<0>(p));
-        tuple["path"] = QString::fromStdString(std::get<1>(p));
-        tuple["last changed"] = QString::fromStdString(std::get<2>(p));
+        tuple["name"] = std::get<0>(p);
+        tuple["path"] = std::get<1>(p);
+        tuple["last changed"] = std::get<2>(p);
         j_array.append(tuple);
     }
     json["recent"] = j_array;

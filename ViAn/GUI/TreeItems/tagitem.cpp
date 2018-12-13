@@ -4,9 +4,9 @@
 
 TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     m_tag = tag;
-    setText(0, QString::fromStdString(tag->get_name()));
-    const QIcon folder_icon("../ViAn/Icons/tag.png");
-    setIcon(0, folder_icon);
+    setText(0, tag->get_name());
+    const QIcon tag_icon("../ViAn/Icons/tag.png");
+    setIcon(0, tag_icon);
 }
 
 TagItem::~TagItem() {}
@@ -14,7 +14,7 @@ TagItem::~TagItem() {}
 void TagItem::remove(){}
 
 void TagItem::rename() {
-    m_tag->m_name = text(0).toStdString();
+    m_tag->m_name = text(0);
 }
 
 Tag *TagItem::get_tag() {

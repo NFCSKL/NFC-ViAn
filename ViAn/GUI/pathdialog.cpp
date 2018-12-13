@@ -12,14 +12,14 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-PathDialog::PathDialog(std::string* path, QWidget* parent, QString default_path) : QDialog(parent) {
+PathDialog::PathDialog(QString* path, QWidget* parent, QString default_path) : QDialog(parent) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setMinimumWidth(MIN_WIDTH);
+    setMinimumWidth(400);
 
     m_path = path;
-    m_q_path = QString::fromStdString(*path);
+    m_q_path = *path;
     m_dir = m_q_path.left(m_q_path.lastIndexOf('/') + 1);
-    m_name = QString::fromStdString(Utility::name_from_path(*path));
+    m_name = Utility::name_from_path(*path);
     m_default_path = default_path;
 
     setWindowTitle("Where is file " + m_name + "?");
@@ -76,7 +76,7 @@ void PathDialog::path_btn_clicked() {
 }
 
 void PathDialog::ok_btn_clicked() {
-    *m_path = path_text->text().toStdString();
+    *m_path = path_text->text();
     accept();
 }
 

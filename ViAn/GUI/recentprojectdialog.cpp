@@ -51,9 +51,9 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
 
     for (auto project : RecentProject().load_recent()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(recent_list);
-        item->setText(0, QString::fromStdString(std::get<0>(project)));     // Set name
-        item->setText(1, QString::fromStdString(std::get<2>(project)));     // Set the last changed date
-        item->setToolTip(0, QString::fromStdString(std::get<1>(project)));
+        item->setText(0, std::get<0>(project));     // Set name
+        item->setText(1, std::get<2>(project));     // Set the last changed date
+        item->setToolTip(0, std::get<1>(project));
         recent_list->addTopLevelItem(item);
     }
 
@@ -139,7 +139,7 @@ void RecentProjectDialog::on_remove_btn_clicked() {
         QString substr = file.left(file.lastIndexOf('/') + 1);
         QDir path(substr);
         if (path.exists()) {
-            RecentProject().remove_project(file.toStdString());
+            RecentProject().remove_project(file);
             path.removeRecursively();
         }
         delete recent_list->currentItem();

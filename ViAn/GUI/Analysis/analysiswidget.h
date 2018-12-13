@@ -27,10 +27,9 @@ class AnalysisWidget : public QWidget
      */
     std::map<AnalysisMethod*, bool*> abort_map;
 
-    std::string dots = "";
+    QString dots = "";
     std::clock_t start;
     int duration = 0;
-    int duplicate_save_file_inc = 1;
     bool abort_all = false;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);

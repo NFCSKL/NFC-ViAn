@@ -1,6 +1,7 @@
 #include "analysismethod.h"
 
 #include "analysissettings.h"
+#include "constants.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/poi.h"
 #include "utility.h"
@@ -15,6 +16,7 @@ AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string&
     m_source_file = video_path;
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
+    //std::string vid_name = Utility::name_from_path(video_path);
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
     m_ana_name = vid_name + settings->get_type_string();
@@ -119,9 +121,8 @@ void AnalysisMethod::run() {
         capture.release();
         m_analysis.settings = analysis_settings;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
-        auto index = new_path.find_last_of('/') + 1;
-        m_ana_name = new_path.substr(index);
-        m_analysis.save_saveable(new_path);
+        m_ana_name = Utility::name_from_path(new_path);
+        m_analysis.save_saveable(QString::fromStdString(new_path));
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
         for (auto p : m_analysis.get_intervals()) {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
@@ -152,8 +153,8 @@ void AnalysisMethod::calculate_scaling_factor() {
     m_scaling_done = true;
     int video_width = analysis_frame.cols;
     int video_height = analysis_frame.rows;
-    float height_ratio = float(FULL_HD_HEIGHT)/float(video_height);
-    float width_ratio = float(FULL_HD_WIDTH)/float(video_width);
+    float height_ratio = float(Constants::FULL_HD_HEIGHT)/float(video_height);
+    float width_ratio = float(Constants::FULL_HD_WIDTH)/float(video_width);
     if (height_ratio >= 1 && width_ratio >= 1) return;
 
     scaling_needed = true;
@@ -161,10 +162,10 @@ void AnalysisMethod::calculate_scaling_factor() {
     if (width_ratio >= height_ratio) {
         scaling_ratio = height_ratio;
         scaled_width = int(video_width * scaling_ratio);
-        scaled_height = FULL_HD_HEIGHT;
+        scaled_height = Constants::FULL_HD_HEIGHT;
     } else {
         scaling_ratio = width_ratio;
-        scaled_width = FULL_HD_WIDTH;
+        scaled_width = Constants::FULL_HD_WIDTH;
         scaled_height = int(video_height * scaling_ratio);
     }
 }

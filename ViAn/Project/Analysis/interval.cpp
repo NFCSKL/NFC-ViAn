@@ -1,110 +1,149 @@
 #include "interval.h"
 
-interval::interval() {
+#include <QDebug>
+#include <QJsonArray>
+
+Interval::Interval(QString name) {
+    m_name = name;
+}
+
+Interval::~Interval() {
 
 }
 
-// TODO FIX
-// Moved this code here since i need it for implementing intervals
-// intervals will be very close to what tags were before.
-// Tags don't need any of this code so they will get a new class.
+void Interval::add_area(int start, int end) {
+    add_area(std::make_pair(start, end));
+}
 
-///**
-// * @brief Tag::add_frame
-// * @param frame
-// * Adds the newly tagged frame as a new poi
-// * unless it's at the edge of a current poi or that frame already is tagged
-// */
-//void Tag::add_frame(int frame) {
-//    add_interval(new AnalysisInterval(frame, frame));
-//}
+/**
+ * @brief Interval::add_area
+ * Adds a new area to the interval list and handle each case
+ * Cred: https://www.geeksforgeeks.org/insert-in-sorted-and-non-overlapping-interval-array/
+ * @param interval
+ */
+void Interval::add_area(std::pair<int, int> interval) {
+    m_unsaved_changes = true;
+    std::vector<std::pair<int, int>> new_list;
 
-//void Tag::remove_frame(int frame) {
-//    remove_interval(new AnalysisInterval(frame, frame));
-//}
+    // Set is empty, simply add new interval
+    if (m_area_list.empty()) {
+        new_list.push_back(interval);
+        m_area_list = new_list;
+        return;
+    }
 
-//void Tag::add_interval(AnalysisInterval *an_interval){
-//    BasicAnalysis::add_interval(an_interval);
-//    merge_intervals();
-//}
+    // Insert new interval first or last
+    if (interval.second < m_area_list.front().first || interval.first > m_area_list.back().second) {
+        if (interval.second < m_area_list.front().first) {
+            new_list.push_back(interval);
+        }
 
-//void Tag::remove_interval(AnalysisInterval *rm_interval) {
-//    std::set<AnalysisInterval*, interval_cmp> intervals = m_intervals;
-//    std::set<AnalysisInterval*, interval_cmp> res;
-//    std::vector<AnalysisInterval*> temp_set;
-//    auto it = intervals.begin();
-//    while (it != intervals.end()) {
-//        std::pair<int, int> overlap = get_overlap(*it, rm_interval);
-//        if (is_interval(overlap.first, overlap.second)) {
-//            std::pair<AnalysisInterval*, AnalysisInterval*> pair = remove_overlap(*it, overlap);
-//            if (pair.first != nullptr) res.insert(pair.first);
-//            if (pair.second != nullptr) res.insert(pair.second);
-//            AnalysisInterval* temp = *it;
-//            temp_set.push_back(temp);
-//        } else {
-//            res.insert(*it);
-//        }
-//        it++;
-//    }
-//    m_intervals = res;
-//    for (auto it = temp_set.begin(); it != temp_set.end(); ++it) delete *it;
-//    delete rm_interval;
-//}
+        for (auto pair : m_area_list) {
+            new_list.push_back(pair);
+        }
 
-///**
-// * @brief Tag::merge_intervals
-// * This function assumes m_intervals is sorted
-// */
-//void Tag::merge_intervals(){
-//    std::set<AnalysisInterval*, interval_cmp> intervals = m_intervals;
-//    std::set<AnalysisInterval*, interval_cmp> res;
-//    auto it = intervals.begin();
-//    AnalysisInterval* current = *it;
-//    it++;
-//    while (it != intervals.end()){
-//       if (current->get_end() +1 >= (*it)->get_start()){ // you might want to change it to >=
-//           auto m_end = std::max((*it)->get_end(), current->get_end());
-//           auto m_start = std::min((*it)->get_start(), current->get_start());
-//           AnalysisInterval* merged = new AnalysisInterval(m_start, m_end);
-//           AnalysisInterval* temp = *it;
-//           current = merged;
-//           delete temp;
-//       } else {
-//           res.insert(current);
-//           current = *(it);
-//       }
-//       it++;
-//    }
-//    res.insert(current);
-//    m_intervals = res;
-//}
+        if (interval.first > m_area_list.back().second) {
+            new_list.push_back(interval);
+        }
+        m_area_list = new_list;
+        return;
+    }
 
-//bool Tag::is_interval(int start, int end) {
-//    return start <= end && start >= 0 && end >= 0;
-//}
+    // New interval covers all. Clear and add new one
+    if (interval.first <= m_area_list.front().first &&
+            interval.second >= m_area_list.back().second) {
+        new_list.push_back(interval);
+        m_area_list = new_list;
+        return;
+    }
 
-//std::pair<int,int> Tag::get_overlap(AnalysisInterval* intval1, AnalysisInterval* intval2) {
-//    int start = std::max(intval1->get_start(), intval2->get_start());
-//    int end = std::min(intval1->get_end(), intval2->get_end());
-//    std::pair<int,int> pair = std::make_pair(start, end);
-//    return pair;
-//}
+    // New interval overlap
+    for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
+        bool overlap = does_overlap(*it, interval);
+        if (!overlap) {
+            new_list.push_back(*it);
 
-//std::pair<AnalysisInterval*, AnalysisInterval*> Tag::remove_overlap(AnalysisInterval* interval, std::pair<int, int> overlap) {
-//    std::pair<AnalysisInterval*, AnalysisInterval*> pair = std::make_pair(nullptr, nullptr);
-//    int start = interval->get_start();
-//    int end = interval->get_end();
-//    if (interval->get_start() == overlap.first) {
-//        if (interval->get_end() == overlap.second) return pair;
-//        start = overlap.second +1;
-//    } else {
-//        end = overlap.first -1;
-//    }
-//    pair.first = new AnalysisInterval(start, end);
-//    if (interval->get_end() != overlap.second) {
-//        int new_start = overlap.second +1;
-//        int new_end = interval->get_end();
-//        pair.second = new AnalysisInterval(new_start, new_end);
-//    }
-//    return pair;
-//}
+            // Check if new interval is between intervals
+            if (it != m_area_list.end() &&
+                    interval.first > (*it).second &&
+                    interval.second < (*(it+1)).first)
+            {
+                new_list.push_back(interval);
+            }
+            continue;
+
+        }
+        // Merge overlapping intervals.
+        // Starting time of new merged interval is minimum of starting time
+        // of both overlapping intervals.
+        int start = std::min(interval.first, (*it).first);
+        int end = interval.second;
+
+        // Traverse the set while intervals are overlapping
+        while (it != m_area_list.end() && overlap) {
+            // Ending time of new merged interval is maximum of ending time
+            // of both overlapping intervals
+            end = std::max(interval.second, (*it).second);
+            if (it == m_area_list.end()-1) {
+                overlap = false;
+            } else {
+                overlap = does_overlap(*(it+1), interval);
+            }
+            it++;
+        }
+
+        it--;
+        new_list.push_back(std::make_pair(start, end));
+    }
+    m_area_list = new_list;
+}
+
+void Interval::remove_area_by_frame(int frame) {
+    for (auto it = m_area_list.begin(); it != m_area_list.end(); ++it) {
+        if ((*it).first <= frame && (*it).second >= frame) {
+            m_area_list.erase(it);
+            return;
+        }
+    }
+}
+
+void Interval::remove_area(std::pair<int, int> interval) {
+    auto p = std::find(m_area_list.begin(), m_area_list.end(), interval);
+    m_area_list.erase(p);
+}
+
+bool Interval::does_overlap(std::pair<int, int> a, std::pair<int, int> b) {
+    return (std::min(a.second, b.second) >= std::max(a.first, b.first));
+}
+
+ANALYSIS_TYPE Interval::get_type() const {
+    return INTERVAL;
+}
+
+void Interval::write(QJsonObject &json) {
+    json["name"] = m_name;
+    QJsonArray interval_areas;
+    for (auto areas : m_area_list) {
+        QJsonObject area;
+        area["start"] = areas.first;
+        area["end"] = areas.second;
+        interval_areas.push_back(area);
+    }
+    json["areas"] = interval_areas;
+    m_unsaved_changes = false;
+}
+
+void Interval::read(const QJsonObject &json) {
+    std::vector<std::pair<int, int>> new_list;
+    m_name = json["name"].toString();
+    QJsonArray json_intervals = json["areas"].toArray();
+    for (int i = 0; i < json_intervals.size(); ++i) {
+        QJsonObject json_frame = json_intervals[i].toObject();
+        int start = json_frame["start"].toInt();
+        int end = json_frame["end"].toInt();
+        std::pair<int, int> pair = std::make_pair(start, end);
+        new_list.push_back(pair);
+    }
+    m_area_list = new_list;
+    m_unsaved_changes = false;
+}

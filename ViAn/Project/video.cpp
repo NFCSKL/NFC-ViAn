@@ -1,4 +1,5 @@
 #include "video.h"
+#include "utility.h"
 
 /**
  * @brief Video::Video
@@ -13,21 +14,20 @@ Video::Video(const VIDEO_TYPE& sequence_type){
  * @param id
  * @param filepath
  */
-Video::Video(std::string file_path, const VIDEO_TYPE& sequence_type){
+Video::Video(QString file_path, const VIDEO_TYPE& sequence_type){
     m_sequence_type = sequence_type;
     this->file_path = file_path;
-    auto index = file_path.find_last_of('/') + 1;
-    m_name = file_path.substr(index);
+    m_name = Utility::name_from_path(file_path);
     m_is_saved = (m_sequence_type == VIDEO); // Ordinary videos can't be changed thus are allways "saved"
 }
 
 Video::~Video() {}
 
-std::string Video::get_name() {
+QString Video::get_name() {
     return m_name;
 }
 
-void Video::set_name(const std::string &new_name) {
+void Video::set_name(const QString &new_name) {
     m_name = new_name;
 }
 
@@ -73,8 +73,8 @@ bool operator==(Video v1, Video v2){
  */
 void Video::read(const QJsonObject& json){
     m_sequence_type = static_cast<VIDEO_TYPE>(json["sequence"].toInt());
-    this->file_path = json["file_path"].toString().toStdString();
-    m_name = json["name"].toString().toStdString();
+    this->file_path = json["file_path"].toString();
+    m_name = json["name"].toString();
     m_is_saved = true;
 }
 
@@ -85,7 +85,7 @@ void Video::read(const QJsonObject& json){
  */
 void Video::write(QJsonObject& json){
     json["sequence"] = m_sequence_type;
-    json["name"] = QString::fromStdString(m_name);
-    json["file_path"] = QString::fromStdString(this->file_path);
+    json["name"] = m_name;
+    json["file_path"] = this->file_path;
     m_is_saved = true;
 }

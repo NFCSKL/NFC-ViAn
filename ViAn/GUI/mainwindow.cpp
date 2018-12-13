@@ -2,6 +2,7 @@
 
 #include "Analysis/analysismethod.h"
 #include "Analysis/analysisslider.h"
+#include "constants.h"
 #include "framewidget.h"
 #include "GUI/Analysis/analysiswidget.h"
 #include "GUI/Analysis/anasettingwidget.h"
@@ -12,10 +13,12 @@
 #include "GUI/manipulatorwidget.h"
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
+#include "GUI/settingsdialog.h"
 #include "GUI/viewpathdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
 #include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
 #include "Project/project.h"
@@ -66,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize video widget
     video_wgt = new VideoWidget();
-    video_wgt->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT * SIZE_MULTIPLIER); // width and height sets aspect ratio
+    video_wgt->setMinimumSize(Constants::VIDEO_WGT_WIDTH * Constants::SIZE_MULTIPLIER,
+                              Constants::VIDEO_WGT_HEIGHT * Constants::SIZE_MULTIPLIER); // width and height sets aspect ratio
     setCentralWidget(video_wgt);
 
     // Initialize project widget
@@ -74,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
     project_wgt->new_project();
+    project_wgt->setIconSize(Singleton::get_instance()->PROJ_THUMBNAIL_SIZE);
 
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
     connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
@@ -113,6 +118,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::clean_zoom_preview, zoom_wgt, &ZoomPreviewWidget::clean_zoom_widget);
     connect(video_wgt, &VideoWidget::zoom_preview, zoom_wgt, &ZoomPreviewWidget::frame_update);
     connect(zoom_wgt, &ZoomPreviewWidget::window_size, video_wgt, &VideoWidget::update_zoom_preview_size);
+    connect(zoom_wgt, &ZoomPreviewWidget::pan_translation, video_wgt, &VideoWidget::translate_zoom_from_preview_click);
     connect(zoom_preview_dock, &QDockWidget::topLevelChanged, zoom_wgt, &ZoomPreviewWidget::on_floating_changed);
     
     // Initialize analysis queue widget
@@ -237,6 +243,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::enable_poi_btns, video_wgt, &VideoWidget::enable_poi_btns);
     connect(project_wgt, &ProjectWidget::set_poi_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
     connect(project_wgt, &ProjectWidget::set_tag_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
+    connect(project_wgt, &ProjectWidget::set_interval_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_interval_areas);
 
     // Tag connects
     connect(video_wgt, &VideoWidget::add_tag, project_wgt, &ProjectWidget::add_tag);
@@ -244,6 +251,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::tag_remove_frame, project_wgt, &ProjectWidget::remove_frame_from_tag_item);
     connect(project_wgt, &ProjectWidget::update_tag, video_wgt, &VideoWidget::update_tag);
     connect(project_wgt, &ProjectWidget::clear_tag, video_wgt, &VideoWidget::clear_tag);
+
+    // Interval connects
+    connect(video_wgt, &VideoWidget::add_interval, project_wgt, &ProjectWidget::add_interval);
+    connect(video_wgt, &VideoWidget::set_interval_area, project_wgt, &ProjectWidget::set_interval_area);
 
     // Connects for removing, clearing or closing
     connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
@@ -406,13 +417,13 @@ void MainWindow::init_edit_menu() {
     options_act->setStatusTip(tr("Program options"));
 
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    connect(options_act, &QAction::triggered, this, &MainWindow::options);
     connect(cw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_cw);
     connect(ccw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_ccw);
     connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);
     connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
     connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
     connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
+    connect(options_act, &QAction::triggered, this, &MainWindow::options);
 }
 
 /**
@@ -496,9 +507,10 @@ void MainWindow::init_analysis_menu() {
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
-    if (video_widgets.size() < FLOATING_WIDGET_MAX) {
+    if (video_widgets.size() < Singleton::get_instance()->FLOATING_WIDGET_MAX) {
         VideoWidget* widget_video = new VideoWidget(nullptr, true);
-        widget_video->setMinimumSize(VIDEO_WGT_WIDTH * SIZE_MULTIPLIER, VIDEO_WGT_HEIGHT *SIZE_MULTIPLIER);
+        widget_video->setMinimumSize(Constants::VIDEO_WGT_WIDTH * Constants::SIZE_MULTIPLIER,
+                                     Constants::VIDEO_WGT_HEIGHT *Constants::SIZE_MULTIPLIER);
         widget_video->show();
         video_widgets.push_back(widget_video);
 
@@ -529,14 +541,10 @@ void MainWindow::close_all_widgets() {
 void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Tag/Interval"));
 
-    // Interval code is outcommented since intervals currently is not available
-    // Add the code back when intervals are re-added.
-
     QAction* new_label_act = new QAction(tr("New tag &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
-//    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
-//    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
+    QAction* tag_interval_act = new QAction(tr("&Tag interval"));
 //    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
     interval_act = new QAction(tr("&Interval"), this);
 
@@ -546,12 +554,12 @@ void MainWindow::init_interval_menu() {
     new_label_act->setIcon(QIcon("../ViAn/Icons/tag.png"));
     new_tag_act->setIcon(QIcon("../ViAn/Icons/tag_frame.png"));
     remove_tag_act->setIcon(QIcon("../ViAn/Icons/remove_frame.png"));
+    tag_interval_act->setIcon(QIcon("../ViAn/Icons/create_interval.png"));
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
     remove_tag_act->setShortcut(Qt::Key_U);
-//    tag_interval_act->setShortcut(tr("Shift+T"));
-//    rm_tag_interval_act->setShortcut(tr("Shift+R"));
+    tag_interval_act->setShortcut(Qt::Key_K);
 //    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
 
     new_label_act->setStatusTip(tr("Create new tag label"));
@@ -563,16 +571,15 @@ void MainWindow::init_interval_menu() {
     interval_menu->addAction(new_tag_act);
     interval_menu->addAction(remove_tag_act);
     interval_menu->addSeparator();
-//    interval_menu->addAction(tag_interval_act);
-//    interval_menu->addAction(rm_tag_interval_act);
+    interval_menu->addAction(tag_interval_act);
+    interval_menu->addSeparator();
 //    interval_menu->addAction(rm_interval_act);
     interval_menu->addAction(interval_act);
 
     connect(new_label_act, &QAction::triggered, video_wgt, &VideoWidget::new_tag_clicked);
     connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
     connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
-//    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
-//    connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
+    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::create_interval_clicked);
 //    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
@@ -748,18 +755,13 @@ void MainWindow::cont_bri() {
     manipulator_dock->show();
 }
 
-void MainWindow::export_images(){
-    std::pair<int, int> interval = video_wgt->get_frame_interval();
+void MainWindow::export_images() {
+    if (!video_wgt || !video_wgt->playback_slider) return;
+    std::pair<int, int> interval = video_wgt->playback_slider->get_valid_interval();
     VideoProject* vid_proj = video_wgt->get_current_video_project();
     if (vid_proj == nullptr){
         emit set_status_bar("A video needs to be selected");
         return;
-    }
-
-    if (interval.first > interval.second) {
-        int tmp = interval.second;
-        interval.second = interval.first;
-        interval.first = tmp;
     }
     ImageExporter* im_exp = new ImageExporter();
     FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->get_dir(),
@@ -794,21 +796,28 @@ void MainWindow::export_images(){
  */
 void MainWindow::options() {
     emit set_status_bar("Opening options");
+    SettingsDialog* dialog = new SettingsDialog(this);
+    int status = dialog->exec();
+    if (status) {
+        Singleton* s = Singleton::get_instance();
+        if (project_wgt) project_wgt->setIconSize(s->PROJ_THUMBNAIL_SIZE);
+        if (video_wgt && video_wgt->playback_slider) video_wgt->playback_slider->setPageStep(s->PAGE_STEP);
+    }
 }
 
 void MainWindow::open_project_dialog(){
     QString project_path = QFileDialog().getOpenFileName(
                 this,
                 tr("Open project"),
-                project_wgt->get_default_path(),
+                Constants::DEFAULT_PATH,
                 "*.vian");
     project_wgt->open_project(project_path);
 }
 
 void MainWindow::open_project_folder() {
     if (!project_wgt->m_proj) return;
-    std::string dir = project_wgt->m_proj->get_dir();
-    QDesktopServices::openUrl(QUrl("file:///"+QString::fromStdString(dir), QUrl::TolerantMode));
+    QString dir = project_wgt->m_proj->get_dir();
+    QDesktopServices::openUrl(QUrl("file:///"+dir, QUrl::TolerantMode));
 }
 
 void MainWindow::view_paths() {

@@ -15,7 +15,7 @@
  */
 QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     // Set Title
-    setWindowTitle(QString::fromStdString("Vian - Analysis queue"));
+    setWindowTitle("Vian - Analysis queue");
     // Create queue
     m_queue = new QListWidget();
     // Create Abort button

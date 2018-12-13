@@ -14,8 +14,6 @@
  * it's settings are updated properly
  */
 class Zoomer {
-    static const double DEGREES_TO_RADIANS_FACTOR;
-
     // Viewport rectangle and size
     QSize m_viewport_size;
     cv::RotatedRect m_viewport;

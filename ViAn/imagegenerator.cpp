@@ -1,6 +1,8 @@
 #include "imagegenerator.h"
 
+#include "constants.h"
 #include "Project/project.h"
+#include "utility.h"
 
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -8,9 +10,7 @@
 #include <QDebug>
 #include <QDir>
 
-const unsigned int ImageGenerator::THUMBNAIL_SIZE = 80;
-
-ImageGenerator::ImageGenerator(cv::Mat frame, std::string proj_path){
+ImageGenerator::ImageGenerator(cv::Mat frame, QString proj_path){
     m_frame = frame.clone();
     m_path = proj_path;
 }
@@ -19,57 +19,35 @@ ImageGenerator::~ImageGenerator() {
     m_frame.release();
 }
 
-std::string ImageGenerator::create_thumbnail(std::string name) {
-    std::string save_path = m_path + Project::THUMBNAIL_FOLDER;
+QString ImageGenerator::create_thumbnail(QString name) {
+    QString save_path = m_path + Constants::THUMBNAIL_FOLDER;
     if (!create_directory(save_path)) return "";
-    return export_image(save_path + name, PNG, THUMBNAIL_SIZE);
+    return export_image(save_path + name, PNG, Constants::THUMBNAIL_SIZE);
 
 }
 
-std::string ImageGenerator::create_tiff(std::string name) {
-    std::string save_path = m_path + Project::STILLS_FOLDER;
-    if (!create_directory(save_path)) return "";    
-    return export_image(save_path + name, TIFF);
-}
-
-
-std::string ImageGenerator::create_bookmark(std::string name) {
-    std::string save_path = m_path + Project::BOOKMARK_FOLDER;
+QString ImageGenerator::create_tiff(QString name) {
+    QString save_path = m_path + Constants::STILLS_FOLDER;
     if (!create_directory(save_path)) return "";
     return export_image(save_path + name, TIFF);
 }
-/**
- * @brief ImageGenerator::add_serial_number
- * @param name
- * @param file_end
- * @return
- * Appends (i) to file if i-1 images with same name exist
- */
-std::string ImageGenerator::add_serial_number(std::string name, std::string file_end) {
-    QString qend = QString::fromStdString(file_end);
-    QString qname = QString::fromStdString(name);
-    QString res = qname+qend;
-    int i = 0;
-    if(QFile::exists(res)){
-        res = qname + QString("(%1)"+ qend).arg(i);
-    }
-    while(QFile::exists(res) && ++i){
-        res = qname + QString("(%1)"+ qend).arg(i);
-    }
-    return res.toStdString();
-}
 
+
+QString ImageGenerator::create_bookmark(QString name) {
+    QString save_path = m_path + Constants::BOOKMARK_FOLDER;
+    if (!create_directory(save_path)) return "";
+    return export_image(save_path + name, TIFF);
+}
 
 /**
  * @brief ImageGenerator::create_directory
  * Creates the full directory path.
  * @return true if the path exists/has been creat§ed
  */
-bool ImageGenerator::create_directory(std::string path) {
-    const QString q_path = QString::fromStdString(path);
-    bool success = QDir().exists(q_path);
+bool ImageGenerator::create_directory(QString path) {
+    bool success = QDir().exists(path);
     if (!success) {
-        success = QDir().mkpath(q_path);
+        success = QDir().mkpath(path);
     }
     return success;
 }
@@ -83,7 +61,7 @@ bool ImageGenerator::create_directory(std::string path) {
  * @return
  * Export single image to requested path with extension ext
  */
-std::string ImageGenerator::export_image(std::string requested_path, int ext, const unsigned int size, bool keep_aspect_ratio) {
+QString ImageGenerator::export_image(QString requested_path, int ext, const unsigned int size, bool keep_aspect_ratio) {
     cv::Mat tmp = m_frame.clone();
     if (size > 0) {
         // Do resize
@@ -101,7 +79,7 @@ std::string ImageGenerator::export_image(std::string requested_path, int ext, co
             cvtColor(tmp, tmp, CV_BGR2RGB);
             break;
     }
-    std::string end;
+    QString end;
     // Extension
     switch (ext) {
         case PNG:
@@ -114,8 +92,8 @@ std::string ImageGenerator::export_image(std::string requested_path, int ext, co
             end = ".png";
             break;
     }
-    std::string saved_path = add_serial_number(requested_path, end);
-    cv::imwrite(saved_path, tmp);
+    QString saved_path = Utility::add_serial_number(requested_path, end);
+    cv::imwrite(saved_path.toStdString(), tmp);
     tmp.release();
     return saved_path;
 }

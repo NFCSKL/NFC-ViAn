@@ -1,5 +1,6 @@
 #include "frameprocessor.h"
 
+#include "constants.h"
 #include "overlay.h"
 #include "utility.h"
 #include "Video/videoplayer.h"
@@ -7,11 +8,6 @@
 #include <QDebug>
 
 #include <mutex>
-
-const int FrameProcessor::DEGREES_0 = 0;
-const int FrameProcessor::DEGREES_90 = 90;
-const int FrameProcessor::DEGREES_180 = 180;
-const int FrameProcessor::DEGREES_270 = 270;
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
@@ -167,9 +163,11 @@ void FrameProcessor::process_frame() {
             manipulated_frame = m_frame.clone();
         }
     } catch (cv::Exception& e) {
+        Q_UNUSED(e)
         qWarning() << "Failed to copy new frame in processor";
         return;
     }
+    m_z_settings->frame_size = QSize(m_frame.cols, m_frame.rows);
 
     // Rotates the frame, according to the choosen direction.
     // TODO: Computation heavy.. Will cause lag on larger images.
@@ -207,6 +205,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
+    m_z_settings->center = m_zoomer.get_center();
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
@@ -218,13 +217,13 @@ void FrameProcessor::load_zoomer_state() {
     m_z_settings->set_state = false;
     m_zoomer.load_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation);
 
-    if (m_z_settings->rotation == DEGREES_0) {
+    if (m_z_settings->rotation == Constants::DEGREE_MIN) {
         m_rotate_direction = ROTATE_NONE;
-    } else if (m_z_settings->rotation == DEGREES_90) {
+    } else if (m_z_settings->rotation == Constants::DEGREE_90) {
         m_rotate_direction = ROTATE_90;
-    } else if (m_z_settings->rotation == DEGREES_180) {
+    } else if (m_z_settings->rotation == Constants::DEGREE_180) {
         m_rotate_direction = ROTATE_180;
-    } else if (m_z_settings->rotation == DEGREES_270) {
+    } else if (m_z_settings->rotation == Constants::DEGREE_270) {
         m_rotate_direction = ROTATE_270;
     }
     has_new_zoom_state = true;
@@ -379,13 +378,13 @@ void FrameProcessor::update_rotation(const int& direction) {
     if (direction != m_rotate_direction) {
         m_rotate_direction = direction;
         if (m_rotate_direction == ROTATE_NONE) {
-            m_zoomer.update_rotation(DEGREES_0);
+            m_zoomer.update_rotation(Constants::DEGREE_MIN);
         } else if (m_rotate_direction == ROTATE_90) {
-            m_zoomer.update_rotation(DEGREES_90);
+            m_zoomer.update_rotation(Constants::DEGREE_90);
         } else if (m_rotate_direction == ROTATE_180) {
-            m_zoomer.update_rotation(DEGREES_180);
+            m_zoomer.update_rotation(Constants::DEGREE_180);
         } else if (m_rotate_direction == ROTATE_270) {
-            m_zoomer.update_rotation(DEGREES_270);
+            m_zoomer.update_rotation(Constants::DEGREE_270);
         }
         m_zoomer.enforce_frame_boundaries();
     }

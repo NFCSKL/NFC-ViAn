@@ -2,10 +2,6 @@
 #define IMAGEIMPORTER_H
 
 #include <QObject>
-#include <QFileInfo>
-#include <QStringList>
-
-#include "utility.h"
 
 class ImageImporter : public QObject
 {
@@ -22,7 +18,7 @@ public slots:
     void abort();
 signals:
     void finished();
-    void imported_sequence(QStringList images, QStringList checksums, std::string path, int seq_type);
+    void imported_sequence(QStringList images, QStringList checksums, QString path, int seq_type);
     void update_progress(int progress);
 };
 

@@ -22,7 +22,7 @@ void BookmarkTest::cleanup() {
 }
 
 void BookmarkTest::test_saved_status() {
-    m_bookmark->reset_root_dir(m_temp_dir.path().toStdString());
+    m_bookmark->reset_root_dir(m_temp_dir.path());
     QVERIFY(!m_bookmark->is_saved());
     m_bookmark->m_unsaved_changes = false;
 

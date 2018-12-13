@@ -53,7 +53,6 @@ SOURCES += main.cpp \
     GUI/TreeItems/folderitem.cpp \
     GUI/TreeItems/tagitem.cpp \
     GUI/TreeItems/analysisitem.cpp \
-    GUI/fpsdialog.cpp \
     GUI/frameexporterdialog.cpp \
     GUI/framewidget.cpp \
     GUI/videowidget.cpp \
@@ -77,19 +76,23 @@ SOURCES += main.cpp \
     GUI/TreeItems/tagframeitem.cpp \
     Project/Analysis/interval.cpp \
     Project/Analysis/tagframe.cpp \
+    Project/imagesequence.cpp \
     GUI/TreeItems/sequenceitem.cpp \
+    GUI/TreeItems/sequencecontaineritem.cpp \
+    GUI/TreeItems/sequencetagitem.cpp \
     GUI/Analysis/anasettingwidget.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/zoompreviewwidget.cpp \
     GUI/manipulatorwidget.cpp \
-    GUI/pathdialog.cpp \
     GUI/Analysis/analysislistitem.cpp \
+    GUI/TreeItems/intervalitem.cpp \
+    GUI/TreeItems/intervalareaitem.cpp \
+    GUI/pathdialog.cpp \
     GUI/viewpathdialog.cpp \
     GUI/viewpathitem.cpp \
-    Project/imagesequence.cpp \
-    GUI/TreeItems/sequencecontaineritem.cpp \
-    GUI/sequencedialog.cpp \
-    GUI/TreeItems/sequencetagitem.cpp
+    GUI/settingsdialog.cpp \
+    constants.cpp \
+    GUI/sequencedialog.cpp
 
 #
 # TEST
@@ -131,7 +134,6 @@ HEADERS += reportgenerator.h\
     GUI/projectdialog.h \
     GUI/projectwidget.h \
     GUI/recentprojectdialog.h \
-    GUI/fpsdialog.h \
     GUI/frameexporterdialog.h \
     GUI/framewidget.h \
     GUI/videowidget.h \
@@ -156,26 +158,30 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/tagframeitem.h \
     Project/Analysis/interval.h \
     Project/Analysis/tagframe.h \
+    Project/imagesequence.h \
+    Project/video.h \
     GUI/TreeItems/sequenceitem.h \
+    GUI/TreeItems/sequencecontaineritem.h \
+    GUI/TreeItems/sequencetagitem.h\
     GUI/Analysis/anasettingwidget.h \
     GUI/Bookmark/bookmarkdialog.h \
     GUI/zoompreviewwidget.h \
     GUI/manipulatorwidget.h \
-    GUI/pathdialog.h \
     GUI/Analysis/analysislistitem.h \
+    GUI/TreeItems/intervalitem.h \
+    GUI/TreeItems/intervalareaitem.h \
+    GUI/pathdialog.h \
     GUI/viewpathdialog.h \
     GUI/viewpathitem.h \
-    Project/imagesequence.h \
-    Project/video.h \
-    GUI/TreeItems/sequencecontaineritem.h \
-    GUI/sequencedialog.h \
-    GUI/TreeItems/sequencetagitem.h
+    GUI/settingsdialog.h \
+    constants.h \
+    GUI/sequencedialog.h
 
 #
 # LIBRARY
 #
-SOURCES += Library/customdialog.cpp
-HEADERS += Library/customdialog.h
+SOURCES +=
+HEADERS +=
 
 #
 # GUI
@@ -205,7 +211,6 @@ SOURCES += \
     Video/shapes/pen.cpp \
     Video/shapes/rectangle.cpp \
     Video/shapes/text.cpp \
-    Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
 HEADERS += \
     Video/overlay.h \
@@ -215,7 +220,6 @@ HEADERS += \
     Video/shapes/pen.h \
     Video/shapes/rectangle.h \
     Video/shapes/text.h \
-    Video/shapes/analysarea.h \
     Video/framemanipulator.h
 
 win32 {
@@ -259,7 +263,6 @@ HEADERS  += \
 # Project
 #
 SOURCES += Project/Test/projecttestsuite.cpp \
-    Project/report.cpp \
     Project/project.cpp \
     Project/video.cpp \
     Project/videoproject.cpp \
@@ -273,7 +276,6 @@ HEADERS +=Project/Test/projecttestsuite.h \
     Project/video.h \
     Project/videoproject.h \
     Project/bookmark.h  \
-    Project/report.h \
     Project/Analysis/analysis.h \
     Project/Analysis/poi.h
 

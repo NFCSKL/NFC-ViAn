@@ -45,9 +45,9 @@ void AnaSettingWidget::init_settings() {
     QLabel* interval_label = new QLabel("0");
     QLabel* b_box_xy_label = new QLabel("0");
     QLabel* b_box_size_label = new QLabel("0");
-    form_layout->addRow(QString::fromStdString("Interval"), interval_label);
-    form_layout->addRow(QString::fromStdString("Bounding box X,Y"), b_box_xy_label);
-    form_layout->addRow(QString::fromStdString("Bounding box size"), b_box_size_label);
+    form_layout->addRow("Interval", interval_label);
+    form_layout->addRow("Bounding box X,Y", b_box_xy_label);
+    form_layout->addRow("Bounding box size", b_box_size_label);
     settings_map.insert(std::make_pair("Interval", interval_label));
     settings_map.insert(std::make_pair("Bounding box X,Y", b_box_xy_label));
     settings_map.insert(std::make_pair("Bounding box size", b_box_size_label));

@@ -24,6 +24,7 @@ class BasicAnalysis;
 class DoubleClickButton;
 class DrawScrollArea;
 class FrameWidget;
+class Interval;
 class QCheckBox;
 class QColor;
 class QGridLayout;
@@ -58,7 +59,7 @@ private:
     overlay_settings o_settings;
     video_sync v_sync;
 
-    std::string m_video_path;
+    QString m_video_path;
 
     std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
     std::atomic_int video_width{0};
@@ -100,12 +101,9 @@ public:
     AnalysisSlider* playback_slider;
 
     VideoProject* get_current_video_project();
-    std::pair<int, int> get_frame_interval();
-    int get_current_frame();
     VideoController* v_controller;
 
     int get_current_video_length();
-    void set_overlay(Overlay* overlay);
     void set_update_text(QString, Shapes*);
     void set_clear_drawings(int frame);
     void set_delete_drawing(Shapes* shape);
@@ -118,6 +116,8 @@ signals:
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*, AnalysisSettings*);
     void add_tag(VideoProject*, Tag*);
+    void add_interval(VideoProject*, Interval*);
+    void set_interval_area(int new_area_start);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);
@@ -125,7 +125,7 @@ signals:
     void delete_sc_activated();
     void open_view_path_dialog();
     void zoom_preview(cv::Mat preview_frame);
-    void update_videoitem(std::string);
+    void update_videoitem(QString);
     void update_manipulator_wgt(int, double, double);
     void update_thumbnail();
 public slots:
@@ -141,15 +141,12 @@ public slots:
     void remove_tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
-    void tag_interval(void);
-    void remove_tag_interval(void);
+    void new_interval(QString name);
     void set_basic_analysis(BasicAnalysis*);
     void clear_tag(void);
-    void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
     void analysis_play_btn_toggled(bool value);
-    void set_slider_max(int value);
     void display_index_slot();
     void on_new_frame();
     void on_playback_slider_pressed(void);
@@ -162,13 +159,12 @@ public slots:
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
 
-    void set_current_frame_size(QSize size);
     void on_export_frame(void);
     void on_bookmark_clicked(void);
     void quick_bookmark(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
-    void set_interval(int start, int end);
+    void create_interval_clicked();
     void delete_interval(void);
     void frame_line_edit_finished();
     void zoom_label_finished();
@@ -208,12 +204,9 @@ public slots:
     void update_playback_speed(int speed);
     void set_brightness_contrast(int bri, double cont, double gamma);
     void update_zoom_preview_size(QSize s);
+    void translate_zoom_from_preview_click(QPoint click_pos);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
-    const int PERCENT_INT_CONVERT = 100;
-    const int ZOOM_LABEL_MIN = 1;
-    const int ZOOM_LABEL_MAX = 10000;
-    const int FIVE_SEC = 5000;
 
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
@@ -243,6 +236,7 @@ private:
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
+    QPushButton* create_interval_btn;
 
     //Shortcuts
     QShortcut* bookmark_quick_sc;
@@ -271,13 +265,11 @@ private:
     QString convert_time(int time);
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
+    Interval* m_current_interval = nullptr;
+
     bool m_floating = false;
-    bool state_video = false;
     bool frame_is_clean = false;
 
-    bool tag_clicked = false;
-
-    bool slider_is_blocked = false;
     bool video_btns_enabled = false;
     bool analysis_only = false;
 

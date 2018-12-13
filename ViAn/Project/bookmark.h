@@ -17,37 +17,36 @@ class VideoProject;
 class Bookmark : public Writeable {
     friend class BookmarkTest;
     VideoProject* m_vid_proj;
-//    int m_type = UNSORTED;
-//    std::string m_container_name = "";
-    std::pair<int, std::string> m_container;
+    std::pair<int, QString> m_container;
 
     QString m_time = "";               // Time of the bookmark (format "mm:ss")
-    std::string m_description = "";    // Description for the bookmark, given by user
+    QString m_description = "";    // Description for the bookmark, given by user
     VideoState m_state;                 // Contains the state of the video, eg frame, zoom rect and scale factor
-    std::string m_thumbnail_path = "";        // Contains the path to the thumbnail for the bookmark
+    QString m_thumbnail_path = "";        // Contains the path to the thumbnail for the bookmark
 
     bool m_unsaved_changes = true;  // Track whether the class instance has unsaved changes
     ID id = 0;
 public:
-    std::string m_file;
-    Bookmark(VideoProject* vid_proj, const std::string &file_name, const std::string& text, const VideoState& state, const QString &m_time);
+    QString m_file;             // Path for the frame in the bookmark
+    QString m_image_name;
+    Bookmark(VideoProject* vid_proj, const QString &file_name, const QString& text, const VideoState& state, const QString &m_time);
     Bookmark(const Bookmark& bookmark);
     Bookmark();
     ~Bookmark();
     ID get_id();
     void set_id(ID id);
-    void reset_root_dir(const std::string& dir);
+    void reset_root_dir(const QString &dir);
     QString get_time();
     int get_frame_number();
     VideoState get_state();
-    std::pair<int, std::string> get_container();
+    std::pair<int, QString> get_container();
     VideoProject* get_video_project();
-    std::string get_description();
-    void set_description(const std::string &text);
-    void set_container(std::string name, int type);
-    void rename_container(std::string old_name, std::string new_name);
-    void set_thumbnail_path(std::__cxx11::string path);
-    std::__cxx11::string get_thumbnail_path();
+    QString get_description();
+    void set_description(const QString &text);
+    void set_container(QString name, int type);
+    void rename_container(QString old_name, QString new_name);
+    void set_thumbnail_path(QString path);
+    QString get_thumbnail_path();
     void set_video_project(VideoProject* vid_proj);
     void add_to_video_project();
     bool remove();
@@ -55,7 +54,6 @@ public:
     void write(QJsonObject& json);
     bool is_saved() const;
     void remove_exported_image();
-private:
 
 };
 

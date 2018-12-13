@@ -36,7 +36,7 @@ void Analysis::read(const QJsonObject &json){
 
 
     this->type = static_cast<ANALYSIS_TYPE>(json["type"].toInt());
-    this->m_name = json["name"].toString().toStdString();
+    this->m_name = json["name"].toString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
@@ -60,7 +60,7 @@ void Analysis::write(QJsonObject &json){
     json["interval start"] = settings->interval.first;
     json["interval end"] = settings->interval.second;
     json["type"] = this->type;
-    json["name"] = QString::fromStdString(this->m_name);
+    json["name"] = this->m_name;
     QJsonArray json_POIs;
     for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
         QJsonObject json_POI;

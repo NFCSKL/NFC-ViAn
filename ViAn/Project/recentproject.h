@@ -9,16 +9,14 @@
 #include <tuple>
 
 class RecentProject : public Saveable {
-    std::list<std::tuple<std::string, std::string, std::string>> recent_items;
-    static const std::string FILE_NAME;
-    static const std::string PATH;
-    static const int RECENT_MAX = 10;
+    std::list<std::tuple<QString, QString, QString>> recent_items;
+
 public:
     RecentProject();
 
-    void update_recent(const std::string& name, const std::string& project_path, const std::string& last_changed);
-    bool remove_project(const std::string& project_path);
-    std::list<std::tuple<std::string, std::string, std::string>> load_recent();
+    void update_recent(const QString& name, const QString& project_path, const QString& last_changed);
+    bool remove_project(const QString &project_path);
+    std::list<std::tuple<QString, QString, QString>> load_recent();
     void save();
 
     void read(const QJsonObject& json);

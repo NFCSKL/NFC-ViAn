@@ -61,7 +61,6 @@ private:
     Shapes* get_empty_shape(SHAPES shape_type);
     void get_drawing(QPoint pos, int frame_nr);
     bool point_in_drawing(QPoint pos, Shapes* shape);
-    cv::Point qpoint_to_point(QPoint pnt);
     
     Shapes* current_drawing = nullptr;
     QPoint prev_point;

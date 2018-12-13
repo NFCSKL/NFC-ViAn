@@ -2,11 +2,11 @@
 
 #include "Project/Analysis/tagframe.h"
 
-SequenceTagItem::SequenceTagItem(const std::string &name, const int &index, TagFrame *tag) :
+SequenceTagItem::SequenceTagItem(const QString &name, const int &index, TagFrame *tag) :
     TreeItem (SEQUENCE_TAG_ITEM) {
     m_index = index;
     m_tag = tag;
-    setText(0, QString::fromStdString(name));
+    setText(0, name);
 }
 
 int SequenceTagItem::get_index() {

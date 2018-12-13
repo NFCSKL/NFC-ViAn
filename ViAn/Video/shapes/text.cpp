@@ -1,5 +1,6 @@
 #include "text.h"
 
+#include "constants.h"
 #include "utility.h"
 
 #include "opencv2/imgproc/imgproc.hpp"
@@ -10,6 +11,7 @@
  * @brief Text::Text
  */
 Text::Text() : Shapes(SHAPES::TEXT) {
+    m_name = "Text";
     font_scale = 0;
 }
 
@@ -31,18 +33,6 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPE
 
 Text::~Text() {}
 
-/**
- * @brief Text::draw
- * Draws the object on top of the specified frame.
- * @param frame Frame to draw on.
- * @return Returns the frame with drawing.
- */
-cv::Mat Text::draw(cv::Mat &frame) {
-    cv::putText(frame, m_name.toStdString(), draw_start, cv::FONT_HERSHEY_SIMPLEX, font_scale,
-                color, thickness);
-    return frame;
-}
-
 cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
     Q_UNUSED(anchor) Q_UNUSED(scale_factor)
     QPoint rot_start = Utility::rotate(Utility::from_cvpoint(draw_start), angle, width, height);
@@ -63,10 +53,10 @@ void Text::handle_new_pos(QPoint pos) {
 
 double Text::set_font_scale(QPoint diff_point) {
     int diff_sum = diff_point.x() + diff_point.y();
-    if (diff_sum > 0 && font_scale < FONT_SCALE_MAX) {
-        font_scale += FONT_SCALE_STEP;
-    } else if (diff_sum < 0 && font_scale > FONT_SCALE_MIN) {
-        font_scale += -FONT_SCALE_STEP;
+    if (diff_sum > 0 && font_scale < Constants::FONT_SCALE_MAX) {
+        font_scale += Constants::FONT_SCALE_STEP;
+    } else if (diff_sum < 0 && font_scale > Constants::FONT_SCALE_MIN) {
+        font_scale += -Constants::FONT_SCALE_STEP;
     }
     return font_scale;
 }
@@ -75,12 +65,28 @@ double Text::get_font_scale() {
     return font_scale;
 }
 
-QString Text::get_name() {
-    return m_name;
+cv::Size Text::get_text_size() {
+    return text_size;
 }
 
-void Text::set_name(QString name) {
-    m_name = name;
+void Text::set_text_size(cv::Size size) {
+    text_size = size;
+}
+
+/**
+ * @brief Text::update_text_pos
+ * Updates the start and end point of the text-drawing
+ * @param pos
+ */
+void Text::update_text_pos(QPoint pos) {
+    draw_start = Utility::from_qpoint(pos);
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
+}
+
+void Text::update_text_draw_end() {
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
 }
 
 /**
@@ -90,7 +96,6 @@ void Text::set_name(QString name) {
  */
 void Text::write(QJsonObject& json) {
     write_shape(json);
-    json["name"] = m_name;
     json["font"] = font_scale;
 }
 
@@ -101,6 +106,5 @@ void Text::write(QJsonObject& json) {
  */
 void Text::read(const QJsonObject& json) {
     read_shape(json);
-    m_name = json["name"].toString();
     font_scale = json["font"].toDouble();
 }

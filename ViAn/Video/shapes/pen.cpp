@@ -11,6 +11,7 @@
  * @brief Pen::Pen
  */
 Pen::Pen() : Shapes(SHAPES::PEN) {
+    m_name = "Pen";
 }
 
 /**
@@ -19,29 +20,11 @@ Pen::Pen() : Shapes(SHAPES::PEN) {
  * @param pos Starting point for the new object
  */
 Pen::Pen(QColor col, QPoint pos) : Shapes(SHAPES::PEN, col, pos) {
-    points.push_back(qpoint_to_point(pos));
+    m_name = "Pen";
+    points.push_back(Utility::from_qpoint(pos));
 }
 
 Pen::~Pen() {}
-
-/**
- * @brief Pen::draw
- * Draws the object on top of the specified frame.
- * @param frame Frame to draw on.
- * @return Returns the frame with drawing.
- */
-cv::Mat Pen::draw(cv::Mat &frame) {
-    cv::Point p(-1, -1);
-    for (auto point : points) {
-        if (p.x < 0 || p.y < 0) {
-            p = point;
-            continue;
-        }
-        cv::line(frame, p, point, color, thickness);
-        p = point;
-    }
-    return frame;
-}
 
 /**
  * @brief Pen::draw_scaled
@@ -73,23 +56,15 @@ cv::Mat Pen::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, 
  * @param pos
  */
 void Pen::handle_new_pos(QPoint pos) {
-    points.push_back(qpoint_to_point(pos));
+    points.push_back(Utility::from_qpoint(pos));
 }
 
 void Pen::move_shape(QPoint diff_point) {
     std::vector<cv::Point> new_points;
     for (cv::Point point : points) {
-        new_points.push_back(point + qpoint_to_point(diff_point));
+        new_points.push_back(point + Utility::from_qpoint(diff_point));
     }
     points = new_points;
-}
-
-QString Pen::get_name() {
-    return m_name;
-}
-
-void Pen::set_name(QString name) {
-    m_name = name;
 }
 
 std::vector<cv::Point> Pen::get_points() {
@@ -115,7 +90,6 @@ void Pen::write(QJsonObject& json) {
         json_points.append(json_point);
     }
     json["points"] = json_points;
-    json["name"] = m_name;
 }
 
 /**
@@ -133,5 +107,4 @@ void Pen::read(const QJsonObject& json) {
         p.y = json_point["py"].toInt();
         points.push_back(p);
     }
-    m_name = json["name"].toString();
 }

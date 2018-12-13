@@ -15,7 +15,7 @@
  * @param interval  :   end points of the interval to be exported
  * @param file_path :   path to the video to export images from
  */
-ImageExporter::ImageExporter(const std::pair<int, int>& interval, const std::string& file_path, const std::string& export_path) {
+ImageExporter::ImageExporter(const std::pair<int, int>& interval, const QString &file_path, const QString &export_path) {
     set_interval(interval);
     m_file_path = file_path;
     m_export_path = export_path;
@@ -29,11 +29,11 @@ void ImageExporter::set_interval(const std::pair<int, int> &interval){
                 interval : std::make_pair(interval.second, interval.first);
 }
 
-void ImageExporter::set_file_path(const std::string &file_path){
+void ImageExporter::set_file_path(const QString &file_path){
     m_file_path = file_path;
 }
 
-void ImageExporter::set_export_path(const std::string &export_path){
+void ImageExporter::set_export_path(const QString &export_path){
     m_export_path = export_path;
 }
 
@@ -47,7 +47,7 @@ std::pair<int, int> ImageExporter::get_interval(){
  * This can take a long time and should as such be done in a seperate thread.
  */
 void ImageExporter::export_images() {
-    cv::VideoCapture capture(m_file_path);
+    cv::VideoCapture capture(m_file_path.toStdString());
     if (!capture.isOpened()) {
         return;
     }
@@ -56,13 +56,13 @@ void ImageExporter::export_images() {
     int max_digits = Utility::number_of_digits(capture.get(CV_CAP_PROP_FRAME_COUNT));
     int current_frame = m_export_interval.first;
     int progress = 0;
-    std::string padded_number = "";
+    QString padded_number = "";
 
     cv::Mat frame;
     capture.set(CV_CAP_PROP_POS_FRAMES, m_export_interval.first);
     while (capture.read(frame) && (m_export_interval.first + progress) <= m_export_interval.second && !m_aborted) {
-        padded_number = Utility::zfill(std::to_string(current_frame), max_digits);
-        cv::imwrite(m_export_path + padded_number + ".tiff", frame);
+        padded_number = Utility::zfill(QString::number(current_frame), max_digits);
+        cv::imwrite(m_export_path.toStdString() + padded_number.toStdString() + ".tiff", frame);
         current_frame++;
         emit update_progress(++progress);
         QCoreApplication::processEvents(); // Process thread event loop. Needed for abort flag to update

@@ -4,7 +4,7 @@
 
 ViewPathItem::ViewPathItem(Video* video, QTreeWidget* parent) : QTreeWidgetItem (parent) {
     m_video = video;
-    set_path(QString::fromStdString(video->file_path));
+    set_path(video->file_path);
 }
 
 void ViewPathItem::set_path(QString path) {
@@ -53,6 +53,6 @@ bool ViewPathItem::is_valid() {
 }
 
 void ViewPathItem::update_video() {
-    m_video->file_path = m_full_path.toStdString();
-    m_video->set_name(m_name.toStdString());
+    m_video->file_path = m_full_path;
+    m_video->set_name(m_name);
 }

@@ -99,7 +99,7 @@ void ProjectTestsuite::save_status_test(){
     directory.setAutoRemove(true);
     QVERIFY(directory.isValid());
 
-    std::string project_path = directory.path().toStdString();
+    QString project_path = directory.path();
     std::unique_ptr<Project> project(new Project("testproject", project_path));
     QVERIFY(!project->is_saved());
 
@@ -123,19 +123,19 @@ void ProjectTestsuite::save_status_test(){
     project->save_project();
 
     // Verify that removing a bookmark updates status
-    video_project->delete_bookmark(bookmark_id);
+    video_project->remove_bookmark(bookmark);
     QVERIFY(!project->is_saved());
     project->save_project();
 
     // VIDEOPROJECT/ANALYSIS
     // Verify that adding an analysis updates status
     BasicAnalysis* analysis = new BasicAnalysis();
-    int analysis_id = video_project->add_analysis(analysis);
+    video_project->add_analysis(analysis);
     QVERIFY(!project->is_saved());
     project->save_project();
 
     // Verify that removing an analysis updates status
-    video_project->delete_analysis(analysis_id);
+    video_project->remove_analysis(analysis);
     QVERIFY(!project->is_saved());
     project->save_project();
 

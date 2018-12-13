@@ -19,14 +19,13 @@ enum list_types {BOOKMARK, CONTAINER};
 class BookmarkWidget : public QWidget
 {
     Q_OBJECT
-    std::string m_path;
+    QString m_path;
     BookmarkList* bm_list;
     QVBoxLayout* bm_list_layout;
     QVBoxLayout* layout;
     QScrollArea* scroll_area;
     QDockWidget* folder_dock;
     QThread* processing_thread;
-    const int TEXT_EDIT_MIN_HEIGHT = 64;
 
 public:
     explicit BookmarkWidget(QWidget *parent = nullptr);
@@ -39,13 +38,13 @@ public slots:
     void create_bookmark(VideoProject *vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description);
     void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
-    void set_path(std::string path);
+    void set_path(QString path);
     void clear_bookmarks();
     void generate_report();
 private slots:
 //    void item_context_menu(QPoint pos);
 private:
-    BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, std::string> *container);
+    BookmarkCategory* add_to_container(BookmarkItem* bm_item, std::pair<int, QString> *container);
     QString get_input_text(QString text, bool* ok);
 };
 

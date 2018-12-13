@@ -9,7 +9,7 @@ class SequenceTagItem : public TreeItem {
     int m_index{};
     TagFrame* m_tag;
 public:
-    SequenceTagItem(const std::string& name, const int& index, TagFrame *tag);
+    SequenceTagItem(const QString& name, const int& index, TagFrame *tag);
     int get_index();
     VideoState get_state();
     void remove();

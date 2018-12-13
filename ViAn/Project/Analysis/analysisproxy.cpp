@@ -15,11 +15,11 @@
  */
 AnalysisProxy::AnalysisProxy() {}
 
-AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
+AnalysisProxy::AnalysisProxy(const QString file_analysis) :
     file_analysis(file_analysis) {
 }
 
-AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
+AnalysisProxy::AnalysisProxy(const Analysis &other, const QString file)
     : BasicAnalysis(other),
       file_analysis(file),
       type(other.type) {
@@ -50,7 +50,7 @@ AnalysisSettings* AnalysisProxy::get_settings() {
     return settings;
 }
 
-void AnalysisProxy::reset_root_dir(const std::string &dir) {
+void AnalysisProxy::reset_root_dir(const QString &dir) {
     file_analysis = dir+Utility::name_from_path(file_analysis);
     m_unsaved_changes = true;
 }
@@ -62,7 +62,7 @@ void AnalysisProxy::reset_root_dir(const std::string &dir) {
  */
 void AnalysisProxy::read(const QJsonObject &json) {
     AnalysisSettings* new_settings = new AnalysisSettings();
-    m_name = json["name"].toString().toStdString();
+    m_name = json["name"].toString();
     int height = json["bounding box height"].toInt();
     int width = json["bounding box width"].toInt();
     int y = json["bounding box y"].toInt();
@@ -76,7 +76,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
     }
     settings = new_settings;
 
-    file_analysis = json["full_path"].toString().toStdString();
+    file_analysis = json["full_path"].toString();
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_poi = json_intervals[i].toObject();
@@ -94,7 +94,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
  * @param json
  */
 void AnalysisProxy::write(QJsonObject &json) {
-    json["name"] = QString::fromStdString(m_name);
+    json["name"] = m_name;
     json["bounding box height"] = settings->bounding_box.height;
     json["bounding box width"] = settings->bounding_box.width;
     json["bounding box y"] = settings->bounding_box.y;
@@ -107,7 +107,7 @@ void AnalysisProxy::write(QJsonObject &json) {
         json[QString::fromStdString(name)] = settings->get_setting(name);
     }
 
-    json["full_path"] = QString::fromStdString(file_analysis);
+    json["full_path"] = file_analysis;
     QJsonArray intervals;
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;
@@ -123,6 +123,6 @@ ANALYSIS_TYPE AnalysisProxy::get_type() const {
     return type;
 }
 
-std::string AnalysisProxy::full_path() const {
+QString AnalysisProxy::full_path() const {
     return file_analysis;
 }

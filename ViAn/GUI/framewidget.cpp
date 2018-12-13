@@ -1,6 +1,7 @@
 #include "framewidget.h"
 
 #include "Analysis/analysissettings.h"
+#include "constants.h"
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/videoproject.h"
@@ -64,7 +65,8 @@ void FrameWidget::copy() {
     case TEXT: {
         Text* text = dynamic_cast<Text*>(current_drawing);
         copied_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
-        copied_item->set_text_size(text->get_text_size());
+        Text* copied_item_text = dynamic_cast<Text*>(copied_item);
+        copied_item_text->set_text_size(text->get_text_size());
         break;
     }
     default:
@@ -107,7 +109,8 @@ void FrameWidget::paste() {
     case TEXT: {
         Text* text = dynamic_cast<Text*>(copied_item);
         new_item = new Text(text->get_color(), QPoint(0,0), text->get_name(), text->get_font_scale());
-        new_item->set_text_size(text->get_text_size());
+        Text* new_text = dynamic_cast<Text*>(new_item);
+        new_text->set_text_size(text->get_text_size());
         break;
     }
     default:
@@ -219,11 +222,11 @@ void FrameWidget::set_scale_factor(double scale_factor) {
 void FrameWidget::set_rotation(int rotation) {
     int width = m_org_image.cols;
     int height = m_org_image.rows;
-    if (m_rotation == DEGREE_90 || m_rotation == DEGREE_270) {
+    if (m_rotation == Constants::DEGREE_90 || m_rotation == Constants::DEGREE_270) {
         std::swap(width, height);
     }
     int diff_rotation = rotation - m_rotation;
-    if (diff_rotation < DEGREE_MIN) diff_rotation += DEGREE_MAX;
+    if (diff_rotation < Constants::DEGREE_MIN) diff_rotation += Constants::DEGREE_MAX;
     rect_start = Utility::rotate(rect_start, diff_rotation, width, height);
     rect_end = Utility::rotate(rect_end, diff_rotation, width, height);
 
@@ -501,7 +504,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     default:
         // Rotate here
         bool right_click = (event->button() == Qt::RightButton);
-        emit mouse_pressed(rotate(scaled_pos, DEGREE_MAX-m_rotation, true), right_click);
+        emit mouse_pressed(rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation, true), right_click);
         break;
     }
 }
@@ -526,7 +529,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         end_panning();
         break;
     default:
-        emit mouse_released(rotate(scaled_pos, DEGREE_MAX-m_rotation, true), false);
+        emit mouse_released(rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation, true), false);
         break;
     }
 }
@@ -578,7 +581,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         if (event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton) {
             bool shift = (event->modifiers() == Qt::ShiftModifier);
             bool ctrl = (event->modifiers() == Qt::ControlModifier);
-            emit mouse_moved(rotate(scaled_pos, DEGREE_MAX-m_rotation, true), shift, ctrl);
+            emit mouse_moved(rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation, true), shift, ctrl);
         }
         break;
     }
@@ -604,25 +607,26 @@ void FrameWidget::wheelEvent(QWheelEvent *event) {
         if (event->modifiers() == Qt::ShiftModifier) {
             init_panning(event->pos());
             if (num_steps.y() < 0) {
-                panning(event->pos()+QPoint(-PAN_FACTOR*m_scale_factor,0));
+                panning(event->pos()+QPoint(-Constants::PAN_FACTOR*m_scale_factor,0));
             } else {
-                panning(event->pos()+QPoint(PAN_FACTOR*m_scale_factor,0));
+                panning(event->pos()+QPoint(Constants::PAN_FACTOR*m_scale_factor,0));
             }
         }
         else if (event->modifiers() == Qt::ControlModifier) {
             if (num_steps.y() < 0) {
-                emit move_viewport_center(scaled_pos, 1/ZOOM_STEP);
+                emit move_viewport_center(scaled_pos, 1/Constants::ZOOM_STEP);
             } else {
-                emit move_viewport_center(scaled_pos, ZOOM_STEP);
+                emit move_viewport_center(scaled_pos, Constants::ZOOM_STEP);
             }
         } else {
             init_panning(event->pos());
             if (num_steps.y() < 0) {
-                panning(event->pos()+QPoint(0,-PAN_FACTOR*m_scale_factor));
+                panning(event->pos()+QPoint(0,-Constants::PAN_FACTOR*m_scale_factor));
             } else {
-                panning(event->pos()+QPoint(0,PAN_FACTOR*m_scale_factor));
+                panning(event->pos()+QPoint(0,Constants::PAN_FACTOR*m_scale_factor));
             }
         }
+        break;
     default:
         break;
     }
@@ -641,8 +645,8 @@ void FrameWidget::set_analysis_settings() {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
         settings->quick_analysis = true;
 
-        QPoint scaled_start = rotate(scale_to_video(ana_rect_start), DEGREE_MAX-m_rotation, true);
-        QPoint scaled_end = rotate(scale_to_video(ana_rect_end), DEGREE_MAX-m_rotation, true);
+        QPoint scaled_start = rotate(scale_to_video(ana_rect_start), Constants::DEGREE_MAX-m_rotation, true);
+        QPoint scaled_end = rotate(scale_to_video(ana_rect_end), Constants::DEGREE_MAX-m_rotation, true);
         QRect scaled_rect(scaled_start, scaled_end);
         settings->set_bounding_box(Utility::from_qrect(scaled_rect));
 
@@ -701,7 +705,7 @@ QPoint FrameWidget::rotate(QPoint pos, int rotation, bool swap) {
     int width = m_org_image.cols;
     int height = m_org_image.rows;
 
-    if (swap && (rotation == DEGREE_90 || rotation == DEGREE_270)) {
+    if (swap && (rotation == Constants::DEGREE_90 || rotation == Constants::DEGREE_270)) {
         std::swap(width, height);
     }
     return Utility::rotate(pos, rotation, width, height);

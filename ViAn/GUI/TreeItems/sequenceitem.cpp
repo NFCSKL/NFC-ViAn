@@ -1,5 +1,8 @@
 #include "sequenceitem.h"
+
+#include "Project/imagesequence.h"
 #include "Project/videoproject.h"
+#include "videoitem.h"
 
 ImageSequence* SequenceItem::get_img_sequence() {
     auto vid_item = dynamic_cast<VideoItem*>(this->parent()->parent());
@@ -12,11 +15,9 @@ ImageSequence* SequenceItem::get_img_sequence() {
     return nullptr;
 }
 
-
-
-SequenceItem::SequenceItem(const std::string& name, const std::string& hash) : TreeItem(SEQUENCE_ITEM) {
+SequenceItem::SequenceItem(const QString& name, const QString& hash) : TreeItem(SEQUENCE_ITEM) {
     m_hash = hash;
-    setText(0, QString::fromStdString(name));
+    setText(0, name);
 }
 
 /**
@@ -26,13 +27,8 @@ SequenceItem::SequenceItem(const std::string& name, const std::string& hash) : T
  */
 int SequenceItem::get_index() {
     int index = 0;
-    auto vid_item = dynamic_cast<VideoItem*>(this->parent()->parent());
-    if (vid_item) {
-        auto sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
-        if (sequence) {
-            index = sequence->get_index_of_hash(m_hash);
-        }
-    }
+    auto sequence = get_img_sequence();
+    if (sequence) index = sequence->get_index_of_hash(m_hash);
     return index;
 }
 
@@ -41,7 +37,7 @@ int SequenceItem::get_index() {
  * Returns the hash/checksum of the image file belonging to the item
  * @return
  */
-std::string SequenceItem::get_hash() const {
+QString SequenceItem::get_hash() const {
     return m_hash;
 }
 
