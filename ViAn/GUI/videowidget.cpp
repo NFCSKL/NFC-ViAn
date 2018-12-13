@@ -196,6 +196,7 @@ void VideoWidget::init_frame_processor() {
         connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
         connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
+        connect(f_processor, &FrameProcessor::send_current_state, this, &VideoWidget::set_current_state);
 
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
         connect(scroll_area, &DrawScrollArea::new_size, this, &VideoWidget::set_draw_area_size);
@@ -1665,6 +1666,10 @@ void VideoWidget::translate_zoom_from_preview_click(QPoint click_pos) {
         z_settings.x_movement = scaled.x();
         z_settings.y_movement = scaled.y();
     });
+}
+
+void VideoWidget::set_current_state(VideoState* state) {
+    current_state = state;
 }
 
 void VideoWidget::speed_up_activate() {

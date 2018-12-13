@@ -205,6 +205,7 @@ public slots:
     void set_brightness_contrast(int bri, double cont, double gamma);
     void update_zoom_preview_size(QSize s);
     void translate_zoom_from_preview_click(QPoint click_pos);
+    void set_current_state(VideoState* state);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
@@ -266,6 +267,7 @@ private:
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
     Interval* m_current_interval = nullptr;
+    VideoState* current_state = nullptr;
 
     bool m_floating = false;
     bool frame_is_clean = false;
