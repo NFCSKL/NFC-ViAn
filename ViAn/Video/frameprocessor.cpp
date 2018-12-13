@@ -2,6 +2,7 @@
 
 #include "constants.h"
 #include "overlay.h"
+#include "Project/video.h"
 #include "utility.h"
 #include "Video/videoplayer.h"
 
@@ -28,9 +29,13 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     m_abort = abort;
+
+    current_state = new VideoState();
 }
 
-FrameProcessor::~FrameProcessor() {}
+FrameProcessor::~FrameProcessor() {
+    delete current_state;
+}
 
 /**
  * @brief FrameProcessor::check_events
@@ -204,8 +209,12 @@ void FrameProcessor::process_frame() {
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
 
-    // Emit manipulated frame and current frame number
+
     m_z_settings->center = m_zoomer.get_center();
+
+    update_current_state();
+    // Emit manipulated frame and current frame number
+    emit send_current_state(current_state);
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
@@ -408,4 +417,15 @@ void FrameProcessor::reset_settings() {
 
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
+}
+
+void FrameProcessor::update_current_state() {
+    current_state->frame = m_frame_index->load();
+    current_state->contrast = m_manipulator.get_contrast();
+    current_state->brightness = m_manipulator.get_brightness();
+    current_state->gamma = m_manipulator.get_gamma();
+    current_state->rotation = m_zoomer.get_angle();
+    current_state->scale_factor = m_zoomer.get_scale_factor();
+    current_state->anchor = m_zoomer.get_anchor();
+    current_state->center = m_zoomer.get_center();
 }

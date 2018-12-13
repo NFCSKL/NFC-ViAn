@@ -3,7 +3,6 @@
 
 #include "constants.h"
 #include "Filehandler/saveable.h"
-//#include "Video/framemanipulator.h"
 
 #include "opencv2/core/core.hpp"
 
