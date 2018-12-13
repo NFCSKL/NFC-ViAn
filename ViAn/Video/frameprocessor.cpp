@@ -10,9 +10,11 @@
 #include <mutex>
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
-                               zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                               std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
+                               zoomer_settings* z_settings, std::atomic_int* width,
+                               std::atomic_int* height, std::atomic_bool* new_frame_video,
+                               manipulation_settings* m_settings, video_sync* v_sync,
+                               std::atomic_int* frame_index, overlay_settings* o_settings,
+                               std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
     m_new_frame = new_frame;
 
     m_overlay_changed = overlay_changed;
@@ -75,10 +77,12 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
+            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
             update_overlay_settings();
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load()) {
+                qDebug() << "should not be here processing old frame";
                 process_frame();
             }
             lk.unlock();
@@ -87,6 +91,7 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
+            qDebug() << "settings changed";
             m_changed->store(false);
             update_manipulator_settings();
             update_zoomer_settings();
@@ -103,6 +108,7 @@ void FrameProcessor::check_events() {
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
+            qDebug() << "new frame";
             if (m_z_settings->set_state) {
                 load_zoomer_state();
             }
@@ -202,6 +208,8 @@ void FrameProcessor::process_frame() {
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
+
+    qDebug() << "Processing";
 
     // Emit manipulated frame and current frame number
     emit zoom_preview(preview_frame);

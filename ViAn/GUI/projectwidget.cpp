@@ -748,6 +748,12 @@ bool ProjectWidget::prompt_save() {
     return ok;
 }
 
+void ProjectWidget::set_current_video_project(VideoProject* vid_proj, VideoState state) {
+    VideoItem* v_item = get_video_item(vid_proj);
+    setCurrentItem(v_item);
+    emit marked_video_state(vid_proj, state);
+}
+
 /**
  * @brief ProjectWidget::tree_item_changed
  * Slot function for when the current tree item is changed.
@@ -1270,7 +1276,7 @@ void ProjectWidget::remove_tree_item(QTreeWidgetItem* item) {
     blockSignals(true);
     delete item;
     blockSignals(false);
-    setCurrentItem(nullptr);
+    //setCurrentItem(nullptr);
 }
 
 /**
@@ -1295,6 +1301,10 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
         video_list.erase(video_it);
         m_proj->remove_video_project(v_proj);
     }
+
+
+    // TODO add better checks
+    setCurrentItem(itemAbove(item));
     emit item_removed(v_proj);
     emit remove_overlay();
 }

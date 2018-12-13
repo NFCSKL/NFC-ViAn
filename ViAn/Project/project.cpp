@@ -79,7 +79,7 @@ void Project::remove_video_project(VideoProject* vid_proj){
     delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
-    *it = nullptr; // Not need?
+    //*it = nullptr; // Not need?
 }
 
 void Project::add_bookmark(Bookmark* bmark) {
@@ -167,6 +167,7 @@ void Project::set_temporary(const bool &is_temporary){
  * @return m_unsaved_changes
  */
 bool Project::is_saved() const {
+    qDebug() << m_videos.size();
     bool video_projects_saved = std::all_of(m_videos.begin(), m_videos.end(),
                                             [](VideoProject* vp){return vp->is_saved();});
     bool bookmarks_saved = std::all_of(m_bookmarks.begin(), m_bookmarks.end(),

@@ -186,8 +186,10 @@ void VideoWidget::init_video_controller(){
  * Creates a new FrameProcessor instance which is then moved to a new thread.
  */
 void VideoWidget::init_frame_processor() {
-    f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed, &m_abort_processor);
+    f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings,
+                                     &video_width, &video_height, &new_frame_video,
+                                     &m_settings, &v_sync, &frame_index, &o_settings,
+                                     &overlay_changed, &m_abort_processor);
 
     try {
         processing_thread = new QThread(this);
@@ -987,6 +989,7 @@ void VideoWidget::display_index_slot() {
  */
 void VideoWidget::on_new_frame() {
     int frame_num = frame_index.load();
+    qDebug() << "in new frame" << frame_num;
     if (frame_num == m_frame_length - 1) play_btn->setChecked(false);
     if (!playback_slider->is_blocked()) {
         // Block signals to prevent value_changed signal to trigger
@@ -1013,7 +1016,7 @@ void VideoWidget::on_new_frame() {
     }
 
     playback_slider->update();
-    player_con.notify_one();
+    //player_con.notify_one();
 }
 
 /**
@@ -1078,6 +1081,7 @@ void VideoWidget::on_playback_slider_moved() {
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
     if (!video_btns_enabled) set_video_btns(true);
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
+        //qDebug() << "vid proj empty";
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
@@ -1109,6 +1113,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         player_con.notify_all();
 
     } else {
+        //qDebug() << "just set the state";
         set_state(state);
         if (state.frame > -1) {
             on_new_frame();
@@ -1235,6 +1240,7 @@ void VideoWidget::capture_failed() {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
+    qDebug() << "in video info" << current_frame_index;
     m_vid_proj->get_video()->set_size(video_width, video_height);
     m_video_width = video_width;
     m_video_height = video_height;
@@ -1243,10 +1249,10 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     current_frame_size = QSize(video_width, video_height);
 
     // Solves a bug where the setMaximum will set the frame index to max in some cases
-    playback_slider->blockSignals(true);
+    //playback_slider->blockSignals(true);
     playback_slider->setMaximum(last_frame);
     playback_slider->setValue(current_frame_index);
-    playback_slider->blockSignals(false);
+    //playback_slider->blockSignals(false);
 
     if (frame_rate != 0) {
         set_total_time((last_frame + 1) / frame_rate);

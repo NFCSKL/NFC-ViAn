@@ -113,6 +113,7 @@ public slots:
     void update_analysis_settings();
     void advanced_analysis();
     bool prompt_save();
+    void set_current_video_project(VideoProject* vid_proj, VideoState state);
     void update_current_videoitem(QString path);
     void update_videoitems();
 private slots:

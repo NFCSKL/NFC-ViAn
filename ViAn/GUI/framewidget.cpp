@@ -382,12 +382,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             painter.drawRect(detect_rect);
         }
     }
-    // TODO This is to prevent crash when clicking bookmark before loading video
-    // This should get a better fix later
-    if (!m_vid_proj) {
-        painter.end();
-        return;
-    }
     // Draw the current drawing bounding box
     Shapes* current_drawing = m_vid_proj->get_overlay()->get_current_drawing();
     bool show_overlay = m_vid_proj->get_overlay()->get_show_overlay();

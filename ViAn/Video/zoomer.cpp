@@ -372,6 +372,7 @@ void Zoomer::scale_frame(cv::Mat &frame) {
     int interpol = m_interpol_method;
     if (m_scale_factor < 1) interpol = cv::INTER_AREA;
 
+    qDebug() << "view rect" << frame.cols << frame.rows;
     try {
         cv::resize(frame(view_rectangle), frame, cv::Size(), m_scale_factor, m_scale_factor, interpol);
     } catch (cv::Exception& e) {

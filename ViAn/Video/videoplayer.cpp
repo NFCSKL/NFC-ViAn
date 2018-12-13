@@ -201,6 +201,7 @@ bool VideoPlayer::synced_read(){
             }
         }
     }
+    qDebug() << "synced read notify";
     m_v_sync->con_var.notify_all();
 
     // Wait for processing thread to finish processing new frame
@@ -244,6 +245,7 @@ bool VideoPlayer::wait_load_read(){
             return false;
         }
     }
+    qDebug() << "wait load notify";
     m_v_sync->con_var.notify_all();
     return true;
 }
