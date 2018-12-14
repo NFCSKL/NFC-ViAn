@@ -12,8 +12,9 @@
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                               std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
+                               std::atomic_bool* new_frame_video, manipulation_settings* m_settings,
+                               video_sync* v_sync, std::atomic_int* frame_index, overlay_settings* o_settings,
+                               std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
     m_new_frame = new_frame;
 
     m_overlay_changed = overlay_changed;
@@ -61,6 +62,7 @@ void FrameProcessor::check_events() {
 
         // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
+            qDebug() << "new frame video";
             m_o_settings->no_video = false;
             reset_settings();
             m_overlay = m_o_settings->overlay;
@@ -80,6 +82,7 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
+            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
             update_overlay_settings();
             // Skip reprocessing of old frame if there is a new
@@ -92,6 +95,7 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
+            qDebug() << "settings changed";
             m_changed->store(false);
             update_manipulator_settings();
             update_zoomer_settings();
@@ -108,6 +112,7 @@ void FrameProcessor::check_events() {
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
+            qDebug() << "new frame";
             if (m_z_settings->set_state) {
                 load_zoomer_state();
             }
@@ -196,6 +201,7 @@ void FrameProcessor::process_frame() {
     int frame_num = m_frame_index->load();
     int width = m_width->load();
     int height = m_height->load();
+    qDebug() << "width and height" << width << height;
 
     // Draws the text drawings on the overlay
     m_overlay->draw_overlay(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
@@ -214,6 +220,7 @@ void FrameProcessor::process_frame() {
 
     update_current_state();
     // Emit manipulated frame and current frame number
+    qDebug() << "send current";
     emit send_current_state(current_state);
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());

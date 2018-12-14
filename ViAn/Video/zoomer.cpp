@@ -230,7 +230,9 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
     // Check for default state
     if (center_point.x() == -1 && center_point.y() == -1) {
         if (scale_factor == 1.) {
+            qDebug() << "Fitting" << m_scale_factor;
             fit_viewport();
+            qDebug() << "after" << m_scale_factor;
         } else {
             center();
         }
@@ -249,6 +251,7 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
 void Zoomer::fit_viewport() {
     m_scale_factor = std::min(m_viewport_size.width() / double(m_transformed_frame_rect.width),
                               m_viewport_size.height() / double(m_transformed_frame_rect.height));
+    qDebug() << "size in zoom" << m_transformed_frame_rect.width << m_transformed_frame_rect.height;
     center();
 }
 

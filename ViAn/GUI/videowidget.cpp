@@ -187,7 +187,8 @@ void VideoWidget::init_video_controller(){
  */
 void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed, &m_abort_processor);
+                                     &video_height, &new_frame_video, &m_settings, &v_sync,
+                                     &frame_index, &o_settings, &overlay_changed, &m_abort_processor);
 
     try {
         processing_thread = new QThread(this);
@@ -660,6 +661,12 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
         if (proj_tree_item == SEQUENCE_TAG_ITEM) {
             qDebug() << "I'm in mister";
             // TODO Update the state in the sequence tag item
+
+
+            qDebug() << "current" << current_state->scale_factor;
+            qDebug() << "get" << scale;
+            qDebug() << m_vid_proj->get_video()->state.scale_factor;
+            // TODO use current not get ???
         }
 
         if (proj_tree_item == VIDEO_ITEM) {
@@ -1118,10 +1125,36 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         }
         player_con.notify_all();
 
+    } else if (vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
+        // Set state variables but don't update the processor
+        {
+            std::lock_guard<std::mutex> v_lock(v_sync.lock);
+            z_settings.set_state = true;
+            z_settings.anchor = state.anchor;
+            z_settings.center = state.center;
+            z_settings.zoom_factor = state.scale_factor;
+            z_settings.rotation = state.rotation;
+            m_settings.brightness = state.brightness;
+            m_settings.contrast = state.contrast;
+            m_settings.gamma = state.gamma;
+            o_settings.overlay = m_vid_proj->get_overlay();
+        }
+
+        // Set new video information and notify player
+        {
+            std::lock_guard<std::mutex> p_lock(player_lock);
+            v_sync.frame_index_on_load = state.frame;
+            m_video_path = vid_proj->get_video()->file_path;
+            new_video.store(true);
+        }
+        player_con.notify_all();
     } else {
         qDebug() << "state scale" << state.scale_factor;
         qDebug() << "con bri" << state.contrast << state.brightness;
         set_state(state);
+        // TODO
+        // This state will call settings changed which will update the processor
+        // and call a process frame call. This is bad.
         if (state.frame > -1) {
             on_new_frame();
         }

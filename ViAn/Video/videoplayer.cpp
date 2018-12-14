@@ -48,7 +48,6 @@ void VideoPlayer::load_video() {
     if (m_capture.isOpened()) {
         m_capture.release();
     }
-    m_new_video->store(false);
 
     current_frame = 0;
     m_is_playing->store(false);
@@ -164,6 +163,7 @@ void VideoPlayer::load_video_info() {
 }
 
 bool VideoPlayer::synced_read(){
+    qDebug() << "synced read";
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
@@ -182,6 +182,7 @@ bool VideoPlayer::synced_read(){
             try {
                 m_v_sync->frame.release();
                 m_capture.retrieve(m_v_sync->frame);
+                qDebug() << "new frame stored - not same";
                 m_new_frame->store(true);
                 m_video_width->store(m_v_sync->frame.cols);
                 m_video_height->store(m_v_sync->frame.rows);
@@ -193,6 +194,7 @@ bool VideoPlayer::synced_read(){
         } else {
             try {
                 m_capture.retrieve(m_v_sync->frame);
+                qDebug() << "new frame stored - same";
                 m_new_frame->store(true);
             } catch( cv::Exception& e ) {
                 const char* err_msg = e.what();
@@ -213,6 +215,7 @@ bool VideoPlayer::synced_read(){
 
 
 bool VideoPlayer::wait_load_read(){
+    qDebug() << "wait load read";
     // Wait for processing thread to finish processing new frame
     {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
@@ -234,6 +237,7 @@ bool VideoPlayer::wait_load_read(){
             set_frame();
             return m_new_frame->load();
         } else if (m_capture.read(m_v_sync->frame)) {
+            qDebug() << "new frame stored";
             m_new_frame->store(true);
             m_frame->store(0);
             m_v_sync->lock.unlock();
