@@ -67,6 +67,7 @@ void FrameProcessor::check_events() {
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
+            update_frame_size();
             update_overlay_settings();
             update_manipulator_settings();
             update_zoomer_settings();
@@ -99,6 +100,7 @@ void FrameProcessor::check_events() {
             m_changed->store(false);
             update_manipulator_settings();
             update_zoomer_settings();
+            m_z_settings->skip_update = false;
 
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load() && !m_z_settings->skip_frame_refresh) {
@@ -113,6 +115,7 @@ void FrameProcessor::check_events() {
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
             qDebug() << "new frame";
+
             if (m_z_settings->set_state) {
                 load_zoomer_state();
             }
@@ -127,26 +130,7 @@ void FrameProcessor::check_events() {
                 continue;
             }
 
-            // Check for new dimensions on unrotated frame
-            // update zoomer as necessary
-            // This is required for image sequences since
-            // they can contain images of various sizes
-            cv::Rect prev_size = m_zoomer.get_frame_rect();
-            int new_width{m_frame.cols}, new_height{m_frame.rows};
-            bool has_new_frame_size{m_unrotated_size.width != new_width || m_unrotated_size.height != new_height};
-            bool frame_rect_changed{prev_size.width != new_width || prev_size.height != new_height};
-
-            if (frame_rect_changed && has_new_frame_size) {
-                m_zoomer.set_frame_size(cv::Size(new_width, new_height));
-                if (has_new_zoom_state) {
-                    m_zoomer.enforce_frame_boundaries();
-                } else {
-                    m_zoomer.fit_viewport();
-                }
-                emit_zoom_data();
-            }
-            has_new_zoom_state = false;
-            m_unrotated_size = cv::Size(new_width, new_height);
+            update_frame_size();
             process_frame();
 
             lk.unlock();
@@ -226,12 +210,37 @@ void FrameProcessor::process_frame() {
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
+void FrameProcessor::update_frame_size() {
+    qDebug() << "update frame size";
+    // Check for new dimensions on unrotated frame
+    // update zoomer as necessary
+    // This is required for image sequences since
+    // they can contain images of various sizes
+    cv::Rect prev_size = m_zoomer.get_frame_rect();
+    int new_width{m_frame.cols}, new_height{m_frame.rows};
+    bool has_new_frame_size{m_unrotated_size.width != new_width || m_unrotated_size.height != new_height};
+    bool frame_rect_changed{prev_size.width != new_width || prev_size.height != new_height};
+
+    if (frame_rect_changed && has_new_frame_size) {
+        qDebug() << "actually change it";
+        m_zoomer.set_frame_size(cv::Size(new_width, new_height));
+        if (has_new_zoom_state) {
+            m_zoomer.enforce_frame_boundaries();
+        } else {
+            m_zoomer.fit_viewport();
+        }
+        emit_zoom_data();
+    }
+    has_new_zoom_state = false;
+    m_unrotated_size = cv::Size(new_width, new_height);
+}
+
 /**
  * @brief FrameProcessor::load_zoomer_state
  */
 void FrameProcessor::load_zoomer_state() {
     m_z_settings->set_state = false;
-    m_zoomer.load_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation);
+    m_zoomer.load_state(m_z_settings->center, m_z_settings->zoom_factor, m_z_settings->rotation, m_z_settings->skip_update);
 
     if (m_z_settings->rotation == Constants::DEGREE_MIN) {
         m_rotate_direction = ROTATE_NONE;

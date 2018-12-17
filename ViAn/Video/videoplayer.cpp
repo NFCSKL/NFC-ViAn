@@ -182,7 +182,6 @@ bool VideoPlayer::synced_read(){
             try {
                 m_v_sync->frame.release();
                 m_capture.retrieve(m_v_sync->frame);
-                qDebug() << "new frame stored - not same";
                 m_new_frame->store(true);
                 m_video_width->store(m_v_sync->frame.cols);
                 m_video_height->store(m_v_sync->frame.rows);
@@ -194,7 +193,6 @@ bool VideoPlayer::synced_read(){
         } else {
             try {
                 m_capture.retrieve(m_v_sync->frame);
-                qDebug() << "new frame stored - same";
                 m_new_frame->store(true);
             } catch( cv::Exception& e ) {
                 const char* err_msg = e.what();
@@ -237,7 +235,6 @@ bool VideoPlayer::wait_load_read(){
             set_frame();
             return m_new_frame->load();
         } else if (m_capture.read(m_v_sync->frame)) {
-            qDebug() << "new frame stored";
             m_new_frame->store(true);
             m_frame->store(0);
             m_v_sync->lock.unlock();

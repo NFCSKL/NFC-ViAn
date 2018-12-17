@@ -55,6 +55,7 @@ struct zoomer_settings {
     bool do_point_zoom = false;
     bool has_new_zoom_area{false};
     bool skip_frame_refresh{false};
+    bool skip_update{false};
 };
 
 /**
@@ -203,6 +204,7 @@ private:
     void update_rotation(const int& rotation);
 
     void reset_settings();
+    void update_frame_size();
     void load_zoomer_state();
     void emit_zoom_data();
     void update_current_state();

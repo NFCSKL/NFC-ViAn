@@ -659,7 +659,6 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_vid_proj) return;
     if (!m_floating) {
         if (proj_tree_item == SEQUENCE_TAG_ITEM) {
-            qDebug() << "I'm in mister";
             // TODO Update the state in the sequence tag item
 
 
@@ -1125,33 +1124,18 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         }
         player_con.notify_all();
 
-    } else if (vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
-        // Set state variables but don't update the processor
-        {
-            std::lock_guard<std::mutex> v_lock(v_sync.lock);
-            z_settings.set_state = true;
-            z_settings.anchor = state.anchor;
-            z_settings.center = state.center;
-            z_settings.zoom_factor = state.scale_factor;
-            z_settings.rotation = state.rotation;
-            m_settings.brightness = state.brightness;
-            m_settings.contrast = state.contrast;
-            m_settings.gamma = state.gamma;
-            o_settings.overlay = m_vid_proj->get_overlay();
-        }
-
-        // Set new video information and notify player
-        {
-            std::lock_guard<std::mutex> p_lock(player_lock);
-            v_sync.frame_index_on_load = state.frame;
-            m_video_path = vid_proj->get_video()->file_path;
-            new_video.store(true);
-        }
-        player_con.notify_all();
     } else {
         qDebug() << "state scale" << state.scale_factor;
-        qDebug() << "con bri" << state.contrast << state.brightness;
+
+        z_settings.skip_update = true;
         set_state(state);
+        // Maybe store the state first so it can read it as a default
+
+        // read frame // load video
+        // set the frame size
+        // load state and those variables
+        // update the processor to show everything
+
         // TODO
         // This state will call settings changed which will update the processor
         // and call a process frame call. This is bad.
@@ -1522,6 +1506,7 @@ void VideoWidget::set_zoom_factor(double scale_factor) {
  * @param state
  */
 void VideoWidget::set_state(VideoState state) {
+    qDebug() << "skip frame" << frame_index.load() << state.frame;
     update_processing_settings([&](){
         z_settings.set_state = true;
         z_settings.anchor = state.anchor;

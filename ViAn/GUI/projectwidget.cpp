@@ -790,7 +790,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         update_current_interval(vid_item);
         break;
     } case SEQUENCE_TAG_ITEM: {
-        qDebug() << "Sequence tag item";
+        qDebug() << "-------------- Sequence tag item";
         auto seq_item = dynamic_cast<SequenceTagItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         VideoState state;
