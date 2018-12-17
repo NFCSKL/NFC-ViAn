@@ -1291,7 +1291,7 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     }
     fps_label->setText(QString::number(frame_rate) + "fps");
     max_frames->setText("/ " + QString::number(last_frame));
-
+    emit set_zoom_tool();
     on_new_frame();
 }
 

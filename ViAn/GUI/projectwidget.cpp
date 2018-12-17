@@ -778,7 +778,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -804,7 +804,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
         emit marked_basic_analysis(tag_item->get_tag());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -825,7 +825,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -849,7 +849,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(true);
         emit set_detections(true);
         emit set_poi_slider(true);
@@ -874,7 +874,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -908,7 +908,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -921,7 +921,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
         emit set_video_project(vid_item->get_video_project());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -964,7 +964,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit marked_video_state(vid_item->get_video_project(), state);
         emit item_type(item->type());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
@@ -980,7 +980,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         emit set_video_project(vid_item->get_video_project());
 
-        emit set_zoom_tool();
+        //emit set_zoom_tool();
         emit set_show_analysis_details(false);
         emit set_detections(false);
         emit set_poi_slider(false);
