@@ -192,6 +192,7 @@ signals:
     void set_bri_cont(int, double, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
     void zoom_preview(cv::Mat preview_frame);
+    void new_frame_size(int width, int height);
 private:
     void process_frame();
     void update_zoomer_settings();

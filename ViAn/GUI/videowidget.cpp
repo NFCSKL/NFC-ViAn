@@ -197,6 +197,7 @@ void VideoWidget::init_frame_processor() {
         connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
         connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
+        connect(f_processor, &FrameProcessor::new_frame_size, this, &VideoWidget::set_frame_size);
 
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
         connect(scroll_area, &DrawScrollArea::new_size, this, &VideoWidget::set_draw_area_size);
@@ -1270,11 +1271,10 @@ void VideoWidget::capture_failed() {
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
     m_vid_proj->get_video()->set_size(video_width, video_height);
-    m_video_width = video_width;
-    m_video_height = video_height;
     m_frame_rate = frame_rate;
     m_frame_length = last_frame + 1;
     current_frame_size = QSize(video_width, video_height);
+    set_frame_size(video_width, video_height);
 
     // Solves a bug where the setMaximum will set the frame index to max in some cases
     playback_slider->blockSignals(true);
@@ -1290,10 +1290,15 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
         set_current_time(0);
     }
     fps_label->setText(QString::number(frame_rate) + "fps");
-    size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
     max_frames->setText("/ " + QString::number(last_frame));
 
     on_new_frame();
+}
+
+void VideoWidget::set_frame_size(int width, int height) {
+    m_video_width = width;
+    m_video_height = height;
+    size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
 }
 
 void VideoWidget::on_playback_stopped(){

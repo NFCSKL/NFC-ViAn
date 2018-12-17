@@ -172,6 +172,7 @@ public slots:
     void enable_poi_btns(bool, bool);
     void capture_failed();
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
+    void set_frame_size(int width, int height);
     void on_playback_stopped(void);
 
     void set_overlay_removed();

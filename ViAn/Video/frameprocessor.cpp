@@ -223,6 +223,7 @@ void FrameProcessor::update_frame_size() {
     }
     has_new_zoom_state = false;
     m_unrotated_size = cv::Size(new_width, new_height);
+    emit new_frame_size(new_width, new_height);
 }
 
 /**
