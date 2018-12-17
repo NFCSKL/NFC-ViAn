@@ -52,6 +52,7 @@ signals:
     void marked_video_state(VideoProject *vid_proj, VideoState state);
     void proj_path(QString);
     void load_bookmarks(VideoProject* vid_proj);
+    void set_state(VideoState* state_p);
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);

@@ -155,6 +155,7 @@ public slots:
     void on_playback_slider_moved(void);
 
     void load_marked_video_state(VideoProject *vid_proj, VideoState state);
+    void set_current_state(VideoState* state);
     void set_item_type(int);
     void clear_current_video();
     void remove_item(VideoProject* vid_proj);
@@ -266,6 +267,7 @@ private:
     VideoProject* m_vid_proj = nullptr;
     Tag* m_tag = nullptr;
     Interval* m_current_interval = nullptr;
+    VideoState* current_state;
 
     bool m_floating = false;
     bool frame_is_clean = false;

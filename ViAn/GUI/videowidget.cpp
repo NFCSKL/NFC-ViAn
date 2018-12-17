@@ -659,7 +659,9 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
     if (!m_floating) {
         if (proj_tree_item == SEQUENCE_TAG_ITEM) {
             // TODO Update the state in the sequence tag item
-
+            current_state->center = center;
+            current_state->scale_factor = scale;
+            current_state->rotation = angle;
 
             qDebug() << "current" << current_state->scale_factor;
             qDebug() << "get" << scale;
@@ -1146,6 +1148,10 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
     emit update_manipulator_wgt(state.brightness, state.contrast, state.gamma);
+}
+
+void VideoWidget::set_current_state(VideoState* state) {
+    current_state = state;
 }
 
 /**

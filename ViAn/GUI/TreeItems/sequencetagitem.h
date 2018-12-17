@@ -12,6 +12,7 @@ public:
     SequenceTagItem(const QString& name, const int& index, TagFrame *tag);
     int get_index();
     VideoState get_state();
+    VideoState* get_state_pointer();
     void remove();
     void rename();
 };

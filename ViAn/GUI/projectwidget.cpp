@@ -796,6 +796,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         VideoState state;
         state = seq_item->get_state();
         state.frame = seq_item->get_index();
+        VideoState* state_p = seq_item->get_state_pointer();
+        emit set_state(state_p);
         emit set_video_project(vid_item->get_video_project());
         emit marked_video_state(vid_item->get_video_project(), state);
 

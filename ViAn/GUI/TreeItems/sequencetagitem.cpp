@@ -17,6 +17,10 @@ VideoState SequenceTagItem::get_state() {
     return m_tag->m_state;
 }
 
+VideoState* SequenceTagItem::get_state_pointer() {
+    return &(m_tag->m_state);
+}
+
 void SequenceTagItem::remove() {}
 
 void SequenceTagItem::rename() {}
