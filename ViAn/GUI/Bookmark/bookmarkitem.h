@@ -8,7 +8,8 @@ class BookmarkItem : public QListWidgetItem {
     QString hover_text;
 public:
     BookmarkItem(Bookmark *bookmark, int type = 1);
-    ~BookmarkItem();
+    ~BookmarkItem() override;
+    void update_item(const int &index, const int &cat_id, const int &type);
     Bookmark* get_bookmark();
     int get_frame_number();
     QString get_file_path();

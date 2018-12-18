@@ -23,18 +23,17 @@ class Project;
 class Video;
 class VideoProject : public Saveable {
     friend class VideoProjectTest;
-    std::map<ID,Bookmark*> m_bookmarks;
     std::string m_tree_index = "";
     std::map<ID,BasicAnalysis*> m_analyses;
     Overlay* m_overlay = new Overlay();
     Video* m_video = nullptr;
     Project* m_project = nullptr;
-    ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_id = 0; // Analysis id counter
 
     bool m_unsaved_changes = true;
     bool current = false;
 
+    ID id = -1;
 public:
 
     VideoProject(Video* v); //Needs to have a video
@@ -43,16 +42,14 @@ public:
 
     VideoState state;
 
-    Q_DECL_DEPRECATED ID id;
+    int get_id() const;
+    void set_id(const int& new_id);
 
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
     ID add_analysis(BasicAnalysis* analysis);
-    ID add_bookmark(Bookmark* bookmark);
-
     void remove_analysis(BasicAnalysis* analysis);
-    void remove_bookmark(Bookmark* bookmark);
 
     void set_tree_index(std::stack<int> tree_index);
     void set_project(Project* proj);
@@ -64,7 +61,6 @@ public:
     QString get_proj_path();
     Video* get_video();
     Overlay* get_overlay();
-    std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,BasicAnalysis*> get_analyses();
     BasicAnalysis *get_analysis(const int &id);
 

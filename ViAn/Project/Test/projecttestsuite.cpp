@@ -114,20 +114,9 @@ void ProjectTestsuite::save_status_test(){
     QVERIFY(!project->is_saved());
     project->save_project();
 
-    // VIDEOPROJECT/BOOKMARK
-    // Verify that modifying a video project updates status
-    // Verify that adding a bookmark updates status
-    Bookmark* bookmark = new Bookmark();
-    int bookmark_id = video_project->add_bookmark(bookmark);
-    QVERIFY(!project->is_saved());
-    project->save_project();
-
-    // Verify that removing a bookmark updates status
-    video_project->remove_bookmark(bookmark);
-    QVERIFY(!project->is_saved());
-    project->save_project();
 
     // VIDEOPROJECT/ANALYSIS
+    // Verify that modifying a video project updates status
     // Verify that adding an analysis updates status
     BasicAnalysis* analysis = new BasicAnalysis();
     video_project->add_analysis(analysis);

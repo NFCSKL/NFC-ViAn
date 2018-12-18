@@ -5,6 +5,7 @@
 #include "bookmarkitem.h"
 #include "bookmarkwidget.h"
 #include "imagegenerator.h"
+#include "Project/project.h"
 #include "Project/video.h"
 #include "Project/videoproject.h"
 
@@ -20,7 +21,7 @@
 
 BookmarkList::BookmarkList(bool accept_container, int container_type, QWidget* parent) : QListWidget(parent) {
     m_accept_container = accept_container;
-    m_container_type = container_type;
+    m_list_type = container_type;
     // Enable drag and drop
     setSelectionMode(QAbstractItemView::SingleSelection);
     setDragDropMode(QAbstractItemView::DragDrop);
@@ -50,11 +51,15 @@ BookmarkList::~BookmarkList() {
     clear();
 }
 
-void BookmarkList::add_new_folder() {
-    BookmarkCategory* new_category = new BookmarkCategory("Category " +  QString::number(category_cnt++), CONTAINER);
-    addItem(new_category);
-    setItemWidget(new_category, new_category->get_folder());
-    connect(new_category, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
+void BookmarkList::clear_lists() {
+    for (int i = count()-1; i >= 0; --i) {
+        if (item(i)->type() == CONTAINER) {
+            BookmarkCategory* cat = dynamic_cast<BookmarkCategory*>(item(i));
+            cat->clear_lists();
+        } else if (item(i)->type() == BOOKMARK) {
+            delete item(i);
+        }
+    }
 }
 
 /**
@@ -70,34 +75,33 @@ QListWidgetItem *BookmarkList::get_clicked_item() {
  * Stores the name of the parent container that the widget resides in
  * @param name : name of parent container
  */
-void BookmarkList::set_parent_name(QString& name) {
-    m_par_cont_name = name;
+void BookmarkList::set_parent_id(const int& new_id) {
+    m_par_cont_id = new_id;
 }
 
 /**
- * @brief BookmarkList::get_parent_name
- * Returns the name of the parent container that the widget resides in.
- * @return m_par_cont_name : name of parent container
+ * @brief BookmarkList::update_index
+ * Update the index on all the items in the bookmarklist
  */
-QString BookmarkList::get_parent_name() {
-    return m_par_cont_name;
-}
-
-/**
- * @brief BookmarkList::on_parent_name_edited
- * Stores the updated parent container name in each bookmark
- * @param name
- */
-void BookmarkList::on_parent_name_edited(QString name) {
-    for (auto i = 0; i < this->count(); ++i) {
-        auto item = this->item(i);
-        if (item->type() == 0) {
-            // BookmarkItem. Update container name
-            auto bm_item = dynamic_cast<BookmarkItem*>(item);
-            bm_item->get_bookmark()->rename_container(m_par_cont_name, name);
+void BookmarkList::update_index() {
+    for (int i = 0; i < count(); ++i) {
+        QListWidgetItem* item = this->item(i);
+        int index = this->row(item);
+        switch (item->type()) {
+        case CONTAINER: {
+            BookmarkCategory* cat_item = dynamic_cast<BookmarkCategory*>(item);
+            cat_item->update_index(index);
+            break;
+        }
+        case BOOKMARK: {
+            BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
+            b_item->get_bookmark()->set_index(index);
+            break;
+        }
+        default:
+            break;
         }
     }
-    m_par_cont_name = name;
 }
 
 /**
@@ -111,8 +115,8 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
     menu->addAction(rename, this, &BookmarkList::rename_item);
     menu->addAction("Delete", this, &BookmarkList::remove_item);
     menu->addSeparator();
-    if (m_container_type == UNSORTED) {
-        menu->addAction("New category", this, &BookmarkList::add_new_folder);
+    if (m_list_type == UNSORTED) {
+        menu->addAction("New category", this, [this]{ add_category("New Category");});
     }
     menu->exec(mapToGlobal(pos));
     delete menu;
@@ -121,23 +125,23 @@ void BookmarkList::item_right_clicked(const QPoint pos) {
 /**
  * @brief BookmarkList::bookmark_drop
  * Creates the new bookmark item and inserts it in the correct index in the bookmark list
- * @param source : The source list where the bookmark awas located before. Used to get current item
+ * @param source : The source list where the bookmark was located before. Used to get current item
  * @param event
  */
-void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
+bool BookmarkList::bookmark_drop(QDropEvent *event) {
+    BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
+    BookmarkItem* cast_item = dynamic_cast<BookmarkItem*>(list->currentItem());
     // BookmarkItem. Copy and add
-    auto item = source->currentItem();
-    auto cast_item = dynamic_cast<BookmarkItem*>(item);
-
     BookmarkItem* bm_item = cast_item->copy();
-    bm_item->get_bookmark()->set_container(m_par_cont_name, m_container_type);
-    int index = row(itemAt(event->pos()+QPoint(0, Constants::BOOKMARK_THUMBNAIL_HEIGHT/2)));
+    int index = row(itemAt(event->pos()+QPoint(0, Constants::THUMBNAIL_SIZE/2)));
     if (index == -1) {
-        addItem(bm_item);
-    } else {
-        insertItem(index, bm_item);
+        index = count();
     }
+    bm_item->update_item(index, m_par_cont_id, m_list_type);
+    insertItem(index, bm_item);
+
     event->acceptProposedAction();
+    return true;
 }
 
 /**
@@ -147,25 +151,28 @@ void BookmarkList::bookmark_drop(BookmarkList *source, QDropEvent *event) {
  * @param source : The source list where the container awas located before. Used to get current item
  * @param event
  */
-void BookmarkList::container_drop(BookmarkList *source, QDropEvent *event) {
-    // BookmarkCategory
-    auto item = source->currentItem();
+bool BookmarkList::container_drop(QDropEvent *event) {
+    // If this list won't accept categories, return
     if (!m_accept_container) {
         event->ignore();
-        return;
+        return false;
     }
-    auto cast_item = dynamic_cast<BookmarkCategory*>(item);
 
+    BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
+    BookmarkCategory* cast_item = dynamic_cast<BookmarkCategory*>(list->currentItem());
     BookmarkCategory* cat_item = cast_item->copy();
-    int index = row(itemAt(event->pos()+QPoint(0, Constants::BOOKMARK_THUMBNAIL_HEIGHT/2)));
+    int index = row(itemAt(event->pos()+QPoint(0, Constants::THUMBNAIL_SIZE/2)));
     if (index == -1) {
-        addItem(cat_item);
-    } else {
-        insertItem(index, cat_item);
+        index = count();
     }
+    cat_item->set_index(index);
+    insertItem(index, cat_item);
+
     setItemWidget(cat_item, cat_item->get_folder());
     connect(cat_item, &BookmarkCategory::set_bookmark_video, this, &BookmarkList::set_bookmark_video);
+
     event->acceptProposedAction();
+    return true;
 }
 
 /**
@@ -217,7 +224,7 @@ void BookmarkList::remove_item() {
     msg_box.setIcon(QMessageBox::Warning);
     msg_box.setMinimumSize(315,125);
     msg_box.setText("Deleting item\n"
-                    "this will delete all bookmarks in the categories");
+                    "This will delete all bookmarks in the categories");
     msg_box.setInformativeText("Are you sure?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msg_box.setDefaultButton(QMessageBox::No);
@@ -227,21 +234,21 @@ void BookmarkList::remove_item() {
     if (currentItem()->type() == BOOKMARK) {
         BookmarkItem* bm_item = dynamic_cast<BookmarkItem*>(currentItem());
         Bookmark* b_mark = bm_item->get_bookmark();
-        b_mark->get_video_project()->remove_bookmark(b_mark);
+        b_mark->get_project()->remove_bookmark(b_mark);
         delete bm_item;
     } else if (currentItem()->type() == CONTAINER) {
         BookmarkCategory* cat_item = dynamic_cast<BookmarkCategory*>(currentItem());
         // Remove all bookmarks from the disputed list
         for (auto bm_item : cat_item->get_disputed()) {
             Bookmark* b_mark = bm_item->get_bookmark();
-            b_mark->get_video_project()->remove_bookmark(b_mark);
+            b_mark->get_project()->remove_bookmark(b_mark);
         }
         // Remove all bookmarks from the references list
         for (auto bm_item : cat_item->get_references()) {
             Bookmark* b_mark = bm_item->get_bookmark();
-            b_mark->get_video_project()->remove_bookmark(b_mark);
+            b_mark->get_project()->remove_bookmark(b_mark);
         }
-        delete currentItem();
+        cat_item->get_project()->remove_category(cat_item);
     }
 }
 
@@ -272,14 +279,14 @@ void BookmarkList::mousePressEvent(QMouseEvent *event) {
         // TODO Add context menu in the categories.
         // Need to figure out a way to mark the bookmarkcategory as
         // currentItem so remove_item() can remove it.
-    } else if (m_container_type != UNSORTED && event->button() == Qt::RightButton) {
+    } else if (m_list_type != UNSORTED && event->button() == Qt::RightButton) {
 //        QMenu* menu = new QMenu;
 //        menu->addAction("Delete", this, &BookmarkList::remove_item);
 //        menu->exec(mapToGlobal(event->pos()));
 //        delete menu;
     } else if (event->button() == Qt::RightButton) {
         QMenu* menu = new QMenu;
-        menu->addAction("New category", this, &BookmarkList::add_new_folder);
+        menu->addAction("New category", this, [this]{ add_category("New Category");});
         menu->exec(mapToGlobal(event->pos()));
         delete menu;
     } else {
@@ -297,12 +304,15 @@ void BookmarkList::mouseDoubleClickEvent(QMouseEvent *event) {
     if (!itemAt(event->pos())) return;
     auto item = itemAt(event->pos());
     if (item->type() != BOOKMARK) return;
-    auto b_item = dynamic_cast<BookmarkItem*>(item);
+    BookmarkItem* b_item = dynamic_cast<BookmarkItem*>(item);
+    Bookmark* bmark = b_item->get_bookmark();
 
     // Start video at correct frame
     VideoState state;
-    state = b_item->get_bookmark()->get_state();
-    emit set_bookmark_video(b_item->get_bookmark()->get_video_project(), state);
+    state = bmark->get_state();
+
+    VideoProject* parent = bmark->get_project()->get_video_project(bmark->get_vid_proj_id());
+    emit set_bookmark_video(parent, state);
 }
 
 /**
@@ -341,18 +351,11 @@ void BookmarkList::mouseMoveEvent(QMouseEvent *event) {
     drag->setMimeData(mime_data);
 
     // Starts the drop. Will remove the original item if Qt::MoveAction is recieved
-    Qt::DropAction drop_action;
     if (event->modifiers() == Qt::ControlModifier) {
-        drop_action = drag->exec(Qt::CopyAction);
+        drag->exec(Qt::CopyAction);
     } else {
-        drop_action = drag->exec(Qt::MoveAction);
+        drag->exec(Qt::MoveAction);
     }
-
-    if (drop_action == Qt::MoveAction) {
-        auto item = takeItem(row(clicked_item));
-        delete item;
-    }
-    clicked_item = nullptr;
 }
 
 /**
@@ -381,7 +384,6 @@ void BookmarkList::dragEnterEvent(QDragEnterEvent *event) {
  * It will create a copy of the item and add it to the list.
  * It is up to the source listwidget to remove the original item.
  * @param event
- * TODO split into functions
  */
 void BookmarkList::dropEvent(QDropEvent *event) {
     // Get subclass type from mimedata
@@ -392,10 +394,21 @@ void BookmarkList::dropEvent(QDropEvent *event) {
     stream >> type;
 
     // Get origin widget of drag item
-    BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
+    bool success = false;
     if (type == BOOKMARK) {
-        bookmark_drop(list, event);
+        success = bookmark_drop(event);
     } else if (type == CONTAINER) {
-        container_drop(list, event);
+        success = container_drop(event);
     }
+
+    if (success) {
+        BookmarkList* list = dynamic_cast<BookmarkList*>(event->source());
+        if (event->dropAction() == Qt::MoveAction) {
+            delete list->takeItem(list->row(list->clicked_item));
+        }
+        list->clicked_item = nullptr;
+    }
+
+    update_index();
+    sortItems();
 }

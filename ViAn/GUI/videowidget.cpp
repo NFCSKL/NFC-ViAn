@@ -757,7 +757,6 @@ void VideoWidget::delete_interval() {
     m_interval.first = -1;
     m_interval.second = -1;
     playback_slider->clear_interval();
-    playback_slider->update();
 }
 
 /**

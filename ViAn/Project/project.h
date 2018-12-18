@@ -6,6 +6,8 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
+class Bookmark;
+class BookmarkCategory;
 class VideoProject;
 
 using ID = int;
@@ -23,8 +25,11 @@ class Project : public Saveable{
     QString last_changed = "";      // Date and time when the project was last saved
 
     std::vector<VideoProject*> m_videos;
+    std::vector<Bookmark*> m_bookmarks;
+    std::vector<BookmarkCategory*> m_categories;
+
     int m_vid_count = 0;
-    int m_rp_count = 0;
+    int m_cat_count = 0;
     bool m_temporary = true;
     bool m_unsaved_changes = false;
 public:
@@ -36,6 +41,12 @@ public:
 
     ID add_video_project(VideoProject *vid_proj);
     void remove_video_project(VideoProject* vid_proj);
+
+    void add_bookmark(Bookmark* bmark);
+    void remove_bookmark(Bookmark* bmark);
+
+    ID add_category(BookmarkCategory* cat);
+    void remove_category(BookmarkCategory* cat);
 
     // read and write operator for Projects
     void read(const QJsonObject& json);
@@ -53,6 +64,9 @@ public:
     QString generate_tmp_directory();
 
     std::vector<VideoProject *>& get_videos();
+    std::vector<Bookmark *>& get_bookmarks();
+    std::vector<BookmarkCategory *>& get_categories();
+    VideoProject* get_video_project(int id);
     QString get_dir() const;
     QString get_name() const;
     QString get_file() const;

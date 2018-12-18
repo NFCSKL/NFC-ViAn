@@ -11,10 +11,8 @@ public:
 
 private slots:
     void add_analysis_test();
-    void add_bookmark_test();
     void read_write_test();
     void delete_analysis();
-    void delete_bookmark();
     void save_load_delete_test();
     void save_status_test();
 };

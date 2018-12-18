@@ -1,10 +1,12 @@
 #include "reportgenerator.h"
 
 #include "GUI/Bookmark/bookmarkitem.h"
+#include "GUI/Bookmark/bookmarkcategory.h"
 #include "Project/bookmark.h"
 #include "utility.h"
 
 #include <ActiveQt/QAxObject>
+#include <QDebug>
 #include <QDir>
 #include <QTextStream>
 
@@ -16,9 +18,9 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(QString proj_path, ReportContainer report_container) {
+ReportGenerator::ReportGenerator(QString proj_path, std::vector<QListWidgetItem*> items) {
     m_path = proj_path;
-    m_rep_cont = report_container;
+    list_items = items;
     word = new QAxObject("Word.Application");
 }
 
@@ -102,18 +104,43 @@ void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) 
  * @param para, document to add the bookmarks to
  */
 void ReportGenerator::create_bookmark_table(QAxObject* para) {
+    // The end of the previous range
+    int end = 0;
+    for (auto item : list_items) {
+        if (item->type() == 1) {            // Type = CONTAINER
+            end = add_category(para, end, item);
+        } else if (item->type() == 0) {     // Type = BOOKMARK
+            end = add_bookmark(para, end, item);
+        }
+    }
+}
+
+int ReportGenerator::add_category(QAxObject* para, int end, QListWidgetItem* item) {
+    BookmarkCategory* cat = dynamic_cast<BookmarkCategory*>(item);
+    // 3 rows for the title, category name and the category
+    auto table_rows = 3;
     // Space to use for table
-    QAxObject* range = para->querySubObject("Range(int,int)",0,0);
+    QAxObject* range = para->querySubObject("Range()");
+    range->dynamicCall("SetRange(int,int)", end, end+2000);
 
-    // Table should have room for categories, their titles and its own title
-    // so the table needs 1 (title) + 2*(number of categories) of rows
-    auto table_rows = m_rep_cont.size()*2+1;
+    QAxObject* tables = range->querySubObject("Tables");
+    QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), table_rows,2,1,1);
+    table->dynamicCall("AutoFormat(QVariant)", BORDER);
+    table->dynamicCall("SetTitle(QString)", "Title");
 
-    // Create the table for all bookmarks
-    QAxObject* table = add_table(range, table_rows, 2, BORDER);
-
+    // Add the category to the space
     // Table indexed from 1, begin after title.
     int cell_row = 1;
+
+    // Access duplicate category title cells and merge them together
+    QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
+    QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
+    _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
+    // Write category name
+    cell_add_text(table, cat->get_name(), cell_row, 1);
+
+    // Go to next table row
+    cell_row++;
 
     // Add title text
     cell_add_text(table, "Omstritt", cell_row, 1);
@@ -121,54 +148,43 @@ void ReportGenerator::create_bookmark_table(QAxObject* para) {
 
     cell_row++;
 
-    for (size_t i = 0; i != m_rep_cont.size(); i++) { // for each category, make a paragraph of bookmarks
-        // Access duplicate category title cells and merge them together
-        QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
-        QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
-        _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
-        // Write category name
-        cell_add_text(table, m_rep_cont.at(i).first, cell_row, 1);
+    // Access disputed and reference bookmarks
+    std::vector<BookmarkItem*> bm_disp = cat->get_disputed();
+    std::vector<BookmarkItem*> bm_ref = cat->get_references();
 
-        // Go to next table row
-        cell_row++;
+    // Access cells to be used for storing disp and ref bookmarks
+    QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 1);
+    QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 2);
 
-        // Access disputed and reference bookmarks
-        std::vector<BookmarkItem*> bm_disp = m_rep_cont.at(i).second.first;
-        std::vector<BookmarkItem*> bm_ref = m_rep_cont.at(i).second.second;
+    // Insert categories into disputed and reference cells.
+    cell_insert_category(cell_disp, bm_disp);
+    cell_insert_category(cell_ref, bm_ref);
 
-        // Access cells to be used for storing disp and ref bookmarks
-        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 1);
-        QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 2);
-
-        // Insert categories into disputed and reference cells.
-        cell_insert_category(cell_disp, bm_disp);
-        cell_insert_category(cell_ref, bm_ref);
-
-        // Go to next table row
-        cell_row++;
-    }
-
-    // Iterate over the uncategorized bookmarks backwards
-    for (auto i = uncat_bmarks.size(); i --> 0;) {
-        // Access Bookmark
-        BookmarkItem* bm = uncat_bmarks.at(i);
-        QString file_name = bm->get_file_path();
-        file_name.replace("/", "\\\\");
-
-        // Get the range "table" occupy
-        QAxObject* bmark_range = table->querySubObject("Range");
-        // Get the last position of that range
-        bmark_range->dynamicCall("Collapse(int)", 0);   // 0 - get end, 1 - get start of range
-
-        // Insert the bookmark description, divider line and bookmark image as a stack
-        // because they are all inserted at the same position
-        bmark_range->dynamicCall("InsertAfter(QString Text)", QString("\v") + get_bookmark_descr(bm));
-
-        QAxObject* p_shapes = para->querySubObject("InlineShapes");
-        p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
-                     file_name, false, true, bmark_range->asVariant());
-    }
+    // Insert empty line and update the end position
+    range->dynamicCall("InsertParagraphAfter()");
+    return range->dynamicCall("End()").toInt()-1;
 }
+
+int ReportGenerator::add_bookmark(QAxObject* para, int end, QListWidgetItem* item) {
+    BookmarkItem* bm = dynamic_cast<BookmarkItem*>(item);
+    // Access Bookmark
+    QString file_name = bm->get_file_path();
+    file_name.replace("/", "\\\\");
+
+    QAxObject* bmark_range = para->querySubObject("Range()");
+    bmark_range->dynamicCall("SetRange(int,int)", end, end+100);
+    // Get the last position of that range
+
+    // Insert the bookmark description, divider line and bookmark image as a stack
+    // because they are all inserted at the same position
+    bmark_range->dynamicCall("InsertAfter(QString Text)", get_bookmark_descr(bm));
+    bmark_range->dynamicCall("InsertParagraphAfter()");
+    QAxObject* p_shapes = para->querySubObject("InlineShapes()");
+    p_shapes->dynamicCall("AddPicture(const QString&,bool,bool,QVariant)",
+                 file_name, false, true, bmark_range->asVariant());
+    return bmark_range->dynamicCall("End()").toInt()-1;
+}
+
 /**
  * @brief ReportGenerator::cell_insert_category
  * @param cell
@@ -181,7 +197,7 @@ void ReportGenerator::cell_insert_category(QAxObject* cell, std::vector<Bookmark
     // Table indexed from 1, no title so start at 1.
     int cell_row = 1;
     // Number of rows required for Category list
-    int max_row = bm_list.size();    
+    int max_row = bm_list.size();
     // If empty category, no bookmarks to add => return
     if(max_row == 0) return;
     // Create table for category list, requires max_row > 0

@@ -1,5 +1,7 @@
 #include "project.h"
 
+#include "bookmark.h"
+#include "GUI/Bookmark/bookmarkcategory.h"
 #include "videoproject.h"
 
 #include <QDebug>
@@ -48,21 +50,28 @@ Project::~Project(){
 }
 
 /**
- * @brief Project::add_video
+ * @brief Project::add_video_project
  * @return Video ID to be used for identifying the video.
  */
 ID Project::add_video_project(VideoProject *vid_proj){
     vid_proj->set_project(this);
     m_videos.push_back(vid_proj);
+    int id;
+    if (vid_proj->get_id() == -1) {
+        vid_proj->set_id(m_vid_count);
+        id = m_vid_count;
+        m_vid_count++;
+    } else {
+        id = vid_proj->get_id();
+    }
     m_unsaved_changes = true;
-    return m_vid_count++;
+    return id;
 }
 
 /**
- * @brief Project::remove_video
- * @param id
+ * @brief Project::remove_video_project
+ * @param vid_proj
  * Remove video from videos and delete its contents.
- * TODO, not used
  */
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
@@ -70,10 +79,49 @@ void Project::remove_video_project(VideoProject* vid_proj){
     delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
+    *it = nullptr; // Not need?
+}
+
+void Project::add_bookmark(Bookmark* bmark) {
+    bmark->set_project(this);
+    m_bookmarks.push_back(bmark);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_bookmark(Bookmark* bmark) {
+    auto it = std::find(m_bookmarks.begin(), m_bookmarks.end(), bmark);
+    if (it == m_bookmarks.end()) return;
+    delete *it;
+    m_bookmarks.erase(it);
+    m_unsaved_changes = true;
+    bmark->remove_exported_image();
+}
+
+ID Project::add_category(BookmarkCategory* cat) {
+    cat->set_project(this);
+    m_categories.push_back(cat);
+    int id;
+    if (cat->get_id() == -1) {
+        cat->set_id(m_cat_count);
+        id = m_cat_count;
+        m_cat_count++;
+    } else {
+        id = cat->get_id();
+    }
+    m_unsaved_changes = true;
+    return id;
+}
+
+void Project::remove_category(BookmarkCategory* cat) {
+    auto it = std::find(m_categories.begin(), m_categories.end(), cat);
+    if (it == m_categories.end()) return;
+    delete *it;
+    m_categories.erase(it);
+    m_unsaved_changes = true;
 }
 
 /**
- * @brief Project::set_saved_status
+ * @brief Project::set_unsaved
  * Set unsaved status
  * Should be used by video_project and analysis
  * @param changed
@@ -90,6 +138,9 @@ void Project::set_name_and_path(const QString &name, const QString &path) {
         m_dir = path + name + "/";
         for (auto it = begin(m_videos); it != end(m_videos); ++it) {
             (*it)->reset_root_dir(m_dir);
+        }
+        for (auto bmark : m_bookmarks) {
+            bmark->reset_root_dir(m_dir);
         }
     } else {
         // Attempts to generate a temporary path
@@ -116,8 +167,13 @@ void Project::set_temporary(const bool &is_temporary){
  * @return m_unsaved_changes
  */
 bool Project::is_saved() const {
-    bool video_projects_saved = std::all_of(m_videos.begin(), m_videos.end(), [](VideoProject* vp){return vp->is_saved();});
-    return !m_unsaved_changes && video_projects_saved;
+    bool video_projects_saved = std::all_of(m_videos.begin(), m_videos.end(),
+                                            [](VideoProject* vp){return vp->is_saved();});
+    bool bookmarks_saved = std::all_of(m_bookmarks.begin(), m_bookmarks.end(),
+                                            [](Bookmark* bm){return bm->is_saved();});
+    bool categories_saved = std::all_of(m_categories.begin(), m_categories.end(),
+                                            [](BookmarkCategory* cat){return cat->is_saved();});
+    return !m_unsaved_changes && video_projects_saved && bookmarks_saved && categories_saved;
 }
 
 bool Project::is_temporary() const {
@@ -134,6 +190,9 @@ void Project::read(const QJsonObject& json){
     m_file = full_path();
     m_dir = m_file.left(m_file.lastIndexOf("/")+1);
     m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER;
+    m_vid_count = json["vid IDs"].toInt();
+    m_cat_count = json["cat IDs"].toInt();
+
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -142,7 +201,33 @@ void Project::read(const QJsonObject& json){
         v->read(json_vid_proj);
         add_video_project(v);
         v->reset_root_dir(m_dir);
-    }    
+    }
+
+    // Read bookmarks from json
+    QJsonArray json_bookmarks = json["bookmarks"].toArray();
+    for (int i = 0; i < json_bookmarks.size(); ++i) {
+        QJsonObject json_bmark = json_bookmarks[i].toObject();
+        Bookmark* bmark = new Bookmark();
+        bmark->read(json_bmark);
+        add_bookmark(bmark);
+        bmark->reset_root_dir(m_dir);
+    }
+
+    // Read categories from json
+    QJsonArray json_cats = json["categories"].toArray();
+    for (int i = 0; i < json_cats.size(); ++i) {
+        QJsonObject json_category = json_cats[i].toObject();
+
+        QString name = json_category["name"].toString();
+        int index = json_category["index"].toInt();
+        int id = json_category["id"].toInt();
+
+        BookmarkCategory* new_category = new BookmarkCategory(name, 1);
+        new_category->set_index(index);
+        new_category->set_id(id);
+        add_category(new_category);
+        new_category->m_unsaved_changes = false;
+    }
     m_unsaved_changes = false;
 }
 
@@ -153,15 +238,40 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     json["name"] = m_name;
-    json["root_dir"] =  m_dir;
-    QJsonArray json_proj;
+    json["root_dir"] = m_dir;
+    json["vid IDs"] = m_vid_count;
+    json["cat IDs"] = m_cat_count;
+
     // Write Videos to json
+    QJsonArray json_proj;
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         QJsonObject json_vid_proj;
         (*it)->write(json_vid_proj);
         json_proj.append(json_vid_proj);
     }
     json["videos"] = json_proj;
+
+    // Write Bookmarks to json
+    QJsonArray json_bmarks;
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
+        QJsonObject json_bmark;
+        (*it)->write(json_bmark);
+        json_bmarks.append(json_bmark);
+    }
+    json["bookmarks"] = json_bmarks;
+
+    // Write Categories to json
+    QJsonArray json_cats;
+    for(auto it = m_categories.begin(); it != m_categories.end(); it++){
+        QJsonObject json_category;
+        json_category["name"] = (*it)->get_name();
+        json_category["index"] = (*it)->get_index();
+        json_category["id"] = (*it)->get_id();
+        json_cats.append(json_category);
+        (*it)->m_unsaved_changes = false;
+    }
+    json["categories"] = json_cats;
+
     m_unsaved_changes = false;
 }
 
@@ -258,8 +368,32 @@ QString Project::generate_tmp_directory() {
  * @brief Project::get_videos
  * @return videos&
  */
-std::vector<VideoProject*> &Project::get_videos(){
+std::vector<VideoProject*> &Project::get_videos() {
     return m_videos;
+}
+
+std::vector<Bookmark*> &Project::get_bookmarks() {
+    return m_bookmarks;
+}
+
+std::vector<BookmarkCategory*> &Project::get_categories() {
+    return m_categories;
+}
+
+/**
+ * @brief Project::get_video_project
+ * Get the videoproject with the ID from the list of videoproject.
+ * If the videoproject is not found return nullptr.
+ * @param id
+ * @return
+ */
+VideoProject* Project::get_video_project(int id) {
+    for (auto vp : m_videos) {
+        if (vp->get_id() == id) {
+            return vp;
+        }
+    }
+    return nullptr;
 }
 
 QString Project::get_dir() const {

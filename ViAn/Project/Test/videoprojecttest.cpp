@@ -33,20 +33,6 @@ void VideoProjectTest::add_analysis_test(){
 }
 
 /**
- * @brief VideoProjectTest::add_bookmark_test
- * Tests if adding bookmark to vid_proj, increases
- * size of bookmark member
- */
-void VideoProjectTest::add_bookmark_test(){
-    VideoProject* vid_proj = new VideoProject();
-
-    vid_proj->add_bookmark(new Bookmark());
-    vid_proj->add_bookmark(new Bookmark());
-    vid_proj->add_bookmark(new Bookmark());
-    QCOMPARE(vid_proj->m_bookmarks.size(), unsigned(3));
-}
-
-/**
  * @brief VideoProjectTest::delete_analysis
  * Tests if deleting analyses to vid_proj, decreases
  * size of analyses member
@@ -70,29 +56,6 @@ void VideoProjectTest::delete_analysis(){
 }
 
 /**
- * @brief VideoProjectTest::delete_bookmark
- * Tests if deleting bookmark to vid_proj, decreases
- * size of bookmark member
- */
-void VideoProjectTest::delete_bookmark(){
-    VideoProject* vid_proj = new VideoProject();
-
-    Bookmark* bmark1 = new Bookmark();
-    Bookmark* bmark2 = new Bookmark();
-    Bookmark* bmark3 = new Bookmark();
-
-    vid_proj->add_bookmark(bmark1);
-    vid_proj->add_bookmark(bmark2);
-    vid_proj->add_bookmark(bmark3);
-    QCOMPARE(vid_proj->m_bookmarks.size(), unsigned(3));
-
-    vid_proj->remove_bookmark(bmark1);
-    vid_proj->remove_bookmark(bmark2);
-    vid_proj->remove_bookmark(bmark3);
-    QCOMPARE(vid_proj->m_analyses.size(), unsigned(0));
-}
-
-/**
  * @brief VideoProjectTest::read_write_test
  * Tests if written and read video projects to and from Qjson
  * are similar (Doesn't test for complete equality)
@@ -104,10 +67,6 @@ void VideoProjectTest::read_write_test(){
     vid_proj->add_analysis(new AnalysisProxy());
     vid_proj->add_analysis(new AnalysisProxy());
 
-    vid_proj->add_bookmark(new Bookmark());
-    vid_proj->add_bookmark(new Bookmark());
-    vid_proj->add_bookmark(new Bookmark());
-
     QJsonObject json_vid_proj;
     vid_proj->write(json_vid_proj);
 
@@ -115,9 +74,7 @@ void VideoProjectTest::read_write_test(){
     vid_proj2->read(json_vid_proj);
 
     QCOMPARE(vid_proj->m_ana_id, vid_proj2->m_ana_id);
-    QCOMPARE(vid_proj->m_bm_cnt, vid_proj2->m_bm_cnt);
     QCOMPARE(vid_proj->m_analyses.size(), vid_proj2->m_analyses.size());
-    QCOMPARE(vid_proj->m_bookmarks.size(), vid_proj2->m_bookmarks.size());
 }
 
 /**
@@ -132,10 +89,6 @@ void VideoProjectTest::save_load_delete_test(){
     vid_proj->add_analysis(new AnalysisProxy());
     vid_proj->add_analysis(new AnalysisProxy());
 
-    vid_proj->add_bookmark(new Bookmark());
-    vid_proj->add_bookmark(new Bookmark());
-    vid_proj->add_bookmark(new Bookmark());
-
     QDir dir;
     dir.mkpath("C:/TEST/VID_PROJ_TEST/");
     QString file_path("C:/TEST/VID_PROJ_TEST/test");
@@ -145,9 +98,7 @@ void VideoProjectTest::save_load_delete_test(){
     vid_proj2->load_saveable(file_path);
 
     QCOMPARE(vid_proj->m_ana_id, vid_proj2->m_ana_id);
-    QCOMPARE(vid_proj->m_bm_cnt, vid_proj2->m_bm_cnt);
     QCOMPARE(vid_proj->m_analyses.size(), vid_proj2->m_analyses.size());
-    QCOMPARE(vid_proj->m_bookmarks.size(), vid_proj2->m_bookmarks.size());
 
     vid_proj2->delete_saveable();
     dir.rmpath("C:/TEST/VID_PROJ_TEST/");
@@ -160,11 +111,6 @@ void VideoProjectTest::save_status_test() {
 
     BasicAnalysis* analysis = new BasicAnalysis();
     video_project->add_analysis(analysis);
-    QVERIFY(!video_project->is_saved());
-    video_project->m_unsaved_changes = false;
-
-    Bookmark* bookmark = new Bookmark();
-    video_project->add_bookmark(bookmark);
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 
@@ -182,10 +128,6 @@ void VideoProjectTest::save_status_test() {
     video_project->m_unsaved_changes = false;
 
     video_project->remove_analysis(analysis);
-    QVERIFY(!video_project->is_saved());
-    video_project->m_unsaved_changes = false;
-
-    video_project->remove_bookmark(bookmark);
     QVERIFY(!video_project->is_saved());
     video_project->m_unsaved_changes = false;
 }

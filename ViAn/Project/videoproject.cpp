@@ -33,6 +33,14 @@ VideoProject::~VideoProject(){
     delete m_video;
 }
 
+int VideoProject::get_id() const {
+    return id;
+}
+
+void VideoProject::set_id(const int& new_id) {
+    id = new_id;
+}
+
 /**
  * @brief VideoProject::get_video
  * @return video
@@ -52,15 +60,6 @@ Overlay* VideoProject::get_overlay() {
 }
 
 /**
- * @brief VideoProject::get_bookmarks
- * @return bookmarks
- * Return all bookmarks.
- */
-std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
-    return m_bookmarks;
-}
-
-/**
  * @brief VideoProject::get_analysis
  * @param id of the analysis
  * @return the analysis
@@ -70,11 +69,9 @@ BasicAnalysis *VideoProject::get_analysis(const int& id) {
 }
 
 bool VideoProject::is_saved() {
-    bool bookmarks_saved = std::all_of(m_bookmarks.begin(), m_bookmarks.end(),
-                                       [](std::map<ID,Bookmark*>::const_reference t){return t.second->is_saved();});
     bool analyses_saved = std::all_of(m_analyses.begin(), m_analyses.end(),
                                        [](std::map<ID,BasicAnalysis*>::const_reference t){return t.second->is_saved();});
-    return !m_unsaved_changes && analyses_saved && bookmarks_saved && m_overlay->is_saved() && m_video->is_saved();
+    return !m_unsaved_changes && analyses_saved && m_overlay->is_saved() && m_video->is_saved();
 }
 
 /**
@@ -102,16 +99,7 @@ void VideoProject::read(const QJsonObject& json){
     } else {
         m_video = vid;
     }
-
-
-    QJsonArray json_bookmarks = json["bookmarks"].toArray();
-    // Read bookmarks from json
-    for(int i = 0; i != json_bookmarks.size(); i++){
-        QJsonObject json_bookmark = json_bookmarks[i].toObject();
-        Bookmark* new_bookmark = new Bookmark();
-        new_bookmark->read(json_bookmark);
-        add_bookmark(new_bookmark);
-    }
+    id = json["ID"].toInt();
     QJsonObject json_overlay = json["overlay"].toObject();
     this->m_overlay->read(json_overlay);
     QJsonArray json_analyses = json["analyses"].toArray();
@@ -152,15 +140,6 @@ void VideoProject::read(const QJsonObject& json){
 void VideoProject::write(QJsonObject& json){
     json["tree_index"] = QString::fromStdString(m_tree_index);
     m_video->write(json);
-    // Write bookmarks to json
-    QJsonArray json_bookmarks;
-    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
-        QJsonObject json_bookmark;
-        Bookmark* temp = it->second;
-        temp->write(json_bookmark);
-        json_bookmarks.append(json_bookmark);
-    }
-    json["bookmarks"] = json_bookmarks;
     // Write analyses to json
     QJsonArray json_analyses;
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
@@ -175,6 +154,7 @@ void VideoProject::write(QJsonObject& json){
     m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
     m_unsaved_changes = false;
+    json["ID"] = id;
 }
 
 void VideoProject::set_tree_index(std::stack<int> tree_index) {
@@ -193,14 +173,10 @@ void VideoProject::set_project(Project *proj){
 
 void VideoProject::reset_root_dir(const QString &dir) {
     if (m_video->is_sequence()) {
-        auto seq = dynamic_cast<ImageSequence*>(m_video);
+        ImageSequence* seq = dynamic_cast<ImageSequence*>(m_video);
         if (seq) {
             seq->reset_root_dir(dir);
         }
-    }
-
-    for(auto bm : m_bookmarks){
-        bm.second->reset_root_dir(dir);
     }
     for(auto& an : m_analyses){
         if(an.second->get_type() == MOTION_DETECTION){ ;
@@ -226,26 +202,6 @@ void VideoProject::remove_analysis(BasicAnalysis *analysis) {
     m_analyses.erase(analysis->get_id());
     m_unsaved_changes = true;
     delete analysis;
-}
-
-/**
- * @brief VideoProject::add_bookmark
- * @param bookmark
- * Add new bookmark.
- */
-ID VideoProject::add_bookmark(Bookmark *bookmark){
-    m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
-    bookmark->set_id(m_bm_cnt);
-    bookmark->set_video_project(this);
-    m_unsaved_changes = true;
-    return m_bm_cnt++;
-}
-
-void VideoProject::remove_bookmark(Bookmark *bookmark) {
-    m_bookmarks.erase(bookmark->get_id());
-    m_unsaved_changes = true;
-    bookmark->remove_exported_image();
-    delete bookmark;
 }
 
 std::string VideoProject::get_index_path() {

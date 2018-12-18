@@ -50,8 +50,7 @@ public:
 signals:
     void selected_media();
     void marked_video_state(VideoProject *vid_proj, VideoState state);
-    void proj_path(QString);
-    void load_bookmarks(VideoProject* vid_proj);
+    void set_project(Project*);
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
@@ -154,6 +153,7 @@ signals:
     void item_removed(VideoProject* vid_proj);
     void open_in_widget(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
+    void save_bmark_wgt();
     void clear_analysis();
     void abort_all_analysis();
 };

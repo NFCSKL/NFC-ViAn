@@ -120,7 +120,7 @@ void ProjectWidget::add_project(const QString project_name, const QString projec
     Project* new_proj = new Project(project_name, project_path);
     set_main_window_name(project_name);
     m_proj = new_proj;
-    emit proj_path(m_proj->get_dir());
+    emit set_project(m_proj);
 }
 
 /**
@@ -1211,6 +1211,7 @@ void ProjectWidget::update_settings() {
  * If a folder is selected then it will delete all subitems as well.
  */
 void ProjectWidget::remove_item() {
+    if (!currentItem()) return;
     if (currentItem()->type() == ANALYSIS_ITEM && !dynamic_cast<AnalysisItem*>(currentItem())->is_finished()) {
         return;
     } else if (currentItem()->type() == VIDEO_ITEM) {
@@ -1286,19 +1287,13 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
         remove_tree_item(item->child(0));
     }
     // Remove the video from the list of videos
-    auto it = std::find(m_proj->get_videos().begin(), m_proj->get_videos().end(), v_proj);
-    if (it != m_proj->get_videos().end()) {
-        m_proj->get_videos().erase(it);
-        // TODO store folder for deletion if project saved
-        if (v_proj->get_video()->is_sequence()) {
-            // Will be deleted in close
-            removed_sequences.push_back(v_proj);
-        } else {
-            auto video_it = std::find(video_list.begin(), video_list.end(), (*it)->get_video());
-            video_list.erase(video_it);
-            delete v_proj;
-        }
-        m_proj->set_unsaved(true);
+
+    if (v_proj->get_video()->is_sequence()) {
+        removed_sequences.push_back(v_proj);
+    } else {
+        auto video_it = std::find(video_list.begin(), video_list.end(), v_proj->get_video());
+        video_list.erase(video_it);
+        m_proj->remove_video_project(v_proj);
     }
     emit item_removed(v_proj);
     emit remove_overlay();
@@ -1503,7 +1498,7 @@ bool ProjectWidget::save_project() {
             m_proj->set_name_and_path(name, path);
             m_proj->set_temporary(false);
             set_main_window_name(name);
-            emit proj_path(m_proj->get_dir());
+            emit set_project(m_proj);
             QDir dir;
             dir.mkpath(m_proj->get_dir());
 
@@ -1531,6 +1526,7 @@ bool ProjectWidget::save_project() {
 
     save_item_data();
     emit save_draw_wgt();
+    emit save_bmark_wgt();
 
     // Mark all analysis as saved
     std::vector<AnalysisItem*> a_items;
@@ -1570,16 +1566,15 @@ bool ProjectWidget::open_project(QString project_path) {
     }
     m_proj = new_proj;
     set_status_bar("Opening project");
-\
+
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.load_state(m_proj->get_dir() + "treestate");
     set_main_window_name(m_proj->get_name());
-    emit proj_path(m_proj->get_dir());
+    emit set_project(m_proj);
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
-        emit load_bookmarks(vid_proj);
 
         if (vid_proj->get_video()->is_sequence()) continue;
         video_list.push_back(vid_proj->get_video());

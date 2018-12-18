@@ -12,8 +12,8 @@
  */
 BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(bookmark->get_description(), nullptr, type) {
     QString frame = QString::number(bookmark->get_frame_number());
-    QString v_name = bookmark->get_video_project()->get_video()->get_name();
-    hover_text = "Source: " + v_name + "\nFrame: " + frame + "\nTime: " + bookmark->get_time();
+    hover_text = "Source: " + bookmark->m_image_name + "\nFrame: " + frame +
+            "\nTime: " + bookmark->get_time();
     QString description = bookmark->get_description();
     if (description != "") {
         setToolTip(hover_text + "\nDescription: " + description);
@@ -28,6 +28,11 @@ BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(bookm
  * Destructor, no memory allocated.
  */
 BookmarkItem::~BookmarkItem() {
+}
+
+void BookmarkItem::update_item(const int &index, const int &cat_id, const int &type) {
+    m_bookmark->set_index(index);
+    m_bookmark->set_container(cat_id, type);
 }
 
 /**
