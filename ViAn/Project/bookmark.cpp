@@ -180,18 +180,8 @@ void Bookmark::read(const QJsonObject& json){
     m_container = pair;
 
     VideoState state;
-    state.frame = json["frame"].toInt();
-    state.scale_factor = json["scale_factor"].toDouble();
-    int x = json["anchor x"].toInt();
-    int y = json["anchor y"].toInt();
-    state.anchor = QPoint(x, y);
-    x = json["center_x"].toInt();
-    y = json["center_y"].toInt();
-    state.center = QPoint(x, y);
-    state.rotation = json["rotation"].toInt();
-    state.brightness = json["brightness"].toInt();
-    state.contrast = json["contrast"].toDouble();
-    state.gamma = json["gamma"].toDouble();
+    QJsonObject json_state = json["state"].toObject();
+    state.read(json_state);
     m_state = state;
     
     m_unsaved_changes = false;
@@ -211,15 +201,9 @@ void Bookmark::write(QJsonObject& json){
     json["container"] = m_container.second;
     json["type"] = m_container.first;
 
-    json["scale_factor"] = m_state.scale_factor;
-    json["anchor x"] = m_state.anchor.x();
-    json["anchor y"] = m_state.anchor.y();
-    json["center_x"] = m_state.center.x();
-    json["center_y"] = m_state.center.y();
-    json["rotation"] = m_state.rotation;
-    json["brightness"] = m_state.brightness;
-    json["contrast"] = m_state.contrast;
-    json["gamma"] = m_state.gamma;
+    QJsonObject json_state;
+    m_state.write(json_state);
+    json["state"] = json_state;
 
     m_unsaved_changes = false;
 }
