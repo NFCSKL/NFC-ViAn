@@ -29,8 +29,11 @@ private:
     bool is_new{false};
 
 public:
-    ImageSequence(const QString& name);
-    ImageSequence(const QString& name, const std::vector<QString>& images, const std::vector<QString>& checksums);
+    ImageSequence(const QString& name, VIDEO_TYPE seq_type = VIDEO_SEQUENCE);
+    ImageSequence(const QString& name, const std::vector<QString>& images,
+                  const std::vector<QString>& checksums, VIDEO_TYPE seq_type = VIDEO_SEQUENCE);
+
+    std::map<QString, QString> get_paths() const;
 
     QString get_search_path() const;
     QString get_pattern_name();

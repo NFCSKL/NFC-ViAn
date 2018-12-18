@@ -31,7 +31,7 @@ void ImageSequence::update() {
  * @brief ImageSequence::ImageSequence
  * @param name: name of the sequence
  */
-ImageSequence::ImageSequence(const QString& path) : Video(true){
+ImageSequence::ImageSequence(const QString& path, VIDEO_TYPE seq_type) : Video(seq_type){
     m_seq_path = path;
     m_name = Utility::name_from_path(path);
 }
@@ -41,8 +41,9 @@ ImageSequence::ImageSequence(const QString& path) : Video(true){
  * @param name: name of the sequence
  * @param images: vector of paths to images
  */
-ImageSequence::ImageSequence(const QString& path, const std::vector<QString>& images, const std::vector<QString>& checksums)
-    : Video(path, true) {
+ImageSequence::ImageSequence(const QString& path, const std::vector<QString>& images,
+                             const std::vector<QString>& checksums, VIDEO_TYPE seq_type)
+    : Video(path, seq_type) {
 
     // Store image order and original file paths
     for (size_t i = 0; i < checksums.size(); ++i) {
@@ -55,10 +56,14 @@ ImageSequence::ImageSequence(const QString& path, const std::vector<QString>& im
     is_new = true;
 }
 
+std::map<QString, QString> ImageSequence::get_paths() const {
+    return m_original_images;
+}
+
 /**
  * @brief ImageSequence::get_search_path
  * Returns the absolute path to the parent folder of the images.
- * @return std::string with the actual disc path to the folder containing the images
+ * @return QString with the actual disc path to the folder containing the images
  */
 QString ImageSequence::get_search_path() const {
     return m_seq_path;
@@ -123,7 +128,7 @@ int ImageSequence::get_index_of_hash(const QString &hash) const {
  * @brief ImageSequence::get_original_name_from_hash
  * Returns the path to the original file mapped to the hash/checksum
  * @param hash
- * @return std::string containing original image path
+ * @return QString containing original image path
  */
 QString ImageSequence::get_original_name_from_hash(const QString &hash) const {
     return Utility::name_from_path(m_original_images.at(hash));

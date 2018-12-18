@@ -23,6 +23,7 @@
 #include "Project/recentproject.h"
 #include "Project/videoproject.h"
 #include "projectdialog.h"
+#include "sequencedialog.h"
 #include "utility.h"
 #include "viewpathdialog.h"
 
@@ -184,25 +185,25 @@ void ProjectWidget::add_images() {
         return;
     }
 
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Import image sequence"),
-                                         tr("Sequence name:"), QLineEdit::Normal,
-                                         "Sequence", &ok,
-                                         Qt::WindowCloseButtonHint);
+    QString text{};
+    int sequence_type;
+    SequenceDialog* seq_dialog = new SequenceDialog(&text, &sequence_type, this);
+
+    bool reply = seq_dialog->exec();
 
     // Check if dialog was accepted and that proper name was used
     QString seq_name{"sequence"};
-    if (ok && !text.isEmpty())
+    if (reply && !text.isEmpty()) {
         seq_name = text;
-    else
+    } else {
         return;
-
+    }
 
     QString path = m_proj->get_dir() + "Sequences/" + seq_name;
 
     QProgressDialog* progress = new QProgressDialog(
                 "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
-    ImageImporter* importer = new ImageImporter(image_paths, path);
+    ImageImporter* importer = new ImageImporter(image_paths, path, sequence_type);
     QThread* copy_thread = new QThread();
     importer->moveToThread(copy_thread);
 
@@ -218,13 +219,14 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, QString path) {
+void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, QString path, int seq_type) {
     std::vector<QString> images, hashes;
     for (auto i = 0; i < image_paths.size(); i++) {
         images.push_back(image_paths.at(i));
         hashes.push_back(checksums.at(i));
     }
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes));
+    VIDEO_TYPE type = static_cast<VIDEO_TYPE>(seq_type);
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes, type));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -281,8 +283,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         item->setSelected(true);
         setCurrentItem(item);
         for (auto t_frame : tag->tag_map) {
-            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-            tf_item->set_state(t_frame.second);
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.second);
             item->addChild(tf_item);
         }
         item->setExpanded(true);
@@ -311,8 +312,7 @@ void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
         tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
     }
     for (auto t_frame : tag->tag_map) {
-        TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-        tf_item->set_state(t_frame.second);
+        TagFrameItem* tf_item = new TagFrameItem(t_frame.second);
         item->addChild(tf_item);
     }
 }
@@ -324,8 +324,7 @@ void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
  * @param t_frame
  */
 void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
-    TagFrameItem* tf_item = new TagFrameItem(frame);
-    tf_item->set_state(t_frame);
+    TagFrameItem* tf_item = new TagFrameItem(t_frame);
     m_tag_item->setExpanded(true);
     for (int i = 0; i < m_tag_item->childCount(); ++i) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
@@ -441,8 +440,30 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     if (vid_proj->get_video()->is_sequence()) {
         ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
         vid_item->setToolTip(0, sequence->get_search_path());
+
+        // Tag all frames in the sequence if it's a tag sequence
+        if (sequence->get_sequence_type() == TAG_SEQUENCE) {
+            // Add the tag for the sequence
+            Tag* tag = new Tag("Images");
+            vid_proj->add_analysis(tag);
+
+            // Add the sequence frame to the tag
+            for (auto image : sequence->get_paths()) {
+                QString hash = image.first;
+                QString path = image.second;
+                int frame = sequence->get_index_of_hash(hash);
+
+                // Create the tagframe
+                VideoState state; // = sequence->state;
+                state.frame = frame;
+                TagFrame* t_frame = new TagFrame(frame, state);
+                t_frame->set_name(Utility::name_from_path(path));
+                tag->add_frame(frame, t_frame);
+            }
+        }
     }
     vid_item->setToolTip(0, vid_proj->get_video()->file_path);
+
 
     // If there only is one selected item and it's a folder,
     // add the new video to that folder otherwise to the top level

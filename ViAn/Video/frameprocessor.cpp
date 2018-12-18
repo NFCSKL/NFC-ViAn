@@ -10,9 +10,11 @@
 #include <mutex>
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
-                               zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                               std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
+                               zoomer_settings* z_settings, std::atomic_int* width,
+                               std::atomic_int* height, std::atomic_bool* new_frame_video,
+                               manipulation_settings* m_settings, video_sync* v_sync,
+                               std::atomic_int* frame_index, overlay_settings* o_settings,
+                               std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
     m_new_frame = new_frame;
 
     m_overlay_changed = overlay_changed;
@@ -116,27 +118,7 @@ void FrameProcessor::check_events() {
                 m_v_sync->con_var.notify_all();
                 continue;
             }
-
-            // Check for new dimensions on unrotated frame
-            // update zoomer as necessary
-            // This is required for image sequences since
-            // they can contain images of various sizes
-            cv::Rect prev_size = m_zoomer.get_frame_rect();
-            int new_width{m_frame.cols}, new_height{m_frame.rows};
-            bool has_new_frame_size{m_unrotated_size.width != new_width || m_unrotated_size.height != new_height};
-            bool frame_rect_changed{prev_size.width != new_width || prev_size.height != new_height};
-
-            if (frame_rect_changed && has_new_frame_size) {
-                m_zoomer.set_frame_size(cv::Size(new_width, new_height));
-                if (has_new_zoom_state) {
-                    m_zoomer.enforce_frame_boundaries();
-                } else {
-                    m_zoomer.fit_viewport();
-                }
-                emit_zoom_data();
-            }
-            has_new_zoom_state = false;
-            m_unrotated_size = cv::Size(new_width, new_height);
+            update_frame_size();
             process_frame();
 
             lk.unlock();
@@ -208,6 +190,30 @@ void FrameProcessor::process_frame() {
     m_z_settings->center = m_zoomer.get_center();
     emit zoom_preview(preview_frame);
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
+}
+
+void FrameProcessor::update_frame_size() {
+    // Check for new dimensions on unrotated frame
+    // update zoomer as necessary
+    // This is required for image sequences since
+    // they can contain images of various sizes
+    cv::Rect prev_size = m_zoomer.get_frame_rect();
+    int new_width{m_frame.cols}, new_height{m_frame.rows};
+    bool has_new_frame_size{m_unrotated_size.width != new_width || m_unrotated_size.height != new_height};
+    bool frame_rect_changed{prev_size.width != new_width || prev_size.height != new_height};
+
+    if (frame_rect_changed && has_new_frame_size) {
+        m_zoomer.set_frame_size(cv::Size(new_width, new_height));
+        if (has_new_zoom_state) {
+            m_zoomer.enforce_frame_boundaries();
+        } else {
+            m_zoomer.fit_viewport();
+        }
+        emit_zoom_data();
+    }
+    has_new_zoom_state = false;
+    m_unrotated_size = cv::Size(new_width, new_height);
+    emit new_frame_size(new_width, new_height);
 }
 
 /**

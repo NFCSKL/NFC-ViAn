@@ -83,7 +83,7 @@ public slots:
     void add_video();
     void create_video(QString path);
     void add_images();
-    void create_sequence(QStringList image_paths, QStringList checksums, QString path);
+    void create_sequence(QStringList image_paths, QStringList checksums, QString path, int seq_type);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_tag(VideoProject*, Tag *tag);
     void add_frames_to_tag_item(TreeItem *item);
