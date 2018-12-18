@@ -454,7 +454,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 int frame = sequence->get_index_of_hash(hash);
 
                 // Create the tagframe
-                VideoState state; // = sequence->state;
+                VideoState state;
                 state.frame = frame;
                 TagFrame* t_frame = new TagFrame(frame, state);
                 t_frame->set_name(Utility::name_from_path(path));
