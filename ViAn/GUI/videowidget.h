@@ -133,7 +133,7 @@ public slots:
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);
-    void set_zoom_state(QPoint, double, int);
+    void set_zoom_state(QPoint center, double scale, int angle, QPoint anchor);
     void play_btn_toggled(bool status);
     void update_tag();
     void update_tag_color(int b, double c, double g);

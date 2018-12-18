@@ -253,8 +253,8 @@ void FrameProcessor::emit_zoom_data() {
     // Store changes made
     m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
     m_z_settings->anchor = m_zoomer.get_anchor();
-
-    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
+    qDebug() << "THIS IS WRONG";
+    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle(), m_zoomer.get_anchor());
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
     emit set_rotation(m_zoomer.get_angle());
@@ -331,7 +331,9 @@ void FrameProcessor::update_manipulator_settings() {
     }
     update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
-    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
+    qDebug() << "IS THIS THE BAD ONE";
+    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle(), m_zoomer.get_anchor());
+    //emit set_anchor()
     emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast(), m_manipulator.get_gamma());
 }
 

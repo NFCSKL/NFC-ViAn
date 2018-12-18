@@ -655,14 +655,16 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  * @brief VideoWidget::set_zoom_state
  * Stores the current zoom modifications and rotation made to the video
  */
-void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
+void VideoWidget::set_zoom_state(QPoint center, double scale, int angle, QPoint anchor) {
     if (!m_vid_proj) return;
     if (!m_floating) {
         if (proj_tree_item == SEQUENCE_TAG_ITEM) {
             // TODO Update the state in the sequence tag item
+            qDebug() << "ANCHOR" << anchor << current_state->anchor;
             current_state->center = center;
             current_state->scale_factor = scale;
             current_state->rotation = angle;
+            current_state->anchor = anchor;
 
             qDebug() << "current" << current_state->scale_factor;
             qDebug() << "get" << scale;
@@ -674,11 +676,13 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
             m_vid_proj->state.center = center;
             m_vid_proj->state.scale_factor = scale;
             m_vid_proj->state.rotation = angle;
+            m_vid_proj->state.anchor = anchor;
         }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
         video->state.scale_factor = scale;
         video->state.rotation = angle;
+        video->state.anchor = anchor;
 
         if (angle == 90 || angle == 270) {
             size_label->setText("(" + QString::number(m_video_height) + "x" + QString::number(m_video_width) + ")");
