@@ -10,7 +10,7 @@
 #include <QJsonObject>
 #include <QPoint>
 
-struct VideoState {
+struct VideoState : Writeable {
     int frame = 0;
     double contrast = Constants::CONTRAST_DEFAULT;
     int brightness = Constants::BRIGHTNESS_DEFAULT;
@@ -33,6 +33,8 @@ struct VideoState {
         center = rh.center;
         video = rh.video;
     }
+    virtual void read(const QJsonObject& json);
+    virtual void write(QJsonObject& json);
 };
 
 typedef int ID;
