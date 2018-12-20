@@ -456,6 +456,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 // Create the tagframe
                 VideoState state;
                 state.frame = frame;
+                state.scale_factor = 1.;
                 TagFrame* t_frame = new TagFrame(frame, state);
                 t_frame->set_name(Utility::name_from_path(path));
                 tag->add_frame(frame, t_frame);
@@ -777,6 +778,7 @@ bool ProjectWidget::prompt_save() {
  * @param prev_item     : previous tree item
  */
 void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
+    qDebug() << "------------- Clicked";
     Q_UNUSED(prev_item)
     if (!item) return;
     switch(item->type()){
@@ -917,10 +919,10 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         VideoState state;
         state = tf_item->get_state();
-        if (item->parent()->type() == TAG_ITEM) {
-            emit marked_video_state(vid_item->get_video_project(), state);
-            emit item_type(item->type());
+        emit marked_video_state(vid_item->get_video_project(), state);
+        emit item_type(item->type());
 
+        if (item->parent()->type() == TAG_ITEM) {
             TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
             emit marked_basic_analysis(tag_item->get_tag());
 
@@ -928,10 +930,9 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
             tag_item->setCheckState(0, Qt::Checked);
             m_tag_item = tag_item;
         } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
-            emit marked_video_state(vid_item->get_video_project(), state);
-            emit item_type(item->type());
             DrawingTagItem* dt_item = dynamic_cast<DrawingTagItem*>(item->parent());
             emit marked_basic_analysis(dt_item->get_tag());
+
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }

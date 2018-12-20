@@ -58,6 +58,7 @@ void FrameProcessor::check_events() {
 
         // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
+            qDebug() << "new frame video";
             m_o_settings->no_video = false;
             reset_settings();
             m_overlay = m_o_settings->overlay;
@@ -77,6 +78,7 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
+            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
             update_overlay_settings();
             // Skip reprocessing of old frame if there is a new
@@ -89,6 +91,7 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
+            qDebug() << "settings changed";
             m_changed->store(false);
             update_manipulator_settings();
             update_zoomer_settings();
@@ -100,11 +103,13 @@ void FrameProcessor::check_events() {
                 continue;
             } else {
                 m_z_settings->skip_frame_refresh = false;
+                lk.unlock();
             }
         }
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
+            qDebug() << "new frame";
             if (m_z_settings->set_state) {
                 load_zoomer_state();
             }
@@ -158,7 +163,7 @@ void FrameProcessor::process_frame() {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
     }
 
-    // Create zoom perview mat
+    // Create zoom preview mat
     cv::Mat preview_frame = manipulated_frame.clone();
     std::pair<double, double> ratios = Utility::size_ratio(m_z_settings->preview_window_size,
                                                            m_zoomer.get_transformed_size());
@@ -173,6 +178,7 @@ void FrameProcessor::process_frame() {
     int frame_num = m_frame_index->load();
     int width = m_width->load();
     int height = m_height->load();
+    qDebug() << "processing";
 
     // Draws the text drawings on the overlay
     m_overlay->draw_overlay(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
@@ -258,39 +264,47 @@ void FrameProcessor::emit_zoom_data() {
 void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
     if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
+        qDebug() << "viewport";
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
     else if (m_z_settings->set_state) {
+        qDebug() << "state";
         load_zoomer_state();
-    }
-    // Center the zoom rect
-    else if (m_z_settings->do_point_zoom) {
-        m_z_settings->do_point_zoom = false;
-        m_zoomer.point_zoom(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Scale/zoom factor has been changed
     else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
+        qDebug() << "scale factor";
         m_zoomer.set_scale_factor(m_z_settings->zoom_factor);
+    }
+    // Center the zoom rect
+    else if (m_z_settings->do_point_zoom) {
+        qDebug() << "point zoom";
+        m_z_settings->do_point_zoom = false;
+        m_zoomer.point_zoom(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Zoom rectangle has changed
     else if (m_z_settings->has_new_zoom_area) {
+        qDebug() << "new zoom area";
         m_zoomer.area_zoom(m_z_settings->zoom_area_tl, m_z_settings->zoom_area_br);
         m_z_settings->has_new_zoom_area = false;
     }
     // Panning occured
     else if (m_z_settings->x_movement != 0 || m_z_settings->y_movement != 0) {
+        qDebug() << "movement";
         m_zoomer.translate_viewport_center(m_z_settings->x_movement, m_z_settings->y_movement);
         m_z_settings->x_movement = 0;
         m_z_settings->y_movement = 0;
     }
     // Fit to screen
     else if (m_z_settings->fit) {
+        qDebug() << "fit screen";
         m_z_settings->fit = false;
         m_zoomer.fit_viewport();
     }
     // Set original size (no zoom)
     else if (m_z_settings->original) {
+        qDebug() << "original size";
         m_z_settings->original = false;
         m_zoomer.reset();
     }

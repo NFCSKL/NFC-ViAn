@@ -15,7 +15,7 @@ struct VideoState {
     int brightness = Constants::BRIGHTNESS_DEFAULT;
     double gamma = Constants::GAMMA_DEFAULT;
     int rotation = 0;
-    double scale_factor = 1;
+    double scale_factor = -1;
     QPoint anchor = QPoint(0,0);
     // Center point is relative the rotation
     QPoint center = QPoint(-1,-1);
