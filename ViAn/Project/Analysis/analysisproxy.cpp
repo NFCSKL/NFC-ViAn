@@ -119,7 +119,7 @@ void AnalysisProxy::write(QJsonObject &json) {
     m_unsaved_changes = false;
 }
 
-ANALYSIS_TYPE AnalysisProxy::get_type() const {
+int AnalysisProxy::get_type() const {
     return type;
 }
 

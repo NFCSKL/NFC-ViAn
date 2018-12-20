@@ -19,15 +19,15 @@ class AnalysisSettings {
     SettingsDescr m_descriptions;       // Descriptions for settings constants
 
 public:
-    ANALYSIS_TYPE type;
+    int type;
     cv::Rect bounding_box;
     std::pair<int, int> interval;
     bool use_bounding_box = false;
     bool use_interval = false;
     bool quick_analysis = false;
 
-    AnalysisSettings(ANALYSIS_TYPE type, std::pair<int, int> interval, cv::Rect bounding_box);
-    AnalysisSettings(ANALYSIS_TYPE type);
+    AnalysisSettings(int type, std::pair<int, int> interval, cv::Rect bounding_box);
+    AnalysisSettings(int type);
     AnalysisSettings();
     AnalysisSettings(AnalysisSettings *as);
     virtual ~AnalysisSettings();
@@ -35,7 +35,7 @@ public:
     void reset_settings();
     cv::Rect get_bounding_box() const;
     void set_bounding_box(const cv::Rect &value);
-    ANALYSIS_TYPE get_type() const;
+    int get_type() const;
     std::pair<int, int> get_interval() const;
     void set_interval(const std::pair<int, int> &value);
 

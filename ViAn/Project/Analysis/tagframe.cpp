@@ -31,10 +31,13 @@ void TagFrame::read(const QJsonObject &json) {
     QJsonObject json_state = json["state"].toObject();
     state.read(json_state);
     m_state = state;
+    name = json["name"].toString();
 }
 
 void TagFrame::write(QJsonObject &json) {
     QJsonObject json_state;
     m_state.write(json_state);
     json["state"] = json_state;
+    json["frame"] = m_state.frame;
+    json["name"] = name;
 }

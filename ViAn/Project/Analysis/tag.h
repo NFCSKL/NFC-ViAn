@@ -11,12 +11,12 @@
 class TagFrame;
 
 class Tag : public BasicAnalysis {
-    bool m_drawing_tag = false;
+    int m_type = TAG;
 
 public:
-    Tag(QString name = "", bool drawing_tag = false);
+    Tag(QString name = "", int type = TAG);
     ~Tag() override;
-    virtual ANALYSIS_TYPE get_type() const override;
+    virtual int get_type() const override;
     virtual void read(const QJsonObject& json) override;
     virtual void write(QJsonObject &json) override;
     void add_frame(int frame, TagFrame *t_frame);
@@ -28,7 +28,6 @@ public:
     int previous_frame(int);
     std::vector<int> get_frames();
     bool is_drawing_tag();
-    void set_drawing_tag(bool);
 
     std::map<int, TagFrame*> tag_map;
 };
