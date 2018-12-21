@@ -1512,6 +1512,9 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
         z_settings.rotation = state.rotation;
+        // TODO Maybe test some more to see if this really isn't needed anymore
+        // Now with the new flag variable in the frameprocessor it shouldn't be needed
+        // It it's removed, remove the check from the processor as well
         //z_settings.skip_frame_refresh = frame_index.load() != state.frame;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
