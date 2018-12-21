@@ -14,7 +14,8 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
                                std::atomic_int* height, std::atomic_bool* new_frame_video,
                                manipulation_settings* m_settings, video_sync* v_sync,
                                std::atomic_int* frame_index, overlay_settings* o_settings,
-                               std::atomic_bool* overlay_changed, std::atomic_bool *abort) {
+                               std::atomic_bool* overlay_changed, std::atomic_bool *abort,
+                               std::atomic_bool* frame_changing) {
     m_new_frame = new_frame;
 
     m_overlay_changed = overlay_changed;
@@ -30,6 +31,7 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_frame_index = frame_index;
     m_abort = abort;
+    m_frame_changing = frame_changing;
 }
 
 FrameProcessor::~FrameProcessor() {}
@@ -58,7 +60,6 @@ void FrameProcessor::check_events() {
 
         // A new video has been loaded. Reset processing settings
         if (m_new_frame_video->load()) {
-            qDebug() << "new frame video";
             m_o_settings->no_video = false;
             reset_settings();
             m_overlay = m_o_settings->overlay;
@@ -78,8 +79,11 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
-            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
+            if (m_frame_changing->load()) {
+                lk.unlock();
+                continue;
+            }
             update_overlay_settings();
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load()) {
@@ -91,8 +95,11 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug() << "settings changed";
             m_changed->store(false);
+            if (m_frame_changing->load()) {
+                lk.unlock();
+                continue;
+            }
             update_manipulator_settings();
             update_zoomer_settings();
 
@@ -103,16 +110,11 @@ void FrameProcessor::check_events() {
                 continue;
             } else {
                 m_z_settings->skip_frame_refresh = false;
-                lk.unlock();
             }
         }
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load() && m_overlay) {
-            qDebug() << "new frame";
-            if (m_z_settings->set_state) {
-                load_zoomer_state();
-            }
             m_new_frame->store(false);
             try {
                 m_frame = m_v_sync->frame.clone();
@@ -124,12 +126,19 @@ void FrameProcessor::check_events() {
                 continue;
             }
             update_frame_size();
+            if (m_frame_changing->load()) {
+                update_overlay_settings();
+                update_manipulator_settings();
+                update_zoomer_settings();
+                m_frame_changing->store(false);
+            }
             process_frame();
 
             lk.unlock();
             m_v_sync->con_var.notify_all();
             continue;
         }
+        lk.unlock();
     }
 }
 
@@ -178,7 +187,6 @@ void FrameProcessor::process_frame() {
     int frame_num = m_frame_index->load();
     int width = m_width->load();
     int height = m_height->load();
-    qDebug() << "processing";
 
     // Draws the text drawings on the overlay
     m_overlay->draw_overlay(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
@@ -195,6 +203,7 @@ void FrameProcessor::process_frame() {
     // Emit manipulated frame and current frame number
     m_z_settings->center = m_zoomer.get_center();
     emit zoom_preview(preview_frame);
+    emit_zoom_data();
     emit done_processing(m_frame, manipulated_frame, m_frame_index->load());
 }
 
@@ -215,7 +224,6 @@ void FrameProcessor::update_frame_size() {
         } else {
             m_zoomer.fit_viewport();
         }
-        emit_zoom_data();
     }
     has_new_zoom_state = false;
     m_unrotated_size = cv::Size(new_width, new_height);
@@ -254,6 +262,7 @@ void FrameProcessor::emit_zoom_data() {
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
     emit set_rotation(m_zoomer.get_angle());
+    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast(), m_manipulator.get_gamma());
 }
 
 /**
@@ -264,47 +273,39 @@ void FrameProcessor::emit_zoom_data() {
 void FrameProcessor::update_zoomer_settings() {
     // Viewport has changed size
     if (m_zoomer.get_viewport_size() != m_z_settings->draw_area_size) {
-        qDebug() << "viewport";
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
     else if (m_z_settings->set_state) {
-        qDebug() << "state";
         load_zoomer_state();
     }
     // Scale/zoom factor has been changed
     else if (m_zoomer.get_scale_factor() != m_z_settings->zoom_factor) {
-        qDebug() << "scale factor";
         m_zoomer.set_scale_factor(m_z_settings->zoom_factor);
     }
     // Center the zoom rect
     else if (m_z_settings->do_point_zoom) {
-        qDebug() << "point zoom";
         m_z_settings->do_point_zoom = false;
         m_zoomer.point_zoom(m_z_settings->center, m_z_settings->zoom_step);
     }
     // Zoom rectangle has changed
     else if (m_z_settings->has_new_zoom_area) {
-        qDebug() << "new zoom area";
         m_zoomer.area_zoom(m_z_settings->zoom_area_tl, m_z_settings->zoom_area_br);
         m_z_settings->has_new_zoom_area = false;
     }
     // Panning occured
     else if (m_z_settings->x_movement != 0 || m_z_settings->y_movement != 0) {
-        qDebug() << "movement";
         m_zoomer.translate_viewport_center(m_z_settings->x_movement, m_z_settings->y_movement);
         m_z_settings->x_movement = 0;
         m_z_settings->y_movement = 0;
     }
     // Fit to screen
     else if (m_z_settings->fit) {
-        qDebug() << "fit screen";
         m_z_settings->fit = false;
         m_zoomer.fit_viewport();
     }
     // Set original size (no zoom)
     else if (m_z_settings->original) {
-        qDebug() << "original size";
         m_z_settings->original = false;
         m_zoomer.reset();
     }
@@ -312,8 +313,6 @@ void FrameProcessor::update_zoomer_settings() {
     else if (m_zoomer.get_interpolation_method() != m_z_settings->interpolation){
         m_zoomer.set_interpolation_method(m_z_settings->interpolation);
     }
-
-    emit_zoom_data();
 }
 
 /**
@@ -335,8 +334,6 @@ void FrameProcessor::update_manipulator_settings() {
     }
     update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
-    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
-    emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast(), m_manipulator.get_gamma());
 }
 
 /**

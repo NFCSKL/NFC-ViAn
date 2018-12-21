@@ -230,14 +230,11 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
     // Check for default state
     if (center_point.x() == -1 && center_point.y() == -1) {
         if (scale_factor == -1.) {
-            qDebug() << "Fitting";
             fit_viewport();
         } else {
-            qDebug() << "center";
             center();
         }
     } else {
-        qDebug() << "else";
         m_viewport = cv::RotatedRect(cv::Point2f(center_point.x(), center_point.y()),
                                      m_viewport.size, m_angle);
         update_anchor();
@@ -346,7 +343,6 @@ void Zoomer::reset() {
  * Centers the viewport rectangle on the frame
  */
 void Zoomer::center() {
-    qDebug() << "in center pt2";
     int center_x{m_transformed_frame_rect.tl().x + m_transformed_frame_rect.br().x / 2}, center_y{m_transformed_frame_rect.tl().y + m_transformed_frame_rect.br().y / 2};
     m_viewport = cv::RotatedRect(cv::Point2f(center_x, center_y), m_viewport.size, m_angle);
     update_anchor();

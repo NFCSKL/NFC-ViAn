@@ -189,7 +189,7 @@ void VideoWidget::init_frame_processor() {
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings,
                                      &video_width, &video_height, &new_frame_video,
                                      &m_settings, &v_sync, &frame_index, &o_settings,
-                                     &overlay_changed, &m_abort_processor);
+                                     &overlay_changed, &m_abort_processor, &m_frame_changing);
 
     try {
         processing_thread = new QThread(this);
@@ -664,7 +664,7 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
             m_vid_proj->state.scale_factor = scale;
             m_vid_proj->state.rotation = angle;
         }
-        if (m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
+        if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
             TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
             t_frame->m_state.center = center;
             t_frame->m_state.scale_factor = scale;
@@ -1118,6 +1118,10 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         player_con.notify_all();
 
     } else {
+        if (frame_index.load() != state.frame) {
+            std::lock_guard<std::mutex> v_lock(v_sync.lock);
+            m_frame_changing.store(true);
+        }
         set_state(state);
         if (state.frame > -1) {
             on_new_frame();
@@ -1193,7 +1197,6 @@ void VideoWidget::set_video_btns(bool b) {
     }
 }
 
-
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
@@ -1203,6 +1206,19 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
         analysis_play_btn->setChecked(ana_play_btn);
         analysis_only = ana_play_btn;
     }
+}
+
+void VideoWidget::set_seq_tag_btns(bool value) {
+    play_btn->setDisabled(value);
+    stop_btn->setDisabled(value);
+    next_frame_btn->setDisabled(value);
+    prev_frame_btn->setDisabled(value);
+    new_label_btn->setDisabled(value);
+    set_start_interval_btn->setDisabled(value);
+    set_end_interval_btn->setDisabled(value);
+    create_interval_btn->setDisabled(value);
+    tag_btn->setDisabled(value);
+    speed_slider->setDisabled(value);
 }
 
 /**
@@ -1496,7 +1512,7 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
         z_settings.rotation = state.rotation;
-        z_settings.skip_frame_refresh = frame_index.load() != state.frame;
+        //z_settings.skip_frame_refresh = frame_index.load() != state.frame;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
         m_settings.gamma = state.gamma;

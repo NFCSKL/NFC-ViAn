@@ -143,6 +143,8 @@ class FrameProcessor : public QObject {
     std::atomic_bool* m_overlay_changed;
     // New video loaded by video player
     std::atomic_bool* m_new_frame_video;
+    // New frame is in loading, not yet done
+    std::atomic_bool* m_frame_changing;
 
     /**
      *  Input settings,
@@ -177,7 +179,7 @@ public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                    std::atomic_bool* new_frame_video, manipulation_settings* m_settings, video_sync* v_sync,
-                   std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed, std::atomic_bool *abort);
+                   std::atomic_int* frame_index, overlay_settings *o_settings, std::atomic_bool *overlay_changed, std::atomic_bool *abort, std::atomic_bool *frame_changing);
     ~FrameProcessor();
 
 public slots:
