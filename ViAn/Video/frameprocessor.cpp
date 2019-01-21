@@ -184,6 +184,8 @@ void FrameProcessor::process_frame() {
     cv::rectangle(preview_frame, view_rectangle.tl() * factor,
                   view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
+    qDebug() << "Processing";
+
     int frame_num = m_frame_index->load();
     int width = m_width->load();
     int height = m_height->load();
@@ -194,8 +196,10 @@ void FrameProcessor::process_frame() {
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
 
+    qDebug() << "settings zoomer" << m_z_settings->zoom_factor << m_zoomer.get_scale_factor();
+
     // Draws the other drawings on the overlay
-    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_zoomer.get_anchor()), m_zoomer.get_scale_factor(), m_zoomer.get_angle(), width, height);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
