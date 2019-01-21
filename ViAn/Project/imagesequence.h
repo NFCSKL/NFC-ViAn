@@ -48,6 +48,7 @@ public:
 
     void set_remove(const bool& remove);
     bool remove_image_with_hash(const QString& hash);
+    bool remove_image_with_index(const int& index);
     bool remove_image_from_disc(const QString& image_name) const;
     bool rename_image_on_disc(const QString& old_name, const QString& new_name) const;
     void add_image(const QString &image_path, const int& index=-1); //UNUSED TODO REMOVE?

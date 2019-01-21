@@ -2,7 +2,10 @@
 
 #include "tagframe.h"
 
+#include <QDebug>
 #include <QJsonArray>
+
+#include <map>
 
 Tag::Tag(QString name, int type) {
     m_name = name;
@@ -60,6 +63,36 @@ void Tag::update_color_whole_tag(int b, double c, double g) {
         (*it).second->m_state.brightness = b;
         (*it).second->m_state.contrast = c;
         (*it).second->m_state.gamma = g;
+    }
+}
+
+/**
+ * @brief Tag::update_index_tag
+ * Update the tag so all tag frames' index matches the files index.
+ * Use after changing a frame of a tag_sequence
+ */
+void Tag::update_index_tag(int frame) {
+    qDebug() << "frame" << frame;
+    if (m_type != SEQUENCE_TAG) return;
+    TagFrame* temp_frame = nullptr;
+    for (auto it = tag_map.rbegin(); it != tag_map.rend(); ++it) {
+
+
+        if (it->first >= frame) {
+            if (temp_frame) {
+                auto temp = it->second;
+                it->second = temp_frame;
+                temp_frame = temp;
+                it->second->m_state.frame--;// = it->second->m_state->frame-1;
+            } else {
+                temp_frame = it->second;
+            }
+
+            qDebug() << "first" << it->first <<  it->second->m_state.frame;
+        }
+        if (it->first == frame) {
+            tag_map.rbegin()->second = temp_frame;
+        }
     }
 }
 

@@ -638,8 +638,10 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM ||
-                   child->type() == ANALYSIS_ITEM ||
+        } else if (child->type() == TAG_ITEM) {
+            TagItem* t_item = dynamic_cast<TagItem*>(child);
+            t_item->rename();
+        } else if (child->type() == ANALYSIS_ITEM ||
                    child->type() == DRAWING_TAG_ITEM ||
                    child->type() == INTERVAL_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
@@ -1139,7 +1141,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
             TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
             Tag* tag = t_item->get_tag();
             if (tag->get_type() == SEQUENCE_TAG) {
-                menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                //menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
             }
             menu.addAction("Update", this, &ProjectWidget::update_tag);
@@ -1404,7 +1406,29 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
 //            if (sequence) {
 //                sequence->remove_image_with_index(frame);
 //            }
+
+
+//            //tag->remove_frame(frame);
+
+//            // update the state in the tag_frames with new index (-1)
+//            // make the state that the tagframes hold into pointers
+//            // so i can update them from the tag_map in the tag.
+
+//            // Otherwise i would have to iterate through the proj tree and update
+//            // the states from there or close and remake them.
+
+//            tag->update_index_tag(frame);
+//            tag->remove_frame(tag->tag_map.rbegin()->first);
+//            tree_item_changed(item->parent()->parent());
+
+//            // Remove frame and update the index of all other tags
+//            //tag->update_index_tag(frame);
+//            //emit marked_basic_analysis(tag);
+//            // tag seq not work, normal do
+//            // different when saved and not
 //        }
+//    } else {
+//        tag->remove_frame(frame);   // untag
     }
 }
 
