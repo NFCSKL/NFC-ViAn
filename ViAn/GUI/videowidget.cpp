@@ -1584,6 +1584,8 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
         settings_changed.store(true);
         v_sync.lock.unlock();
         v_sync.con_var.notify_all();
+    } else {
+        lambda();
     }
 }
 
