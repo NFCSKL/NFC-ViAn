@@ -257,6 +257,7 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
     case EDIT:
         for (auto shape : overlays[frame_nr]) {
             if (point_in_drawing(pos, shape)) {
+                mouse_pressed(pos, frame_nr, false);
                 return;
             }
         }
@@ -267,7 +268,9 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
             if (point_in_drawing(pos, shape)) {
                 get_drawing(pos, frame_nr);
                 emit set_tool_edit();
+                set_tool(EDIT);
                 prev_point = pos;
+                mouse_pressed(pos, frame_nr, false);
                 break;
             }
         }
@@ -428,8 +431,13 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
             prev_point = pos;
         } else if (current_shape == TEXT) {
             dynamic_cast<Text*>(overlays[frame_nr].back())->update_text_pos(pos);
-        } else {
+        } else if (current_shape != ZOOM && current_shape != EDIT){
+//            if (shift && (current_shape == RECTANGLE ||
+//                          current_shape == CIRCLE ||
+//                          current_shape == ARROW ||
+//                          current_shape) {
             if (current_shape != PEN && shift) {
+                qDebug() << "currnet shape" << current_shape;
                 // When the shift modifier is used draw a symmetric drawing
                 // It's not possible with the pen tool.
                 int x = pos.x() - overlays[frame_nr].back()->get_draw_start().x;

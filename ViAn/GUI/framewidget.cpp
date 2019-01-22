@@ -453,6 +453,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+    qDebug() << "double click";
     if (frame_is_clear) return;
     QPoint scaled_pos = scale_to_video(event->pos());
     emit mouse_double_click(scaled_pos);
@@ -463,6 +464,7 @@ void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
+    qDebug() << "press";
     if (frame_is_clear) return;
     // Pos when the frame is at 100%
     QPoint scaled_pos = scale_to_video(event->pos());
@@ -514,6 +516,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
+    qDebug() << "release";
     if (frame_is_clear) return;
     QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
@@ -539,6 +542,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
+    //qDebug() << "move";
     if (frame_is_clear) return;
     QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
@@ -592,6 +596,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void FrameWidget::wheelEvent(QWheelEvent *event) {
+    qDebug() << "wheel";
     if (frame_is_clear) return;
     QPoint scaled_pos = scale_to_video(event->pos());
     QPoint num_degree = event->angleDelta() / 8;
