@@ -184,8 +184,6 @@ void FrameProcessor::process_frame() {
     cv::rectangle(preview_frame, view_rectangle.tl() * factor,
                   view_rectangle.br() * factor, cv::Scalar(255,255,255));
 
-    qDebug() << "Processing";
-
     int frame_num = m_frame_index->load();
     int width = m_width->load();
     int height = m_height->load();

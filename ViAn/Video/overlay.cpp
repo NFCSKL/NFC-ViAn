@@ -288,7 +288,6 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
-    qDebug() << "frame - current" << frame_nr << current_frame;
     if (show_overlay) {
         if (current_shape == EDIT) {
             edit = true;
@@ -434,12 +433,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
         } else if (current_shape == TEXT) {
             dynamic_cast<Text*>(overlays[frame_nr].back())->update_text_pos(pos);
         } else if (current_shape != ZOOM && current_shape != EDIT){
-//            if (shift && (current_shape == RECTANGLE ||
-//                          current_shape == CIRCLE ||
-//                          current_shape == ARROW ||
-//                          current_shape) {
             if (current_shape != PEN && shift) {
-                qDebug() << "currnet shape" << current_shape;
                 // When the shift modifier is used draw a symmetric drawing
                 // It's not possible with the pen tool.
                 int x = pos.x() - overlays[frame_nr].back()->get_draw_start().x;
