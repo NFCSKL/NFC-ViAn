@@ -288,19 +288,21 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
+    qDebug() << "frame - current" << frame_nr << current_frame;
     if (show_overlay) {
         if (current_shape == EDIT) {
             edit = true;
             prev_point = pos;
             m_right_click = right_click;
             if (right_click) {
-                if (current_drawing) {
+                if (current_drawing && current_drawing->get_frame() == frame_nr) {
                     current_drawing->set_anchor(pos);
                 }
                 return;
             }
 
-            if (current_drawing && point_in_drawing(pos, current_drawing)) {
+            if (current_drawing && current_drawing->get_frame() == frame_nr
+                    && point_in_drawing(pos, current_drawing)) {
                 return;
             } else {
                 get_drawing(pos, frame_nr);
@@ -408,7 +410,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
     // Only update the overlay is is exists and is currently being shown
     if (show_overlay && !overlays[frame_nr].empty()) {
         if (current_shape == EDIT && edit) {
-            if (current_drawing == nullptr) return;
+            if (!current_drawing || current_drawing->get_frame() != frame_nr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;
                 Text* temp_text = dynamic_cast<Text*>(current_drawing);
