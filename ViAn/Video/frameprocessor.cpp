@@ -172,6 +172,8 @@ void FrameProcessor::process_frame() {
         cv::rotate(manipulated_frame, manipulated_frame, m_rotate_direction);
     }
 
+    qDebug() << "Processing";
+
     // Create zoom preview mat
     cv::Mat preview_frame = manipulated_frame.clone();
     std::pair<double, double> ratios = Utility::size_ratio(m_z_settings->preview_window_size,

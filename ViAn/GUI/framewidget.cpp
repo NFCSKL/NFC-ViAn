@@ -486,6 +486,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             }
         } else if (event->button() == Qt::LeftButton) {
             if (zoom_rect.contains(scaled_pos)) {
+                if (rect_start == rect_end) return;
                 end_zoom();
                 mark_rect = false;
                 unsetCursor();
