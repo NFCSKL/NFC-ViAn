@@ -198,7 +198,7 @@ private:
     void process_frame();
     void update_zoomer_settings();
     void update_manipulator_settings();
-    void update_overlay_settings();
+    bool update_overlay_settings();
     void update_rotation(const int& rotation);
 
     void reset_settings();
