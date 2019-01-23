@@ -456,7 +456,8 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 // Create the tagframe
                 VideoState state;
                 state.frame = frame;
-                TagFrame* t_frame = new TagFrame(frame, state);
+                VideoState* state_p = new VideoState(state);
+                TagFrame* t_frame = new TagFrame(frame, state_p);
                 t_frame->set_name(Utility::name_from_path(path));
                 tag->add_frame(frame, t_frame);
             }
@@ -1141,7 +1142,7 @@ void ProjectWidget::context_menu(const QPoint &point) {
             TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
             Tag* tag = t_item->get_tag();
             if (tag->get_type() == SEQUENCE_TAG) {
-                //menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
             }
             menu.addAction("Update", this, &ProjectWidget::update_tag);
@@ -1203,7 +1204,8 @@ void ProjectWidget::drawing_tag() {
         if (frame_overlay.second.size() > 0) {
             VideoState state;
             state.frame = frame_overlay.first;
-            TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
+            VideoState* state_p = new VideoState(state);
+            TagFrame* t_frame = new TagFrame(frame_overlay.first, state_p);
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }
@@ -1396,39 +1398,39 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
     Tag* tag = tag_item->get_tag();
     int frame = tf_item->get_frame();
-    tag->remove_frame(frame);
+    //tag->remove_frame(frame);
     if (tag->get_type() == SEQUENCE_TAG) {
         // TODO remove the tagframe from the sequence and from folder
         // something like this
-//        VideoItem* vid_item = dynamic_cast<VideoItem*>(tag_item->parent());
-//        if (vid_item) {
-//            ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
-//            if (sequence) {
-//                sequence->remove_image_with_index(frame);
-//            }
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(tag_item->parent());
+        if (vid_item) {
+            ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
+            if (sequence) {
+                sequence->remove_image_with_index(frame);
+            }
 
 
-//            //tag->remove_frame(frame);
+            //tag->remove_frame(frame);
 
-//            // update the state in the tag_frames with new index (-1)
-//            // make the state that the tagframes hold into pointers
-//            // so i can update them from the tag_map in the tag.
+            // update the state in the tag_frames with new index (-1)
+            // make the state that the tagframes hold into pointers
+            // so i can update them from the tag_map in the tag.
 
-//            // Otherwise i would have to iterate through the proj tree and update
-//            // the states from there or close and remake them.
+            // Otherwise i would have to iterate through the proj tree and update
+            // the states from there or close and remake them.
 
-//            tag->update_index_tag(frame);
-//            tag->remove_frame(tag->tag_map.rbegin()->first);
-//            tree_item_changed(item->parent()->parent());
+            tag->remove_frame(frame);
+            tag->update_index_tag(frame);
+            tree_item_changed(item->parent()->parent());
 
-//            // Remove frame and update the index of all other tags
-//            //tag->update_index_tag(frame);
-//            //emit marked_basic_analysis(tag);
-//            // tag seq not work, normal do
-//            // different when saved and not
-//        }
-//    } else {
-//        tag->remove_frame(frame);   // untag
+            // Remove frame and update the index of all other tags
+            //tag->update_index_tag(frame);
+            //emit marked_basic_analysis(tag);
+            // tag seq not work, normal do
+            // different when saved and not
+        }
+    } else {
+        tag->remove_frame(frame);   // untag
     }
 }
 

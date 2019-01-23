@@ -666,9 +666,9 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
         }
         if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
             TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
-            t_frame->m_state.center = center;
-            t_frame->m_state.scale_factor = scale;
-            t_frame->m_state.rotation = angle;
+            t_frame->m_state->center = center;
+            t_frame->m_state->scale_factor = scale;
+            t_frame->m_state->rotation = angle;
         }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
@@ -805,10 +805,10 @@ void VideoWidget::update_tag() {
     try {
         TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
         VideoState state = m_vid_proj->get_video()->state;
-        t_frame->m_state = state;
-        t_frame->m_state.brightness = m_settings.brightness;
-        t_frame->m_state.contrast = m_settings.contrast;
-        t_frame->m_state.gamma = m_settings.gamma;
+        t_frame->m_state = &state;
+        t_frame->m_state->brightness = m_settings.brightness;
+        t_frame->m_state->contrast = m_settings.contrast;
+        t_frame->m_state->gamma = m_settings.gamma;
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } catch (const std::out_of_range) {
         qWarning() << "Can't update. No tag found on current frame";
@@ -848,7 +848,7 @@ void VideoWidget::tag_frame() {
         } else {
             // Add frame to tag
             VideoState state = m_vid_proj->get_video()->state;
-            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), &state);
             m_tag->add_frame(playback_slider->value(), t_frame);
             emit tag_new_frame(playback_slider->value(), t_frame);
             emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " tagged");
@@ -935,7 +935,7 @@ void VideoWidget::next_poi_btn_clicked() {
     if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
-            state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+            state = *(playback_slider->m_tag->tag_map[new_frame]->m_state);
             load_marked_video_state(m_vid_proj, state);
         }
         {
@@ -959,7 +959,7 @@ void VideoWidget::prev_poi_btn_clicked() {
     if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
-            state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+            state = *(playback_slider->m_tag->tag_map[new_frame]->m_state);
             load_marked_video_state(m_vid_proj, state);
         }
         {
@@ -1597,6 +1597,11 @@ void VideoWidget::update_playback_speed(int speed) {
 }
 
 void VideoWidget::on_export_frame() {
+    for (auto tag_frame : m_tag->tag_map) {
+        qDebug() << "normal- tagframe" << tag_frame.first << tag_frame.second->m_state->frame;
+    }
+
+
     if (frame_is_clean) return;
     int frame = frame_index.load();
     // Get sequence item and send that one to get the hash

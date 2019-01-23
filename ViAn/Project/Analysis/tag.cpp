@@ -60,9 +60,9 @@ void Tag::update_color_correction(int frame, int b_value, double c_value, double
  */
 void Tag::update_color_whole_tag(int b, double c, double g) {
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
-        (*it).second->m_state.brightness = b;
-        (*it).second->m_state.contrast = c;
-        (*it).second->m_state.gamma = g;
+        (*it).second->m_state->brightness = b;
+        (*it).second->m_state->contrast = c;
+        (*it).second->m_state->gamma = g;
     }
 }
 
@@ -74,26 +74,36 @@ void Tag::update_color_whole_tag(int b, double c, double g) {
 void Tag::update_index_tag(int frame) {
     qDebug() << "frame" << frame;
     if (m_type != SEQUENCE_TAG) return;
-    TagFrame* temp_frame = nullptr;
-    for (auto it = tag_map.rbegin(); it != tag_map.rend(); ++it) {
+    std::map<int, TagFrame*> temp_map;
+    int index = 0;
+    for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
 
-
-        if (it->first >= frame) {
-            if (temp_frame) {
-                auto temp = it->second;
-                it->second = temp_frame;
-                temp_frame = temp;
-                it->second->m_state.frame--;// = it->second->m_state->frame-1;
-            } else {
-                temp_frame = it->second;
-            }
-
-            qDebug() << "first" << it->first <<  it->second->m_state.frame;
+        qDebug() << "index - first" << index << it->first;
+        if (it->first != index) {
+            it->second->m_state->frame = index;
+            temp_map[index] = it->second;
+            //tag_map.erase(it->first);
+        } else {
+            temp_map[index] = it->second;
         }
-        if (it->first == frame) {
-            tag_map.rbegin()->second = temp_frame;
-        }
+        index++;
     }
+    tag_map = temp_map;
+//        if (it->first >= frame) {
+//            if (temp_frame) {
+//                auto temp = it->second;
+//                it->second = temp_frame;
+//                temp_frame = temp;
+//                it->second->m_state.frame--;// = it->second->m_state->frame-1;
+//            } else {
+//                temp_frame = it->second;
+//            }
+
+//            qDebug() << "first" << it->first <<  it->second->m_state.frame;
+//        }
+//        if (it->first == frame) {
+//            tag_map.rbegin()->second = temp_frame;
+//        }
 }
 
 int Tag::next_frame(int frame) {
