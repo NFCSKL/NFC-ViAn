@@ -1179,7 +1179,6 @@ void VideoWidget::clear_current_video() {
 }
 
 void VideoWidget::set_video_btns(bool b) {
-    qDebug() << "setting video buttons";
     for (QPushButton* btn : btns) {
         btn->setEnabled(b);
     }
@@ -1201,7 +1200,6 @@ void VideoWidget::set_video_btns(bool b) {
 }
 
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
-    qDebug() << "setting poi buttons";
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
 
@@ -1213,7 +1211,6 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
 }
 
 void VideoWidget::set_seq_tag_btns(bool value) {
-    qDebug() << "setting seq buttons";
     play_btn->setDisabled(value);
     stop_btn->setDisabled(value);
     next_frame_btn->setDisabled(value);
