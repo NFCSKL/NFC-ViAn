@@ -1421,6 +1421,7 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
 
             tag->remove_frame(frame);
             tag->update_index_tag(frame);
+            emit new_slider_max(-1);
             tree_item_changed(item->parent()->parent());
 
             // Remove frame and update the index of all other tags

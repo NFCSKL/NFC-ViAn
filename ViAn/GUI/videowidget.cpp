@@ -1085,6 +1085,7 @@ void VideoWidget::on_playback_slider_moved() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
+
     if (!video_btns_enabled) set_video_btns(true);
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);
@@ -1127,6 +1128,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
             on_new_frame();
         }
         set_video_btns(!frame_is_clean);
+        if (vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) set_seq_tag_btns(true);
     }
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
@@ -1177,6 +1179,7 @@ void VideoWidget::clear_current_video() {
 }
 
 void VideoWidget::set_video_btns(bool b) {
+    qDebug() << "setting video buttons";
     for (QPushButton* btn : btns) {
         btn->setEnabled(b);
     }
@@ -1198,6 +1201,7 @@ void VideoWidget::set_video_btns(bool b) {
 }
 
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
+    qDebug() << "setting poi buttons";
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
 
@@ -1209,6 +1213,7 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
 }
 
 void VideoWidget::set_seq_tag_btns(bool value) {
+    qDebug() << "setting seq buttons";
     play_btn->setDisabled(value);
     stop_btn->setDisabled(value);
     next_frame_btn->setDisabled(value);
@@ -1267,8 +1272,8 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     set_frame_size(video_width, video_height);
 
     // Solves a bug where the setMaximum will set the frame index to max in some cases
+    set_slider_max(last_frame);
     playback_slider->blockSignals(true);
-    playback_slider->setMaximum(last_frame);
     playback_slider->setValue(current_frame_index);
     playback_slider->blockSignals(false);
 
@@ -1280,9 +1285,19 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
         set_current_time(0);
     }
     fps_label->setText(QString::number(frame_rate) + "fps");
-    max_frames->setText("/ " + QString::number(last_frame));
 
     on_new_frame();
+}
+
+void VideoWidget::set_slider_max(int max) {
+    playback_slider->blockSignals(true);
+    if (max == -1) {
+        playback_slider->setMaximum(playback_slider->maximum()-1);
+    } else {
+        playback_slider->setMaximum(max);
+    }
+    playback_slider->blockSignals(false);
+    max_frames->setText("/ " + QString::number(playback_slider->maximum()));
 }
 
 void VideoWidget::set_frame_size(int width, int height) {
