@@ -1609,11 +1609,6 @@ void VideoWidget::update_playback_speed(int speed) {
 }
 
 void VideoWidget::on_export_frame() {
-    for (auto tag_frame : m_tag->tag_map) {
-        qDebug() << "normal- tagframe" << tag_frame.first << tag_frame.second->m_state->frame;
-    }
-
-
     if (frame_is_clean) return;
     int frame = frame_index.load();
     // Get sequence item and send that one to get the hash

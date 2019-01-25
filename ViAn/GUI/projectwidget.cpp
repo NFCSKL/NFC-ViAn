@@ -460,6 +460,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 TagFrame* t_frame = new TagFrame(frame, state_p);
                 t_frame->set_name(Utility::name_from_path(path));
                 tag->add_frame(frame, t_frame);
+                vid_proj->tag_seq_tag = tag;
             }
         }
     } else {
@@ -1406,29 +1407,14 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
         if (vid_item) {
             ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
             if (sequence) {
-                sequence->remove_image_with_index(frame);
+                bool res = sequence->remove_image_with_index(frame);
+                if (!res) return;
             }
-
-
-            //tag->remove_frame(frame);
-
-            // update the state in the tag_frames with new index (-1)
-            // make the state that the tagframes hold into pointers
-            // so i can update them from the tag_map in the tag.
-
-            // Otherwise i would have to iterate through the proj tree and update
-            // the states from there or close and remake them.
-
+            // Remove frame and update the index of all other tags
             tag->remove_frame(frame);
-            tag->update_index_tag(frame);
+            tag->update_index_tag();
             emit new_slider_max(-1);
             tree_item_changed(item->parent()->parent());
-
-            // Remove frame and update the index of all other tags
-            //tag->update_index_tag(frame);
-            //emit marked_basic_analysis(tag);
-            // tag seq not work, normal do
-            // different when saved and not
         }
     } else {
         tag->remove_frame(frame);   // untag
@@ -1735,6 +1721,10 @@ bool ProjectWidget::close_project() {
                 } else if (!sequence->is_saved()) {
                     // Revert changes done to sequences
                     sequence->revert();
+                    // Revert the changes done to the tag_map
+                    if (vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
+                        vid_proj->tag_seq_tag->revert_tag_map();
+                    }
                 }
             }
         }

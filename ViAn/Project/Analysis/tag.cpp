@@ -71,39 +71,20 @@ void Tag::update_color_whole_tag(int b, double c, double g) {
  * Update the tag so all tag frames' index matches the files index.
  * Use after changing a frame of a tag_sequence
  */
-void Tag::update_index_tag(int frame) {
-    qDebug() << "frame" << frame;
+void Tag::update_index_tag() {
     if (m_type != SEQUENCE_TAG) return;
     std::map<int, TagFrame*> temp_map;
     int index = 0;
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
-
-        qDebug() << "index - first" << index << it->first;
         if (it->first != index) {
             it->second->m_state->frame = index;
             temp_map[index] = it->second;
-            //tag_map.erase(it->first);
         } else {
             temp_map[index] = it->second;
         }
         index++;
     }
     tag_map = temp_map;
-//        if (it->first >= frame) {
-//            if (temp_frame) {
-//                auto temp = it->second;
-//                it->second = temp_frame;
-//                temp_frame = temp;
-//                it->second->m_state.frame--;// = it->second->m_state->frame-1;
-//            } else {
-//                temp_frame = it->second;
-//            }
-
-//            qDebug() << "first" << it->first <<  it->second->m_state.frame;
-//        }
-//        if (it->first == frame) {
-//            tag_map.rbegin()->second = temp_frame;
-//        }
 }
 
 int Tag::next_frame(int frame) {
@@ -136,6 +117,10 @@ std::vector<int> Tag::get_frames() {
 
 bool Tag::is_drawing_tag() {
     return (m_type == DRAWING_TAG);
+}
+
+void Tag::revert_tag_map() {
+    tag_map = saved_map;
 }
 
 int Tag::get_type() const {
