@@ -89,6 +89,10 @@ void Text::update_text_draw_end() {
     draw_end = p;
 }
 
+cv::Point Text::get_text_draw_end() {
+    return cv::Point(draw_start.x + text_size.width, draw_start.y - text_size.height);
+}
+
 /**
  * @brief Text::write
  * @param json

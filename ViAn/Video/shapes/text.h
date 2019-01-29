@@ -19,6 +19,7 @@ public:
 
     void update_text_pos(QPoint pos);
     void update_text_draw_end();
+    cv::Point get_text_draw_end();
 
 private:
     double font_scale;
