@@ -672,7 +672,7 @@ void MainWindow::init_export_menu() {
     export_menu->addAction(gen_report_act);
 
     export_act->setShortcut(tr("Shift+X"));
-    copy_frame_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::ALT + Qt::Key_C));
+    copy_frame_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::CTRL + Qt::Key_C));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
