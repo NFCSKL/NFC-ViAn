@@ -83,7 +83,8 @@ void ProjectDialog::browse_btn_clicked() {
 void ProjectDialog::ok_btn_clicked() {
     for (auto it : name_text->text()) {
         // Check that the name only contains upper and lower case letter and numbers
-        if (isalnum(it.toLatin1()) == 0) {
+        auto ch = it.toLatin1();
+        if (isalnum(ch) == 0 && ch != ' ' && ch != '-' && ch != '_') {
             // If not, send popup to notify user
             QMessageBox msg_box;
             msg_box.setMinimumSize(370,120);
