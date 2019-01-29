@@ -17,7 +17,7 @@ class AnalsysSettings;
 class AnalysisProxy : public BasicAnalysis
 {
     QString file_analysis = "";  // m_analysis.full_path()
-    ANALYSIS_TYPE type = MOTION_DETECTION; //TODO Remove
+    int type = MOTION_DETECTION;
 public:
     AnalysisProxy();
     AnalysisProxy(const QString file_analysis);
@@ -32,7 +32,7 @@ public:
     AnalysisSettings *get_settings();
 
     void reset_root_dir(const QString &dir);
-    virtual ANALYSIS_TYPE get_type() const override;
+    virtual int get_type() const override;
     virtual QString full_path() const override;
     virtual void read(const QJsonObject& json) override;
     virtual void write(QJsonObject& json) override;

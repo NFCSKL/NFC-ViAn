@@ -12,8 +12,6 @@
 
 #include <QTreeWidgetItem>
 
-//const QString VideoItem::SEQUENCE_CONTAINER_NAME = "Image";
-
 VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     m_vid_proj = video_project;
     setFlags(flags() | Qt::ItemIsDragEnabled);
@@ -85,7 +83,7 @@ void VideoItem::load_thumbnail() {
 void VideoItem::load_sequence_items() {
     if (m_vid_proj == nullptr ) return;
     auto seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
-    if (seq) {
+    if (seq && seq->get_sequence_type() == VIDEO_SEQUENCE) {
         // Create container item for all SequenceItems
         SequenceContainerItem* container = new SequenceContainerItem();
         addChild(container);
@@ -104,15 +102,14 @@ void VideoItem::load_sequence_items() {
                 bool added{false};
                 for (auto i = 0; i < container->childCount(); ++i) {
                     auto child_item = dynamic_cast<SequenceItem*>(container->child(i));
-                    if (child_item) {
-                        if (child_item->get_index() > seq_item_index) {
-                            container->insertChild(i, seq_item);
-                            added = true;
-                            break;
-                        }
+                    if (!child_item) {
+                        continue;
+                    } else if (child_item->get_index() > seq_item_index) {
+                        container->insertChild(i, seq_item);
+                        added = true;
+                        break;
                     }
                 }
-
                 if (!added) {
                     // Item should be added at the end
                     container->addChild(seq_item);

@@ -23,6 +23,7 @@
 #include "Project/recentproject.h"
 #include "Project/videoproject.h"
 #include "projectdialog.h"
+#include "sequencedialog.h"
 #include "utility.h"
 #include "viewpathdialog.h"
 
@@ -184,25 +185,25 @@ void ProjectWidget::add_images() {
         return;
     }
 
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Import image sequence"),
-                                         tr("Sequence name:"), QLineEdit::Normal,
-                                         "Sequence", &ok,
-                                         Qt::WindowCloseButtonHint);
+    QString text{};
+    int sequence_type;
+    SequenceDialog* seq_dialog = new SequenceDialog(&text, &sequence_type, this);
+
+    bool reply = seq_dialog->exec();
 
     // Check if dialog was accepted and that proper name was used
     QString seq_name{"sequence"};
-    if (ok && !text.isEmpty())
+    if (reply && !text.isEmpty()) {
         seq_name = text;
-    else
+    } else {
         return;
-
+    }
 
     QString path = m_proj->get_dir() + "Sequences/" + seq_name;
 
     QProgressDialog* progress = new QProgressDialog(
                 "Copying images...", "Abort", 0, image_paths.size(), this, Qt::WindowMinimizeButtonHint);
-    ImageImporter* importer = new ImageImporter(image_paths, path);
+    ImageImporter* importer = new ImageImporter(image_paths, path, sequence_type);
     QThread* copy_thread = new QThread();
     importer->moveToThread(copy_thread);
 
@@ -218,13 +219,14 @@ void ProjectWidget::add_images() {
     copy_thread->start();
 }
 
-void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, QString path) {
+void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksums, QString path, int seq_type) {
     std::vector<QString> images, hashes;
     for (auto i = 0; i < image_paths.size(); i++) {
         images.push_back(image_paths.at(i));
         hashes.push_back(checksums.at(i));
     }
-    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes));
+    VIDEO_TYPE type = static_cast<VIDEO_TYPE>(seq_type);
+    VideoProject* vid_proj = new VideoProject(new ImageSequence(path, images, hashes, type));
     m_proj->add_video_project(vid_proj);
     tree_add_video(vid_proj, "test");
 }
@@ -274,20 +276,19 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
         return;
     }
 
-    if (tag->is_drawing_tag()) {
+    if (tag->get_type() == DRAWING_TAG) {
         DrawingTagItem* item = new DrawingTagItem(tag);
         vid_item->addChild(item);
         clearSelection();
         item->setSelected(true);
         setCurrentItem(item);
         for (auto t_frame : tag->tag_map) {
-            TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-            tf_item->set_state(t_frame.second);
+            TagFrameItem* tf_item = new TagFrameItem(t_frame.second);
             item->addChild(tf_item);
         }
         item->setExpanded(true);
         tree_item_changed(item);
-    } else if (!tag->is_drawing_tag()) {
+    } else if (tag->get_type() == TAG) {
         TagItem* item = new TagItem(tag);
         vid_item->addChild(item);
         clearSelection();
@@ -311,8 +312,7 @@ void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
         tag = dynamic_cast<DrawingTagItem*>(item)->get_tag();
     }
     for (auto t_frame : tag->tag_map) {
-        TagFrameItem* tf_item = new TagFrameItem(t_frame.first);
-        tf_item->set_state(t_frame.second);
+        TagFrameItem* tf_item = new TagFrameItem(t_frame.second);
         item->addChild(tf_item);
     }
 }
@@ -324,8 +324,7 @@ void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
  * @param t_frame
  */
 void ProjectWidget::add_new_frame_to_tag_item(int frame, TagFrame* t_frame) {
-    TagFrameItem* tf_item = new TagFrameItem(frame);
-    tf_item->set_state(t_frame);
+    TagFrameItem* tf_item = new TagFrameItem(t_frame);
     m_tag_item->setExpanded(true);
     for (int i = 0; i < m_tag_item->childCount(); ++i) {
         TagFrameItem* temp = dynamic_cast<TagFrameItem*>(m_tag_item->child(i));
@@ -441,8 +440,30 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     if (vid_proj->get_video()->is_sequence()) {
         ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_proj->get_video());
         vid_item->setToolTip(0, sequence->get_search_path());
+
+        // Tag all frames in the sequence if it's a tag sequence
+        if (sequence->get_sequence_type() == TAG_SEQUENCE) {
+            // Add the tag for the sequence
+            Tag* tag = new Tag("Images", SEQUENCE_TAG);
+            vid_proj->add_analysis(tag);
+
+            // Add the sequence frame to the tag
+            for (auto image : sequence->get_paths()) {
+                QString hash = image.first;
+                QString path = image.second;
+                int frame = sequence->get_index_of_hash(hash);
+
+                // Create the tagframe
+                VideoState state;
+                state.frame = frame;
+                TagFrame* t_frame = new TagFrame(frame, state);
+                t_frame->set_name(Utility::name_from_path(path));
+                tag->add_frame(frame, t_frame);
+            }
+        }
+    } else {
+        vid_item->setToolTip(0, vid_proj->get_video()->file_path);
     }
-    vid_item->setToolTip(0, vid_proj->get_video()->file_path);
 
     // If there only is one selected item and it's a folder,
     // add the new video to that folder otherwise to the top level
@@ -587,13 +608,17 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
         // Create and add VideoItem
         if (item != nullptr && item->type() == VIDEO_ITEM) {
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
-            v_item->setToolTip(0, vid_proj->get_video()->file_path);
+
             v_item->set_video_project(vid_proj);
-            add_analyses_to_item(v_item);
             auto vid = vid_proj->get_video();
             if (vid && vid->is_sequence()) {
+                ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid);
+                v_item->setToolTip(0, sequence->get_search_path());
                 v_item->load_sequence_items();
+            } else {
+                v_item->setToolTip(0, vid->file_path);
             }
+            add_analyses_to_item(v_item);
         }
     }
 }
@@ -613,8 +638,10 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
             save_item_data(child);
         } else if (child->type() == FOLDER_ITEM) {
             save_item_data(child);
-        } else if (child->type() == TAG_ITEM ||
-                   child->type() == ANALYSIS_ITEM ||
+        } else if (child->type() == TAG_ITEM) {
+            TagItem* t_item = dynamic_cast<TagItem*>(child);
+            t_item->rename();
+        } else if (child->type() == ANALYSIS_ITEM ||
                    child->type() == DRAWING_TAG_ITEM ||
                    child->type() == INTERVAL_ITEM) {
             auto r_item = dynamic_cast<TreeItem*>(child);
@@ -631,7 +658,7 @@ void ProjectWidget::save_item_data(QTreeWidgetItem* item) {
  */
 void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
     for (std::pair<int,BasicAnalysis*> ana : v_item->get_video_project()->get_analyses()){
-        if (ana.second->get_type() == TAG) {
+        if (ana.second->get_type() == TAG || ana.second->get_type() == SEQUENCE_TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
             add_frames_to_tag_item(tag_item);
@@ -880,11 +907,15 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_tag_slider(true);
         emit set_interval_slider(false);
         emit enable_poi_btns(true, false);
+        if (tag_item->get_tag()->get_type() == SEQUENCE_TAG) {
+            emit seq_tag_btns(true);
+        }
         break;
     } case TAG_FRAME_ITEM: {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        emit set_video_project(vid_item->get_video_project());
+        VideoProject* vp = vid_item->get_video_project();
+        emit set_video_project(vp);
 
         emit set_zoom_tool();
         emit set_show_analysis_details(false);
@@ -896,21 +927,23 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         VideoState state;
         state = tf_item->get_state();
-        if (item->parent()->type() == TAG_ITEM) {
-            emit marked_video_state(vid_item->get_video_project(), state);
-            emit item_type(item->type());
+        emit marked_video_state(vp, state);
+        emit item_type(item->type());
 
+        if (item->parent()->type() == TAG_ITEM) {
             TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
             emit marked_basic_analysis(tag_item->get_tag());
+            if (tag_item->get_tag()->get_type() == SEQUENCE_TAG) {
+                emit seq_tag_btns(true);
+            }
 
             if (m_tag_item && m_tag_item != tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             tag_item->setCheckState(0, Qt::Checked);
             m_tag_item = tag_item;
         } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
-            emit marked_video_state(vid_item->get_video_project(), state);
-            emit item_type(item->type());
             DrawingTagItem* dt_item = dynamic_cast<DrawingTagItem*>(item->parent());
             emit marked_basic_analysis(dt_item->get_tag());
+
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }
@@ -1104,15 +1137,22 @@ void ProjectWidget::context_menu(const QPoint &point) {
             menu.addAction("Tag drawings", this, &ProjectWidget::drawing_tag);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
-        case TAG_FRAME_ITEM:
+        case TAG_FRAME_ITEM: {
+            TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
+            Tag* tag = t_item->get_tag();
+            if (tag->get_type() == SEQUENCE_TAG) {
+                //menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                break;
+            }
             menu.addAction("Update", this, &ProjectWidget::update_tag);
             if (item->parent()->type() == TAG_ITEM) {
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
+        }
         case SEQUENCE_ITEM:
             if (item->parent()->type() == SEQUENCE_CONTAINER_ITEM) {
-                menu.addAction("Remove", this, &ProjectWidget::remove_item);
+                menu.addAction("Delete", this, &ProjectWidget::remove_item);
             }
             break;
         default:
@@ -1287,7 +1327,6 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
         remove_tree_item(item->child(0));
     }
     // Remove the video from the list of videos
-
     if (v_proj->get_video()->is_sequence()) {
         removed_sequences.push_back(v_proj);
     } else {
@@ -1306,10 +1345,11 @@ void ProjectWidget::remove_video_item(QTreeWidgetItem *item) {
  */
 void ProjectWidget::remove_tag_item(QTreeWidgetItem *item) {
     emit set_tag_slider(false);
-
     VideoItem* vid_item = dynamic_cast<VideoItem*>(item->parent());
     Tag* tag = dynamic_cast<TagItem*>(item)->get_tag();
-    vid_item->get_video_project()->remove_analysis(tag);
+    if (tag->get_type() != SEQUENCE_TAG) {
+        vid_item->get_video_project()->remove_analysis(tag);
+    }
     m_tag_item = nullptr;
     emit marked_basic_analysis(nullptr);
 }
@@ -1354,8 +1394,42 @@ void ProjectWidget::remove_analysis_item(QTreeWidgetItem* item) {
 void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
     TagItem* tag_item = dynamic_cast<TagItem*>(item->parent());
     TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
+    Tag* tag = tag_item->get_tag();
     int frame = tf_item->get_frame();
-    tag_item->get_tag()->remove_frame(frame);
+    tag->remove_frame(frame);
+    if (tag->get_type() == SEQUENCE_TAG) {
+        // TODO remove the tagframe from the sequence and from folder
+        // something like this
+//        VideoItem* vid_item = dynamic_cast<VideoItem*>(tag_item->parent());
+//        if (vid_item) {
+//            ImageSequence* sequence = dynamic_cast<ImageSequence*>(vid_item->get_video_project()->get_video());
+//            if (sequence) {
+//                sequence->remove_image_with_index(frame);
+//            }
+
+
+//            //tag->remove_frame(frame);
+
+//            // update the state in the tag_frames with new index (-1)
+//            // make the state that the tagframes hold into pointers
+//            // so i can update them from the tag_map in the tag.
+
+//            // Otherwise i would have to iterate through the proj tree and update
+//            // the states from there or close and remake them.
+
+//            tag->update_index_tag(frame);
+//            tag->remove_frame(tag->tag_map.rbegin()->first);
+//            tree_item_changed(item->parent()->parent());
+
+//            // Remove frame and update the index of all other tags
+//            //tag->update_index_tag(frame);
+//            //emit marked_basic_analysis(tag);
+//            // tag seq not work, normal do
+//            // different when saved and not
+//        }
+//    } else {
+//        tag->remove_frame(frame);   // untag
+    }
 }
 
 void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {

@@ -63,6 +63,7 @@ signals:
     void set_show_analysis_details(bool);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
+    void seq_tag_btns(bool);
     void set_poi_slider(bool);
     void set_tag_slider(bool);
     void set_interval_slider(bool);
@@ -83,7 +84,7 @@ public slots:
     void add_video();
     void create_video(QString path);
     void add_images();
-    void create_sequence(QStringList image_paths, QStringList checksums, QString path);
+    void create_sequence(QStringList image_paths, QStringList checksums, QString path, int seq_type);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_tag(VideoProject*, Tag *tag);
     void add_frames_to_tag_item(TreeItem *item);

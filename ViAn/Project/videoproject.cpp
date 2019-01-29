@@ -108,7 +108,7 @@ void VideoProject::read(const QJsonObject& json){
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();        
         BasicAnalysis* analysis = nullptr;
-        ANALYSIS_TYPE save_type = (ANALYSIS_TYPE)json_analysis["analysis_type"].toInt();
+        int save_type = json_analysis["analysis_type"].toInt();
         switch(save_type){
         case TAG:
             analysis = new Tag();
@@ -121,6 +121,9 @@ void VideoProject::read(const QJsonObject& json){
             break;
         case INTERVAL:
             analysis = new Interval();
+            break;
+        case SEQUENCE_TAG:
+            analysis = new Tag("Images", SEQUENCE_TAG);
             break;
         default:
             qWarning("Something went wrong. Undefined analysis");

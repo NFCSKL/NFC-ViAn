@@ -116,7 +116,7 @@ bool Interval::does_overlap(std::pair<int, int> a, std::pair<int, int> b) {
     return (std::min(a.second, b.second) >= std::max(a.first, b.first));
 }
 
-ANALYSIS_TYPE Interval::get_type() const {
+int Interval::get_type() const {
     return INTERVAL;
 }
 

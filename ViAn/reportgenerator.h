@@ -8,9 +8,6 @@ class QAxObject;
 class QListWidgetItem;
 
 enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
-using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
-using Category = std::pair<QString,RefDisp>;
-using ReportContainer = std::vector<Category>;
 
 /**
  * @brief The ReportGenerator class

@@ -2,7 +2,7 @@
 
 #include "constants.h"
 
-AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
+AnalysisSettings::AnalysisSettings(int type,
                                    std::pair<int, int> interval,
                                    cv::Rect bounding_box)
     : type(type)
@@ -11,7 +11,7 @@ AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
     set_bounding_box(bounding_box);
 }
 
-AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type) : type(type) {
+AnalysisSettings::AnalysisSettings(int type) : type(type) {
     reset_settings();
 }
 
@@ -107,7 +107,7 @@ void AnalysisSettings::set_bounding_box(const cv::Rect &value) {
     use_bounding_box = true;
 }
 
-ANALYSIS_TYPE AnalysisSettings::get_type() const {
+int AnalysisSettings::get_type() const {
     return type;
 }
 

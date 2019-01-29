@@ -241,6 +241,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::set_show_analysis_details, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
     connect(project_wgt, &ProjectWidget::set_detections, video_wgt->frame_wgt, &FrameWidget::set_detections);
     connect(project_wgt, &ProjectWidget::enable_poi_btns, video_wgt, &VideoWidget::enable_poi_btns);
+    connect(project_wgt, &ProjectWidget::seq_tag_btns, video_wgt, &VideoWidget::set_seq_tag_btns);
     connect(project_wgt, &ProjectWidget::set_poi_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
     connect(project_wgt, &ProjectWidget::set_tag_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
     connect(project_wgt, &ProjectWidget::set_interval_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_interval_areas);

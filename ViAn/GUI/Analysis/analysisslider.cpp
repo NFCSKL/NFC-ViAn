@@ -164,6 +164,7 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
         switch (analysis->get_type()) {
         case TAG:
         case DRAWING_TAG:
+        case SEQUENCE_TAG:
             m_tag = dynamic_cast<Tag*>(analysis);
             repaint();
             break;
@@ -267,7 +268,6 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
             }
         }
     }
-
     return curr_frame;
 }
 

@@ -186,8 +186,10 @@ void VideoWidget::init_video_controller(){
  * Creates a new FrameProcessor instance which is then moved to a new thread.
  */
 void VideoWidget::init_frame_processor() {
-    f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed, &m_abort_processor);
+    f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings,
+                                     &video_width, &video_height, &new_frame_video,
+                                     &m_settings, &v_sync, &frame_index, &o_settings,
+                                     &overlay_changed, &m_abort_processor, &m_frame_changing);
 
     try {
         processing_thread = new QThread(this);
@@ -196,6 +198,7 @@ void VideoWidget::init_frame_processor() {
         connect(processing_thread, &QThread::started, f_processor, &FrameProcessor::check_events);
         connect(f_processor, &FrameProcessor::done_processing, frame_wgt, &FrameWidget::on_new_image);
         connect(f_processor, &FrameProcessor::zoom_preview, this, &VideoWidget::zoom_preview);
+        connect(f_processor, &FrameProcessor::new_frame_size, this, &VideoWidget::set_frame_size);
 
         connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_area);
         connect(scroll_area, &DrawScrollArea::new_size, this, &VideoWidget::set_draw_area_size);
@@ -661,6 +664,12 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
             m_vid_proj->state.scale_factor = scale;
             m_vid_proj->state.rotation = angle;
         }
+        if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
+            TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
+            t_frame->m_state.center = center;
+            t_frame->m_state.scale_factor = scale;
+            t_frame->m_state.rotation = angle;
+        }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
         video->state.scale_factor = scale;
@@ -1109,6 +1118,10 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         player_con.notify_all();
 
     } else {
+        if (frame_index.load() != state.frame) {
+            std::lock_guard<std::mutex> v_lock(v_sync.lock);
+            m_frame_changing.store(true);
+        }
         set_state(state);
         if (state.frame > -1) {
             on_new_frame();
@@ -1184,7 +1197,6 @@ void VideoWidget::set_video_btns(bool b) {
     }
 }
 
-
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
@@ -1194,6 +1206,19 @@ void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
         analysis_play_btn->setChecked(ana_play_btn);
         analysis_only = ana_play_btn;
     }
+}
+
+void VideoWidget::set_seq_tag_btns(bool value) {
+    play_btn->setDisabled(value);
+    stop_btn->setDisabled(value);
+    next_frame_btn->setDisabled(value);
+    prev_frame_btn->setDisabled(value);
+    new_label_btn->setDisabled(value);
+    set_start_interval_btn->setDisabled(value);
+    set_end_interval_btn->setDisabled(value);
+    create_interval_btn->setDisabled(value);
+    tag_btn->setDisabled(value);
+    speed_slider->setDisabled(value);
 }
 
 /**
@@ -1236,11 +1261,10 @@ void VideoWidget::capture_failed() {
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
     m_vid_proj->get_video()->set_size(video_width, video_height);
-    m_video_width = video_width;
-    m_video_height = video_height;
     m_frame_rate = frame_rate;
     m_frame_length = last_frame + 1;
     current_frame_size = QSize(video_width, video_height);
+    set_frame_size(video_width, video_height);
 
     // Solves a bug where the setMaximum will set the frame index to max in some cases
     playback_slider->blockSignals(true);
@@ -1256,10 +1280,15 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
         set_current_time(0);
     }
     fps_label->setText(QString::number(frame_rate) + "fps");
-    size_label->setText("(" + QString::number(video_width) + "x" + QString::number(video_height) + ")");
     max_frames->setText("/ " + QString::number(last_frame));
 
     on_new_frame();
+}
+
+void VideoWidget::set_frame_size(int width, int height) {
+    m_video_width = width;
+    m_video_height = height;
+    size_label->setText("(" + QString::number(width) + "x" + QString::number(height) + ")");
 }
 
 void VideoWidget::on_playback_stopped(){
@@ -1483,7 +1512,10 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
         z_settings.rotation = state.rotation;
-        z_settings.skip_frame_refresh = frame_index.load() != state.frame;
+        // TODO Maybe test some more to see if this really isn't needed anymore
+        // Now with the new flag variable in the frameprocessor it shouldn't be needed
+        // It it's removed, remove the check from the processor as well
+        //z_settings.skip_frame_refresh = frame_index.load() != state.frame;
         m_settings.brightness = state.brightness;
         m_settings.contrast = state.contrast;
         m_settings.gamma = state.gamma;

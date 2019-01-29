@@ -13,7 +13,8 @@
 
 class AnalysisSettings;
 
-enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG = 2, BASIC_ANALYSIS = 3, DRAWING_TAG = 4, INTERVAL = 5};
+enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG, BASIC_ANALYSIS, DRAWING_TAG, INTERVAL,
+                    SEQUENCE_TAG};
 
 struct interval_cmp {
     bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {
@@ -45,7 +46,7 @@ public:
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     virtual void add_interval(AnalysisInterval *ai);
-    virtual ANALYSIS_TYPE get_type() const;
+    virtual int get_type() const;
 
     ID get_id();
     void set_id(ID id);

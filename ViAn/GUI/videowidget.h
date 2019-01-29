@@ -75,6 +75,7 @@ private:
     std::atomic_bool video_loaded{false};       // True when a video is loaded/open
     std::atomic_bool m_abort_playback{false};     // Flag used to abort playback when closing program
     std::atomic_bool m_abort_processor{false};
+    std::atomic_bool m_frame_changing{false};   // True when a new frame is to be loaded but have yet bet set in the processor/zoomer
 
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
@@ -169,8 +170,10 @@ public slots:
     void frame_line_edit_finished();
     void zoom_label_finished();
     void enable_poi_btns(bool, bool);
+    void set_seq_tag_btns(bool);
     void capture_failed();
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
+    void set_frame_size(int width, int height);
     void on_playback_stopped(void);
 
     void set_overlay_removed();
