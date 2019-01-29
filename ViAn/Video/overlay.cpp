@@ -233,26 +233,37 @@ void Overlay::update_text(QString text, Shapes* shape) {
  */
 bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
     cv::Rect drawing;
+    int tl_x, tl_y, br_x, br_y;
     if (shape->get_shape() == PEN) {
         Pen* current = dynamic_cast<Pen*>(shape);
         drawing = cv::boundingRect(current->get_points());
+        tl_x = drawing.tl().x;
+        tl_y = drawing.tl().y;
+        br_x = drawing.br().x;
+        br_y = drawing.br().y;
+    } else if (shape->get_shape() == TEXT) {
+        Text* current = dynamic_cast<Text*>(shape);
+        tl_x = current->get_draw_start().x;
+        tl_y = current->get_draw_start().y;
+        br_x = current->get_text_draw_end().x;
+        br_y = current->get_text_draw_end().y;
     } else {
-        int tl_x = shape->get_draw_start().x;
-        int tl_y = shape->get_draw_start().y;
-        int br_x = shape->get_draw_end().x;
-        int br_y = shape->get_draw_end().y;
-
-        if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
-            tl_y += -DRAW_RECT_MARGIN;
-            br_y += DRAW_RECT_MARGIN;
-        }
-
-        if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
-            tl_x += -DRAW_RECT_MARGIN;
-            br_x += DRAW_RECT_MARGIN;
-        }
-        drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
+        tl_x = shape->get_draw_start().x;
+        tl_y = shape->get_draw_start().y;
+        br_x = shape->get_draw_end().x;
+        br_y = shape->get_draw_end().y;
     }
+
+    if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
+        tl_y += -DRAW_RECT_MARGIN;
+        br_y += DRAW_RECT_MARGIN;
+    }
+
+    if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
+        tl_x += -DRAW_RECT_MARGIN;
+        br_x += DRAW_RECT_MARGIN;
+    }
+    drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     return shape->get_show() && drawing.contains(Utility::from_qpoint(pos));
 }
 

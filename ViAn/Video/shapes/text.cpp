@@ -90,7 +90,11 @@ void Text::update_text_draw_end() {
 }
 
 cv::Point Text::get_text_draw_end() {
-    return cv::Point(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    return text_draw_end;
+}
+
+void Text::set_text_draw_end(cv::Point pos) {
+    text_draw_end = pos;
 }
 
 /**

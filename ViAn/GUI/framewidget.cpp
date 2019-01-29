@@ -413,6 +413,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             } else if (m_rotation == 270) {
                 br = QPoint(tl.x() + current->get_text_size().height, tl.y() + current->get_text_size().width);
             }
+            current->set_text_draw_end(Utility::from_qpoint(br));
             current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
         } else {
             current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
