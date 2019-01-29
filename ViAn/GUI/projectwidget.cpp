@@ -446,6 +446,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
             // Add the tag for the sequence
             Tag* tag = new Tag("Images", SEQUENCE_TAG);
             vid_proj->add_analysis(tag);
+            vid_proj->tag_seq_tag = tag;
 
             // Add the sequence frame to the tag
             for (auto image : sequence->get_paths()) {
@@ -460,7 +461,6 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 TagFrame* t_frame = new TagFrame(frame, state_p);
                 t_frame->set_name(Utility::name_from_path(path));
                 tag->add_frame(frame, t_frame);
-                vid_proj->tag_seq_tag = tag;
             }
         }
     } else {

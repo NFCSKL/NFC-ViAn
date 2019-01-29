@@ -31,8 +31,8 @@ bool Tag::find_frame(int frame) {
 void Tag::remove_frame(int frame) {
     auto it = tag_map.find(frame);
     if (it != tag_map.end()) {
-        tag_map.erase(it);
         delete (*it).second;
+        tag_map.erase(it);
         m_unsaved_changes = true;
     }
 }
@@ -136,6 +136,7 @@ void Tag::write(QJsonObject &json) {
         tag_frame.second->write(f_num);
         frames.push_back(f_num);
     }
+    saved_map = tag_map;
     json["frames"] = frames;
     m_unsaved_changes = false;
 }
@@ -152,5 +153,6 @@ void Tag::read(const QJsonObject &json) {
 
         tag_map.insert(std::pair<int,TagFrame*>(frame, t_frame));
     }
+    saved_map = tag_map;
     m_unsaved_changes = false;
 }
