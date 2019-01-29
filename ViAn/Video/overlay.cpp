@@ -257,6 +257,7 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
     case EDIT:
         for (auto shape : overlays[frame_nr]) {
             if (point_in_drawing(pos, shape)) {
+                mouse_pressed(pos, frame_nr, false);
                 return;
             }
         }
@@ -267,7 +268,9 @@ void Overlay::mouse_double_clicked(QPoint pos, int frame_nr) {
             if (point_in_drawing(pos, shape)) {
                 get_drawing(pos, frame_nr);
                 emit set_tool_edit();
+                set_tool(EDIT);
                 prev_point = pos;
+                mouse_pressed(pos, frame_nr, false);
                 break;
             }
         }
@@ -291,13 +294,14 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr, bool right_click) {
             prev_point = pos;
             m_right_click = right_click;
             if (right_click) {
-                if (current_drawing) {
+                if (current_drawing && current_drawing->get_frame() == frame_nr) {
                     current_drawing->set_anchor(pos);
                 }
                 return;
             }
 
-            if (current_drawing && point_in_drawing(pos, current_drawing)) {
+            if (current_drawing && current_drawing->get_frame() == frame_nr
+                    && point_in_drawing(pos, current_drawing)) {
                 return;
             } else {
                 get_drawing(pos, frame_nr);
@@ -405,7 +409,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
     // Only update the overlay is is exists and is currently being shown
     if (show_overlay && !overlays[frame_nr].empty()) {
         if (current_shape == EDIT && edit) {
-            if (current_drawing == nullptr) return;
+            if (!current_drawing || current_drawing->get_frame() != frame_nr) return;
             if (m_right_click && current_drawing->get_shape() == TEXT) {
                 QPoint diff_point = pos - prev_point;
                 Text* temp_text = dynamic_cast<Text*>(current_drawing);
@@ -428,7 +432,7 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr, bool shift, bool
             prev_point = pos;
         } else if (current_shape == TEXT) {
             dynamic_cast<Text*>(overlays[frame_nr].back())->update_text_pos(pos);
-        } else {
+        } else if (current_shape != ZOOM && current_shape != EDIT){
             if (current_shape != PEN && shift) {
                 // When the shift modifier is used draw a symmetric drawing
                 // It's not possible with the pen tool.

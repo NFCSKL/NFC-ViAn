@@ -84,9 +84,9 @@ void FrameProcessor::check_events() {
                 lk.unlock();
                 continue;
             }
-            update_overlay_settings();
+            bool is_updated = update_overlay_settings();
             // Skip reprocessing of old frame if there is a new
-            if (!m_new_frame->load()) {
+            if (!m_new_frame->load() && is_updated) {
                 process_frame();
             }
             lk.unlock();
@@ -195,7 +195,7 @@ void FrameProcessor::process_frame() {
     m_zoomer.scale_frame(manipulated_frame);
 
     // Draws the other drawings on the overlay
-    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_zoomer.get_anchor()), m_zoomer.get_scale_factor(), m_zoomer.get_angle(), width, height);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);
@@ -340,7 +340,7 @@ void FrameProcessor::update_manipulator_settings() {
  * @brief FrameProcessor::update_overlay_settings
  *
  */
-void FrameProcessor::update_overlay_settings() {
+bool FrameProcessor::update_overlay_settings() {
     int curr_frame = m_frame_index->load();
     m_overlay->set_showing_overlay(m_o_settings->show_overlay);
     m_overlay->set_tool(m_o_settings->tool);
@@ -388,7 +388,10 @@ void FrameProcessor::update_overlay_settings() {
     } else if (m_o_settings->set_current_drawing) {
         m_o_settings->set_current_drawing = false;
         m_overlay->set_current_drawing(m_o_settings->shape);
+    } else {
+        return false;
     }
+    return true;
 }
 
 void FrameProcessor::update_rotation(const int& direction) {
@@ -422,7 +425,4 @@ void FrameProcessor::reset_settings() {
     m_zoomer.set_angle(0);
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
     m_zoomer.reset();
-
-    emit set_anchor(m_zoomer.get_anchor());
-    emit set_scale_factor(m_zoomer.get_scale_factor());
 }
