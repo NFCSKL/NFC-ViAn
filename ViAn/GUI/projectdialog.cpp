@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 
+#include <cctype>
 
 /**
  * @brief ProjectDialog::ProjectDialog
@@ -80,6 +81,23 @@ void ProjectDialog::browse_btn_clicked() {
 }
 
 void ProjectDialog::ok_btn_clicked() {
+    for (auto it : name_text->text()) {
+        // Check that the name only contains upper and lower case letter and numbers
+        auto ch = it.toLatin1();
+        if (isalnum(ch) == 0 && ch != ' ' && ch != '-' && ch != '_') {
+            // If not, send popup to notify user
+            QMessageBox msg_box;
+            msg_box.setMinimumSize(370,120);
+            msg_box.setModal(true);
+            msg_box.setIcon(QMessageBox::Warning);
+            msg_box.setText("The entered project name is not accepted. Please try again.");
+            msg_box.setInformativeText("The name can only contain letters and numbers");
+            msg_box.setStandardButtons(QMessageBox::Ok);
+            msg_box.setDefaultButton(QMessageBox::Ok);
+            msg_box.exec();
+            return;
+        }
+    }
     QString path = path_text->text() + "/" + name_text->text() + "/" + name_text->text() + ".vian";
 
     QFile pathFile(path);
