@@ -29,7 +29,7 @@ void BasicAnalysis::clear_intervals() {
     m_intervals.clear();
 }
 
-ANALYSIS_TYPE BasicAnalysis::get_type() const {
+int BasicAnalysis::get_type() const {
     return BASIC_ANALYSIS;
 }
 

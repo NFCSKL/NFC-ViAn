@@ -31,7 +31,7 @@ void ImageSequence::update() {
  * @brief ImageSequence::ImageSequence
  * @param name: name of the sequence
  */
-ImageSequence::ImageSequence(const QString& path) : Video(true){
+ImageSequence::ImageSequence(const QString& path, VIDEO_TYPE seq_type) : Video(seq_type){
     m_seq_path = path;
     m_name = Utility::name_from_path(path);
 }
@@ -41,8 +41,9 @@ ImageSequence::ImageSequence(const QString& path) : Video(true){
  * @param name: name of the sequence
  * @param images: vector of paths to images
  */
-ImageSequence::ImageSequence(const QString& path, const std::vector<QString>& images, const std::vector<QString>& checksums)
-    : Video(path, true) {
+ImageSequence::ImageSequence(const QString& path, const std::vector<QString>& images,
+                             const std::vector<QString>& checksums, VIDEO_TYPE seq_type)
+    : Video(path, seq_type) {
 
     // Store image order and original file paths
     for (size_t i = 0; i < checksums.size(); ++i) {
@@ -55,10 +56,14 @@ ImageSequence::ImageSequence(const QString& path, const std::vector<QString>& im
     is_new = true;
 }
 
+std::map<QString, QString> ImageSequence::get_paths() const {
+    return m_original_images;
+}
+
 /**
  * @brief ImageSequence::get_search_path
  * Returns the absolute path to the parent folder of the images.
- * @return std::string with the actual disc path to the folder containing the images
+ * @return QString with the actual disc path to the folder containing the images
  */
 QString ImageSequence::get_search_path() const {
     return m_seq_path;
@@ -123,7 +128,7 @@ int ImageSequence::get_index_of_hash(const QString &hash) const {
  * @brief ImageSequence::get_original_name_from_hash
  * Returns the path to the original file mapped to the hash/checksum
  * @param hash
- * @return std::string containing original image path
+ * @return QString containing original image path
  */
 QString ImageSequence::get_original_name_from_hash(const QString &hash) const {
     return Utility::name_from_path(m_original_images.at(hash));
@@ -158,7 +163,6 @@ bool ImageSequence::never_saved() const {
  * @return bool whether the given hash exists or not
  */
 bool ImageSequence::remove_image_with_hash(const QString &hash) {
-    if (m_saved_order.empty()) return true;
     auto it = m_unsaved_order.find(hash);
     if (it == m_unsaved_order.end()) return false;
     auto hash_idx = (*it);
@@ -185,8 +189,28 @@ bool ImageSequence::remove_image_with_hash(const QString &hash) {
             m_unsaved_order[key_val.first] = i - 1;
         }
     }
+    if (m_saved_order.empty()) {
+        remove_image_from_disc(hash);
+    }
     m_is_saved = false;
     return true;
+}
+
+bool ImageSequence::remove_image_with_index(const int& index) {
+    QString hash = "Invalid path";
+    bool found_hash = false;
+    for (auto elem : m_unsaved_order) {
+        if (elem.second == index) {
+            hash = elem.first;
+            found_hash = true;
+            break;
+        }
+    }
+
+    if (found_hash) {
+        return remove_image_with_hash(hash);
+    }
+    return false;
 }
 
 /**
@@ -222,7 +246,7 @@ int ImageSequence::length(){
 
 /**
  * @brief ImageSequence::restore
- * Restores the image sequnce to the last saved order by
+ * Restores the image sequence to the last saved order by
  * renaming all files on disc to the indices stored in the
  * save order map.
  * If the sequence never has been saved all files will be removed.

@@ -20,6 +20,7 @@ using ID = int;
 class BasicAnalysis;
 class Bookmark;
 class Project;
+class Tag;
 class Video;
 class VideoProject : public Saveable {
     friend class VideoProjectTest;
@@ -39,6 +40,8 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     ~VideoProject();
+
+    Tag* tag_seq_tag = nullptr;
 
     VideoState state;
 

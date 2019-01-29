@@ -1,20 +1,17 @@
 #include "tagframeitem.h"
 
 #include "Project/Analysis/tagframe.h"
-#include "tagitem.h"
 
-TagFrameItem::TagFrameItem(int frame) : TreeItem(TAG_FRAME_ITEM) {
-    m_frame = frame;
-    setText(0, QString::number(m_frame));
+TagFrameItem::TagFrameItem(TagFrame* t_frame) : TreeItem(TAG_FRAME_ITEM) {
+    m_t_frame = t_frame;
+    m_frame = t_frame->m_frame;
+    m_name = t_frame->name;
+    setText(0, m_name);
     setFlags(flags() & ~Qt::ItemIsEditable);
 }
 
-void TagFrameItem::set_state(TagFrame* t_frame) {
-    m_t_frame = t_frame;
-}
-
 VideoState TagFrameItem::get_state() {
-    return m_t_frame->m_state;
+    return *(m_t_frame->m_state);
 }
 
 void TagFrameItem::remove(){}
@@ -24,5 +21,5 @@ void TagFrameItem::rename() {
 }
 
 int TagFrameItem::get_frame() {
-    return m_frame;
+    return m_t_frame->m_state->frame;
 }

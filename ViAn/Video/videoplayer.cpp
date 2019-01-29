@@ -48,7 +48,6 @@ void VideoPlayer::load_video() {
     if (m_capture.isOpened()) {
         m_capture.release();
     }
-    m_new_video->store(false);
 
     current_frame = 0;
     m_is_playing->store(false);

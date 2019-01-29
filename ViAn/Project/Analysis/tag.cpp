@@ -2,11 +2,14 @@
 
 #include "tagframe.h"
 
+#include <QDebug>
 #include <QJsonArray>
 
-Tag::Tag(QString name, bool drawing_tag) {
+#include <map>
+
+Tag::Tag(QString name, int type) {
     m_name = name;
-    m_drawing_tag = drawing_tag;
+    m_type = type;
 }
 
 Tag::~Tag() {
@@ -28,8 +31,8 @@ bool Tag::find_frame(int frame) {
 void Tag::remove_frame(int frame) {
     auto it = tag_map.find(frame);
     if (it != tag_map.end()) {
-        tag_map.erase(it);
         delete (*it).second;
+        tag_map.erase(it);
         m_unsaved_changes = true;
     }
 }
@@ -57,10 +60,31 @@ void Tag::update_color_correction(int frame, int b_value, double c_value, double
  */
 void Tag::update_color_whole_tag(int b, double c, double g) {
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
-        (*it).second->m_state.brightness = b;
-        (*it).second->m_state.contrast = c;
-        (*it).second->m_state.gamma = g;
+        (*it).second->m_state->brightness = b;
+        (*it).second->m_state->contrast = c;
+        (*it).second->m_state->gamma = g;
     }
+}
+
+/**
+ * @brief Tag::update_index_tag
+ * Update the tag so all tag frames' index matches the files index.
+ * Use after changing a frame of a tag_sequence
+ */
+void Tag::update_index_tag() {
+    if (m_type != SEQUENCE_TAG) return;
+    std::map<int, TagFrame*> temp_map;
+    int index = 0;
+    for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
+        if (it->first != index) {
+            it->second->m_state->frame = index;
+            temp_map[index] = it->second;
+        } else {
+            temp_map[index] = it->second;
+        }
+        index++;
+    }
+    tag_map = temp_map;
 }
 
 int Tag::next_frame(int frame) {
@@ -92,41 +116,43 @@ std::vector<int> Tag::get_frames() {
 }
 
 bool Tag::is_drawing_tag() {
-    return m_drawing_tag;
+    return (m_type == DRAWING_TAG);
 }
 
-void Tag::set_drawing_tag(bool value) {
-    m_drawing_tag = value;
+void Tag::revert_tag_map() {
+    tag_map = saved_map;
 }
 
-ANALYSIS_TYPE Tag::get_type() const {
-    if (m_drawing_tag) return DRAWING_TAG;
-    return TAG;
+int Tag::get_type() const {
+    return m_type;
 }
 
 void Tag::write(QJsonObject &json) {
     json["name"] = m_name;
-    json["drawing_tag"] = m_drawing_tag;
+    json["type"] = m_type;
     QJsonArray frames;
     for (auto tag_frame : tag_map) {
         QJsonObject f_num;
         tag_frame.second->write(f_num);
         frames.push_back(f_num);
     }
+    saved_map = tag_map;
     json["frames"] = frames;
     m_unsaved_changes = false;
 }
 
 void Tag::read(const QJsonObject &json) {
     m_name = json["name"].toString();
-    m_drawing_tag = json["drawing_tag"].toBool();
+    m_type = json["type"].toInt();
     QJsonArray json_intervals = json["frames"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_frame = json_intervals[i].toObject();
         int frame = json_frame["frame"].toInt();
         TagFrame* t_frame = new TagFrame(frame);
         t_frame->read(json_frame);
+
         tag_map.insert(std::pair<int,TagFrame*>(frame, t_frame));
     }
+    saved_map = tag_map;
     m_unsaved_changes = false;
 }

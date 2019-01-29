@@ -90,7 +90,8 @@ SOURCES += main.cpp \
     GUI/viewpathdialog.cpp \
     GUI/viewpathitem.cpp \
     GUI/settingsdialog.cpp \
-    constants.cpp
+    constants.cpp \
+    GUI/sequencedialog.cpp
 
 #
 # TEST
@@ -171,7 +172,8 @@ HEADERS += reportgenerator.h\
     GUI/viewpathdialog.h \
     GUI/viewpathitem.h \
     GUI/settingsdialog.h \
-    constants.h
+    constants.h \
+    GUI/sequencedialog.h
 
 #
 # LIBRARY

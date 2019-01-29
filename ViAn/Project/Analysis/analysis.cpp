@@ -35,7 +35,7 @@ void Analysis::read(const QJsonObject &json){
     settings = new_settings;
 
 
-    this->type = static_cast<ANALYSIS_TYPE>(json["type"].toInt());
+    this->type = json["type"].toInt();
     this->m_name = json["name"].toString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
@@ -72,7 +72,7 @@ void Analysis::write(QJsonObject &json){
     m_unsaved_changes = false;
 }
 
-ANALYSIS_TYPE Analysis::get_type() const {
+int Analysis::get_type() const {
     return type;
 }
 

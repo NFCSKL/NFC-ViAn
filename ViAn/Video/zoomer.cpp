@@ -229,15 +229,14 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
 
     // Check for default state
     if (center_point.x() == -1 && center_point.y() == -1) {
-        if (scale_factor == 1.) {
+        if (scale_factor == -1.) {
             fit_viewport();
         } else {
             center();
         }
     } else {
         m_viewport = cv::RotatedRect(cv::Point2f(center_point.x(), center_point.y()),
-                                     m_viewport.size,
-                                     m_angle);
+                                     m_viewport.size, m_angle);
         update_anchor();
     }
 }

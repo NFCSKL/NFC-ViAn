@@ -241,6 +241,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::set_show_analysis_details, video_wgt->playback_slider, &AnalysisSlider::set_show_ana_interval);
     connect(project_wgt, &ProjectWidget::set_detections, video_wgt->frame_wgt, &FrameWidget::set_detections);
     connect(project_wgt, &ProjectWidget::enable_poi_btns, video_wgt, &VideoWidget::enable_poi_btns);
+    connect(project_wgt, &ProjectWidget::seq_tag_btns, video_wgt, &VideoWidget::set_seq_tag_btns);
     connect(project_wgt, &ProjectWidget::set_poi_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
     connect(project_wgt, &ProjectWidget::set_tag_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
     connect(project_wgt, &ProjectWidget::set_interval_slider, video_wgt->playback_slider, &AnalysisSlider::set_show_interval_areas);
@@ -272,6 +273,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(analysis_wgt, &AnalysisWidget::name_in_tree, project_wgt, &ProjectWidget::set_tree_item_name);
     connect(video_wgt, &VideoWidget::open_view_path_dialog, this, &MainWindow::view_paths);
     connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
+    connect(project_wgt, &ProjectWidget::new_slider_max, video_wgt, &VideoWidget::set_slider_max);
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);

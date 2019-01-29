@@ -45,7 +45,6 @@ Project::~Project(){
     for (auto video_proj : m_videos) {
         delete video_proj;
     }
-
     m_videos.clear();
 }
 
@@ -79,7 +78,6 @@ void Project::remove_video_project(VideoProject* vid_proj){
     delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
-    *it = nullptr; // Not need?
 }
 
 void Project::add_bookmark(Bookmark* bmark) {

@@ -40,7 +40,7 @@ public:
     void point_zoom(QPoint, double zoom_step);
     void update_rotation(const int& angle);
     void translate_viewport_center(int x, int y);
-    void load_state(QPoint anchor, double scale_factor, int angle);
+    void load_state(QPoint center, double scale_factor, int angle);
     void fit_viewport();
     void scale_frame(cv::Mat& frame);
     void reset();
