@@ -399,32 +399,29 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             cv::Rect bounding_rect = cv::boundingRect(current->get_points());
             tl = Utility::from_cvpoint(bounding_rect.tl());
             br = Utility::from_cvpoint(bounding_rect.br());
-        } else if (current_drawing->get_shape() == TEXT) {
-            Text* current = dynamic_cast<Text*>(current_drawing);
-            tl = Utility::from_cvpoint(current_drawing->get_draw_start());
-            br = Utility::from_cvpoint(current_drawing->get_draw_end());
-            br = rotate(br, 360-m_rotation, false);
-            //br = QPoint(tl.x() + current->get_text_size().width, tl.y() - current->get_text_size().height);
-            //br = rotate(Utility::from_cvpoint(current->get_text_draw_end()), 0, false);
-            qDebug() << "tl - br" << tl << br;
         } else {
             tl = Utility::from_cvpoint(current_drawing->get_draw_start());
             br = Utility::from_cvpoint(current_drawing->get_draw_end());
         }
-        QRectF current_rect1;
-        QRectF current_rect2;
+        QRectF current_rect;
         if (current_drawing->get_shape() == TEXT) {
-            current_rect1 = QRectF(scale_to_view(tl), rotate(scale_to_view(br), 360-m_rotation, false));
-            //current_rect2 = QRectF(scale_to_view(tl), scale_to_view(rotate(br, 360-m_rotation, false)));
-            current_rect2 = QRectF(scale_to_view(tl), scale_to_view(br));
+            Text* current = dynamic_cast<Text*>(current_drawing);
+            if (m_rotation == 90) {
+                br = QPoint(tl.x() - current->get_text_size().height, tl.y() - current->get_text_size().width);
+            } else if (m_rotation == 180) {
+                br = QPoint(tl.x() - current->get_text_size().width, tl.y() + current->get_text_size().height);
+            } else if (m_rotation == 270) {
+                br = QPoint(tl.x() + current->get_text_size().height, tl.y() + current->get_text_size().width);
+            }
+            current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
         } else {
-            //current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
+            current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
         }
         painter.setPen(Qt::black);
-        painter.drawRect(current_rect1);
+        painter.drawRect(current_rect);
         QPen pen(Qt::white, 1, Qt::DashLine);
         painter.setPen(pen);
-        painter.drawRect(current_rect2);
+        painter.drawRect(current_rect);
     }
     painter.end();
 }

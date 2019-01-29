@@ -23,7 +23,7 @@ public:
 
 private:
     double font_scale;
-    cv::Size text_size;
+    cv::Size text_size = cv::Size(-1, -1);
     int baseline = 0;
 };
 

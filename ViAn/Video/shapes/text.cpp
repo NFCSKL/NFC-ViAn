@@ -111,4 +111,5 @@ void Text::write(QJsonObject& json) {
 void Text::read(const QJsonObject& json) {
     read_shape(json);
     font_scale = json["font"].toDouble();
+    text_size = cv::Size(draw_end.x - draw_start.x, draw_start.y - draw_end.y);
 }

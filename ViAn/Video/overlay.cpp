@@ -174,7 +174,11 @@ Shapes* Overlay::get_empty_shape(SHAPES shape_type) {
 void Overlay::add_drawing(Shapes* shape, int frame_nr) {
     if (shape->get_shape() == TEXT) {
         Text* temp_text = dynamic_cast<Text*>(shape);
-        temp_text->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        // If the text size is the default value set new one
+        // Otherwise use the saved one.
+        if (temp_text->get_text_size() == cv::Size(-1, -1)) {
+            temp_text->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        }
     }
     shape->set_frame(frame_nr);
     overlays[frame_nr].push_back(shape);
