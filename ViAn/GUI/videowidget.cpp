@@ -666,9 +666,9 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
         }
         if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
             TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
-            t_frame->m_state.center = center;
-            t_frame->m_state.scale_factor = scale;
-            t_frame->m_state.rotation = angle;
+            t_frame->m_state->center = center;
+            t_frame->m_state->scale_factor = scale;
+            t_frame->m_state->rotation = angle;
         }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
@@ -805,10 +805,10 @@ void VideoWidget::update_tag() {
     try {
         TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
         VideoState state = m_vid_proj->get_video()->state;
-        t_frame->m_state = state;
-        t_frame->m_state.brightness = m_settings.brightness;
-        t_frame->m_state.contrast = m_settings.contrast;
-        t_frame->m_state.gamma = m_settings.gamma;
+        t_frame->m_state = &state;
+        t_frame->m_state->brightness = m_settings.brightness;
+        t_frame->m_state->contrast = m_settings.contrast;
+        t_frame->m_state->gamma = m_settings.gamma;
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } catch (const std::out_of_range) {
         qWarning() << "Can't update. No tag found on current frame";
@@ -848,7 +848,7 @@ void VideoWidget::tag_frame() {
         } else {
             // Add frame to tag
             VideoState state = m_vid_proj->get_video()->state;
-            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), &state);
             m_tag->add_frame(playback_slider->value(), t_frame);
             emit tag_new_frame(playback_slider->value(), t_frame);
             emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " tagged");
@@ -935,7 +935,7 @@ void VideoWidget::next_poi_btn_clicked() {
     if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
-            state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+            state = *(playback_slider->m_tag->tag_map[new_frame]->m_state);
             load_marked_video_state(m_vid_proj, state);
         }
         {
@@ -959,7 +959,7 @@ void VideoWidget::prev_poi_btn_clicked() {
     if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
-            state = playback_slider->m_tag->tag_map[new_frame]->m_state;
+            state = *(playback_slider->m_tag->tag_map[new_frame]->m_state);
             load_marked_video_state(m_vid_proj, state);
         }
         {
@@ -1085,6 +1085,7 @@ void VideoWidget::on_playback_slider_moved() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
+
     if (!video_btns_enabled) set_video_btns(true);
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);
@@ -1127,6 +1128,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
             on_new_frame();
         }
         set_video_btns(!frame_is_clean);
+        if (vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) set_seq_tag_btns(true);
     }
     set_status_bar("Video loaded");
     play_btn->setChecked(false);
@@ -1267,8 +1269,8 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
     set_frame_size(video_width, video_height);
 
     // Solves a bug where the setMaximum will set the frame index to max in some cases
+    set_slider_max(last_frame);
     playback_slider->blockSignals(true);
-    playback_slider->setMaximum(last_frame);
     playback_slider->setValue(current_frame_index);
     playback_slider->blockSignals(false);
 
@@ -1280,9 +1282,19 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
         set_current_time(0);
     }
     fps_label->setText(QString::number(frame_rate) + "fps");
-    max_frames->setText("/ " + QString::number(last_frame));
 
     on_new_frame();
+}
+
+void VideoWidget::set_slider_max(int max) {
+    playback_slider->blockSignals(true);
+    if (max == -1) {
+        playback_slider->setMaximum(playback_slider->maximum()-1);
+    } else {
+        playback_slider->setMaximum(max);
+    }
+    playback_slider->blockSignals(false);
+    max_frames->setText("/ " + QString::number(playback_slider->maximum()));
 }
 
 void VideoWidget::set_frame_size(int width, int height) {

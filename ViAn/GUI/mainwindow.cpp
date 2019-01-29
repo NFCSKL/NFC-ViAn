@@ -273,6 +273,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(analysis_wgt, &AnalysisWidget::name_in_tree, project_wgt, &ProjectWidget::set_tree_item_name);
     connect(video_wgt, &VideoWidget::open_view_path_dialog, this, &MainWindow::view_paths);
     connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
+    connect(project_wgt, &ProjectWidget::new_slider_max, video_wgt, &VideoWidget::set_slider_max);
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);

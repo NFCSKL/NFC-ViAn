@@ -24,13 +24,15 @@ public:
     void remove_frame(int);
     void update_color_correction(int frame, int b_value, double c_value, double g_value);
     void update_color_whole_tag(int b, double c, double g);
-    void update_index_tag(int frame = 0);
+    void update_index_tag();
     int next_frame(int);
     int previous_frame(int);
     std::vector<int> get_frames();
     bool is_drawing_tag();
+    void revert_tag_map();
 
     std::map<int, TagFrame*> tag_map;
+    std::map<int, TagFrame*> saved_map;
 };
 
 #endif // TAG_H

@@ -122,9 +122,12 @@ void VideoProject::read(const QJsonObject& json){
         case INTERVAL:
             analysis = new Interval();
             break;
-        case SEQUENCE_TAG:
-            analysis = new Tag("Images", SEQUENCE_TAG);
+        case SEQUENCE_TAG: {
+            Tag* tag = new Tag("Images", SEQUENCE_TAG);
+            analysis = tag;
+            tag_seq_tag = tag;
             break;
+        }
         default:
             qWarning("Something went wrong. Undefined analysis");
             return;

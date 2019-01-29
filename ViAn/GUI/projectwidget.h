@@ -77,6 +77,7 @@ signals:
     void new_vid_proj(VideoProject*);
     void item_type(int);
     void update_tag();
+    void new_slider_max(int);
 
 public slots:
     void new_project(void);

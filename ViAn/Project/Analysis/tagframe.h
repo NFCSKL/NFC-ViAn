@@ -10,7 +10,7 @@ class TagFrame : public Writeable {
 
 public:
     TagFrame(int frame);
-    TagFrame(int frame, VideoState state);
+    TagFrame(int frame, VideoState *state);
     virtual ~TagFrame();
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
@@ -18,7 +18,7 @@ public:
     void update_color_correction(int b, double c, double g);
     void set_name(QString new_name);
 
-    VideoState m_state;
+    VideoState* m_state;
     int m_frame;
     QString name;
 };

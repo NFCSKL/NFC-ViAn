@@ -15,7 +15,6 @@
  * This function is meant to be called before saving to file
  */
 void ImageSequence::update() {
-    qDebug() << "update";
     // If a hash from the saved order no longer exists in the unsaved order the file should be removed.
     // If this happens the file should be saved as its hash instead of index
     for (auto it = m_saved_order.begin(); it != m_saved_order.end(); ++it) {
@@ -164,7 +163,6 @@ bool ImageSequence::never_saved() const {
  * @return bool whether the given hash exists or not
  */
 bool ImageSequence::remove_image_with_hash(const QString &hash) {
-    if (m_saved_order.empty()) return true;
     auto it = m_unsaved_order.find(hash);
     if (it == m_unsaved_order.end()) return false;
     auto hash_idx = (*it);
@@ -187,10 +185,12 @@ bool ImageSequence::remove_image_with_hash(const QString &hash) {
     for (auto key_val : unsaved) {
         int i = key_val.second;
         if (i > index) {
-            qDebug() << i << index << key_val.first;
             rename_image_on_disc(Utility::zfill(i, INDEX_LENGTH), Utility::zfill(i - 1, INDEX_LENGTH));
             m_unsaved_order[key_val.first] = i - 1;
         }
+    }
+    if (m_saved_order.empty()) {
+        remove_image_from_disc(hash);
     }
     m_is_saved = false;
     return true;
@@ -220,7 +220,6 @@ bool ImageSequence::remove_image_with_index(const int& index) {
  * @return bool whether the file was removed or not
  */
 bool ImageSequence::remove_image_from_disc(const QString &image_name) const {
-    qDebug() << "remove";
     return QFile().remove(m_seq_path + "/" + image_name);
 }
 

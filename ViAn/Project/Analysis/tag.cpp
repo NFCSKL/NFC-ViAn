@@ -31,8 +31,8 @@ bool Tag::find_frame(int frame) {
 void Tag::remove_frame(int frame) {
     auto it = tag_map.find(frame);
     if (it != tag_map.end()) {
-        tag_map.erase(it);
         delete (*it).second;
+        tag_map.erase(it);
         m_unsaved_changes = true;
     }
 }
@@ -60,9 +60,9 @@ void Tag::update_color_correction(int frame, int b_value, double c_value, double
  */
 void Tag::update_color_whole_tag(int b, double c, double g) {
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
-        (*it).second->m_state.brightness = b;
-        (*it).second->m_state.contrast = c;
-        (*it).second->m_state.gamma = g;
+        (*it).second->m_state->brightness = b;
+        (*it).second->m_state->contrast = c;
+        (*it).second->m_state->gamma = g;
     }
 }
 
@@ -71,29 +71,20 @@ void Tag::update_color_whole_tag(int b, double c, double g) {
  * Update the tag so all tag frames' index matches the files index.
  * Use after changing a frame of a tag_sequence
  */
-void Tag::update_index_tag(int frame) {
-    qDebug() << "frame" << frame;
+void Tag::update_index_tag() {
     if (m_type != SEQUENCE_TAG) return;
-    TagFrame* temp_frame = nullptr;
-    for (auto it = tag_map.rbegin(); it != tag_map.rend(); ++it) {
-
-
-        if (it->first >= frame) {
-            if (temp_frame) {
-                auto temp = it->second;
-                it->second = temp_frame;
-                temp_frame = temp;
-                it->second->m_state.frame--;// = it->second->m_state->frame-1;
-            } else {
-                temp_frame = it->second;
-            }
-
-            qDebug() << "first" << it->first <<  it->second->m_state.frame;
+    std::map<int, TagFrame*> temp_map;
+    int index = 0;
+    for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
+        if (it->first != index) {
+            it->second->m_state->frame = index;
+            temp_map[index] = it->second;
+        } else {
+            temp_map[index] = it->second;
         }
-        if (it->first == frame) {
-            tag_map.rbegin()->second = temp_frame;
-        }
+        index++;
     }
+    tag_map = temp_map;
 }
 
 int Tag::next_frame(int frame) {
@@ -128,6 +119,10 @@ bool Tag::is_drawing_tag() {
     return (m_type == DRAWING_TAG);
 }
 
+void Tag::revert_tag_map() {
+    tag_map = saved_map;
+}
+
 int Tag::get_type() const {
     return m_type;
 }
@@ -141,6 +136,7 @@ void Tag::write(QJsonObject &json) {
         tag_frame.second->write(f_num);
         frames.push_back(f_num);
     }
+    saved_map = tag_map;
     json["frames"] = frames;
     m_unsaved_changes = false;
 }
@@ -157,5 +153,6 @@ void Tag::read(const QJsonObject &json) {
 
         tag_map.insert(std::pair<int,TagFrame*>(frame, t_frame));
     }
+    saved_map = tag_map;
     m_unsaved_changes = false;
 }
