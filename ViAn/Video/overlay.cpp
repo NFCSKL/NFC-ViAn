@@ -41,6 +41,21 @@ void Overlay::draw_overlay(cv::Mat &frame, int frame_nr, cv::Point anchor, doubl
             // Only draw the text drawings
             if ((*it)->get_show() && (*it)->get_shape() == TEXT) {
                 frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle, width, height);
+                Text* text = dynamic_cast<Text*>(*it);
+                cv::Point p;
+                if (angle == 90) {
+                    p = cv::Point(text->get_draw_start().x - text->get_text_size().height,
+                                                      text->get_draw_start().y - text->get_text_size().width);
+                } else if (angle == 180) {
+                    p = cv::Point(text->get_draw_start().x - text->get_text_size().width,
+                                                      text->get_draw_start().y + text->get_text_size().height);
+                } else if (angle == 270) {
+                    p = cv::Point(text->get_draw_start().x + text->get_text_size().height,
+                                                      text->get_draw_start().y + text->get_text_size().width);
+                } else {
+                    p = text->get_draw_end();
+                }
+                text->set_text_draw_end(p);
             }
         }
     }
