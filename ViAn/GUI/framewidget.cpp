@@ -462,7 +462,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
     if (frame_is_clear) return;
     QPoint scaled_pos = scale_to_video(event->pos());
-    emit mouse_double_click(scaled_pos);
+    emit mouse_double_click(rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation, true));
 }
 
 /**
