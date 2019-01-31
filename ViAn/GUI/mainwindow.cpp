@@ -662,22 +662,28 @@ void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
     QAction* export_act = new QAction(tr("E&xport interval..."), this);
+    QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
     export_act->setIcon(QIcon("../ViAn/Icons/folder_interval.png"));
+    copy_frame_act->setIcon(QIcon("../ViAn/Icons/copy.png"));
     gen_report_act->setIcon(QIcon("../ViAn/Icons/report.png"));
 
     export_menu->addAction(export_act);
+    export_menu->addAction(copy_frame_act);
     export_menu->addSeparator();
     export_menu->addAction(gen_report_act);
 
     export_act->setShortcut(tr("Shift+X"));
+    copy_frame_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::CTRL + Qt::Key_C));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
+    copy_frame_act->setStatusTip("Copy the current frame to the clipboard");
     gen_report_act->setStatusTip(tr("Generate report"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+    connect(copy_frame_act, &QAction::triggered, video_wgt->frame_wgt, &FrameWidget::copy_to_clipboard);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
     connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }

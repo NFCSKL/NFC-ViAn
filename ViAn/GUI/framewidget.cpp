@@ -16,7 +16,9 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#include <QClipboard>
 #include <QDebug>
+#include <QGuiApplication>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
@@ -288,6 +290,22 @@ void FrameWidget::set_overlay_color(QColor color) {
         emit send_color(color);
         this->overlay_color = color;
     }
+}
+
+/**
+ * @brief FrameWidget::copy_to_clipboard
+ * Copy the current frame to the clipboard for use in other applications
+ */
+void FrameWidget::copy_to_clipboard() {
+    cv::Mat img2 = _tmp_frame.clone();
+
+    QImage _qimage = QImage(img2.data, img2.cols, img2.rows, img2.cols*3, QImage::Format_RGB888);
+
+    QPixmap pix;
+    pix = QPixmap::fromImage(_qimage);
+
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    clipboard->setPixmap(pix);
 }
 
 cv::Mat FrameWidget::get_modified_frame() const {

@@ -101,6 +101,7 @@ public slots:
     void set_scale_factor(double scale_factor);
     void set_rotation(int rotation);
     void update();
+    void copy_to_clipboard();
 protected:
     QImage _qimage;
     cv::Mat _tmp_frame;
