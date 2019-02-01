@@ -41,6 +41,21 @@ void Overlay::draw_overlay(cv::Mat &frame, int frame_nr, cv::Point anchor, doubl
             // Only draw the text drawings
             if ((*it)->get_show() && (*it)->get_shape() == TEXT) {
                 frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle, width, height);
+                Text* text = dynamic_cast<Text*>(*it);
+                cv::Point p;
+                if (angle == 90) {
+                    p = cv::Point(text->get_draw_start().x - text->get_text_size().height,
+                                                      text->get_draw_start().y - text->get_text_size().width);
+                } else if (angle == 180) {
+                    p = cv::Point(text->get_draw_start().x - text->get_text_size().width,
+                                                      text->get_draw_start().y + text->get_text_size().height);
+                } else if (angle == 270) {
+                    p = cv::Point(text->get_draw_start().x + text->get_text_size().height,
+                                                      text->get_draw_start().y + text->get_text_size().width);
+                } else {
+                    p = text->get_draw_end();
+                }
+                text->set_text_draw_end(p);
             }
         }
     }
@@ -174,7 +189,11 @@ Shapes* Overlay::get_empty_shape(SHAPES shape_type) {
 void Overlay::add_drawing(Shapes* shape, int frame_nr) {
     if (shape->get_shape() == TEXT) {
         Text* temp_text = dynamic_cast<Text*>(shape);
-        temp_text->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        // If the text size is the default value set new one
+        // Otherwise use the saved one.
+        if (temp_text->get_text_size() == cv::Size(-1, -1)) {
+            temp_text->set_text_size(cv::getTextSize(current_string.toStdString(), cv::FONT_HERSHEY_SIMPLEX, current_font_scale, Singleton::get_instance()->LINE_THICKNESS, &baseline));
+        }
     }
     shape->set_frame(frame_nr);
     overlays[frame_nr].push_back(shape);
@@ -229,26 +248,37 @@ void Overlay::update_text(QString text, Shapes* shape) {
  */
 bool Overlay::point_in_drawing(QPoint pos, Shapes *shape) {
     cv::Rect drawing;
+    int tl_x, tl_y, br_x, br_y;
     if (shape->get_shape() == PEN) {
         Pen* current = dynamic_cast<Pen*>(shape);
         drawing = cv::boundingRect(current->get_points());
+        tl_x = drawing.tl().x;
+        tl_y = drawing.tl().y;
+        br_x = drawing.br().x;
+        br_y = drawing.br().y;
+    } else if (shape->get_shape() == TEXT) {
+        Text* current = dynamic_cast<Text*>(shape);
+        tl_x = current->get_draw_start().x;
+        tl_y = current->get_draw_start().y;
+        br_x = current->get_text_draw_end().x;
+        br_y = current->get_text_draw_end().y;
     } else {
-        int tl_x = shape->get_draw_start().x;
-        int tl_y = shape->get_draw_start().y;
-        int br_x = shape->get_draw_end().x;
-        int br_y = shape->get_draw_end().y;
-
-        if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
-            tl_y += -DRAW_RECT_MARGIN;
-            br_y += DRAW_RECT_MARGIN;
-        }
-
-        if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
-            tl_x += -DRAW_RECT_MARGIN;
-            br_x += DRAW_RECT_MARGIN;
-        }
-        drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
+        tl_x = shape->get_draw_start().x;
+        tl_y = shape->get_draw_start().y;
+        br_x = shape->get_draw_end().x;
+        br_y = shape->get_draw_end().y;
     }
+
+    if (tl_y - br_y <= DRAW_RECT_MIN && tl_y - br_y >= -DRAW_RECT_MIN) {
+        tl_y += -DRAW_RECT_MARGIN;
+        br_y += DRAW_RECT_MARGIN;
+    }
+
+    if (tl_x - br_x <= DRAW_RECT_MIN && tl_x - br_x >= -DRAW_RECT_MIN) {
+        tl_x += -DRAW_RECT_MARGIN;
+        br_x += DRAW_RECT_MARGIN;
+    }
+    drawing = cv::Rect(cv::Point(tl_x, tl_y), cv::Point(br_x, br_y));
     return shape->get_show() && drawing.contains(Utility::from_qpoint(pos));
 }
 
