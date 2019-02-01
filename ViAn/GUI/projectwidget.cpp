@@ -457,8 +457,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 // Create the tagframe
                 VideoState state;
                 state.frame = frame;
-                VideoState* state_p = new VideoState(state);
-                TagFrame* t_frame = new TagFrame(frame, state_p);
+                TagFrame* t_frame = new TagFrame(frame, state);
                 t_frame->set_name(Utility::name_from_path(path));
                 tag->add_frame(frame, t_frame);
             }
@@ -1205,8 +1204,7 @@ void ProjectWidget::drawing_tag() {
         if (frame_overlay.second.size() > 0) {
             VideoState state;
             state.frame = frame_overlay.first;
-            VideoState* state_p = new VideoState(state);
-            TagFrame* t_frame = new TagFrame(frame_overlay.first, state_p);
+            TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }
