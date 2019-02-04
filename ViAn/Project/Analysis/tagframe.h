@@ -20,6 +20,7 @@ public:
     void set_name(QString new_name);
     void set_frame(int frame);
     void set_scale_rot(double scale, int rot);
+    void set_center(QPoint center);
     VideoState get_state();
     VideoState get_original();
 

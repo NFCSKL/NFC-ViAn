@@ -666,7 +666,7 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
         }
         if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
             TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
-            t_frame->get_original().center = center;
+            t_frame->set_center(center);
             t_frame->set_scale_rot(scale, angle);
         }
         Video* video = m_vid_proj->get_video();

@@ -34,6 +34,10 @@ void TagFrame::set_scale_rot(double scale, int rot) {
     m_state.rotation = rot;
 }
 
+void TagFrame::set_center(QPoint center) {
+    m_state.center = center;
+}
+
 /**
  * @brief TagFrame::get_state
  * Make a copy and return
