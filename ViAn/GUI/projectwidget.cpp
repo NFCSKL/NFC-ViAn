@@ -1804,6 +1804,19 @@ void ProjectWidget::update_videoitems() {
     }
 }
 
+void ProjectWidget::select_video_project(VideoProject* vid_proj, VideoState state) {
+    std::vector<VideoItem*> v_items;
+    QTreeWidgetItem* s_item = invisibleRootItem();
+    get_video_items(s_item, v_items);
+    for (auto vid_item : v_items) {
+        if (vid_item->get_video_project() == vid_proj) {
+            vid_item->get_video_project()->state = state;
+            setCurrentItem(vid_item);
+            return;
+        }
+    }
+}
+
 /**
  * @brief ProjectWidget::message_box
  * Creates a popup yes/no message box with the inputed text

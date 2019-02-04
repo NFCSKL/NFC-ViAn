@@ -117,6 +117,7 @@ public slots:
     bool prompt_save();
     void update_current_videoitem(QString path);
     void update_videoitems();
+    void select_video_project(VideoProject* vid_proj, VideoState state);
 private slots:
     void context_menu(const QPoint& point);
     void open_video_in_widget();
