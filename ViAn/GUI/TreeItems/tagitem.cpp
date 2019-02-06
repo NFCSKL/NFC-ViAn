@@ -5,7 +5,7 @@
 TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     m_tag = tag;
     setText(0, tag->get_name());
-    const QIcon tag_icon("../ViAn/Icons/tag.png");
+    const QIcon tag_icon(":/Icons/tag.png");
     setIcon(0, tag_icon);
 }
 

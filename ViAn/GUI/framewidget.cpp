@@ -278,7 +278,7 @@ void FrameWidget::set_cursor(SHAPES tool) {
         break;
     case MOVE:
         break;
-        //setCursor(QCursor(QPixmap("../ViAn/Icons/pen.png")));  a way to use custom cursors
+        //setCursor(QCursor(QPixmap(":/Icons/pen.png")));  a way to use custom cursors
     case EDIT:
         setCursor(Qt::SizeAllCursor);
         break;
@@ -591,7 +591,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
             repaint();
         } else {
             if (zoom_rect.contains(scaled_pos) && mark_rect) {
-                setCursor(QCursor(QPixmap("../ViAn/Icons/new_zoom.png")));
+                setCursor(QCursor(QPixmap(":/Icons/new_zoom.png")));
             } else {
                 unsetCursor();
             }

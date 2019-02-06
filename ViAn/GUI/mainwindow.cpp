@@ -309,15 +309,15 @@ void MainWindow::init_file_menu() {
     QAction* quit_act = new QAction(tr("&Quit"), this);
 
     // Set icons
-    new_project_act->setIcon(QIcon("../ViAn/Icons/new.png"));
-    open_project_act->setIcon(QIcon("../ViAn/Icons/open.png"));
-    recent_project_act->setIcon(QIcon("../ViAn/Icons/home.png"));
-    open_proj_folder_act->setIcon(QIcon("../ViAn/Icons/new_folder.png"));
-    save_project_act->setIcon(QIcon("../ViAn/Icons/save.png"));
-    add_vid_act->setIcon(QIcon("../ViAn/Icons/add_video.png"));
-    add_seq_act->setIcon(QIcon("../ViAn/Icons/image_sequence.png"));
-    view_paths->setIcon(QIcon("../ViAn/Icons/path.png"));
-    quit_act->setIcon(QIcon("../ViAn/Icons/quit.png"));
+    new_project_act->setIcon(QIcon(":/Icons/new.png"));
+    open_project_act->setIcon(QIcon(":/Icons/open.png"));
+    recent_project_act->setIcon(QIcon(":/Icons/home.png"));
+    open_proj_folder_act->setIcon(QIcon(":/Icons/new_folder.png"));
+    save_project_act->setIcon(QIcon(":/Icons/save.png"));
+    add_vid_act->setIcon(QIcon(":/Icons/add_video.png"));
+    add_seq_act->setIcon(QIcon(":/Icons/image_sequence.png"));
+    view_paths->setIcon(QIcon(":/Icons/path.png"));
+    quit_act->setIcon(QIcon(":/Icons/quit.png"));
 
     // Add actions to the menu
     file_menu->addAction(new_project_act);
@@ -382,14 +382,14 @@ void MainWindow::init_edit_menu() {
     QAction* reset_zoom_act = new QAction(tr("&Reset zoom"), this);
     QAction* options_act = new QAction(tr("&Options..."), this);
 
-    cont_bri_act->setIcon(QIcon("../ViAn/Icons/screen.png"));
-    cw_act->setIcon(QIcon("../ViAn/Icons/right.png"));
-    ccw_act->setIcon(QIcon("../ViAn/Icons/left.png"));
-    zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
-    zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
-    fit_screen_act->setIcon(QIcon("../ViAn/Icons/resize.png"));
-    reset_zoom_act->setIcon(QIcon("../ViAn/Icons/original_size.png"));
-    options_act->setIcon(QIcon("../ViAn/Icons/gears.png"));
+    cont_bri_act->setIcon(QIcon(":/Icons/screen.png"));
+    cw_act->setIcon(QIcon(":/Icons/right.png"));
+    ccw_act->setIcon(QIcon(":/Icons/left.png"));
+    zoom_in_act->setIcon(QIcon(":/Icons/zoom_in.png"));
+    zoom_out_act->setIcon(QIcon(":/Icons/zoom_out.png"));
+    fit_screen_act->setIcon(QIcon(":/Icons/resize.png"));
+    reset_zoom_act->setIcon(QIcon(":/Icons/original_size.png"));
+    options_act->setIcon(QIcon(":/Icons/gears.png"));
 
     edit_menu->addAction(cont_bri_act);
     edit_menu->addAction(cw_act);
@@ -477,9 +477,9 @@ void MainWindow::init_analysis_menu() {
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
 
-    advanced_analysis_act->setIcon(QIcon("../ViAn/Icons/advanced_analys.png"));
-    quick_analysis_act->setIcon(QIcon("../ViAn/Icons/analys.png"));
-    settings_act->setIcon(QIcon("../ViAn/Icons/cog.png"));
+    advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analys.png"));
+    quick_analysis_act->setIcon(QIcon(":/Icons/analys.png"));
+    settings_act->setIcon(QIcon(":/Icons/cog.png"));
 
     quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
     advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
@@ -553,10 +553,10 @@ void MainWindow::init_interval_menu() {
     interval_act->setCheckable(true);
     interval_act->setChecked(true);
 
-    new_label_act->setIcon(QIcon("../ViAn/Icons/tag.png"));
-    new_tag_act->setIcon(QIcon("../ViAn/Icons/tag_frame.png"));
-    remove_tag_act->setIcon(QIcon("../ViAn/Icons/remove_frame.png"));
-    tag_interval_act->setIcon(QIcon("../ViAn/Icons/create_interval.png"));
+    new_label_act->setIcon(QIcon(":/Icons/tag.png"));
+    new_tag_act->setIcon(QIcon(":/Icons/tag_frame.png"));
+    remove_tag_act->setIcon(QIcon(":/Icons/remove_frame.png"));
+    tag_interval_act->setIcon(QIcon(":/Icons/create_interval.png"));
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
@@ -607,14 +607,14 @@ void MainWindow::init_drawings_menu() {
     drawing_act->setCheckable(true);
     drawing_act->setChecked(true);
 
-    color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
-    rectangle_act->setIcon(QIcon("../ViAn/Icons/box.png"));
-    circle_act->setIcon(QIcon("../ViAn/Icons/circle.png"));
-    line_act->setIcon(QIcon("../ViAn/Icons/line.png"));
-    arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
-    pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
-    text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
-    delete_drawing_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
+    color_act->setIcon(QIcon(":/Icons/color.png"));
+    rectangle_act->setIcon(QIcon(":/Icons/box.png"));
+    circle_act->setIcon(QIcon(":/Icons/circle.png"));
+    line_act->setIcon(QIcon(":/Icons/line.png"));
+    arrow_act->setIcon(QIcon(":/Icons/arrow.png"));
+    pen_act->setIcon(QIcon(":/Icons/pen.png"));
+    text_act->setIcon(QIcon(":/Icons/text.png"));
+    delete_drawing_act->setIcon(QIcon(":/Icons/clear.png"));
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
@@ -665,9 +665,9 @@ void MainWindow::init_export_menu() {
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
-    export_act->setIcon(QIcon("../ViAn/Icons/folder_interval.png"));
-    copy_frame_act->setIcon(QIcon("../ViAn/Icons/copy.png"));
-    gen_report_act->setIcon(QIcon("../ViAn/Icons/report.png"));
+    export_act->setIcon(QIcon(":/Icons/folder_interval.png"));
+    copy_frame_act->setIcon(QIcon(":/Icons/copy.png"));
+    gen_report_act->setIcon(QIcon(":/Icons/report.png"));
 
     export_menu->addAction(export_act);
     export_menu->addAction(copy_frame_act);
@@ -695,7 +695,7 @@ void MainWindow::init_export_menu() {
 void MainWindow::init_help_menu() {
     QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
     QAction* help_act = new QAction(tr("&Open manual"), this);
-    help_act->setIcon(QIcon("../ViAn/Icons/question.png"));
+    help_act->setIcon(QIcon(":/Icons/question.png"));
     help_menu->addAction(help_act);
     help_act->setShortcut(QKeySequence(Qt::Key_F1));
     help_act->setStatusTip(tr("Help"));

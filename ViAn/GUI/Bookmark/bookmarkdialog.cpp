@@ -6,7 +6,7 @@
 BookmarkDialog::BookmarkDialog(QWidget *parent) : QInputDialog(parent) {
     setOption(QInputDialog::UsePlainTextEditForTextInput);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowIcon(QIcon("../ViAn/Icons/bookmark.png"));
+    setWindowIcon(QIcon(":/Icons/bookmark.png"));
     setWindowTitle("Bookmark description");
     setLabelText("Write a description of the bookmark:");
     setToolTip("Write a description of the bookmark. This will be used when creating a report.");

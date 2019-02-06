@@ -10,7 +10,7 @@
 AnalysisItem::AnalysisItem(AnalysisProxy* analysis) : TreeItem(ANALYSIS_ITEM) {
     m_analysis = analysis;
     finished = true;
-    const QIcon analysis_icon("../ViAn/Icons/analysis.png");
+    const QIcon analysis_icon(":/Icons/analysis.png");
     setIcon(0, analysis_icon);
     setText(0, m_analysis->get_name());
 }
@@ -18,7 +18,7 @@ AnalysisItem::AnalysisItem(AnalysisProxy* analysis) : TreeItem(ANALYSIS_ITEM) {
  * @brief AnalysisItem::AnalysisItem
  */
 AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
-    const QIcon analysis_icon("../ViAn/Icons/analysis.png");
+    const QIcon analysis_icon(":/Icons/analysis.png");
     setIcon(0, analysis_icon);
     setText(0, "Analysis");
 }

@@ -4,7 +4,7 @@ PenItem::PenItem(Pen* pen) : ShapeItem(PEN_ITEM) {
     m_pen = pen;
     setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, pen->get_name());
-    const QIcon pen_icon("../ViAn/Icons/pen.png");
+    const QIcon pen_icon(":/Icons/pen.png");
     setIcon(0, pen_icon);
 
     map = QPixmap(16,16);

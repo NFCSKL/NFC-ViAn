@@ -2,7 +2,7 @@
 
 FolderItem::FolderItem() : TreeItem(FOLDER_ITEM) {
     setFlags(flags() | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
-    const QIcon folder_icon("../ViAn/Icons/folder.png");
+    const QIcon folder_icon(":/Icons/folder.png");
     setIcon(0, folder_icon);
 }
 
