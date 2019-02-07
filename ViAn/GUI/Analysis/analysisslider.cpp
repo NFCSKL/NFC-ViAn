@@ -219,6 +219,10 @@ void AnalysisSlider::clear_interval() {
     m_interval.second = INTERVAL_DEFAULT;
 }
 
+bool AnalysisSlider::is_show_interval() {
+    return show_interval;
+}
+
 /**
  * @brief AnalysisSlider::set_interval_first
  * @return

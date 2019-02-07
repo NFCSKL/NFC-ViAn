@@ -51,6 +51,7 @@ public:
     int set_interval_first();
     int set_interval_second();
     void clear_interval(void);
+    bool is_show_interval();
 
     // Drawing interval functions
     void draw_interval(std::pair<int, int> interval, QRect groove, double frame_width);

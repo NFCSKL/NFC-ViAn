@@ -718,6 +718,7 @@ void VideoWidget::quick_bookmark() {
  * Sets the start point of the frame interval
  */
 void VideoWidget::set_interval_start_clicked() {
+    if (!playback_slider->is_show_interval()) return;
     m_interval.first = playback_slider->set_interval_first();
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
@@ -729,6 +730,7 @@ void VideoWidget::set_interval_start_clicked() {
  * Sets the end of the frame interval
 */
 void VideoWidget::set_interval_end_clicked() {
+    if (!playback_slider->is_show_interval()) return;
     m_interval.second = playback_slider->set_interval_second();
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
@@ -742,6 +744,7 @@ void VideoWidget::set_interval_end_clicked() {
  * from the interval on the slider
  */
 void VideoWidget::create_interval_clicked() {
+    if (!playback_slider->is_show_interval()) return;
     int first = m_interval.first;
     int second = m_interval.second;
     if (first == -1 || second <= 0 || second < first) {
@@ -760,6 +763,7 @@ void VideoWidget::create_interval_clicked() {
     emit set_status_bar("Interval: " + QString::number(first) + " - " +
                         QString::number(second) + " added");
     delete_interval();
+    playback_slider->update();
 }
 
 void VideoWidget::new_interval(QString name) {
@@ -996,7 +1000,7 @@ void VideoWidget::display_index_slot() {
 
     int first;
     int second;
-    if (loop && playback_slider->valid_interval(interval)) {
+    if (loop && playback_slider->valid_interval(interval) && playback_slider->is_show_interval()) {
         first = interval.first;
         second = interval.second;
     } else {
@@ -1012,7 +1016,7 @@ void VideoWidget::display_index_slot() {
     }
 
     if (analysis_only) {
-        if (loop && playback_slider->valid_interval(interval)) {
+        if (loop && playback_slider->valid_interval(interval) && playback_slider->is_show_interval()) {
             if (frame_num > playback_slider->get_last_poi_end()) {
                 frame_num = interval.first;
             }
@@ -1044,7 +1048,7 @@ int VideoWidget::update_from_ana_only(int frame) {
 int VideoWidget::update_from_loop(int frame) {
     int new_frame = frame;
     auto interval = playback_slider->m_interval;
-    if (loop && playback_slider->valid_interval(interval)) {
+    if (loop && playback_slider->valid_interval(interval) && playback_slider->is_show_interval()) {
         if (!playback_slider->is_in_interval(frame)) {
             new_frame = interval.first;
         }
@@ -1065,7 +1069,7 @@ void VideoWidget::on_new_frame() {
         playback_slider->setValue(frame_num);
         playback_slider->blockSignals(false);
     }
-    if (analysis_only && !loop) {
+    if (analysis_only && !(loop && playback_slider->is_show_interval())) {
         if (!playback_slider->is_in_POI(frame_num)) {
             if (frame_num >= playback_slider->get_last_poi_end()) {
                 play_btn->setChecked(false);
