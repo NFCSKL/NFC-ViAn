@@ -57,6 +57,8 @@ public:
     bool valid_interval(std::pair<int, int> interval);
     std::pair<int,int> get_valid_interval();
 
+    bool is_in_interval(int frame);
+
     // POI functions
     bool is_in_POI(int frame);
     int get_next_poi_start(int curr_frame);

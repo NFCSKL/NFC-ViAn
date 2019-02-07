@@ -438,6 +438,15 @@ int AnalysisSlider::get_last_poi_end() {
     return 0;
 }
 
+bool AnalysisSlider::is_in_interval(int frame) {
+    if (show_interval) {
+        if (frame >=m_interval.first && frame <= m_interval.second) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * @brief AnalysisSlider::is_in_POI
  * Checks to see if frame is in a POI.

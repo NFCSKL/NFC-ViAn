@@ -166,6 +166,7 @@ public slots:
     void set_interval_start_clicked();
     void set_interval_end_clicked();
     void create_interval_clicked();
+    void loop_interval_toggled(bool value);
     void delete_interval(void);
     void frame_line_edit_finished();
     void zoom_label_finished();
@@ -241,6 +242,7 @@ private:
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
     QPushButton* create_interval_btn;
+    QPushButton* loop_btn;
 
     //Shortcuts
     QShortcut* bookmark_quick_sc;
@@ -276,6 +278,7 @@ private:
 
     bool video_btns_enabled = false;
     bool analysis_only = false;
+    bool loop = false;
 
     QString bmark_description = "";
 
@@ -296,6 +299,9 @@ private:
     void add_btns_to_layouts();
     void connect_btns();
     void init_playback_slider();
+
+    int update_from_ana_only(int frame);
+    int update_from_loop(int frame);
 
     void closeEvent(QCloseEvent *event) override;
 private slots:
