@@ -1197,7 +1197,7 @@ void ProjectWidget::drawing_tag() {
         return;
     }
     // Create tag drawing
-    Tag* tag = new Tag("Drawing tag", true);
+    Tag* tag = new Tag("Drawing tag", DRAWING_TAG);
 
     // Add all drawings to tag frame items.
     VideoProject* vid_proj = vid_item->get_video_project();
