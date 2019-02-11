@@ -1804,15 +1804,31 @@ void ProjectWidget::update_videoitems() {
     }
 }
 
+/**
+ * @brief ProjectWidget::select_video_project
+ * Set vid_proj to current project with the state state.
+ * If vid_proj already is current just set state else
+ * iterate over the vid_items to find the correct one in the tree
+ *
+ * This is used from the bookmarks to select the video in the projecttree
+ * when clicking through bookmarks
+ * @param vid_proj
+ * @param state
+ */
 void ProjectWidget::select_video_project(VideoProject* vid_proj, VideoState state) {
-    std::vector<VideoItem*> v_items;
-    QTreeWidgetItem* s_item = invisibleRootItem();
-    get_video_items(s_item, v_items);
-    for (auto vid_item : v_items) {
-        if (vid_item->get_video_project() == vid_proj) {
-            vid_item->get_video_project()->state = state;
-            setCurrentItem(vid_item);
-            return;
+    if (vid_proj->is_current()) {
+        vid_proj->state = state;
+        emit marked_video_state(vid_proj, state);
+    } else {
+        std::vector<VideoItem*> v_items;
+        QTreeWidgetItem* s_item = invisibleRootItem();
+        get_video_items(s_item, v_items);
+        for (auto vid_item : v_items) {
+            if (vid_item->get_video_project() == vid_proj) {
+                vid_item->get_video_project()->state = state;
+                setCurrentItem(vid_item);
+                return;
+            }
         }
     }
 }
