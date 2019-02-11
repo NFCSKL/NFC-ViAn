@@ -719,7 +719,9 @@ void VideoWidget::quick_bookmark() {
  */
 void VideoWidget::set_interval_start_clicked() {
     if (!playback_slider->is_show_interval()) return;
-    m_interval.first = playback_slider->set_interval_first();
+    int frame = playback_slider->set_interval_first();
+    m_interval.first = frame;
+    m_vid_proj->m_interval.first = frame;
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
     playback_slider->update();
@@ -731,7 +733,9 @@ void VideoWidget::set_interval_start_clicked() {
 */
 void VideoWidget::set_interval_end_clicked() {
     if (!playback_slider->is_show_interval()) return;
-    m_interval.second = playback_slider->set_interval_second();
+    int frame = playback_slider->set_interval_second();
+    m_interval.second = frame;
+    m_vid_proj->m_interval.second = frame;
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
     playback_slider->update();
@@ -762,7 +766,6 @@ void VideoWidget::create_interval_clicked() {
     emit set_interval_area(first);
     emit set_status_bar("Interval: " + QString::number(first) + " - " +
                         QString::number(second) + " added");
-    delete_interval();
     playback_slider->update();
 }
 
@@ -775,12 +778,18 @@ void VideoWidget::loop_interval_toggled(bool value) {
     loop = value;
 }
 
+void VideoWidget::set_interval(std::pair<int, int> interval) {
+    m_interval = interval;
+    playback_slider->set_interval(interval);
+}
+
 /**
  * @brief VideoWidget::delete_interval
  */
 void VideoWidget::delete_interval() {
     m_interval.first = -1;
     m_interval.second = -1;
+    if (m_vid_proj) m_vid_proj->m_interval = m_interval;
     playback_slider->clear_interval();
 }
 
@@ -1157,7 +1166,7 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
         if (m_vid_proj) m_vid_proj->set_current(false);
         vid_proj->set_current(true);
         m_vid_proj = vid_proj;
-        delete_interval();
+        set_interval(vid_proj->m_interval);
         frame_is_clean = false;
         frame_wgt->clear_frame(false);
 

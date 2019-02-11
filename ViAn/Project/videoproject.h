@@ -42,6 +42,7 @@ public:
     ~VideoProject();
 
     Tag* tag_seq_tag = nullptr;
+    std::pair<int, int> m_interval = std::make_pair(-1, -1);
 
     VideoState state;
 

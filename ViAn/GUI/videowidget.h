@@ -167,6 +167,7 @@ public slots:
     void set_interval_end_clicked();
     void create_interval_clicked();
     void loop_interval_toggled(bool value);
+    void set_interval(std::pair<int, int> interval);
     void delete_interval(void);
     void frame_line_edit_finished();
     void zoom_label_finished();

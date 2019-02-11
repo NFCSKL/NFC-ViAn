@@ -50,6 +50,7 @@ public:
     // Interval settings
     int set_interval_first();
     int set_interval_second();
+    void set_interval(std::pair<int, int> interval);
     void clear_interval(void);
     bool is_show_interval();
 

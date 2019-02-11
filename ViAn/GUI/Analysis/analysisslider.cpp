@@ -211,12 +211,17 @@ void AnalysisSlider::set_show_ana_interval(bool show) {
     show_ana_interval = show;
 }
 
+void AnalysisSlider::set_interval(std::pair<int, int> interval) {
+    m_interval = interval;
+}
+
 /**
  * @brief AnalysisSlider::clear_interval
  */
 void AnalysisSlider::clear_interval() {
     m_interval.first = INTERVAL_DEFAULT;
     m_interval.second = INTERVAL_DEFAULT;
+    update();
 }
 
 bool AnalysisSlider::is_show_interval() {
