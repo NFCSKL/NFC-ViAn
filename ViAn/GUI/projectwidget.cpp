@@ -812,10 +812,11 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         if (vid_item->get_video_project() == nullptr) return;
         emit set_video_project(vid_item->get_video_project());
-        VideoState state;
-        vid_item->get_video_project()->state.video = true;
-        state = vid_item->get_video_project()->state;
-        emit marked_video_state(vid_item->get_video_project(), state);
+        if (!vid_item->get_video_project()->get_video()->is_sequence()) {
+            VideoState state;
+            state = vid_item->get_video_project()->state;
+            emit marked_video_state(vid_item->get_video_project(), state);
+        }
         emit item_type(item->type());
 
         emit set_zoom_tool();
