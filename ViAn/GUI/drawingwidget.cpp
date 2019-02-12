@@ -393,6 +393,42 @@ void DrawingWidget::remove_item() {
     remove_from_tree(currentItem());
 }
 
+/**
+ * @brief DrawingWidget::remove_item_frame
+ * Called when a frame is removed from a sequence.
+ * Updates the drawings and widget with the new frame numbers
+ * @param frame
+ */
+void DrawingWidget::remove_item_frame(int frame) {
+    blockSignals(true);
+    auto root = invisibleRootItem();
+    bool found = false;
+    QTreeWidgetItem* item = nullptr;
+    for (int i = 0; i < root->childCount(); i++) {
+        QTreeWidgetItem* t_item = root->child(i);
+        if (found) {
+            // Lowering frame by one
+            FrameItem* f_item = dynamic_cast<FrameItem*>(t_item);
+            f_item->set_frame(f_item->get_frame()-1);
+            // Update all shapes with the new frame
+            for (int j = 0; j < t_item->childCount(); j++) {
+                ShapeItem* s_item = dynamic_cast<ShapeItem*>(t_item->child(j));
+                Shapes* shape = s_item->get_shape();
+                shape->set_frame(shape->get_frame()-1);
+            }
+        }
+        if (t_item->text(0) == QString::number(frame) && !found) {
+            item = t_item;
+            found = true;
+        }
+    }
+    if (found) {
+        remove_from_tree(item);
+    }
+    m_overlay->remove_frame(frame);
+    blockSignals(false);
+}
+
 void DrawingWidget::delete_item() {
     if (!currentItem() || m_overlay->get_tool() != EDIT) return;
     ShapeItem* item = dynamic_cast<ShapeItem*>(currentItem());

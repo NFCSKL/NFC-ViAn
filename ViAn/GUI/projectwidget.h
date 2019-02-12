@@ -78,6 +78,7 @@ signals:
     void item_type(int);
     void update_tag();
     void new_slider_max(int);
+    void remove_frame(int);
 
 public slots:
     void new_project(void);
