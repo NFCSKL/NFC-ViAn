@@ -1427,6 +1427,7 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
 void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
     SequenceItem* seq_item = dynamic_cast<SequenceItem*>(item);
     if (seq_item) {
+        emit remove_frame(seq_item->get_index());
         seq_item->remove();
     }
 }
