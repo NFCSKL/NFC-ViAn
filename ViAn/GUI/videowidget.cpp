@@ -1015,7 +1015,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_num));
 
     if (!m_floating) {
-        if (proj_tree_item == VIDEO_ITEM) {
+        if (proj_tree_item == VIDEO_ITEM || proj_tree_item == ANALYSIS_ITEM) {
             m_vid_proj->state.frame = frame_num;
         }
         m_vid_proj->get_video()->state.frame = frame_num;
