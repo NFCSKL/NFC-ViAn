@@ -12,7 +12,7 @@
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint));
     setWindowTitle("Vian - Settings");
-    setWindowIcon(QIcon("../ViAn/Icons/settings.png"));
+    setWindowIcon(QIcon(":/Icons/settings.png"));
     setAttribute(Qt::WA_DeleteOnClose);
     setMinimumSize(400,100);
 

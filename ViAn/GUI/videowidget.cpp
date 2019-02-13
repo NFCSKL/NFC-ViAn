@@ -235,27 +235,27 @@ void VideoWidget::init_frame_processor() {
  * Set icons on all buttons
  */
 void VideoWidget::set_btn_icons() {
-    play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
-    stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
-    next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
-    prev_frame_btn = new QPushButton(QIcon("../ViAn/Icons/prev_frame.png"), "", this);
-    next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next.png"), "", this);
+    play_btn = new QPushButton(QIcon(":/Icons/play.png"), "", this);
+    stop_btn = new QPushButton(QIcon(":/Icons/stop.png"), "", this);
+    next_frame_btn = new QPushButton(QIcon(":/Icons/next_frame.png"), "", this);
+    prev_frame_btn = new QPushButton(QIcon(":/Icons/prev_frame.png"), "", this);
+    next_poi_btn = new QPushButton(QIcon(":/Icons/next.png"), "", this);
     prev_poi_btn = new DoubleClickButton(this);
-    prev_poi_btn->setIcon(QIcon("../ViAn/Icons/prev.png"));
-    bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
-    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/export.png"), "", this);
+    prev_poi_btn->setIcon(QIcon(":/Icons/prev.png"));
+    bookmark_btn = new QPushButton(QIcon(":/Icons/bookmark.png"), "", this);
+    export_frame_btn = new QPushButton(QIcon(":/Icons/export.png"), "", this);
 
-    analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play+check.png"), "", this);
-    tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag_frame.png"), "", this);
-    new_label_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
-    set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
-    set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
-    create_interval_btn = new QPushButton(QIcon("../ViAn/Icons/create_interval.png"), "", this);
-    loop_btn = new QPushButton(QIcon("../ViAn/Icons/loop.png"), "", this);
+    analysis_play_btn = new QPushButton(QIcon(":/Icons/play+check.png"), "", this);
+    tag_btn = new QPushButton(QIcon(":/Icons/tag_frame.png"), "", this);
+    new_label_btn = new QPushButton(QIcon(":/Icons/tag.png"), "", this);
+    set_start_interval_btn = new QPushButton(QIcon(":/Icons/start_interval.png"), "", this);
+    set_end_interval_btn = new QPushButton(QIcon(":/Icons/end_interval.png"), "", this);
+    create_interval_btn = new QPushButton(QIcon(":/Icons/create_interval.png"), "", this);
+    loop_btn = new QPushButton(QIcon(":/Icons/loop.png"), "", this);
 
     interpolate_check = new QCheckBox("Interpolate", this);
-    fit_btn = new QPushButton(QIcon("../ViAn/Icons/resize.png"), "", this);
-    original_size_btn = new QPushButton(QIcon("../ViAn/Icons/original_size.png"), "", this);
+    fit_btn = new QPushButton(QIcon(":/Icons/resize.png"), "", this);
+    original_size_btn = new QPushButton(QIcon(":/Icons/original_size.png"), "", this);
 
 
     zoom_label = new QLineEdit("100%", this);
@@ -806,7 +806,7 @@ void VideoWidget::play_btn_toggled(bool status) {
     if (status) {
         emit set_zoom_tool();
         set_status_bar("Play");
-        play_btn->setIcon(QIcon("../ViAn/Icons/pause.png"));
+        play_btn->setIcon(QIcon(":/Icons/pause.png"));
     } else {
         if (analysis_only) {
             int new_frame = playback_slider->get_closest_poi(playback_slider->value());
@@ -816,7 +816,7 @@ void VideoWidget::play_btn_toggled(bool status) {
             }
         }
         play_btn->setChecked(false);
-        play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
+        play_btn->setIcon(QIcon(":/Icons/play.png"));
         set_status_bar("Pause");
     }
 }

@@ -5,7 +5,7 @@
 DrawingTagItem::DrawingTagItem(Tag *tag) : TreeItem(DRAWING_TAG_ITEM) {
     m_tag = tag;
     setText(0, tag->get_name());
-    const QIcon draw_tag_icon("../Vian/Icons/pen.png");
+    const QIcon draw_tag_icon(":/Icons/pen.png");
     setIcon(0, draw_tag_icon);
 }
 
