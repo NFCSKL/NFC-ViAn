@@ -6,7 +6,7 @@ class VideoProject;
 class VideoItem : public TreeItem {
     VideoProject* m_vid_proj = nullptr;
     const QString SEQUENCE_CONTAINER_NAME = "Images";
-    const QIcon error_icon = QIcon("../ViAn/Icons/error_stop.png");
+    const QIcon error_icon = QIcon(":/Icons/error_stop.png");
 public:
     VideoItem(VideoProject* video_project);
     VideoItem();

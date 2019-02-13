@@ -5,7 +5,7 @@
 IntervalItem::IntervalItem(Interval *interval) : TreeItem(INTERVAL_ITEM) {
     m_interval = interval;
     setText(0, interval->get_name());
-    const QIcon interval_icon("../ViAn/Icons/create_interval.png");
+    const QIcon interval_icon(":/Icons/create_interval.png");
     setIcon(0, interval_icon);
 }
 

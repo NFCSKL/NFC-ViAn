@@ -19,8 +19,8 @@ class ViewPathDialog : public QDialog
 
     QTreeWidget* path_list;
     const int NUM_COLUMNS = 3;
-    const QIcon check_icon = QIcon("../ViAn/Icons/check.png");
-    const QIcon cross_icon = QIcon("../ViAn/Icons/abort.png");
+    const QIcon check_icon = QIcon(":/Icons/check.png");
+    const QIcon cross_icon = QIcon(":/Icons/abort.png");
 
     std::vector<Video*> m_video_list;
 public:

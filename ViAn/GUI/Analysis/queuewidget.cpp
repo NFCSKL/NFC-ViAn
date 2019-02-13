@@ -19,7 +19,7 @@ QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     // Create queue
     m_queue = new QListWidget();
     // Create Abort button
-    abort_btn = new QPushButton(QIcon("../ViAn/Icons/abort.png"),"",this);
+    abort_btn = new QPushButton(QIcon(":/Icons/abort.png"),"",this);
     // Create main layout
     QVBoxLayout* layout = new QVBoxLayout();
     // Layout for current analysis

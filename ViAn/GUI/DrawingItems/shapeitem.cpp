@@ -19,10 +19,10 @@ void ShapeItem::update_shape_color() {
 
 void ShapeItem::update_show_icon(bool show) {
     if (show) {
-        const QIcon show_icon("../ViAn/Icons/show.png");
+        const QIcon show_icon(":/Icons/show.png");
         setIcon(2, show_icon);
     } else {
-        const QIcon hide_icon("../ViAn/Icons/hide.png");
+        const QIcon hide_icon(":/Icons/hide.png");
         setIcon(2, hide_icon);
     }
 }

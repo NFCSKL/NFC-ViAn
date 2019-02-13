@@ -5,7 +5,7 @@ RectItem::RectItem(Rectangle* rect) : ShapeItem(RECT_ITEM) {
     m_rect = rect;
     setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, rect->get_name());
-    const QIcon rect_icon("../ViAn/Icons/box.png");
+    const QIcon rect_icon(":/Icons/box.png");
     setIcon(0, rect_icon);
 
     map = QPixmap(16,16);
