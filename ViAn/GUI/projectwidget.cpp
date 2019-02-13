@@ -1140,15 +1140,16 @@ void ProjectWidget::context_menu(const QPoint &point) {
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
         case TAG_FRAME_ITEM: {
-            TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
-            Tag* tag = t_item->get_tag();
-            if (tag->get_type() == SEQUENCE_TAG) {
+            if (item->parent()->type() == TAG_ITEM) {
+                TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
+                Tag* tag = t_item->get_tag();
+                if (tag->get_type() == TAG) {
+                    menu.addAction("Update", this, &ProjectWidget::update_tag);
+                }
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
-            }
-            menu.addAction("Update", this, &ProjectWidget::update_tag);
-            if (item->parent()->type() == TAG_ITEM) {
-                menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
+                menu.addAction("Update", this, &ProjectWidget::update_tag);
             }
             break;
         }
