@@ -61,7 +61,6 @@
         <file>Icons/1471539599_question-sign.png</file>
         <file>Icons/1471539641_globe.png</file>
         <file>Icons/1471539642_font.png</file>
-        <file>Icons/1471539682_retweet.png</file>
         <file>Icons/1471539689_warning-sign.png</file>
         <file>Icons/1471539694_timer.png</file>
         <file>Icons/1471539700_address-book.png</file>
@@ -160,5 +159,6 @@
         <file>Icons/zoom.png</file>
         <file>Icons/zoom_in.png</file>
         <file>Icons/zoom_out.png</file>
+        <file>Icons/loop.png</file>
     </qresource>
 </RCC>
