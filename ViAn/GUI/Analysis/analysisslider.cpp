@@ -211,12 +211,21 @@ void AnalysisSlider::set_show_ana_interval(bool show) {
     show_ana_interval = show;
 }
 
+void AnalysisSlider::set_interval(std::pair<int, int> interval) {
+    m_interval = interval;
+}
+
 /**
  * @brief AnalysisSlider::clear_interval
  */
 void AnalysisSlider::clear_interval() {
     m_interval.first = INTERVAL_DEFAULT;
     m_interval.second = INTERVAL_DEFAULT;
+    update();
+}
+
+bool AnalysisSlider::is_show_interval() {
+    return show_interval;
 }
 
 /**
@@ -436,6 +445,15 @@ int AnalysisSlider::get_last_poi_end() {
     if (m_show_pois && rects.size() > 0) return rects.back().second;
     if (m_show_interval_areas && m_interval_areas->m_area_list.size() > 0) return m_interval_areas->m_area_list.back().second;
     return 0;
+}
+
+bool AnalysisSlider::is_in_interval(int frame) {
+    if (show_interval) {
+        if (frame >=m_interval.first && frame <= m_interval.second) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**

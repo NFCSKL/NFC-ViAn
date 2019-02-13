@@ -548,7 +548,7 @@ void MainWindow::init_interval_menu() {
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
     QAction* tag_interval_act = new QAction(tr("&Tag interval"));
-//    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
+    QAction* rm_interval_act = new QAction(tr("&Clear interval"), this);
     interval_act = new QAction(tr("&Interval"), this);
 
     interval_act->setCheckable(true);
@@ -563,7 +563,7 @@ void MainWindow::init_interval_menu() {
     new_tag_act->setShortcut(Qt::Key_T);
     remove_tag_act->setShortcut(Qt::Key_U);
     tag_interval_act->setShortcut(Qt::Key_K);
-//    rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
+    rm_interval_act->setShortcut(Qt::Key_J);
 
     new_label_act->setStatusTip(tr("Create new tag label"));
     new_tag_act->setStatusTip(tr("Tag the current frame"));
@@ -575,15 +575,15 @@ void MainWindow::init_interval_menu() {
     interval_menu->addAction(remove_tag_act);
     interval_menu->addSeparator();
     interval_menu->addAction(tag_interval_act);
+    interval_menu->addAction(rm_interval_act);
     interval_menu->addSeparator();
-//    interval_menu->addAction(rm_interval_act);
     interval_menu->addAction(interval_act);
 
     connect(new_label_act, &QAction::triggered, video_wgt, &VideoWidget::new_tag_clicked);
     connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
     connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::create_interval_clicked);
-//    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
+    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
