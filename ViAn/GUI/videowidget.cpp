@@ -829,6 +829,7 @@ void VideoWidget::update_tag_color(int b, double c, double g) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
+    if (!tag_btn->isEnabled()) return;
     // If no tag is selected show the new tag dialog
     if (m_tag == nullptr || m_tag->is_drawing_tag()) {
         new_tag_clicked();
@@ -879,6 +880,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
+    if (!tag_btn->isEnabled()) return;
     if (!m_vid_proj || frame_is_clean) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1013,7 +1015,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_num));
 
     if (!m_floating) {
-        if (proj_tree_item == VIDEO_ITEM) {
+        if (proj_tree_item == VIDEO_ITEM || proj_tree_item == ANALYSIS_ITEM) {
             m_vid_proj->state.frame = frame_num;
         }
         m_vid_proj->get_video()->state.frame = frame_num;

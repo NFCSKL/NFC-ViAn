@@ -421,7 +421,14 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             tl = Utility::from_cvpoint(current_drawing->get_draw_start());
             br = Utility::from_cvpoint(current_drawing->get_draw_end());
         }
-        QRectF current_rect(scale_to_view(tl), scale_to_view(br));
+        QRectF current_rect;
+        if (current_drawing->get_shape() == TEXT) {
+            Text* current = dynamic_cast<Text*>(current_drawing);
+            br = Utility::from_cvpoint(current->get_text_draw_end());
+            current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
+        } else {
+            current_rect = QRectF(scale_to_view(tl), scale_to_view(br));
+        }
         painter.setPen(Qt::black);
         painter.drawRect(current_rect);
         QPen pen(Qt::white, 1, Qt::DashLine);
@@ -473,7 +480,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mouseDoubleClickEvent(QMouseEvent *event) {
     if (frame_is_clear) return;
     QPoint scaled_pos = scale_to_video(event->pos());
-    emit mouse_double_click(scaled_pos);
+    emit mouse_double_click(rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation, true));
 }
 
 /**

@@ -19,11 +19,14 @@ public:
 
     void update_text_pos(QPoint pos);
     void update_text_draw_end();
+    cv::Point get_text_draw_end();
+    void set_text_draw_end(cv::Point pos);
 
 private:
     double font_scale;
-    cv::Size text_size;
+    cv::Size text_size = cv::Size(-1, -1);
     int baseline = 0;
+    cv::Point text_draw_end;
 };
 
 #endif // TEXT_H

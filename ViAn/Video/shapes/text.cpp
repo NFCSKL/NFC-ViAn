@@ -89,6 +89,14 @@ void Text::update_text_draw_end() {
     draw_end = p;
 }
 
+cv::Point Text::get_text_draw_end() {
+    return text_draw_end;
+}
+
+void Text::set_text_draw_end(cv::Point pos) {
+    text_draw_end = pos;
+}
+
 /**
  * @brief Text::write
  * @param json
@@ -107,4 +115,6 @@ void Text::write(QJsonObject& json) {
 void Text::read(const QJsonObject& json) {
     read_shape(json);
     font_scale = json["font"].toDouble();
+    text_size = cv::Size(draw_end.x - draw_start.x, draw_start.y - draw_end.y);
+    text_draw_end = draw_end;
 }
