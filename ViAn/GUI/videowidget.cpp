@@ -666,9 +666,8 @@ void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
         }
         if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
             TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
-            t_frame->m_state->center = center;
-            t_frame->m_state->scale_factor = scale;
-            t_frame->m_state->rotation = angle;
+            t_frame->set_center(center);
+            t_frame->set_scale_rot(scale, angle);
         }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
@@ -805,10 +804,9 @@ void VideoWidget::update_tag() {
     try {
         TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
         VideoState state = m_vid_proj->get_video()->state;
-        t_frame->m_state = &state;
-        t_frame->m_state->brightness = m_settings.brightness;
-        t_frame->m_state->contrast = m_settings.contrast;
-        t_frame->m_state->gamma = m_settings.gamma;
+        t_frame->get_original() = state;
+        t_frame->update_color_correction(m_settings.brightness, m_settings.contrast,
+                                         m_settings.gamma);
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
     } catch (const std::out_of_range) {
         qWarning() << "Can't update. No tag found on current frame";
@@ -831,6 +829,7 @@ void VideoWidget::update_tag_color(int b, double c, double g) {
  * Adds the current frame to a tag.
  */
 void VideoWidget::tag_frame() {
+    if (!tag_btn->isEnabled()) return;
     // If no tag is selected show the new tag dialog
     if (m_tag == nullptr || m_tag->is_drawing_tag()) {
         new_tag_clicked();
@@ -848,7 +847,7 @@ void VideoWidget::tag_frame() {
         } else {
             // Add frame to tag
             VideoState state = m_vid_proj->get_video()->state;
-            TagFrame* t_frame = new TagFrame(playback_slider->value(), &state);
+            TagFrame* t_frame = new TagFrame(playback_slider->value(), state);
             m_tag->add_frame(playback_slider->value(), t_frame);
             emit tag_new_frame(playback_slider->value(), t_frame);
             emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " tagged");
@@ -881,6 +880,7 @@ void VideoWidget::remove_tag_frame() {
  * New-tag button clicked
  */
 void VideoWidget::new_tag_clicked() {
+    if (!tag_btn->isEnabled()) return;
     if (!m_vid_proj || frame_is_clean) return;
     TagDialog* tag_dialog = new TagDialog();
     tag_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -935,7 +935,7 @@ void VideoWidget::next_poi_btn_clicked() {
     if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
-            state = *(playback_slider->m_tag->tag_map[new_frame]->m_state);
+            state = playback_slider->m_tag->tag_map[new_frame]->get_state();
             load_marked_video_state(m_vid_proj, state);
         }
         {
@@ -959,7 +959,7 @@ void VideoWidget::prev_poi_btn_clicked() {
     if (new_frame != current_frame) {
         if (playback_slider->get_show_tags()) {
             VideoState state;
-            state = *(playback_slider->m_tag->tag_map[new_frame]->m_state);
+            state = playback_slider->m_tag->tag_map[new_frame]->get_state();
             load_marked_video_state(m_vid_proj, state);
         }
         {
@@ -1015,7 +1015,7 @@ void VideoWidget::on_new_frame() {
     frame_line_edit->setText(QString::number(frame_num));
 
     if (!m_floating) {
-        if (proj_tree_item == VIDEO_ITEM) {
+        if (proj_tree_item == VIDEO_ITEM || proj_tree_item == ANALYSIS_ITEM) {
             m_vid_proj->state.frame = frame_num;
         }
         m_vid_proj->get_video()->state.frame = frame_num;
@@ -1085,7 +1085,7 @@ void VideoWidget::on_playback_slider_moved() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState state) {
-
+    set_seq_tag_btns(false);
     if (!video_btns_enabled) set_video_btns(true);
     if (!vid_proj->is_current() || m_vid_proj == nullptr) {
         if (m_vid_proj) m_vid_proj->set_current(false);

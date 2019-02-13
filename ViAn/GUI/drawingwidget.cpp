@@ -287,22 +287,23 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
     if (!item) return;
     switch (item->type()) {
     case FRAME_ITEM: {
+        emit set_current_drawing(nullptr);
         FrameItem* frame_item = dynamic_cast<FrameItem*>(item);
-
         VideoState state;
         state = m_vid_proj->get_video()->state;
         state.frame = frame_item->get_frame();
-
+        // Reset these to default values so the zoomer will fit to viewport
+        state.center = QPoint(-1, -1);
+        state.scale_factor = -1;
         emit jump_to_frame(m_vid_proj, state);
-        emit set_current_drawing(nullptr);
         break;
     }
     case RECT_ITEM:
     case CIRCLE_ITEM:
-    case LINE_ITEM:
     case ARROW_ITEM:
-    case TEXT_ITEM:
-    case PEN_ITEM: {
+    case LINE_ITEM:
+    case PEN_ITEM:
+    case TEXT_ITEM: {
         ShapeItem* shape_item = dynamic_cast<ShapeItem*>(item);
         Shapes* shape = shape_item->get_shape();
         if (col == 1) {
@@ -314,14 +315,15 @@ void DrawingWidget::tree_item_clicked(QTreeWidgetItem *item, const int &col) {
         } else if (col == 2) {
             shape_item->update_show_icon(shape->toggle_show());
         }
-
+        emit set_tool_edit();
+        emit set_current_drawing(shape);
         VideoState state;
         state = m_vid_proj->get_video()->state;
         state.frame = shape->get_frame();
-
+        // Reset these to default values so the zoomer will fit to viewport
+        state.center = QPoint(-1, -1);
+        state.scale_factor = -1;
         emit jump_to_frame(m_vid_proj, state);
-        emit set_current_drawing(shape);
-        emit set_tool_edit();
         break;
     }
     default:
@@ -389,6 +391,42 @@ void DrawingWidget::item_changed(QTreeWidgetItem* item) {
  */
 void DrawingWidget::remove_item() {
     remove_from_tree(currentItem());
+}
+
+/**
+ * @brief DrawingWidget::remove_item_frame
+ * Called when a frame is removed from a sequence.
+ * Updates the drawings and widget with the new frame numbers
+ * @param frame
+ */
+void DrawingWidget::remove_item_frame(int frame) {
+    blockSignals(true);
+    auto root = invisibleRootItem();
+    bool found = false;
+    QTreeWidgetItem* item = nullptr;
+    for (int i = 0; i < root->childCount(); i++) {
+        QTreeWidgetItem* t_item = root->child(i);
+        if (found) {
+            // Lowering frame by one
+            FrameItem* f_item = dynamic_cast<FrameItem*>(t_item);
+            f_item->set_frame(f_item->get_frame()-1);
+            // Update all shapes with the new frame
+            for (int j = 0; j < t_item->childCount(); j++) {
+                ShapeItem* s_item = dynamic_cast<ShapeItem*>(t_item->child(j));
+                Shapes* shape = s_item->get_shape();
+                shape->set_frame(shape->get_frame()-1);
+            }
+        }
+        if (t_item->text(0) == QString::number(frame) && !found) {
+            item = t_item;
+            found = true;
+        }
+    }
+    if (found) {
+        remove_from_tree(item);
+    }
+    m_overlay->remove_frame(frame);
+    blockSignals(false);
 }
 
 void DrawingWidget::delete_item() {
