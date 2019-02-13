@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
     connect(video_wgt, &VideoWidget::delete_sc_activated, drawing_wgt, &DrawingWidget::delete_item);
+    connect(project_wgt, &ProjectWidget::remove_frame, drawing_wgt, &DrawingWidget::remove_item_frame);
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
@@ -132,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::new_bookmark, bookmark_wgt, &BookmarkWidget::create_bookmark);
     connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
     connect(project_wgt, &ProjectWidget::set_project, bookmark_wgt, &BookmarkWidget::set_project);
-    connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, video_wgt, &VideoWidget::load_marked_video_state);
+    connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, project_wgt, &ProjectWidget::select_video_project);
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     connect(project_wgt, &ProjectWidget::save_bmark_wgt, bookmark_wgt, &BookmarkWidget::save_item_data);
     bookmark_dock->setWidget(bookmark_wgt);

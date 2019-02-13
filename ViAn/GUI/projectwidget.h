@@ -78,6 +78,7 @@ signals:
     void item_type(int);
     void update_tag();
     void new_slider_max(int);
+    void remove_frame(int);
 
 public slots:
     void new_project(void);
@@ -117,6 +118,7 @@ public slots:
     bool prompt_save();
     void update_current_videoitem(QString path);
     void update_videoitems();
+    void select_video_project(VideoProject* vid_proj, VideoState state);
 private slots:
     void context_menu(const QPoint& point);
     void open_video_in_widget();

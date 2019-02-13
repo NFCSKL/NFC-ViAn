@@ -11,7 +11,9 @@ TagFrameItem::TagFrameItem(TagFrame* t_frame) : TreeItem(TAG_FRAME_ITEM) {
 }
 
 VideoState TagFrameItem::get_state() {
-    return *(m_t_frame->m_state);
+    VideoState state;
+    state = m_t_frame->get_state();
+    return state;
 }
 
 void TagFrameItem::remove(){}
@@ -21,5 +23,5 @@ void TagFrameItem::rename() {
 }
 
 int TagFrameItem::get_frame() {
-    return m_t_frame->m_state->frame;
+    return m_t_frame->get_state().frame;
 }

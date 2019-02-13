@@ -8,6 +8,7 @@
 #include "sequenceitem.h"
 
 #include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
 #include <QTreeWidgetItem>
@@ -59,6 +60,14 @@ void VideoItem::set_thumbnail() {
     }
     cv::Mat frame;
     cap >> frame;
+    switch (frame.type()) {
+        case CV_8UC1:
+            cvtColor(frame, frame, CV_GRAY2RGB);
+            break;
+        case CV_8UC3:
+            cvtColor(frame, frame, CV_BGR2RGB);
+            break;
+    }
     ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());
     QString thumbnail_path = im_gen.create_thumbnail(m_vid_proj->get_video()->get_name());
     const QIcon icon(thumbnail_path);

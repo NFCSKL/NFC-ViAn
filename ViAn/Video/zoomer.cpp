@@ -228,7 +228,7 @@ void Zoomer::load_state(QPoint center_point, double scale_factor, int angle) {
     adjust_frame_rect_rotation();
 
     // Check for default state
-    if (center_point.x() == -1 && center_point.y() == -1) {
+    if (center_point == QPoint(-1, -1)) {
         if (scale_factor == -1.) {
             fit_viewport();
         } else {

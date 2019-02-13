@@ -457,8 +457,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
                 // Create the tagframe
                 VideoState state;
                 state.frame = frame;
-                VideoState* state_p = new VideoState(state);
-                TagFrame* t_frame = new TagFrame(frame, state_p);
+                TagFrame* t_frame = new TagFrame(frame, state);
                 t_frame->set_name(Utility::name_from_path(path));
                 tag->add_frame(frame, t_frame);
             }
@@ -813,10 +812,11 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         if (vid_item->get_video_project() == nullptr) return;
         emit set_video_project(vid_item->get_video_project());
-        VideoState state;
-        vid_item->get_video_project()->state.video = true;
-        state = vid_item->get_video_project()->state;
-        emit marked_video_state(vid_item->get_video_project(), state);
+        if (!vid_item->get_video_project()->get_video()->is_sequence()) {
+            VideoState state;
+            state = vid_item->get_video_project()->state;
+            emit marked_video_state(vid_item->get_video_project(), state);
+        }
         emit item_type(item->type());
 
         emit set_zoom_tool();
@@ -1140,15 +1140,16 @@ void ProjectWidget::context_menu(const QPoint &point) {
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
         case TAG_FRAME_ITEM: {
-            TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
-            Tag* tag = t_item->get_tag();
-            if (tag->get_type() == SEQUENCE_TAG) {
+            if (item->parent()->type() == TAG_ITEM) {
+                TagItem* t_item = dynamic_cast<TagItem*>(item->parent());
+                Tag* tag = t_item->get_tag();
+                if (tag->get_type() == TAG) {
+                    menu.addAction("Update", this, &ProjectWidget::update_tag);
+                }
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 break;
-            }
-            menu.addAction("Update", this, &ProjectWidget::update_tag);
-            if (item->parent()->type() == TAG_ITEM) {
-                menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            } else if (item->parent()->type() == DRAWING_TAG_ITEM) {
+                menu.addAction("Update", this, &ProjectWidget::update_tag);
             }
             break;
         }
@@ -1197,7 +1198,7 @@ void ProjectWidget::drawing_tag() {
         return;
     }
     // Create tag drawing
-    Tag* tag = new Tag("Drawing tag", true);
+    Tag* tag = new Tag("Drawing tag", DRAWING_TAG);
 
     // Add all drawings to tag frame items.
     VideoProject* vid_proj = vid_item->get_video_project();
@@ -1205,8 +1206,7 @@ void ProjectWidget::drawing_tag() {
         if (frame_overlay.second.size() > 0) {
             VideoState state;
             state.frame = frame_overlay.first;
-            VideoState* state_p = new VideoState(state);
-            TagFrame* t_frame = new TagFrame(frame_overlay.first, state_p);
+            TagFrame* t_frame = new TagFrame(frame_overlay.first, state);
             tag->add_frame(frame_overlay.first, t_frame);
         }
     }
@@ -1414,6 +1414,10 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
             tag->remove_frame(frame);
             tag->update_index_tag();
             emit new_slider_max(-1);
+
+            // Update drawing widget
+            emit remove_frame(frame);
+
             tree_item_changed(item->parent()->parent());
         }
     } else {
@@ -1424,6 +1428,7 @@ void ProjectWidget::remove_tag_frame_item(QTreeWidgetItem *item) {
 void ProjectWidget::remove_sequence_item(QTreeWidgetItem *item) {
     SequenceItem* seq_item = dynamic_cast<SequenceItem*>(item);
     if (seq_item) {
+        emit remove_frame(seq_item->get_index());
         seq_item->remove();
     }
 }
@@ -1802,6 +1807,35 @@ void ProjectWidget::update_videoitems() {
             v_item->setText(0, video->get_name());
             v_item->setToolTip(0, video->file_path);
             v_item->set_thumbnail();
+        }
+    }
+}
+
+/**
+ * @brief ProjectWidget::select_video_project
+ * Set vid_proj to current project with the state state.
+ * If vid_proj already is current just set state else
+ * iterate over the vid_items to find the correct one in the tree
+ *
+ * This is used from the bookmarks to select the video in the projecttree
+ * when clicking through bookmarks
+ * @param vid_proj
+ * @param state
+ */
+void ProjectWidget::select_video_project(VideoProject* vid_proj, VideoState state) {
+    if (vid_proj->is_current()) {
+        vid_proj->state = state;
+        emit marked_video_state(vid_proj, state);
+    } else {
+        std::vector<VideoItem*> v_items;
+        QTreeWidgetItem* s_item = invisibleRootItem();
+        get_video_items(s_item, v_items);
+        for (auto vid_item : v_items) {
+            if (vid_item->get_video_project() == vid_proj) {
+                vid_item->get_video_project()->state = state;
+                setCurrentItem(vid_item);
+                return;
+            }
         }
     }
 }

@@ -558,6 +558,28 @@ void Overlay::delete_drawing(Shapes* shape) {
 }
 
 /**
+ * @brief Overlay::remove_frame
+ * Used when a frame is removed from a sequence.
+ * Updates the overlays map with the new frame numbers
+ * @param frame
+ */
+void Overlay::remove_frame(int frame) {
+    std::map<int, std::vector<Shapes*>> new_overlays;
+    bool found = false;
+    for (auto node : overlays) {
+        if (node.first == frame && !found) {
+            found = true;
+            node.second.clear();
+        } else if (found && node.first > frame) {
+            new_overlays[node.first-1] = node.second;
+        } else {
+            new_overlays[node.first] = node.second;
+        }
+    }
+    set_overlays(new_overlays);
+}
+
+/**
  * @brief Overlay::read
  * @param json
  * Reads the overlay from a Json object.
