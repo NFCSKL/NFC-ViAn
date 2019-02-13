@@ -18,3 +18,8 @@ Shapes* FrameItem::get_shape() {
 int FrameItem::get_frame() {
     return m_frame;
 }
+
+void FrameItem::set_frame(int frame) {
+    m_frame = frame;
+    setText(0, QString::number(frame));
+}

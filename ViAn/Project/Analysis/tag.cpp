@@ -60,9 +60,7 @@ void Tag::update_color_correction(int frame, int b_value, double c_value, double
  */
 void Tag::update_color_whole_tag(int b, double c, double g) {
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
-        (*it).second->m_state->brightness = b;
-        (*it).second->m_state->contrast = c;
-        (*it).second->m_state->gamma = g;
+        (*it).second->update_color_correction(b, c, g);
     }
 }
 
@@ -77,7 +75,7 @@ void Tag::update_index_tag() {
     int index = 0;
     for (auto it = tag_map.begin(); it != tag_map.end(); ++it) {
         if (it->first != index) {
-            it->second->m_state->frame = index;
+            it->second->set_frame(index);
             temp_map[index] = it->second;
         } else {
             temp_map[index] = it->second;

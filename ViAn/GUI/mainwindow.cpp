@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(project_wgt, &ProjectWidget::save_draw_wgt, drawing_wgt, &DrawingWidget::save_item_data);
     connect(video_wgt, &VideoWidget::delete_sc_activated, drawing_wgt, &DrawingWidget::delete_item);
+    connect(project_wgt, &ProjectWidget::remove_frame, drawing_wgt, &DrawingWidget::remove_item_frame);
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();

@@ -43,6 +43,7 @@ public:
     void update_text(QString, Shapes*shape);
     void clear(int frame_nr);
     void delete_drawing(Shapes *shape);
+    void remove_frame(int frame);
     void clear_overlay();
 
     void read(const QJsonObject& json);
