@@ -277,7 +277,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::new_slider_max, video_wgt, &VideoWidget::set_slider_max);
 
     // Open the recent project dialog
-    QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
+    rp_dialog->exec();
+    //QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
 }
 
 /**

@@ -160,5 +160,6 @@
         <file>Icons/zoom_in.png</file>
         <file>Icons/zoom_out.png</file>
         <file>Icons/loop.png</file>
+        <file>Splashscreen.png</file>
     </qresource>
 </RCC>
