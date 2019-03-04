@@ -36,7 +36,7 @@ void DrawingToolbar::create_actions() {
     color_tool_act = new QAction(QIcon(":/Icons/color.png"), tr("Color picker"), this);
     delete_tool_act = new QAction(QIcon(":/Icons/clear.png"), tr("Delete current drawing"), this);
 
-    zoom_tool_act->setShortcut(QKeySequence(Qt::Key_V));
+    zoom_tool_act->setShortcut(QKeySequence(Qt::Key_A));
     edit_tool_act->setShortcut(QKeySequence(Qt::Key_E));
 
     tools = new QActionGroup(this);

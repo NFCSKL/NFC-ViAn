@@ -50,6 +50,8 @@ class FrameWidget : public QWidget
     int current_frame_nr = 0;
     double m_scale_factor = 1;
     int m_rotation = 0;
+    bool m_flip_h = false;
+    bool m_flip_v = false;
 
     std::pair<double, double> panning_tracker {}; // Track when to actually pan. Based on current zoom level
 
@@ -100,6 +102,7 @@ public slots:
     void set_anchor(QPoint);
     void set_scale_factor(double scale_factor);
     void set_rotation(int rotation);
+    void set_flip(bool flip_h, bool flip_v);
     void update();
     void copy_to_clipboard();
 protected:
@@ -121,12 +124,13 @@ private:
     void set_rect_start(QPoint pos);
     void set_analysis_settings();
     void panning(QPoint pos);
-    QPoint rotate(QPoint pos, int rotation, bool swap);
+    QPoint rotate(QPoint pos, int rotation);
+    QPoint flip_point(QPoint pos);
     QPoint rect_update(QPoint pos);
     void end_panning();
     void end_zoom();
     QPoint scale_to_video(QPoint pos);
-    QPoint scale_to_view(QPoint pos, bool rotate = true);
+    QPoint scale_to_view(QPoint pos);
 };
 
 #endif // FRAMEWIDGET_H

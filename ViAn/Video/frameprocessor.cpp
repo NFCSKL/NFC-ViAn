@@ -165,6 +165,16 @@ void FrameProcessor::process_frame() {
     }
     m_z_settings->frame_size = QSize(m_frame.cols, m_frame.rows);
 
+    int flip = 5;       // 5 = no flip
+    if (m_flip_state_h && m_flip_state_v) {
+        flip = -1;
+    } else if (m_flip_state_h) {
+        flip = 0;
+    } else if (m_flip_state_v) {
+        flip = 1;
+    }
+    if (flip != 5) cv::flip(manipulated_frame, manipulated_frame, flip);
+
     // Rotates the frame, according to the choosen direction.
     // TODO: Computation heavy.. Will cause lag on larger images.
     // Should ideally be applied after zoom
@@ -246,6 +256,8 @@ void FrameProcessor::load_zoomer_state() {
     } else if (m_z_settings->rotation == Constants::DEGREE_270) {
         m_rotate_direction = ROTATE_270;
     }
+    m_flip_state_h = m_z_settings->flip_state_h;
+    m_flip_state_v = m_z_settings->flip_state_v;
     has_new_zoom_state = true;
 }
 
@@ -258,9 +270,10 @@ void FrameProcessor::emit_zoom_data() {
     m_z_settings->zoom_factor = m_zoomer.get_scale_factor();
     m_z_settings->anchor = m_zoomer.get_anchor();
 
-    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle());
+    emit set_zoom_state(m_zoomer.get_center(), m_zoomer.get_scale_factor(), m_zoomer.get_angle(), m_flip_state_h, m_flip_state_v);
     emit set_anchor(m_zoomer.get_anchor());
     emit set_scale_factor(m_zoomer.get_scale_factor());
+    emit set_flip(m_flip_state_h, m_flip_state_v);
     emit set_rotation(m_zoomer.get_angle());
     emit set_bri_cont(m_manipulator.get_brightness(), m_manipulator.get_contrast(), m_manipulator.get_gamma());
 }
@@ -334,6 +347,7 @@ void FrameProcessor::update_manipulator_settings() {
     }
     update_rotation(rotate_direction);
     m_man_settings->rotate = 0;
+    update_flip();
 }
 
 /**
@@ -410,6 +424,30 @@ void FrameProcessor::update_rotation(const int& direction) {
     }
 }
 
+void FrameProcessor::update_flip() {
+    if (m_man_settings->do_flip_h) {
+        m_man_settings->do_flip_h = false;
+        if (m_zoomer.get_angle() == Constants::DEGREE_90 || m_zoomer.get_angle() == Constants::DEGREE_270) {
+            m_flip_state_v = !m_flip_state_v;
+            //m_zoomer.update_flip_state(false, true);
+        } else {
+            m_flip_state_h = !m_flip_state_h;
+        }
+        m_zoomer.update_flip_state(true, false);
+    }
+
+    if (m_man_settings->do_flip_v) {
+        m_man_settings->do_flip_v = false;
+        if (m_zoomer.get_angle() == Constants::DEGREE_90 || m_zoomer.get_angle() == Constants::DEGREE_270) {
+            m_flip_state_h = !m_flip_state_h;
+            //m_zoomer.update_flip_state(true, false);
+        } else {
+            m_flip_state_v = !m_flip_state_v;
+        }
+        m_zoomer.update_flip_state(false, true);
+    }
+}
+
 /**
  * @brief FrameProcessor::reset_settings
  * Resets the processing settings.
@@ -419,6 +457,8 @@ void FrameProcessor::update_rotation(const int& direction) {
 void FrameProcessor::reset_settings() {
     m_new_frame_video->store(false);
     m_rotate_direction = ROTATE_NONE;
+    m_flip_state_h = false;
+    m_flip_state_v = false;
 
     // Reset manipulator values
     m_manipulator.reset();
