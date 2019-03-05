@@ -205,7 +205,6 @@ void FrameWidget::set_anchor(QPoint p) {
     if (m_vid_proj) {
         m_vid_proj->get_video()->state.anchor = p;
     }
-    qDebug() << "Anchor: " << anchor;
 }
 
 void FrameWidget::set_scale_factor(double scale_factor) {
@@ -223,16 +222,8 @@ void FrameWidget::set_scale_factor(double scale_factor) {
  * @param rotation
  */
 void FrameWidget::set_rotation(int rotation) {
-    int width = m_org_image.cols;
-    int height = m_org_image.rows;
-    if (m_rotation == Constants::DEGREE_90 || m_rotation == Constants::DEGREE_270) {
-        std::swap(width, height);
-    }
     int diff_rotation = rotation - m_rotation;
     if (diff_rotation < Constants::DEGREE_MIN) diff_rotation += Constants::DEGREE_MAX;
-    //rect_start = Utility::rotate(rect_start, diff_rotation, width, height);
-    //rect_end = Utility::rotate(rect_end, diff_rotation, width, height);
-
     m_rotation = rotation;
 
     if (m_vid_proj) {
@@ -243,22 +234,8 @@ void FrameWidget::set_rotation(int rotation) {
 
 void FrameWidget::set_flip(bool flip_h, bool flip_v) {
     // flip_h & flip_v ---- current flip state
-    int width = m_org_image.cols;
-    int height = m_org_image.rows;
-
     m_flip_h = flip_h;
     m_flip_v = flip_v;
-
-//    if (m_flip_h != flip_h) {
-//        m_flip_h = flip_h;
-//        //rect_start = Utility::flip(rect_start, true, false, width, height);
-//        //rect_end = Utility::flip(rect_end, true, false, width, height);
-//    }
-//    if (m_flip_v != flip_v) {
-//        m_flip_v = flip_v;
-//        //rect_start = Utility::flip(rect_start, false, true, width, height);
-//        //rect_end = Utility::flip(rect_end, false, true, width, height);
-//    }
     if (m_vid_proj) {
         m_vid_proj->get_video()->state.flip_h = flip_h;
         m_vid_proj->get_video()->state.flip_v = flip_v;
@@ -473,15 +450,8 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
  * @return
  */
 QPoint FrameWidget::scale_to_video(QPoint pos) {
-    int width = m_org_image.cols;
-    int height = m_org_image.rows;
-
     QPoint scaled_pos = pos;
     scaled_pos = anchor + scaled_pos/m_scale_factor;
-    //scaled_pos = Utility::rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation, width, height);
-    //scaled_pos = Utility::flip(scaled_pos, m_flip_h, m_flip_v, width, height);
-
-
     scaled_pos = rotate(scaled_pos, Constants::DEGREE_MAX-m_rotation);
     return scaled_pos;
 }

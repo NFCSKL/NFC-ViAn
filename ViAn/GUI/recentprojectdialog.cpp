@@ -41,7 +41,7 @@ RecentProjectDialog::RecentProjectDialog(QWidget* parent) : QDialog(parent) {
     open_btn->setToolTip(tr("Open selected project"));
     remove_btn = new QPushButton(tr("Remove"));
     remove_btn->setToolTip("Remove selected project");
-    exit_btn = new QPushButton(tr("Exit"));
+    exit_btn = new QPushButton(tr("Exit Vian"));
     exit_btn->setToolTip("Exit Vian");
     v_btn_layout->addWidget(new_btn);                           // Second row second col first row
     v_btn_layout->addWidget(browse_btn);                          // Second row second col second row
