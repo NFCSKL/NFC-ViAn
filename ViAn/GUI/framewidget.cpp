@@ -706,9 +706,7 @@ void FrameWidget::set_analysis_settings() {
         AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
         settings->quick_analysis = true;
 
-        QPoint scaled_start = rotate(scale_to_video(ana_rect_start), Constants::DEGREE_MAX-m_rotation);
-        QPoint scaled_end = rotate(scale_to_video(ana_rect_end), Constants::DEGREE_MAX-m_rotation);
-        QRect scaled_rect(scaled_start, scaled_end);
+        QRect scaled_rect(scale_to_video(ana_rect_start), scale_to_video(ana_rect_end));
         settings->set_bounding_box(Utility::from_qrect(scaled_rect));
 
         emit quick_analysis(settings);
@@ -768,7 +766,6 @@ QPoint FrameWidget::rotate(QPoint pos, int rotation) {
 
     QPoint new_pos = pos;
     if (rotation == Constants::DEGREE_90 || rotation == Constants::DEGREE_270) {
-        //std::swap(width, height);
         new_pos = Utility::rotate(new_pos, rotation, height, width);
     } else {
         new_pos = Utility::rotate(new_pos, rotation, width, height);
