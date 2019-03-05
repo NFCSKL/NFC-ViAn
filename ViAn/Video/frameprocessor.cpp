@@ -199,13 +199,21 @@ void FrameProcessor::process_frame() {
     int height = m_height->load();
 
     // Draws the text drawings on the overlay
-    m_overlay->draw_overlay(manipulated_frame, frame_num, Utility::from_qpoint(m_z_settings->anchor), m_z_settings->zoom_factor, m_zoomer.get_angle(), width, height);
+    m_overlay->draw_overlay(manipulated_frame, frame_num,
+                            Utility::from_qpoint(m_z_settings->anchor),
+                            m_z_settings->zoom_factor, m_zoomer.get_angle(),
+                            m_flip_state_h, m_flip_state_v,
+                            width, height);
 
     // Apply zoom
     m_zoomer.scale_frame(manipulated_frame);
 
     // Draws the other drawings on the overlay
-    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num, Utility::from_qpoint(m_zoomer.get_anchor()), m_zoomer.get_scale_factor(), m_zoomer.get_angle(), width, height);
+    m_overlay->draw_overlay_scaled(manipulated_frame, frame_num,
+                                   Utility::from_qpoint(m_zoomer.get_anchor()),
+                                   m_zoomer.get_scale_factor(), m_zoomer.get_angle(),
+                                   m_flip_state_h, m_flip_state_v,
+                                   width, height);
 
     // Applies brightness and contrast
     m_manipulator.apply(manipulated_frame);

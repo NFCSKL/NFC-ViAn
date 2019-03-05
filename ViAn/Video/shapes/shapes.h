@@ -23,7 +23,10 @@ public:
     void update_drawing_sym(int dx, int dy);
     virtual void move_shape(QPoint p);
     virtual void handle_new_pos(QPoint pos) = 0;
-    virtual cv::Mat draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) = 0;
+    virtual cv::Mat draw_scaled(cv::Mat &frame, cv::Point anchor,
+                                double scale_factor, int angle,
+                                bool flip_h, bool flip_v,
+                                int width, int height) = 0;
 
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;
