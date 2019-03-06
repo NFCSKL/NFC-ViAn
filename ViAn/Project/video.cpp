@@ -100,8 +100,8 @@ void VideoState::read(const QJsonObject& json) {
    y = json["center_y"].toInt();
    center = QPoint(x, y);
    rotation = json["rotation"].toInt();
-   flip_h = json["flip_h"].toInt();
-   flip_v = json["flip_v"].toInt();
+   flip_h = json["flip_h"].toBool();
+   flip_v = json["flip_v"].toBool();
    brightness = json["brightness"].toInt();
    contrast = json["contrast"].toDouble();
    gamma = json["gamma"].toDouble();
