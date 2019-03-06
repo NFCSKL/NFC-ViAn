@@ -69,6 +69,7 @@ private:
     QDockWidget* queue_dock;
     QDockWidget* ana_settings_dock;
     QDockWidget* manipulator_dock;
+    QDockWidget* videoedit_dock;
 
     VideoWidget* video_wgt;
     ProjectWidget* project_wgt;
@@ -89,6 +90,7 @@ private:
     QAction* toggle_manipulator_wgt;
     QAction* toggle_main_toolbar;
     QAction* toggle_drawing_toolbar;
+    QAction* toggle_videoedit_wgt;
 
     std::vector<VideoWidget*> video_widgets;
 

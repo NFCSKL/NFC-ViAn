@@ -91,7 +91,9 @@ SOURCES += main.cpp \
     GUI/viewpathitem.cpp \
     GUI/settingsdialog.cpp \
     constants.cpp \
-    GUI/sequencedialog.cpp
+    GUI/sequencedialog.cpp \
+    GUI/VideoEdit/videoeditwidget.cpp \
+    GUI/VideoEdit/videoeditlist.cpp
 
 #
 # TEST
@@ -173,7 +175,9 @@ HEADERS += reportgenerator.h\
     GUI/viewpathitem.h \
     GUI/settingsdialog.h \
     constants.h \
-    GUI/sequencedialog.h
+    GUI/sequencedialog.h \
+    GUI/VideoEdit/videoeditwidget.h \
+    GUI/VideoEdit/videoeditlist.h
 
 #
 # LIBRARY

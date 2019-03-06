@@ -8,6 +8,7 @@
 #include "GUI/Analysis/anasettingwidget.h"
 #include "GUI/Analysis/queuewidget.h"
 #include "GUI/Bookmark/bookmarkwidget.h"
+#include "GUI/VideoEdit/videoeditwidget.h"
 #include "GUI/drawingwidget.h"
 #include "GUI/frameexporterdialog.h"
 #include "GUI/manipulatorwidget.h"
@@ -39,6 +40,8 @@
 #include <QProgressDialog>
 #include <QThread>
 #include <QTimer>
+//#include <QTextEdit> - NIAP
+
 
 /**
  * @brief MainWindow::MainWindow
@@ -52,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     manipulator_dock = new QDockWidget(tr("Color correction settings"), this);
+    videoedit_dock = new QDockWidget(tr("Video Edit"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -59,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     manipulator_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    videoedit_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_drawing_wgt = drawing_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
@@ -66,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
     toggle_zoom_preview_wgt = zoom_preview_dock->toggleViewAction();
     toggle_manipulator_wgt = manipulator_dock->toggleViewAction();
+    toggle_videoedit_wgt = videoedit_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -157,6 +163,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
     connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag_color);
+
+    // Initialize videoedit widget
+    VideoEditWidget *videoedit_wgt = new VideoEditWidget;
+//    VideoEditList *videoedit_wgt = new VideoEditList;
+    videoedit_dock->setWidget(videoedit_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
+
 
     // Main toolbar
     main_toolbar = new MainToolbar();
@@ -443,6 +456,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_queue_wgt);
     view_menu->addAction(toggle_ana_settings_wgt);
     view_menu->addAction(toggle_manipulator_wgt);
+    view_menu->addAction(toggle_videoedit_wgt);
     view_menu->addSeparator();
     view_menu->addAction(toggle_main_toolbar);
     view_menu->addAction(toggle_drawing_toolbar);
@@ -454,6 +468,7 @@ void MainWindow::init_view_menu() {
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
     toggle_manipulator_wgt->setStatusTip(tr("Show/hide color correction widget"));
+    toggle_videoedit_wgt->setStatusTip(tr("Show/hide video edit widget"));
 }
 
 /**
