@@ -834,7 +834,8 @@ void VideoWidget::update_tag() {
     try {
         TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
         VideoState state = m_vid_proj->get_video()->state;
-        t_frame->get_original() = state;
+        t_frame->set_center(state.center);
+        t_frame->set_scale_rot(state.scale_factor, state.rotation, state.flip_h, state.flip_v);
         t_frame->update_color_correction(m_settings.brightness, m_settings.contrast,
                                          m_settings.gamma);
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
