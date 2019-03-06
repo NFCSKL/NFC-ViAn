@@ -7,7 +7,7 @@ IntervalAreaItem::IntervalAreaItem(int start, int end) : TreeItem(INTERVAL_AREA_
     m_end = end;
     QString name = QString::number(m_start) + " - " + QString::number(m_end);
     setText(0, name);
-    setFlags(flags() & ~Qt::ItemIsEditable);
+    setFlags(flags() & ~Qt::ItemIsEditable | Qt::ItemIsDragEnabled);
 }
 
 int IntervalAreaItem::get_start() {

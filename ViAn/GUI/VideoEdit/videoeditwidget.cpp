@@ -23,6 +23,4 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
     setLayout(layout);
 
     connect(generate_video_btn, &QPushButton::clicked, videoedit_list, &VideoEditList::generate_video);
-
-
 }

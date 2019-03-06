@@ -40,7 +40,6 @@
 #include <QProgressDialog>
 #include <QThread>
 #include <QTimer>
-//#include <QTextEdit> - NIAP
 
 
 /**

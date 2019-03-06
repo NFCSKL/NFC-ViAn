@@ -13,6 +13,7 @@ VideoEditList::VideoEditList()
 //        QListWidgetItem *item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(i));
 //        //item->setSizeHint(QSize(100,100));
 //        addItem(item);
+
 //    }
     QString iconpath = "E:\\still1.jpg";
     QListWidgetItem *item = new QListWidgetItem(QIcon(iconpath),QString("Item %1").arg(1));
@@ -62,8 +63,6 @@ void VideoEditList::context_menu(const QPoint &point)
         delete menu;
 
     }
-
-
 }
 
 
