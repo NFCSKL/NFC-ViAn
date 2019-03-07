@@ -1338,6 +1338,7 @@ void VideoWidget::capture_failed() {
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
     m_vid_proj->get_video()->set_size(video_width, video_height);
+    m_vid_proj->get_video()->set_last_frame(last_frame);
     m_frame_rate = frame_rate;
     m_frame_length = last_frame + 1;
     current_frame_size = QSize(video_width, video_height);

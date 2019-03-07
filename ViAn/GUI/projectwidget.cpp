@@ -1098,7 +1098,6 @@ void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
 void ProjectWidget::context_menu(const QPoint &point) {
     if (m_proj == nullptr) return;
     QMenu menu(this);
-
     const int item_count = selectedItems().count();
     if (item_count == 0) {
         // Clicked on root tree
@@ -1110,7 +1109,9 @@ void ProjectWidget::context_menu(const QPoint &point) {
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
         case INTERVAL_AREA_ITEM:
+            menu.addAction("Add to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            //menu.addAction("Add to video edit", this, &ProjectWidget::add_to_video_edit);
             break;
         case INTERVAL_ITEM:
         case TAG_ITEM:
@@ -1212,6 +1213,25 @@ void ProjectWidget::drawing_tag() {
     }
     // Add tag to tree
     add_tag(vid_proj, tag);
+}
+
+void ProjectWidget::add_to_video_edit(QTreeWidgetItem* item) {
+    QString path = "";
+    int last_frame = 0;
+    int start, end;
+    if (item->type() == INTERVAL_AREA_ITEM) {
+        IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
+        VideoItem* v_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        path = v_item->get_video_project()->get_video()->file_path;
+        qDebug() << "Video" << path;
+        start = ia_item->get_start();
+        end = ia_item->get_end();
+        last_frame = v_item->get_video_project()->get_video()->get_last_frame();
+    } else {
+        return;
+    }
+    emit interval_to_edit(path, start, end, last_frame);
+
 }
 
 /**

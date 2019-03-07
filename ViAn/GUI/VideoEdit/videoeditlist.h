@@ -19,11 +19,13 @@ private:
 
 private slots:
     void context_menu(const QPoint& point);
+    void edit_item(QListWidgetItem *item);
     void remove_item();
     void toggle_viewlayout();
     void show_video();
 public slots:
     void generate_video();
+    void add_interval(QString path, int start, int end, int last_frame);
 protected:
 //    void mousePressEvent(QMouseEvent* event) override;
 

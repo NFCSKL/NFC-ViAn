@@ -19,6 +19,7 @@ public:
     explicit VideoEditWidget(QWidget *parent = nullptr);
 
 signals:
+    void interval_to_edit(QString, int, int, int);
 
 public slots:
 };

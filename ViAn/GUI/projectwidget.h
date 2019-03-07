@@ -125,6 +125,7 @@ private slots:
     void remove_item();
     void rename_item();
     void drawing_tag();
+    void add_to_video_edit(QTreeWidgetItem* item);
     void update_settings();
     void create_folder_item();
     void tree_item_changed(QTreeWidgetItem *item, QTreeWidgetItem *prev_item = nullptr);
@@ -160,6 +161,7 @@ signals:
     void save_bmark_wgt();
     void clear_analysis();
     void abort_all_analysis();
+    void interval_to_edit(QString path, int start, int end, int last_frame);
 };
 
 #endif // PROJECTWIDGET_H
