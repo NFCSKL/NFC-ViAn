@@ -161,7 +161,7 @@ signals:
     void save_bmark_wgt();
     void clear_analysis();
     void abort_all_analysis();
-    void interval_to_edit(QString path, int start, int end, int last_frame);
+    void interval_to_edit(int start, int end, VideoProject* vid_proj);
 };
 
 #endif // PROJECTWIDGET_H

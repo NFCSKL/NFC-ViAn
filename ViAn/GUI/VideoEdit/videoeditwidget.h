@@ -7,6 +7,7 @@
 
 class QScrollArea;
 class QVBoxLayout;
+class VideoProject;
 
 class VideoEditWidget : public QWidget
 {
@@ -19,7 +20,7 @@ public:
     explicit VideoEditWidget(QWidget *parent = nullptr);
 
 signals:
-    void interval_to_edit(QString, int, int, int);
+    void interval_to_edit(int, int, VideoProject*);
 
 public slots:
 };

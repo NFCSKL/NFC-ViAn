@@ -1,5 +1,7 @@
 #include "videoeditwidget.h"
 
+#include "Project/videoproject.h"
+
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QScrollArea>

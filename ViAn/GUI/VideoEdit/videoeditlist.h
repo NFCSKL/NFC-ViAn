@@ -2,8 +2,8 @@
 #define VIDEOEDITLIST_H
 
 #include <QListWidget>
-#include <QMouseEvent>
 
+class VideoProject;
 class VideoEditList : public QListWidget {
     Q_OBJECT
 
@@ -25,7 +25,7 @@ private slots:
     void show_video();
 public slots:
     void generate_video();
-    void add_interval(QString path, int start, int end, int last_frame);
+    void add_interval(int start, int end, VideoProject *vid_proj);
 protected:
 //    void mousePressEvent(QMouseEvent* event) override;
 

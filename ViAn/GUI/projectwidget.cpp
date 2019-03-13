@@ -1216,21 +1216,18 @@ void ProjectWidget::drawing_tag() {
 }
 
 void ProjectWidget::add_to_video_edit(QTreeWidgetItem* item) {
-    QString path = "";
-    int last_frame = 0;
     int start, end;
+    VideoProject* vid_proj = nullptr;
     if (item->type() == INTERVAL_AREA_ITEM) {
         IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
         VideoItem* v_item = dynamic_cast<VideoItem*>(item->parent()->parent());
-        path = v_item->get_video_project()->get_video()->file_path;
-        qDebug() << "Video" << path;
         start = ia_item->get_start();
         end = ia_item->get_end();
-        last_frame = v_item->get_video_project()->get_video()->get_last_frame();
+        vid_proj = v_item->get_video_project();
     } else {
         return;
     }
-    emit interval_to_edit(path, start, end, last_frame);
+    emit interval_to_edit(start, end, vid_proj);
 
 }
 
