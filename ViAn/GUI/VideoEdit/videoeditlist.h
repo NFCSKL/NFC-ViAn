@@ -27,8 +27,6 @@ private slots:
 public slots:
     void generate_video();
     void add_interval(int start, int end, VideoProject *vid_proj);
-protected:
-//    void mousePressEvent(QMouseEvent* event) override;
 
 };
 

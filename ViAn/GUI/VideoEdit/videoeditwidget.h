@@ -23,6 +23,7 @@ signals:
     void interval_to_edit(int, int, VideoProject*);
 
 public slots:
+    void clear_intervals();
 };
 
 #endif // VIDEOEDITWIDGET_H
