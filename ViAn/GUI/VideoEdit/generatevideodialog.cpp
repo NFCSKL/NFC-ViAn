@@ -1,6 +1,7 @@
 #include "generatevideodialog.h"
 
 #include <QBoxLayout>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -36,6 +37,12 @@ GenerateVideoDialog::GenerateVideoDialog(std::vector<QSize> sizes, std::vector<i
     QFormLayout* resolution_layout = new QFormLayout;
     resolution_layout->addRow("Resolution: ", resolution);
 
+    // Keep size option
+    keep_size_box = new QCheckBox;
+    connect(keep_size_box, &QCheckBox::stateChanged, this, &GenerateVideoDialog::keep_size_toggled);
+    QFormLayout* keep_size_layout = new QFormLayout;
+    keep_size_layout->addRow("Keep all sizes ", keep_size_box);
+
     // Frame rate line
     frame_rate = new QComboBox;
     for (int fps : fpses) {
@@ -48,6 +55,7 @@ GenerateVideoDialog::GenerateVideoDialog(std::vector<QSize> sizes, std::vector<i
     // Add all to the layout
     vertical_layout->addLayout(video_name_layout);
     vertical_layout->addLayout(resolution_layout);
+    vertical_layout->addLayout(keep_size_layout);
     vertical_layout->addLayout(frame_rate_layout);
     vertical_layout->addWidget(btn_box);
 
@@ -62,10 +70,15 @@ GenerateVideoDialog::~GenerateVideoDialog() {
     delete btn_box;
 }
 
-void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps) {
+void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps, bool* keep_size) {
     *name = name_edit->text();
     *size = resolution->currentData().toSize();
     *fps = frame_rate->currentData().toInt();
+    *keep_size = keep_size_box->checkState();
+}
+
+void GenerateVideoDialog::keep_size_toggled(int state) {
+    resolution->setDisabled(state);
 }
 
 /**

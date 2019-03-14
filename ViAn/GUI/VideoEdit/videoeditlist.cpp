@@ -168,35 +168,27 @@ void VideoEditList::generate_video() {
         sizes.push_back(QSize(max_width, max_height));
     }
 
-    // Maybe add some default sizes???
-
     // Add the sizes to the dialog and ask the user to choose one to resize to.
     GenerateVideoDialog dialog(sizes, fpses, this);
     int res = dialog.exec();
     QString name;
     QSize size;
     int fps;
-    dialog.get_values(&name, &size, &fps);
+    bool keep_size;
+    dialog.get_values(&name, &size, &fps, &keep_size);
 
-    if (res == dialog.Rejected) {
-        qDebug() << "Rejected";
-        return;
-    } else {
-        qDebug() << "Accepted";
-    }
-
+    if (res == dialog.Rejected) return;
     if (name.isEmpty()) name = "video";
+    if (keep_size) size = QSize(max_width, max_height);
 
     cv::Mat frame;
     cv::VideoWriter vw;
     int fourCC = CV_FOURCC('M', 'J', 'P', 'G');
     cv::Size cv_size(size.width(), size.height());
-    vw.open(name.toStdString() + ".avi", fourCC, fps, cv_size);
+    vw.open(name.toStdString() + ".mkv", fourCC, fps, cv_size);
     if (!vw.isOpened()) {
-        qDebug() << "vw not opened";
+        qWarning() << "vw not opened";
         return;
-    } else {
-        qDebug() << "ok";
     }
     // Loop over all items
     for (int i = 0; i < count(); ++i) {
@@ -207,34 +199,27 @@ void VideoEditList::generate_video() {
         int width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
         int height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-        // Wrong when width > height but height > size height
-        bool width_bigger = (width >= height);
-
-        // Should instead of if width > height be something like which one is closer
-        if (height == 1004) width_bigger = false;
-
-
-        int max_dim = (width_bigger) ? width : height;
-        float scale = (width_bigger) ? static_cast<float>(size.width()) / max_dim
+        bool width_matter = (width - size.width() >= height - size.height());
+        int max_dim = (width_matter) ? width : height;
+        float scale = (width_matter) ? static_cast<float>(size.width()) / max_dim
                                      : static_cast<float>(size.height()) / max_dim;
 
-
-
         // Iterate over the interval
-        //while (true) {
         while (capture.get(CV_CAP_PROP_POS_FRAMES) <= ve_item->get_end()) {
             qDebug() << "nr" << capture.get(CV_CAP_PROP_POS_FRAMES);
-            if (!capture.read(frame)) {
-                break;
-            }
+            if (!capture.read(frame)) break;
 
             cv::Mat resized = cv::Mat::zeros(cv_size, frame.type());
-            qDebug() << "resized size" << resized.cols << resized .rows;
 
             int f_width = frame.cols, f_height = frame.rows;
-
             cv::Rect roi;
-            if (width_bigger) {
+
+            if (keep_size) {
+                roi.width = f_width;
+                roi.height = f_height;
+                roi.x = (size.width() - roi.width) / 2;
+                roi.y = (size.height() - roi.height) / 2;
+            } else if (width_matter) {
                 roi.width = size.width();
                 roi.x = 0;
                 roi.height = f_height * scale;
@@ -245,20 +230,12 @@ void VideoEditList::generate_video() {
                 roi.width = f_width * scale;
                 roi.x = (size.width() - roi.width) / 2;
             }
-
-            qDebug() << "roi size" << roi.width << roi.height;
-
-            qDebug() << "before resize";
-            // Resize
-
             cv::resize(frame, resized(roi), roi.size());
-            qDebug() << "after resize";
 
             vw.write(resized);
         }
         capture.release();
     }
-    qDebug() << "frames" << vw.get(CV_CAP_PROP_FRAME_COUNT);
     vw.release();
 
 
