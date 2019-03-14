@@ -20,7 +20,7 @@ private:
 private slots:
     void context_menu(const QPoint& point);
     void edit_item(QListWidgetItem *item);
-    void remove_item();
+    void remove_item(QListWidgetItem* item);
     void toggle_viewlayout();
     void show_video();
 public slots:

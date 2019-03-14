@@ -2,6 +2,7 @@
 
 #include "editdialog.h"
 #include "generatevideodialog.h"
+#include "utility.h"
 #include "videoedititem.h"
 
 #include "opencv2/highgui/highgui.hpp"
@@ -60,8 +61,8 @@ void VideoEditList::context_menu(const QPoint &point) {
  */
 void VideoEditList::item_right_clicked(const QPoint pos) {
     QMenu* menu = new QMenu;
-    menu->addAction("Remove", this, &VideoEditList::remove_item);
     menu->addAction("Edit interval", this, [this, pos] { edit_item(itemAt(pos)); });
+    menu->addAction("Remove", this, [this, pos] { remove_item(itemAt(pos)); });
     menu->addSeparator();
     menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
     menu->addAction("Show video", this, &VideoEditList::show_video);
@@ -86,10 +87,8 @@ void VideoEditList::edit_item(QListWidgetItem* item) {
  * @brief VideoEditList::remove_item
  * Removes the clicked list item
  */
-void VideoEditList::remove_item() {
-    QMessageBox msgBox;
-    msgBox.setText("remove_item");
-    msgBox.exec();
+void VideoEditList::remove_item(QListWidgetItem* item) {
+    delete item;
 }
 
 
@@ -180,6 +179,7 @@ void VideoEditList::generate_video() {
     if (res == dialog.Rejected) return;
     if (name.isEmpty()) name = "video";
     if (keep_size) size = QSize(max_width, max_height);
+    name = Utility::add_serial_number(name, "");
 
     cv::Mat frame;
     cv::VideoWriter vw;
@@ -212,8 +212,8 @@ void VideoEditList::generate_video() {
             cv::Mat resized = cv::Mat::zeros(cv_size, frame.type());
 
             int f_width = frame.cols, f_height = frame.rows;
-            cv::Rect roi;
 
+            cv::Rect roi;
             if (keep_size) {
                 roi.width = f_width;
                 roi.height = f_height;
@@ -237,17 +237,4 @@ void VideoEditList::generate_video() {
         capture.release();
     }
     vw.release();
-
-
-
-    QString str;
-
-    for(int i = 0; i < count(); ++i) {
-        QString tmp = item(i)->text();
-        str = str + "\n" + tmp;
-    }
-    QMessageBox msgBox;
-    msgBox.setText(str);
-    msgBox.exec();
-
 }
