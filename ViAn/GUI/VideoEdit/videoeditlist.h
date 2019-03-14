@@ -8,6 +8,7 @@ class VideoEditList : public QListWidget {
     Q_OBJECT
 
     QListWidgetItem* clicked_item = nullptr;
+    QString m_proj_path = "";
 
 public:
     VideoEditList();

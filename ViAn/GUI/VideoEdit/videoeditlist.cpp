@@ -1,9 +1,11 @@
 #include "videoeditlist.h"
 
+#include "constants.h"
 #include "editdialog.h"
 #include "generatevideodialog.h"
 #include "utility.h"
 #include "videoedititem.h"
+#include "Project/videoproject.h"
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -29,6 +31,7 @@ VideoEditList::VideoEditList()
 
 void VideoEditList::add_interval(int start, int end, VideoProject* vid_proj) {
     VideoEditItem* ve_item = new VideoEditItem(start, end, vid_proj, this);
+    m_proj_path = vid_proj->get_proj_path();
     qDebug() << count();
     addItem(ve_item);
     qDebug() << count();
@@ -114,6 +117,7 @@ void VideoEditList::toggle_viewlayout() {
  * Shows the video from the videoclip-items in list
  */
 void VideoEditList::show_video() {
+    qDebug() << m_proj_path;
     QString str;
 
     for(int i = 0; i < selectedItems().count(); ++i)
@@ -179,6 +183,11 @@ void VideoEditList::generate_video() {
     if (res == dialog.Rejected) return;
     if (name.isEmpty()) name = "video";
     if (keep_size) size = QSize(max_width, max_height);
+
+    QString video_folder_path = m_proj_path + Constants::GENERATED_VIDEO_FOLDER;
+    if (!QDir().mkpath(video_folder_path)) return;
+
+    name = video_folder_path + name;
     name = Utility::add_serial_number(name, "");
 
     cv::Mat frame;
