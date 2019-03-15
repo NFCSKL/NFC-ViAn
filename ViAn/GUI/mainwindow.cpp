@@ -803,7 +803,7 @@ void MainWindow::export_images() {
 
     connect(im_exp, &ImageExporter::finished_msg, this, &MainWindow::set_status_bar);
     connect(progress, &QProgressDialog::canceled, im_exp, &ImageExporter::abort);
-    connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
+    connect(im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
 
     QThread* exporter_thread = new QThread;
     im_exp->moveToThread(exporter_thread);

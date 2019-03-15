@@ -5,6 +5,7 @@
 #include "generatevideodialog.h"
 #include "utility.h"
 #include "videoedititem.h"
+#include "videogenerator.h"
 #include "Project/videoproject.h"
 
 #include "opencv2/highgui/highgui.hpp"
@@ -13,6 +14,8 @@
 
 #include <QMenu>
 #include <QMessageBox>
+#include <QProgressDialog>
+#include <QThread>
 #include <QDebug>
 
 #include <iostream>
@@ -140,38 +143,11 @@ void VideoEditList::generate_video() {
 
     std::vector<QSize> sizes;
     std::vector<int> fpses;
-    int max_width = 0, max_height = 0;
+    QSize max_size;
+    get_video_info(&sizes, &fpses, &max_size);
 
-    // Loop over all intervals and save the different sizes in a list
-    for (int j = 0; j < count(); ++j) {
-        VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item(j));
-        cv::VideoCapture video_cap;
-        video_cap.open(ve_item->get_path().toStdString());
-        if (!video_cap.isOpened()) return;
-        int width = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_WIDTH));
-        int height = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-        int fps = static_cast<int>(video_cap.get(CV_CAP_PROP_FPS));
-        QSize s(width, height);
-
-        if (std::find(sizes.begin(), sizes.end(), s) == sizes.end()) {
-            sizes.push_back(s);
-        }
-
-        if (std::find(fpses.begin(), fpses.end(), fps) == fpses.end()) {
-            fpses.push_back(fps);
-        }
-
-        max_width = std::max(width, max_width);
-        max_height = std::max(height, max_height);
-
-        video_cap.release();
-    }
-
-    if (std::find(sizes.begin(), sizes.end(), QSize(max_width, max_height)) == sizes.end()) {
-        sizes.push_back(QSize(max_width, max_height));
-    }
-
-    // Add the sizes to the dialog and ask the user to choose one to resize to.
+    // Add the sizes and frame rates to the dialog
+    // and ask the user to choose the wanted variables.
     GenerateVideoDialog dialog(sizes, fpses, this);
     int res = dialog.exec();
     QString name;
@@ -182,68 +158,78 @@ void VideoEditList::generate_video() {
 
     if (res == dialog.Rejected) return;
     if (name.isEmpty()) name = "video";
-    if (keep_size) size = QSize(max_width, max_height);
+    if (keep_size) size = max_size;
 
+    // Create the path from the genereated video
     QString video_folder_path = m_proj_path + Constants::GENERATED_VIDEO_FOLDER;
+    // Create the folder for the generated video
     if (!QDir().mkpath(video_folder_path)) return;
 
     name = video_folder_path + name;
-    name = Utility::add_serial_number(name, "");
+    name = Utility::add_serial_number(name, ".mkv");
 
-    cv::Mat frame;
-    cv::VideoWriter vw;
-    int fourCC = CV_FOURCC('M', 'J', 'P', 'G');
-    cv::Size cv_size(size.width(), size.height());
-    vw.open(name.toStdString() + ".mkv", fourCC, fps, cv_size);
-    if (!vw.isOpened()) {
-        qWarning() << "vw not opened";
-        return;
-    }
-    // Loop over all items
-    for (int i = 0; i < count(); ++i) {
-        VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item(i));
-        cv::VideoCapture capture(ve_item->get_path().toStdString());
-        if (!capture.isOpened()) continue;
-        capture.set(CV_CAP_PROP_POS_FRAMES, ve_item->get_start());
-        int width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
-        int height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    VideoGenerator* vid_gen = new VideoGenerator(this, name, size, fps, keep_size);
 
-        bool width_matter = (width - size.width() >= height - size.height());
-        int max_dim = (width_matter) ? width : height;
-        float scale = (width_matter) ? static_cast<float>(size.width()) / max_dim
-                                     : static_cast<float>(size.height()) / max_dim;
+    QProgressDialog* progress = new QProgressDialog(
+                "Generating video... 0/" + QString::number(count()), "Abort",
+                0, 0, this, Qt::WindowMinimizeButtonHint);
+    progress->setAutoClose(false);
 
-        // Iterate over the interval
-        while (capture.get(CV_CAP_PROP_POS_FRAMES) <= ve_item->get_end()) {
-            qDebug() << "nr" << capture.get(CV_CAP_PROP_POS_FRAMES);
-            if (!capture.read(frame)) break;
+    connect(progress, &QProgressDialog::canceled, vid_gen, &VideoGenerator::abort);
+    connect(vid_gen, &VideoGenerator::update_progress, progress, &QProgressDialog::setValue);
+    connect(vid_gen, &VideoGenerator::update_range, progress, &QProgressDialog::setRange);
+    connect(vid_gen, &VideoGenerator::update_text, progress, &QProgressDialog::setLabelText);
 
-            cv::Mat resized = cv::Mat::zeros(cv_size, frame.type());
+    QThread* gen_thread = new QThread;
+    vid_gen->moveToThread(gen_thread);
+    connect(gen_thread, &QThread::started, vid_gen, &VideoGenerator::generate_video);
+    connect(vid_gen, &VideoGenerator::finished, gen_thread, &QThread::quit);
+    connect(vid_gen, &VideoGenerator::finished, vid_gen, &VideoGenerator::deleteLater);
+    connect(vid_gen, &VideoGenerator::finished, progress, &QProgressDialog::close);
+    connect(gen_thread, &QThread::finished, gen_thread, &QThread::deleteLater);
+    progress->show();
+    gen_thread->start();
+}
 
-            int f_width = frame.cols, f_height = frame.rows;
+/**
+ * @brief VideoEditList::get_video_info
+ * @param sizes
+ * @param fpses
+ * @param max_size
+ * Iterate over the items in the list and save all the different
+ * resolutions and frame rates to lists
+ */
+void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* fpses, QSize* max_size) {
+    int max_width = 0, max_height = 0;
 
-            cv::Rect roi;
-            if (keep_size) {
-                roi.width = f_width;
-                roi.height = f_height;
-                roi.x = (size.width() - roi.width) / 2;
-                roi.y = (size.height() - roi.height) / 2;
-            } else if (width_matter) {
-                roi.width = size.width();
-                roi.x = 0;
-                roi.height = f_height * scale;
-                roi.y = (size.height() - roi.height) / 2;
-            } else {
-                roi.y = 0;
-                roi.height = size.height();
-                roi.width = f_width * scale;
-                roi.x = (size.width() - roi.width) / 2;
-            }
-            cv::resize(frame, resized(roi), roi.size());
-
-            vw.write(resized);
+    // Loop over all intervals and save the different sizes and frame rates in lists
+    for (int j = 0; j < count(); ++j) {
+        VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item(j));
+        cv::VideoCapture video_cap;
+        video_cap.open(ve_item->get_path().toStdString());
+        if (!video_cap.isOpened()) return;
+        int width = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_WIDTH));
+        int height = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+        int fps = static_cast<int>(video_cap.get(CV_CAP_PROP_FPS));
+        QSize s(width, height);
+        // Store video size
+        if (std::find(sizes->begin(), sizes->end(), s) == sizes->end()) {
+            sizes->push_back(s);
         }
-        capture.release();
+        // Store frame rate
+        if (std::find(fpses->begin(), fpses->end(), fps) == fpses->end()) {
+            fpses->push_back(fps);
+        }
+        // Store the greatest size among the videos
+        max_width = std::max(width, max_width);
+        max_height = std::max(height, max_height);
+
+        video_cap.release();
     }
-    vw.release();
+
+    *max_size =QSize(max_width, max_height);
+
+    if (std::find(sizes->begin(), sizes->end(), *max_size) == sizes->end()) {
+        sizes->push_back(*max_size);
+    }
 }

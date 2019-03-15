@@ -96,7 +96,8 @@ SOURCES += main.cpp \
     GUI/VideoEdit/videoeditlist.cpp \
     GUI/VideoEdit/videoedititem.cpp \
     GUI/VideoEdit/editdialog.cpp \
-    GUI/VideoEdit/generatevideodialog.cpp
+    GUI/VideoEdit/generatevideodialog.cpp \
+    GUI/VideoEdit/videogenerator.cpp
 
 #
 # TEST
@@ -183,7 +184,8 @@ HEADERS += reportgenerator.h\
     GUI/VideoEdit/videoeditlist.h \
     GUI/VideoEdit/videoedititem.h \
     GUI/VideoEdit/editdialog.h \
-    GUI/VideoEdit/generatevideodialog.h
+    GUI/VideoEdit/generatevideodialog.h \
+    GUI/VideoEdit/videogenerator.h
 
 #
 # LIBRARY

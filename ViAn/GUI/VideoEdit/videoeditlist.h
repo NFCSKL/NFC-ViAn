@@ -15,6 +15,7 @@ public:
 
 private:
     void item_right_clicked(const QPoint pos);
+    void get_video_info(std::vector<QSize>* sizes, std::vector<int>* fpses, QSize* max_size);
 
     bool horizontalLayout;
 
