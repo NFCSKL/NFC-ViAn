@@ -3,7 +3,7 @@
 #include "imagegenerator.h"
 #include "Project/videoproject.h"
 
-#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
@@ -30,6 +30,7 @@ void VideoEditItem::set_icon() {
     cv::VideoCapture cap(path);
     if (!cap.isOpened()) return;
     cv::Mat frame;
+    cap.set(CV_CAP_PROP_POS_FRAMES, m_start);
     cap >> frame;
     switch (frame.type()) {
     case CV_8UC1:
