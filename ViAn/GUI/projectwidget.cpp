@@ -167,6 +167,47 @@ void ProjectWidget::create_video(QString path) {
     video_list.push_back(video);
 }
 
+
+/**
+ * @brief ProjectWidget::generate_video
+ * @param path
+ * Add the video generated from the videoedit widget to the tree
+ * this video will be added in a folder called "Generated videos"
+ * this folder will be created if it does not already exist
+ */
+void ProjectWidget::generate_video(QString path) {
+    QString folder_name = "Generated videos";
+    FolderItem* folder_item = nullptr;
+    for(int i = 0; i < invisibleRootItem()->childCount(); ++i) {
+        QTreeWidgetItem* item = invisibleRootItem()->child(i);
+        if (item->type() == FOLDER_ITEM) {
+            if (item->text(0) == folder_name) {
+                folder_item = dynamic_cast<FolderItem*>(item);
+                break;
+            }
+        }
+    }
+    if (folder_item == nullptr) {
+        folder_item = new FolderItem();
+        folder_item->setText(0, folder_name);
+        addTopLevelItem(folder_item);
+    }
+
+    // Add the video to the tree
+    int index = path.lastIndexOf('/') + 1;
+    QString vid_name = path.right(path.length() - index);
+    Video* video = new Video(path);
+    VideoProject* vid_proj = new VideoProject(video);
+    m_proj->add_video_project(vid_proj);
+
+    VideoItem* vid_item = new VideoItem(vid_proj);
+    vid_item->setToolTip(0, vid_proj->get_video()->file_path);
+    folder_item->addChild(vid_item);
+    folder_item->setExpanded(true);
+    vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
+    video_list.push_back(video);
+}
+
 /**
  * @brief ProjectWidget::add_images
  * Slot function for adding image sequences

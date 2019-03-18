@@ -36,6 +36,7 @@ protected:
 
 signals:
     void set_video(VideoProject*, VideoState state);
+    void add_video(QString path);
 };
 
 #endif // VIDEOEDITLIST_H

@@ -187,6 +187,7 @@ void VideoEditList::generate_video() {
     connect(vid_gen, &VideoGenerator::finished, gen_thread, &QThread::quit);
     connect(vid_gen, &VideoGenerator::finished, vid_gen, &VideoGenerator::deleteLater);
     connect(vid_gen, &VideoGenerator::finished, progress, &QProgressDialog::close);
+    connect(vid_gen, &VideoGenerator::finished, this, [this, name] { add_video(name); });
     connect(gen_thread, &QThread::finished, gen_thread, &QThread::deleteLater);
     progress->show();
     gen_thread->start();
