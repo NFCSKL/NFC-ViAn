@@ -289,6 +289,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
     connect(project_wgt, &ProjectWidget::new_slider_max, video_wgt, &VideoWidget::set_slider_max);
     connect(project_wgt, &ProjectWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
+    connect(video_wgt, &VideoWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
@@ -564,6 +565,7 @@ void MainWindow::init_interval_menu() {
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
     QAction* tag_interval_act = new QAction(tr("&Tag interval"));
+    QAction* add_interval_act = new QAction(tr("&Add interval"));
     QAction* rm_interval_act = new QAction(tr("&Clear interval"), this);
     interval_act = new QAction(tr("&Interval"), this);
 
@@ -574,11 +576,13 @@ void MainWindow::init_interval_menu() {
     new_tag_act->setIcon(QIcon(":/Icons/tag_frame.png"));
     remove_tag_act->setIcon(QIcon(":/Icons/remove_frame.png"));
     tag_interval_act->setIcon(QIcon(":/Icons/create_interval.png"));
+    add_interval_act->setIcon(QIcon(":/Icons/add_interval.png"));
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
     remove_tag_act->setShortcut(Qt::Key_U);
     tag_interval_act->setShortcut(Qt::Key_K);
+    add_interval_act->setShortcut(Qt::Key_P);
     rm_interval_act->setShortcut(Qt::Key_J);
 
     new_label_act->setStatusTip(tr("Create new tag label"));
@@ -591,6 +595,7 @@ void MainWindow::init_interval_menu() {
     interval_menu->addAction(remove_tag_act);
     interval_menu->addSeparator();
     interval_menu->addAction(tag_interval_act);
+    interval_menu->addAction(add_interval_act);
     interval_menu->addAction(rm_interval_act);
     interval_menu->addSeparator();
     interval_menu->addAction(interval_act);
@@ -599,6 +604,7 @@ void MainWindow::init_interval_menu() {
     connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
     connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::create_interval_clicked);
+    connect(add_interval_act, &QAction::triggered, video_wgt, &VideoWidget::add_interval_clicked);
     connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);

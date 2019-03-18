@@ -251,6 +251,7 @@ void VideoWidget::set_btn_icons() {
     set_start_interval_btn = new QPushButton(QIcon(":/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon(":/Icons/end_interval.png"), "", this);
     create_interval_btn = new QPushButton(QIcon(":/Icons/create_interval.png"), "", this);
+    interval_to_edit_btn = new QPushButton(QIcon(":/Icons/add_interval.png"), "", this);
     loop_btn = new QPushButton(QIcon(":/Icons/loop.png"), "", this);
 
     interpolate_check = new QCheckBox("Interpolate", this);
@@ -293,6 +294,7 @@ void VideoWidget::set_btn_tool_tip() {
     set_start_interval_btn->setToolTip("Set left interval point: I");
     set_end_interval_btn->setToolTip("Set right interval point: O");
     create_interval_btn->setToolTip("Save the current marked interval: K");
+    interval_to_edit_btn->setToolTip(tr("Add the interval directly to the video edit widget: P"));
     loop_btn->setToolTip("Loop the marked interval");
 
     fit_btn->setToolTip(tr("Scale video to screen: Ctrl + F"));
@@ -320,6 +322,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(set_start_interval_btn);
     btns.push_back(set_end_interval_btn);
     btns.push_back(create_interval_btn);
+    btns.push_back(interval_to_edit_btn);
     btns.push_back(fit_btn);
     btns.push_back(original_size_btn);
     for (QPushButton* btn : btns) {
@@ -353,7 +356,8 @@ void VideoWidget::set_btn_tab_order() {
     setTabOrder(new_label_btn, set_start_interval_btn);
     setTabOrder(set_start_interval_btn, set_end_interval_btn);
     setTabOrder(set_end_interval_btn, create_interval_btn);
-    setTabOrder(create_interval_btn, loop_btn);
+    setTabOrder(create_interval_btn, interval_to_edit_btn);
+    setTabOrder(interval_to_edit_btn, loop_btn);
     setTabOrder(loop_btn, fit_btn);
     setTabOrder(fit_btn, original_size_btn);
     setTabOrder(original_size_btn, interpolate_check);
@@ -457,6 +461,7 @@ void VideoWidget::add_btns_to_layouts() {
     other_btns->addWidget(set_start_interval_btn);
     other_btns->addWidget(set_end_interval_btn);
     other_btns->addWidget(create_interval_btn);
+    other_btns->addWidget(interval_to_edit_btn);
     other_btns->addWidget(loop_btn);
 
     control_row->addLayout(other_btns);
@@ -512,6 +517,7 @@ void VideoWidget::connect_btns() {
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
     connect(create_interval_btn, &QPushButton::clicked, this, &VideoWidget::create_interval_clicked);
+    connect(interval_to_edit_btn, &QPushButton::clicked, this, &VideoWidget::add_interval_clicked);
     connect(loop_btn, &QPushButton::toggled, this, &VideoWidget::loop_interval_toggled);
 }
 
@@ -766,6 +772,17 @@ void VideoWidget::create_interval_clicked() {
     emit set_status_bar("Interval: " + QString::number(first) + " - " +
                         QString::number(second) + " added");
     playback_slider->update();
+}
+
+void VideoWidget::add_interval_clicked() {
+    if (!playback_slider->is_show_interval()) return;
+    int first = m_interval.first;
+    int second = m_interval.second;
+    if (first == -1 || second <= 0 || second < first) {
+        emit set_status_bar("Select an interval");
+        return;
+    }
+    emit interval_to_edit(first, second, m_vid_proj);
 }
 
 void VideoWidget::new_interval(QString name) {

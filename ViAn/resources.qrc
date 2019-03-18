@@ -160,5 +160,6 @@
         <file>Icons/zoom_in.png</file>
         <file>Icons/zoom_out.png</file>
         <file>Icons/loop.png</file>
+        <file>Icons/add_interval.png</file>
     </qresource>
 </RCC>
