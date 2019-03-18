@@ -63,6 +63,10 @@ QString VideoEditItem::get_path() {
     return m_path;
 }
 
+VideoProject* VideoEditItem::get_proj() {
+    return m_vid_proj;
+}
+
 void VideoEditItem::set_start(int new_start) {
     m_start = new_start;
     set_name();

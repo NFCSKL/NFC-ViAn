@@ -164,7 +164,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize videoedit widget
     VideoEditWidget *videoedit_wgt = new VideoEditWidget;
-//    VideoEditList *videoedit_wgt = new VideoEditList;
     videoedit_dock->setWidget(videoedit_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
 
@@ -290,6 +289,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::new_slider_max, video_wgt, &VideoWidget::set_slider_max);
     connect(project_wgt, &ProjectWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
     connect(video_wgt, &VideoWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
+    connect(videoedit_wgt, &VideoEditWidget::set_video, project_wgt, &ProjectWidget::select_video_project);
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);

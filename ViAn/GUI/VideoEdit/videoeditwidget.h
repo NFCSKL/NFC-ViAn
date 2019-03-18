@@ -21,6 +21,7 @@ public:
 
 signals:
     void interval_to_edit(int, int, VideoProject*);
+    void set_video(VideoProject*, VideoState state);
 
 public slots:
     void clear_intervals();

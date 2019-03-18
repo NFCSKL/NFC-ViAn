@@ -20,6 +20,7 @@ public:
     int get_end();
     int get_last_frame();
     QString get_path();
+    VideoProject* get_proj();
     void set_start(int new_start);
     void set_end(int new_end);
 };

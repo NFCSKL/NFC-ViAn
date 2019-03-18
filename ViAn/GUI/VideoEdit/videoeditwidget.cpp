@@ -26,6 +26,7 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
 
     connect(generate_video_btn, &QPushButton::clicked, videoedit_list, &VideoEditList::generate_video);
     connect(this, &VideoEditWidget::interval_to_edit, videoedit_list, &VideoEditList::add_interval);
+    connect(videoedit_list, &VideoEditList::set_video, this, &VideoEditWidget::set_video);
 }
 
 void VideoEditWidget::clear_intervals() {

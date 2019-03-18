@@ -14,6 +14,7 @@
 
 #include <QMenu>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QProgressDialog>
 #include <QThread>
 #include <QDebug>
@@ -232,4 +233,15 @@ void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* 
     if (std::find(sizes->begin(), sizes->end(), *max_size) == sizes->end()) {
         sizes->push_back(*max_size);
     }
+}
+
+void VideoEditList::mouseDoubleClickEvent(QMouseEvent* event) {
+    if (!itemAt(event->pos())) return;
+    VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(itemAt(event->pos()));
+
+    // Start at the first frame of the interval
+    VideoState state;
+    state.frame = ve_item->get_start();
+
+    emit set_video(ve_item->get_proj(), state);
 }

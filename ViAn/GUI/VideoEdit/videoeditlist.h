@@ -1,6 +1,8 @@
 #ifndef VIDEOEDITLIST_H
 #define VIDEOEDITLIST_H
 
+#include "Project/video.h"
+
 #include <QListWidget>
 
 class VideoProject;
@@ -29,6 +31,11 @@ public slots:
     void generate_video();
     void add_interval(int start, int end, VideoProject *vid_proj);
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
+
+signals:
+    void set_video(VideoProject*, VideoState state);
 };
 
 #endif // VIDEOEDITLIST_H
