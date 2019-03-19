@@ -189,6 +189,7 @@ void VideoProject::reset_root_dir(const QString &dir) {
             dynamic_cast<AnalysisProxy*>(an.second)->reset_root_dir(dir);
         }
     }
+    m_video->reset_root_dir(dir);
 }
 
 /**

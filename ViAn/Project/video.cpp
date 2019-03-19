@@ -64,6 +64,12 @@ void Video::set_last_frame(int frame) {
     m_last_frame = frame;
 }
 
+void Video::reset_root_dir(const QString &dir) {
+    if (file_path.contains(Constants::GENERATED_VIDEO_FOLDER)) {
+        file_path = dir + Constants::GENERATED_VIDEO_FOLDER + Utility::name_from_path(file_path);
+    }
+}
+
 /**
  * @brief operator ==
  * @param v1

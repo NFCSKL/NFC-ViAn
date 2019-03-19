@@ -75,6 +75,7 @@ ID Project::add_video_project(VideoProject *vid_proj){
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
+    vid_proj->set_current(false);
     delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
@@ -139,6 +140,9 @@ void Project::set_name_and_path(const QString &name, const QString &path) {
         }
         for (auto bmark : m_bookmarks) {
             bmark->reset_root_dir(m_dir);
+        }
+        for (auto vid : m_videos) {
+            vid->reset_root_dir(m_dir);
         }
     } else {
         // Attempts to generate a temporary path
