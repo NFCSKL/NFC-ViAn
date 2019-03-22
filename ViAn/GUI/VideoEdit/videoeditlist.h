@@ -5,12 +5,13 @@
 
 #include <QListWidget>
 
+class Project;
 class VideoProject;
 class VideoEditList : public QListWidget {
     Q_OBJECT
 
     QListWidgetItem* clicked_item = nullptr;
-    QString m_proj_path = "";
+    Project* m_proj = nullptr;
 
 public:
     VideoEditList();
@@ -18,6 +19,7 @@ public:
 private:
     void item_right_clicked(const QPoint pos);
     void get_video_info(std::vector<QSize>* sizes, std::vector<int>* fpses, QSize* max_size);
+    void load_intervals();
 
     bool horizontalLayout;
 
@@ -30,6 +32,8 @@ private slots:
 public slots:
     void generate_video();
     void add_interval(int start, int end, VideoProject *vid_proj);
+    void set_project(Project* proj);
+    void save_item_data();
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;

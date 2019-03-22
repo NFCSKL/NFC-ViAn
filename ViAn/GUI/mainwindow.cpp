@@ -167,6 +167,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     videoedit_dock->setWidget(videoedit_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
 
+    connect(project_wgt, &ProjectWidget::set_project, videoedit_wgt, &VideoEditWidget::set_project);
+    connect(project_wgt, &ProjectWidget::save_videdit_wgt, videoedit_wgt, &VideoEditWidget::save_item_data);
 
     // Main toolbar
     main_toolbar = new MainToolbar();

@@ -6,7 +6,7 @@
 #include "utility.h"
 #include "videoedititem.h"
 #include "videogenerator.h"
-#include "Project/videoproject.h"
+#include "Project/project.h"
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -34,12 +34,23 @@ VideoEditList::VideoEditList()
 }
 
 void VideoEditList::add_interval(int start, int end, VideoProject* vid_proj) {
-    VideoEditItem* ve_item = new VideoEditItem(start, end, vid_proj, this);
-    m_proj_path = vid_proj->get_proj_path();
-    qDebug() << count();
+    VideoEditItem* ve_item = new VideoEditItem(start, end, vid_proj, m_proj, this);
     addItem(ve_item);
-    qDebug() << count();
+    m_proj->add_interval(ve_item);
     repaint();
+}
+
+void VideoEditList::set_project(Project* proj) {
+    m_proj = proj;
+    clear();
+    load_intervals();
+}
+
+void VideoEditList::load_intervals() {
+    for (VideoEditItem* ve_item : m_proj->get_intervals()) {
+        addItem(ve_item);
+    }
+    sortItems();
 }
 
 void VideoEditList::context_menu(const QPoint &point) {
@@ -95,7 +106,9 @@ void VideoEditList::edit_item(QListWidgetItem* item) {
  * Removes the clicked list item
  */
 void VideoEditList::remove_item(QListWidgetItem* item) {
-    delete item;
+    VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item);
+    m_proj->remove_interval(ve_item);
+    delete ve_item;
 }
 
 
@@ -121,7 +134,7 @@ void VideoEditList::toggle_viewlayout() {
  * Shows the video from the videoclip-items in list
  */
 void VideoEditList::show_video() {
-    qDebug() << m_proj_path;
+    //qDebug() << m_proj_path;
     QString str;
 
     for(int i = 0; i < selectedItems().count(); ++i)
@@ -162,7 +175,7 @@ void VideoEditList::generate_video() {
     if (keep_size) size = max_size;
 
     // Create the path from the genereated video
-    QString video_folder_path = m_proj_path + Constants::GENERATED_VIDEO_FOLDER;
+    QString video_folder_path = m_proj->get_dir() + Constants::GENERATED_VIDEO_FOLDER;
     // Create the folder for the generated video
     if (!QDir().mkpath(video_folder_path)) return;
 
@@ -229,10 +242,17 @@ void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* 
         video_cap.release();
     }
 
-    *max_size =QSize(max_width, max_height);
+    *max_size = QSize(max_width, max_height);
 
     if (std::find(sizes->begin(), sizes->end(), *max_size) == sizes->end()) {
         sizes->push_back(*max_size);
+    }
+}
+
+void VideoEditList::save_item_data() {
+    for (int i = 0; i < count(); ++i) {
+        VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item(i));
+        ve_item->set_index(i);
     }
 }
 

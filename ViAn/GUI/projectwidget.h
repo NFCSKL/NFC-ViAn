@@ -160,6 +160,7 @@ signals:
     void open_in_widget(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
     void save_bmark_wgt();
+    void save_videdit_wgt();
     void clear_analysis();
     void abort_all_analysis();
     void interval_to_edit(int start, int end, VideoProject* vid_proj);

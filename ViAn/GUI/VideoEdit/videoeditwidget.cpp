@@ -1,5 +1,6 @@
 #include "videoeditwidget.h"
 
+#include "Project/project.h"
 #include "Project/videoproject.h"
 
 #include <QBoxLayout>
@@ -26,6 +27,8 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
 
     connect(generate_video_btn, &QPushButton::clicked, videoedit_list, &VideoEditList::generate_video);
     connect(this, &VideoEditWidget::interval_to_edit, videoedit_list, &VideoEditList::add_interval);
+    connect(this, &VideoEditWidget::set_project, videoedit_list, &VideoEditList::set_project);
+    connect(this, &VideoEditWidget::save_item_data, videoedit_list, &VideoEditList::save_item_data);
     connect(videoedit_list, &VideoEditList::set_video, this, &VideoEditWidget::set_video);
     connect(videoedit_list, &VideoEditList::add_video, this, &VideoEditWidget::add_video);
 }
