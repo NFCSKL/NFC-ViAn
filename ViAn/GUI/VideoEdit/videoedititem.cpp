@@ -26,6 +26,7 @@ VideoEditItem::VideoEditItem(int start, int end, VideoProject* vid_proj, Project
 
 void VideoEditItem::set_name() {
     QString name = QString::number(m_start) + " - " + QString::number(m_end);
+    name = Utility::name_from_path(m_path) + "\n" + name;
     setText(name);
 }
 
