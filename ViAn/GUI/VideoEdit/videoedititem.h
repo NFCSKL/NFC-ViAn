@@ -2,6 +2,7 @@
 #define VIDEOEDITITEM_H
 
 #include <QListWidgetItem>
+#include <QDebug>
 
 class Project;
 class VideoProject;
@@ -36,7 +37,7 @@ public:
 
     bool is_saved() const;
 
-    bool operator<(const VideoEditItem &other) const;
+    bool operator<(const QListWidgetItem &other) const;
 };
 
 #endif // VIDEOEDITITEM_H

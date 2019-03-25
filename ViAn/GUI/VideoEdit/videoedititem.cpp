@@ -102,10 +102,12 @@ bool VideoEditItem::is_saved() const{
     return !m_unsaved_changes;
 }
 
-bool VideoEditItem::operator<(const VideoEditItem& other) const {
+bool VideoEditItem::operator<(const QListWidgetItem& other) const {
     int index1, index2;
+
+    VideoEditItem* ve_item1 = dynamic_cast<VideoEditItem*>(const_cast<QListWidgetItem*>(&other));
     index1 = const_cast<VideoEditItem*>(this)->get_index();
-    index2 = const_cast<VideoEditItem*>(&other)->get_index();
+    index2 = ve_item1->get_index();
 
     bool res = index1 < index2;
     return res;

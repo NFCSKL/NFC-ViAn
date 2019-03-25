@@ -9,7 +9,8 @@
 #include <QLineEdit>
 #include <QScrollArea>
 
-BookmarkCategory::BookmarkCategory(QString name, int type) : QListWidgetItem(nullptr, type) {
+BookmarkCategory::BookmarkCategory(QString name, int type)
+    : BookmarkBaseItem("", type) {
     m_name = name;
     // Setup layout
     layout = new QVBoxLayout();
@@ -173,26 +174,4 @@ bool BookmarkCategory::is_saved() const {
 void BookmarkCategory::clear_lists() {
     disp_list->clear_lists();
     ref_list->clear_lists();
-}
-
-bool QListWidgetItem::operator<(const QListWidgetItem& other) const {
-    int index1, index2;
-    if (this->type() == 1) {    // Type = container
-        BookmarkCategory* c_item1 = dynamic_cast<BookmarkCategory*>(const_cast<QListWidgetItem*>(this));
-        index1 = c_item1->get_index();
-    } else {
-        BookmarkItem* b_item1 = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(this));
-        index1 = b_item1->get_bookmark()->get_index();
-    }
-
-    if (other.type() == 1) {    // Type = container
-        BookmarkCategory* c_item1 = dynamic_cast<BookmarkCategory*>(const_cast<QListWidgetItem*>(&other));
-        index2 = c_item1->get_index();
-    } else {
-        BookmarkItem* b_item1 = dynamic_cast<BookmarkItem*>(const_cast<QListWidgetItem*>(&other));
-        index2 = b_item1->get_bookmark()->get_index();
-    }
-
-    bool res = index1 < index2;
-    return res;
 }

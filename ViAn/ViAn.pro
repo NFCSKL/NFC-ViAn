@@ -97,7 +97,8 @@ SOURCES += main.cpp \
     GUI/VideoEdit/videoedititem.cpp \
     GUI/VideoEdit/editdialog.cpp \
     GUI/VideoEdit/generatevideodialog.cpp \
-    GUI/VideoEdit/videogenerator.cpp
+    GUI/VideoEdit/videogenerator.cpp \
+    GUI/Bookmark/bookmarkbaseitem.cpp
 
 #
 # TEST
@@ -185,7 +186,8 @@ HEADERS += reportgenerator.h\
     GUI/VideoEdit/videoedititem.h \
     GUI/VideoEdit/editdialog.h \
     GUI/VideoEdit/generatevideodialog.h \
-    GUI/VideoEdit/videogenerator.h
+    GUI/VideoEdit/videogenerator.h \
+    GUI/Bookmark/bookmarkbaseitem.h
 
 #
 # LIBRARY
