@@ -19,7 +19,7 @@ public:
     void update_color_correction(int b, double c, double g);
     void set_name(QString new_name);
     void set_frame(int frame);
-    void set_scale_rot(double scale, int rot);
+    void set_scale_rot(double scale, int rot, bool flip_h, bool flip_v);
     void set_center(QPoint center);
     VideoState get_state();
     VideoState get_original();

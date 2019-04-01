@@ -249,3 +249,14 @@ QPoint Utility::rotate(QPoint pos, int rotation, int width, int height) {
 
     return QPoint(translated_x, translated_y);
 }
+
+QPoint Utility::flip(QPoint pos, bool flip_h, bool flip_v, int width, int height) {
+    // 0 - x horizontal, 1 - y, -1 - both
+    if (flip_h) {
+        pos = QPoint(pos.x(), height - pos.y());
+    }
+    if (flip_v) {
+        pos = QPoint(width - pos.x(), pos.y());
+    }
+    return pos;
+}

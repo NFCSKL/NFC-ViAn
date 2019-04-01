@@ -35,12 +35,16 @@ Overlay::~Overlay() {
  * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
-void Overlay::draw_overlay(cv::Mat &frame, int frame_nr, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+void Overlay::draw_overlay(cv::Mat &frame, int frame_nr, cv::Point anchor,
+                           double scale_factor, int angle,
+                           bool flip_h, bool flip_v,
+                           int width, int height) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
             // Only draw the text drawings
             if ((*it)->get_show() && (*it)->get_shape() == TEXT) {
-                frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle, width, height);
+                frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle,
+                                           flip_h, flip_v, width, height);
                 Text* text = dynamic_cast<Text*>(*it);
                 cv::Point p;
                 if (angle == 90) {
@@ -71,7 +75,9 @@ void Overlay::draw_overlay(cv::Mat &frame, int frame_nr, cv::Point anchor, doubl
  * @param anchor - The top left coordinate of the zoomrect, used to scale the drawings
  * @param scale_factor - The zoom percent, used to scale the drawings
  */
-void Overlay::draw_overlay_scaled(cv::Mat &frame, int frame_nr, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+void Overlay::draw_overlay_scaled(cv::Mat &frame, int frame_nr, cv::Point anchor,
+                                  double scale_factor, int angle,
+                                  bool flip_h, bool flip_v, int width, int height) {
     if (show_overlay) {
         for (auto it = overlays[frame_nr].begin(); it != overlays[frame_nr].end(); it++) {
             // Don't draw text drawings since they work a little different.
@@ -79,7 +85,8 @@ void Overlay::draw_overlay_scaled(cv::Mat &frame, int frame_nr, cv::Point anchor
             // They are drawing first and then scaled with the Mat
             if ((*it)->get_show() && (*it)->get_shape() != TEXT) {
                 // The anchor and scale factor is used to scale the drawing
-                frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle, width, height);
+                frame = (*it)->draw_scaled(frame, anchor, scale_factor, angle,
+                                           flip_h, flip_v, width, height);
             }
         }
     }

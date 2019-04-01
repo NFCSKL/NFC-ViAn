@@ -15,6 +15,8 @@ struct VideoState : Writeable {
     int brightness = Constants::BRIGHTNESS_DEFAULT;
     double gamma = Constants::GAMMA_DEFAULT;
     int rotation = 0;
+    bool flip_h = false;
+    bool flip_v = false;
     double scale_factor = -1;
     QPoint anchor = QPoint(0,0);
     // Center point is relative the rotation
@@ -27,6 +29,8 @@ struct VideoState : Writeable {
         brightness = rh.brightness;
         gamma = rh.gamma;
         rotation = rh.rotation;
+        flip_h = rh.flip_h;
+        flip_v = rh.flip_v;
         scale_factor = rh.scale_factor;
         anchor = rh.anchor;
         center = rh.center;

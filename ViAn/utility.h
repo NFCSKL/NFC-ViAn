@@ -32,6 +32,7 @@ namespace Utility{
      bool remove_checksum_files(const QString& parent_folder, const QStringList& hashes);
 
      QPoint rotate(QPoint pos, int rotation, int width, int height);
+     QPoint flip(QPoint pos, bool flip_h, bool flip_v, int width, int height);
 }
 
 #endif // UTILITY_H

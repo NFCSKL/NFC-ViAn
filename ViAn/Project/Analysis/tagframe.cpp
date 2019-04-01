@@ -29,9 +29,11 @@ void TagFrame::set_frame(int frame) {
     m_state.frame = frame;
 }
 
-void TagFrame::set_scale_rot(double scale, int rot) {
+void TagFrame::set_scale_rot(double scale, int rot, bool flip_h, bool flip_v) {
     m_state.scale_factor = scale;
     m_state.rotation = rot;
+    m_state.flip_h = flip_h;
+    m_state.flip_v = flip_v;
 }
 
 void TagFrame::set_center(QPoint center) {

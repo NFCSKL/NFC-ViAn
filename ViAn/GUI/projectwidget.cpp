@@ -1646,7 +1646,7 @@ bool ProjectWidget::save_project() {
         auto seq = dynamic_cast<ImageSequence*>(v_proj->get_video());
         QDir directory(seq->get_search_path());
         directory.removeRecursively();
-        delete v_proj;
+        m_proj->remove_video_project(v_proj);
     }
     removed_sequences.clear();
 

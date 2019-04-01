@@ -33,9 +33,14 @@ Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPE
 
 Text::~Text() {}
 
-cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor,
+                          double scale_factor, int angle,
+                          bool flip_h, bool flip_v,
+                          int width, int height) {
     Q_UNUSED(anchor) Q_UNUSED(scale_factor)
-    QPoint rot_start = Utility::rotate(Utility::from_cvpoint(draw_start), angle, width, height);
+    QPoint rot_start = Utility::from_cvpoint(draw_start);
+    rot_start = Utility::flip(rot_start, flip_h, flip_v, width, height);
+    rot_start = Utility::rotate(rot_start, angle, width, height);
     cv::putText(frame, m_name.toStdString(), Utility::from_qpoint(rot_start), cv::FONT_HERSHEY_SIMPLEX, font_scale,
                 color, thickness);
     return frame;
