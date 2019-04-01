@@ -32,9 +32,16 @@ Rectangle::~Rectangle() {}
  * @param scale_factor - Zoom factor, used to scale drawing.
  * @return Returns the frame with drawing.
  */
-cv::Mat Rectangle::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
-    QPoint rot_start = Utility::rotate(Utility::from_cvpoint(draw_start), angle, width, height);
-    QPoint rot_end = Utility::rotate(Utility::from_cvpoint(draw_end), angle, width, height);
+cv::Mat Rectangle::draw_scaled(cv::Mat &frame, cv::Point anchor,
+                               double scale_factor, int angle,
+                               bool flip_h, bool flip_v,
+                               int width, int height) {
+    QPoint rot_start = Utility::from_cvpoint(draw_start);
+    QPoint rot_end = Utility::from_cvpoint(draw_end);
+    rot_start = Utility::flip(rot_start, flip_h, flip_v, width, height);
+    rot_end = Utility::flip(rot_end, flip_h, flip_v, width, height);
+    rot_start = Utility::rotate(rot_start, angle, width, height);
+    rot_end = Utility::rotate(rot_end, angle, width, height);
     cv::Rect rect((Utility::from_qpoint(rot_start)-anchor)*scale_factor, (Utility::from_qpoint(rot_end)-anchor)*scale_factor);
     cv::rectangle(frame, rect, color, thickness);
     return frame;

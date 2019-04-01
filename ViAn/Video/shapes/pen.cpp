@@ -34,15 +34,23 @@ Pen::~Pen() {}
  * @param scale_factor - Zoom factor, used to scale drawing.
  * @return Returns the frame with drawing.
  */
-cv::Mat Pen::draw_scaled(cv::Mat &frame, cv::Point anchor, double scale_factor, int angle, int width, int height) {
+cv::Mat Pen::draw_scaled(cv::Mat &frame, cv::Point anchor,
+                         double scale_factor, int angle,
+                         bool flip_h, bool flip_v,
+                         int width, int height) {
     cv::Point p(-1, -1);
     for (auto point : points) {
         if (p.x < 0 || p.y < 0) {
             p = point;
             continue;
         }
-        QPoint rot_start = Utility::rotate(Utility::from_cvpoint(p), angle, width, height);
-        QPoint rot_end = Utility::rotate(Utility::from_cvpoint(point), angle, width, height);
+
+        QPoint rot_start = Utility::from_cvpoint(p);
+        QPoint rot_end = Utility::from_cvpoint(point);
+        rot_start = Utility::flip(rot_start, flip_h, flip_v, width, height);
+        rot_end = Utility::flip(rot_end, flip_h, flip_v, width, height);
+        rot_start = Utility::rotate(rot_start, angle, width, height);
+        rot_end = Utility::rotate(rot_end, angle, width, height);
         cv::line(frame, (Utility::from_qpoint(rot_start)-anchor)*scale_factor, (Utility::from_qpoint(rot_end)-anchor)*scale_factor, color, thickness);
         p = point;
     }
