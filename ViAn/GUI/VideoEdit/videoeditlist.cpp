@@ -6,6 +6,7 @@
 #include "utility.h"
 #include "videoedititem.h"
 #include "videogenerator.h"
+#include "videointerval.h"
 #include "Project/project.h"
 
 #include "opencv2/highgui/highgui.hpp"
@@ -34,9 +35,11 @@ VideoEditList::VideoEditList()
 }
 
 void VideoEditList::add_interval(int start, int end, VideoProject* vid_proj) {
-    VideoEditItem* ve_item = new VideoEditItem(start, end, vid_proj, m_proj, this);
+    VideoInterval* vid_interval = new VideoInterval(start, end, vid_proj);
+    m_proj->add_interval(vid_interval);
+
+    VideoEditItem* ve_item = new VideoEditItem(vid_interval, this);
     addItem(ve_item);
-    m_proj->add_interval(ve_item);
     repaint();
 }
 
@@ -47,7 +50,8 @@ void VideoEditList::set_project(Project* proj) {
 }
 
 void VideoEditList::load_intervals() {
-    for (VideoEditItem* ve_item : m_proj->get_intervals()) {
+    for (VideoInterval* interval : m_proj->get_intervals()) {
+        VideoEditItem* ve_item = new VideoEditItem(interval, this);
         addItem(ve_item);
     }
     sortItems();
@@ -107,7 +111,8 @@ void VideoEditList::edit_item(QListWidgetItem* item) {
  */
 void VideoEditList::remove_item(QListWidgetItem* item) {
     VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item);
-    m_proj->remove_interval(ve_item);
+    VideoInterval* interval = ve_item->get_interval();
+    m_proj->remove_interval(interval);
     delete ve_item;
 }
 
@@ -133,8 +138,8 @@ void VideoEditList::toggle_viewlayout() {
  * @brief VideoEditList::show_video
  * Shows the video from the videoclip-items in list
  */
+// Todo make this do something or remove
 void VideoEditList::show_video() {
-    //qDebug() << m_proj_path;
     QString str;
 
     for(int i = 0; i < selectedItems().count(); ++i)
@@ -252,7 +257,7 @@ void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* 
 void VideoEditList::save_item_data() {
     for (int i = 0; i < count(); ++i) {
         VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item(i));
-        ve_item->set_index(i);
+        ve_item->get_interval()->set_index(i);
     }
 }
 
@@ -264,5 +269,5 @@ void VideoEditList::mouseDoubleClickEvent(QMouseEvent* event) {
     VideoState state;
     state.frame = ve_item->get_start();
 
-    emit set_video(ve_item->get_proj(), state);
+    emit set_video(ve_item->get_interval()->get_vid_proj(), state);
 }

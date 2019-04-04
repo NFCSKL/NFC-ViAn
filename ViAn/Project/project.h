@@ -8,7 +8,7 @@
 
 class Bookmark;
 class BookmarkCategory;
-class VideoEditItem;
+class VideoInterval;
 class VideoProject;
 
 using ID = int;
@@ -28,7 +28,7 @@ class Project : public Saveable{
     std::vector<VideoProject*> m_videos;
     std::vector<Bookmark*> m_bookmarks;
     std::vector<BookmarkCategory*> m_categories;
-    std::vector<VideoEditItem*> m_intervals;
+    std::vector<VideoInterval*> m_intervals;
 
     int m_vid_count = 0;
     int m_cat_count = 0;
@@ -51,8 +51,8 @@ public:
     ID add_category(BookmarkCategory* cat);
     void remove_category(BookmarkCategory* cat);
 
-    void add_interval(VideoEditItem* interval);
-    void remove_interval(VideoEditItem* interval);
+    void add_interval(VideoInterval* interval);
+    void remove_interval(VideoInterval* interval);
 
     // read and write operator for Projects
     void read(const QJsonObject& json);
@@ -72,7 +72,7 @@ public:
     std::vector<VideoProject *>& get_videos();
     std::vector<Bookmark *>& get_bookmarks();
     std::vector<BookmarkCategory *>& get_categories();
-    std::vector<VideoEditItem *>& get_intervals();
+    std::vector<VideoInterval *> &get_intervals();
     VideoProject* get_video_project(int id);
     QString get_dir() const;
     QString get_name() const;

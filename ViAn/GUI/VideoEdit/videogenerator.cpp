@@ -55,7 +55,6 @@ void VideoGenerator::generate_video() {
             int curr_frame = static_cast<int>(capture.get(CV_CAP_PROP_POS_FRAMES));
             update_progress(curr_frame);
             QCoreApplication::processEvents();
-            qDebug() << "nr" << curr_frame;
             if (!capture.read(frame)) break;
 
             cv::Mat resized = cv::Mat::zeros(cv_size, frame.type());

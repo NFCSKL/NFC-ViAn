@@ -70,7 +70,7 @@ namespace Constants {
     const QString SEQUENCE_FOLDER = "Sequences/";
     const QString GENERATED_VIDEO_FOLDER = "GeneratedVideos/";
     const QString RECENT_FILE_NAME = "recent_projects";
-    const QString RECENT_FILE_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/ViAn/";
+    const QString RECENT_FILE_PATH = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/ViAn/";
 
     const int RECENT_MAX = 10;
 

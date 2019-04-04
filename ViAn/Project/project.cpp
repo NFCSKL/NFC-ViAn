@@ -2,7 +2,7 @@
 
 #include "bookmark.h"
 #include "GUI/Bookmark/bookmarkcategory.h"
-#include "GUI/VideoEdit/videoedititem.h"
+#include "GUI/VideoEdit/videointerval.h"
 #include "videoproject.h"
 
 #include <QDebug>
@@ -120,12 +120,13 @@ void Project::remove_category(BookmarkCategory* cat) {
     m_unsaved_changes = true;
 }
 
-void Project::add_interval(VideoEditItem* interval) {
+void Project::add_interval(VideoInterval* interval) {
+    interval->set_project(this);
     m_intervals.push_back(interval);
     m_unsaved_changes = true;
 }
 
-void Project::remove_interval(VideoEditItem* interval) {
+void Project::remove_interval(VideoInterval *interval) {
     auto it = std::find(m_intervals.begin(), m_intervals.end(), interval);
     if (it == m_intervals.end()) return;
     delete *it;
@@ -154,9 +155,6 @@ void Project::set_name_and_path(const QString &name, const QString &path) {
         }
         for (auto bmark : m_bookmarks) {
             bmark->reset_root_dir(m_dir);
-        }
-        for (auto vid : m_videos) {
-            vid->reset_root_dir(m_dir);
         }
     } else {
         // Attempts to generate a temporary path
@@ -190,7 +188,7 @@ bool Project::is_saved() const {
     bool categories_saved = std::all_of(m_categories.begin(), m_categories.end(),
                                             [](BookmarkCategory* cat){return cat->is_saved();});
     bool intervals_saved = std::all_of(m_intervals.begin(), m_intervals.end(),
-                                            [](VideoEditItem* ve_item){return ve_item->is_saved();});
+                                            [](VideoInterval* interval){return interval->is_saved();});
 
     return !m_unsaved_changes && video_projects_saved &&
             bookmarks_saved && categories_saved && intervals_saved;
@@ -253,16 +251,10 @@ void Project::read(const QJsonObject& json){
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
         QJsonObject json_interval = json_intervals[i].toObject();
-
-        int start = json_interval["start"].toInt();
-        int end = json_interval["end"].toInt();
-        int index = json_interval["index"].toInt();
-        int id = json_interval["id"].toInt();
-
-        VideoEditItem* ve_item = new VideoEditItem(start, end, get_video_project(id), this);
-        ve_item->set_index(index);
-        add_interval(ve_item);
-        ve_item->m_unsaved_changes = false;
+        VideoInterval* interval = new VideoInterval();
+        interval->read(json_interval);
+        add_interval(interval);
+        //interval->reset_root_dir(m_dir);
     }
     m_unsaved_changes = false;
 }
@@ -311,12 +303,8 @@ void Project::write(QJsonObject& json){
     QJsonArray json_intervals;
     for(auto it = m_intervals.begin(); it != m_intervals.end(); it++){
         QJsonObject json_interval;
-        json_interval["start"] = (*it)->get_start();
-        json_interval["end"] = (*it)->get_end();
-        json_interval["index"] = (*it)->get_index();
-        json_interval["id"] = (*it)->get_vid_proj_id();
+        (*it)->write(json_interval);
         json_intervals.append(json_interval);
-        (*it)->m_unsaved_changes = false;
     }
     json["intervals"] = json_intervals;
 
@@ -334,7 +322,6 @@ bool Project::save_project(){
     auto time = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(time);
     last_changed = std::ctime(&now_c);
-    //last_changed.erase(last_changed.end()-1);       // Remove the "\n"
     last_changed.remove(last_changed.size()-1, 1);
     return save_saveable(m_file);
 }
@@ -428,7 +415,7 @@ std::vector<BookmarkCategory*> &Project::get_categories() {
     return m_categories;
 }
 
-std::vector<VideoEditItem*> &Project::get_intervals() {
+std::vector<VideoInterval*> &Project::get_intervals() {
     return m_intervals;
 }
 

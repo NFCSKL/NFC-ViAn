@@ -86,10 +86,6 @@ void GenerateVideoDialog::keep_size_toggled(int state) {
  * Accept widget and return variables
  */
 void GenerateVideoDialog::ok_btn_clicked() {
-    QSize size = resolution->currentData().toSize();
-    qDebug() << size.width() << size.height();
-    int fps = frame_rate->currentData().toInt();
-    qDebug() << fps;
     accept();
 }
 

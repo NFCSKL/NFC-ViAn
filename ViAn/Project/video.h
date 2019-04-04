@@ -67,7 +67,6 @@ public:
     int get_last_frame();
     void set_size(int width, int height);
     void set_last_frame(int frame);
-    void reset_root_dir(const QString &dir);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

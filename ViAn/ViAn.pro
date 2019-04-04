@@ -98,7 +98,8 @@ SOURCES += main.cpp \
     GUI/VideoEdit/editdialog.cpp \
     GUI/VideoEdit/generatevideodialog.cpp \
     GUI/VideoEdit/videogenerator.cpp \
-    GUI/Bookmark/bookmarkbaseitem.cpp
+    GUI/Bookmark/bookmarkbaseitem.cpp \
+    GUI/VideoEdit/videointerval.cpp
 
 #
 # TEST
@@ -187,7 +188,8 @@ HEADERS += reportgenerator.h\
     GUI/VideoEdit/editdialog.h \
     GUI/VideoEdit/generatevideodialog.h \
     GUI/VideoEdit/videogenerator.h \
-    GUI/Bookmark/bookmarkbaseitem.h
+    GUI/Bookmark/bookmarkbaseitem.h \
+    GUI/VideoEdit/videointerval.h
 
 #
 # LIBRARY
