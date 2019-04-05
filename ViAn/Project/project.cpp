@@ -254,7 +254,6 @@ void Project::read(const QJsonObject& json){
         VideoInterval* interval = new VideoInterval();
         interval->read(json_interval);
         add_interval(interval);
-        //interval->reset_root_dir(m_dir);
     }
     m_unsaved_changes = false;
 }
