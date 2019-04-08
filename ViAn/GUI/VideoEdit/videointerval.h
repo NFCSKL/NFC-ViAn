@@ -2,6 +2,7 @@
 #define VIDEOINTERVAL_H
 
 #include "Filehandler/saveable.h"
+#include "Project/video.h"
 
 #include <QJsonObject>
 
@@ -16,6 +17,7 @@ class VideoInterval : public Writeable {
     QString m_path = "";
     int m_last_frame = -1;
     Project* m_proj = nullptr;
+    VideoState m_state;
 
     bool m_unsaved_changes = true;
 public:
@@ -29,6 +31,7 @@ public:
     int get_proj_id();
     VideoProject* get_vid_proj();
     Project* get_proj();
+    VideoState get_state();
 
     void set_start(int start);
     void set_end(int end);

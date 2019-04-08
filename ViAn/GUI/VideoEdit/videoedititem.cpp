@@ -1,10 +1,12 @@
 #include "videoedititem.h"
 
+#include "constants.h"
 #include "imagegenerator.h"
 #include "Project/project.h"
 #include "Project/videoproject.h"
-#include "videointerval.h"
 #include "utility.h"
+#include "Video/framemanipulator.h"
+#include "videointerval.h"
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -36,6 +38,42 @@ void VideoEditItem::set_icon() {
     cv::Mat frame;
     cap.set(CV_CAP_PROP_POS_FRAMES, get_start());
     cap >> frame;
+    // Update color corrections
+    FrameManipulator manipulator;
+    manipulator.set_brightness(m_interval->get_state().brightness);
+    manipulator.set_contrast(m_interval->get_state().contrast);
+    manipulator.set_gamma(m_interval->get_state().gamma);
+    manipulator.apply(frame);
+
+    // Update rotation
+    int rotation = m_interval->get_state().rotation;
+    if (rotation == Constants::DEGREE_MIN) {
+        rotation = -1;
+    } else if (rotation == Constants::DEGREE_90) {
+        rotation = cv::ROTATE_90_CLOCKWISE;
+    } else if (rotation == Constants::DEGREE_180) {
+        rotation = cv::ROTATE_180;
+    } else if (rotation == Constants::DEGREE_270) {
+        rotation = cv::ROTATE_90_COUNTERCLOCKWISE;
+    }
+    if (rotation != -1) cv::rotate(frame, frame, rotation);
+
+    // Update flip
+    int flip = 5;       // 5 means no flip
+    bool flip_h = m_interval->get_state().flip_h;
+    bool flip_v = m_interval->get_state().flip_v;
+    if (rotation == cv::ROTATE_90_CLOCKWISE || rotation == cv::ROTATE_90_COUNTERCLOCKWISE) {
+        std::swap(flip_h, flip_v);
+    }
+    if (flip_h && flip_v) {
+        flip = -1;
+    } else if (flip_h) {
+        flip = 0;
+    } else if (flip_v) {
+        flip = 1;
+    }
+    if (flip != 5) cv::flip(frame, frame, flip);
+
     switch (frame.type()) {
     case CV_8UC1:
         cvtColor(frame, frame, CV_GRAY2RGB);

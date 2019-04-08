@@ -11,6 +11,7 @@ VideoInterval::VideoInterval(const int& start, const int& end,
     m_start = start;
     m_end = end;
     m_last_frame = vid_proj->get_video()->get_last_frame();
+    m_state = vid_proj->state;
 }
 
 VideoInterval::VideoInterval() {
@@ -44,6 +45,10 @@ Project* VideoInterval::get_proj() {
     return m_proj;
 }
 
+VideoState VideoInterval::get_state() {
+    return m_state;
+}
+
 void VideoInterval::set_start(int start) {
     m_start = start;
 }
@@ -71,6 +76,11 @@ void VideoInterval::read(const QJsonObject& json) {
     m_index = json["index"].toInt();
     m_last_frame = json["last frame"].toInt();
 
+    VideoState state;
+    QJsonObject json_state = json["state"].toObject();
+    state.read(json_state);
+    m_state = state;
+
     m_unsaved_changes = false;
 }
 
@@ -80,6 +90,10 @@ void VideoInterval::write(QJsonObject& json) {
     json["end"] = m_end;
     json["index"] = m_index;
     json["last frame"] = m_last_frame;
+
+    QJsonObject json_state;
+    m_state.write(json_state);
+    json["state"] = json_state;
 
     m_unsaved_changes = false;
 }

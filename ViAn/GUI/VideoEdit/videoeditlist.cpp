@@ -225,12 +225,17 @@ void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* 
     // Loop over all intervals and save the different sizes and frame rates in lists
     for (int j = 0; j < count(); ++j) {
         VideoEditItem* ve_item = dynamic_cast<VideoEditItem*>(item(j));
+        int rotation = ve_item->get_interval()->get_state().rotation;
         cv::VideoCapture video_cap;
         video_cap.open(ve_item->get_path().toStdString());
         if (!video_cap.isOpened()) return;
         int width = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_WIDTH));
         int height = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_HEIGHT));
         int fps = static_cast<int>(video_cap.get(CV_CAP_PROP_FPS));
+        if (rotation == Constants::DEGREE_90 || rotation == Constants::DEGREE_270) {
+            std::swap(width, height);
+        }
+
         QSize s(width, height);
         // Store video size
         if (std::find(sizes->begin(), sizes->end(), s) == sizes->end()) {
@@ -267,6 +272,7 @@ void VideoEditList::mouseDoubleClickEvent(QMouseEvent* event) {
 
     // Start at the first frame of the interval
     VideoState state;
+    state = ve_item->get_interval()->get_state();
     state.frame = ve_item->get_start();
 
     emit set_video(ve_item->get_interval()->get_vid_proj(), state);
