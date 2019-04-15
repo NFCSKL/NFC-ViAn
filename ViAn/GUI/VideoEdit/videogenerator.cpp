@@ -40,7 +40,7 @@ void VideoGenerator::generate_video() {
         VideoState state;
         state = ve_item->get_interval()->get_state();
 
-        emit update_text("Generating video... " + QString::number(i)
+        emit update_text("Generating video... " + QString::number(i+1)
                          + "/" + QString::number(m_list->count()));
         emit update_range(ve_item->get_start(), ve_item->get_end());
 
@@ -99,6 +99,10 @@ void VideoGenerator::generate_video() {
             update_progress(curr_frame);
             QCoreApplication::processEvents();
             if (!capture.read(frame)) break;
+
+            if (frame.type() == CV_8UC1) {
+                cvtColor(frame, frame, CV_GRAY2RGB);
+            }
 
             // Set state variables to frame
             manipulator.apply(frame);

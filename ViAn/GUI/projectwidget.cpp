@@ -198,6 +198,7 @@ void ProjectWidget::generate_video(QString path) {
     QString vid_name = path.right(path.length() - index);
     Video* video = new Video(path);
     VideoProject* vid_proj = new VideoProject(video);
+    vid_proj->set_generated_video(true);
     m_proj->add_video_project(vid_proj);
 
     VideoItem* vid_item = new VideoItem(vid_proj);
@@ -1624,9 +1625,10 @@ bool ProjectWidget::save_project() {
             m_proj->set_name_and_path(name, path);
             m_proj->set_temporary(false);
             set_main_window_name(name);
-            emit set_project(m_proj);
             QDir dir;
             dir.mkpath(m_proj->get_dir());
+
+            QString new_path = path + name + "/" + Constants::GENERATED_VIDEO_FOLDER;
 
             // If the current video is a sequence then it needs to be reloaded
             // since the images path will have changed
@@ -1635,7 +1637,11 @@ bool ProjectWidget::save_project() {
                     vid_proj->set_current(false);
                     emit marked_video_state(vid_proj, vid_proj->get_video()->state);
                 }
+                if (vid_proj->is_generated_video()) {
+                    vid_proj->get_video()->file_path = new_path + vid_proj->get_video()->get_name();
+                }
             }
+            update_videoitems();
         } else {
             // User aborted dialog, cancel save
             return false;
@@ -1654,6 +1660,8 @@ bool ProjectWidget::save_project() {
     emit save_draw_wgt();
     emit save_bmark_wgt();
     emit save_videdit_wgt();
+
+    emit set_project(m_proj);
 
     // Mark all analysis as saved
     std::vector<AnalysisItem*> a_items;
@@ -1859,14 +1867,14 @@ void ProjectWidget::update_current_videoitem(QString path) {
 }
 
 void ProjectWidget::update_videoitems() {
-    for (auto item : findItems(".", Qt::MatchContains, 0)) {
-        if (item->type() == VIDEO_ITEM) {
-            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
-            Video* video = v_item->get_video_project()->get_video();
-            v_item->setText(0, video->get_name());
-            v_item->setToolTip(0, video->file_path);
-            v_item->set_thumbnail();
-        }
+    std::vector<VideoItem*> v_items;
+    QTreeWidgetItem* s_item = invisibleRootItem();
+    get_video_items(s_item, v_items);
+    for (auto v_item : v_items) {
+        Video* video = v_item->get_video_project()->get_video();
+        v_item->setText(0, video->get_name());
+        v_item->setToolTip(0, video->file_path);
+        v_item->set_thumbnail();
     }
 }
 

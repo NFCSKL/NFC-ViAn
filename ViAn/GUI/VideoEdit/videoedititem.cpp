@@ -2,6 +2,7 @@
 
 #include "constants.h"
 #include "imagegenerator.h"
+#include "Project/imagesequence.h"
 #include "Project/project.h"
 #include "Project/videoproject.h"
 #include "utility.h"
@@ -27,7 +28,12 @@ VideoEditItem::~VideoEditItem() {
 
 void VideoEditItem::set_name() {
     QString name = QString::number(get_start()) + " - " + QString::number(get_end());
-    name = Utility::name_from_path(m_path) + "\n" + name;
+    if (m_interval->get_vid_proj()->get_video()->is_sequence()) {
+        ImageSequence* img_seq = dynamic_cast<ImageSequence*>(m_interval->get_vid_proj()->get_video());
+        name = Utility::name_from_path(img_seq->get_search_path()) + "\n" + name;
+    } else {
+        name = Utility::name_from_path(m_path) + "\n" + name;
+    }
     setText(name);
 }
 
