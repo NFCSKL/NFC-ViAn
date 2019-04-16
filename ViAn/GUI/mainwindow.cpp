@@ -14,6 +14,7 @@
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
 #include "GUI/settingsdialog.h"
+#include "GUI/yolowidget.h"
 #include "GUI/viewpathdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
@@ -82,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
     connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
+    connect(project_wgt, &ProjectWidget::open_yolo_wgt, this, &MainWindow::open_yolo_widget);
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
@@ -157,6 +159,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
     connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag_color);
+
+    // Initialize yolo widget
+    yolo_wgt = new YoloWidget(nullptr);
+    yolo_wgt->close();
 
     // Main toolbar
     main_toolbar = new MainToolbar();
@@ -551,6 +557,12 @@ void MainWindow::close_all_widgets() {
         delete widget;
     }
     video_widgets.clear();
+}
+
+void MainWindow::open_yolo_widget(AnalysisProxy* analysis) {
+    qDebug() << "opening";
+    yolo_wgt->show();
+    yolo_wgt->set_analysis(analysis);
 }
 
 void MainWindow::init_interval_menu() {

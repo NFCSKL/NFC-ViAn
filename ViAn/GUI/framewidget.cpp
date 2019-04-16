@@ -229,7 +229,6 @@ void FrameWidget::set_rotation(int rotation) {
     if (m_vid_proj) {
         m_vid_proj->get_video()->state.rotation = rotation;
     }
-    qDebug() << "Rotation: " << m_rotation;
 }
 
 void FrameWidget::set_flip(bool flip_h, bool flip_v) {
@@ -240,8 +239,6 @@ void FrameWidget::set_flip(bool flip_h, bool flip_v) {
         m_vid_proj->get_video()->state.flip_h = flip_h;
         m_vid_proj->get_video()->state.flip_v = flip_v;
     }
-
-    qDebug() << "Flip: h - v " << m_flip_h << m_flip_v;
 }
 
 void FrameWidget::set_current_frame_nr(int nr) {

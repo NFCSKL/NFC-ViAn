@@ -1122,14 +1122,18 @@ void ProjectWidget::context_menu(const QPoint &point) {
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
-        case ANALYSIS_ITEM:
-            if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+        case ANALYSIS_ITEM: {
+            AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+            if (ana_item->is_finished()) {
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
                 menu.addAction("Rename", this, &ProjectWidget::rename_item);
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                menu.addSeparator();
+                menu.addAction("Open yolo widget", this, [this, ana_item]{ open_yolo_widget(ana_item);});
             }
             break;
+        }
         case FOLDER_ITEM:
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1466,6 +1470,11 @@ void ProjectWidget::remove_interval_area_item(QTreeWidgetItem* item) {
  */
 void ProjectWidget::rename_item(){
     editItem(currentItem());
+}
+
+void ProjectWidget::open_yolo_widget(AnalysisItem* ana_item) {
+    AnalysisProxy* analysis = ana_item->get_analysis();
+    emit open_yolo_wgt(analysis);
 }
 
 /**

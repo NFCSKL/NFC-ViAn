@@ -59,6 +59,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void open_yolo_wgt(AnalysisProxy*);
     void set_zoom_tool();
     void set_show_analysis_details(bool);
     void set_detections(bool);
@@ -124,6 +125,7 @@ private slots:
     void open_video_in_widget();
     void remove_item();
     void rename_item();
+    void open_yolo_widget(AnalysisItem* ana_item);
     void drawing_tag();
     void update_settings();
     void create_folder_item();

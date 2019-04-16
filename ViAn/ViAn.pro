@@ -91,7 +91,8 @@ SOURCES += main.cpp \
     GUI/viewpathitem.cpp \
     GUI/settingsdialog.cpp \
     constants.cpp \
-    GUI/sequencedialog.cpp
+    GUI/sequencedialog.cpp \
+    GUI/yolowidget.cpp
 
 #
 # TEST
@@ -173,7 +174,8 @@ HEADERS += reportgenerator.h\
     GUI/viewpathitem.h \
     GUI/settingsdialog.h \
     constants.h \
-    GUI/sequencedialog.h
+    GUI/sequencedialog.h \
+    GUI/yolowidget.h
 
 #
 # LIBRARY
