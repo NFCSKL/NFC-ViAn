@@ -36,6 +36,7 @@ public:
 
 private:
     ID id = 0;
+    ID vid_proj_id = -1;
 
 protected:
 
@@ -50,6 +51,8 @@ public:
 
     ID get_id();
     void set_id(ID id);
+    ID get_vid_proj_id();
+    void set_vid_proj_id(ID id);
 
     void clear_intervals();
     QString get_name() const;

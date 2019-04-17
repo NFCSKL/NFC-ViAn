@@ -14,7 +14,7 @@
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
 #include "GUI/settingsdialog.h"
-#include "GUI/yolowidget.h"
+#include "GUI/YoloWidget/yolowidget.h"
 #include "GUI/viewpathdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
@@ -135,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::new_bookmark, bookmark_wgt, &BookmarkWidget::create_bookmark);
     connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
     connect(project_wgt, &ProjectWidget::set_project, bookmark_wgt, &BookmarkWidget::set_project);
+    //connect(project_wgt, &ProjectWidget::set_project, yolo_wgt, &YoloWidget::set_project);
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, project_wgt, &ProjectWidget::select_video_project);
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     connect(project_wgt, &ProjectWidget::save_bmark_wgt, bookmark_wgt, &BookmarkWidget::save_item_data);

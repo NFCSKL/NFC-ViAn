@@ -76,6 +76,14 @@ void BasicAnalysis::set_id(ID new_id) {
     id = new_id;
 }
 
+ID BasicAnalysis::get_vid_proj_id() {
+    return vid_proj_id;
+}
+
+void BasicAnalysis::set_vid_proj_id(ID new_id) {
+    vid_proj_id = new_id;
+}
+
 QString BasicAnalysis::get_name() const {
     return m_name;
 }

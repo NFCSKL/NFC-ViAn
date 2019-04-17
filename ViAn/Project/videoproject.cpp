@@ -200,6 +200,7 @@ void VideoProject::reset_root_dir(const QString &dir) {
 ID VideoProject::add_analysis(BasicAnalysis *analysis){
     m_analyses.insert(std::make_pair(m_ana_id, analysis));
     analysis->set_id(m_ana_id);
+    analysis->set_vid_proj_id(id);
     m_unsaved_changes = true;
     return m_ana_id++;
 }
