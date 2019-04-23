@@ -65,7 +65,6 @@ SOURCES += \
     GUI/framewidget.cpp \
     GUI/mainwindow.cpp \
     GUI/manipulatorwidget.cpp \
-    GUI/myqaction.cpp \
     GUI/pathdialog.cpp \
     GUI/projectdialog.cpp \
     GUI/projectwidget.cpp \
@@ -169,7 +168,6 @@ HEADERS += \
     GUI/framewidget.h \
     GUI/mainwindow.h \
     GUI/manipulatorwidget.h \
-    GUI/myqaction.h \
     GUI/pathdialog.h \
     GUI/projectdialog.h \
     GUI/projectwidget.h \

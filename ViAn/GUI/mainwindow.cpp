@@ -135,7 +135,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::new_bookmark, bookmark_wgt, &BookmarkWidget::create_bookmark);
     connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
     connect(project_wgt, &ProjectWidget::set_project, bookmark_wgt, &BookmarkWidget::set_project);
-    //connect(project_wgt, &ProjectWidget::set_project, yolo_wgt, &YoloWidget::set_project);
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, project_wgt, &ProjectWidget::select_video_project);
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     connect(project_wgt, &ProjectWidget::save_bmark_wgt, bookmark_wgt, &BookmarkWidget::save_item_data);
@@ -164,6 +163,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Initialize yolo widget
     yolo_wgt = new YoloWidget(nullptr);
     yolo_wgt->close();
+
+    connect(project_wgt, &ProjectWidget::set_project, yolo_wgt, &YoloWidget::set_project);
 
     // Main toolbar
     main_toolbar = new MainToolbar();
