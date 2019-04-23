@@ -124,6 +124,7 @@ void AnalysisMethod::run() {
         m_ana_name = Utility::name_from_path(new_path);
         m_analysis.save_saveable(QString::fromStdString(new_path));
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
+        proxy->set_video_path(QString::fromStdString(m_source_file));
         for (auto p : m_analysis.get_intervals()) {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
             proxy->m_slider_interval.push_back(pair);

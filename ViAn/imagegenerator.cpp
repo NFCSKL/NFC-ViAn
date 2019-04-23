@@ -1,6 +1,5 @@
 #include "imagegenerator.h"
 
-#include "constants.h"
 #include "Project/project.h"
 #include "utility.h"
 
@@ -19,10 +18,10 @@ ImageGenerator::~ImageGenerator() {
     m_frame.release();
 }
 
-QString ImageGenerator::create_thumbnail(QString name) {
+QString ImageGenerator::create_thumbnail(QString name, unsigned int size) {
     QString save_path = m_path + Constants::THUMBNAIL_FOLDER;
     if (!create_directory(save_path)) return "";
-    return export_image(save_path + name, PNG, Constants::THUMBNAIL_SIZE);
+    return export_image(save_path + name, PNG, size);
 
 }
 

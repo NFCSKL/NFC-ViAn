@@ -82,6 +82,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
     ana_item->saved = false;
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis_item->parent());
     vid->get_video_project()->add_analysis(analysis);
+
     current_analysis_item = nullptr;
     duration = 0;
 

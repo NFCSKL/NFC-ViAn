@@ -46,6 +46,19 @@ Analysis* AnalysisProxy::load_analysis() {
     return analysis;
 }
 
+/**
+ * @brief AnalysisProxy::set_video_path
+ * @param path
+ * Set the path to the video that the analysis is performed on
+ */
+void AnalysisProxy::set_video_path(QString path) {
+    m_video_path = path;
+}
+
+QString AnalysisProxy::get_video_path() {
+    return m_video_path;
+}
+
 AnalysisSettings* AnalysisProxy::get_settings() {
     return settings;
 }
@@ -54,7 +67,6 @@ void AnalysisProxy::reset_root_dir(const QString &dir) {
     file_analysis = dir+Utility::name_from_path(file_analysis);
     m_unsaved_changes = true;
 }
-
 
 /**
  * @brief AnalysisProxy::read
@@ -77,6 +89,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
     settings = new_settings;
 
     file_analysis = json["full_path"].toString();
+    m_video_path = json["video_path"].toString();
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_poi = json_intervals[i].toObject();
@@ -108,6 +121,7 @@ void AnalysisProxy::write(QJsonObject &json) {
     }
 
     json["full_path"] = file_analysis;
+    json["video_path"] = m_video_path;
     QJsonArray intervals;
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;

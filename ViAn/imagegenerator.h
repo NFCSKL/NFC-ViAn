@@ -1,6 +1,7 @@
 #ifndef IMAGEGENERATOR_H
 #define IMAGEGENERATOR_H
 
+#include "constants.h"
 #include "opencv2/core/core.hpp"
 #include <QString>
 
@@ -17,7 +18,7 @@ public:
     ImageGenerator(cv::Mat frame, QString path);
     ~ImageGenerator();
 
-    QString create_thumbnail(QString name);
+    QString create_thumbnail(QString name, unsigned int size = Constants::THUMBNAIL_SIZE);
     QString create_tiff(QString name);
     QString create_bookmark(QString name);
 

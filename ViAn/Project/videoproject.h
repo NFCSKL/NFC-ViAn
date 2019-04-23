@@ -17,6 +17,7 @@ using ID = int;
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
+class AnalysisProxy;
 class BasicAnalysis;
 class Bookmark;
 class Project;

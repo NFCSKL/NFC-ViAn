@@ -11,6 +11,7 @@ class YoloWidget : public QListWidget
     Q_OBJECT
     Analysis* m_analysis = nullptr;
     Project* m_proj = nullptr;
+    std::vector<AnalysisProxy*> m_ana_list;
 public:
     YoloWidget(QWidget* parent = nullptr);
 
