@@ -56,7 +56,7 @@ SOURCES += \
     GUI/TreeItems/tagitem.cpp \
     GUI/TreeItems/treeitem.cpp \
     GUI/TreeItems/videoitem.cpp \
-    GUI/YoloWidget/yolowidget.cpp \
+    GUI/YoloWidget/yololistwidget.cpp \
     GUI/YoloWidget/yolowidgetitem.cpp \
     GUI/doubleclickbutton.cpp \
     GUI/drawingwidget.cpp \
@@ -117,7 +117,8 @@ SOURCES += \
     imageimporter.cpp \
     main.cpp \
     reportgenerator.cpp \
-    utility.cpp
+    utility.cpp \
+    GUI/YoloWidget/yolowidget.cpp
 
 HEADERS += \
     Analysis/analysismethod.h \
@@ -159,7 +160,7 @@ HEADERS += \
     GUI/TreeItems/tagitem.h \
     GUI/TreeItems/treeitem.h \
     GUI/TreeItems/videoitem.h \
-    GUI/YoloWidget/yolowidget.h \
+    GUI/YoloWidget/yololistwidget.h \
     GUI/YoloWidget/yolowidgetitem.h \
     GUI/doubleclickbutton.h \
     GUI/drawingwidget.h \
@@ -220,7 +221,8 @@ HEADERS += \
     imageimporter.h \
     reportgenerator.h \
     table.h \
-    utility.h
+    utility.h \
+    GUI/YoloWidget/yolowidget.h
 
 FORMS    +=
 

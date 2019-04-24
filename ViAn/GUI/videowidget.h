@@ -169,6 +169,7 @@ public slots:
     void loop_interval_toggled(bool value);
     void set_interval(std::pair<int, int> interval);
     void delete_interval(void);
+    void set_frame(int);
     void frame_line_edit_finished();
     void zoom_label_finished();
     void enable_poi_btns(bool, bool);
