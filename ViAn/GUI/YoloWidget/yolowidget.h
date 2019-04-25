@@ -7,6 +7,7 @@ class AnalysisProxy;
 class Project;
 class QComboBox;
 class QSlider;
+class VideoProject;
 class YoloListWidget;
 class YoloWidget : public QWidget
 {
@@ -26,7 +27,7 @@ private slots:
     void update_frame_list(std::vector<int> frame_list);
 
 signals:
-    void set_frame(int);
+    void set_frame(VideoProject*, int);
 };
 
 #endif // YOLOWIDGET_H

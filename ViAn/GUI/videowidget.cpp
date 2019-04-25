@@ -1715,11 +1715,6 @@ void VideoWidget::on_export_frame() {
     emit set_status_bar(QString("Frame %1 exported").arg(frame));
 }
 
-void VideoWidget::set_frame(int frame) {
-    frame_index.store(frame);
-    on_new_frame();
-}
-
 /**
  * @brief VideoWidget::frame_line_edit_finished
  * Slot function for when the frame_line_edit is finished edited and enter is pressed
@@ -1737,7 +1732,8 @@ void VideoWidget::frame_line_edit_finished() {
     } else if (converted < 0) {
         emit set_status_bar("Error! Input is negative!");
     } else {
-        set_frame(converted);
+        frame_index.store(converted);
+        on_new_frame();
     }
     frame_line_edit->clearFocus();
 }

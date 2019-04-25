@@ -12,6 +12,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
+#include <QMouseEvent>
+
 #include <QDebug>
 
 YoloListWidget::YoloListWidget(QWidget *parent) : QListWidget(parent) {
@@ -43,7 +45,16 @@ void YoloListWidget::choose_ana_frame(QString text) {
     int num = text.toInt(&ok);
     if (!ok) return;
     show_frame(num);
-    emit set_frame(num);
+    update_video_widget(num);
+}
+
+void YoloListWidget::update_video_widget(int frame) {
+    VideoProject* vid_proj = m_proj->get_video_project(m_analysis->get_vid_proj_id());
+    int id = m_analysis->get_id();
+    VideoState state;
+    state.frame = frame;
+    vid_proj->get_video()->state = state;
+    emit set_frame(vid_proj, id);
 }
 
 void YoloListWidget::show_frame(int frame_num) {
@@ -83,4 +94,14 @@ void YoloListWidget::show_frame(int frame_num) {
 void YoloListWidget::set_project(Project* proj) {
     m_proj = proj;
     m_ana_list = m_proj->get_analyses();
+}
+
+void YoloListWidget::mousePressEvent(QMouseEvent* event) {
+    if (itemAt(event->pos())) {
+        YoloWidgetItem* yi_item = dynamic_cast<YoloWidgetItem*>(itemAt(event->pos()));
+        bool ok;
+        int num = yi_item->text().toInt(&ok);
+        if (!ok) return;
+        update_video_widget(num);
+    }
 }

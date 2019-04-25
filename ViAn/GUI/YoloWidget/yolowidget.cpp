@@ -1,6 +1,7 @@
 #include "yolowidget.h"
 
 #include "Project/Analysis/analysisproxy.h"
+#include "Project/videoproject.h"
 #include "yololistwidget.h"
 
 #include <QBoxLayout>
@@ -17,9 +18,9 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
 
     m_list = new YoloListWidget();
 
+    layout->addWidget(frames_combo);
     layout->addWidget(m_list);
     layout->addWidget(frames_slider);
-    layout->addWidget(frames_combo);
 
     layout->setMargin(5);
     layout->setSpacing(5);

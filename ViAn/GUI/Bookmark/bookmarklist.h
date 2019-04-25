@@ -2,6 +2,7 @@
 #define BOOKMARKLIST_H
 
 #include "Project/bookmark.h"
+#include "Project/video.h"
 
 #include <QListWidget>
 

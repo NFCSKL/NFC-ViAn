@@ -165,7 +165,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     yolo_wgt->close();
 
     connect(project_wgt, &ProjectWidget::set_project, yolo_wgt, &YoloWidget::set_project);
-    connect(yolo_wgt, &YoloWidget::set_frame, video_wgt, &VideoWidget::set_frame);
+    connect(yolo_wgt, &YoloWidget::set_frame, project_wgt, &ProjectWidget::select_analysis);
 
     // Main toolbar
     main_toolbar = new MainToolbar();

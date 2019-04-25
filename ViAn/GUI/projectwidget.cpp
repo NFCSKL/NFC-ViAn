@@ -1836,14 +1836,24 @@ void ProjectWidget::select_video_project(VideoProject* vid_proj, VideoState stat
         vid_proj->state = state;
         emit marked_video_state(vid_proj, state);
     } else {
-        std::vector<VideoItem*> v_items;
-        QTreeWidgetItem* s_item = invisibleRootItem();
-        get_video_items(s_item, v_items);
-        for (auto vid_item : v_items) {
-            if (vid_item->get_video_project() == vid_proj) {
-                vid_item->get_video_project()->state = state;
-                setCurrentItem(vid_item);
-                return;
+        VideoItem* vid_item = get_video_item(vid_proj);
+        vid_proj->state = state;
+        setCurrentItem(vid_item);
+    }
+}
+
+void ProjectWidget::select_analysis(VideoProject* vid_proj, int ana_id) {
+    VideoItem* vid_item = get_video_item(vid_proj);
+    for (int i = 0; i < vid_item->childCount(); i++) {
+        QTreeWidgetItem* item = vid_item->child(i);
+        if (item->type() == ANALYSIS_ITEM) {
+            AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+            if (ana_item->get_analysis()->get_id() == ana_id) {
+                if (ana_item->isSelected()) {
+                    emit marked_video_state(vid_proj, vid_proj->get_video()->state);
+                } else {
+                    setCurrentItem(ana_item);
+                }
             }
         }
     }

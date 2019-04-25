@@ -6,6 +6,7 @@
 class Analysis;
 class AnalysisProxy;
 class Project;
+class VideoProject;
 class YoloListWidget : public QListWidget
 {
     Q_OBJECT
@@ -20,6 +21,7 @@ public:
 
     void set_analysis(AnalysisProxy* analysis);
     void show_frame(int frame_num);
+    void update_video_widget(int frame);
 
 public slots:
     void set_project(Project* proj);
@@ -27,7 +29,10 @@ public slots:
 
 signals:
     void update_frames(std::vector<int>);
-    void set_frame(int);
+    void set_frame(VideoProject*, int);
+
+protected:
+    void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif // YOLOLISTWIDGET_H
