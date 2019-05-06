@@ -229,13 +229,32 @@ FORMS    +=
 RESOURCES += resources.qrc
 
 win32 {
-    INCLUDEPATH += C:\opencv\release\install\include
-    LIBS += C:\opencv\release\bin\libopencv_core320.dll
-    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
-    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
-    LIBS += C:\opencv\release\bin\libopencv_video320.dll
-    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
-    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
+#    INCLUDEPATH += C:\opencv\release\install\include
+#    LIBS += C:\opencv\release\bin\libopencv_core320.dll
+#    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
+#    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
+#    LIBS += C:\opencv\release\bin\libopencv_video320.dll
+#    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
+#    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
+
+#   D:\darknet\darknet-master\own_build\Release
+#   C:\opencv_3.4.3\build\bin\Release
+
+    INCLUDEPATH += C:\opencv_3.4.3\build\install\include
+    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_core343.dll
+    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_highgui343.dll
+    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_imgcodecs343.dll
+    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_imgproc343.dll
+    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_video343.dll
+    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_videoio343.dll
+
+#    INCLUDEPATH += D:\darknet\darknet-master\include
+#    LIBS += D:/darknet/darknet-master/build/darknet/x64/yolo_cpp_dll.dll
+
+#    LIBS += D:\darknet\darknet-master\own_build\Release\darklib.dll
+
+#    INCLUDEPATH += D:\opencv4\darknet-master\include
+#    LIBS += D:\opencv4\darknet-master\build\darknet\x64\yolo_cpp_dll.dll
 }
 
 unix {

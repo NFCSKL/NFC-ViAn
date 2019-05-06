@@ -12,6 +12,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
+//#include "yolo_v2_class.hpp"
+
 #include <QMouseEvent>
 
 #include <QDebug>
@@ -88,6 +90,17 @@ void YoloListWidget::show_frame(int frame_num) {
         y_item->setIcon(icon);
         addItem(y_item);
         setIconSize(QSize(250,250));
+
+
+        std::string names_file = "data/coco.names";
+        std::string cfg_file = "cfg/yolov3.cfg";
+        std::string weights_file = "yolov3.weights";
+        std::string file_name;
+
+        //Detector detector(cfg_file, weights_file);
+
+        //std::vector<bbox_t> detections2 = detector
+
     }
 }
 
@@ -98,10 +111,21 @@ void YoloListWidget::set_project(Project* proj) {
 
 void YoloListWidget::mousePressEvent(QMouseEvent* event) {
     if (itemAt(event->pos())) {
-        YoloWidgetItem* yi_item = dynamic_cast<YoloWidgetItem*>(itemAt(event->pos()));
-        bool ok;
-        int num = yi_item->text().toInt(&ok);
-        if (!ok) return;
-        update_video_widget(num);
+        switch (event->button()) {
+        case Qt::LeftButton: {
+            YoloWidgetItem* yi_item = dynamic_cast<YoloWidgetItem*>(itemAt(event->pos()));
+            bool ok;
+            int num = yi_item->text().toInt(&ok);
+            if (!ok) return;
+            update_video_widget(num);
+            break;
+        }
+        case Qt::RightButton:
+
+
+            break;
+        default:
+            break;
+        }
     }
 }
