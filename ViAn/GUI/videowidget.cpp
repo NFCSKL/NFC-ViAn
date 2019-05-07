@@ -379,9 +379,6 @@ void VideoWidget::set_btn_shortcuts() {
     bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     // Tag and zoom shortcuts are in the menus
     export_frame_btn->setShortcut(QKeySequence(Qt::Key_X));
-    set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
-    set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
-
     bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);

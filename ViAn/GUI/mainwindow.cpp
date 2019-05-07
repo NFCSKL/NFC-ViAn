@@ -41,6 +41,8 @@
 #include <QThread>
 #include <QTimer>
 
+#include "windows.h"
+
 
 /**
  * @brief MainWindow::MainWindow
@@ -579,6 +581,8 @@ void MainWindow::init_interval_menu() {
     QAction* new_label_act = new QAction(tr("New tag &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
+    QAction* interval_start_act = new QAction(tr("Set &start"));
+    QAction* interval_end_act = new QAction(tr("Set &end"));
     QAction* tag_interval_act = new QAction(tr("&Tag interval"));
     QAction* add_interval_act = new QAction(tr("&Add interval"));
     QAction* rm_interval_act = new QAction(tr("&Clear interval"), this);
@@ -590,18 +594,24 @@ void MainWindow::init_interval_menu() {
     new_label_act->setIcon(QIcon(":/Icons/tag.png"));
     new_tag_act->setIcon(QIcon(":/Icons/tag_frame.png"));
     remove_tag_act->setIcon(QIcon(":/Icons/remove_frame.png"));
+    interval_start_act->setIcon(QIcon(":/Icons/start_interval.png"));
+    interval_end_act->setIcon(QIcon(":/Icons/end_interval.png"));
     tag_interval_act->setIcon(QIcon(":/Icons/create_interval.png"));
     add_interval_act->setIcon(QIcon(":/Icons/add_interval.png"));
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
     remove_tag_act->setShortcut(Qt::Key_U);
+    interval_start_act->setShortcut(Qt::Key_I);
+    interval_end_act->setShortcut(Qt::Key_O);
     tag_interval_act->setShortcut(Qt::Key_K);
     add_interval_act->setShortcut(Qt::Key_P);
     rm_interval_act->setShortcut(Qt::Key_J);
 
     new_label_act->setStatusTip(tr("Create new tag label"));
     new_tag_act->setStatusTip(tr("Tag the current frame"));
+    interval_start_act->setStatusTip(tr("Set the start of an interval"));
+    interval_end_act->setStatusTip(tr("Set the end of an interval"));
     remove_tag_act->setStatusTip(tr("Untag the current frame"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
 
@@ -609,6 +619,8 @@ void MainWindow::init_interval_menu() {
     interval_menu->addAction(new_tag_act);
     interval_menu->addAction(remove_tag_act);
     interval_menu->addSeparator();
+    interval_menu->addAction(interval_start_act);
+    interval_menu->addAction(interval_end_act);
     interval_menu->addAction(tag_interval_act);
     interval_menu->addAction(add_interval_act);
     interval_menu->addAction(rm_interval_act);
@@ -618,6 +630,10 @@ void MainWindow::init_interval_menu() {
     connect(new_label_act, &QAction::triggered, video_wgt, &VideoWidget::new_tag_clicked);
     connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
     connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
+
+    connect(interval_start_act, &QAction::triggered, video_wgt, &VideoWidget::set_interval_start_clicked);
+    connect(interval_end_act, &QAction::triggered, video_wgt, &VideoWidget::set_interval_end_clicked);
+
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::create_interval_clicked);
     connect(add_interval_act, &QAction::triggered, video_wgt, &VideoWidget::add_interval_clicked);
     connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
@@ -699,7 +715,7 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("E&xport interval..."), this);
+    QAction* export_act = new QAction(tr("E&xport interval to stills..."), this);
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
@@ -739,6 +755,7 @@ void MainWindow::init_help_menu() {
     help_act->setStatusTip(tr("Help"));
 
     //connect
+    connect(help_act, &QAction::triggered, this, &MainWindow::help_clicked);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -834,6 +851,16 @@ void MainWindow::export_images() {
     connect(exporter_thread, &QThread::finished, exporter_thread, &QThread::deleteLater);
     progress->show();
     exporter_thread->start();
+}
+
+/**
+ * @brief MainWindow::help_clicked
+ * Open the help PDF
+ */
+void MainWindow::help_clicked() {
+    qDebug() << "opening help";
+    qDebug() << "not yet finished";
+    //ShellExecuteA(GetDesktopWindow(), "open", ":/vian-help.pdf", NULL, NULL, SW_SHOWNORMAL);
 }
 
 /**

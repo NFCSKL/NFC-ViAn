@@ -163,5 +163,6 @@
         <file>Icons/add_interval.png</file>
         <file>Icons/flip_horizontal.png</file>
         <file>Icons/flip_vertical.png</file>
+        <file>vian-help.pdf</file>
     </qresource>
 </RCC>
