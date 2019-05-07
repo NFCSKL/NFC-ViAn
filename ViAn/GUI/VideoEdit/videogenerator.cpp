@@ -15,12 +15,14 @@
 #include <QDebug>
 
 VideoGenerator::VideoGenerator(QListWidget* list, QString name, QSize size,
-                               int fps, bool keep_size) {
+                               int fps, bool keep_size, bool title_screen, QString title_text) {
     m_list = list;
     m_name = name;
     m_size = size;
     m_fps = fps;
     m_keep_size = keep_size;
+    m_title = title_screen;
+    m_title_text = title_text;
 }
 
 void VideoGenerator::generate_video() {
@@ -32,6 +34,29 @@ void VideoGenerator::generate_video() {
     if (!vw.isOpened()) {
         qWarning() << "vw not opened";
         return;
+    }
+
+    // Create title screen
+    if (m_title) {
+        cv::Mat black = cv::Mat::zeros(cv_size, CV_8UC1);
+        cvtColor(black, black, CV_GRAY2RGB);
+
+        std::string text = m_title_text.toStdString();
+        auto font = cv::FONT_HERSHEY_PLAIN;
+        double fontscale = 4;
+        int thickness = 2;
+        int baseline = 0;
+        cv::Size text_size = cv::getTextSize(text, font, fontscale,
+                                             thickness, &baseline);
+        int text_x = (black.cols - text_size.width) / 2;
+        int text_y = (black.rows + text_size.height) / 2;
+
+        cv::putText(black, text, cv::Point(text_x, text_y),
+                    font, fontscale, cv::Scalar(255,255,255), thickness);
+        // Add title screen for 5 sec
+        for (int f = 0; f < m_fps*5; f++) {
+            vw.write(black);
+        }
     }
 
     // Loop over all items

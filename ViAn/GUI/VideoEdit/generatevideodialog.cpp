@@ -43,9 +43,9 @@ GenerateVideoDialog::GenerateVideoDialog(std::vector<QSize> sizes, std::vector<i
     connect(custom_size_box, &QCheckBox::stateChanged, this, &GenerateVideoDialog::custom_size_toggled);
     custom_width = new QLineEdit(this);
     custom_height = new QLineEdit(this);
-    QValidator* validator = new QIntValidator(100, 4000, this);
-    custom_width->setValidator(validator);
-    custom_height->setValidator(validator);
+    QValidator* size_validator = new QIntValidator(100, 4000, this);
+    custom_width->setValidator(size_validator);
+    custom_height->setValidator(size_validator);
 
     QHBoxLayout* custom_size_layout = new QHBoxLayout();
     custom_size_layout->addWidget(custom_width);
@@ -70,11 +70,33 @@ GenerateVideoDialog::GenerateVideoDialog(std::vector<QSize> sizes, std::vector<i
     QFormLayout* frame_rate_layout = new QFormLayout;
     frame_rate_layout->addRow("Frame rate: ", frame_rate);
 
+    custom_fps_box = new QCheckBox;
+    connect(custom_fps_box, &QCheckBox::stateChanged, this, &GenerateVideoDialog::custom_fps_toggled);
+    custom_fps = new QLineEdit(this);
+    QValidator* fps_validator = new QIntValidator(5, 60, this);
+    custom_fps->setValidator(fps_validator);
+    custom_fps->setDisabled(true);
+
+    frame_rate_layout->addRow("Custom frame rate: ", custom_fps_box);
+    frame_rate_layout->addWidget(custom_fps);
+
+    // Title screen line
+    title_box = new QCheckBox;
+    connect(title_box, &QCheckBox::stateChanged, this, &GenerateVideoDialog::title_screen_toggled);
+    title_text = new QLineEdit(this);
+    title_text->setMaxLength(20);
+    title_text->setDisabled(true);
+
+    QFormLayout* title_screen_layout = new QFormLayout;
+    title_screen_layout->addRow("Add title screen: ", title_box);
+    title_screen_layout->addWidget(title_text);
+
     // Add all to the layout
     vertical_layout->addLayout(video_name_layout);
     vertical_layout->addLayout(resolution_layout);
     vertical_layout->addLayout(keep_size_layout);
     vertical_layout->addLayout(frame_rate_layout);
+    vertical_layout->addLayout(title_screen_layout);
     vertical_layout->addWidget(btn_box);
 
     // Connect buttons
@@ -88,7 +110,8 @@ GenerateVideoDialog::~GenerateVideoDialog() {
     delete btn_box;
 }
 
-void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps, bool* keep_size) {
+void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps,
+                                     bool* keep_size, bool* title_screen, QString* text) {
     if (custom_size_box->isChecked()) {
         int width = custom_width->text().toInt();
         int height = custom_height->text().toInt();
@@ -97,9 +120,17 @@ void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps, bool*
         *size = resolution->currentData().toSize();
     }
 
+    if (custom_fps_box->isChecked()) {
+        *fps = custom_fps->text().toInt();
+    } else {
+        *fps = frame_rate->currentData().toInt();
+    }
+
     *name = name_edit->text();
-    *fps = frame_rate->currentData().toInt();
     *keep_size = keep_size_box->checkState();
+
+    *title_screen = title_box->checkState();
+    *text = title_text->text();
 }
 
 void GenerateVideoDialog::keep_size_toggled(int state) {
@@ -118,6 +149,15 @@ void GenerateVideoDialog::custom_size_toggled(int state) {
     custom_height->setEnabled(state);
 }
 
+void GenerateVideoDialog::custom_fps_toggled(int state) {
+    frame_rate->setDisabled(state);
+    custom_fps->setEnabled(state);
+}
+
+void GenerateVideoDialog::title_screen_toggled(int state) {
+    title_text->setEnabled(state);
+}
+
 /**
  * @brief GenerateVideoDialog::ok_btn_clicked
  * Accept widget and return variables
@@ -127,6 +167,15 @@ void GenerateVideoDialog::ok_btn_clicked() {
         if (!custom_width->hasAcceptableInput() || !custom_height->hasAcceptableInput()) {
             QMessageBox msg_box;
             msg_box.setText("Invalid resolution");
+            msg_box.setDefaultButton(QMessageBox::Ok);
+            msg_box.exec();
+            return;
+        }
+    }
+    if (custom_fps_box->isChecked()) {
+        if (!custom_fps->hasAcceptableInput()) {
+            QMessageBox msg_box;
+            msg_box.setText("Invalid frame rate");
             msg_box.setDefaultButton(QMessageBox::Ok);
             msg_box.exec();
             return;
