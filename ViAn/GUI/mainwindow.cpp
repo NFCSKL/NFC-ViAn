@@ -29,6 +29,7 @@
 #include "statusbar.h"
 #include "videowidget.h"
 
+#include <QCoreApplication>
 
 #include <QCloseEvent>
 #include <QDebug>
@@ -858,9 +859,13 @@ void MainWindow::export_images() {
  * Open the help PDF
  */
 void MainWindow::help_clicked() {
-    qDebug() << "opening help";
-    qDebug() << "not yet finished";
-    //ShellExecuteA(GetDesktopWindow(), "open", ":/vian-help.pdf", NULL, NULL, SW_SHOWNORMAL);
+    //QDesktopServices::openUrl(QUrl::fromLocalFile(":/vian-help.pdf"));
+    QDesktopServices::openUrl(QUrl(":/vian-help.pdf"));
+    // and include core application
+//    qDebug() << qApp->applicationDirPath();
+//    QFile help_file("qrc:/vian-help.pdf");
+//    help_file.copy(qApp->applicationDirPath().append("/vian-help.pdf"));
+//    QDesktopServices::openUrl(QUrl::fromLocalFile(qApp->applicationDirPath().append("/vian-help.pdf")));
 }
 
 /**
