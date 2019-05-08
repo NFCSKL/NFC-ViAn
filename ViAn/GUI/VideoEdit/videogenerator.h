@@ -17,8 +17,12 @@ class VideoGenerator : public QObject {
     bool m_keep_size;
     bool m_title;
     QString m_title_text;
+    QString m_description;
+    int m_duration;
 public:
-    VideoGenerator(QListWidget* list, QString name, QSize size, int fps, bool keep_size, bool title_screen, QString title_text);
+    VideoGenerator(QListWidget* list, QString name, QSize size,
+                   int fps, bool keep_size, bool title_screen,
+                   QString title_text, QString description, int duration);
 
 public slots:
     void generate_video();

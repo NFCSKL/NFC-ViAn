@@ -15,7 +15,8 @@
 #include <QDebug>
 
 VideoGenerator::VideoGenerator(QListWidget* list, QString name, QSize size,
-                               int fps, bool keep_size, bool title_screen, QString title_text) {
+                               int fps, bool keep_size, bool title_screen,
+                               QString title_text, QString description, int duration) {
     m_list = list;
     m_name = name;
     m_size = size;
@@ -23,6 +24,8 @@ VideoGenerator::VideoGenerator(QListWidget* list, QString name, QSize size,
     m_keep_size = keep_size;
     m_title = title_screen;
     m_title_text = title_text;
+    m_description = description;
+    m_duration = duration;
 }
 
 void VideoGenerator::generate_video() {
@@ -42,19 +45,28 @@ void VideoGenerator::generate_video() {
         cvtColor(black, black, CV_GRAY2RGB);
 
         std::string text = m_title_text.toStdString();
-        auto font = cv::FONT_HERSHEY_PLAIN;
-        double fontscale = 4;
+        std::string desc = m_description.toStdString();
+        auto font = cv::FONT_HERSHEY_TRIPLEX;
+        auto desc_font = cv::FONT_HERSHEY_DUPLEX;
+        double fontscale = 5;
+        double desc_fontscale = fontscale-4;
         int thickness = 2;
         int baseline = 0;
-        cv::Size text_size = cv::getTextSize(text, font, fontscale,
+        cv::Size title_size = cv::getTextSize(text, font, fontscale,
                                              thickness, &baseline);
-        int text_x = (black.cols - text_size.width) / 2;
-        int text_y = (black.rows + text_size.height) / 2;
+        cv::Size desc_size = cv::getTextSize(desc, desc_font, desc_fontscale,
+                                             thickness, &baseline);
+        int title_x = (black.cols - title_size.width) / 2;
+        int title_y = (black.rows + title_size.height) / 2;
+        int desc_x = (black.cols - desc_size.width) / 2;
+        int desc_y = title_y + desc_size.height*2;
 
-        cv::putText(black, text, cv::Point(text_x, text_y),
+        cv::putText(black, text, cv::Point(title_x, title_y),
                     font, fontscale, cv::Scalar(255,255,255), thickness);
+        cv::putText(black, desc, cv::Point(desc_x, desc_y),
+                    desc_font, desc_fontscale, cv::Scalar(255,255,255), thickness);
         // Add title screen for 5 sec
-        for (int f = 0; f < m_fps*5; f++) {
+        for (int f = 0; f < m_fps*m_duration; f++) {
             vw.write(black);
         }
     }

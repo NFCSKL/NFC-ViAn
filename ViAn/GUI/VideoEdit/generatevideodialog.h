@@ -22,11 +22,13 @@ class GenerateVideoDialog : public QDialog
     QLineEdit* custom_fps;
     QCheckBox* title_box;
     QLineEdit* title_text;
+    QLineEdit* description_text;
+    QLineEdit* title_duration;
 public:
     explicit GenerateVideoDialog(std::vector<QSize> sizes, std::vector<int> fpses, QWidget* parent = nullptr);
     ~GenerateVideoDialog();
 
-    void get_values(QString* name, QSize* size, int* fps, bool *keep_size, bool *title_screen, QString *text);
+    void get_values(QString* name, QSize* size, int* fps, bool *keep_size, bool *title_screen, QString *text, QString *description, int *duration);
 
 private slots:
     void keep_size_toggled(int state);

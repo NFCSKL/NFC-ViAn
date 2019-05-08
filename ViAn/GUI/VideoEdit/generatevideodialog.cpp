@@ -84,17 +84,27 @@ GenerateVideoDialog::GenerateVideoDialog(std::vector<QSize> sizes, std::vector<i
     title_box = new QCheckBox;
     connect(title_box, &QCheckBox::stateChanged, this, &GenerateVideoDialog::title_screen_toggled);
     title_text = new QLineEdit(this);
-    title_text->setMaxLength(20);
+    title_text->setMaxLength(30);
     title_text->setDisabled(true);
+    description_text = new QLineEdit(this);
+    description_text->setMaxLength(50);
+    description_text->setDisabled(true);
+
+    title_duration = new QLineEdit(this);
+    QValidator* duration_validator = new QIntValidator(0, 60, this);
+    title_duration->setValidator(duration_validator);
+    title_duration->setDisabled(true);
 
     QFormLayout* title_screen_layout = new QFormLayout;
     title_screen_layout->addRow("Add title screen: ", title_box);
-    title_screen_layout->addWidget(title_text);
+    title_screen_layout->addRow("Title: ", title_text);
+    title_screen_layout->addRow("Description: ", description_text);
+    title_screen_layout->addRow("Duration (in sec): ", title_duration);
 
     // Add all to the layout
     vertical_layout->addLayout(video_name_layout);
-    vertical_layout->addLayout(resolution_layout);
     vertical_layout->addLayout(keep_size_layout);
+    vertical_layout->addLayout(resolution_layout);
     vertical_layout->addLayout(frame_rate_layout);
     vertical_layout->addLayout(title_screen_layout);
     vertical_layout->addWidget(btn_box);
@@ -111,7 +121,9 @@ GenerateVideoDialog::~GenerateVideoDialog() {
 }
 
 void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps,
-                                     bool* keep_size, bool* title_screen, QString* text) {
+                                     bool* keep_size, bool* title_screen,
+                                     QString* text, QString* description,
+                                     int* duration) {
     if (custom_size_box->isChecked()) {
         int width = custom_width->text().toInt();
         int height = custom_height->text().toInt();
@@ -126,11 +138,14 @@ void GenerateVideoDialog::get_values(QString* name, QSize* size, int* fps,
         *fps = frame_rate->currentData().toInt();
     }
 
+
     *name = name_edit->text();
     *keep_size = keep_size_box->checkState();
 
     *title_screen = title_box->checkState();
     *text = title_text->text();
+    *description = description_text->text();
+    *duration = title_duration->text().toInt();
 }
 
 void GenerateVideoDialog::keep_size_toggled(int state) {
@@ -156,6 +171,8 @@ void GenerateVideoDialog::custom_fps_toggled(int state) {
 
 void GenerateVideoDialog::title_screen_toggled(int state) {
     title_text->setEnabled(state);
+    description_text->setEnabled(state);
+    title_duration->setEnabled(state);
 }
 
 /**
@@ -176,6 +193,15 @@ void GenerateVideoDialog::ok_btn_clicked() {
         if (!custom_fps->hasAcceptableInput()) {
             QMessageBox msg_box;
             msg_box.setText("Invalid frame rate");
+            msg_box.setDefaultButton(QMessageBox::Ok);
+            msg_box.exec();
+            return;
+        }
+    }
+    if (title_box->isChecked()) {
+        if (!title_duration->hasAcceptableInput()) {
+            QMessageBox msg_box;
+            msg_box.setText("Invalid title duration");
             msg_box.setDefaultButton(QMessageBox::Ok);
             msg_box.exec();
             return;

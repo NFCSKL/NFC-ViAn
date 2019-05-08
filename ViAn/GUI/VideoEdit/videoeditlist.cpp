@@ -175,7 +175,10 @@ void VideoEditList::generate_video() {
     bool keep_size;
     bool title_screen;
     QString title_text;
-    dialog.get_values(&name, &size, &fps, &keep_size, &title_screen, &title_text);
+    QString description;
+    int title_duration;
+    dialog.get_values(&name, &size, &fps, &keep_size, &title_screen,
+                      &title_text, &description, &title_duration);
 
     if (res == dialog.Rejected) return;
     if (name.isEmpty()) name = "video";
@@ -189,7 +192,10 @@ void VideoEditList::generate_video() {
     name = video_folder_path + name;
     name = Utility::add_serial_number(name, ".mkv");
 
-    VideoGenerator* vid_gen = new VideoGenerator(this, name, size, fps, keep_size, title_screen, title_text);
+    VideoGenerator* vid_gen = new VideoGenerator(this, name, size, fps,
+                                                 keep_size, title_screen,
+                                                 title_text, description,
+                                                 title_duration);
 
     QProgressDialog* progress = new QProgressDialog(
                 "Generating video... 0/" + QString::number(count()), "Abort",
