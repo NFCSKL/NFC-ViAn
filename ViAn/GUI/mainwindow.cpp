@@ -859,13 +859,10 @@ void MainWindow::export_images() {
  * Open the help PDF
  */
 void MainWindow::help_clicked() {
-    //QDesktopServices::openUrl(QUrl::fromLocalFile(":/vian-help.pdf"));
-    QDesktopServices::openUrl(QUrl(":/vian-help.pdf"));
-    // and include core application
-//    qDebug() << qApp->applicationDirPath();
-//    QFile help_file("qrc:/vian-help.pdf");
-//    help_file.copy(qApp->applicationDirPath().append("/vian-help.pdf"));
-//    QDesktopServices::openUrl(QUrl::fromLocalFile(qApp->applicationDirPath().append("/vian-help.pdf")));
+    // Put vian-help.pdf in C:/Users/Student/Documents/GitHub/NFC-ViAn/build-ViAn-Desktop_Qt_5_11_2_MinGW_32bit-Debug/debug/
+    // Move to release when done
+    QUrl url3 = QUrl::fromLocalFile(qApp->applicationDirPath().append("/vian-help.pdf"));
+    QDesktopServices::openUrl(url3);
 }
 
 /**

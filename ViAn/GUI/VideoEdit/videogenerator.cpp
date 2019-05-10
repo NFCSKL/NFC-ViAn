@@ -52,14 +52,33 @@ void VideoGenerator::generate_video() {
         double desc_fontscale = fontscale-4;
         int thickness = 2;
         int baseline = 0;
-        cv::Size title_size = cv::getTextSize(text, font, fontscale,
-                                             thickness, &baseline);
-        cv::Size desc_size = cv::getTextSize(desc, desc_font, desc_fontscale,
-                                             thickness, &baseline);
-        int title_x = (black.cols - title_size.width) / 2;
-        int title_y = (black.rows + title_size.height) / 2;
-        int desc_x = (black.cols - desc_size.width) / 2;
-        int desc_y = title_y + desc_size.height*2;
+
+        int title_x = 0;
+        int title_y = 0;
+        int desc_x = 0;
+        int desc_y = 0;
+
+        bool ok = false;
+        while (!ok) {
+            cv::Size title_size = cv::getTextSize(text, font, fontscale,
+                                                 thickness, &baseline);
+            cv::Size desc_size = cv::getTextSize(desc, desc_font, desc_fontscale,
+                                                 thickness, &baseline);
+            title_x = (black.cols - title_size.width) / 2;
+            title_y = (black.rows + title_size.height) / 2;
+            desc_x = (black.cols - desc_size.width) / 2;
+            desc_y = title_y + desc_size.height*2;
+
+            if (title_x < 0) {
+                fontscale -= 0.1;
+                ok = false;
+            } else if (desc_x < 0) {
+                desc_fontscale -= 0.1;
+                ok = false;
+            } else {
+                ok = true;
+            }
+        }
 
         cv::putText(black, text, cv::Point(title_x, title_y),
                     font, fontscale, cv::Scalar(255,255,255), thickness);
