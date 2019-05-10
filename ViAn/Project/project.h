@@ -6,6 +6,8 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
+#include <vector>
+
 class AnalysisProxy;
 class Bookmark;
 class BookmarkCategory;

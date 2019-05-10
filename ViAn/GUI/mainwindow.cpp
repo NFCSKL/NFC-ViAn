@@ -287,6 +287,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
+    qDebug() << "open cv:" << CV_VERSION;
 }
 
 /**

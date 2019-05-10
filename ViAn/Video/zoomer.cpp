@@ -185,8 +185,9 @@ void Zoomer::translate_viewport_center(int x, int y){
                                   0);
 
 
-    int length{4};
-    cv::Point2f p[length];
+//    int length{4};
+//    cv::Point2f p[length];
+    cv::Point2f p[4];
     contained_rect.points(p); //bl, tl, tr, br
 
     bool left_contained{p[0].x >= 0 || p[1].x >= 0};

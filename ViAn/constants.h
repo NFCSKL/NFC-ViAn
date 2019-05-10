@@ -5,8 +5,12 @@
 #include <QString>
 #include <QStandardPaths>
 
+//#include <math.h>
 #include <cmath>
 #include <string>
+
+//#define M_PI   3.14159265358979323846264338327950288
+
 
 class Singleton {
 private:
