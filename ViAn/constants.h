@@ -8,6 +8,7 @@
 //#include <math.h>
 #include <cmath>
 #include <string>
+#include <QtMath>
 
 //#define M_PI   3.14159265358979323846264338327950288
 
@@ -49,6 +50,7 @@ namespace Constants {
     const int VIDEO_WGT_HEIGHT = 9;
 
     const std::string MOTION_DET_STR = "-motion_analysis";
+    const std::string YOLO_STR = "-object_detection";
     const QString NEW_STR = " (NEW!)";
 
     const int PAN_FACTOR = 20;

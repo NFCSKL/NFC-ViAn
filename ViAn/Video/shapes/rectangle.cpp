@@ -43,7 +43,8 @@ cv::Mat Rectangle::draw_scaled(cv::Mat &frame, cv::Point anchor,
     rot_start = Utility::rotate(rot_start, angle, width, height);
     rot_end = Utility::rotate(rot_end, angle, width, height);
     cv::Rect rect((Utility::from_qpoint(rot_start)-anchor)*scale_factor, (Utility::from_qpoint(rot_end)-anchor)*scale_factor);
-    cv::rectangle(frame, rect, color, thickness);
+    cv::InputOutputArray inout_array = frame;
+    cv::rectangle(inout_array, rect, color, thickness);
     return frame;
 }
 

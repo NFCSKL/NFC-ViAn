@@ -32,6 +32,16 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
 }
 
 void YoloWidget::set_analysis(AnalysisProxy* analysis) {
+    switch (analysis->get_type()) {
+    case MOTION_DETECTION:
+        setWindowTitle("Motion detection - " + analysis->get_name());
+        break;
+    case YOLO:
+        setWindowTitle("Object detection - " + analysis->get_name());
+        break;
+    default:
+        break;
+    }
     m_list->set_analysis(analysis);
 }
 

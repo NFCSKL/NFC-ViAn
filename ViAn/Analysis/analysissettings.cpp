@@ -13,6 +13,7 @@ AnalysisSettings::AnalysisSettings(int type,
 
 AnalysisSettings::AnalysisSettings(int type) : type(type) {
     reset_settings();
+    this->type = type;
 }
 
 AnalysisSettings::AnalysisSettings() {
@@ -93,6 +94,8 @@ std::string AnalysisSettings::get_type_string() {
     switch (type) {
     case MOTION_DETECTION:
         return Constants::MOTION_DET_STR;
+    case YOLO:
+        return Constants::YOLO_STR;
     default:
         return "";
     }

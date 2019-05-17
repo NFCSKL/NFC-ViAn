@@ -6,8 +6,10 @@
 #include "Project/Analysis/poi.h"
 #include "utility.h"
 
-#include "opencv2/highgui/highgui.hpp"
+//#include "opencv2/highgui/highgui.hpp"
+
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/videoio/videoio.hpp"
 
 #include <QDebug>
 
@@ -45,7 +47,7 @@ void AnalysisMethod::run() {
         return;
     }
     std::vector<DetectionBox> detections;
-    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
+    num_frames = capture.get(cv::CAP_PROP_FRAME_COUNT);
     POI* m_POI = new POI();    
 
     int end_frame = num_frames -1;
@@ -53,7 +55,7 @@ void AnalysisMethod::run() {
     // If Interval should be used, use interval frames
     if(analysis_settings->use_interval){
         start_frame = analysis_settings->interval.first;
-        capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
+        capture.set(cv::CAP_PROP_POS_FRAMES, start_frame);
         end_frame = analysis_settings->interval.second;
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame;
@@ -111,7 +113,7 @@ void AnalysisMethod::run() {
         capture.release();
         emit analysis_aborted();
         return;
-    }else{
+    } else {
         // Makes sure that a POI that stretches to the end of the
         // video gets an end frame.
         if (detecting) {
@@ -138,7 +140,7 @@ void AnalysisMethod::run() {
  * @return Progression of analysis in whole percent.
  */
 int AnalysisMethod::get_progress(int start_frame) {
-    return ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
+    return (double(current_frame_index-start_frame)/double(num_frames)) * 100;
 
 }
 

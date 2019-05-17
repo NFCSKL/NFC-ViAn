@@ -62,10 +62,10 @@ void VideoItem::set_thumbnail() {
     cap >> frame;
     switch (frame.type()) {
         case CV_8UC1:
-            cvtColor(frame, frame, CV_GRAY2RGB);
+            cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(frame, frame, CV_BGR2RGB);
+            cvtColor(frame, frame, cv::COLOR_BGR2RGB);
             break;
     }
     ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());

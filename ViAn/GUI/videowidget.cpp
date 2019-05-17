@@ -130,6 +130,15 @@ void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     emit start_analysis(m_vid_proj, settings);
 }
 
+void VideoWidget::yolo_analysis() {
+    AnalysisSettings* new_settings = new AnalysisSettings(YOLO);
+    qDebug() << "frame rate" << m_frame_rate;
+
+    // Set it to one frame per second
+    new_settings->set_setting("SAMPLE_FREQUENCY", m_frame_rate);
+    emit start_analysis(m_vid_proj, new_settings);
+}
+
 /**
  * @brief VideoWidget::init_btn_layout
  * Set up the button layouts

@@ -34,7 +34,7 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
     m_queue_wgt->enqueue(method);
     emit show_analysis_queue(true);
     if (!analysis_queue.empty()) {
-        analysis_queue.push_back(analys);        
+        analysis_queue.push_back(analys);
         QString name = "Queued #" + QString::number(analysis_queue.size()-1);
         emit name_in_tree(item, name);
     } else {
@@ -74,8 +74,18 @@ void AnalysisWidget::perform_analysis(std::tuple<AnalysisMethod*, QTreeWidgetIte
  */
 void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
     emit show_progress(0);
-    analysis->m_name = "Analysis";
-    current_analysis_item->setText(0,"Analysis");
+    switch (analysis->get_type()) {
+    case MOTION_DETECTION:
+        analysis->m_name = "Motion analysis";
+        current_analysis_item->setText(0,"Motion analysis");
+        break;
+    case YOLO:
+        analysis->m_name = "Object detection";
+        current_analysis_item->setText(0,"Object detection");
+        break;
+    default:
+        break;
+    }
     analysis_queue.pop_front();
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     ana_item->set_analysis(analysis);

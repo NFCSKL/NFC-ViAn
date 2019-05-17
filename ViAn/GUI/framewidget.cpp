@@ -318,10 +318,10 @@ cv::Mat FrameWidget::get_org_frame() const {
     cv::Mat tmp = m_org_image.clone();
     switch (tmp.type()) {
         case CV_8UC1:
-            cvtColor(m_org_image, tmp, CV_GRAY2RGB);
+            cvtColor(m_org_image, tmp, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(m_org_image, tmp, CV_BGR2RGB);
+            cvtColor(m_org_image, tmp, cv::COLOR_BGR2RGB);
             break;
     }
     return tmp;
@@ -333,13 +333,13 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
     m_org_image = org_image;
     switch (mod_image.type()) {
         case CV_8UC1:
-            cvtColor(mod_image, _tmp_frame, CV_GRAY2RGB);
+            cvtColor(mod_image, _tmp_frame, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(mod_image, _tmp_frame, CV_BGR2RGB);
+            cvtColor(mod_image, _tmp_frame, cv::COLOR_BGR2RGB);
             break;
         case CV_8UC4:
-            cvtColor(mod_image, _tmp_frame, CV_BGRA2RGB);
+            cvtColor(mod_image, _tmp_frame, cv::COLOR_BGRA2RGB);
             break;
         default:
             qWarning() << "Mat was of unknown type [" << mod_image.type() << "]";

@@ -66,16 +66,16 @@ QString ImageGenerator::export_image(QString requested_path, int ext, const unsi
         // Do resize
         double ratio = 1;
         if (keep_aspect_ratio) ratio = m_frame.cols / static_cast<double>(m_frame.rows);
-        resize(m_frame, tmp, cv::Size(ratio * size, size));
+        cv::resize(m_frame, tmp, cv::Size(ratio * size, size));
     }
 
     // Convert to RGB
     switch (tmp.type()) {
         case CV_8UC1:
-            cvtColor(tmp, tmp, CV_GRAY2RGB);
+            cvtColor(tmp, tmp, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(tmp, tmp, CV_BGR2RGB);
+            cvtColor(tmp, tmp, cv::COLOR_BGR2RGB);
             break;
     }
     QString end;

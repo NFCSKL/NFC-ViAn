@@ -38,6 +38,22 @@ DetectionBox::DetectionBox(cv::Rect rect) {
     m_lower_right = std::make_pair(rect.x + rect.width, rect.y + rect.height);
 }
 
+void DetectionBox::set_class_name(std::string name) {
+    class_name = name;
+}
+
+void DetectionBox::set_confidence(float conf) {
+    confidence = conf;
+}
+
+std::string DetectionBox::get_class_name() {
+    return class_name;
+}
+
+float DetectionBox::get_confidence() {
+    return confidence;
+}
+
 /**
  * @brief DetectionBox::read
  * Reads DetectionBox from json format.

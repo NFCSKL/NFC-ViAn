@@ -487,6 +487,7 @@ void MainWindow::init_analysis_menu() {
 
     QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
     QAction* advanced_analysis_act = new QAction(tr("&Full analysis..."), this);
+    QAction* yolo_analysis_act = new QAction(tr("&Yolo analysis"));
     QAction* settings_act = new QAction(tr("Analysis &settings..."), this);
     ana_details_act = new QAction(tr("&Analysis details"), this);
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
@@ -500,12 +501,14 @@ void MainWindow::init_analysis_menu() {
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
 
-    advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analys.png"));
     quick_analysis_act->setIcon(QIcon(":/Icons/analys.png"));
+    advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analys.png"));
+    yolo_analysis_act->setIcon(QIcon(":/Icons/yologo.png"));
     settings_act->setIcon(QIcon(":/Icons/cog.png"));
 
     quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
     advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
+    yolo_analysis_act->setStatusTip(tr("Perform analysis with yolo on the video"));
     settings_act->setStatusTip(tr("Change the settings for analyses."));
     ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
     detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
@@ -513,17 +516,20 @@ void MainWindow::init_analysis_menu() {
 
     //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));   // Not set because it collides with the alt menu shortcuts
     advanced_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
+    yolo_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);
+    analysis_menu->addAction(yolo_analysis_act);
     analysis_menu->addAction(settings_act);
     analysis_menu->addSeparator();
     analysis_menu->addAction(ana_details_act);
     analysis_menu->addAction(detect_intv_act);
     analysis_menu->addAction(bound_box_act);
 
-    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
+    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
+    connect(yolo_analysis_act, &QAction::triggered, video_wgt, &VideoWidget::yolo_analysis);
     connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);

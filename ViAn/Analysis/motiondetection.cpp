@@ -7,11 +7,13 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+
 /**
  * @brief MotionDetection::MotionDetection
  * @param source_file
  */
-MotionDetection::MotionDetection(const std::string& source_file, const std::string& save_file, AnalysisSettings* settings) : AnalysisMethod(source_file, save_file, settings) {
+MotionDetection::MotionDetection(const std::string& source_file, const std::string& save_file, AnalysisSettings* settings)
+    : AnalysisMethod(source_file, save_file, settings) {
     m_analysis.type = MOTION_DETECTION; 
 }
 
@@ -48,8 +50,8 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     cv::threshold(temp, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
     cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 
-    // Creates OOIs from the detected countours.
-    cv::findContours(result, contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+    // Creates OOIs from the detected contours.
+    cv::findContours(result, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {            
             cv::Rect rect = cv::boundingRect(contour);

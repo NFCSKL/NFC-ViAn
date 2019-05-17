@@ -13,6 +13,7 @@
 #include "opencv2/videoio/videoio.hpp"
 
 //#include "yolo_v2_class.hpp"
+//#include <YOLOv3SE.h>
 
 #include <QMouseEvent>
 
@@ -63,15 +64,15 @@ void YoloListWidget::show_frame(int frame_num) {
     QString path = m_analysis->get_video_path();
     cv::Mat frame;
     cv::VideoCapture cap(path.toStdString());
-    cap.set(CV_CAP_PROP_POS_FRAMES, frame_num);
+    cap.set(cv::CAP_PROP_POS_FRAMES, frame_num);
     cap >> frame;
 
     switch (frame.type()) {
         case CV_8UC1:
-            cvtColor(frame, frame, CV_GRAY2RGB);
+            cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(frame, frame, CV_BGR2RGB);
+            cvtColor(frame, frame, cv::COLOR_BGR2RGB);
             break;
     }
 
@@ -80,7 +81,16 @@ void YoloListWidget::show_frame(int frame_num) {
     std::vector<cv::Rect> detections = ana->get_detections_on_frame(frame_num);
     for (cv::Rect rect : detections) {
         YoloWidgetItem* y_item = new YoloWidgetItem(this);
-        y_item->setText(QString::number(frame_num));
+        switch (ana->get_type()) {
+        case MOTION_DETECTION:
+            y_item->setText(QString::number(frame_num));
+            break;
+        case YOLO:
+            //y_item->setText(QString::number(frame_num) + ": " + );
+            break;
+        default:
+            break;
+        }
         cv::Mat dst;
         cv::resize(frame(rect), dst, cv::Size(rect.width,rect.height));
 
@@ -92,15 +102,18 @@ void YoloListWidget::show_frame(int frame_num) {
         setIconSize(QSize(250,250));
 
 
-        std::string names_file = "data/coco.names";
-        std::string cfg_file = "cfg/yolov3.cfg";
-        std::string weights_file = "yolov3.weights";
-        std::string file_name;
+//        std::string names_file = "data/coco.names";
+//        std::string cfg_file = "cfg/yolov3.cfg";
+//        std::string weights_file = "yolov3.weights";
+//        std::string file_name;
 
         //Detector detector(cfg_file, weights_file);
 
         //std::vector<bbox_t> detections2 = detector
 
+//        YOLOv3 detector;
+//        detector.Create(weights_file, cfg_file, names_file);
+//        std::vector<BoxSE> boxes = detector.Detect(dst, 0.5F);
     }
 }
 

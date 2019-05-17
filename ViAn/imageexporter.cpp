@@ -53,13 +53,13 @@ void ImageExporter::export_images() {
     }
 
     // Get number of digits in the last frame number
-    int max_digits = Utility::number_of_digits(capture.get(CV_CAP_PROP_FRAME_COUNT));
+    int max_digits = Utility::number_of_digits(capture.get(cv::CAP_PROP_FRAME_COUNT));
     int current_frame = m_export_interval.first;
     int progress = 0;
     QString padded_number = "";
 
     cv::Mat frame;
-    capture.set(CV_CAP_PROP_POS_FRAMES, m_export_interval.first);
+    capture.set(cv::CAP_PROP_POS_FRAMES, m_export_interval.first);
     while (capture.read(frame) && (m_export_interval.first + progress) <= m_export_interval.second && !m_aborted) {
         padded_number = Utility::zfill(QString::number(current_frame), max_digits);
         cv::imwrite(m_export_path.toStdString() + padded_number.toStdString() + ".tiff", frame);

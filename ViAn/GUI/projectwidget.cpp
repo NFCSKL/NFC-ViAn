@@ -2,6 +2,7 @@
 
 #include "Analysis/analysisdialog.h"
 #include "Analysis/motiondetection.h"
+#include "Analysis/yoloanalysis.h"
 #include "constants.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/TreeItems/drawingtagitem.h"
@@ -243,6 +244,12 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
         std::string path = vid_proj->get_video()->file_path.toStdString();
         std::string dir = m_proj->m_dir.toStdString();
         method = new MotionDetection(path, dir, settings);
+        break;
+    }
+    case YOLO: {
+        std::string path = vid_proj->get_video()->file_path.toStdString();
+        std::string dir = m_proj->m_dir.toStdString();
+        method = new YoloAnalysis(path, dir, settings);
         break;
     }
     default:

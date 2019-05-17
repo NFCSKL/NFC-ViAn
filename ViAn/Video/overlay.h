@@ -83,7 +83,7 @@ private:
     SHAPES current_shape = ZOOM;
     QColor current_colour = Qt::red;
     QString current_string = "Enter text";
-    float current_font_scale = 1;
+    double current_font_scale = 1;
     const int DRAW_RECT_MIN = 10;
     const int DRAW_RECT_MARGIN = 7;
 
