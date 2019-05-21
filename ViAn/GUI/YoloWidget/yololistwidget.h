@@ -14,8 +14,6 @@ class YoloListWidget : public QListWidget
     Project* m_proj = nullptr;
     std::vector<AnalysisProxy*> m_ana_list;
     std::vector<int> m_frame_list;
-
-    const int ANA_FRAME_STEP = 10;
 public:
     YoloListWidget(QWidget* parent = nullptr);
 

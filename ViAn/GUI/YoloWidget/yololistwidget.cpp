@@ -4,6 +4,7 @@
 #include "imagegenerator.h"
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/poi.h"
 #include "Project/project.h"
 #include "Project/videoproject.h"
 #include "utility.h"
@@ -29,13 +30,14 @@ void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     m_frame_list.clear();
     m_analysis = analysis;
 
+
     // Iterate over all intervals
     for (auto interval : m_analysis->get_intervals()) {
         int frame_nr = interval->get_start();
         while(interval->in_interval(frame_nr)) {
             qDebug() << "frame nr" << frame_nr;
             m_frame_list.push_back(frame_nr);
-            frame_nr += ANA_FRAME_STEP;
+            frame_nr += m_analysis->get_sample_freq();
         }
     }
     emit update_frames(m_frame_list);
@@ -78,19 +80,25 @@ void YoloListWidget::show_frame(int frame_num) {
 
     Analysis* ana = m_analysis->load_analysis();
     // Iterate over all detections on the frame
-    std::vector<cv::Rect> detections = ana->get_detections_on_frame(frame_num);
-    for (cv::Rect rect : detections) {
+    std::vector<DetectionBox> detections = ana->get_detectionbox_on_frame(frame_num);
+    for (DetectionBox d_box : detections) {
         YoloWidgetItem* y_item = new YoloWidgetItem(this);
         switch (ana->get_type()) {
         case MOTION_DETECTION:
             y_item->setText(QString::number(frame_num));
             break;
-        case YOLO:
-            //y_item->setText(QString::number(frame_num) + ": " + );
+        case OBJECT_DETECTION: {
+            QString text = QString::number(frame_num) + ": " +
+                    QString::fromStdString(d_box.get_class_name()) + " " +
+                    QString::number(d_box.get_confidence()*100)+"%";
+            y_item->setText(text);
             break;
+        }
         default:
             break;
         }
+
+        cv::Rect rect = d_box.get_rect();
         cv::Mat dst;
         cv::resize(frame(rect), dst, cv::Size(rect.width,rect.height));
 

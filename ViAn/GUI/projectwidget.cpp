@@ -238,6 +238,7 @@ void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksu
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
+    settings->frame_rate = vid_proj->get_video()->get_frame_rate();
     AnalysisMethod* method = nullptr;
     switch (settings->get_type()) {
     case MOTION_DETECTION: {
@@ -246,7 +247,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
         method = new MotionDetection(path, dir, settings);
         break;
     }
-    case YOLO: {
+    case OBJECT_DETECTION: {
         std::string path = vid_proj->get_video()->file_path.toStdString();
         std::string dir = m_proj->m_dir.toStdString();
         method = new YoloAnalysis(path, dir, settings);
@@ -751,6 +752,16 @@ void ProjectWidget::advanced_analysis() {
     AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
+}
+
+void ProjectWidget::advanced_motion_detection() {
+    analysis_settings->type = MOTION_DETECTION;
+    advanced_analysis();
+}
+
+void ProjectWidget::advanced_object_detection() {
+    analysis_settings->type = OBJECT_DETECTION;
+    advanced_analysis();
 }
 
 /**

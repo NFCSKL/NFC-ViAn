@@ -10,6 +10,7 @@
 
 YoloAnalysis::YoloAnalysis(const std::string& source_file, const std::string& save_file, AnalysisSettings* settings)
     : AnalysisMethod (source_file, save_file, settings) {
+    m_analysis.type = OBJECT_DETECTION;
 
     return;
 

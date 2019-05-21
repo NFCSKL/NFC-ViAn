@@ -21,6 +21,7 @@ void DrawingToolbar::create_actions() {
     zoom_in_tool_act = new QAction(QIcon(":/Icons/zoom_in.png"), tr("Zoom in"), this);
     zoom_out_tool_act = new QAction(QIcon(":/Icons/zoom_out.png"), tr("Zoom out"), this);
     analysis_tool_act = new QAction(QIcon(":/Icons/analys.png"), tr("ROI analysis"), this);
+    yolo_tool_act = new QAction(QIcon(":/Icons/object_detection.png"), tr("Object detection"), this);
     zoom_tool_act = new QAction(QIcon(":/Icons/cursor.png"), tr("Pan/zoom tool"), this);
     edit_tool_act = new QAction(QIcon(":/Icons/cross.png"), tr("Edit tool"), this);
     rectangle_tool_act = new QAction(QIcon(":/Icons/box.png"), tr("Rectangle"), this);
@@ -41,6 +42,7 @@ void DrawingToolbar::create_actions() {
 
     tools = new QActionGroup(this);
     tools->addAction(analysis_tool_act);
+    tools->addAction(yolo_tool_act);
     tools->addAction(zoom_tool_act);
     tools->addAction(edit_tool_act);
     tools->addAction(rectangle_tool_act);
@@ -56,6 +58,7 @@ void DrawingToolbar::create_actions() {
     connect(zoom_in_tool_act, &QAction::triggered, this, &DrawingToolbar::zoom_in_tool_act_clicked);
     connect(zoom_out_tool_act, &QAction::triggered, this, &DrawingToolbar::zoom_out_tool_act_clicked);
     connect(analysis_tool_act, &QAction::triggered, this, &DrawingToolbar::analysis_tool_act_clicked);
+    connect(yolo_tool_act, &QAction::triggered, this, &DrawingToolbar::yolo_tool_act_clicked);
     connect(zoom_tool_act, &QAction::triggered, this, &DrawingToolbar::zoom_tool_act_clicked);
     connect(edit_tool_act, &QAction::triggered, this, &DrawingToolbar::edit_tool_clicked);
 
@@ -116,6 +119,11 @@ void DrawingToolbar::zoom_out_tool_act_clicked() {
 void DrawingToolbar::analysis_tool_act_clicked() {
     emit set_status_bar("Analysis tool");
     emit set_overlay_tool(ANALYSIS_BOX);
+}
+
+void DrawingToolbar::yolo_tool_act_clicked() {
+    emit set_status_bar("Object detection");
+    emit set_overlay_tool(OBJECT_DETECT_BOX);
 }
 
 void DrawingToolbar::zoom_tool_act_clicked() {

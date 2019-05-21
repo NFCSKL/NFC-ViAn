@@ -34,6 +34,7 @@ public:
     QAction* zoom_in_tool_act;
     QAction* zoom_out_tool_act;
     QAction* analysis_tool_act;
+    QAction* yolo_tool_act;
     QAction* zoom_tool_act;
     QAction* edit_tool_act;
     QAction* rectangle_tool_act;
@@ -52,6 +53,7 @@ private slots:
     void zoom_in_tool_act_clicked();
     void zoom_out_tool_act_clicked();
     void analysis_tool_act_clicked();
+    void yolo_tool_act_clicked();
     void zoom_tool_act_clicked();
     void edit_tool_clicked();
 

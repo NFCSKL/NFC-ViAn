@@ -483,15 +483,16 @@ void MainWindow::init_view_menu() {
  * Set up the analysis menu
  */
 void MainWindow::init_analysis_menu() {
-    QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
+    QMenu* analysis_menu = menuBar()->addMenu(tr("Video &Analysis"));
 
-    QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
-    QAction* advanced_analysis_act = new QAction(tr("&Full analysis..."), this);
-    QAction* yolo_analysis_act = new QAction(tr("&Yolo analysis"));
+    QAction* quick_analysis_act = new QAction(tr("&Motion detection"), this);
+    QAction* advanced_analysis_act = new QAction(tr("&Motion detection (batch)..."), this);
+    QAction* yolo_analysis_act = new QAction(tr("&Object detection"));
+    QAction* yolo_advanced_act = new QAction(tr("&Object detection (batch)..."));
     QAction* settings_act = new QAction(tr("Analysis &settings..."), this);
-    ana_details_act = new QAction(tr("&Analysis details"), this);
-    detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
-    bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
+    ana_details_act = new QAction(tr("&Analysis input"), this);
+    detect_intv_act = new QAction(tr("&Detection on timeline"), this);      //Slider pois
+    bound_box_act = new QAction(tr("&Detection boxes"), this);        //Video oois
 
     ana_details_act->setCheckable(true);
     detect_intv_act->setCheckable(true);
@@ -503,12 +504,14 @@ void MainWindow::init_analysis_menu() {
 
     quick_analysis_act->setIcon(QIcon(":/Icons/analys.png"));
     advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analys.png"));
-    yolo_analysis_act->setIcon(QIcon(":/Icons/yologo.png"));
+    yolo_analysis_act->setIcon(QIcon(":/Icons/advanced_analysis_up.png"));
+    yolo_advanced_act->setIcon(QIcon(":/Icons/advanced_object_detection.png"));
     settings_act->setIcon(QIcon(":/Icons/cog.png"));
 
     quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
     advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
     yolo_analysis_act->setStatusTip(tr("Perform analysis with yolo on the video"));
+    yolo_advanced_act->setStatusTip(tr("Perform advanced analysis with yolo on a custom area"));
     settings_act->setStatusTip(tr("Change the settings for analyses."));
     ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
     detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
@@ -517,10 +520,13 @@ void MainWindow::init_analysis_menu() {
     //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));   // Not set because it collides with the alt menu shortcuts
     advanced_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
     yolo_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    //yolo_advanced_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_));    // Choose a shortcut
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);
     analysis_menu->addAction(yolo_analysis_act);
+    analysis_menu->addAction(yolo_advanced_act);
+    analysis_menu->addSeparator();
     analysis_menu->addAction(settings_act);
     analysis_menu->addSeparator();
     analysis_menu->addAction(ana_details_act);
@@ -528,8 +534,11 @@ void MainWindow::init_analysis_menu() {
     analysis_menu->addAction(bound_box_act);
 
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
-    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
-    connect(yolo_analysis_act, &QAction::triggered, video_wgt, &VideoWidget::yolo_analysis);
+    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_motion_detection);
+
+    connect(yolo_analysis_act, &QAction::triggered, draw_toolbar->yolo_tool_act, &QAction::trigger);
+    connect(yolo_advanced_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_object_detection);
+
     connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);

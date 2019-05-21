@@ -11,6 +11,7 @@
  * @brief The Analysis class
  *
  */
+class DetectionBox;
 class Analysis : public BasicAnalysis {
     friend class AnalysisProxy;
 public:
@@ -21,6 +22,7 @@ public:
     virtual void write(QJsonObject& json) override;
     virtual int get_type() const override;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
+    std::vector<DetectionBox> get_detectionbox_on_frame(int frame_num);
     QString get_name() const;
 
 };

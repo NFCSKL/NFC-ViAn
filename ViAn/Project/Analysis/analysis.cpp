@@ -87,3 +87,15 @@ std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
     }
     return res;
 }
+
+std::vector<DetectionBox> Analysis::get_detectionbox_on_frame(int frame_num) {
+    std::vector<DetectionBox> res;
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); it++) {
+        POI* ai = static_cast<POI*>(*it);
+        if (ai->in_interval(frame_num)) {
+            res = ai->get_detectionbox_on_frame(frame_num);
+            break;
+        }
+    }
+    return res;
+}

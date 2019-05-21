@@ -79,7 +79,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy* analysis) {
         analysis->m_name = "Motion analysis";
         current_analysis_item->setText(0,"Motion analysis");
         break;
-    case YOLO:
+    case OBJECT_DETECTION:
         analysis->m_name = "Object detection";
         current_analysis_item->setText(0,"Object detection");
         break;

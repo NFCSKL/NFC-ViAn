@@ -59,6 +59,14 @@ QString AnalysisProxy::get_video_path() {
     return m_video_path;
 }
 
+void AnalysisProxy::set_sample_freq(int freq) {
+    sample_freq = freq;
+}
+
+int AnalysisProxy::get_sample_freq() {
+    return sample_freq;
+}
+
 AnalysisSettings* AnalysisProxy::get_settings() {
     return settings;
 }

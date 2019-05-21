@@ -56,6 +56,14 @@ void Video::set_size(int width, int height) {
     m_height = height;
 }
 
+void Video::set_frame_rate(int fps) {
+    frame_rate = fps;
+}
+
+int Video::get_frame_rate() {
+    return frame_rate;
+}
+
 /**
  * @brief operator ==
  * @param v1

@@ -41,7 +41,12 @@ bool AnalysisMethod::sample_current_frame() {
  */
 void AnalysisMethod::run() {
     setup_analysis();
-    sample_freq = get_setting("SAMPLE_FREQUENCY");
+    if (analysis_settings->type == MOTION_DETECTION) {
+        sample_freq = get_setting("SAMPLE_FREQUENCY");
+    } else if (analysis_settings->type == OBJECT_DETECTION) {
+        sample_freq = analysis_settings->frame_rate * get_setting("Sample frequency (frames/sec)");
+    }
+    if (sample_freq == 0) sample_freq++;
     capture.open(m_source_file);
     if (!capture.isOpened()) {
         return;
@@ -124,9 +129,11 @@ void AnalysisMethod::run() {
         m_analysis.settings = analysis_settings;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
         m_ana_name = Utility::name_from_path(new_path);
+        m_analysis.set_name(QString::fromStdString(m_ana_name));
         m_analysis.save_saveable(QString::fromStdString(new_path));
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
         proxy->set_video_path(QString::fromStdString(m_source_file));
+        proxy->set_sample_freq(sample_freq);
         for (auto p : m_analysis.get_intervals()) {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
             proxy->m_slider_interval.push_back(pair);
@@ -195,6 +202,6 @@ std::string AnalysisMethod::analysis_name() const {
     return m_ana_name;
 }
 
-int AnalysisMethod::get_setting(const std::string &var) {
+double AnalysisMethod::get_setting(const std::string &var) {
     return analysis_settings->get_setting(var);
 }

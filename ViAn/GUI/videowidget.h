@@ -131,7 +131,6 @@ signals:
     void update_thumbnail();
 public slots:
     void quick_analysis(AnalysisSettings* settings);
-    void yolo_analysis();
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);

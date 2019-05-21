@@ -14,7 +14,7 @@
 class AnalysisSettings;
 
 enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG, BASIC_ANALYSIS, DRAWING_TAG, INTERVAL,
-                    SEQUENCE_TAG, YOLO};
+                    SEQUENCE_TAG, OBJECT_DETECTION};
 
 struct interval_cmp {
     bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {

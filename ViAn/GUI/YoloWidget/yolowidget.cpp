@@ -36,7 +36,7 @@ void YoloWidget::set_analysis(AnalysisProxy* analysis) {
     case MOTION_DETECTION:
         setWindowTitle("Motion detection - " + analysis->get_name());
         break;
-    case YOLO:
+    case OBJECT_DETECTION:
         setWindowTitle("Object detection - " + analysis->get_name());
         break;
     default:

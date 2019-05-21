@@ -52,6 +52,7 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
     QFormLayout* form_lay = new QFormLayout();
     v_lay->addLayout(form_lay);
     add_settings(form_lay);
+
     // Add Buttons
     btn_box = new QDialogButtonBox;
     btn_box->addButton(QDialogButtonBox::Ok);

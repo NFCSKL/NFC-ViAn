@@ -162,6 +162,8 @@
         <file>Icons/loop.png</file>
         <file>Icons/flip_horizontal.png</file>
         <file>Icons/flip_vertical.png</file>
-        <file>Icons/yologo.png</file>
+        <file>Icons/advanced_analysis_up.png</file>
+        <file>Icons/advanced_object_detection.png</file>
+        <file>Icons/object_detection.png</file>
     </qresource>
 </RCC>

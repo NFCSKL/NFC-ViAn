@@ -12,7 +12,7 @@
 
 #include <map>
 
-using Settings = std::map<std::string,int>;
+using Settings = std::map<std::string,double>;
 using SettingsDescr = std::map<std::string,std::string>;
 
 class AnalysisProxy;
@@ -58,7 +58,7 @@ public:
 
     AnalysisSettings* analysis_settings = nullptr;
 
-    int get_setting(const std::string& var);             // Get integer value for variable
+    double get_setting(const std::string& var);             // Get double value for variable
     virtual void setup_analysis() = 0;
     virtual std::vector<DetectionBox> analyse_frame() = 0;
 

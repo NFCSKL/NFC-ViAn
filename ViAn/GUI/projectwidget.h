@@ -116,6 +116,8 @@ public slots:
     void dropEvent(QDropEvent *event);
     void update_analysis_settings();
     void advanced_analysis();
+    void advanced_motion_detection();
+    void advanced_object_detection();
     bool prompt_save();
     void update_current_videoitem(QString path);
     void update_videoitems();
