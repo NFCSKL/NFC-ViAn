@@ -41,12 +41,6 @@ bool AnalysisMethod::sample_current_frame() {
  */
 void AnalysisMethod::run() {
     setup_analysis();
-    if (analysis_settings->type == MOTION_DETECTION) {
-        sample_freq = get_setting("SAMPLE_FREQUENCY");
-    } else if (analysis_settings->type == OBJECT_DETECTION) {
-        sample_freq = analysis_settings->frame_rate * get_setting("Sample frequency (frames/sec)");
-    }
-    if (sample_freq == 0) sample_freq++;
     capture.open(m_source_file);
     if (!capture.isOpened()) {
         return;
@@ -203,5 +197,11 @@ std::string AnalysisMethod::analysis_name() const {
 }
 
 double AnalysisMethod::get_setting(const std::string &var) {
-    return analysis_settings->get_setting(var);
+    double ret = 1;
+    if (analysis_settings->type == MOTION_DETECTION) {
+        ret = analysis_settings->get_motion_setting(var);
+    } else if (analysis_settings->type == OBJECT_DETECTION) {
+        ret = analysis_settings->get_object_setting(var);
+    }
+    return ret;
 }

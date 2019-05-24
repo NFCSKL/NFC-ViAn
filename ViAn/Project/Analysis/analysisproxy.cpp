@@ -89,12 +89,22 @@ void AnalysisProxy::read(const QJsonObject &json) {
     int x = json["bounding box x"].toInt();
     new_settings->bounding_box = cv::Rect(x, y, width, height);
     new_settings->interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
+    type = json["analysis_type"].toInt();
+    new_settings->type = type;
 
-    std::vector<std::string> vars = new_settings->get_var_names();
-    for (std::string name : vars) {
-        new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
+    if (type == MOTION_DETECTION) {
+        std::vector<std::string> vars = new_settings->get_motion_var_names();
+        for (std::string name : vars) {
+            new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
+        }
+        settings = new_settings;
+    } else if (type == OBJECT_DETECTION) {
+        std::vector<std::string> vars = new_settings->get_object_var_names();
+        for (std::string name : vars) {
+            new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
+        }
+        settings = new_settings;
     }
-    settings = new_settings;
 
     file_analysis = json["full_path"].toString();
     m_video_path = json["video_path"].toString();
@@ -123,11 +133,18 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["interval start"] = settings->interval.first;
     json["interval end"] = settings->interval.second;
 
-    std::vector<std::string> vars = settings->get_var_names();
-    for (std::string name : vars) {
-        json[QString::fromStdString(name)] = settings->get_setting(name);
+    if (type == MOTION_DETECTION) {
+        std::vector<std::string> vars = settings->get_motion_var_names();
+        for (std::string name : vars) {
+            json[QString::fromStdString(name)] = settings->get_motion_setting(name);
+        }
+    } else if (type == OBJECT_DETECTION) {
+        std::vector<std::string> vars = settings->get_object_var_names();
+        for (std::string name : vars) {
+            json[QString::fromStdString(name)] = settings->get_object_setting(name);
+        }
     }
-
+    json["analysis_type"] = type;
     json["full_path"] = file_analysis;
     json["video_path"] = m_video_path;
     QJsonArray intervals;

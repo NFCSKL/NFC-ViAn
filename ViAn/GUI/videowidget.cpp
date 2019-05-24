@@ -12,7 +12,9 @@
 #include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
+//#include "Project/imagesequence.h"
 #include "Project/videoproject.h"
+//#include "utility.h"
 #include "Video/videocontroller.h"
 
 #include <QBoxLayout>
@@ -264,6 +266,7 @@ void VideoWidget::set_btn_icons() {
     zoom_label->setMaximumWidth(60);
     zoom_label->setEnabled(false);
     connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
+    video_label = new QLabel("", this);
     fps_label = new QLabel("0fps", this);
     size_label = new QLabel("(0x0)", this);
     rotation_label = new QLabel("0°", this);
@@ -301,6 +304,7 @@ void VideoWidget::set_btn_tool_tip() {
     zoom_label->setToolTip("The zoom factor of the video: Z");
     interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation: N");
 
+    video_label->setToolTip("Name of the current video");
     fps_label->setToolTip("The frame rate of the video");
     size_label->setToolTip("The size of  the video");
     rotation_label->setToolTip("The current rotation of the video");
@@ -469,6 +473,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     control_row->addLayout(zoom_btns);
 
+    interval_btns->addWidget(video_label);
     interval_btns->addWidget(fps_label);
     interval_btns->addWidget(size_label);
     interval_btns->addWidget(rotation_label);
@@ -1250,6 +1255,7 @@ void VideoWidget::clear_current_video() {
     play_btn->setChecked(false);
     delete_interval();
     set_total_time(0);
+    video_label->setText("");
     fps_label->setText("Fps: -");
     max_frames->setText("/ -");
     zoom_label->setText("100%");
@@ -1306,6 +1312,10 @@ void VideoWidget::set_seq_tag_btns(bool value) {
     speed_slider->setDisabled(value);
 }
 
+void VideoWidget::update_video_label(QString name) {
+    video_label->setText(name);
+}
+
 /**
  * @brief VideoWidget::capture_failed
  * Open a dialog where the user can enter a new path to the video.
@@ -1345,6 +1355,17 @@ void VideoWidget::capture_failed() {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
+
+//    QString file_name;
+//    VideoState state = m_vid_proj->get_video()->state;
+//    if (m_vid_proj->get_video()->is_sequence()) {
+//        ImageSequence* seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
+//        file_name = Utility::name_from_path(seq->get_original_name_from_index(state.frame));
+//    } else {
+//        file_name = m_vid_proj->get_video()->get_name();
+//    }
+//    video_label->setText(file_name);
+
     m_vid_proj->get_video()->set_size(video_width, video_height);
     m_vid_proj->get_video()->set_frame_rate(frame_rate);
     m_frame_rate = frame_rate;

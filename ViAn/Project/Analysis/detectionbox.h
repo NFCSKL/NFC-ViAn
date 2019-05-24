@@ -29,6 +29,7 @@ public:
     void read(const QJsonObject& json) override;
     void write(QJsonObject& json) override;
     cv::Rect get_rect();
+    void update_rect(cv::Rect rect);
     void scale_coordinates(float scale_ratio);
 };
 #endif // DETECTIONBOX_H

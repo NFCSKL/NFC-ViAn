@@ -65,6 +65,9 @@ void DetectionBox::read(const QJsonObject &json){
 
     m_lower_right.first = json["LR_X"].toInt();
     m_lower_right.second = json["LR_Y"].toInt();
+
+    class_name = json["class_name"].toString().toStdString();
+    confidence = json["confidence"].toDouble();
 }
 
 /**
@@ -78,6 +81,9 @@ void DetectionBox::write(QJsonObject &json){
 
     json["LR_X"] = m_lower_right.first;
     json["LR_Y"] = m_lower_right.second;
+
+    json["class_name"] = QString::fromStdString(class_name);
+    json["confidence"] = confidence;
 }
 
 /**
@@ -88,6 +94,16 @@ void DetectionBox::write(QJsonObject &json){
 cv::Rect DetectionBox::get_rect() {
     return cv::Rect(m_upper_left.first, m_upper_left.second, m_lower_right.first - m_upper_left.first,
                       m_lower_right.second - m_upper_left.second);
+}
+
+/**
+ * @brief DetectionBox::update_rect
+ * Updates the detection box with new coordinates
+ * @param rect
+ */
+void DetectionBox::update_rect(cv::Rect rect) {
+    m_upper_left = std::make_pair(rect.x, rect.y);
+    m_lower_right = std::make_pair(rect.x + rect.width, rect.y + rect.height);
 }
 
 /**

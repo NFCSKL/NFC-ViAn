@@ -51,6 +51,7 @@ signals:
     void selected_media();
     void marked_video_state(VideoProject *vid_proj, VideoState state);
     void set_project(Project*);
+    void video_name(QString);
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
@@ -114,7 +115,8 @@ public slots:
     void remove_interval_area_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
-    void update_analysis_settings();
+    void update_motion_settings();
+    void update_object_settings();
     void advanced_analysis();
     void advanced_motion_detection();
     void advanced_object_detection();

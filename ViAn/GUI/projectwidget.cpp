@@ -262,7 +262,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
-    AnalysisItem* ana = new AnalysisItem();
+    AnalysisItem* ana = new AnalysisItem(settings->get_type());
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
@@ -678,6 +678,9 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else if (ana.second->get_type() == OBJECT_DETECTION) {
+            AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
+            v_item->addChild(ana_item);
         } else if (ana.second->get_type() == INTERVAL) {
             IntervalItem* int_item = new IntervalItem(dynamic_cast<Interval*>(ana.second));
             v_item->addChild(int_item);
@@ -737,7 +740,15 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
-void ProjectWidget::update_analysis_settings() {
+void ProjectWidget::update_motion_settings() {
+    analysis_settings->type = MOTION_DETECTION;
+    std::vector<VideoItem*> v_items;
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
+    dialog->show();
+}
+
+void ProjectWidget::update_object_settings() {
+    analysis_settings->type = OBJECT_DETECTION;
     std::vector<VideoItem*> v_items;
     AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
     dialog->show();
@@ -804,6 +815,7 @@ bool ProjectWidget::prompt_save() {
 void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
     Q_UNUSED(prev_item)
     if (!item) return;
+    emit video_name(item->text(0));
     switch(item->type()){
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);

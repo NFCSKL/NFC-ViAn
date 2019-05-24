@@ -42,12 +42,14 @@ public:
     std::pair<int, int> get_interval() const;
     void set_interval(const std::pair<int, int> &value);
 
-    std::vector<std::string> get_var_names();
+    std::vector<std::string> get_motion_var_names();
+    std::vector<std::string> get_object_var_names();
     void set_setting(const std::string &var, double value);
     void set_full_settings(Settings new_motion_settings, Settings new_object_settings);
     void set_full_settings(std::pair<Settings, Settings> pair);
     std::pair<Settings, Settings> get_full_settings();
-    double get_setting(const std::string& var);
+    double get_motion_setting(const std::string& var);
+    double get_object_setting(const std::string& var);
     std::string get_descr(const std::string& var_name);
     std::string get_type_string();
 

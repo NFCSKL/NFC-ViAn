@@ -62,16 +62,18 @@ void AnalysisSettings::add_object_setting(const std::string &var, double value_d
         m_descriptions_object[var] = descr;
 }
 
-std::vector<std::string> AnalysisSettings::get_var_names() {
+std::vector<std::string> AnalysisSettings::get_motion_var_names() {
     std::vector<std::string> res;
-    if (type == MOTION_DETECTION) {
-        for(auto pair : m_settings_motion){
-            res.push_back(pair.first);
-        }
-    } else if (type == OBJECT_DETECTION) {
-        for(auto pair : m_settings_object){
-            res.push_back(pair.first);
-        }
+    for(auto pair : m_settings_motion){
+        res.push_back(pair.first);
+    }
+    return res;
+}
+
+std::vector<std::string> AnalysisSettings::get_object_var_names() {
+    std::vector<std::string> res;
+    for(auto pair : m_settings_object){
+        res.push_back(pair.first);
     }
     return res;
 }
@@ -98,17 +100,18 @@ std::pair<Settings, Settings> AnalysisSettings::get_full_settings() {
     return std::make_pair(m_settings_motion, m_settings_object);
 }
 
-double AnalysisSettings::get_setting(const std::string &var) {
-    if (type == MOTION_DETECTION) {
-        auto val_pair = m_settings_motion.find(var);
-        if(val_pair != m_settings_motion.end())
-            return val_pair->second;
-    } else if (type == OBJECT_DETECTION) {
-        auto val_pair = m_settings_object.find(var);
-        if(val_pair != m_settings_object.end())
-            return val_pair->second;
-    }
+double AnalysisSettings::get_motion_setting(const std::string &var) {
+    auto val_pair = m_settings_motion.find(var);
+    if(val_pair != m_settings_motion.end())
+        return val_pair->second;
+    qWarning("No variable \"%s found",var.c_str());
+    return -1;
+}
 
+double AnalysisSettings::get_object_setting(const std::string &var) {
+    auto val_pair = m_settings_object.find(var);
+    if(val_pair != m_settings_object.end())
+        return val_pair->second;
     qWarning("No variable \"%s found",var.c_str());
     return -1;
 }

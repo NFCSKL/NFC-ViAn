@@ -9,7 +9,7 @@
 
 class AnalysisInterval : public Writeable
 {
-    using interval = std::pair<int,int>;    
+    using interval = std::pair<int,int>;
 protected:
     int m_start = -1;
     int m_end = -1;

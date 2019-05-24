@@ -6,7 +6,6 @@
 #include <QJsonObject>
 
 class Analysis;
-class AnalsysSettings;
 
 /**
  * @brief The AnalysisProxy class

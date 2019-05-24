@@ -1,5 +1,8 @@
 #include "yoloanalysis.h"
 
+#include "analysissettings.h"
+#include "utility.h"
+
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -122,6 +125,13 @@ void YoloAnalysis::setup_analysis() {
     net = cv::dnn::readNetFromDarknet(modelConfiguration, modelWeights);
     net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
     net.setPreferableTarget(cv::dnn::DNN_TARGET_CPU);
+
+    inpWidth = get_setting("Network size");
+    inpHeight = get_setting("Network size");
+    confThreshold = get_setting("Confidence threshold");
+    nmsThreshold = get_setting("Nms threshold");
+    sample_freq = analysis_settings->frame_rate * get_setting("Sample frequency (frames/sec)");
+    if (sample_freq == 0) sample_freq++;
 }
 
 std::vector<DetectionBox> YoloAnalysis::analyse_frame() {
@@ -194,6 +204,13 @@ std::vector<DetectionBox> YoloAnalysis::postprocess(cv::Mat& frame, const std::v
         } else {
             box.set_class_name("Not found");
         }
+
+        if(analysis_settings->use_bounding_box) {
+            cv::Rect slice_rect = analysis_settings->bounding_box;
+            cv::Rect rect_to_original (box.get_rect().tl()+slice_rect.tl(), slice_rect.tl()+box.get_rect().br());
+            box.update_rect(rect_to_original);
+        }
+        if(scaling_needed) box.update_rect(Utility::scale_rect(box.get_rect(), scaling_ratio, cv::Point(0,0)));
         detection_boxes.push_back(box);
     }
     return detection_boxes;

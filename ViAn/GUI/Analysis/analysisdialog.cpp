@@ -10,6 +10,7 @@
 #include <QDialogButtonBox>
 #include <QFile>
 #include <QFormLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 
@@ -25,28 +26,38 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSetti
     QVBoxLayout* v_lay = new QVBoxLayout();
     if (vid_projs.empty()) do_analysis = false;
 
+
     if (do_analysis) {
         setWindowTitle("Vian - Full analysis");
+
+        QLabel* select_files = new QLabel();
+        select_files->setText("Select files to analyze");
+        v_lay->addWidget(select_files);
         m_v_proj_list = new QListWidget(this);
 
         // Windows-like file selection
-        m_v_proj_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
         for(VideoItem* v : vid_projs) {
             QString path = v->get_video_project()->get_video()->file_path;
             QFile load_file(path);
             if (load_file.open(QIODevice::ReadOnly)) {
                 VideoListItem* item = new VideoListItem(v->get_video_project());
+                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+                item->setCheckState(Qt::Unchecked);
                 m_v_proj_list->addItem(item);
                 if (v->get_video_project()->is_current()) {
-                    item->setSelected(true);
+                    item->setCheckState(Qt::Checked);
                     m_v_proj_list->setCurrentItem(item);
                 }
             }
         }
         v_lay->addWidget(m_v_proj_list);
 
-        connect(m_v_proj_list, &QListWidget::itemSelectionChanged, this, &AnalysisDialog::item_changed);
+        connect(m_v_proj_list, &QListWidget::itemChanged, this, &AnalysisDialog::item_changed);
     }
+
+    QLabel* settings_label = new QLabel();
+    settings_label->setText("Settings");
+    v_lay->addWidget(settings_label);
 
     // Add analysis form
     QFormLayout* form_lay = new QFormLayout();
@@ -78,11 +89,13 @@ AnalysisDialog::~AnalysisDialog() {
  */
 void AnalysisDialog::ok_btn_clicked() {
     if (do_analysis) {
-        for(auto item : m_v_proj_list->selectedItems()){
-            VideoProject* vid_proj = dynamic_cast<VideoListItem*>(item)->m_vid_proj;
-            set_settings();
-            emit start_analysis(vid_proj, m_analysis_settings);
-            close();
+        for (int i = 0; i < m_v_proj_list->count(); i++) {
+            if (m_v_proj_list->item(i)->checkState() == Qt::Checked) {
+                VideoProject* vid_proj = dynamic_cast<VideoListItem*>(m_v_proj_list->item(i))->m_vid_proj;
+                set_settings();
+                emit start_analysis(vid_proj, m_analysis_settings);
+                close();
+            }
         }
         return;
     }
@@ -99,11 +112,14 @@ void AnalysisDialog::cancel_btn_clicked() {
 }
 
 void AnalysisDialog::item_changed() {
-    if (m_v_proj_list->selectedItems().length() > 0) {
-        btn_box->button(QDialogButtonBox::Ok)->setEnabled(true);
-    } else {
-        btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
+    qDebug() << "item changed";
+    for (int i = 0; i < m_v_proj_list->count(); i++) {
+        if (m_v_proj_list->item(i)->checkState() == Qt::Checked) {
+            btn_box->button(QDialogButtonBox::Ok)->setEnabled(true);
+            return;
+        }
     }
+    btn_box->button(QDialogButtonBox::Ok)->setDisabled(true);
 }
 
 /**
@@ -112,13 +128,25 @@ void AnalysisDialog::item_changed() {
  * Add Settings to form layout
  */
 void AnalysisDialog::add_settings(QFormLayout *form) {
-    std::vector<std::string> vars = m_analysis_settings->get_var_names();
+    std::vector<std::string> vars;
+    if (m_analysis_settings->type == MOTION_DETECTION) {
+        vars = m_analysis_settings->get_motion_var_names();
+    } else if (m_analysis_settings->type == OBJECT_DETECTION) {
+        vars = m_analysis_settings->get_object_var_names();
+    }
     for(std::string name : vars) {
         QWidget* var_line;
-        if (name == "DETECT_SHADOWS") {
-            var_line = new QCheckBox();
+        if (m_analysis_settings->type == MOTION_DETECTION) {
+
+            if (name == "DETECT_SHADOWS") {
+                var_line = new QCheckBox();
+            } else {
+                var_line = new QLineEdit(QString::number(m_analysis_settings->get_motion_setting(name)));
+            }
+        } else if (m_analysis_settings->type == OBJECT_DETECTION) {
+            var_line = new QLineEdit(QString::number(m_analysis_settings->get_object_setting(name)));
         } else {
-            var_line = new QLineEdit(QString::number(m_analysis_settings->get_setting(name)));
+            var_line = new QLineEdit();
         }
         var_line->setToolTip(QString::fromStdString(m_analysis_settings->get_descr(name)));
         form->addRow(QString::fromStdString(name), var_line);
@@ -148,12 +176,17 @@ void AnalysisDialog::set_settings() {
 void AnalysisDialog::reset_settings() {
     m_analysis_settings->reset_settings();
     for (auto line : m_settings) {
-        if (line.first == "DETECT_SHADOWS") {
-            QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
-            settings->setChecked(m_analysis_settings->get_setting(line.first));
-        } else {
+        if (m_analysis_settings->type == MOTION_DETECTION) {
+            if (line.first == "DETECT_SHADOWS") {
+                QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
+                settings->setChecked(int(m_analysis_settings->get_motion_setting(line.first)));
+            } else {
+                QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
+                settings->setText(QString::number(m_analysis_settings->get_motion_setting(line.first)));
+            }
+        } else if (m_analysis_settings->type == OBJECT_DETECTION) {
             QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
-            settings->setText(QString::number(m_analysis_settings->get_setting(line.first)));
+            settings->setText(QString::number(m_analysis_settings->get_object_setting(line.first)));
         }
     }
 }

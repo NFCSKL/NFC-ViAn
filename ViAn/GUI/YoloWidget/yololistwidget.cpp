@@ -29,13 +29,12 @@ YoloListWidget::YoloListWidget(QWidget *parent) : QListWidget(parent) {
 void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     m_frame_list.clear();
     m_analysis = analysis;
-
+    Analysis* ana = m_analysis->load_analysis();
 
     // Iterate over all intervals
-    for (auto interval : m_analysis->get_intervals()) {
+    for (auto interval : ana->get_intervals()) {
         int frame_nr = interval->get_start();
         while(interval->in_interval(frame_nr)) {
-            qDebug() << "frame nr" << frame_nr;
             m_frame_list.push_back(frame_nr);
             frame_nr += m_analysis->get_sample_freq();
         }

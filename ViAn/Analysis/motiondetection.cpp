@@ -32,6 +32,7 @@ void MotionDetection::setup_analysis(){
                                                                get_setting("DETECT_SHADOWS"));
     dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(get_setting("OPEN_DEGREE"),
                                                                          get_setting("OPEN_DEGREE")));
+    sample_freq = get_setting("SAMPLE_FREQUENCY");
 }
 
 

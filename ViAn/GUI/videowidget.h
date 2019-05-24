@@ -173,6 +173,7 @@ public slots:
     void zoom_label_finished();
     void enable_poi_btns(bool, bool);
     void set_seq_tag_btns(bool);
+    void update_video_label(QString name);
     void capture_failed();
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void set_slider_max(int max);
@@ -224,6 +225,7 @@ private:
     QLineEdit* frame_line_edit;
     QLineEdit* zoom_label;
     QCheckBox* interpolate_check; // Checked = bicubic, unchecked = nearest
+    QLabel* video_label;
     QLabel* fps_label;
     QLabel* size_label;
     QLabel* rotation_label;
