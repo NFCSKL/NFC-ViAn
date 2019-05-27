@@ -161,11 +161,16 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
  */
 void AnalysisDialog::set_settings() {
     for(auto line : m_settings) {
-        int val;
-        if (line.first == "DETECT_SHADOWS") {
-            QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
-            val = settings->isChecked();
-        } else {
+        int val = -1;
+        if (m_analysis_settings->type == MOTION_DETECTION) {
+            if (line.first == "DETECT_SHADOWS") {
+                QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
+                val = settings->isChecked();
+            } else {
+                QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
+                val = settings->text().toInt();
+            }
+        } else if (m_analysis_settings->type == OBJECT_DETECTION) {
             QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
             val = settings->text().toInt();
         }
