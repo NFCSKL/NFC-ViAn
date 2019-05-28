@@ -6,6 +6,7 @@
 #include "videolistitem.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QFile>
@@ -13,6 +14,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QSpinBox>
 
 AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, AnalysisSettings *analysis_settings)
     : m_analysis_settings(analysis_settings) {
@@ -135,22 +137,86 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
         vars = m_analysis_settings->get_object_var_names();
     }
     for(std::string name : vars) {
-        QWidget* var_line;
+        QWidget* var = new QLineEdit("Error");
         if (m_analysis_settings->type == MOTION_DETECTION) {
-
-            if (name == "DETECT_SHADOWS") {
-                var_line = new QCheckBox();
-            } else {
-                var_line = new QLineEdit(QString::number(m_analysis_settings->get_motion_setting(name)));
+            if (name == "OPEN_DEGREE") {
+                QSpinBox* spin_var = new QSpinBox();
+                spin_var->setMaximum(10);
+                spin_var->setMinimum(0);
+                spin_var->setValue(m_analysis_settings->get_motion_setting(name));
+                var = spin_var;
+            } else if (name == "SMALLEST_OBJECT_SIZE") {
+                QSpinBox* spin_var = new QSpinBox();
+                spin_var->setMaximum(1000);
+                spin_var->setMinimum(10);
+                spin_var->setValue(m_analysis_settings->get_motion_setting(name));
+                var = spin_var;
+            } else if (name == "BACKGROUND_HISTORY") {
+                QSpinBox* spin_var = new QSpinBox();
+                spin_var->setMaximum(1000);
+                spin_var->setMinimum(10);
+                spin_var->setValue(m_analysis_settings->get_motion_setting(name));
+                var = spin_var;
+            } else if (name == "MOG2_THRESHOLD") {
+                QSpinBox* spin_var = new QSpinBox();
+                spin_var->setMaximum(50);
+                spin_var->setMinimum(0);
+                spin_var->setValue(m_analysis_settings->get_motion_setting(name));
+                var = spin_var;
+            } else if (name == "DETECT_SHADOWS") {
+                QCheckBox* check_var = new QCheckBox;
+                var = check_var;
+            } else if (name == "SAMPLE_FREQUENCY") {
+                QSpinBox* spin_var = new QSpinBox();
+                spin_var->setMaximum(1000);
+                spin_var->setMinimum(1);
+                spin_var->setValue(m_analysis_settings->get_motion_setting(name));
+                var = spin_var;
             }
         } else if (m_analysis_settings->type == OBJECT_DETECTION) {
-            var_line = new QLineEdit(QString::number(m_analysis_settings->get_object_setting(name)));
+            if (name == "Network size") {
+                QComboBox* combo_var = new QComboBox();
+                combo_var->addItem(QString::number(608));
+                combo_var->addItem(QString::number(416));
+                combo_var->addItem(QString::number(320));
+                combo_var->addItem(QString::number(256));
+                combo_var->addItem(QString::number(128));
+                combo_var->addItem(QString::number(64));
+                combo_var->setCurrentText(QString::number(416));
+                var = combo_var;
+            } else if (name == "Sample frequency (frames/sec)") {
+                QComboBox* combo_var = new QComboBox();
+                combo_var->addItem(QString::number(100));
+                combo_var->addItem(QString::number(10));
+                combo_var->addItem(QString::number(5));
+                combo_var->addItem(QString::number(2));
+                combo_var->addItem(QString::number(1));
+                combo_var->addItem(QString::number(0.5));
+                combo_var->addItem(QString::number(0.2));
+                combo_var->addItem(QString::number(0.1));
+                combo_var->setCurrentText(QString::number(1));
+                var = combo_var;
+            } else if (name == "Confidence threshold") {
+                QDoubleSpinBox* spin_var = new QDoubleSpinBox();
+                spin_var->setMaximum(1);
+                spin_var->setMinimum(0);
+                spin_var->setSingleStep(0.1);
+                spin_var->setValue(m_analysis_settings->get_object_setting(name));
+                var = spin_var;
+            } else if (name == "Nms threshold") {
+                QDoubleSpinBox* spin_var = new QDoubleSpinBox();
+                spin_var->setMaximum(1);
+                spin_var->setMinimum(0);
+                spin_var->setSingleStep(0.1);
+                spin_var->setValue(m_analysis_settings->get_object_setting(name));
+                var = spin_var;
+            }
         } else {
-            var_line = new QLineEdit();
+            var = new QLineEdit();
         }
-        var_line->setToolTip(QString::fromStdString(m_analysis_settings->get_descr(name)));
-        form->addRow(QString::fromStdString(name), var_line);
-        m_settings.insert(std::make_pair(name, var_line));
+        var->setToolTip(QString::fromStdString(m_analysis_settings->get_descr(name)));
+        form->addRow(QString::fromStdString(name), var);
+        m_settings.insert(std::make_pair(name, var));
     }
 }
 
@@ -161,18 +227,40 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
  */
 void AnalysisDialog::set_settings() {
     for(auto line : m_settings) {
-        int val = -1;
-        if (m_analysis_settings->type == MOTION_DETECTION) {
-            if (line.first == "DETECT_SHADOWS") {
-                QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
-                val = settings->isChecked();
-            } else {
-                QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
-                val = settings->text().toInt();
-            }
-        } else if (m_analysis_settings->type == OBJECT_DETECTION) {
-            QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
-            val = settings->text().toInt();
+        double val = -1;
+        if (line.first == "OPEN_DEGREE") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->value();
+        } else if (line.first == "SMALLEST_OBJECT_SIZE") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->value();
+        } else if (line.first == "BACKGROUND_HISTORY") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->value();
+        } else if (line.first == "MOG2_THRESHOLD") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->value();
+        } else if (line.first == "DETECT_SHADOWS") {
+            QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
+            val = settings->checkState();
+        } else if (line.first == "SAMPLE_FREQUENCY") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->value();
+
+        } else if (line.first == "Network size") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->text().toDouble();
+            //val = settings->value();
+        } else if (line.first == "Sample frequency (frames/sec)") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            val = settings->text().toDouble();
+            //val = settings->value();
+        } else if (line.first == "Confidence threshold") {
+            QDoubleSpinBox* settings = dynamic_cast<QDoubleSpinBox*>(line.second);
+            val = settings->value();
+        } else if (line.first == "Nms threshold") {
+            QDoubleSpinBox* settings = dynamic_cast<QDoubleSpinBox*>(line.second);
+            val = settings->value();
         }
         m_analysis_settings->set_setting(line.first, val);
     }
@@ -181,17 +269,38 @@ void AnalysisDialog::set_settings() {
 void AnalysisDialog::reset_settings() {
     m_analysis_settings->reset_settings();
     for (auto line : m_settings) {
-        if (m_analysis_settings->type == MOTION_DETECTION) {
-            if (line.first == "DETECT_SHADOWS") {
-                QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
-                settings->setChecked(int(m_analysis_settings->get_motion_setting(line.first)));
-            } else {
-                QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
-                settings->setText(QString::number(m_analysis_settings->get_motion_setting(line.first)));
-            }
-        } else if (m_analysis_settings->type == OBJECT_DETECTION) {
-            QLineEdit* settings = dynamic_cast<QLineEdit*>(line.second);
-            settings->setText(QString::number(m_analysis_settings->get_object_setting(line.first)));
+        if (line.first == "OPEN_DEGREE") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            settings->setValue(int(m_analysis_settings->get_motion_setting(line.first)));
+        } else if (line.first == "SMALLEST_OBJECT_SIZE") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            settings->setValue(int(m_analysis_settings->get_motion_setting(line.first)));
+        } else if (line.first == "BACKGROUND_HISTORY") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            settings->setValue(int(m_analysis_settings->get_motion_setting(line.first)));
+        } else if (line.first == "MOG2_THRESHOLD") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            settings->setValue(int(m_analysis_settings->get_motion_setting(line.first)));
+        } else if (line.first == "DETECT_SHADOWS") {
+            QCheckBox* settings = dynamic_cast<QCheckBox*>(line.second);
+            settings->setChecked(int(m_analysis_settings->get_motion_setting(line.first)));
+        } else if (line.first == "SAMPLE_FREQUENCY") {
+            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
+            settings->setValue(int(m_analysis_settings->get_motion_setting(line.first)));
+
+        } else if (line.first == "Network size") {
+            QComboBox* settings = dynamic_cast<QComboBox*>(line.second);
+            settings->setCurrentText(QString::number(m_analysis_settings->get_object_setting(line.first)));
+        } else if (line.first == "Sample frequency (frames/sec)") {
+            QComboBox* settings = dynamic_cast<QComboBox*>(line.second);
+            settings->setCurrentText(QString::number(m_analysis_settings->get_object_setting(line.first)));
+        } else if (line.first == "Confidence threshold") {
+            QDoubleSpinBox* settings = dynamic_cast<QDoubleSpinBox*>(line.second);
+            settings->setValue(double(m_analysis_settings->get_object_setting(line.first)));
+        } else if (line.first == "Nms threshold") {
+            QDoubleSpinBox* settings = dynamic_cast<QDoubleSpinBox*>(line.second);
+            settings->setValue(double(m_analysis_settings->get_object_setting(line.first)));
         }
+
     }
 }

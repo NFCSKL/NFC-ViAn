@@ -815,7 +815,6 @@ bool ProjectWidget::prompt_save() {
 void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* prev_item) {
     Q_UNUSED(prev_item)
     if (!item) return;
-    emit video_name(item->text(0));
     switch(item->type()){
     case SEQUENCE_ITEM: {
         auto seq_item = dynamic_cast<SequenceItem*>(item);
@@ -837,6 +836,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         update_current_tag(vid_item);
         update_current_interval(vid_item);
+        emit video_name(item->text(0));
         break;
     } case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -859,6 +859,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         update_current_tag(vid_item);
         update_current_interval(vid_item);
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case ANALYSIS_ITEM: {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
@@ -883,6 +884,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         update_current_tag(vid_item);
         update_current_interval(vid_item);
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
 
         AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
         emit update_settings_wgt(settings);
@@ -905,6 +907,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_tag_slider(true);
         emit set_interval_slider(false);
         emit enable_poi_btns(true, false);
+
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
 
         if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
         m_tag_item = nullptr;
@@ -942,6 +946,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         if (tag_item->get_tag()->get_type() == SEQUENCE_TAG) {
             emit seq_tag_btns(true);
         }
+
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case TAG_FRAME_ITEM: {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
@@ -979,6 +985,12 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }
+
+        if (vp->get_video()->is_sequence()) {
+            emit video_name(item->text(0));
+        } else {
+            emit video_name(vp->get_video()->get_name());
+        }
         break;
     } case INTERVAL_ITEM: {
         IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item);
@@ -1002,6 +1014,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_interval_slider(true);
         emit enable_poi_btns(true, true);
 
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case INTERVAL_AREA_ITEM: {
         IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
@@ -1027,6 +1040,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
         emit marked_basic_analysis(interval_item->get_interval());
         m_interval_item = interval_item;
+
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case FOLDER_ITEM: {
         emit item_type(item->type());

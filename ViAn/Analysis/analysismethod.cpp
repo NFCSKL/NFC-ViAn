@@ -68,8 +68,7 @@ void AnalysisMethod::run() {
             if(analysis_settings->use_bounding_box){
                 cv::Mat temp (original_frame, analysis_settings->bounding_box);
                 analysis_frame = temp;
-            }
-            else{
+            } else {
                 analysis_frame = original_frame;
             }
             // If scaling is needed, i.e if video is high resolution

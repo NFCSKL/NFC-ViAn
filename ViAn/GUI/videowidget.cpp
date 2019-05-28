@@ -1356,16 +1356,6 @@ void VideoWidget::capture_failed() {
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
 
-//    QString file_name;
-//    VideoState state = m_vid_proj->get_video()->state;
-//    if (m_vid_proj->get_video()->is_sequence()) {
-//        ImageSequence* seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
-//        file_name = Utility::name_from_path(seq->get_original_name_from_index(state.frame));
-//    } else {
-//        file_name = m_vid_proj->get_video()->get_name();
-//    }
-//    video_label->setText(file_name);
-
     m_vid_proj->get_video()->set_size(video_width, video_height);
     m_vid_proj->get_video()->set_frame_rate(frame_rate);
     m_frame_rate = frame_rate;

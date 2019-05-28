@@ -132,6 +132,7 @@ void YoloAnalysis::setup_analysis() {
     nmsThreshold = get_setting("Nms threshold");
     sample_freq = analysis_settings->frame_rate * get_setting("Sample frequency (frames/sec)");
     if (sample_freq == 0) sample_freq++;
+    if (sample_freq >= 100) sample_freq = 1;    // Analyse every frame
 }
 
 std::vector<DetectionBox> YoloAnalysis::analyse_frame() {

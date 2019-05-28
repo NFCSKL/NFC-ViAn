@@ -95,13 +95,13 @@ void AnalysisProxy::read(const QJsonObject &json) {
     if (type == MOTION_DETECTION) {
         std::vector<std::string> vars = new_settings->get_motion_var_names();
         for (std::string name : vars) {
-            new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
+            new_settings->set_setting(name, json[QString::fromStdString(name)].toDouble());
         }
         settings = new_settings;
     } else if (type == OBJECT_DETECTION) {
         std::vector<std::string> vars = new_settings->get_object_var_names();
         for (std::string name : vars) {
-            new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
+            new_settings->set_setting(name, json[QString::fromStdString(name)].toDouble());
         }
         settings = new_settings;
     }
