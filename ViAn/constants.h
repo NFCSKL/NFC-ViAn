@@ -27,6 +27,10 @@ public:
     int PAGE_STEP = 10;
     int FLOATING_WIDGET_MAX = 3;
     QSize PROJ_THUMBNAIL_SIZE = QSize(20,20);
+
+    QString class_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/coco.names";
+    QString config_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.cfg";
+    QString weight_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.weights";
 };
 
 namespace Constants {

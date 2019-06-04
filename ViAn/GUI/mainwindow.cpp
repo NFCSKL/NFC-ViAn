@@ -490,8 +490,8 @@ void MainWindow::init_analysis_menu() {
     QAction* advanced_analysis_act = new QAction(tr("&Motion detection (batch)..."), this);
     QAction* yolo_analysis_act = new QAction(tr("&Object detection"));
     QAction* yolo_advanced_act = new QAction(tr("&Object detection (batch)..."));
-    QAction* settings_motion_act = new QAction(tr("Motion analysis &settings..."), this);
-    QAction* settings_object_act = new QAction(tr("Object analysis &settings..."), this);
+    QAction* settings_motion_act = new QAction(tr("Motion detection &settings..."), this);
+    QAction* settings_object_act = new QAction(tr("Object detection &settings..."), this);
     ana_details_act = new QAction(tr("&Analysis input"), this);
     detect_intv_act = new QAction(tr("&Detection on timeline"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Detection boxes"), this);        //Video oois

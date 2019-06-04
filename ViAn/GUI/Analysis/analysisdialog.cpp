@@ -248,13 +248,11 @@ void AnalysisDialog::set_settings() {
             val = settings->value();
 
         } else if (line.first == "Network size") {
-            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
-            val = settings->text().toDouble();
-            //val = settings->value();
+            QComboBox* settings = dynamic_cast<QComboBox*>(line.second);
+            val = settings->currentText().toDouble();
         } else if (line.first == "Sample frequency (frames/sec)") {
-            QSpinBox* settings = dynamic_cast<QSpinBox*>(line.second);
-            val = settings->text().toDouble();
-            //val = settings->value();
+            QComboBox* settings = dynamic_cast<QComboBox*>(line.second);
+            val = settings->currentText().toDouble();
         } else if (line.first == "Confidence threshold") {
             QDoubleSpinBox* settings = dynamic_cast<QDoubleSpinBox*>(line.second);
             val = settings->value();

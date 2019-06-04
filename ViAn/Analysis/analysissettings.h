@@ -29,13 +29,6 @@ public:
     bool quick_analysis = false;
     int frame_rate = 25;
 
-    std::string class_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/coco.names";
-    std::string config_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.cfg";
-    std::string weight_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.weights";
-
-
-    // continue with these
-
     AnalysisSettings(int type, std::pair<int, int> interval, cv::Rect bounding_box);
     AnalysisSettings(int type);
     AnalysisSettings();

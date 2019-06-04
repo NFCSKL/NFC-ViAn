@@ -15,6 +15,8 @@ class YoloWidget : public QWidget
     YoloListWidget* m_list = nullptr;
     QSlider* frames_slider;
     QComboBox* frames_combo;
+    QComboBox* analyses_combo;
+    QComboBox* classes_combo;
 public:
     YoloWidget(QWidget* parent = nullptr);
 
@@ -24,6 +26,7 @@ public slots:
     void set_project(Project* proj);
 
 private slots:
+    void set_classes();
     void update_frame_list(std::vector<int> frame_list);
 
 signals:

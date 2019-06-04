@@ -13,9 +13,6 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
-//#include "yolo_v2_class.hpp"
-//#include <YOLOv3SE.h>
-
 #include <QMouseEvent>
 
 #include <QDebug>
@@ -24,104 +21,145 @@ YoloListWidget::YoloListWidget(QWidget *parent) : QListWidget(parent) {
     setMinimumSize(1000, 1000);
     setViewMode(QListWidget::IconMode);
     setResizeMode(QListWidget::Adjust);
+    setIconSize(QSize(250,250));
 }
 
 void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     m_frame_list.clear();
-    m_analysis = analysis;
-    Analysis* ana = m_analysis->load_analysis();
+    m_proxy = analysis;
+    m_analysis = m_proxy->load_analysis();
 
     // Iterate over all intervals
-    for (auto interval : ana->get_intervals()) {
+    for (auto interval : m_analysis->get_intervals()) {
         int frame_nr = interval->get_start();
         while(interval->in_interval(frame_nr)) {
             m_frame_list.push_back(frame_nr);
-            frame_nr += m_analysis->get_sample_freq();
+            frame_nr += m_proxy->get_sample_freq();
         }
     }
+    // Update the Combobox with the frames from the analysid
     emit update_frames(m_frame_list);
-    choose_ana_frame("New analysis");
+    create_detection_items();
+    filter_detections();
+    //choose_ana_frame("New analysis");
 }
 
-void YoloListWidget::choose_ana_frame(QString text) {
-    clear();
-    bool ok;
-    int num = text.toInt(&ok);
-    if (!ok) return;
-    show_frame(num);
-    update_video_widget(num);
-}
+void YoloListWidget::create_detection_items() {
+    m_detection_list.clear();
 
-void YoloListWidget::update_video_widget(int frame) {
-    VideoProject* vid_proj = m_proj->get_video_project(m_analysis->get_vid_proj_id());
-    int id = m_analysis->get_id();
-    VideoState state;
-    state.frame = frame;
-    vid_proj->get_video()->state = state;
-    emit set_frame(vid_proj, id);
-}
-
-void YoloListWidget::show_frame(int frame_num) {
-    QString path = m_analysis->get_video_path();
+    QString path = m_proxy->get_video_path();
     cv::Mat frame;
     cv::VideoCapture cap(path.toStdString());
-    cap.set(cv::CAP_PROP_POS_FRAMES, frame_num);
-    cap >> frame;
+    // Iterate over all frames
+    for (int frame_num : m_frame_list) {
+        cap.set(cv::CAP_PROP_POS_FRAMES, frame_num);
+        cap >> frame;
 
-    switch (frame.type()) {
+        switch (frame.type()) {
         case CV_8UC1:
             cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
             cvtColor(frame, frame, cv::COLOR_BGR2RGB);
             break;
-    }
-
-    Analysis* ana = m_analysis->load_analysis();
-    // Iterate over all detections on the frame
-    std::vector<DetectionBox> detections = ana->get_detectionbox_on_frame(frame_num);
-    for (DetectionBox d_box : detections) {
-        YoloWidgetItem* y_item = new YoloWidgetItem(this);
-        switch (ana->get_type()) {
-        case MOTION_DETECTION:
-            y_item->setText(QString::number(frame_num));
-            break;
-        case OBJECT_DETECTION: {
-            QString text = QString::number(frame_num) + ": " +
-                    QString::fromStdString(d_box.get_class_name()) + " " +
-                    QString::number(d_box.get_confidence()*100)+"%";
-            y_item->setText(text);
-            break;
-        }
-        default:
-            break;
         }
 
-        cv::Rect rect = d_box.get_rect();
-        cv::Mat dst;
-        cv::resize(frame(rect), dst, cv::Size(rect.width,rect.height));
+        // Iterate over all detection on the frame
+        std::vector<DetectionBox> detections = m_analysis->get_detectionbox_on_frame(frame_num);
+        for (DetectionBox d_box : detections) {
+            YoloWidgetItem* y_item = new YoloWidgetItem();
+            switch (m_analysis->type) {
+            case MOTION_DETECTION:
+                y_item->setText(QString::number(frame_num));
+                break;
+            case OBJECT_DETECTION: {
+                QString text = QString::number(frame_num) + ": " +
+                        QString::fromStdString(d_box.get_class_name()) + " " +
+                        QString::number(double(d_box.get_confidence()*100))+"%";
+                y_item->setText(text);
+                y_item->class_name = QString::fromStdString(d_box.get_class_name());
+                y_item->confidence = double(d_box.get_confidence());
+                break;
+            }
+            default:
+                break;
+            }
+            y_item->frame_nr = frame_num;
+            cv::Rect rect = d_box.get_rect();
+            cv::Mat dst;
+            cv::resize(frame(rect), dst, cv::Size(rect.width, rect.height));
+            y_item->rect = rect;
 
-        ImageGenerator im_gen(dst, m_proj->get_dir());
-        QString thumbnail_path = im_gen.create_thumbnail(Utility::name_from_path(path), 250);
-        const QIcon icon(thumbnail_path);
-        y_item->setIcon(icon);
-        addItem(y_item);
-        setIconSize(QSize(250,250));
-
-
-//        std::string names_file = "data/coco.names";
-//        std::string cfg_file = "cfg/yolov3.cfg";
-//        std::string weights_file = "yolov3.weights";
-//        std::string file_name;
-
-        //Detector detector(cfg_file, weights_file);
-
-        //std::vector<bbox_t> detections2 = detector
-
-//        YOLOv3 detector;
-//        detector.Create(weights_file, cfg_file, names_file);
-//        std::vector<BoxSE> boxes = detector.Detect(dst, 0.5F);
+            ImageGenerator im_gen(dst, m_proj->get_dir());
+            QString thumbnail_path = im_gen.create_thumbnail(Utility::name_from_path(path), 250);
+            const QIcon icon(thumbnail_path);
+            y_item->setIcon(icon);
+            m_detection_list.push_back(y_item);
+        }
     }
+}
+
+/**
+ * @brief YoloListWidget::update_video_widget
+ * Update video widget in the mainwindow
+ * @param frame
+ */
+void YoloListWidget::update_video_widget(int frame) {
+    VideoProject* vid_proj = m_proj->get_video_project(m_proxy->get_vid_proj_id());
+    int id = m_proxy->get_id();
+    VideoState state;
+    state.frame = frame;
+    vid_proj->get_video()->state = state;
+    emit set_frame(vid_proj, id);
+}
+
+void YoloListWidget::filter_detections() {
+    //clear();
+    while (count()>0) {
+        takeItem(0);
+    }
+
+    for (YoloWidgetItem* y_item : m_detection_list) {
+        bool class_bool = false;
+        bool frame_bool = false;
+        bool conf_bool = false;
+
+        qDebug() << m_class_name << y_item->class_name;
+        // Check class
+        if (m_class_name == "ALL") {
+            class_bool = true;
+        } else if (m_class_name == y_item->class_name) {
+            class_bool = true;
+        }
+        // Check frame
+        if (m_frame == -1) {
+            frame_bool = true;
+        } else if (m_frame == y_item->frame_nr) {
+            frame_bool = true;
+        }
+        // Check confidence
+        if (y_item->confidence >= m_confidence) {
+            conf_bool = true;
+        }
+
+        if (class_bool && frame_bool && conf_bool) {
+            addItem(y_item);
+        }
+    }
+}
+
+void YoloListWidget::update_frame_filter(QString text) {
+    bool ok;
+    int num = text.toInt(&ok);
+    if (!ok) num = -1;
+    m_frame = num;
+    filter_detections();
+    update_video_widget(num);
+}
+
+void YoloListWidget::update_class_filter(QString class_name) {
+    m_class_name = class_name;
+    filter_detections();
 }
 
 void YoloListWidget::set_project(Project* proj) {

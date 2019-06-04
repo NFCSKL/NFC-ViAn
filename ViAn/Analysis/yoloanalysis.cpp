@@ -1,6 +1,7 @@
 #include "yoloanalysis.h"
 
 #include "analysissettings.h"
+#include "constants.h"
 #include "utility.h"
 
 #include "opencv2/highgui/highgui.hpp"
@@ -112,14 +113,15 @@ YoloAnalysis::YoloAnalysis(const std::string& source_file, const std::string& sa
 
 void YoloAnalysis::setup_analysis() {
     // Load names of classes
-    std::string classesFile = "C:/Users/Student/Desktop/yolo in opencv/yolo3/coco.names";
+    Singleton* s = Singleton::get_instance();
+    std::string classesFile = s->class_file.toStdString();
     std::ifstream ifs(classesFile.c_str());
     std::string line;
     while (getline(ifs, line)) classes.push_back(line);
 
     // Give the configuration and weight files for the model
-    cv::String modelConfiguration = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.cfg";
-    cv::String modelWeights = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.weights";
+    cv::String modelConfiguration = s->config_file.toStdString();
+    cv::String modelWeights = s->weight_file.toStdString();
 
     // Load the network
     net = cv::dnn::readNetFromDarknet(modelConfiguration, modelWeights);
