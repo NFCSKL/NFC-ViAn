@@ -14,13 +14,14 @@ class YoloListWidget : public QListWidget
     AnalysisProxy* m_proxy = nullptr;
     Analysis* m_analysis = nullptr;
     Project* m_proj = nullptr;
-    std::vector<AnalysisProxy*> m_ana_list;
     std::vector<int> m_frame_list;
     std::vector<YoloWidgetItem*> m_detection_list;
 
     QString m_class_name = "ALL";
     int m_frame = 0;
     double m_confidence = 0.5;
+
+    int last_frame = 100;
 public:
     YoloListWidget(QWidget* parent = nullptr);
 
@@ -31,13 +32,17 @@ public:
 public slots:
     void create_detection_items();
     void set_project(Project* proj);
-    void update_frame_filter(QString text);
     void filter_detections();
+    void update_frame_filter(QString text);
+    void update_confidence_filter(int confidence);
     void update_class_filter(QString class_name);
+
+    void update_slider();
 
 signals:
     void update_frames(std::vector<int>);
     void set_frame(VideoProject*, int);
+    void slider_max(int);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

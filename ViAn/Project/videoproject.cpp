@@ -203,7 +203,8 @@ ID VideoProject::add_analysis(BasicAnalysis *analysis){
     m_analyses.insert(std::make_pair(m_ana_id, analysis));
     analysis->set_id(m_ana_id);
     analysis->set_vid_proj_id(id);
-    if (analysis->get_type() == MOTION_DETECTION) {
+    if (analysis->get_type() == MOTION_DETECTION ||
+            analysis->get_type() == OBJECT_DETECTION) {
         AnalysisProxy* ana_proxy = dynamic_cast<AnalysisProxy*>(analysis);
         m_project->add_analysis(ana_proxy);
     }
@@ -212,7 +213,8 @@ ID VideoProject::add_analysis(BasicAnalysis *analysis){
 }
 
 void VideoProject::remove_analysis(BasicAnalysis *analysis) {
-    if (analysis->get_type() == MOTION_DETECTION) {
+    if (analysis->get_type() == MOTION_DETECTION ||
+            analysis->get_type() == OBJECT_DETECTION) {
         m_project->remove_analysis(dynamic_cast<AnalysisProxy*>(analysis));
     }
     m_analyses.erase(analysis->get_id());

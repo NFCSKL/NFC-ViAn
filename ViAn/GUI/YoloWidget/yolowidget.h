@@ -4,8 +4,10 @@
 #include <QWidget>
 
 class AnalysisProxy;
+class AnalysisSlider;
 class Project;
 class QComboBox;
+class QLabel;
 class QSlider;
 class VideoProject;
 class YoloListWidget;
@@ -13,10 +15,13 @@ class YoloWidget : public QWidget
 {
     Q_OBJECT
     YoloListWidget* m_list = nullptr;
-    QSlider* frames_slider;
+    AnalysisSlider* frames_slider;
     QComboBox* frames_combo;
-    QComboBox* analyses_combo;
+    QSlider* confidence_slider;
+    QLabel* conf_value;
     QComboBox* classes_combo;
+
+    std::vector<AnalysisProxy*> m_ana_list;
 public:
     YoloWidget(QWidget* parent = nullptr);
 
@@ -27,7 +32,9 @@ public slots:
 
 private slots:
     void set_classes();
+    void update_conf_value(int value);
     void update_frame_list(std::vector<int> frame_list);
+    void set_slider_max(int);
 
 signals:
     void set_frame(VideoProject*, int);

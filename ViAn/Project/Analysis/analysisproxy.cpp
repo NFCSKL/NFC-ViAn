@@ -108,6 +108,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
 
     file_analysis = json["full_path"].toString();
     m_video_path = json["video_path"].toString();
+    sample_freq = json["sample_freq"].toInt();
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_poi = json_intervals[i].toObject();
@@ -147,6 +148,7 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["analysis_type"] = type;
     json["full_path"] = file_analysis;
     json["video_path"] = m_video_path;
+    json["sample_freq"] = sample_freq;
     QJsonArray intervals;
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;

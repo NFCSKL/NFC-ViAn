@@ -189,7 +189,15 @@ std::vector<DetectionBox> YoloAnalysis::postprocess(cv::Mat& frame, const std::v
 
                 classIds.push_back(classIdPoint.x);
                 confidences.push_back(static_cast<float>(confidence));
-                boxes.push_back(cv::Rect(left, top, width, height));
+
+                int x_diff = left + width - frame.cols;
+                if (x_diff > 0) width = width - x_diff;
+
+                int y_diff = top + height - frame.rows;
+                if (y_diff > 0) height = height - y_diff;
+
+                cv::Rect box = cv::Rect(left, top, width, height);
+                boxes.push_back(box);
             }
         }
     }

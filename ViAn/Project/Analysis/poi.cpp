@@ -42,7 +42,6 @@ void POI::set_end_frame(int frame_num) {
 std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
     std::vector<cv::Rect> rects = {};
     if(in_interval((frame_num))){
-        //return OOIs[frame_num];
         for(DetectionBox ooi: OOIs[frame_num]){
             rects.push_back(ooi.get_rect());
         }

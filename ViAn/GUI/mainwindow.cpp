@@ -585,7 +585,6 @@ void MainWindow::close_all_widgets() {
 }
 
 void MainWindow::open_yolo_widget(AnalysisProxy* analysis) {
-    qDebug() << "opening";
     yolo_wgt->show();
     yolo_wgt->set_analysis(analysis);
 }
