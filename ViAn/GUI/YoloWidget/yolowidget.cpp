@@ -17,7 +17,6 @@
 
 YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout();
-    frames_slider = new AnalysisSlider(Qt::Horizontal, this);
 
     // Drop down for choosing frame
     frames_combo = new QComboBox();
@@ -48,9 +47,13 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     icon_size_slider->setMinimum(100);
     icon_size_slider->setValue(250);
 
+    frames_slider = new AnalysisSlider(Qt::Horizontal, this);
+    curr_time = new QLabel("Start");
+    end_time = new QLabel("End");
 
     // Add to layouts
     QHBoxLayout* top_layout = new QHBoxLayout();
+
     QHBoxLayout* frames_layout = new QHBoxLayout();
     frames_layout->addWidget(frames_combo);
     frames_layout->addWidget(prev_btn);
@@ -70,11 +73,16 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
 
     m_list = new YoloListWidget();
 
+    QHBoxLayout* ana_slider_layout = new QHBoxLayout();
+    ana_slider_layout->addWidget(curr_time);
+    ana_slider_layout->addWidget(frames_slider);
+    ana_slider_layout->addWidget(end_time);
+
     layout->addLayout(top_layout);
     layout->addLayout(conf_layout);
     layout->addLayout(icon_size_layout);
     layout->addWidget(m_list);
-    layout->addWidget(frames_slider);
+    layout->addLayout(ana_slider_layout);
 
     layout->setMargin(5);
     layout->setSpacing(5);
@@ -177,6 +185,8 @@ void YoloWidget::next_btn_clicked() {
 void YoloWidget::set_slider_value(int value) {
     if (value < 0) value = 0;
     frames_slider->setValue(value);
+    end_time->setText(QString::number(m_list->last_frame));
+    curr_time->setText(QString::number(value));
 }
 
 void YoloWidget::set_icon_size(int size) {

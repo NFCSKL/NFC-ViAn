@@ -21,7 +21,6 @@ class YoloListWidget : public QListWidget
     int m_frame = 0;
     double m_confidence = 0.5;
 
-    int last_frame = 100;
 public:
     YoloListWidget(QWidget* parent = nullptr);
 
@@ -29,6 +28,7 @@ public:
     void show_frame(int frame_num);
     void update_video_widget(int frame);
 
+    int last_frame = 100;
 public slots:
     void create_detection_items();
     void set_project(Project* proj);

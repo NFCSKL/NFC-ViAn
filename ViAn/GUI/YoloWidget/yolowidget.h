@@ -16,7 +16,6 @@ class YoloWidget : public QWidget
 {
     Q_OBJECT
     YoloListWidget* m_list = nullptr;
-    AnalysisSlider* frames_slider;
     QComboBox* frames_combo;
     QPushButton* next_btn;
     QPushButton* prev_btn;
@@ -25,6 +24,9 @@ class YoloWidget : public QWidget
     QComboBox* classes_combo;
     QSlider* icon_size_slider;
     QLabel* icon_size_label;
+    AnalysisSlider* frames_slider;
+    QLabel* curr_time;
+    QLabel* end_time;
 
     std::vector<AnalysisProxy*> m_ana_list;
 public:
