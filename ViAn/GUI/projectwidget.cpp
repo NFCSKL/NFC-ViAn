@@ -1174,8 +1174,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
                 menu.addAction(show_settings_act);
                 menu.addAction("Rename", this, &ProjectWidget::rename_item);
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
-                menu.addSeparator();
-                menu.addAction("Open object detection widget", this, [this, ana_item]{ open_yolo_widget(ana_item);});
+                if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
+                    menu.addSeparator();
+                    menu.addAction("Open object detection widget", this, [this, ana_item]{ open_yolo_widget(ana_item);});
+                }
             }
             break;
         }

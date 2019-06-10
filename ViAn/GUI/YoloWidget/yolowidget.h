@@ -8,6 +8,7 @@ class AnalysisSlider;
 class Project;
 class QComboBox;
 class QLabel;
+class QPushButton;
 class QSlider;
 class VideoProject;
 class YoloListWidget;
@@ -17,6 +18,8 @@ class YoloWidget : public QWidget
     YoloListWidget* m_list = nullptr;
     AnalysisSlider* frames_slider;
     QComboBox* frames_combo;
+    QPushButton* next_btn;
+    QPushButton* prev_btn;
     QSlider* confidence_slider;
     QLabel* conf_value;
     QComboBox* classes_combo;
@@ -35,6 +38,8 @@ private slots:
     void update_conf_value(int value);
     void update_frame_list(std::vector<int> frame_list);
     void set_slider_max(int);
+    void prev_btn_clicked();
+    void next_btn_clicked();
 
 signals:
     void set_frame(VideoProject*, int);

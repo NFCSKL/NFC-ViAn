@@ -521,10 +521,10 @@ void MainWindow::init_analysis_menu() {
     detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
     bound_box_act->setStatusTip(tr("Toggle boxes on video on/off"));
 
-    //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));   // Not set because it collides with the alt menu shortcuts
+    quick_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_A));
     advanced_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
-    yolo_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
-    //yolo_advanced_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_));    // Choose a shortcut
+    yolo_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_B));
+    yolo_advanced_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_B));
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);

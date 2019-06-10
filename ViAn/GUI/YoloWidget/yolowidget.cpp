@@ -11,6 +11,7 @@
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QSlider>
 #include <QDebug>
 
@@ -21,6 +22,12 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     frames_combo = new QComboBox();
     frames_combo->setDisabled(true);
     frames_combo->addItem("---");
+
+    prev_btn = new QPushButton(QIcon(":/Icons/prev_frame.png"), "", this);
+    next_btn = new QPushButton(QIcon(":/Icons/next_frame.png"), "", this);
+    prev_btn->setFixedSize(22, 22);
+    next_btn->setFixedSize(22, 22);
+
     // Slider for confidence
     confidence_slider = new QSlider(Qt::Horizontal);
     confidence_slider->setMinimum(0);
@@ -36,7 +43,11 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     set_classes();
 
     QHBoxLayout* top_layout = new QHBoxLayout();
-    top_layout->addWidget(frames_combo);
+    QHBoxLayout* frames_layout = new QHBoxLayout();
+    frames_layout->addWidget(frames_combo);
+    frames_layout->addWidget(prev_btn);
+    frames_layout->addWidget(next_btn);
+    top_layout->addLayout(frames_layout);
     top_layout->addWidget(classes_combo);
 
     QHBoxLayout* conf_layout = new QHBoxLayout();
@@ -57,9 +68,11 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
 
     connect(m_list, &YoloListWidget::update_frames, this, &YoloWidget::update_frame_list);
     connect(frames_combo, &QComboBox::currentTextChanged, m_list, &YoloListWidget::update_frame_filter);
+    connect(classes_combo, &QComboBox::currentTextChanged, m_list, &YoloListWidget::update_class_filter);
     connect(confidence_slider, &QSlider::valueChanged, this, &YoloWidget::update_conf_value);
     connect(confidence_slider, &QSlider::valueChanged, m_list, &YoloListWidget::update_confidence_filter);
-    connect(classes_combo, &QComboBox::currentTextChanged, m_list, &YoloListWidget::update_class_filter);
+    connect(prev_btn, &QPushButton::clicked, this, &YoloWidget::prev_btn_clicked);
+    connect(next_btn, &QPushButton::clicked, this, &YoloWidget::next_btn_clicked);
     connect(m_list, &YoloListWidget::slider_max, this, &YoloWidget::set_slider_max);
     connect(m_list, &YoloListWidget::set_frame, this, &YoloWidget::set_frame);
 }
@@ -128,6 +141,17 @@ void YoloWidget::set_slider_max(int max) {
     frames_slider->setMaximum(max);
     frames_slider->set_show_on_slider(true);
     frames_slider->set_show_pois(true);
-    qDebug() << "they are set";
     frames_slider->update();
+}
+
+void YoloWidget::prev_btn_clicked() {
+    if (frames_combo->currentIndex() != 0) {
+        frames_combo->setCurrentIndex(frames_combo->currentIndex()-1);
+    }
+}
+
+void YoloWidget::next_btn_clicked() {
+    if (frames_combo->currentIndex() != frames_combo->count()-1) {
+        frames_combo->setCurrentIndex(frames_combo->currentIndex()+1);
+    }
 }
