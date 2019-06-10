@@ -43,6 +43,7 @@ signals:
     void update_frames(std::vector<int>);
     void set_frame(VideoProject*, int);
     void slider_max(int);
+    void set_slider(int frame);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

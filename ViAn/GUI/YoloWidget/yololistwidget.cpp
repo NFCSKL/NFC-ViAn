@@ -21,7 +21,6 @@ YoloListWidget::YoloListWidget(QWidget *parent) : QListWidget(parent) {
     setMinimumSize(1000, 800);
     setViewMode(QListWidget::IconMode);
     setResizeMode(QListWidget::Adjust);
-    setIconSize(QSize(250,250));
 }
 
 void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
@@ -100,7 +99,7 @@ void YoloListWidget::create_detection_items() {
             y_item->rect = rect;
 
             ImageGenerator im_gen(dst, m_proj->get_dir());
-            QString thumbnail_path = im_gen.create_thumbnail(Utility::name_from_path(path), 250);
+            QString thumbnail_path = im_gen.create_thumbnail(Utility::name_from_path(path), 500);
             const QIcon icon(thumbnail_path);
             y_item->setIcon(icon);
             m_detection_list.push_back(y_item);
@@ -165,6 +164,7 @@ void YoloListWidget::update_frame_filter(QString text) {
     if (!ok) num = -1;
     m_frame = num;
     filter_detections();
+    emit set_slider(num);
     update_video_widget(num);
 }
 

@@ -23,6 +23,8 @@ class YoloWidget : public QWidget
     QSlider* confidence_slider;
     QLabel* conf_value;
     QComboBox* classes_combo;
+    QSlider* icon_size_slider;
+    QLabel* icon_size_label;
 
     std::vector<AnalysisProxy*> m_ana_list;
 public:
@@ -32,6 +34,7 @@ public:
 
 public slots:
     void set_project(Project* proj);
+    void set_slider_value(int value);
 
 private slots:
     void set_classes();
@@ -40,6 +43,7 @@ private slots:
     void set_slider_max(int);
     void prev_btn_clicked();
     void next_btn_clicked();
+    void set_icon_size(int value);
 
 signals:
     void set_frame(VideoProject*, int);
