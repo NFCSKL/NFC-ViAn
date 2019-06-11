@@ -288,7 +288,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Open the recent project dialog
     QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
-    qDebug() << "open cv:" << CV_VERSION;
 }
 
 /**
@@ -755,6 +754,7 @@ void MainWindow::init_help_menu() {
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (project_wgt->close_project()) {
         event->accept();
+        delete yolo_wgt;
     } else {
         event->ignore();
     }

@@ -165,7 +165,6 @@ void YoloListWidget::update_frame_filter(QString text) {
     m_frame = num;
     filter_detections();
     emit set_slider(num);
-    update_video_widget(num);
 }
 
 void YoloListWidget::update_confidence_filter(int confidence) {
@@ -191,10 +190,7 @@ void YoloListWidget::mousePressEvent(QMouseEvent* event) {
         switch (event->button()) {
         case Qt::LeftButton: {
             YoloWidgetItem* yi_item = dynamic_cast<YoloWidgetItem*>(itemAt(event->pos()));
-            bool ok;
-            int num = yi_item->text().toInt(&ok);
-            if (!ok) return;
-            update_video_widget(num);
+            update_video_widget(yi_item->frame_nr);
             break;
         }
         case Qt::RightButton:

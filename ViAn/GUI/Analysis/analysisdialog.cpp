@@ -114,7 +114,6 @@ void AnalysisDialog::cancel_btn_clicked() {
 }
 
 void AnalysisDialog::item_changed() {
-    qDebug() << "item changed";
     for (int i = 0; i < m_v_proj_list->count(); i++) {
         if (m_v_proj_list->item(i)->checkState() == Qt::Checked) {
             btn_box->button(QDialogButtonBox::Ok)->setEnabled(true);
