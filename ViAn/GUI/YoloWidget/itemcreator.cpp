@@ -21,6 +21,9 @@ ItemCreator::ItemCreator(Analysis* analysis, std::vector<YoloWidgetItem*>* detec
 }
 
 void ItemCreator::create_detection_items() {
+    for (auto item : *m_detection_list) {
+        delete item;
+    }
     m_detection_list->clear();
 
     cv::Mat frame;
