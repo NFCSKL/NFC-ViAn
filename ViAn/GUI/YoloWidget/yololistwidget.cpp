@@ -78,7 +78,7 @@ void YoloListWidget::create_detection_items() {
             case OBJECT_DETECTION: {
                 QString text = QString::number(frame_num) + ": " +
                         QString::fromStdString(d_box.get_class_name()) + " " +
-                        QString::number(double(d_box.get_confidence()*100))+"%";
+                        QString::number(int(d_box.get_confidence()*100))+"%";
                 y_item->setText(text);
                 y_item->class_name = QString::fromStdString(d_box.get_class_name());
                 y_item->confidence = double(d_box.get_confidence());
