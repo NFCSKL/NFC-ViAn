@@ -119,7 +119,8 @@ SOURCES += \
     reportgenerator.cpp \
     utility.cpp \
     GUI/YoloWidget/yolowidget.cpp \
-    Analysis/yoloanalysis.cpp
+    Analysis/yoloanalysis.cpp \
+    GUI/YoloWidget/itemcreator.cpp
 
 HEADERS += \
     Analysis/analysismethod.h \
@@ -224,7 +225,8 @@ HEADERS += \
     table.h \
     utility.h \
     GUI/YoloWidget/yolowidget.h \
-    Analysis/yoloanalysis.h
+    Analysis/yoloanalysis.h \
+    GUI/YoloWidget/itemcreator.h
 
 FORMS    +=
 

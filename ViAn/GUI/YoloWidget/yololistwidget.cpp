@@ -1,5 +1,6 @@
 #include "yololistwidget.h"
 
+#include "GUI/YoloWidget/itemcreator.h"
 #include "GUI/YoloWidget/yolowidgetitem.h"
 #include "imagegenerator.h"
 #include "Project/Analysis/analysis.h"
@@ -14,6 +15,7 @@
 #include "opencv2/videoio/videoio.hpp"
 
 #include <QMouseEvent>
+#include <QThread>
 
 #include <QDebug>
 
@@ -39,71 +41,23 @@ void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     }
     // Update the Combobox with the frames from the analysid
     emit update_frames(m_frame_list);
-    create_detection_items();
+    QString video_path = m_proxy->get_video_path();
+
+    ItemCreator* item_creator = new ItemCreator(m_analysis, &m_detection_list,
+                                                m_frame_list, video_path, m_proj->get_dir());
+
+    QThread* create_thread = new QThread;
+    item_creator->moveToThread(create_thread);
+    connect(create_thread, &QThread::started, item_creator, &ItemCreator::create_detection_items);
+    connect(item_creator, &ItemCreator::finished, create_thread, &QThread::quit);
+    connect(item_creator, &ItemCreator::finished, item_creator, &ItemCreator::deleteLater);
+    connect(create_thread, &QThread::finished, create_thread, &QThread::deleteLater);
+    connect(item_creator, &ItemCreator::send_last_frame, this, &YoloListWidget::set_last_frame);
+    connect(item_creator, &ItemCreator::detection_added, this, &YoloListWidget::filter_detections);
+    create_thread->start();
+
     filter_detections();
     update_slider();
-}
-
-void YoloListWidget::create_detection_items() {
-    m_detection_list.clear();
-
-    QString path = m_proxy->get_video_path();
-    cv::Mat frame;
-    cv::VideoCapture cap(path.toStdString());
-
-    last_frame = int(cap.get(cv::CAP_PROP_FRAME_COUNT)) - 1;
-
-    // Iterate over all frames
-    for (int frame_num : m_frame_list) {
-        cap.set(cv::CAP_PROP_POS_FRAMES, frame_num);
-        cap >> frame;
-
-        switch (frame.type()) {
-        case CV_8UC1:
-            cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
-            break;
-        case CV_8UC3:
-            cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-            break;
-        }
-
-        // Iterate over all detection on the frame
-        std::vector<DetectionBox> detections = m_analysis->get_detectionbox_on_frame(frame_num);
-        for (DetectionBox d_box : detections) {
-            YoloWidgetItem* y_item = new YoloWidgetItem();
-            switch (m_analysis->type) {
-            case MOTION_DETECTION:
-                y_item->setText(QString::number(frame_num));
-                break;
-            case OBJECT_DETECTION: {
-                QString text = QString::number(frame_num) + ": " +
-                        QString::fromStdString(d_box.get_class_name()) + " " +
-                        QString::number(int(d_box.get_confidence()*100))+"%";
-                y_item->setText(text);
-                y_item->class_name = QString::fromStdString(d_box.get_class_name());
-                y_item->confidence = double(d_box.get_confidence());
-                break;
-            }
-            default:
-                break;
-            }
-            y_item->frame_nr = frame_num;
-            cv::Rect rect = d_box.get_rect();   // printing rect here
-            cv::Mat dst;
-            try {
-                cv::resize(frame(rect), dst, cv::Size(rect.width, rect.height));
-            } catch (cv::Exception& e) {
-                qWarning() << e.what();
-                continue;
-            }
-            y_item->rect = rect;
-
-            ImageGenerator im_gen(dst, m_proj->get_dir());
-            QString thumbnail_path = im_gen.create_thumbnail(Utility::name_from_path(path), 500);
-            y_item->set_icon(thumbnail_path);
-            m_detection_list.push_back(y_item);
-        }
-    }
 }
 
 /**
@@ -178,6 +132,10 @@ void YoloListWidget::update_class_filter(QString class_name) {
 
 void YoloListWidget::update_slider() {
     emit slider_max(last_frame);
+}
+
+void YoloListWidget::set_last_frame(int frame) {
+    last_frame = frame;
 }
 
 void YoloListWidget::set_project(Project* proj) {

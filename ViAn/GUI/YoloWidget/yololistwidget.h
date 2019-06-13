@@ -30,7 +30,6 @@ public:
 
     int last_frame = 100;
 public slots:
-    void create_detection_items();
     void set_project(Project* proj);
     void filter_detections();
     void update_frame_filter(QString text);
@@ -38,6 +37,7 @@ public slots:
     void update_class_filter(QString class_name);
 
     void update_slider();
+    void set_last_frame(int frame);
 
 signals:
     void update_frames(std::vector<int>);
