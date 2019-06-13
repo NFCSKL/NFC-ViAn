@@ -100,8 +100,7 @@ void YoloListWidget::create_detection_items() {
 
             ImageGenerator im_gen(dst, m_proj->get_dir());
             QString thumbnail_path = im_gen.create_thumbnail(Utility::name_from_path(path), 500);
-            const QIcon icon(thumbnail_path);
-            y_item->setIcon(icon);
+            y_item->set_icon(thumbnail_path);
             m_detection_list.push_back(y_item);
         }
     }

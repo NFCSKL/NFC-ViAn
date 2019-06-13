@@ -13,7 +13,9 @@ public:
     QString class_name;
     double confidence;
     cv::Rect rect;
+    QString thumbnail_path;
     ~YoloWidgetItem();
+    void set_icon(QString icon_path);
 };
 
 #endif // YOLOWIDGETITEM_H
