@@ -189,8 +189,7 @@ void YoloListWidget::mousePressEvent(QMouseEvent* event) {
     if (itemAt(event->pos())) {
         switch (event->button()) {
         case Qt::LeftButton: {
-            YoloWidgetItem* yi_item = dynamic_cast<YoloWidgetItem*>(itemAt(event->pos()));
-            update_video_widget(yi_item->frame_nr);
+            setCurrentItem(itemAt(event->pos()));
             break;
         }
         case Qt::RightButton:
@@ -200,5 +199,12 @@ void YoloListWidget::mousePressEvent(QMouseEvent* event) {
         default:
             break;
         }
+    }
+}
+
+void YoloListWidget::mouseDoubleClickEvent(QMouseEvent* event) {
+    if (itemAt(event->pos())) {
+        YoloWidgetItem* yi_item = dynamic_cast<YoloWidgetItem*>(itemAt(event->pos()));
+        update_video_widget(yi_item->frame_nr);
     }
 }

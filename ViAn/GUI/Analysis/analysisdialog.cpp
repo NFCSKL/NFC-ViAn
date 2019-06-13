@@ -181,11 +181,11 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
                 combo_var->addItem(QString::number(256));
                 combo_var->addItem(QString::number(128));
                 combo_var->addItem(QString::number(64));
-                combo_var->setCurrentText(QString::number(416));
+                combo_var->setCurrentText(QString::number(m_analysis_settings->get_object_setting(name)));
                 var = combo_var;
             } else if (name == "Sample frequency (frames/sec)") {
                 QComboBox* combo_var = new QComboBox();
-                combo_var->addItem(QString::number(100));
+                combo_var->addItem(QString::number(1000));
                 combo_var->addItem(QString::number(10));
                 combo_var->addItem(QString::number(5));
                 combo_var->addItem(QString::number(2));
@@ -193,7 +193,7 @@ void AnalysisDialog::add_settings(QFormLayout *form) {
                 combo_var->addItem(QString::number(0.5));
                 combo_var->addItem(QString::number(0.2));
                 combo_var->addItem(QString::number(0.1));
-                combo_var->setCurrentText(QString::number(1));
+                combo_var->setCurrentText(QString::number(m_analysis_settings->get_object_setting(name)));
                 var = combo_var;
             } else if (name == "Confidence threshold") {
                 QDoubleSpinBox* spin_var = new QDoubleSpinBox();

@@ -165,6 +165,7 @@ void YoloWidget::update_frame_list(std::vector<int> frame_list) {
 
 void YoloWidget::set_slider_max(int max) {
     frames_slider->setMaximum(max);
+    end_time->setText(QString::number(max));
     frames_slider->set_show_on_slider(true);
     frames_slider->set_show_pois(true);
     frames_slider->update();

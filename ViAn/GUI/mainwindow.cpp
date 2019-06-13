@@ -242,9 +242,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::marked_basic_analysis, video_wgt, &VideoWidget::set_basic_analysis);
 
     // Connects for showing/hiding widgets and info
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_details_checked);
-    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
-    connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
     connect(toggle_ana_settings_wgt, &QAction::toggled, project_wgt, &ProjectWidget::toggle_settings);
     connect(project_wgt, &ProjectWidget::toggle_analysis_details, ana_details_act, &QAction::toggle);
     connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
@@ -499,10 +496,6 @@ void MainWindow::init_analysis_menu() {
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
 
-    ana_details_act->setChecked(false);
-    detect_intv_act->setChecked(true);
-    bound_box_act->setChecked(true);
-
     quick_analysis_act->setIcon(QIcon(":/Icons/analys.png"));
     advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analysis_black.png"));
     yolo_analysis_act->setIcon(QIcon(":/Icons/object_detection.png"));
@@ -539,16 +532,24 @@ void MainWindow::init_analysis_menu() {
 
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
     connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_motion_detection);
-
     connect(yolo_analysis_act, &QAction::triggered, draw_toolbar->yolo_tool_act, &QAction::trigger);
     connect(yolo_advanced_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_object_detection);
 
     connect(settings_motion_act, &QAction::triggered, project_wgt, &ProjectWidget::update_motion_settings);
     connect(settings_object_act, &QAction::triggered, project_wgt, &ProjectWidget::update_object_settings);
+
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_details_checked);
+    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
+    connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
+
+    ana_details_act->setChecked(true);
+    detect_intv_act->setChecked(true);
+    bound_box_act->setChecked(true);
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
