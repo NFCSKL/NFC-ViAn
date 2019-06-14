@@ -9,6 +9,7 @@
 #include "utility.h"
 
 #include <QBoxLayout>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
@@ -19,6 +20,8 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout();
 
     // Drop down for choosing frame
+    QLabel* frame_label = new QLabel("Frames: ");
+    frame_label->setMaximumWidth(50);
     frames_combo = new QComboBox();
     frames_combo->setDisabled(true);
     frames_combo->addItem("---");
@@ -27,8 +30,14 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     next_btn = new QPushButton(QIcon(":/Icons/next_frame.png"), "", this);
     prev_btn->setFixedSize(22, 22);
     next_btn->setFixedSize(22, 22);
+    exact_frame_box = new QCheckBox;
+    exact_frame_box->setMaximumWidth(20);
+    QLabel* exact_label = new QLabel("Exact frame");
+    exact_label->setMaximumWidth(60);
 
     // Drop down for classes
+    QLabel* class_label = new QLabel("Class: ");
+    class_label->setMaximumWidth(50);
     classes_combo = new QComboBox();
     set_classes();
 
@@ -58,7 +67,12 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     frames_layout->addWidget(frames_combo);
     frames_layout->addWidget(prev_btn);
     frames_layout->addWidget(next_btn);
+    frames_layout->addWidget(exact_label);
+    frames_layout->addWidget(exact_frame_box);
+
+    top_layout->addWidget(frame_label);
     top_layout->addLayout(frames_layout);
+    top_layout->addWidget(class_label);
     top_layout->addWidget(classes_combo);
 
     QHBoxLayout* icon_size_layout = new QHBoxLayout();
@@ -98,6 +112,8 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     connect(next_btn, &QPushButton::clicked, this, &YoloWidget::next_btn_clicked);
     connect(m_list, &YoloListWidget::slider_max, this, &YoloWidget::set_slider_max);
     connect(m_list, &YoloListWidget::set_frame, this, &YoloWidget::set_frame);
+    connect(exact_frame_box, &QCheckBox::toggled, m_list, &YoloListWidget::set_exact_frame_bool);
+    connect(frames_slider, &AnalysisSlider::valueChanged, m_list, &YoloListWidget::update_frame_filter_int);
 
     connect(m_list, &YoloListWidget::set_slider, this, &YoloWidget::set_slider_value);
     connect(icon_size_slider, &QSlider::valueChanged, this, &YoloWidget::set_icon_size);

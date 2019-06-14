@@ -6,8 +6,6 @@
 #include "Project/Analysis/poi.h"
 #include "utility.h"
 
-//#include "opencv2/highgui/highgui.hpp"
-
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 

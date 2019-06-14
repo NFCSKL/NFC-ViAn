@@ -20,6 +20,7 @@ class YoloListWidget : public QListWidget
     QString m_class_name = "ALL";
     int m_frame = 0;
     double m_confidence = 0.5;
+    bool exact_frame = false;
 
 public:
     YoloListWidget(QWidget* parent = nullptr);
@@ -28,16 +29,19 @@ public:
     void show_frame(int frame_num);
     void update_video_widget(int frame);
 
+
     int last_frame = 100;
 public slots:
     void set_project(Project* proj);
     void filter_detections();
     void update_frame_filter(QString text);
+    void update_frame_filter_int(int frame);
     void update_confidence_filter(int confidence);
     void update_class_filter(QString class_name);
 
     void update_slider();
     void set_last_frame(int frame);
+    void set_exact_frame_bool(bool b);
 
 signals:
     void update_frames(std::vector<int>);

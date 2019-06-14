@@ -91,13 +91,15 @@ void YoloListWidget::filter_detections() {
         // Check class
         if (m_class_name == "ALL") {
             class_bool = true;
-        } else if (m_class_name == y_item->class_name) {
+        } else if (y_item->class_name == m_class_name) {
             class_bool = true;
         }
         // Check frame
         if (m_frame == -1) {
             frame_bool = true;
-        } else if (m_frame == y_item->frame_nr) {
+        } else if (exact_frame && y_item->frame_nr == m_frame) {
+            frame_bool = true;
+        } else if (!exact_frame && y_item->frame_nr >= m_frame) {
             frame_bool = true;
         }
         // Check confidence
@@ -120,6 +122,12 @@ void YoloListWidget::update_frame_filter(QString text) {
     emit set_slider(num);
 }
 
+void YoloListWidget::update_frame_filter_int(int frame) {
+    m_frame = frame;
+    filter_detections();
+    emit set_slider(frame);
+}
+
 void YoloListWidget::update_confidence_filter(int confidence) {
     m_confidence = double(confidence)/100;
     filter_detections();
@@ -136,10 +144,16 @@ void YoloListWidget::update_slider() {
 
 void YoloListWidget::set_last_frame(int frame) {
     last_frame = frame;
+    update_slider();
 }
 
 void YoloListWidget::set_project(Project* proj) {
     m_proj = proj;
+}
+
+void YoloListWidget::set_exact_frame_bool(bool b) {
+    exact_frame = b;
+    filter_detections();
 }
 
 void YoloListWidget::mousePressEvent(QMouseEvent* event) {

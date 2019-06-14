@@ -6,6 +6,7 @@
 class AnalysisProxy;
 class AnalysisSlider;
 class Project;
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QPushButton;
@@ -19,6 +20,7 @@ class YoloWidget : public QWidget
     QComboBox* frames_combo;
     QPushButton* next_btn;
     QPushButton* prev_btn;
+    QCheckBox* exact_frame_box;
     QSlider* confidence_slider;
     QLabel* conf_value;
     QComboBox* classes_combo;
