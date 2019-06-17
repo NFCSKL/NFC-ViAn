@@ -104,6 +104,7 @@ struct overlay_settings {
     bool create_text = false;
 
     bool no_video = false;
+    bool copy_paste = false;
 
     SHAPES tool = ZOOM;
     QColor color = Qt::red;

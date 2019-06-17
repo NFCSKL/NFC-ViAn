@@ -1512,7 +1512,9 @@ void VideoWidget::set_no_video() {
 }
 
 void VideoWidget::process_frame() {
-    update_overlay_settings([&](){});
+    update_overlay_settings([&](){
+        o_settings.copy_paste = true;
+    });
 }
 
 /**
