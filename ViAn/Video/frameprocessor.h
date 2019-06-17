@@ -36,6 +36,8 @@ struct zoomer_settings {
     QPoint anchor = QPoint(0,0);
 
     int rotation = 0;
+    bool flip_state_h = false;
+    bool flip_state_v = false;
 
     bool set_state = false;
 
@@ -69,6 +71,9 @@ struct manipulation_settings {
 
     // -1 LEFT(CCW), 0 NONE, 1 RIGHT(CW)
     int rotate = 0;
+
+    bool do_flip_h = false;
+    bool do_flip_v = false;
 };
 
 /**
@@ -166,6 +171,9 @@ class FrameProcessor : public QObject {
     int const ROTATE_NUM = 4;
     int m_rotate_direction = ROTATE_NONE;
 
+    bool m_flip_state_h = false;
+    bool m_flip_state_v = false;
+
     // Used to zoom and scale frame
     Zoomer m_zoomer;
     // Used to adjust contrast and brightness of frame
@@ -188,7 +196,8 @@ signals:
     void set_scale_factor(double);
     void set_anchor(QPoint);
     void set_rotation(int);
-    void set_zoom_state(QPoint, double, int);
+    void set_flip(bool, bool);
+    void set_zoom_state(QPoint, double, int, bool, bool);
     void set_play_btn(bool);
     void set_bri_cont(int, double, double);
     void done_processing(cv::Mat org_frame, cv::Mat mod_frame, int frame_index);
@@ -200,6 +209,7 @@ private:
     void update_manipulator_settings();
     bool update_overlay_settings();
     void update_rotation(const int& rotation);
+    void update_flip();
 
     void reset_settings();
     void update_frame_size();

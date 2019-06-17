@@ -218,6 +218,7 @@ void VideoWidget::init_frame_processor() {
         connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
         connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
         connect(f_processor, &FrameProcessor::set_rotation, frame_wgt, &FrameWidget::set_rotation);
+        connect(f_processor, &FrameProcessor::set_flip, frame_wgt, &FrameWidget::set_flip);
         connect(f_processor, &FrameProcessor::set_play_btn, this->play_btn, &QPushButton::toggle);
         connect(f_processor, &FrameProcessor::set_zoom_state, this, &VideoWidget::set_zoom_state);
         connect(f_processor, &FrameProcessor::set_bri_cont, this, &VideoWidget::set_brightness_contrast);
@@ -664,23 +665,27 @@ void VideoWidget::set_scale_factor(double scale_factor) {
  * @brief VideoWidget::set_zoom_state
  * Stores the current zoom modifications and rotation made to the video
  */
-void VideoWidget::set_zoom_state(QPoint center, double scale, int angle) {
+void VideoWidget::set_zoom_state(QPoint center, double scale, int angle, bool flip_h, bool flip_v) {
     if (!m_vid_proj) return;
     if (!m_floating) {
         if (proj_tree_item == VIDEO_ITEM) {
             m_vid_proj->state.center = center;
             m_vid_proj->state.scale_factor = scale;
             m_vid_proj->state.rotation = angle;
+            m_vid_proj->state.flip_h = flip_h;
+            m_vid_proj->state.flip_v = flip_v;
         }
         if (m_tag && m_vid_proj->get_video()->get_sequence_type() == TAG_SEQUENCE) {
             TagFrame* t_frame = m_tag->tag_map.at(frame_index.load());
             t_frame->set_center(center);
-            t_frame->set_scale_rot(scale, angle);
+            t_frame->set_scale_rot(scale, angle, flip_h, flip_v);
         }
         Video* video = m_vid_proj->get_video();
         video->state.center = center;
         video->state.scale_factor = scale;
         video->state.rotation = angle;
+        video->state.flip_h = flip_h;
+        video->state.flip_v = flip_v;
 
         if (angle == 90 || angle == 270) {
             size_label->setText("(" + QString::number(m_video_height) + "x" + QString::number(m_video_width) + ")");
@@ -829,7 +834,8 @@ void VideoWidget::update_tag() {
     try {
         TagFrame* t_frame = m_tag->tag_map.at(playback_slider->value());
         VideoState state = m_vid_proj->get_video()->state;
-        t_frame->get_original() = state;
+        t_frame->set_center(state.center);
+        t_frame->set_scale_rot(state.scale_factor, state.rotation, state.flip_h, state.flip_v);
         t_frame->update_color_correction(m_settings.brightness, m_settings.contrast,
                                          m_settings.gamma);
         emit set_status_bar("Frame number: " + QString::number(playback_slider->value()) + " updated");
@@ -1178,6 +1184,8 @@ void VideoWidget::load_marked_video_state(VideoProject* vid_proj, VideoState sta
             z_settings.center = state.center;
             z_settings.zoom_factor = state.scale_factor;
             z_settings.rotation = state.rotation;
+            z_settings.flip_state_h = state.flip_h;
+            z_settings.flip_state_v = state.flip_v;
             m_settings.brightness = state.brightness;
             m_settings.contrast = state.contrast;
             m_settings.gamma = state.gamma;
@@ -1599,6 +1607,8 @@ void VideoWidget::set_state(VideoState state) {
         z_settings.center = state.center;
         z_settings.zoom_factor = state.scale_factor;
         z_settings.rotation = state.rotation;
+        z_settings.flip_state_h = state.flip_h;
+        z_settings.flip_state_v = state.flip_v;
         // TODO Maybe test some more to see if this really isn't needed anymore
         // Now with the new flag variable in the frameprocessor it shouldn't be needed
         // It it's removed, remove the check from the processor as well
@@ -1646,7 +1656,7 @@ void VideoWidget::update_brightness_contrast(int b_val, double c_val, double g_v
  * @brief VideoWidget::rotate_cw
  * Tells the frame processor to rotate the frame cw
  */
-void VideoWidget::rotate_cw(){
+void VideoWidget::rotate_cw() {
     update_processing_settings([&](){m_settings.rotate = 1;});
 }
 
@@ -1654,8 +1664,20 @@ void VideoWidget::rotate_cw(){
  * @brief VideoWidget::rotate_ccw
  * Tells the frame processor to rotate the frame ccw
  */
-void VideoWidget::rotate_ccw(){
+void VideoWidget::rotate_ccw() {
     update_processing_settings([&](){m_settings.rotate = -1;});
+}
+
+void VideoWidget::flip_horizontal() {
+    update_processing_settings([&](){
+        m_settings.do_flip_h = true;
+    });
+}
+
+void VideoWidget::flip_vertical() {
+    update_processing_settings([&](){
+        m_settings.do_flip_v = true;
+    });
 }
 
 /**

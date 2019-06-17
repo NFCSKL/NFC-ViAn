@@ -378,6 +378,8 @@ void MainWindow::init_edit_menu() {
     QAction* cont_bri_act = new QAction(tr("&Color corrections..."), this);
     QAction* cw_act = new QAction(tr("&Rotate 90°"), this);
     QAction* ccw_act = new QAction(tr("&Rotate 90°"), this);
+    QAction* flip_horizontal_act = new QAction(tr("Flip &horizonal"), this);
+    QAction* flip_vertical_act = new QAction(tr("Flip &vertical"), this);
     QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
     QAction* zoom_out_act = new QAction(tr("&Zoom out"), this);
     QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
@@ -387,6 +389,8 @@ void MainWindow::init_edit_menu() {
     cont_bri_act->setIcon(QIcon(":/Icons/screen.png"));
     cw_act->setIcon(QIcon(":/Icons/right.png"));
     ccw_act->setIcon(QIcon(":/Icons/left.png"));
+    flip_horizontal_act->setIcon(QIcon(":/Icons/flip_horizontal.png"));
+    flip_vertical_act->setIcon(QIcon(":/Icons/flip_vertical.png"));
     zoom_in_act->setIcon(QIcon(":/Icons/zoom_in.png"));
     zoom_out_act->setIcon(QIcon(":/Icons/zoom_out.png"));
     fit_screen_act->setIcon(QIcon(":/Icons/resize.png"));
@@ -396,6 +400,8 @@ void MainWindow::init_edit_menu() {
     edit_menu->addAction(cont_bri_act);
     edit_menu->addAction(cw_act);
     edit_menu->addAction(ccw_act);
+    edit_menu->addAction(flip_horizontal_act);
+    edit_menu->addAction(flip_vertical_act);
     edit_menu->addAction(zoom_in_act);
     edit_menu->addAction(zoom_out_act);
     edit_menu->addAction(fit_screen_act);
@@ -406,6 +412,8 @@ void MainWindow::init_edit_menu() {
     cont_bri_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_G));
     cw_act->setShortcut(QKeySequence(Qt::Key_R));
     ccw_act->setShortcut(QKeySequence(Qt::Key_L));
+    flip_horizontal_act->setShortcut(QKeySequence(Qt::Key_H));
+    flip_vertical_act->setShortcut(QKeySequence(Qt::Key_V));
     zoom_in_act->setShortcut(Qt::Key_Plus);
     zoom_out_act->setShortcut(Qt::Key_Minus);
     fit_screen_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
@@ -414,6 +422,8 @@ void MainWindow::init_edit_menu() {
     cont_bri_act->setStatusTip(tr("Open a color correction dialog"));
     cw_act->setStatusTip(tr("Rotate clockwise"));
     ccw_act->setStatusTip(tr("Rotate counter clockwise"));
+    flip_horizontal_act->setStatusTip(tr("Flip horizontally"));
+    flip_vertical_act->setStatusTip(tr("Flip vertically"));
     zoom_in_act->setStatusTip(tr("Zoom in"));
     zoom_out_act->setStatusTip(tr("Zoom out"));
     fit_screen_act->setStatusTip(tr("Fit to screen"));
@@ -423,6 +433,8 @@ void MainWindow::init_edit_menu() {
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
     connect(cw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_cw);
     connect(ccw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_ccw);
+    connect(flip_horizontal_act, &QAction::triggered, video_wgt, &VideoWidget::flip_horizontal);
+    connect(flip_vertical_act, &QAction::triggered, video_wgt, &VideoWidget::flip_vertical);
     connect(zoom_in_act, &QAction::triggered, draw_toolbar->zoom_in_tool_act, &QAction::trigger);
     connect(zoom_out_act, &QAction::triggered, draw_toolbar->zoom_out_tool_act, &QAction::trigger);
     connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);

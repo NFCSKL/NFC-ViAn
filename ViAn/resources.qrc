@@ -161,5 +161,7 @@
         <file>Icons/zoom_out.png</file>
         <file>Icons/loop.png</file>
         <file>Splashscreen.png</file>
+        <file>Icons/flip_horizontal.png</file>
+        <file>Icons/flip_vertical.png</file>
     </qresource>
 </RCC>
