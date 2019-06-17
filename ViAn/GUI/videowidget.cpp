@@ -376,13 +376,10 @@ void VideoWidget::set_btn_shortcuts() {
     prev_frame_btn->setShortcut(Qt::Key_Left);
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
-    bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     // Tag and zoom shortcuts are in the menus
-    export_frame_btn->setShortcut(QKeySequence(Qt::Key_X));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
 
-    bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);
     video_start_sc = new QShortcut(QKeySequence(Qt::Key_Home), this);
@@ -393,7 +390,6 @@ void VideoWidget::set_btn_shortcuts() {
     delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
 
     //connect
-    connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
     connect(zoom_edit_sc, &QShortcut::activated, this, &VideoWidget::zoom_label_focus);
     connect(interpol_sc, &QShortcut::activated, interpolate_check, &QCheckBox::toggle);
     connect(video_start_sc, &QShortcut::activated, this, &VideoWidget::set_video_start);

@@ -710,29 +710,46 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("E&xport interval..."), this);
+    QAction* export_act = new QAction(tr("E&xport intervals to stills..."), this);
+    QAction* export_current_act = new QAction(tr("E&xport current frame to still"), this);
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
+    QAction* bookmark_act = new QAction(tr("&Create a bookmark"), this);
+    QAction* bookmark_desc_act = new QAction(tr("&Create a bookmark with description"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
     export_act->setIcon(QIcon(":/Icons/folder_interval.png"));
+    export_current_act->setIcon(QIcon(":/Icons/export.png"));
     copy_frame_act->setIcon(QIcon(":/Icons/copy.png"));
+    bookmark_desc_act->setIcon(QIcon(":/Icons/bookmark.png"));
     gen_report_act->setIcon(QIcon(":/Icons/report.png"));
 
     export_menu->addAction(export_act);
+    export_menu->addAction(export_current_act);
     export_menu->addAction(copy_frame_act);
+    export_menu->addAction(bookmark_act);
+    export_menu->addAction(bookmark_desc_act);
     export_menu->addSeparator();
     export_menu->addAction(gen_report_act);
 
     export_act->setShortcut(tr("Shift+X"));
+    export_current_act->setShortcut(Qt::Key_X);
     copy_frame_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::CTRL + Qt::Key_C));
+    bookmark_act->setShortcut(Qt::Key_B);
+    bookmark_desc_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
+    export_current_act->setStatusTip(tr("Export the current frame to a still"));
     copy_frame_act->setStatusTip("Copy the current frame to the clipboard");
+    bookmark_act->setStatusTip(tr("Bookmark current frame"));
+    bookmark_desc_act->setStatusTip(tr("Bookmark current frame with description"));
     gen_report_act->setStatusTip(tr("Generate report"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+    connect(export_current_act, &QAction::triggered, video_wgt, &VideoWidget::on_export_frame);
     connect(copy_frame_act, &QAction::triggered, video_wgt->frame_wgt, &FrameWidget::copy_to_clipboard);
+    connect(bookmark_act, &QAction::triggered, video_wgt, &VideoWidget::quick_bookmark);
+    connect(bookmark_desc_act, &QAction::triggered, video_wgt, &VideoWidget::on_bookmark_clicked);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
     connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }
