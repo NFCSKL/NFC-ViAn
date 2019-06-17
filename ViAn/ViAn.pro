@@ -198,6 +198,9 @@ HEADERS  += GUI/mainwindow.h \
 FORMS    +=
 
 RESOURCES += resources.qrc
+
+RC_FILE += myapp.rc
+
 #
 # START :
 # VIDEOPLAYER
