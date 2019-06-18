@@ -11,7 +11,11 @@ VideoInterval::VideoInterval(const int& start, const int& end,
     m_start = start;
     m_end = end;
     m_last_frame = vid_proj->get_video()->get_last_frame();
-    m_state = vid_proj->state;
+    if (vid_proj->get_video()->is_sequence()) {
+        m_state = vid_proj->get_video()->state;
+    } else {
+        m_state = vid_proj->state;
+    }
 }
 
 VideoInterval::VideoInterval() {
