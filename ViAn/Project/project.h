@@ -11,6 +11,7 @@
 class AnalysisProxy;
 class Bookmark;
 class BookmarkCategory;
+class VideoInterval;
 class VideoProject;
 
 using ID = int;
@@ -31,9 +32,11 @@ class Project : public Saveable{
     std::vector<Bookmark*> m_bookmarks;
     std::vector<BookmarkCategory*> m_categories;
     std::vector<AnalysisProxy*> m_analyses;
+    std::vector<VideoInterval*> m_intervals;
 
     int m_vid_count = 0;
     int m_cat_count = 0;
+    int m_interval_count = 0;
     bool m_temporary = true;
     bool m_unsaved_changes = false;
 public:
@@ -55,6 +58,9 @@ public:
     void add_analysis(AnalysisProxy* ana);
     void remove_analysis(AnalysisProxy* ana);
 
+    void add_interval(VideoInterval* interval);
+    void remove_interval(VideoInterval* interval);
+
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
@@ -74,6 +80,7 @@ public:
     std::vector<Bookmark *>& get_bookmarks();
     std::vector<BookmarkCategory *>& get_categories();
     std::vector<AnalysisProxy *>& get_analyses();
+    std::vector<VideoInterval *> &get_intervals();
     VideoProject* get_video_project(int id);
     QString get_dir() const;
     QString get_name() const;

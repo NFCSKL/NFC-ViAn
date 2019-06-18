@@ -33,6 +33,7 @@ SOURCES += \
     GUI/Analysis/queuewidget.cpp \
     GUI/Analysis/tagdialog.cpp \
     GUI/Analysis/videolistitem.cpp \
+    GUI/Bookmark/bookmarkbaseitem.cpp \
     GUI/Bookmark/bookmarkcategory.cpp \
     GUI/Bookmark/bookmarkdialog.cpp \
     GUI/Bookmark/bookmarkitem.cpp \
@@ -59,6 +60,13 @@ SOURCES += \
     GUI/TreeItems/tagitem.cpp \
     GUI/TreeItems/treeitem.cpp \
     GUI/TreeItems/videoitem.cpp \
+    GUI/VideoEdit/editdialog.cpp \
+    GUI/VideoEdit/generatevideodialog.cpp \
+    GUI/VideoEdit/videoedititem.cpp \
+    GUI/VideoEdit/videoeditlist.cpp \
+    GUI/VideoEdit/videoeditwidget.cpp \
+    GUI/VideoEdit/videogenerator.cpp \
+    GUI/VideoEdit/videointerval.cpp \
     GUI/YoloWidget/itemcreator.cpp \
     GUI/YoloWidget/yololistwidget.cpp \
     GUI/YoloWidget/yolowidget.cpp \
@@ -139,6 +147,7 @@ HEADERS += \
     GUI/Analysis/queuewidget.h \
     GUI/Analysis/tagdialog.h \
     GUI/Analysis/videolistitem.h \
+    GUI/Bookmark/bookmarkbaseitem.h \
     GUI/Bookmark/bookmarkcategory.h \
     GUI/Bookmark/bookmarkdialog.h \
     GUI/Bookmark/bookmarkitem.h \
@@ -165,6 +174,13 @@ HEADERS += \
     GUI/TreeItems/tagitem.h \
     GUI/TreeItems/treeitem.h \
     GUI/TreeItems/videoitem.h \
+    GUI/VideoEdit/editdialog.h \
+    GUI/VideoEdit/generatevideodialog.h \
+    GUI/VideoEdit/videoedititem.h \
+    GUI/VideoEdit/videoeditlist.h \
+    GUI/VideoEdit/videoeditwidget.h \
+    GUI/VideoEdit/videogenerator.h \
+    GUI/VideoEdit/videointerval.h \
     GUI/YoloWidget/itemcreator.h \
     GUI/YoloWidget/yololistwidget.h \
     GUI/YoloWidget/yolowidget.h \

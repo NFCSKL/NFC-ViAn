@@ -49,7 +49,7 @@ bool RecentProject::remove_project(const QString& project_path) {
  * @return
  */
 std::list<std::tuple<QString, QString, QString> > RecentProject::load_recent(){
-    QString r_path = Constants::RECENT_FILE_PATH + Constants::RECENT_FILE_NAME;
+    QString r_path = Constants::RECENT_FILE_PATH + Constants::RECENT_FILE_NAME + ".json";
     load_saveable(r_path);
     return recent_items;
 }
@@ -59,7 +59,7 @@ std::list<std::tuple<QString, QString, QString> > RecentProject::load_recent(){
  * Save the recent project file
  */
 void RecentProject::save() {
-    QString r_path = Constants::RECENT_FILE_PATH + Constants::RECENT_FILE_NAME;
+    QString r_path = Constants::RECENT_FILE_PATH + Constants::RECENT_FILE_NAME + ".json";
     save_saveable(r_path);
 }
 /**
@@ -71,7 +71,7 @@ void RecentProject::read(const QJsonObject &json) {
         QJsonObject tuple = j.toObject();
         QString name = tuple["name"].toString();
         QString path = tuple["path"].toString();
-        QString last_changed = tuple["last changed"].toString();
+        QString last_changed = QString(tuple["last changed"].toString());
         if (QFile(path).exists()) {
             recent_items.push_back(std::make_tuple(name, path, last_changed));
         } else {

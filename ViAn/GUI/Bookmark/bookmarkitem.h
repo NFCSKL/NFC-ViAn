@@ -1,10 +1,11 @@
 #ifndef BOOKMARKITEM_H
 #define BOOKMARKITEM_H
 
+#include "bookmarkbaseitem.h"
 #include <QListWidgetItem>
 
 class Bookmark;
-class BookmarkItem : public QListWidgetItem {
+class BookmarkItem : public BookmarkBaseItem {
     QString hover_text;
 public:
     BookmarkItem(Bookmark *bookmark, int type = 1);

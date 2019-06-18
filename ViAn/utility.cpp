@@ -91,17 +91,9 @@ QString Utility::name_from_path(const QString full_path) {
  * Appends (i) to file if i-1 images with same name exist
  */
 std::string Utility::add_serial_number(std::string name, std::string file_end) {
-    QString qend = QString::fromStdString(file_end);
     QString qname = QString::fromStdString(name);
-    QString res = qname+qend;
-    int i = 0;
-    if(QFile::exists(res)){
-        res = qname + QString("(%1)"+ qend).arg(i);
-    }
-    while(QFile::exists(res) && ++i){
-        res = qname + QString("(%1)"+ qend).arg(i);
-    }
-    return res.toStdString();
+    QString qend = QString::fromStdString(file_end);
+    return add_serial_number(qname, qend).toStdString();
 }
 
 QString Utility::add_serial_number(QString name, QString file_end) {

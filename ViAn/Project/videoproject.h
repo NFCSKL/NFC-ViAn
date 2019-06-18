@@ -34,6 +34,7 @@ class VideoProject : public Saveable {
 
     bool m_unsaved_changes = true;
     bool current = false;
+    bool generated_video = false;
 
     ID id = -1;
 public:
@@ -72,6 +73,8 @@ public:
     bool is_saved();
     bool is_current();
     void set_current(bool);
+    bool is_generated_video();
+    void set_generated_video(bool);
 };
 
 #endif // VIDEOPROJECT_H

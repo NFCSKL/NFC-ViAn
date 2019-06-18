@@ -87,6 +87,7 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void create_video(QString path);
+    void generate_video(QString path);
     void add_images();
     void create_sequence(QStringList image_paths, QStringList checksums, QString path, int seq_type);
     void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
@@ -132,6 +133,7 @@ private slots:
     void rename_item();
     void open_yolo_widget(AnalysisItem* ana_item);
     void drawing_tag();
+    void add_to_video_edit(QTreeWidgetItem* item);
     void update_settings();
     void create_folder_item();
     void tree_item_changed(QTreeWidgetItem *item, QTreeWidgetItem *prev_item = nullptr);
@@ -165,8 +167,10 @@ signals:
     void open_in_widget(VideoProject* vid_proj);
     void save_draw_wgt(QTreeWidgetItem* = nullptr);
     void save_bmark_wgt();
+    void save_videdit_wgt();
     void clear_analysis();
     void abort_all_analysis();
+    void interval_to_edit(int start, int end, VideoProject* vid_proj);
 };
 
 #endif // PROJECTWIDGET_H

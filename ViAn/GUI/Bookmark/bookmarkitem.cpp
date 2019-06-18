@@ -10,7 +10,8 @@
  * @param bookmark Bookmark to be saved in the item.
  * @param type Type of bookmark item.
  */
-BookmarkItem::BookmarkItem(Bookmark* bookmark, int type) : QListWidgetItem(bookmark->get_description(), nullptr, type) {
+BookmarkItem::BookmarkItem(Bookmark* bookmark, int type)
+    : BookmarkBaseItem(bookmark->get_description(), type) {
     QString frame = QString::number(bookmark->get_frame_number());
     hover_text = "Source: " + bookmark->m_image_name + "\nFrame: " + frame +
             "\nTime: " + bookmark->get_time();
