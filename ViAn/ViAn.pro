@@ -8,6 +8,8 @@ QT       += core gui
 QT       += testlib
 QT       += axcontainer
 
+QT.testlib.CONFIG -= console
+
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -232,55 +234,18 @@ FORMS    +=
 
 RESOURCES += resources.qrc
 
-win32 {
-#    INCLUDEPATH += C:\opencv\release\install\include
-#    LIBS += C:\opencv\release\bin\libopencv_core320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_video320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
-#    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
+RC_FILE += myapp.rc
 
+win32 {
     # For opencv4
     INCLUDEPATH += D:\opencv4\opencv\build\include
     LIBS += D:\opencv4\opencv-build\bin\libopencv_core401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_highgui401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_imgcodecs401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_imgproc401.dll
-#    LIBS += D:\opencv4\opencv-build\bin\libopencv_features2d401.dll
-#    LIBS += D:\opencv4\opencv-build\bin\libopencv_calib3d401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_dnn401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_video401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_videoio401.dll
-
-#    INCLUDEPATH += D:\YOLOv3_SpringEdition-master\Yolov3_SpringEdition_Test
-#    LIBS += D:/YOLOv3_SpringEdition-master/bin/libYOLOv3SE.dll
-
-#   D:\darknet\darknet-master\own_build\Release
-#   C:\opencv_3.4.3\build\bin\Release
-
-#    INCLUDEPATH += C:\opencv_3.4.3\build\install\include
-#    LIBS += C:\opencv_3.4.3\build\install\x64\vc15\lib\opencv_core343.lib
-#    LIBS += C:\opencv_3.4.3\build\install\x64\vc15\lib\opencv_highgui343.lib
-#    LIBS += C:\opencv_3.4.3\build\install\x64\vc15\lib\opencv_imgcodecs343.lib
-#    LIBS += C:\opencv_3.4.3\build\install\x64\vc15\lib\opencv_imgproc343.lib
-#    LIBS += C:\opencv_3.4.3\build\install\x64\vc15\lib\opencv_video343.lib
-#    LIBS += C:\opencv_3.4.3\build\install\x64\vc15\lib\opencv_videoio343.lib
-
-#    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_core343.dll
-#    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_highgui343.dll
-#    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_imgcodecs343.dll
-#    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_imgproc343.dll
-#    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_video343.dll
-#    LIBS += C:\opencv_3.4.3\build\bin\Release\opencv_videoio343.dll
-
-#    INCLUDEPATH += D:\darknet\darknet-master\include
-#    LIBS += D:/darknet/darknet-master/build/darknet/x64/yolo_cpp_dll.dll
-
-#    LIBS += D:\darknet\darknet-master\own_build\Release\darklib.dll
-
-#    INCLUDEPATH += D:\opencv4\darknet-master\include
-#    LIBS += D:\opencv4\darknet-master\build\darknet\x64\yolo_cpp_dll.dll
 }
 
 #unix {
@@ -293,25 +258,3 @@ win32 {
 #    LIBS += -lopencv_highgui
 #}
 
-#win32:CONFIG(release, debug|release) {
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_core343
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_highgui343
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_imgcodecs343
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_imgproc343
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_video343
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_videoio343
-#}
-#else:win32:CONFIG(debug, debug|release) {
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_core343d
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_highgui343d
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_imgcodecs343d
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_imgproc343d
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_video343d
-#    LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_videoio343d
-#}
-#else:unix: LIBS += -L$$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15/lib/ -lopencv_core343
-
-#INCLUDEPATH += $$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15
-#INCLUDEPATH += C:\opencv_3.4.3\build\install\include
-#DEPENDPATH += C:\opencv_3.4.3\build\install\include
-#DEPENDPATH += $$PWD/../../../../../../opencv_3.4.3/build/install/x64/vc15
