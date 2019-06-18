@@ -298,7 +298,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(videoedit_wgt, &VideoEditWidget::add_video, project_wgt, &ProjectWidget::generate_video);
 
     // Open the recent project dialog
-    QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
+    rp_dialog->exec();
+    //QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
 }
 
 /**

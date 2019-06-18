@@ -9,6 +9,7 @@
 #include "opencv2/core/core.hpp"
 
 #include <QApplication>
+#include <QSplashScreen>
 #include <QTest>
 
 Q_DECLARE_METATYPE(cv::Mat)
@@ -23,6 +24,11 @@ Q_DECLARE_METATYPE(std::string)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QPixmap pixmap(":/Splashscreen.png");
+    QSplashScreen splash(pixmap);
+    splash.setWindowFlags(splash.windowFlags() & Qt::WindowStaysOnTopHint);
+    splash.show();
+    a.processEvents();
     MainWindow w;
     /**
      * qRegisterMetaType i
@@ -37,5 +43,6 @@ int main(int argc, char *argv[])
         QTest::qExec(new VideoProjectTest());
     }
     w.show();
+    splash.finish(&w);
     return a.exec();
 }
