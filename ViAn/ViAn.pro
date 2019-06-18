@@ -22,6 +22,7 @@ SOURCES += \
     Analysis/analysismethod.cpp \
     Analysis/analysissettings.cpp \
     Analysis/motiondetection.cpp \
+    Analysis/yoloanalysis.cpp \
     Filehandler/saveable.cpp \
     Filehandler/writeable.cpp \
     GUI/Analysis/analysisdialog.cpp \
@@ -58,7 +59,9 @@ SOURCES += \
     GUI/TreeItems/tagitem.cpp \
     GUI/TreeItems/treeitem.cpp \
     GUI/TreeItems/videoitem.cpp \
+    GUI/YoloWidget/itemcreator.cpp \
     GUI/YoloWidget/yololistwidget.cpp \
+    GUI/YoloWidget/yolowidget.cpp \
     GUI/YoloWidget/yolowidgetitem.cpp \
     GUI/doubleclickbutton.cpp \
     GUI/drawingwidget.cpp \
@@ -119,15 +122,13 @@ SOURCES += \
     imageimporter.cpp \
     main.cpp \
     reportgenerator.cpp \
-    utility.cpp \
-    GUI/YoloWidget/yolowidget.cpp \
-    Analysis/yoloanalysis.cpp \
-    GUI/YoloWidget/itemcreator.cpp
+    utility.cpp
 
 HEADERS += \
     Analysis/analysismethod.h \
     Analysis/analysissettings.h \
     Analysis/motiondetection.h \
+    Analysis/yoloanalysis.h \
     Filehandler/saveable.h \
     Filehandler/writeable.h \
     GUI/Analysis/analysisdialog.h \
@@ -164,7 +165,9 @@ HEADERS += \
     GUI/TreeItems/tagitem.h \
     GUI/TreeItems/treeitem.h \
     GUI/TreeItems/videoitem.h \
+    GUI/YoloWidget/itemcreator.h \
     GUI/YoloWidget/yololistwidget.h \
+    GUI/YoloWidget/yolowidget.h \
     GUI/YoloWidget/yolowidgetitem.h \
     GUI/doubleclickbutton.h \
     GUI/drawingwidget.h \
@@ -224,11 +227,7 @@ HEADERS += \
     imagegenerator.h \
     imageimporter.h \
     reportgenerator.h \
-    table.h \
-    utility.h \
-    GUI/YoloWidget/yolowidget.h \
-    Analysis/yoloanalysis.h \
-    GUI/YoloWidget/itemcreator.h
+    utility.h
 
 FORMS    +=
 
