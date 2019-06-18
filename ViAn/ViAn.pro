@@ -18,198 +18,232 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    reportgenerator.cpp \
-    GUI/Toolbars/maintoolbar.cpp \
-    GUI/Toolbars/drawingtoolbar.cpp \
-    utility.cpp \
-    GUI/drawscrollarea.cpp \
-    Video/zoomer.cpp \
-    GUI/Analysis/analysisslider.cpp \
-    Project/Test/videoprojecttest.cpp \
-    GUI/Bookmark/bookmarkcategory.cpp \
-    imagegenerator.cpp \
-    GUI/Bookmark/bookmarklist.cpp \
-    GUI/statusbar.cpp \
-    GUI/Analysis/analysiswidget.cpp \
-    Video/frameprocessor.cpp \
-    Project/projecttreestate.cpp \
-    GUI/Analysis/tagdialog.cpp \
-    imageexporter.cpp \
-    imageimporter.cpp \
-    Project/Analysis/tag.cpp \
-    Video/videocontroller.cpp \
-    Video/videoplayer.cpp \
-    Project/recentproject.cpp \
-    Project/Analysis/basicanalysis.cpp \
-    Project/Analysis/analysisinterval.cpp \
-    Filehandler/writeable.cpp \
-    Project/Analysis/analysisproxy.cpp \
-    Project/Analysis/detectionbox.cpp \
-    GUI/doubleclickbutton.cpp \
-    GUI/TreeItems/videoitem.cpp \
-    GUI/TreeItems/treeitem.cpp \
-    GUI/recentprojectdialog.cpp \
-    GUI/projectwidget.cpp \
-    GUI/projectdialog.cpp \
-    GUI/TreeItems/folderitem.cpp \
-    GUI/TreeItems/tagitem.cpp \
-    GUI/TreeItems/analysisitem.cpp \
-    GUI/frameexporterdialog.cpp \
-    GUI/framewidget.cpp \
-    GUI/videowidget.cpp \
+SOURCES += \
+    Analysis/analysismethod.cpp \
     Analysis/analysissettings.cpp \
+    Analysis/motiondetection.cpp \
+    Analysis/yoloanalysis.cpp \
+    Filehandler/saveable.cpp \
+    Filehandler/writeable.cpp \
     GUI/Analysis/analysisdialog.cpp \
-    GUI/Analysis/videolistitem.cpp \
+    GUI/Analysis/analysislistitem.cpp \
+    GUI/Analysis/analysisslider.cpp \
+    GUI/Analysis/analysiswidget.cpp \
+    GUI/Analysis/anasettingwidget.cpp \
     GUI/Analysis/queuewidget.cpp \
-    GUI/DrawingItems/frameitem.cpp \
-    GUI/DrawingItems/rectitem.cpp \
-    GUI/drawingwidget.cpp \
-    Video/shapes/shapes.cpp \
-    GUI/DrawingItems/circleitem.cpp \
-    GUI/DrawingItems/lineitem.cpp \
+    GUI/Analysis/tagdialog.cpp \
+    GUI/Analysis/videolistitem.cpp \
+    GUI/Bookmark/bookmarkbaseitem.cpp \
+    GUI/Bookmark/bookmarkcategory.cpp \
+    GUI/Bookmark/bookmarkdialog.cpp \
+    GUI/Bookmark/bookmarkitem.cpp \
+    GUI/Bookmark/bookmarklist.cpp \
+    GUI/Bookmark/bookmarkwidget.cpp \
     GUI/DrawingItems/arrowitem.cpp \
+    GUI/DrawingItems/circleitem.cpp \
+    GUI/DrawingItems/frameitem.cpp \
+    GUI/DrawingItems/lineitem.cpp \
+    GUI/DrawingItems/penitem.cpp \
+    GUI/DrawingItems/rectitem.cpp \
     GUI/DrawingItems/shapeitem.cpp \
     GUI/DrawingItems/textitem.cpp \
-    GUI/DrawingItems/penitem.cpp \
+    GUI/Toolbars/drawingtoolbar.cpp \
+    GUI/Toolbars/maintoolbar.cpp \
+    GUI/TreeItems/analysisitem.cpp \
     GUI/TreeItems/drawingtagitem.cpp \
-    Project/Test/bookmarktest.cpp \
-    GUI/textdialog.cpp \
-    GUI/TreeItems/tagframeitem.cpp \
-    Project/Analysis/interval.cpp \
-    Project/Analysis/tagframe.cpp \
-    Project/imagesequence.cpp \
-    GUI/TreeItems/sequenceitem.cpp \
-    GUI/TreeItems/sequencecontaineritem.cpp \
-    GUI/Analysis/anasettingwidget.cpp \
-    GUI/Bookmark/bookmarkdialog.cpp \
-    GUI/zoompreviewwidget.cpp \
-    GUI/manipulatorwidget.cpp \
-    GUI/Analysis/analysislistitem.cpp \
-    GUI/TreeItems/intervalitem.cpp \
+    GUI/TreeItems/folderitem.cpp \
     GUI/TreeItems/intervalareaitem.cpp \
-    GUI/pathdialog.cpp \
-    GUI/viewpathdialog.cpp \
-    GUI/viewpathitem.cpp \
-    GUI/settingsdialog.cpp \
-    constants.cpp \
-    GUI/sequencedialog.cpp \
-    GUI/VideoEdit/videoeditwidget.cpp \
-    GUI/VideoEdit/videoeditlist.cpp \
-    GUI/VideoEdit/videoedititem.cpp \
+    GUI/TreeItems/intervalitem.cpp \
+    GUI/TreeItems/sequencecontaineritem.cpp \
+    GUI/TreeItems/sequenceitem.cpp \
+    GUI/TreeItems/tagframeitem.cpp \
+    GUI/TreeItems/tagitem.cpp \
+    GUI/TreeItems/treeitem.cpp \
+    GUI/TreeItems/videoitem.cpp \
     GUI/VideoEdit/editdialog.cpp \
     GUI/VideoEdit/generatevideodialog.cpp \
+    GUI/VideoEdit/videoedititem.cpp \
+    GUI/VideoEdit/videoeditlist.cpp \
+    GUI/VideoEdit/videoeditwidget.cpp \
     GUI/VideoEdit/videogenerator.cpp \
-    GUI/Bookmark/bookmarkbaseitem.cpp \
-    GUI/VideoEdit/videointerval.cpp
+    GUI/VideoEdit/videointerval.cpp \
+    GUI/YoloWidget/itemcreator.cpp \
+    GUI/YoloWidget/yololistwidget.cpp \
+    GUI/YoloWidget/yolowidget.cpp \
+    GUI/YoloWidget/yolowidgetitem.cpp \
+    GUI/doubleclickbutton.cpp \
+    GUI/drawingwidget.cpp \
+    GUI/drawscrollarea.cpp \
+    GUI/frameexporterdialog.cpp \
+    GUI/framewidget.cpp \
+    GUI/mainwindow.cpp \
+    GUI/manipulatorwidget.cpp \
+    GUI/pathdialog.cpp \
+    GUI/projectdialog.cpp \
+    GUI/projectwidget.cpp \
+    GUI/recentprojectdialog.cpp \
+    GUI/sequencedialog.cpp \
+    GUI/settingsdialog.cpp \
+    GUI/statusbar.cpp \
+    GUI/textdialog.cpp \
+    GUI/videowidget.cpp \
+    GUI/viewpathdialog.cpp \
+    GUI/viewpathitem.cpp \
+    GUI/zoompreviewwidget.cpp \
+    Project/Analysis/analysis.cpp \
+    Project/Analysis/analysisinterval.cpp \
+    Project/Analysis/analysisproxy.cpp \
+    Project/Analysis/basicanalysis.cpp \
+    Project/Analysis/detectionbox.cpp \
+    Project/Analysis/interval.cpp \
+    Project/Analysis/poi.cpp \
+    Project/Analysis/tag.cpp \
+    Project/Analysis/tagframe.cpp \
+    Project/Test/bookmarktest.cpp \
+    Project/Test/projecttestsuite.cpp \
+    Project/Test/videoprojecttest.cpp \
+    Project/bookmark.cpp \
+    Project/imagesequence.cpp \
+    Project/project.cpp \
+    Project/projecttreestate.cpp \
+    Project/recentproject.cpp \
+    Project/report.cpp \
+    Project/video.cpp \
+    Project/videoproject.cpp \
+    Test/test_video_player.cpp \
+    Video/shapes/arrow.cpp \
+    Video/shapes/circle.cpp \
+    Video/shapes/line.cpp \
+    Video/shapes/pen.cpp \
+    Video/shapes/rectangle.cpp \
+    Video/shapes/shapes.cpp \
+    Video/shapes/text.cpp \
+    Video/framemanipulator.cpp \
+    Video/frameprocessor.cpp \
+    Video/overlay.cpp \
+    Video/videocontroller.cpp \
+    Video/videoplayer.cpp \
+    Video/zoomer.cpp \
+    constants.cpp \
+    imageexporter.cpp \
+    imagegenerator.cpp \
+    imageimporter.cpp \
+    main.cpp \
+    reportgenerator.cpp \
+    utility.cpp
 
-#
-# TEST
-#
-SOURCES +=
-
-HEADERS += reportgenerator.h\
-    GUI/Toolbars/maintoolbar.h \
-    GUI/Toolbars/drawingtoolbar.h \
-    utility.h \
-    GUI/drawscrollarea.h \
-    Video/zoomer.h \
-    GUI/Analysis/analysisslider.h \
-    Project/Test/videoprojecttest.h \
-    GUI/Bookmark/bookmarkcategory.h \
-    imagegenerator.h \
-    imageimporter.h \
-    GUI/Bookmark/bookmarklist.h \
-    GUI/statusbar.h \
-    GUI/Analysis/analysiswidget.h \
-    Video/frameprocessor.h \
-    Project/projecttreestate.h \
-    GUI/Analysis/tagdialog.h \
-    imageexporter.h \
-    Project/Analysis/tag.h \
-    Video/videocontroller.h \
-    Video/videoplayer.h \
-    Project/recentproject.h \
-    Project/Analysis/basicanalysis.h \
-    Project/Analysis/analysisinterval.h \
+HEADERS += \
+    Analysis/analysismethod.h \
+    Analysis/analysissettings.h \
+    Analysis/motiondetection.h \
+    Analysis/yoloanalysis.h \
+    Filehandler/saveable.h \
     Filehandler/writeable.h \
-    Project/Analysis/analysisproxy.h \
-    Project/Analysis/detectionbox.h \
-    GUI/doubleclickbutton.h \
-    GUI/TreeItems/tagitem.h \
-    GUI/TreeItems/videoitem.h \
+    GUI/Analysis/analysisdialog.h \
+    GUI/Analysis/analysislistitem.h \
+    GUI/Analysis/analysisslider.h \
+    GUI/Analysis/analysiswidget.h \
+    GUI/Analysis/anasettingwidget.h \
+    GUI/Analysis/queuewidget.h \
+    GUI/Analysis/tagdialog.h \
+    GUI/Analysis/videolistitem.h \
+    GUI/Bookmark/bookmarkbaseitem.h \
+    GUI/Bookmark/bookmarkcategory.h \
+    GUI/Bookmark/bookmarkdialog.h \
+    GUI/Bookmark/bookmarkitem.h \
+    GUI/Bookmark/bookmarklist.h \
+    GUI/Bookmark/bookmarkwidget.h \
+    GUI/DrawingItems/arrowitem.h \
+    GUI/DrawingItems/circleitem.h \
+    GUI/DrawingItems/frameitem.h \
+    GUI/DrawingItems/lineitem.h \
+    GUI/DrawingItems/penitem.h \
+    GUI/DrawingItems/rectitem.h \
+    GUI/DrawingItems/shapeitem.h \
+    GUI/DrawingItems/textitem.h \
+    GUI/Toolbars/drawingtoolbar.h \
+    GUI/Toolbars/maintoolbar.h \
     GUI/TreeItems/analysisitem.h \
+    GUI/TreeItems/drawingtagitem.h \
+    GUI/TreeItems/folderitem.h \
+    GUI/TreeItems/intervalareaitem.h \
+    GUI/TreeItems/intervalitem.h \
+    GUI/TreeItems/sequencecontaineritem.h \
+    GUI/TreeItems/sequenceitem.h \
+    GUI/TreeItems/tagframeitem.h \
+    GUI/TreeItems/tagitem.h \
     GUI/TreeItems/treeitem.h \
+    GUI/TreeItems/videoitem.h \
+    GUI/VideoEdit/editdialog.h \
+    GUI/VideoEdit/generatevideodialog.h \
+    GUI/VideoEdit/videoedititem.h \
+    GUI/VideoEdit/videoeditlist.h \
+    GUI/VideoEdit/videoeditwidget.h \
+    GUI/VideoEdit/videogenerator.h \
+    GUI/VideoEdit/videointerval.h \
+    GUI/YoloWidget/itemcreator.h \
+    GUI/YoloWidget/yololistwidget.h \
+    GUI/YoloWidget/yolowidget.h \
+    GUI/YoloWidget/yolowidgetitem.h \
+    GUI/doubleclickbutton.h \
+    GUI/drawingwidget.h \
+    GUI/drawscrollarea.h \
+    GUI/frameexporterdialog.h \
+    GUI/framewidget.h \
+    GUI/mainwindow.h \
+    GUI/manipulatorwidget.h \
+    GUI/pathdialog.h \
     GUI/projectdialog.h \
     GUI/projectwidget.h \
     GUI/recentprojectdialog.h \
-    GUI/frameexporterdialog.h \
-    GUI/framewidget.h \
-    GUI/videowidget.h \
-    Analysis/analysissettings.h \
-    Analysis/analysismethod.h \
-    GUI/Analysis/analysisdialog.h \
-    GUI/Analysis/videolistitem.h \
-    GUI/Analysis/queuewidget.h \
-    GUI/DrawingItems/frameitem.h \
-    GUI/DrawingItems/rectitem.h \
-    GUI/drawingwidget.h \
-    Video/shapes/shapes.h \
-    GUI/DrawingItems/circleitem.h \
-    GUI/DrawingItems/lineitem.h \
-    GUI/DrawingItems/arrowitem.h \
-    GUI/DrawingItems/shapeitem.h \
-    GUI/DrawingItems/textitem.h \
-    GUI/DrawingItems/penitem.h \
-    GUI/TreeItems/drawingtagitem.h \
-    Project/Test/bookmarktest.h \
+    GUI/sequencedialog.h \
+    GUI/settingsdialog.h \
+    GUI/statusbar.h \
     GUI/textdialog.h \
-    GUI/TreeItems/tagframeitem.h \
-    Project/Analysis/interval.h \
-    Project/Analysis/tagframe.h \
-    Project/imagesequence.h \
-    Project/video.h \
-    GUI/TreeItems/sequenceitem.h \
-    GUI/TreeItems/sequencecontaineritem.h \
-    GUI/Analysis/anasettingwidget.h \
-    GUI/Bookmark/bookmarkdialog.h \
-    GUI/zoompreviewwidget.h \
-    GUI/manipulatorwidget.h \
-    GUI/Analysis/analysislistitem.h \
-    GUI/TreeItems/intervalitem.h \
-    GUI/TreeItems/intervalareaitem.h \
-    GUI/pathdialog.h \
+    GUI/videowidget.h \
     GUI/viewpathdialog.h \
     GUI/viewpathitem.h \
-    GUI/settingsdialog.h \
+    GUI/zoompreviewwidget.h \
+    Project/Analysis/analysis.h \
+    Project/Analysis/analysisinterval.h \
+    Project/Analysis/analysisproxy.h \
+    Project/Analysis/basicanalysis.h \
+    Project/Analysis/detectionbox.h \
+    Project/Analysis/interval.h \
+    Project/Analysis/poi.h \
+    Project/Analysis/tag.h \
+    Project/Analysis/tagframe.h \
+    Project/Test/bookmarktest.h \
+    Project/Test/projecttestsuite.h \
+    Project/Test/videoprojecttest.h \
+    Project/bookmark.h \
+    Project/imagesequence.h \
+    Project/project.h \
+    Project/projecttreestate.h \
+    Project/recentproject.h \
+    Project/report.h \
+    Project/video.h \
+    Project/videoproject.h \
+    Test/test_video_player.h \
+    Video/shapes/arrow.h \
+    Video/shapes/circle.h \
+    Video/shapes/line.h \
+    Video/shapes/pen.h \
+    Video/shapes/rectangle.h \
+    Video/shapes/shapes.h \
+    Video/shapes/text.h \
+    Video/framemanipulator.h \
+    Video/frameprocessor.h \
+    Video/overlay.h \
+    Video/videocontroller.h \
+    Video/videoplayer.h \
+    Video/zoomer.h \
     constants.h \
-    GUI/sequencedialog.h \
-    GUI/VideoEdit/videoeditwidget.h \
-    GUI/VideoEdit/videoeditlist.h \
-    GUI/VideoEdit/videoedititem.h \
-    GUI/VideoEdit/editdialog.h \
-    GUI/VideoEdit/generatevideodialog.h \
-    GUI/VideoEdit/videogenerator.h \
-    GUI/Bookmark/bookmarkbaseitem.h \
-    GUI/VideoEdit/videointerval.h
-
-#
-# LIBRARY
-#
-SOURCES +=
-HEADERS +=
-
-#
-# GUI
-#
-SOURCES += GUI/mainwindow.cpp \
-    GUI/Bookmark/bookmarkitem.cpp \
-    GUI/Bookmark/bookmarkwidget.cpp
-
-
-HEADERS  += GUI/mainwindow.h \
-    GUI/Bookmark/bookmarkitem.h \
-    GUI/Bookmark/bookmarkwidget.h
+    imageexporter.h \
+    imagegenerator.h \
+    imageimporter.h \
+    reportgenerator.h \
+    utility.h
 
 FORMS    +=
 
@@ -217,94 +251,25 @@ RESOURCES += resources.qrc
 
 RC_FILE += myapp.rc
 
-#
-# START :
-# VIDEOPLAYER
-# OPENCV
-#
-SOURCES += \
-    Video/overlay.cpp \
-    Video/shapes/arrow.cpp \
-    Video/shapes/circle.cpp \
-    Video/shapes/line.cpp \
-    Video/shapes/pen.cpp \
-    Video/shapes/rectangle.cpp \
-    Video/shapes/text.cpp \
-    Video/framemanipulator.cpp
-HEADERS += \
-    Video/overlay.h \
-    Video/shapes/arrow.h \
-    Video/shapes/circle.h \
-    Video/shapes/line.h \
-    Video/shapes/pen.h \
-    Video/shapes/rectangle.h \
-    Video/shapes/text.h \
-    Video/framemanipulator.h
-
 win32 {
-    INCLUDEPATH += C:\opencv\release\install\include
-    LIBS += C:\opencv\release\bin\libopencv_core320.dll
-    LIBS += C:\opencv\release\bin\libopencv_imgproc320.dll
-    LIBS += C:\opencv\release\bin\libopencv_imgcodecs320.dll
-    LIBS += C:\opencv\release\bin\libopencv_video320.dll
-    LIBS += C:\opencv\release\bin\libopencv_videoio320.dll
-    LIBS += C:\opencv\release\bin\libopencv_highgui320.dll
+    # For opencv4
+    INCLUDEPATH += D:\opencv4\opencv\build\include
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_core401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_highgui401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_imgcodecs401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_imgproc401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_dnn401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_video401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_videoio401.dll
 }
 
-unix {
-    INCLUDEPATH += -L/usr/include/opencv2
-    LIBS += -lopencv_core
-    LIBS += -lopencv_imgproc
-    LIBS += -lopencv_imgcodecs
-    LIBS += -lopencv_video
-    LIBS += -lopencv_videoio
-    LIBS += -lopencv_highgui
-}
+#unix {
+#    INCLUDEPATH += -L/usr/include/opencv2
+#    LIBS += -lopencv_core
+#    LIBS += -lopencv_imgproc
+#    LIBS += -lopencv_imgcodecs
+#    LIBS += -lopencv_video
+#    LIBS += -lopencv_videoio
+#    LIBS += -lopencv_highgui
+#}
 
-#
-# START: FILEHANDLER
-#
-SOURCES += \
-    Filehandler/saveable.cpp \
-
-
-
-HEADERS  += \
-    Filehandler/saveable.h \
-
-
-
-#
-# END: FILEHANDLER
-#
-
-#
-# Project
-#
-SOURCES += Project/Test/projecttestsuite.cpp \
-    Project/project.cpp \
-    Project/video.cpp \
-    Project/videoproject.cpp \
-    Project/bookmark.cpp \
-    Project/Analysis/analysis.cpp \
-    Project/Analysis/poi.cpp
-
-
-HEADERS +=Project/Test/projecttestsuite.h \
-    Project/project.h \
-    Project/video.h \
-    Project/videoproject.h \
-    Project/bookmark.h  \
-    Project/Analysis/analysis.h \
-    Project/Analysis/poi.h
-
-
-
-
-#
-# ANALYSIS
-#
-SOURCES += Analysis/analysismethod.cpp\
-    Analysis/motiondetection.cpp
-
-HEADERS += Analysis/motiondetection.h

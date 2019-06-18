@@ -6,8 +6,8 @@
 #include "Project/Analysis/poi.h"
 #include "utility.h"
 
-#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/videoio/videoio.hpp"
 
 #include <QDebug>
 
@@ -39,13 +39,12 @@ bool AnalysisMethod::sample_current_frame() {
  */
 void AnalysisMethod::run() {
     setup_analysis();
-    sample_freq = get_setting("SAMPLE_FREQUENCY");
     capture.open(m_source_file);
     if (!capture.isOpened()) {
         return;
     }
     std::vector<DetectionBox> detections;
-    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
+    num_frames = capture.get(cv::CAP_PROP_FRAME_COUNT);
     POI* m_POI = new POI();    
 
     int end_frame = num_frames -1;
@@ -53,7 +52,7 @@ void AnalysisMethod::run() {
     // If Interval should be used, use interval frames
     if(analysis_settings->use_interval){
         start_frame = analysis_settings->interval.first;
-        capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
+        capture.set(cv::CAP_PROP_POS_FRAMES, start_frame);
         end_frame = analysis_settings->interval.second;
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame;
@@ -67,8 +66,7 @@ void AnalysisMethod::run() {
             if(analysis_settings->use_bounding_box){
                 cv::Mat temp (original_frame, analysis_settings->bounding_box);
                 analysis_frame = temp;
-            }
-            else{
+            } else {
                 analysis_frame = original_frame;
             }
             // If scaling is needed, i.e if video is high resolution
@@ -111,7 +109,7 @@ void AnalysisMethod::run() {
         capture.release();
         emit analysis_aborted();
         return;
-    }else{
+    } else {
         // Makes sure that a POI that stretches to the end of the
         // video gets an end frame.
         if (detecting) {
@@ -122,8 +120,11 @@ void AnalysisMethod::run() {
         m_analysis.settings = analysis_settings;
         std::string new_path = Utility::add_serial_number(m_save_path + m_ana_name, "");
         m_ana_name = Utility::name_from_path(new_path);
+        m_analysis.set_name(QString::fromStdString(m_ana_name));
         m_analysis.save_saveable(QString::fromStdString(new_path));
         AnalysisProxy* proxy = new AnalysisProxy(m_analysis, m_analysis.full_path());
+        proxy->set_video_path(QString::fromStdString(m_source_file));
+        proxy->set_sample_freq(sample_freq);
         for (auto p : m_analysis.get_intervals()) {
             std::pair<int, int> pair = std::make_pair(p->get_start(), p->get_end());
             proxy->m_slider_interval.push_back(pair);
@@ -137,7 +138,7 @@ void AnalysisMethod::run() {
  * @return Progression of analysis in whole percent.
  */
 int AnalysisMethod::get_progress(int start_frame) {
-    return ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
+    return (double(current_frame_index-start_frame)/double(num_frames)) * 100;
 
 }
 
@@ -192,6 +193,12 @@ std::string AnalysisMethod::analysis_name() const {
     return m_ana_name;
 }
 
-int AnalysisMethod::get_setting(const std::string &var) {
-    return analysis_settings->get_setting(var);
+double AnalysisMethod::get_setting(const std::string &var) {
+    double ret = 1;
+    if (analysis_settings->type == MOTION_DETECTION) {
+        ret = analysis_settings->get_motion_setting(var);
+    } else if (analysis_settings->type == OBJECT_DETECTION) {
+        ret = analysis_settings->get_object_setting(var);
+    }
+    return ret;
 }

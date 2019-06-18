@@ -270,6 +270,7 @@ void FrameWidget::set_cursor(SHAPES tool) {
         unsetCursor();
         break;
     case ANALYSIS_BOX:
+    case OBJECT_DETECT_BOX:
     case RECTANGLE:
     case CIRCLE:
     case PEN:
@@ -318,10 +319,10 @@ cv::Mat FrameWidget::get_org_frame() const {
     cv::Mat tmp = m_org_image.clone();
     switch (tmp.type()) {
         case CV_8UC1:
-            cvtColor(m_org_image, tmp, CV_GRAY2RGB);
+            cvtColor(m_org_image, tmp, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(m_org_image, tmp, CV_BGR2RGB);
+            cvtColor(m_org_image, tmp, cv::COLOR_BGR2RGB);
             break;
     }
     return tmp;
@@ -333,13 +334,13 @@ void FrameWidget::on_new_image(cv::Mat org_image, cv::Mat mod_image, int frame_i
     m_org_image = org_image;
     switch (mod_image.type()) {
         case CV_8UC1:
-            cvtColor(mod_image, _tmp_frame, CV_GRAY2RGB);
+            cvtColor(mod_image, _tmp_frame, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(mod_image, _tmp_frame, CV_BGR2RGB);
+            cvtColor(mod_image, _tmp_frame, cv::COLOR_BGR2RGB);
             break;
         case CV_8UC4:
-            cvtColor(mod_image, _tmp_frame, CV_BGRA2RGB);
+            cvtColor(mod_image, _tmp_frame, cv::COLOR_BGRA2RGB);
             break;
         default:
             qWarning() << "Mat was of unknown type [" << mod_image.type() << "]";
@@ -377,7 +378,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         painter.drawRect(zoom);
     }
     // Draw the select-analysis-area box
-    if(m_tool == ANALYSIS_BOX){
+    if(m_tool == ANALYSIS_BOX || m_tool == OBJECT_DETECT_BOX) {
         painter.setPen(QColor(0,255,0));
         QRectF analysis(ana_rect_start, ana_rect_end);
         painter.drawRect(analysis);
@@ -496,6 +497,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
+    case OBJECT_DETECT_BOX:
         if(event->button() == Qt::LeftButton) {
             ana_rect_start = event->pos();
             ana_rect_end = event->pos();
@@ -546,6 +548,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
+    case OBJECT_DETECT_BOX:
         set_analysis_settings();
         break;
     case ZOOM:
@@ -571,6 +574,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     QPoint scaled_pos = scale_to_video(event->pos());
     switch (m_tool) {
     case ANALYSIS_BOX:
+    case OBJECT_DETECT_BOX:
         if (event->buttons() == Qt::LeftButton) {
             ana_rect_end = rect_update(event->pos());
         }
@@ -670,7 +674,14 @@ void FrameWidget::set_analysis_settings() {
     int reply = msg_box.exec();
 
     if (reply == QMessageBox::Yes) {
-        AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
+        AnalysisSettings* settings;
+        if (m_tool == ANALYSIS_BOX) {
+            settings = new AnalysisSettings(MOTION_DETECTION);
+        } else if (m_tool == OBJECT_DETECT_BOX) {
+            settings = new AnalysisSettings(OBJECT_DETECTION);
+        } else {
+            settings = new AnalysisSettings;
+        }
         settings->quick_analysis = true;
 
         QRect scaled_rect(scale_to_video(ana_rect_start), scale_to_video(ana_rect_end));

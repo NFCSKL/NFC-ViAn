@@ -49,6 +49,7 @@ protected:
     VIDEO_TYPE m_sequence_type;
     bool m_is_saved{false};
     int m_width, m_height = 0;
+    int frame_rate;
     int m_last_frame = 0;
 public:
     VideoState state;
@@ -66,6 +67,8 @@ public:
     int get_height();
     int get_last_frame();
     void set_size(int width, int height);
+    void set_frame_rate(int fps);
+    int get_frame_rate();
     void set_last_frame(int frame);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);

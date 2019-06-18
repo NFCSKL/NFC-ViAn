@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+class AnalysisProxy;
 class AnalysisWidget;
 class AnaSettingWidget;
 class BookmarkWidget;
@@ -15,6 +16,7 @@ class QueueWidget;
 class RecentProjectDialog;
 class Shapes;
 class StatusBar;
+class YoloWidget;
 class VideoProject;
 class VideoWidget;
 class ZoomPreviewWidget;
@@ -51,6 +53,7 @@ private slots:
     void open_widget(VideoProject *vid_proj);
     void close_widget(VideoWidget*);
     void close_all_widgets();
+    void open_yolo_widget(AnalysisProxy*);
 
 public slots:
     void options(void);
@@ -81,6 +84,7 @@ private:
     QueueWidget* queue_wgt;
     AnaSettingWidget* ana_settings_wgt;
     ManipulatorWidget* manipulator_wgt;
+    YoloWidget* yolo_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;

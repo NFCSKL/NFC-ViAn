@@ -15,6 +15,7 @@
 #include "GUI/projectwidget.h"
 #include "GUI/recentprojectdialog.h"
 #include "GUI/settingsdialog.h"
+#include "GUI/YoloWidget/yolowidget.h"
 #include "GUI/viewpathdialog.h"
 #include "GUI/zoompreviewwidget.h"
 #include "imageexporter.h"
@@ -50,12 +51,12 @@
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    QDockWidget* project_dock = new QDockWidget(tr("Projects"), this);
+    QDockWidget* project_dock = new QDockWidget(tr("Project"), this);
     QDockWidget* drawing_dock = new QDockWidget(tr("Drawings"), this);
     bookmark_dock = new QDockWidget(tr("Bookmarks"), this);
     QDockWidget* zoom_preview_dock = new QDockWidget(tr("Zoom preview"), this);
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
-    ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
+    ana_settings_dock = new QDockWidget(tr("Analysis input details"), this);
     manipulator_dock = new QDockWidget(tr("Color correction settings"), this);
     videoedit_dock = new QDockWidget(tr("Video Edit"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -90,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(project_wgt, &ProjectWidget::open_in_widget, this, &MainWindow::open_widget);
     connect(project_wgt, &ProjectWidget::close_all_widgets, this, &MainWindow::close_all_widgets);
+    connect(project_wgt, &ProjectWidget::open_yolo_wgt, this, &MainWindow::open_yolo_widget);
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
@@ -164,6 +166,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
     connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag_color);
+
+    // Initialize yolo widget
+    yolo_wgt = new YoloWidget(nullptr);
+    yolo_wgt->close();
+
+    connect(project_wgt, &ProjectWidget::set_project, yolo_wgt, &YoloWidget::set_project);
+    connect(yolo_wgt, &YoloWidget::set_frame, project_wgt, &ProjectWidget::select_analysis);
 
     // Initialize videoedit widget
     VideoEditWidget *videoedit_wgt = new VideoEditWidget;
@@ -240,6 +249,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Connects for settings video project, analysis etc when clicking the project tree
     connect(project_wgt, &ProjectWidget::set_video_project, video_wgt->frame_wgt, &FrameWidget::set_video_project);
     connect(project_wgt, &ProjectWidget::set_video_project, drawing_wgt, &DrawingWidget::set_video_project);
+    connect(project_wgt, &ProjectWidget::video_name, video_wgt, &VideoWidget::update_video_label);
     connect(project_wgt, &ProjectWidget::marked_video_state, video_wgt, &VideoWidget::load_marked_video_state);
     connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->frame_wgt, &FrameWidget::set_analysis);
     connect(project_wgt, &ProjectWidget::marked_analysis, video_wgt->playback_slider, &AnalysisSlider::set_analysis_proxy);
@@ -247,9 +257,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(project_wgt, &ProjectWidget::marked_basic_analysis, video_wgt, &VideoWidget::set_basic_analysis);
 
     // Connects for showing/hiding widgets and info
-    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_details_checked);
-    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
-    connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
     connect(toggle_ana_settings_wgt, &QAction::toggled, project_wgt, &ProjectWidget::toggle_settings);
     connect(project_wgt, &ProjectWidget::toggle_analysis_details, ana_details_act, &QAction::toggle);
     connect(project_wgt, &ProjectWidget::toggle_settings_details, toggle_ana_settings_wgt, &QAction::trigger);
@@ -497,52 +504,76 @@ void MainWindow::init_view_menu() {
  * Set up the analysis menu
  */
 void MainWindow::init_analysis_menu() {
-    QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
+    QMenu* analysis_menu = menuBar()->addMenu(tr("Video &Analysis"));
 
-    QAction* quick_analysis_act = new QAction(tr("&ROI analysis"), this);
-    QAction* advanced_analysis_act = new QAction(tr("&Full analysis..."), this);
-    QAction* settings_act = new QAction(tr("Analysis &settings..."), this);
-    ana_details_act = new QAction(tr("&Analysis details"), this);
-    detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
-    bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
+    QAction* quick_analysis_act = new QAction(tr("&Motion detection"), this);
+    QAction* advanced_analysis_act = new QAction(tr("&Motion detection (batch)..."), this);
+    QAction* yolo_analysis_act = new QAction(tr("&Object detection"));
+    QAction* yolo_advanced_act = new QAction(tr("&Object detection (batch)..."));
+    QAction* settings_motion_act = new QAction(tr("Motion detection &settings..."), this);
+    QAction* settings_object_act = new QAction(tr("Object detection &settings..."), this);
+    ana_details_act = new QAction(tr("&Analysis input"), this);
+    detect_intv_act = new QAction(tr("&Detection on timeline"), this);      //Slider pois
+    bound_box_act = new QAction(tr("&Detection boxes"), this);        //Video oois
 
     ana_details_act->setCheckable(true);
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
 
-    ana_details_act->setChecked(false);
-    detect_intv_act->setChecked(true);
-    bound_box_act->setChecked(true);
-
-    advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analys.png"));
     quick_analysis_act->setIcon(QIcon(":/Icons/analys.png"));
-    settings_act->setIcon(QIcon(":/Icons/cog.png"));
+    advanced_analysis_act->setIcon(QIcon(":/Icons/advanced_analysis_black.png"));
+    yolo_analysis_act->setIcon(QIcon(":/Icons/object_detection.png"));
+    yolo_advanced_act->setIcon(QIcon(":/Icons/advanced_object_detection.png"));
+    settings_motion_act->setIcon(QIcon(":/Icons/settings_motion.png"));
+    settings_object_act->setIcon(QIcon(":/Icons/settings_object.png"));
 
     quick_analysis_act->setStatusTip(tr("Perform quick analysis on a custom area."));
     advanced_analysis_act->setStatusTip(tr("Perform advanced analysis and select settings."));
-    settings_act->setStatusTip(tr("Change the settings for analyses."));
+    yolo_analysis_act->setStatusTip(tr("Perform analysis with yolo on the video"));
+    yolo_advanced_act->setStatusTip(tr("Perform advanced analysis with yolo on a custom area"));
+    settings_motion_act->setStatusTip(tr("Change the settings for motion analyses."));
+    settings_object_act->setStatusTip(tr("Change the settings for object analyses."));
     ana_details_act->setStatusTip(tr("Toggle analysis details on/off"));
     detect_intv_act->setStatusTip(tr("Toggle notations on slider on/off"));
     bound_box_act->setStatusTip(tr("Toggle boxes on video on/off"));
 
-    //quick_analysis_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));   // Not set because it collides with the alt menu shortcuts
+    quick_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_A));
     advanced_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_A));
+    yolo_analysis_act->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_B));
+    yolo_advanced_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_B));
 
     analysis_menu->addAction(quick_analysis_act);
     analysis_menu->addAction(advanced_analysis_act);
-    analysis_menu->addAction(settings_act);
+    analysis_menu->addAction(yolo_analysis_act);
+    analysis_menu->addAction(yolo_advanced_act);
+    analysis_menu->addSeparator();
+    analysis_menu->addAction(settings_motion_act);
+    analysis_menu->addAction(settings_object_act);
     analysis_menu->addSeparator();
     analysis_menu->addAction(ana_details_act);
     analysis_menu->addAction(detect_intv_act);
     analysis_menu->addAction(bound_box_act);
 
-    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
     connect(quick_analysis_act, &QAction::triggered, draw_toolbar->analysis_tool_act, &QAction::trigger);
-    connect(settings_act, &QAction::triggered, project_wgt, &ProjectWidget::update_analysis_settings);
+    connect(advanced_analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_motion_detection);
+    connect(yolo_analysis_act, &QAction::triggered, draw_toolbar->yolo_tool_act, &QAction::trigger);
+    connect(yolo_advanced_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_object_detection);
+
+    connect(settings_motion_act, &QAction::triggered, project_wgt, &ProjectWidget::update_motion_settings);
+    connect(settings_object_act, &QAction::triggered, project_wgt, &ProjectWidget::update_object_settings);
+
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+
+    connect(ana_details_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_details_checked);
+    connect(ana_details_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_details_checked);
+    connect(ana_details_act, &QAction::toggled, project_wgt, &ProjectWidget::toggle_details);
+
+    ana_details_act->setChecked(true);
+    detect_intv_act->setChecked(true);
+    bound_box_act->setChecked(true);
 }
 
 void MainWindow::open_widget(VideoProject* vid_proj) {
@@ -575,6 +606,11 @@ void MainWindow::close_all_widgets() {
         delete widget;
     }
     video_widgets.clear();
+}
+
+void MainWindow::open_yolo_widget(AnalysisProxy* analysis) {
+    yolo_wgt->show();
+    yolo_wgt->set_analysis(analysis);
 }
 
 void MainWindow::init_interval_menu() {
@@ -717,29 +753,46 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("E&xport interval to stills..."), this);
+    QAction* export_act = new QAction(tr("E&xport intervals to stills..."), this);
+    QAction* export_current_act = new QAction(tr("E&xport current frame to still"), this);
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
+    QAction* bookmark_act = new QAction(tr("&Create a bookmark"), this);
+    QAction* bookmark_desc_act = new QAction(tr("&Create a bookmark with description"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
     export_act->setIcon(QIcon(":/Icons/folder_interval.png"));
+    export_current_act->setIcon(QIcon(":/Icons/export.png"));
     copy_frame_act->setIcon(QIcon(":/Icons/copy.png"));
+    bookmark_desc_act->setIcon(QIcon(":/Icons/bookmark.png"));
     gen_report_act->setIcon(QIcon(":/Icons/report.png"));
 
     export_menu->addAction(export_act);
+    export_menu->addAction(export_current_act);
     export_menu->addAction(copy_frame_act);
+    export_menu->addAction(bookmark_act);
+    export_menu->addAction(bookmark_desc_act);
     export_menu->addSeparator();
     export_menu->addAction(gen_report_act);
 
     export_act->setShortcut(tr("Shift+X"));
+    export_current_act->setShortcut(Qt::Key_X);
     copy_frame_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::CTRL + Qt::Key_C));
+    bookmark_act->setShortcut(Qt::Key_B);
+    bookmark_desc_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
+    export_current_act->setStatusTip(tr("Export the current frame to a still"));
     copy_frame_act->setStatusTip("Copy the current frame to the clipboard");
+    bookmark_act->setStatusTip(tr("Bookmark current frame"));
+    bookmark_desc_act->setStatusTip(tr("Bookmark current frame with description"));
     gen_report_act->setStatusTip(tr("Generate report"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+    connect(export_current_act, &QAction::triggered, video_wgt, &VideoWidget::on_export_frame);
     connect(copy_frame_act, &QAction::triggered, video_wgt->frame_wgt, &FrameWidget::copy_to_clipboard);
+    connect(bookmark_act, &QAction::triggered, video_wgt, &VideoWidget::quick_bookmark);
+    connect(bookmark_desc_act, &QAction::triggered, video_wgt, &VideoWidget::on_bookmark_clicked);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
     connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }
@@ -763,6 +816,7 @@ void MainWindow::init_help_menu() {
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (project_wgt->close_project()) {
         event->accept();
+        delete yolo_wgt;
     } else {
         event->ignore();
     }

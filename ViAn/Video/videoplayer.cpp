@@ -91,7 +91,7 @@ void VideoPlayer::set_frame() {
     int frame_index = m_frame->load();
 
     if (frame_index >= 0 && frame_index <= m_last_frame) {
-        m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
+        m_capture.set(cv::CAP_PROP_POS_FRAMES, frame_index);
         current_frame = frame_index;
         synced_read();
     }
@@ -157,10 +157,10 @@ void VideoPlayer::check_events() {
  * Reads video information from the capture object.
  */
 void VideoPlayer::load_video_info() {
-    m_video_width->store(m_capture.get(CV_CAP_PROP_FRAME_WIDTH));
-    m_video_height->store(m_capture.get(CV_CAP_PROP_FRAME_HEIGHT));
-    m_frame_rate = m_capture.get(CV_CAP_PROP_FPS);
-    m_last_frame = m_capture.get(CV_CAP_PROP_FRAME_COUNT) - 1;
+    m_video_width->store(m_capture.get(cv::CAP_PROP_FRAME_WIDTH));
+    m_video_height->store(m_capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    m_frame_rate = m_capture.get(cv::CAP_PROP_FPS);
+    m_last_frame = m_capture.get(cv::CAP_PROP_FRAME_COUNT) - 1;
 }
 
 bool VideoPlayer::synced_read(){
@@ -175,8 +175,8 @@ bool VideoPlayer::synced_read(){
             return false;
         }
 
-        int ncols = static_cast<int>(m_capture.get(CV_CAP_PROP_FRAME_WIDTH));
-        int nrows = static_cast<int>(m_capture.get(CV_CAP_PROP_FRAME_HEIGHT));
+        int ncols = static_cast<int>(m_capture.get(cv::CAP_PROP_FRAME_WIDTH));
+        int nrows = static_cast<int>(m_capture.get(cv::CAP_PROP_FRAME_HEIGHT));
         if (ncols != ccols || nrows != crows) {
             // New frame is not equal in size to the previous one
             try {

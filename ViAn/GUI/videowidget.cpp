@@ -12,7 +12,9 @@
 #include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
+//#include "Project/imagesequence.h"
 #include "Project/videoproject.h"
+//#include "utility.h"
 #include "Video/videocontroller.h"
 
 #include <QBoxLayout>
@@ -265,6 +267,7 @@ void VideoWidget::set_btn_icons() {
     zoom_label->setMaximumWidth(60);
     zoom_label->setEnabled(false);
     connect(zoom_label, &QLineEdit::editingFinished, this, &VideoWidget::zoom_label_finished);
+    video_label = new QLabel("", this);
     fps_label = new QLabel("0fps", this);
     size_label = new QLabel("(0x0)", this);
     rotation_label = new QLabel("0°", this);
@@ -303,6 +306,7 @@ void VideoWidget::set_btn_tool_tip() {
     zoom_label->setToolTip("The zoom factor of the video: Z");
     interpolate_check->setToolTip("Toggle between bicubic and nearest neighbor interpolation: N");
 
+    video_label->setToolTip("Name of the current video");
     fps_label->setToolTip("The frame rate of the video");
     size_label->setToolTip("The size of  the video");
     rotation_label->setToolTip("The current rotation of the video");
@@ -376,10 +380,10 @@ void VideoWidget::set_btn_shortcuts() {
     prev_frame_btn->setShortcut(Qt::Key_Left);
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
-    bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     // Tag and zoom shortcuts are in the menus
-    export_frame_btn->setShortcut(QKeySequence(Qt::Key_X));
-    bookmark_quick_sc = new QShortcut(QKeySequence(Qt::Key_B), this);
+    set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
+    set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
+
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);
     video_start_sc = new QShortcut(QKeySequence(Qt::Key_Home), this);
@@ -390,7 +394,6 @@ void VideoWidget::set_btn_shortcuts() {
     delete_sc->setContext(Qt::WidgetWithChildrenShortcut);
 
     //connect
-    connect(bookmark_quick_sc, &QShortcut::activated, this, &VideoWidget::quick_bookmark);
     connect(zoom_edit_sc, &QShortcut::activated, this, &VideoWidget::zoom_label_focus);
     connect(interpol_sc, &QShortcut::activated, interpolate_check, &QCheckBox::toggle);
     connect(video_start_sc, &QShortcut::activated, this, &VideoWidget::set_video_start);
@@ -471,6 +474,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     control_row->addLayout(zoom_btns);
 
+    interval_btns->addWidget(video_label);
     interval_btns->addWidget(fps_label);
     interval_btns->addWidget(size_label);
     interval_btns->addWidget(rotation_label);
@@ -1264,6 +1268,7 @@ void VideoWidget::clear_current_video() {
     play_btn->setChecked(false);
     delete_interval();
     set_total_time(0);
+    video_label->setText("");
     fps_label->setText("Fps: -");
     max_frames->setText("/ -");
     zoom_label->setText("100%");
@@ -1320,6 +1325,10 @@ void VideoWidget::set_seq_tag_btns(bool value) {
     speed_slider->setDisabled(value);
 }
 
+void VideoWidget::update_video_label(QString name) {
+    video_label->setText(name);
+}
+
 /**
  * @brief VideoWidget::capture_failed
  * Open a dialog where the user can enter a new path to the video.
@@ -1359,7 +1368,9 @@ void VideoWidget::capture_failed() {
  */
 void VideoWidget::on_video_info(int video_width, int video_height, int frame_rate, int last_frame){
     int current_frame_index = frame_index.load();
+
     m_vid_proj->get_video()->set_size(video_width, video_height);
+    m_vid_proj->get_video()->set_frame_rate(frame_rate);
     m_vid_proj->get_video()->set_last_frame(last_frame);
     m_frame_rate = frame_rate;
     m_frame_length = last_frame + 1;
@@ -1519,7 +1530,9 @@ void VideoWidget::set_no_video() {
 }
 
 void VideoWidget::process_frame() {
-    update_overlay_settings([&](){});
+    update_overlay_settings([&](){
+        o_settings.copy_paste = true;
+    });
 }
 
 /**

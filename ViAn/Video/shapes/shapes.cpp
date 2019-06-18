@@ -145,7 +145,7 @@ void Shapes::set_color(QColor col) {
 void Shapes::set_thickness(QPoint pos) {
     int new_thick = thickness + pos.y();
     if ((shape == CIRCLE || shape == RECTANGLE) && new_thick <= -2) return;
-    if (!(shape == CIRCLE || shape == RECTANGLE) && new_thick <= -1) return;
+    if (!(shape == CIRCLE || shape == RECTANGLE) && new_thick <= -0) return;
     thickness = new_thick;
 }
 

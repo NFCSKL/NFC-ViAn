@@ -5,8 +5,13 @@
 #include <QString>
 #include <QStandardPaths>
 
+//#include <math.h>
 #include <cmath>
 #include <string>
+#include <QtMath>
+
+//#define M_PI   3.14159265358979323846264338327950288
+
 
 class Singleton {
 private:
@@ -22,6 +27,10 @@ public:
     int PAGE_STEP = 10;
     int FLOATING_WIDGET_MAX = 3;
     QSize PROJ_THUMBNAIL_SIZE = QSize(20,20);
+
+    QString class_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/coco.names";
+    QString config_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.cfg";
+    QString weight_file = "C:/Users/Student/Desktop/yolo in opencv/yolo3/yolov3.weights";
 };
 
 namespace Constants {
@@ -45,6 +54,7 @@ namespace Constants {
     const int VIDEO_WGT_HEIGHT = 9;
 
     const std::string MOTION_DET_STR = "-motion_analysis";
+    const std::string YOLO_STR = "-object_detection";
     const QString NEW_STR = " (NEW!)";
 
     const int PAN_FACTOR = 20;

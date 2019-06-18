@@ -51,6 +51,7 @@ signals:
     void selected_media();
     void marked_video_state(VideoProject *vid_proj, VideoState state);
     void set_project(Project*);
+    void video_name(QString);
 
     void marked_analysis(AnalysisProxy*);
     void marked_basic_analysis(BasicAnalysis*);
@@ -59,6 +60,7 @@ signals:
     void update_settings_wgt(AnalysisSettings*);
     void show_analysis_settings(bool);
 
+    void open_yolo_wgt(AnalysisProxy*);
     void set_zoom_tool();
     void set_show_analysis_details(bool);
     void set_detections(bool);
@@ -114,17 +116,22 @@ public slots:
     void remove_interval_area_item(QTreeWidgetItem* item);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
-    void update_analysis_settings();
+    void update_motion_settings();
+    void update_object_settings();
     void advanced_analysis();
+    void advanced_motion_detection();
+    void advanced_object_detection();
     bool prompt_save();
     void update_current_videoitem(QString path);
     void update_videoitems();
     void select_video_project(VideoProject* vid_proj, VideoState state);
+    void select_analysis(VideoProject* vid_proj, int ana_id);
 private slots:
     void context_menu(const QPoint& point);
     void open_video_in_widget();
     void remove_item();
     void rename_item();
+    void open_yolo_widget(AnalysisItem* ana_item);
     void drawing_tag();
     void add_to_video_edit(QTreeWidgetItem* item);
     void update_settings();

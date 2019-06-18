@@ -25,7 +25,8 @@ Text::Text() : Shapes(SHAPES::TEXT) {
 Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPES::TEXT, col, pos) {
     set_name(strng);
     font_scale = fnt_scl;
-    text_size = cv::getTextSize(m_name.toStdString(), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
+    cv::String cv_string = m_name.toStdString();
+    text_size = cv::getTextSize(cv_string, cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
     cv::Point bl = cv::Point(draw_start.x-text_size.width/2, draw_start.y + text_size.height/2);
     draw_end = cv::Point(draw_start.x + text_size.width/2, draw_start.y-text_size.height/2);
     draw_start = bl;

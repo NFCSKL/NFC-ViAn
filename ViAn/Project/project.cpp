@@ -120,6 +120,18 @@ void Project::remove_category(BookmarkCategory* cat) {
     m_unsaved_changes = true;
 }
 
+void Project::add_analysis(AnalysisProxy* ana) {
+    m_analyses.push_back(ana);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_analysis(AnalysisProxy* ana) {
+    auto it = std::find(m_analyses.begin(), m_analyses.end(), ana);
+    if (it == m_analyses.end()) return;
+    m_analyses.erase(it);
+    m_unsaved_changes = true;
+}
+
 void Project::add_interval(VideoInterval* interval) {
     interval->set_project(this);
     m_intervals.push_back(interval);
@@ -216,8 +228,8 @@ void Project::read(const QJsonObject& json){
     for (int i = 0; i < json_vid_projs.size(); ++i) {
         QJsonObject json_vid_proj = json_vid_projs[i].toObject();
         VideoProject* v = new VideoProject();
-        v->read(json_vid_proj);
         add_video_project(v);
+        v->read(json_vid_proj);
         v->reset_root_dir(m_dir);
     }
 
@@ -412,6 +424,10 @@ std::vector<Bookmark*> &Project::get_bookmarks() {
 
 std::vector<BookmarkCategory*> &Project::get_categories() {
     return m_categories;
+}
+
+std::vector<AnalysisProxy*> &Project::get_analyses() {
+    return m_analyses;
 }
 
 std::vector<VideoInterval*> &Project::get_intervals() {

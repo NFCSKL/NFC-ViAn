@@ -60,6 +60,14 @@ void Video::set_size(int width, int height) {
     m_height = height;
 }
 
+void Video::set_frame_rate(int fps) {
+    frame_rate = fps;
+}
+
+int Video::get_frame_rate() {
+    return frame_rate;
+}
+
 void Video::set_last_frame(int frame) {
     m_last_frame = frame;
 }
@@ -83,6 +91,9 @@ void Video::read(const QJsonObject& json){
     m_sequence_type = static_cast<VIDEO_TYPE>(json["sequence"].toInt());
     this->file_path = json["file_path"].toString();
     m_name = json["name"].toString();
+    frame_rate = json["frame_rate"].toInt();
+    m_width = json["width"].toInt();
+    m_height = json["height"].toInt();
     m_is_saved = true;
 }
 
@@ -95,6 +106,9 @@ void Video::write(QJsonObject& json){
     json["sequence"] = m_sequence_type;
     json["name"] = m_name;
     json["file_path"] = this->file_path;
+    json["frame_rate"] = frame_rate;
+    json["width"] = m_width;
+    json["height"] = m_height;
     m_is_saved = true;
 }
 

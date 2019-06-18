@@ -6,8 +6,9 @@
 #include "opencv2/core/core.hpp"
 
 #include <QDebug>
-#include <QJsonObject>
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 //#include "Filehandler/saveable.h"
 
@@ -33,7 +34,6 @@ void Analysis::read(const QJsonObject &json){
 
     new_settings->interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
     settings = new_settings;
-
 
     this->type = json["type"].toInt();
     this->m_name = json["name"].toString();
@@ -61,8 +61,10 @@ void Analysis::write(QJsonObject &json){
     json["interval end"] = settings->interval.second;
     json["type"] = this->type;
     json["name"] = this->m_name;
+    // The intervals
     QJsonArray json_POIs;
     for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
+        // The detections
         QJsonObject json_POI;
         POI* p = dynamic_cast<POI*>(*it);
         p->write(json_POI);
@@ -82,6 +84,18 @@ std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
         POI* ai = static_cast<POI*>(*it);
         if(ai->in_interval(frame_num)) {
             res = ai->get_detections_on_frame(frame_num);
+            break;
+        }
+    }
+    return res;
+}
+
+std::vector<DetectionBox> Analysis::get_detectionbox_on_frame(int frame_num) {
+    std::vector<DetectionBox> res;
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); it++) {
+        POI* ai = static_cast<POI*>(*it);
+        if (ai->in_interval(frame_num)) {
+            res = ai->get_detectionbox_on_frame(frame_num);
             break;
         }
     }

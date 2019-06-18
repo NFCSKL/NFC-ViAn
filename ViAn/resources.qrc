@@ -164,6 +164,13 @@
         <file>Splashscreen.png</file>
         <file>Icons/flip_horizontal.png</file>
         <file>Icons/flip_vertical.png</file>
+        <file>Icons/object_detection.png</file>
+        <file>Icons/advanced_object_detection.png</file>
+        <file>Icons/advanced_analysis_black.png</file>
+        <file>Icons/settings_motion.png</file>
+        <file>Icons/settings_object.png</file>
+        <file>Icons/analysis_motion.png</file>
+        <file>Icons/analysis_object.png</file>
         <file>vian-help.pdf</file>
     </qresource>
 </RCC>

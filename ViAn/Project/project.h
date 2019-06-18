@@ -6,6 +6,9 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
+#include <vector>
+
+class AnalysisProxy;
 class Bookmark;
 class BookmarkCategory;
 class VideoInterval;
@@ -28,6 +31,7 @@ class Project : public Saveable{
     std::vector<VideoProject*> m_videos;
     std::vector<Bookmark*> m_bookmarks;
     std::vector<BookmarkCategory*> m_categories;
+    std::vector<AnalysisProxy*> m_analyses;
     std::vector<VideoInterval*> m_intervals;
 
     int m_vid_count = 0;
@@ -51,6 +55,9 @@ public:
     ID add_category(BookmarkCategory* cat);
     void remove_category(BookmarkCategory* cat);
 
+    void add_analysis(AnalysisProxy* ana);
+    void remove_analysis(AnalysisProxy* ana);
+
     void add_interval(VideoInterval* interval);
     void remove_interval(VideoInterval* interval);
 
@@ -72,6 +79,7 @@ public:
     std::vector<VideoProject *>& get_videos();
     std::vector<Bookmark *>& get_bookmarks();
     std::vector<BookmarkCategory *>& get_categories();
+    std::vector<AnalysisProxy *>& get_analyses();
     std::vector<VideoInterval *> &get_intervals();
     VideoProject* get_video_project(int id);
     QString get_dir() const;

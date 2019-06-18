@@ -88,6 +88,9 @@ void FrameProcessor::check_events() {
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load() && is_updated) {
                 process_frame();
+            } else if (m_o_settings->copy_paste) {
+                process_frame();
+                m_o_settings->copy_paste = false;
             }
             lk.unlock();
             continue;

@@ -49,6 +49,19 @@ std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
     return rects;
 }
 
+/**
+ * @brief POI::get_detection_rect_on_frame
+ * Returns all detections on a specified frame in the analysed video
+ * @param frame_num
+ * @return
+ */
+std::vector<DetectionBox> POI::get_detectionbox_on_frame(int frame_num) {
+    if (in_interval(frame_num)) {
+        return OOIs[frame_num];
+    }
+    return {};
+}
+
 
 /**
  * @brief POI::read

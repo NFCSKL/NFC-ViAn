@@ -14,7 +14,9 @@ public:
     AnalysisSettings* m_settings = nullptr;
     
     QFormLayout* form_layout;
-    std::map<std::string, QLabel*> settings_map;
+    std::map<std::string, QLabel*> settings_map_default;
+    std::map<std::string, QLabel*> settings_map_motion;
+    std::map<std::string, QLabel*> settings_map_object;
 
 
     void init_settings();

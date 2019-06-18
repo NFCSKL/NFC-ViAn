@@ -6,7 +6,6 @@
 #include <QJsonObject>
 
 class Analysis;
-class AnalsysSettings;
 
 /**
  * @brief The AnalysisProxy class
@@ -18,6 +17,8 @@ class AnalysisProxy : public BasicAnalysis
 {
     QString file_analysis = "";  // m_analysis.full_path()
     int type = MOTION_DETECTION;
+    QString m_video_path = "";
+    int sample_freq;
 public:
     AnalysisProxy();
     AnalysisProxy(const QString file_analysis);
@@ -25,6 +26,11 @@ public:
     AnalysisProxy(const AnalysisProxy &other);
     ~AnalysisProxy() override;
     Analysis *load_analysis(); // Only use this if all analysisinformation is needed
+
+    void set_video_path(QString);
+    QString get_video_path();
+    void set_sample_freq(int freq);
+    int get_sample_freq();
 
     std::vector<std::pair<int, int>> m_slider_interval;
     bool is_new = false;

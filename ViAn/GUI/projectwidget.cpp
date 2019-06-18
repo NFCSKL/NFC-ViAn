@@ -2,6 +2,7 @@
 
 #include "Analysis/analysisdialog.h"
 #include "Analysis/motiondetection.h"
+#include "Analysis/yoloanalysis.h"
 #include "constants.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/TreeItems/drawingtagitem.h"
@@ -279,12 +280,19 @@ void ProjectWidget::create_sequence(QStringList image_paths, QStringList checksu
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
+    settings->frame_rate = vid_proj->get_video()->get_frame_rate();
     AnalysisMethod* method = nullptr;
     switch (settings->get_type()) {
     case MOTION_DETECTION: {
         std::string path = vid_proj->get_video()->file_path.toStdString();
         std::string dir = m_proj->m_dir.toStdString();
         method = new MotionDetection(path, dir, settings);
+        break;
+    }
+    case OBJECT_DETECTION: {
+        std::string path = vid_proj->get_video()->file_path.toStdString();
+        std::string dir = m_proj->m_dir.toStdString();
+        method = new YoloAnalysis(path, dir, settings);
         break;
     }
     default:
@@ -296,7 +304,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
 
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
-    AnalysisItem* ana = new AnalysisItem();
+    AnalysisItem* ana = new AnalysisItem(settings->get_type());
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
@@ -712,6 +720,9 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         } else if (ana.second->get_type() == MOTION_DETECTION) {
             AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
             v_item->addChild(ana_item);
+        } else if (ana.second->get_type() == OBJECT_DETECTION) {
+            AnalysisItem* ana_item = new AnalysisItem(dynamic_cast<AnalysisProxy*>(ana.second));
+            v_item->addChild(ana_item);
         } else if (ana.second->get_type() == INTERVAL) {
             IntervalItem* int_item = new IntervalItem(dynamic_cast<Interval*>(ana.second));
             v_item->addChild(int_item);
@@ -771,7 +782,15 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
-void ProjectWidget::update_analysis_settings() {
+void ProjectWidget::update_motion_settings() {
+    analysis_settings->type = MOTION_DETECTION;
+    std::vector<VideoItem*> v_items;
+    AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
+    dialog->show();
+}
+
+void ProjectWidget::update_object_settings() {
+    analysis_settings->type = OBJECT_DETECTION;
     std::vector<VideoItem*> v_items;
     AnalysisDialog* dialog = new AnalysisDialog(v_items, analysis_settings);
     dialog->show();
@@ -786,6 +805,16 @@ void ProjectWidget::advanced_analysis() {
     AnalysisDialog* dialog = new AnalysisDialog(v_items, new_settings);
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::start_analysis);
     dialog->show();
+}
+
+void ProjectWidget::advanced_motion_detection() {
+    analysis_settings->type = MOTION_DETECTION;
+    advanced_analysis();
+}
+
+void ProjectWidget::advanced_object_detection() {
+    analysis_settings->type = OBJECT_DETECTION;
+    advanced_analysis();
 }
 
 /**
@@ -849,6 +878,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         update_current_tag(vid_item);
         update_current_interval(vid_item);
+        emit video_name(item->text(0));
         break;
     } case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -871,6 +901,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         update_current_tag(vid_item);
         update_current_interval(vid_item);
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case ANALYSIS_ITEM: {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
@@ -895,6 +926,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
 
         update_current_tag(vid_item);
         update_current_interval(vid_item);
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
 
         AnalysisSettings* settings = dynamic_cast<BasicAnalysis*>(ana_item->get_analysis())->settings;
         emit update_settings_wgt(settings);
@@ -917,6 +949,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_tag_slider(true);
         emit set_interval_slider(false);
         emit enable_poi_btns(true, false);
+
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
 
         if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
         m_tag_item = nullptr;
@@ -954,6 +988,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         if (tag_item->get_tag()->get_type() == SEQUENCE_TAG) {
             emit seq_tag_btns(true);
         }
+
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case TAG_FRAME_ITEM: {
         TagFrameItem* tf_item = dynamic_cast<TagFrameItem*>(item);
@@ -991,6 +1027,12 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
             if (m_tag_item) m_tag_item->setCheckState(0, Qt::Unchecked);
             m_tag_item = nullptr;
         }
+
+        if (vp->get_video()->is_sequence()) {
+            emit video_name(item->text(0));
+        } else {
+            emit video_name(vp->get_video()->get_name());
+        }
         break;
     } case INTERVAL_ITEM: {
         IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item);
@@ -1014,6 +1056,7 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         emit set_interval_slider(true);
         emit enable_poi_btns(true, true);
 
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case INTERVAL_AREA_ITEM: {
         IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
@@ -1039,6 +1082,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
         IntervalItem* interval_item = dynamic_cast<IntervalItem*>(item->parent());
         emit marked_basic_analysis(interval_item->get_interval());
         m_interval_item = interval_item;
+
+        emit video_name(vid_item->get_video_project()->get_video()->get_name());
         break;
     } case FOLDER_ITEM: {
         emit item_type(item->type());
@@ -1165,14 +1210,20 @@ void ProjectWidget::context_menu(const QPoint &point) {
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
             break;
-        case ANALYSIS_ITEM:
-            if (dynamic_cast<AnalysisItem*>(item)->is_finished()) {
+        case ANALYSIS_ITEM: {
+            AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+            if (ana_item->is_finished()) {
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
                 menu.addAction("Rename", this, &ProjectWidget::rename_item);
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
+                    menu.addSeparator();
+                    menu.addAction("Open object detection widget", this, [this, ana_item]{ open_yolo_widget(ana_item);});
+                }
             }
             break;
+        }
         case FOLDER_ITEM:
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1525,6 +1576,11 @@ void ProjectWidget::remove_interval_area_item(QTreeWidgetItem* item) {
  */
 void ProjectWidget::rename_item(){
     editItem(currentItem());
+}
+
+void ProjectWidget::open_yolo_widget(AnalysisItem* ana_item) {
+    AnalysisProxy* analysis = ana_item->get_analysis();
+    emit open_yolo_wgt(analysis);
 }
 
 /**
@@ -1894,14 +1950,24 @@ void ProjectWidget::select_video_project(VideoProject* vid_proj, VideoState stat
         vid_proj->state = state;
         emit marked_video_state(vid_proj, state);
     } else {
-        std::vector<VideoItem*> v_items;
-        QTreeWidgetItem* s_item = invisibleRootItem();
-        get_video_items(s_item, v_items);
-        for (auto vid_item : v_items) {
-            if (vid_item->get_video_project() == vid_proj) {
-                vid_item->get_video_project()->state = state;
-                setCurrentItem(vid_item);
-                return;
+        VideoItem* vid_item = get_video_item(vid_proj);
+        vid_proj->state = state;
+        setCurrentItem(vid_item);
+    }
+}
+
+void ProjectWidget::select_analysis(VideoProject* vid_proj, int ana_id) {
+    VideoItem* vid_item = get_video_item(vid_proj);
+    for (int i = 0; i < vid_item->childCount(); i++) {
+        QTreeWidgetItem* item = vid_item->child(i);
+        if (item->type() == ANALYSIS_ITEM) {
+            AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+            if (ana_item->get_analysis()->get_id() == ana_id) {
+                if (ana_item->isSelected()) {
+                    emit marked_video_state(vid_proj, vid_proj->get_video()->state);
+                } else {
+                    setCurrentItem(ana_item);
+                }
             }
         }
     }

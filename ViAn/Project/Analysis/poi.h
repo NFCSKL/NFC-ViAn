@@ -21,6 +21,7 @@ public:
     void add_detections(int frame_num, std::vector<DetectionBox> detections);
     void set_end_frame(int frame_num);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
+    std::vector<DetectionBox> get_detectionbox_on_frame(int frame_num);
     friend class Analysis;
 
 };

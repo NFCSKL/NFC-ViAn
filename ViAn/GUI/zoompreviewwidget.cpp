@@ -78,13 +78,13 @@ void ZoomPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
 void ZoomPreviewWidget::frame_update(cv::Mat preview_image) {
     switch (preview_image.type()) {
         case CV_8UC1:
-            cvtColor(preview_image, _tmp, CV_GRAY2RGB);
+            cvtColor(preview_image, _tmp, cv::COLOR_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(preview_image, _tmp, CV_BGR2RGB);
+            cvtColor(preview_image, _tmp, cv::COLOR_BGR2RGB);
             break;
         case CV_8UC4:
-            cvtColor(preview_image, _tmp, CV_BGRA2RGB);
+            cvtColor(preview_image, _tmp, cv::COLOR_BGRA2RGB);
             break;
         default:
             qWarning() << "Mat was of unknown type [" << preview_image.type() << "]";

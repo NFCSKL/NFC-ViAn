@@ -46,6 +46,27 @@ Analysis* AnalysisProxy::load_analysis() {
     return analysis;
 }
 
+/**
+ * @brief AnalysisProxy::set_video_path
+ * @param path
+ * Set the path to the video that the analysis is performed on
+ */
+void AnalysisProxy::set_video_path(QString path) {
+    m_video_path = path;
+}
+
+QString AnalysisProxy::get_video_path() {
+    return m_video_path;
+}
+
+void AnalysisProxy::set_sample_freq(int freq) {
+    sample_freq = freq;
+}
+
+int AnalysisProxy::get_sample_freq() {
+    return sample_freq;
+}
+
 AnalysisSettings* AnalysisProxy::get_settings() {
     return settings;
 }
@@ -54,7 +75,6 @@ void AnalysisProxy::reset_root_dir(const QString &dir) {
     file_analysis = dir+Utility::name_from_path(file_analysis);
     m_unsaved_changes = true;
 }
-
 
 /**
  * @brief AnalysisProxy::read
@@ -69,14 +89,26 @@ void AnalysisProxy::read(const QJsonObject &json) {
     int x = json["bounding box x"].toInt();
     new_settings->bounding_box = cv::Rect(x, y, width, height);
     new_settings->interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
+    type = json["analysis_type"].toInt();
+    new_settings->type = type;
 
-    std::vector<std::string> vars = new_settings->get_var_names();
-    for (std::string name : vars) {
-        new_settings->set_setting(name, json[QString::fromStdString(name)].toInt());
+    if (type == MOTION_DETECTION) {
+        std::vector<std::string> vars = new_settings->get_motion_var_names();
+        for (std::string name : vars) {
+            new_settings->set_setting(name, json[QString::fromStdString(name)].toDouble());
+        }
+        settings = new_settings;
+    } else if (type == OBJECT_DETECTION) {
+        std::vector<std::string> vars = new_settings->get_object_var_names();
+        for (std::string name : vars) {
+            new_settings->set_setting(name, json[QString::fromStdString(name)].toDouble());
+        }
+        settings = new_settings;
     }
-    settings = new_settings;
 
     file_analysis = json["full_path"].toString();
+    m_video_path = json["video_path"].toString();
+    sample_freq = json["sample_freq"].toInt();
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_poi = json_intervals[i].toObject();
@@ -102,12 +134,21 @@ void AnalysisProxy::write(QJsonObject &json) {
     json["interval start"] = settings->interval.first;
     json["interval end"] = settings->interval.second;
 
-    std::vector<std::string> vars = settings->get_var_names();
-    for (std::string name : vars) {
-        json[QString::fromStdString(name)] = settings->get_setting(name);
+    if (type == MOTION_DETECTION) {
+        std::vector<std::string> vars = settings->get_motion_var_names();
+        for (std::string name : vars) {
+            json[QString::fromStdString(name)] = settings->get_motion_setting(name);
+        }
+    } else if (type == OBJECT_DETECTION) {
+        std::vector<std::string> vars = settings->get_object_var_names();
+        for (std::string name : vars) {
+            json[QString::fromStdString(name)] = settings->get_object_setting(name);
+        }
     }
-
+    json["analysis_type"] = type;
     json["full_path"] = file_analysis;
+    json["video_path"] = m_video_path;
+    json["sample_freq"] = sample_freq;
     QJsonArray intervals;
     for (auto it = m_slider_interval.begin(); it != m_slider_interval.end(); ++it) {
         QJsonObject interval;

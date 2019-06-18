@@ -10,7 +10,7 @@ class AnalysisItem : public TreeItem {
     bool is_new = false;
 public:
     AnalysisItem(AnalysisProxy* analysis);
-    AnalysisItem();
+    AnalysisItem(int type);
     ~AnalysisItem();
     void set_analysis(AnalysisProxy* analysis);
     AnalysisProxy *get_analysis();
