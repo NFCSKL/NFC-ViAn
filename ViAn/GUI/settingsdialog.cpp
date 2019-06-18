@@ -172,11 +172,9 @@ void SettingsDialog::weight_btn_clicked() {
     QString path = QFileDialog::getOpenFileName(this,
                                                 tr("Choose path"),
                                                 weight_file_label->text());
-    qDebug() << path;
     if (!path.isEmpty()) {
         weight_file_label->setText(path);
     }
-    qDebug() << weight_file_label->text();
 }
 
 void SettingsDialog::ok_btn_clicked() {

@@ -380,9 +380,7 @@ void VideoWidget::set_btn_shortcuts() {
     prev_frame_btn->setShortcut(Qt::Key_Left);
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
-    // Tag and zoom shortcuts are in the menus
-    set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
-    set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
+    // Tag, zoom and interval shortcuts are in the menus
 
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);

@@ -31,7 +31,7 @@ VideoGenerator::VideoGenerator(QListWidget* list, QString name, QSize size,
 void VideoGenerator::generate_video() {
     cv::Mat frame;
     cv::VideoWriter vw;
-    int fourCC = CV_FOURCC('M', 'J', 'P', 'G');
+    int fourCC = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
     cv::Size cv_size(m_size.width(), m_size.height());
     vw.open(m_name.toStdString(), fourCC, m_fps, cv_size);
     if (!vw.isOpened()) {
@@ -42,7 +42,7 @@ void VideoGenerator::generate_video() {
     // Create title screen
     if (m_title) {
         cv::Mat black = cv::Mat::zeros(cv_size, CV_8UC1);
-        cvtColor(black, black, CV_GRAY2RGB);
+        cvtColor(black, black, cv::COLOR_GRAY2RGB);
 
         std::string text = m_title_text.toStdString();
         std::string desc = m_description.toStdString();
@@ -103,7 +103,7 @@ void VideoGenerator::generate_video() {
 
         cv::VideoCapture capture(ve_item->get_path().toStdString());
         if (!capture.isOpened()) continue;
-        capture.set(CV_CAP_PROP_POS_FRAMES, ve_item->get_start());
+        capture.set(cv::CAP_PROP_POS_FRAMES, ve_item->get_start());
 
         // Update color corrections
         FrameManipulator manipulator;
@@ -138,8 +138,8 @@ void VideoGenerator::generate_video() {
             flip = 1;
         }
 
-        int width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
-        int height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+        int width = capture.get(cv::CAP_PROP_FRAME_WIDTH);
+        int height = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
         if (rotation == cv::ROTATE_90_CLOCKWISE || rotation == cv::ROTATE_90_COUNTERCLOCKWISE) {
             std::swap(width, height);
         }
@@ -150,14 +150,14 @@ void VideoGenerator::generate_video() {
                                      : static_cast<float>(m_size.height()) / max_dim;
 
         // Iterate over the interval
-        while (capture.get(CV_CAP_PROP_POS_FRAMES) <= ve_item->get_end() && !m_aborted) {
-            int curr_frame = static_cast<int>(capture.get(CV_CAP_PROP_POS_FRAMES));
+        while (capture.get(cv::CAP_PROP_POS_FRAMES) <= ve_item->get_end() && !m_aborted) {
+            int curr_frame = static_cast<int>(capture.get(cv::CAP_PROP_POS_FRAMES));
             update_progress(curr_frame);
             QCoreApplication::processEvents();
             if (!capture.read(frame)) break;
 
             if (frame.type() == CV_8UC1) {
-                cvtColor(frame, frame, CV_GRAY2RGB);
+                cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
             }
 
             // Set state variables to frame

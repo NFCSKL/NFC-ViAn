@@ -237,9 +237,9 @@ void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* 
         cv::VideoCapture video_cap;
         video_cap.open(ve_item->get_path().toStdString());
         if (!video_cap.isOpened()) return;
-        int width = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_WIDTH));
-        int height = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-        int fps = static_cast<int>(video_cap.get(CV_CAP_PROP_FPS));
+        int width = static_cast<int>(video_cap.get(cv::CAP_PROP_FRAME_WIDTH));
+        int height = static_cast<int>(video_cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+        int fps = static_cast<int>(video_cap.get(cv::CAP_PROP_FPS));
         if (rotation == Constants::DEGREE_90 || rotation == Constants::DEGREE_270) {
             std::swap(width, height);
         }

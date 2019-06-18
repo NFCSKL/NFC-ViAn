@@ -12,6 +12,8 @@
 #include <QSplashScreen>
 #include <QTest>
 
+#include <windows.h>
+
 Q_DECLARE_METATYPE(cv::Mat)
 Q_DECLARE_METATYPE(std::string)
 /**
@@ -29,6 +31,8 @@ int main(int argc, char *argv[])
     splash.setWindowFlags(splash.windowFlags() & Qt::WindowStaysOnTopHint);
     splash.show();
     a.processEvents();
+    Sleep(2000);
+    splash.close();
     MainWindow w;
     /**
      * qRegisterMetaType i
@@ -43,6 +47,5 @@ int main(int argc, char *argv[])
         QTest::qExec(new VideoProjectTest());
     }
     w.show();
-    splash.finish(&w);
     return a.exec();
 }

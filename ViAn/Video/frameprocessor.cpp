@@ -366,8 +366,9 @@ void FrameProcessor::update_manipulator_settings() {
  *
  */
 bool FrameProcessor::update_overlay_settings() {
+    bool res = false;
     int curr_frame = m_frame_index->load();
-    m_overlay->set_showing_overlay(m_o_settings->show_overlay);
+    res = m_overlay->set_showing_overlay(m_o_settings->show_overlay);
     m_overlay->set_tool(m_o_settings->tool);
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
@@ -414,9 +415,11 @@ bool FrameProcessor::update_overlay_settings() {
         m_o_settings->set_current_drawing = false;
         m_overlay->set_current_drawing(m_o_settings->shape);
     } else {
-        return false;
+        return res;
     }
-    return true;
+    res = true;
+
+    return res;
 }
 
 void FrameProcessor::update_rotation(const int& direction) {

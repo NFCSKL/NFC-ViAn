@@ -306,7 +306,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Open the recent project dialog
     rp_dialog->exec();
-    //QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
 }
 
 /**
@@ -369,7 +368,7 @@ void MainWindow::init_file_menu() {
     open_proj_folder_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
     save_project_act->setShortcut(QKeySequence::Save);     //Ctrl + S
     add_vid_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));     //Ctrl + I
-    // TODO    add_seq_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
+    add_seq_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));     //Ctrl + A
     // TODO    view_paths->setShortcuts(Q);     //Ctrl + smth
     quit_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
