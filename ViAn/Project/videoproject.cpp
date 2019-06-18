@@ -225,3 +225,11 @@ bool VideoProject::is_current() {
 void VideoProject::set_current(bool value) {
     current = value;
 }
+
+bool VideoProject::is_generated_video() {
+    return generated_video;
+}
+
+void VideoProject::set_generated_video(bool b) {
+    generated_video = b;
+}

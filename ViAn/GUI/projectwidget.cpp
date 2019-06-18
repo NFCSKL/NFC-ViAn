@@ -167,6 +167,48 @@ void ProjectWidget::create_video(QString path) {
     video_list.push_back(video);
 }
 
+
+/**
+ * @brief ProjectWidget::generate_video
+ * @param path
+ * Add the video generated from the videoedit widget to the tree
+ * this video will be added in a folder called "Generated videos"
+ * this folder will be created if it does not already exist
+ */
+void ProjectWidget::generate_video(QString path) {
+    QString folder_name = "Generated videos";
+    FolderItem* folder_item = nullptr;
+    for(int i = 0; i < invisibleRootItem()->childCount(); ++i) {
+        QTreeWidgetItem* item = invisibleRootItem()->child(i);
+        if (item->type() == FOLDER_ITEM) {
+            if (item->text(0) == folder_name) {
+                folder_item = dynamic_cast<FolderItem*>(item);
+                break;
+            }
+        }
+    }
+    if (folder_item == nullptr) {
+        folder_item = new FolderItem();
+        folder_item->setText(0, folder_name);
+        addTopLevelItem(folder_item);
+    }
+
+    // Add the video to the tree
+    int index = path.lastIndexOf('/') + 1;
+    QString vid_name = path.right(path.length() - index);
+    Video* video = new Video(path);
+    VideoProject* vid_proj = new VideoProject(video);
+    vid_proj->set_generated_video(true);
+    m_proj->add_video_project(vid_proj);
+
+    VideoItem* vid_item = new VideoItem(vid_proj);
+    vid_item->setToolTip(0, vid_proj->get_video()->file_path);
+    folder_item->addChild(vid_item);
+    folder_item->setExpanded(true);
+    vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
+    video_list.push_back(video);
+}
+
 /**
  * @brief ProjectWidget::add_images
  * Slot function for adding image sequences
@@ -1098,7 +1140,6 @@ void ProjectWidget::update_item_data(QTreeWidgetItem *item, int column) {
 void ProjectWidget::context_menu(const QPoint &point) {
     if (m_proj == nullptr) return;
     QMenu menu(this);
-
     const int item_count = selectedItems().count();
     if (item_count == 0) {
         // Clicked on root tree
@@ -1110,7 +1151,9 @@ void ProjectWidget::context_menu(const QPoint &point) {
         QTreeWidgetItem* item = selectedItems().front();
         switch (item->type()) {
         case INTERVAL_AREA_ITEM:
+            menu.addAction("Add to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            //menu.addAction("Add to video edit", this, &ProjectWidget::add_to_video_edit);
             break;
         case INTERVAL_ITEM:
         case TAG_ITEM:
@@ -1212,6 +1255,22 @@ void ProjectWidget::drawing_tag() {
     }
     // Add tag to tree
     add_tag(vid_proj, tag);
+}
+
+void ProjectWidget::add_to_video_edit(QTreeWidgetItem* item) {
+    int start, end;
+    VideoProject* vid_proj = nullptr;
+    if (item->type() == INTERVAL_AREA_ITEM) {
+        IntervalAreaItem* ia_item = dynamic_cast<IntervalAreaItem*>(item);
+        VideoItem* v_item = dynamic_cast<VideoItem*>(item->parent()->parent());
+        start = ia_item->get_start();
+        end = ia_item->get_end();
+        vid_proj = v_item->get_video_project();
+    } else {
+        return;
+    }
+    emit interval_to_edit(start, end, vid_proj);
+
 }
 
 /**
@@ -1566,9 +1625,10 @@ bool ProjectWidget::save_project() {
             m_proj->set_name_and_path(name, path);
             m_proj->set_temporary(false);
             set_main_window_name(name);
-            emit set_project(m_proj);
             QDir dir;
             dir.mkpath(m_proj->get_dir());
+
+            QString new_path = path + name + "/" + Constants::GENERATED_VIDEO_FOLDER;
 
             // If the current video is a sequence then it needs to be reloaded
             // since the images path will have changed
@@ -1577,7 +1637,11 @@ bool ProjectWidget::save_project() {
                     vid_proj->set_current(false);
                     emit marked_video_state(vid_proj, vid_proj->get_video()->state);
                 }
+                if (vid_proj->is_generated_video()) {
+                    vid_proj->get_video()->file_path = new_path + vid_proj->get_video()->get_name();
+                }
             }
+            update_videoitems();
         } else {
             // User aborted dialog, cancel save
             return false;
@@ -1595,6 +1659,9 @@ bool ProjectWidget::save_project() {
     save_item_data();
     emit save_draw_wgt();
     emit save_bmark_wgt();
+    emit save_videdit_wgt();
+
+    emit set_project(m_proj);
 
     // Mark all analysis as saved
     std::vector<AnalysisItem*> a_items;
@@ -1800,14 +1867,14 @@ void ProjectWidget::update_current_videoitem(QString path) {
 }
 
 void ProjectWidget::update_videoitems() {
-    for (auto item : findItems(".", Qt::MatchContains, 0)) {
-        if (item->type() == VIDEO_ITEM) {
-            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
-            Video* video = v_item->get_video_project()->get_video();
-            v_item->setText(0, video->get_name());
-            v_item->setToolTip(0, video->file_path);
-            v_item->set_thumbnail();
-        }
+    std::vector<VideoItem*> v_items;
+    QTreeWidgetItem* s_item = invisibleRootItem();
+    get_video_items(s_item, v_items);
+    for (auto v_item : v_items) {
+        Video* video = v_item->get_video_project()->get_video();
+        v_item->setText(0, video->get_name());
+        v_item->setToolTip(0, video->file_path);
+        v_item->set_thumbnail();
     }
 }
 

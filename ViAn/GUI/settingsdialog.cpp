@@ -52,7 +52,7 @@ void SettingsDialog::add_widgets() {
     thickness_label->setText(QString::number(thickness_slider->value()));
 
     thickness_layout->addRow(thickness_label, thickness_slider);
-    layout->addRow("Thickness", thickness_layout);
+    layout->addRow("Line thickness", thickness_layout);
 
     // Add page step
     page_step_layout = new QFormLayout();
@@ -67,7 +67,7 @@ void SettingsDialog::add_widgets() {
     page_step_label->setText(QString::number(page_step_slider->value()));
 
     page_step_layout->addRow(page_step_label, page_step_slider);
-    layout->addRow("Page step", page_step_layout);
+    layout->addRow("Frame step", page_step_layout);
 
     // Add widget max
     widget_max_layout = new QFormLayout();
@@ -82,7 +82,7 @@ void SettingsDialog::add_widgets() {
     widget_max_label->setText(QString::number(widget_max_slider->value()));
 
     widget_max_layout->addRow(widget_max_label, widget_max_slider);
-    layout->addRow("Floating widgets max", widget_max_layout);
+    layout->addRow("Floating video widgets (max)", widget_max_layout);
 
     // Add widget max
     thumbnail_size_layout = new QFormLayout();

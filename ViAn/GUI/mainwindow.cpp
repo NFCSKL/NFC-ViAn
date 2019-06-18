@@ -8,6 +8,7 @@
 #include "GUI/Analysis/anasettingwidget.h"
 #include "GUI/Analysis/queuewidget.h"
 #include "GUI/Bookmark/bookmarkwidget.h"
+#include "GUI/VideoEdit/videoeditwidget.h"
 #include "GUI/drawingwidget.h"
 #include "GUI/frameexporterdialog.h"
 #include "GUI/manipulatorwidget.h"
@@ -28,6 +29,7 @@
 #include "statusbar.h"
 #include "videowidget.h"
 
+#include <QCoreApplication>
 
 #include <QCloseEvent>
 #include <QDebug>
@@ -39,6 +41,9 @@
 #include <QProgressDialog>
 #include <QThread>
 #include <QTimer>
+
+#include "windows.h"
+
 
 /**
  * @brief MainWindow::MainWindow
@@ -52,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     queue_dock = new QDockWidget(tr("Analysis queue"), this);
     ana_settings_dock = new QDockWidget(tr("Analysis settings"), this);
     manipulator_dock = new QDockWidget(tr("Color correction settings"), this);
+    videoedit_dock = new QDockWidget(tr("Video Edit"), this);
     project_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     drawing_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     bookmark_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -59,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     queue_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     ana_settings_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     manipulator_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    videoedit_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     toggle_project_wgt = project_dock->toggleViewAction();
     toggle_drawing_wgt = drawing_dock->toggleViewAction();
     toggle_bookmark_wgt = bookmark_dock->toggleViewAction();
@@ -66,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     toggle_ana_settings_wgt = ana_settings_dock->toggleViewAction();
     toggle_zoom_preview_wgt = zoom_preview_dock->toggleViewAction();
     toggle_manipulator_wgt = manipulator_dock->toggleViewAction();
+    toggle_videoedit_wgt = videoedit_dock->toggleViewAction();
 
     // Initialize video widget
     video_wgt = new VideoWidget();
@@ -134,7 +142,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(bookmark_wgt, &BookmarkWidget::show_bm_dock, this, &MainWindow::show_bookmark_dock);
     connect(project_wgt, &ProjectWidget::set_project, bookmark_wgt, &BookmarkWidget::set_project);
     connect(bookmark_wgt, &BookmarkWidget::play_bookmark_video, project_wgt, &ProjectWidget::select_video_project);
-    connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     connect(project_wgt, &ProjectWidget::save_bmark_wgt, bookmark_wgt, &BookmarkWidget::save_item_data);
     bookmark_dock->setWidget(bookmark_wgt);
 
@@ -157,6 +164,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(manipulator_wgt, &ManipulatorWidget::values, video_wgt, &VideoWidget::update_brightness_contrast);
     connect(manipulator_wgt, &ManipulatorWidget::update_tag, video_wgt, &VideoWidget::update_tag_color);
+
+    // Initialize videoedit widget
+    VideoEditWidget *videoedit_wgt = new VideoEditWidget;
+    videoedit_dock->setWidget(videoedit_wgt);
+    addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
+
+    connect(project_wgt, &ProjectWidget::set_project, videoedit_wgt, &VideoEditWidget::set_project);
+    connect(project_wgt, &ProjectWidget::save_videdit_wgt, videoedit_wgt, &VideoEditWidget::save_item_data);
 
     // Main toolbar
     main_toolbar = new MainToolbar();
@@ -261,8 +276,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Connects for removing, clearing or closing
     connect(project_wgt, &ProjectWidget::clear_analysis, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
     connect(project_wgt, &ProjectWidget::clear_slider, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
+    connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     connect(project_wgt, &ProjectWidget::project_closed, drawing_wgt, &DrawingWidget::clear_overlay);
     connect(project_wgt, &ProjectWidget::project_closed, video_wgt, &VideoWidget::clear_current_video);
+    connect(project_wgt, &ProjectWidget::project_closed, videoedit_wgt, &VideoEditWidget::clear_intervals);
     connect(project_wgt, &ProjectWidget::item_removed, video_wgt, &VideoWidget::remove_item);
     connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
 
@@ -275,6 +292,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::open_view_path_dialog, this, &MainWindow::view_paths);
     connect(video_wgt, &VideoWidget::update_videoitem, project_wgt, &ProjectWidget::update_current_videoitem);
     connect(project_wgt, &ProjectWidget::new_slider_max, video_wgt, &VideoWidget::set_slider_max);
+    connect(project_wgt, &ProjectWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
+    connect(video_wgt, &VideoWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
+    connect(videoedit_wgt, &VideoEditWidget::set_video, project_wgt, &ProjectWidget::select_video_project);
+    connect(videoedit_wgt, &VideoEditWidget::add_video, project_wgt, &ProjectWidget::generate_video);
 
     // Open the recent project dialog
     rp_dialog->exec();
@@ -456,6 +477,7 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(toggle_queue_wgt);
     view_menu->addAction(toggle_ana_settings_wgt);
     view_menu->addAction(toggle_manipulator_wgt);
+    view_menu->addAction(toggle_videoedit_wgt);
     view_menu->addSeparator();
     view_menu->addAction(toggle_main_toolbar);
     view_menu->addAction(toggle_drawing_toolbar);
@@ -467,6 +489,7 @@ void MainWindow::init_view_menu() {
     toggle_queue_wgt->setStatusTip(tr("Show/hide analysis queue widget"));
     toggle_ana_settings_wgt->setStatusTip(tr("Show/hide analysis info widget"));
     toggle_manipulator_wgt->setStatusTip(tr("Show/hide color correction widget"));
+    toggle_videoedit_wgt->setStatusTip(tr("Show/hide video edit widget"));
 }
 
 /**
@@ -560,7 +583,10 @@ void MainWindow::init_interval_menu() {
     QAction* new_label_act = new QAction(tr("New tag &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
+    QAction* interval_start_act = new QAction(tr("Set &start"));
+    QAction* interval_end_act = new QAction(tr("Set &end"));
     QAction* tag_interval_act = new QAction(tr("&Tag interval"));
+    QAction* add_interval_act = new QAction(tr("&Add interval"));
     QAction* rm_interval_act = new QAction(tr("&Clear interval"), this);
     interval_act = new QAction(tr("&Interval"), this);
 
@@ -570,16 +596,24 @@ void MainWindow::init_interval_menu() {
     new_label_act->setIcon(QIcon(":/Icons/tag.png"));
     new_tag_act->setIcon(QIcon(":/Icons/tag_frame.png"));
     remove_tag_act->setIcon(QIcon(":/Icons/remove_frame.png"));
+    interval_start_act->setIcon(QIcon(":/Icons/start_interval.png"));
+    interval_end_act->setIcon(QIcon(":/Icons/end_interval.png"));
     tag_interval_act->setIcon(QIcon(":/Icons/create_interval.png"));
+    add_interval_act->setIcon(QIcon(":/Icons/add_interval.png"));
 
     new_label_act->setShortcut(tr("Ctrl+T"));
     new_tag_act->setShortcut(Qt::Key_T);
     remove_tag_act->setShortcut(Qt::Key_U);
+    interval_start_act->setShortcut(Qt::Key_I);
+    interval_end_act->setShortcut(Qt::Key_O);
     tag_interval_act->setShortcut(Qt::Key_K);
+    add_interval_act->setShortcut(Qt::Key_P);
     rm_interval_act->setShortcut(Qt::Key_J);
 
     new_label_act->setStatusTip(tr("Create new tag label"));
     new_tag_act->setStatusTip(tr("Tag the current frame"));
+    interval_start_act->setStatusTip(tr("Set the start of an interval"));
+    interval_end_act->setStatusTip(tr("Set the end of an interval"));
     remove_tag_act->setStatusTip(tr("Untag the current frame"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
 
@@ -587,7 +621,10 @@ void MainWindow::init_interval_menu() {
     interval_menu->addAction(new_tag_act);
     interval_menu->addAction(remove_tag_act);
     interval_menu->addSeparator();
+    interval_menu->addAction(interval_start_act);
+    interval_menu->addAction(interval_end_act);
     interval_menu->addAction(tag_interval_act);
+    interval_menu->addAction(add_interval_act);
     interval_menu->addAction(rm_interval_act);
     interval_menu->addSeparator();
     interval_menu->addAction(interval_act);
@@ -595,7 +632,12 @@ void MainWindow::init_interval_menu() {
     connect(new_label_act, &QAction::triggered, video_wgt, &VideoWidget::new_tag_clicked);
     connect(new_tag_act, &QAction::triggered, video_wgt, &VideoWidget::tag_frame);
     connect(remove_tag_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_frame);
+
+    connect(interval_start_act, &QAction::triggered, video_wgt, &VideoWidget::set_interval_start_clicked);
+    connect(interval_end_act, &QAction::triggered, video_wgt, &VideoWidget::set_interval_end_clicked);
+
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::create_interval_clicked);
+    connect(add_interval_act, &QAction::triggered, video_wgt, &VideoWidget::add_interval_clicked);
     connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
@@ -675,7 +717,7 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("E&xport interval..."), this);
+    QAction* export_act = new QAction(tr("E&xport interval to stills..."), this);
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
 
@@ -715,6 +757,7 @@ void MainWindow::init_help_menu() {
     help_act->setStatusTip(tr("Help"));
 
     //connect
+    connect(help_act, &QAction::triggered, this, &MainWindow::help_clicked);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -800,7 +843,7 @@ void MainWindow::export_images() {
 
     connect(im_exp, &ImageExporter::finished_msg, this, &MainWindow::set_status_bar);
     connect(progress, &QProgressDialog::canceled, im_exp, &ImageExporter::abort);
-    connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
+    connect(im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
 
     QThread* exporter_thread = new QThread;
     im_exp->moveToThread(exporter_thread);
@@ -810,6 +853,17 @@ void MainWindow::export_images() {
     connect(exporter_thread, &QThread::finished, exporter_thread, &QThread::deleteLater);
     progress->show();
     exporter_thread->start();
+}
+
+/**
+ * @brief MainWindow::help_clicked
+ * Open the help PDF
+ */
+void MainWindow::help_clicked() {
+    // Put vian-help.pdf in C:/Users/Student/Documents/GitHub/NFC-ViAn/build-ViAn-Desktop_Qt_5_11_2_MinGW_32bit-Debug/debug/
+    // Move to release when done
+    QUrl url3 = QUrl::fromLocalFile(qApp->applicationDirPath().append("/vian-help.pdf"));
+    QDesktopServices::openUrl(url3);
 }
 
 /**

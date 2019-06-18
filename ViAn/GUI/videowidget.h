@@ -119,6 +119,7 @@ signals:
     void add_tag(VideoProject*, Tag*);
     void add_interval(VideoProject*, Interval*);
     void set_interval_area(int new_area_start);
+    void interval_to_edit(int, int, VideoProject*);
     void tag_new_frame(int, TagFrame*);
     void tag_remove_frame(int);
     void set_status_bar(QString);
@@ -166,6 +167,7 @@ public slots:
     void set_interval_start_clicked();
     void set_interval_end_clicked();
     void create_interval_clicked();
+    void add_interval_clicked();
     void loop_interval_toggled(bool value);
     void set_interval(std::pair<int, int> interval);
     void delete_interval(void);
@@ -245,6 +247,7 @@ private:
     QPushButton* set_end_interval_btn;
     QPushButton* export_frame_btn;
     QPushButton* create_interval_btn;
+    QPushButton* interval_to_edit_btn;
     QPushButton* loop_btn;
 
     //Shortcuts

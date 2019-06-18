@@ -49,6 +49,7 @@ protected:
     VIDEO_TYPE m_sequence_type;
     bool m_is_saved{false};
     int m_width, m_height = 0;
+    int m_last_frame = 0;
 public:
     VideoState state;
 public:
@@ -63,7 +64,9 @@ public:
     bool is_saved();
     int get_width();
     int get_height();
+    int get_last_frame();
     void set_size(int width, int height);
+    void set_last_frame(int frame);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

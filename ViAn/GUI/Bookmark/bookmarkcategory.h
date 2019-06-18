@@ -1,6 +1,7 @@
 #ifndef BOOKMARKFOLDER_H
 #define BOOKMARKFOLDER_H
 
+#include "bookmarkbaseitem.h"
 #include "Project/video.h"
 
 #include <QListWidget>
@@ -18,7 +19,7 @@ class VideoProject;
  * This class is inteded to store two scrollable lists
  * containing bookmarks.
  */
-class BookmarkCategory : public QObject, public QListWidgetItem {
+class BookmarkCategory : public QObject, public BookmarkBaseItem {
     Q_OBJECT
     // Title line
     QLineEdit* m_title = nullptr;

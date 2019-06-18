@@ -56,6 +56,10 @@ void BookmarkList::clear_lists() {
         if (item(i)->type() == CONTAINER) {
             BookmarkCategory* cat = dynamic_cast<BookmarkCategory*>(item(i));
             cat->clear_lists();
+
+            // Should do but cause crash
+            // delete cat;
+
         } else if (item(i)->type() == BOOKMARK) {
             delete item(i);
         }

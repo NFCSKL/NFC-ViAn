@@ -51,9 +51,17 @@ int Video::get_height() {
     return m_height;
 }
 
+int Video::get_last_frame() {
+    return m_last_frame;
+}
+
 void Video::set_size(int width, int height) {
     m_width = width;
     m_height = height;
+}
+
+void Video::set_last_frame(int frame) {
+    m_last_frame = frame;
 }
 
 /**

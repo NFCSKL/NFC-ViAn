@@ -2,6 +2,7 @@
 
 #include "bookmark.h"
 #include "GUI/Bookmark/bookmarkcategory.h"
+#include "GUI/VideoEdit/videointerval.h"
 #include "videoproject.h"
 
 #include <QDebug>
@@ -75,6 +76,7 @@ ID Project::add_video_project(VideoProject *vid_proj){
 void Project::remove_video_project(VideoProject* vid_proj){
     auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
     if (it == m_videos.end()) return;
+    vid_proj->set_current(false);
     delete *it;
     m_videos.erase(it);
     m_unsaved_changes = true;
@@ -115,6 +117,20 @@ void Project::remove_category(BookmarkCategory* cat) {
     if (it == m_categories.end()) return;
     delete *it;
     m_categories.erase(it);
+    m_unsaved_changes = true;
+}
+
+void Project::add_interval(VideoInterval* interval) {
+    interval->set_project(this);
+    m_intervals.push_back(interval);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_interval(VideoInterval *interval) {
+    auto it = std::find(m_intervals.begin(), m_intervals.end(), interval);
+    if (it == m_intervals.end()) return;
+    delete *it;
+    m_intervals.erase(it);
     m_unsaved_changes = true;
 }
 
@@ -171,7 +187,11 @@ bool Project::is_saved() const {
                                             [](Bookmark* bm){return bm->is_saved();});
     bool categories_saved = std::all_of(m_categories.begin(), m_categories.end(),
                                             [](BookmarkCategory* cat){return cat->is_saved();});
-    return !m_unsaved_changes && video_projects_saved && bookmarks_saved && categories_saved;
+    bool intervals_saved = std::all_of(m_intervals.begin(), m_intervals.end(),
+                                            [](VideoInterval* interval){return interval->is_saved();});
+
+    return !m_unsaved_changes && video_projects_saved &&
+            bookmarks_saved && categories_saved && intervals_saved;
 }
 
 bool Project::is_temporary() const {
@@ -226,6 +246,15 @@ void Project::read(const QJsonObject& json){
         add_category(new_category);
         new_category->m_unsaved_changes = false;
     }
+
+    // Read intervals from json
+    QJsonArray json_intervals = json["intervals"].toArray();
+    for (int i = 0; i < json_intervals.size(); ++i) {
+        QJsonObject json_interval = json_intervals[i].toObject();
+        VideoInterval* interval = new VideoInterval();
+        interval->read(json_interval);
+        add_interval(interval);
+    }
     m_unsaved_changes = false;
 }
 
@@ -270,6 +299,14 @@ void Project::write(QJsonObject& json){
     }
     json["categories"] = json_cats;
 
+    QJsonArray json_intervals;
+    for(auto it = m_intervals.begin(); it != m_intervals.end(); it++){
+        QJsonObject json_interval;
+        (*it)->write(json_interval);
+        json_intervals.append(json_interval);
+    }
+    json["intervals"] = json_intervals;
+
     m_unsaved_changes = false;
 }
 
@@ -284,7 +321,6 @@ bool Project::save_project(){
     auto time = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(time);
     last_changed = std::ctime(&now_c);
-    //last_changed.erase(last_changed.end()-1);       // Remove the "\n"
     last_changed.remove(last_changed.size()-1, 1);
     return save_saveable(m_file);
 }
@@ -376,6 +412,10 @@ std::vector<Bookmark*> &Project::get_bookmarks() {
 
 std::vector<BookmarkCategory*> &Project::get_categories() {
     return m_categories;
+}
+
+std::vector<VideoInterval*> &Project::get_intervals() {
+    return m_intervals;
 }
 
 /**
