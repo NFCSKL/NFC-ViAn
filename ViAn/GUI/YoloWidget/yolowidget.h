@@ -26,6 +26,7 @@ class YoloWidget : public QWidget
     QComboBox* classes_combo;
     QSlider* icon_size_slider;
     QLabel* icon_size_label;
+    QLabel* detection_number_label;
     AnalysisSlider* frames_slider;
     QLabel* curr_time;
     QLabel* end_time;
@@ -39,6 +40,7 @@ public:
 public slots:
     void set_project(Project* proj);
     void set_slider_value(int value);
+    void set_detection_number(int number);
 
 private slots:
     void set_classes();

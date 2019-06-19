@@ -46,6 +46,7 @@ public slots:
 signals:
     void update_frames(std::vector<int>);
     void set_frame(VideoProject*, int);
+    void number_items(int);
     void slider_max(int);
     void set_slider(int frame);
 

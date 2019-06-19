@@ -300,7 +300,7 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
-    else if (m_z_settings->set_state) {
+    if (m_z_settings->set_state) {
         load_zoomer_state();
     }
     // Scale/zoom factor has been changed
