@@ -1198,9 +1198,12 @@ void ProjectWidget::context_menu(const QPoint &point) {
         case INTERVAL_AREA_ITEM:
             menu.addAction("Add to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
-            //menu.addAction("Add to video edit", this, &ProjectWidget::add_to_video_edit);
             break;
         case INTERVAL_ITEM:
+            menu.addAction("Add all to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
         case TAG_ITEM:
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1215,6 +1218,8 @@ void ProjectWidget::context_menu(const QPoint &point) {
             if (ana_item->is_finished()) {
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
+                menu.addSeparator();
+                menu.addAction("Add all detections to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
                 menu.addAction("Rename", this, &ProjectWidget::rename_item);
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
                 if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
@@ -1317,11 +1322,30 @@ void ProjectWidget::add_to_video_edit(QTreeWidgetItem* item) {
         start = ia_item->get_start();
         end = ia_item->get_end();
         vid_proj = v_item->get_video_project();
+    } else if (item->type() == INTERVAL_ITEM) {
+        IntervalItem* i_item = dynamic_cast<IntervalItem*>(item);
+        for (auto i = 0; i < i_item->childCount(); ++i) {
+            auto child_item = dynamic_cast<IntervalAreaItem*>(i_item->child(i));
+            if (!child_item) {
+                continue;
+            } else {
+                add_to_video_edit(child_item);
+            }
+        }
+        return;
+    } else if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* a_item = dynamic_cast<AnalysisItem*>(item);
+        VideoItem* v_item = dynamic_cast<VideoItem*>(item->parent());
+        vid_proj = v_item->get_video_project();
+        std::vector<std::pair<int, int>> intervals = a_item->get_analysis()->m_slider_interval;
+        for (std::pair<int, int> interval : intervals) {
+            emit interval_to_edit(interval.first, interval.second, vid_proj);
+        }
+        return;
     } else {
         return;
     }
     emit interval_to_edit(start, end, vid_proj);
-
 }
 
 /**
