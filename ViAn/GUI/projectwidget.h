@@ -160,6 +160,10 @@ private:
     void update_current_interval(VideoItem* v_item);
     bool message_box(QString text = "", QString info_text = "", bool warning = false);
     std::vector<VideoProject*> removed_sequences;
+
+protected:
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
+
 signals:
     void close_all_widgets();
     void project_closed();

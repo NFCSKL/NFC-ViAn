@@ -1094,6 +1094,17 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
     emit update_slider();
 }
 
+void ProjectWidget::mouseDoubleClickEvent(QMouseEvent* event) {
+    if (!itemAt(event->pos())) return;
+    auto item = itemAt(event->pos());
+    if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
+            open_yolo_widget(ana_item);
+        }
+    }
+}
+
 /**
  * @brief ProjectWidget::update_current_tag
  * Deselect the current tag if an item under a different video project is chosen
