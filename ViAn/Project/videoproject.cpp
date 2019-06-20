@@ -186,9 +186,14 @@ void VideoProject::reset_root_dir(const QString &dir) {
             seq->reset_root_dir(dir);
         }
     }
-    for(auto& an : m_analyses){
-        if(an.second->get_type() == MOTION_DETECTION){ ;
+    for (auto& an : m_analyses) {
+        switch (an.second->get_type()) {
+        case MOTION_DETECTION:
+        case OBJECT_DETECTION:
             dynamic_cast<AnalysisProxy*>(an.second)->reset_root_dir(dir);
+            break;
+        default:
+            break;
         }
     }
 }
