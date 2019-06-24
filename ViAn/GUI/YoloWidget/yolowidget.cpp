@@ -164,10 +164,11 @@ void YoloWidget::set_analysis(AnalysisProxy* analysis) {
     default:
         break;
     }
+    double number = analysis->get_settings()->get_object_setting("Confidence threshold")*100;
+    int conf = int (number);
+    confidence_slider->setMinimum(conf);
     m_list->set_analysis(analysis);
     frames_slider->set_analysis_proxy(analysis);
-    int conf = int(analysis->get_settings()->get_object_setting("Confidence threshold")*100);
-    confidence_slider->setMinimum(conf);
 }
 
 void YoloWidget::set_project(Project* proj) {

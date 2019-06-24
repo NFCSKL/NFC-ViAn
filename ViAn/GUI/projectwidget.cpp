@@ -1099,6 +1099,7 @@ void ProjectWidget::mouseDoubleClickEvent(QMouseEvent* event) {
     auto item = itemAt(event->pos());
     if (item->type() == ANALYSIS_ITEM) {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        if (!ana_item->is_finished()) return;
         if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
             open_yolo_widget(ana_item);
         }
