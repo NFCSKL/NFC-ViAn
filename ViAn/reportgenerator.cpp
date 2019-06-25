@@ -299,12 +299,24 @@ QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABL
  */
 QString ReportGenerator::date_time_generator() {
     time_t now = time(nullptr);
+
+    std::tm *tt;
+    tt = localtime(&now);
+    QString date, yyyy, mm, dd, hour, min, sec;
+    yyyy = QString::number(tt->tm_year + 1900);
+    mm = QString::number(tt->tm_mon + 1);   if(tt->tm_mon < 10) mm = "0" + mm;
+    dd = QString::number(tt->tm_mday);      if(tt->tm_mday < 10) dd = "0" + dd;
+    hour = QString::number(tt->tm_hour);    if(tt->tm_hour < 10) hour = "0" + hour;
+    min  = QString::number(tt->tm_min);     if(tt->tm_min < 10)  min  = "0" + min;
+    sec  = QString::number(tt->tm_sec);     if(tt->tm_sec < 10)  sec  = "0" + sec;
+    date = yyyy+"-"+mm+"-"+dd+"_"+hour+min+sec;
+
     QString dt = ctime(&now);
     dt.replace(':', '-');
     dt.replace(' ' , '_');
     dt.remove('\n');
     //dt.erase(std::remove(dt.begin(), dt.end(), '\n'), dt.end());
-    return dt;
+    return date;
 }
 
 /**

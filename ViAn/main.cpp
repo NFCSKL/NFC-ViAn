@@ -11,6 +11,8 @@
 #include <QApplication>
 #include <QSplashScreen>
 #include <QTest>
+#include <QThread>
+#include <QTimer>
 
 #include <windows.h>
 
@@ -31,8 +33,8 @@ int main(int argc, char *argv[])
     splash.setWindowFlags(splash.windowFlags() & Qt::WindowStaysOnTopHint);
     splash.show();
     a.processEvents();
-    Sleep(2000);
-    splash.close();
+
+    QTimer::singleShot(1000, &splash, SLOT(close())); // Timer
     MainWindow w;
     /**
      * qRegisterMetaType i
@@ -47,5 +49,6 @@ int main(int argc, char *argv[])
         QTest::qExec(new VideoProjectTest());
     }
     w.show();
+
     return a.exec();
 }
