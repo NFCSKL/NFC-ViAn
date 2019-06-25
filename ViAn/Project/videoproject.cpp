@@ -154,6 +154,7 @@ void VideoProject::write(QJsonObject& json){
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
         BasicAnalysis* an = it2->second;
+        json_analysis["analysis_type"] = an->get_type();
         an->write(json_analysis);
         json_analyses.append(json_analysis);
     }

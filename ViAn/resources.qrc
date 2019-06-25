@@ -172,5 +172,7 @@
         <file>Icons/analysis_motion.png</file>
         <file>Icons/analysis_object.png</file>
         <file>vian-help.pdf</file>
+        <file>yolov3.cfg</file>
+        <file>coco.names</file>
     </qresource>
 </RCC>

@@ -1,5 +1,6 @@
 
 #include "GUI/mainwindow.h"
+#include "GUI/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/Analysis/basicanalysis.h"
 #include "Project/Test/bookmarktest.h"
@@ -11,7 +12,6 @@
 #include <QApplication>
 #include <QSplashScreen>
 #include <QTest>
-#include <QThread>
 #include <QTimer>
 
 #include <windows.h>
@@ -33,8 +33,7 @@ int main(int argc, char *argv[])
     splash.setWindowFlags(splash.windowFlags() & Qt::WindowStaysOnTopHint);
     splash.show();
     a.processEvents();
-
-    QTimer::singleShot(1000, &splash, SLOT(close())); // Timer
+    QTimer::singleShot(1000, &splash, &QSplashScreen::close); // Timer
     MainWindow w;
     /**
      * qRegisterMetaType i
@@ -49,6 +48,6 @@ int main(int argc, char *argv[])
         QTest::qExec(new VideoProjectTest());
     }
     w.show();
-
+    w.rp_dialog->exec();
     return a.exec();
 }

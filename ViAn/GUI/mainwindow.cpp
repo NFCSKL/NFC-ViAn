@@ -303,9 +303,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
     connect(videoedit_wgt, &VideoEditWidget::set_video, project_wgt, &ProjectWidget::select_video_project);
     connect(videoedit_wgt, &VideoEditWidget::add_video, project_wgt, &ProjectWidget::generate_video);
-
-    // Open the recent project dialog
-    rp_dialog->exec();
 }
 
 /**
@@ -854,12 +851,16 @@ void MainWindow::init_rp_dialog() {
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
-    connect(rp_dialog, &RecentProjectDialog::exit, this, &QWidget::close);
+    connect(rp_dialog, &RecentProjectDialog::exit, this, &MainWindow::close_program);
 }
 
 void MainWindow::open_rp_dialog() {
     init_rp_dialog();
     rp_dialog->exec();
+}
+
+void MainWindow::close_program() {
+    QTimer::singleShot(0, qApp, &QCoreApplication::quit);
 }
 
 /**

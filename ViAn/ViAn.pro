@@ -255,10 +255,10 @@ win32 {
     # For opencv4
     INCLUDEPATH += D:\opencv4\opencv\build\include
     LIBS += D:\opencv4\opencv-build\bin\libopencv_core401.dll
+    LIBS += D:\opencv4\opencv-build\bin\libopencv_dnn401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_highgui401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_imgcodecs401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_imgproc401.dll
-    LIBS += D:\opencv4\opencv-build\bin\libopencv_dnn401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_video401.dll
     LIBS += D:\opencv4\opencv-build\bin\libopencv_videoio401.dll
 }

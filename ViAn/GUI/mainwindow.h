@@ -101,6 +101,7 @@ private:
 
     void init_rp_dialog();
     void open_rp_dialog();
+    void close_program();
 
     void init_file_menu();
     void init_edit_menu();
