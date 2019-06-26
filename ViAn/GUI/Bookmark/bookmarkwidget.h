@@ -38,7 +38,7 @@ signals:
 public slots:
     BookmarkCategory *add_new_folder(QString name);
     void create_bookmark(VideoProject *vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description);
-    void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
+    QString export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void save_item_data();
     void set_project(Project* proj);
     void clear_bookmarks();
