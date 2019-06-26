@@ -17,6 +17,7 @@ class RecentProjectDialog;
 class Shapes;
 class StatusBar;
 class YoloWidget;
+class VideoEditWidget;
 class VideoProject;
 class VideoWidget;
 class ZoomPreviewWidget;
@@ -85,6 +86,7 @@ private:
     AnaSettingWidget* ana_settings_wgt;
     ManipulatorWidget* manipulator_wgt;
     YoloWidget* yolo_wgt;
+    VideoEditWidget* videoedit_wgt;
 
     QAction* toggle_project_wgt;
     QAction* toggle_bookmark_wgt;

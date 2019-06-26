@@ -12,9 +12,7 @@
 #include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
-//#include "Project/imagesequence.h"
 #include "Project/videoproject.h"
-//#include "utility.h"
 #include "Video/videocontroller.h"
 
 #include <QBoxLayout>
@@ -127,7 +125,6 @@ int VideoWidget::get_current_video_length(){
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
         settings->set_interval(m_interval);
-        delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);
 }

@@ -27,6 +27,7 @@ private slots:
     void context_menu(const QPoint& point);
     void edit_item(QListWidgetItem *item);
     void remove_item(QListWidgetItem* item);
+    void clear_all_items();
     void toggle_viewlayout();
 public slots:
     void generate_video();

@@ -25,7 +25,7 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
     layout->addWidget(generate_video_btn);
     setLayout(layout);
 
-    connect(generate_video_btn, &QPushButton::clicked, videoedit_list, &VideoEditList::generate_video);
+    connect(generate_video_btn, &QPushButton::clicked, this, &VideoEditWidget::generate_video);
     connect(this, &VideoEditWidget::interval_to_edit, videoedit_list, &VideoEditList::add_interval);
     connect(this, &VideoEditWidget::set_project, videoedit_list, &VideoEditList::set_project);
     connect(this, &VideoEditWidget::save_item_data, videoedit_list, &VideoEditList::save_item_data);
@@ -35,4 +35,8 @@ VideoEditWidget::VideoEditWidget(QWidget *parent) : QWidget(parent)
 
 void VideoEditWidget::clear_intervals() {
     videoedit_list->clear();
+}
+
+void VideoEditWidget::generate_video() {
+    videoedit_list->generate_video();
 }

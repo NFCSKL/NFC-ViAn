@@ -28,6 +28,7 @@ signals:
 
 public slots:
     void clear_intervals();
+    void generate_video();
 };
 
 #endif // VIDEOEDITWIDGET_H

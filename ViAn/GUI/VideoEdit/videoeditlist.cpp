@@ -66,8 +66,8 @@ void VideoEditList::context_menu(const QPoint &point) {
     else{                   // R-clicked not on item
         setCurrentItem(nullptr);
         QMenu* menu = new QMenu;
+        menu->addAction("Clear all", this, &VideoEditList::clear_all_items);
         menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
-        menu->addSeparator();
         menu->addAction("Generate Video", this, &VideoEditList::generate_video);
         menu->exec(mapToGlobal(point));
         delete menu;
@@ -85,6 +85,7 @@ void VideoEditList::item_right_clicked(const QPoint pos) {
     menu->addAction("Edit interval", this, [this, pos] { edit_item(itemAt(pos)); });
     menu->addAction("Remove", this, [this, pos] { remove_item(itemAt(pos)); });
     menu->addSeparator();
+    menu->addAction("Clear all", this, &VideoEditList::clear_all_items);
     menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
     menu->addAction("Generate Video", this, &VideoEditList::generate_video);
 
@@ -112,6 +113,26 @@ void VideoEditList::remove_item(QListWidgetItem* item) {
     VideoInterval* interval = ve_item->get_interval();
     m_proj->remove_interval(interval);
     delete ve_item;
+}
+
+/**
+ * @brief VideoEditList::clear_all_items
+ * Removes all the items in the list
+ */
+void VideoEditList::clear_all_items() {
+    QMessageBox clear_box(this);
+    clear_box.setIcon(QMessageBox::Warning);
+    clear_box.setMinimumSize(300,200);
+    clear_box.setText("Deleting item(s)\n");
+    clear_box.setInformativeText("Are you sure you wanna delete all the items?");
+    clear_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    clear_box.setDefaultButton(QMessageBox::No);
+    int reply = clear_box.exec();
+    if (reply == QMessageBox::No) return;
+
+    for (int i = count()-1; i >= 0; i--) {
+        remove_item(item(i));
+    }
 }
 
 

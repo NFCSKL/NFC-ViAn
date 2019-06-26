@@ -175,7 +175,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(yolo_wgt, &YoloWidget::set_frame, project_wgt, &ProjectWidget::select_analysis);
 
     // Initialize videoedit widget
-    VideoEditWidget *videoedit_wgt = new VideoEditWidget;
+    videoedit_wgt = new VideoEditWidget;
     videoedit_dock->setWidget(videoedit_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
 
@@ -682,29 +682,28 @@ void MainWindow::init_interval_menu() {
 void MainWindow::init_drawings_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Drawings"));
 
-    color_act = new QAction(tr("&Color..."), this);
     QAction* rectangle_act = new QAction(tr("&Rectangle"), this);
     QAction* circle_act = new QAction(tr("&Circle"), this);
     QAction* line_act = new QAction(tr("&Line"), this);
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
+    color_act = new QAction(tr("&Color..."), this);
     QAction* delete_drawing_act = new QAction(tr("&Delete drawing"), this);
 
     drawing_act = new QAction(tr("&Drawings"), this);
     drawing_act->setCheckable(true);
     drawing_act->setChecked(true);
 
-    color_act->setIcon(QIcon(":/Icons/color.png"));
     rectangle_act->setIcon(QIcon(":/Icons/box.png"));
     circle_act->setIcon(QIcon(":/Icons/circle.png"));
     line_act->setIcon(QIcon(":/Icons/line.png"));
     arrow_act->setIcon(QIcon(":/Icons/arrow.png"));
     pen_act->setIcon(QIcon(":/Icons/pen.png"));
     text_act->setIcon(QIcon(":/Icons/text.png"));
+    color_act->setIcon(QIcon(":/Icons/color.png"));
     delete_drawing_act->setIcon(QIcon(":/Icons/clear.png"));
 
-    tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
     drawing_tools->addAction(rectangle_act);
     drawing_tools->addAction(circle_act);
@@ -712,12 +711,12 @@ void MainWindow::init_drawings_menu() {
     drawing_tools->addAction(line_act);
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
+    tool_menu->addAction(color_act);
 
     tool_menu->addAction(delete_drawing_act);
     tool_menu->addSeparator();
     tool_menu->addAction(drawing_act);
 
-    color_act->setStatusTip(tr("Color picker"));
     rectangle_act->setStatusTip(tr("Rectangle tool"));
     circle_act->setStatusTip(tr("Circle tool"));
     line_act->setStatusTip(tr("Line tool"));
@@ -725,6 +724,7 @@ void MainWindow::init_drawings_menu() {
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
     delete_drawing_act->setStatusTip(tr("Delete the current drawing"));
+    color_act->setStatusTip(tr("Color picker"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
     rectangle_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
@@ -755,12 +755,14 @@ void MainWindow::init_export_menu() {
     QAction* bookmark_act = new QAction(tr("&Create a bookmark"), this);
     QAction* bookmark_desc_act = new QAction(tr("&Create a bookmark with description"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
+    QAction* gen_video_act = new QAction(tr("&Generate video"), this);
 
     export_act->setIcon(QIcon(":/Icons/folder_interval.png"));
     export_current_act->setIcon(QIcon(":/Icons/export.png"));
     copy_frame_act->setIcon(QIcon(":/Icons/copy.png"));
     bookmark_desc_act->setIcon(QIcon(":/Icons/bookmark.png"));
     gen_report_act->setIcon(QIcon(":/Icons/report.png"));
+    gen_video_act->setIcon(QIcon(":/Icons/add_video.png"));
 
     export_menu->addAction(export_act);
     export_menu->addAction(export_current_act);
@@ -769,6 +771,7 @@ void MainWindow::init_export_menu() {
     export_menu->addAction(bookmark_desc_act);
     export_menu->addSeparator();
     export_menu->addAction(gen_report_act);
+    export_menu->addAction(gen_video_act);
 
     export_act->setShortcut(tr("Shift+X"));
     export_current_act->setShortcut(Qt::Key_X);
@@ -776,6 +779,7 @@ void MainWindow::init_export_menu() {
     bookmark_act->setShortcut(Qt::Key_B);
     bookmark_desc_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
+    //gen_video_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_)); // TODO add shortcut
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
     export_current_act->setStatusTip(tr("Export the current frame to a still"));
@@ -783,6 +787,7 @@ void MainWindow::init_export_menu() {
     bookmark_act->setStatusTip(tr("Bookmark current frame"));
     bookmark_desc_act->setStatusTip(tr("Bookmark current frame with description"));
     gen_report_act->setStatusTip(tr("Generate report"));
+    gen_video_act->setStatusTip(tr("Generate video"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(export_current_act, &QAction::triggered, video_wgt, &VideoWidget::on_export_frame);
@@ -790,6 +795,7 @@ void MainWindow::init_export_menu() {
     connect(bookmark_act, &QAction::triggered, video_wgt, &VideoWidget::quick_bookmark);
     connect(bookmark_desc_act, &QAction::triggered, video_wgt, &VideoWidget::on_bookmark_clicked);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
+    connect(gen_video_act, &QAction::triggered, videoedit_wgt, &VideoEditWidget::generate_video);
     connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }
 
