@@ -28,7 +28,6 @@ private slots:
     void edit_item(QListWidgetItem *item);
     void remove_item(QListWidgetItem* item);
     void toggle_viewlayout();
-    void show_video();
 public slots:
     void generate_video();
     void add_interval(int start, int end, VideoProject *vid_proj);

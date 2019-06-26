@@ -68,7 +68,6 @@ void VideoEditList::context_menu(const QPoint &point) {
         QMenu* menu = new QMenu;
         menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
         menu->addSeparator();
-        menu->addAction("Show video", this, &VideoEditList::show_video);
         menu->addAction("Generate Video", this, &VideoEditList::generate_video);
         menu->exec(mapToGlobal(point));
         delete menu;
@@ -87,7 +86,6 @@ void VideoEditList::item_right_clicked(const QPoint pos) {
     menu->addAction("Remove", this, [this, pos] { remove_item(itemAt(pos)); });
     menu->addSeparator();
     menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
-    menu->addAction("Show video", this, &VideoEditList::show_video);
     menu->addAction("Generate Video", this, &VideoEditList::generate_video);
 
     menu->exec(mapToGlobal(pos));
@@ -131,26 +129,6 @@ void VideoEditList::toggle_viewlayout() {
     }
 
     horizontalLayout = !horizontalLayout;
-}
-
-
-/**
- * @brief VideoEditList::show_video
- * Shows the video from the videoclip-items in list
- */
-// Todo make this do something or remove
-void VideoEditList::show_video() {
-    QString str;
-
-    for(int i = 0; i < selectedItems().count(); ++i)
-    {
-        // QListWidgetItem* item = item(i);
-        QString tmp = selectedItems().at(i)->text();
-        str = str + "\n" + tmp;
-    }
-    QMessageBox msgBox;
-    msgBox.setText(str);
-    msgBox.exec();
 }
 
 /**
