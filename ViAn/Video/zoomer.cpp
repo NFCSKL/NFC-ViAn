@@ -158,11 +158,11 @@ void Zoomer::update_rotation(const int &angle) {
 
 void Zoomer::update_flip_state(bool h_flip, bool v_flip) {
     cv::Point2f flip_center = m_viewport.center;
-    if (h_flip) {
+    if (v_flip) {
         // Change y
         flip_center = cv::Point2f(flip_center.x, m_transformed_frame_rect.height - flip_center.y);
     }
-    if (v_flip) {
+    if (h_flip) {
         // change x coord
         flip_center = cv::Point2f(m_transformed_frame_rect.width - flip_center.x, flip_center.y);
     }

@@ -172,9 +172,9 @@ void FrameProcessor::process_frame() {
     if (m_flip_state_h && m_flip_state_v) {
         flip = -1;
     } else if (m_flip_state_h) {
-        flip = 0;
-    } else if (m_flip_state_v) {
         flip = 1;
+    } else if (m_flip_state_v) {
+        flip = 0;
     }
     if (flip != 5) cv::flip(manipulated_frame, manipulated_frame, flip);
 
