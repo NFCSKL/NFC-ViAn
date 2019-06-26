@@ -294,7 +294,7 @@ void VideoWidget::set_btn_tool_tip() {
     bookmark_btn->setToolTip(tr("Bookmark current frame: Ctrl + B"));
     export_frame_btn->setToolTip("Export current frame: X");
     tag_btn->setToolTip(tr("Tag the current frame: T"));
-    new_label_btn->setToolTip(tr("Create a new tag label: Ctrl + T"));
+    new_label_btn->setToolTip(tr("Create a new label: Ctrl + T"));
     set_start_interval_btn->setToolTip("Set left interval point: I");
     set_end_interval_btn->setToolTip("Set right interval point: O");
     create_interval_btn->setToolTip("Save the current marked interval: K");

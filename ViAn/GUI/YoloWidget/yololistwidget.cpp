@@ -69,6 +69,14 @@ void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     update_slider();
 }
 
+void YoloListWidget::clear_detection_list() {
+    if (m_detection_list.empty()) return;
+    for (auto item : m_detection_list) {
+        delete item;
+    }
+    m_detection_list.clear();
+}
+
 /**
  * @brief YoloListWidget::update_video_widget
  * Update video widget in the mainwindow

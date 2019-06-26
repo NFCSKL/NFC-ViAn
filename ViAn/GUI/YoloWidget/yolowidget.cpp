@@ -167,6 +167,7 @@ void YoloWidget::set_analysis(AnalysisProxy* analysis) {
     double number = analysis->get_settings()->get_object_setting("Confidence threshold")*100;
     int conf = int (number);
     confidence_slider->setMinimum(conf);
+    m_list->clear_detection_list();
     m_list->set_analysis(analysis);
     frames_slider->set_analysis_proxy(analysis);
 }

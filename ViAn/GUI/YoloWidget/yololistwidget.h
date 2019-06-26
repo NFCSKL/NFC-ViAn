@@ -26,6 +26,7 @@ public:
     YoloListWidget(QWidget* parent = nullptr);
 
     void set_analysis(AnalysisProxy* analysis);
+    void clear_detection_list();
     void show_frame(int frame_num);
     void update_video_widget(int frame);
 

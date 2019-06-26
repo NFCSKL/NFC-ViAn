@@ -69,7 +69,7 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm) {
     QString contrast = QString("Contrast: %1").arg(bm->get_bookmark()->get_state().contrast);
     QString gamma = QString("Gamma: %1").arg(bm->get_bookmark()->get_state().gamma);
     QString description = bm->get_description();
-    QString bm_description = img_file + QString("\v") + time + QString("\vCorrection: ") + brightness + " " + contrast + " " + gamma;
+    QString bm_description = img_file + QString("\v") + time + QString("\v") + brightness + " " + contrast + " " + gamma;
     if (description != "") {
         bm_description = description + QString("\v") + bm_description;
     }

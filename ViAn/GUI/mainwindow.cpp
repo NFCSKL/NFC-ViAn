@@ -612,7 +612,7 @@ void MainWindow::open_yolo_widget(AnalysisProxy* analysis) {
 void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Tag/Interval"));
 
-    QAction* new_label_act = new QAction(tr("New tag &label..."));
+    QAction* new_label_act = new QAction(tr("New &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
     QAction* interval_start_act = new QAction(tr("Set &start"));
@@ -642,7 +642,7 @@ void MainWindow::init_interval_menu() {
     add_interval_act->setShortcut(Qt::Key_P);
     rm_interval_act->setShortcut(Qt::Key_J);
 
-    new_label_act->setStatusTip(tr("Create new tag label"));
+    new_label_act->setStatusTip(tr("Create new label"));
     new_tag_act->setStatusTip(tr("Tag the current frame"));
     interval_start_act->setStatusTip(tr("Set the start of an interval"));
     interval_end_act->setStatusTip(tr("Set the end of an interval"));
@@ -749,7 +749,7 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("E&xport intervals to stills..."), this);
+    QAction* export_act = new QAction(tr("E&xport interval to stills..."), this);
     QAction* export_current_act = new QAction(tr("E&xport current frame to still"), this);
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
     QAction* bookmark_act = new QAction(tr("&Create a bookmark"), this);
