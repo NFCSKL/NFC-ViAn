@@ -515,9 +515,9 @@ void MainWindow::init_analysis_menu() {
     QAction* yolo_advanced_act = new QAction(tr("&Object detection (batch)..."));
     QAction* settings_motion_act = new QAction(tr("Motion detection &settings..."), this);
     QAction* settings_object_act = new QAction(tr("Object detection &settings..."), this);
-    ana_details_act = new QAction(tr("&Analysis input"), this);
-    detect_intv_act = new QAction(tr("&Detection on timeline"), this);      //Slider pois
-    bound_box_act = new QAction(tr("&Detection boxes"), this);        //Video oois
+    ana_details_act = new QAction(tr("Show &analysis input"), this);
+    detect_intv_act = new QAction(tr("Show &detection on timeline"), this);      //Slider pois
+    bound_box_act = new QAction(tr("Show &detection boxes"), this);        //Video oois
 
     ana_details_act->setCheckable(true);
     detect_intv_act->setCheckable(true);
@@ -627,7 +627,7 @@ void MainWindow::init_interval_menu() {
     QAction* tag_interval_act = new QAction(tr("&Tag interval"));
     QAction* add_interval_act = new QAction(tr("&Add interval"));
     QAction* rm_interval_act = new QAction(tr("&Clear interval"), this);
-    interval_act = new QAction(tr("&Interval"), this);
+    interval_act = new QAction(tr("Show &interval"), this);
 
     interval_act->setCheckable(true);
     interval_act->setChecked(true);
@@ -698,7 +698,7 @@ void MainWindow::init_drawings_menu() {
     color_act = new QAction(tr("&Color..."), this);
     QAction* delete_drawing_act = new QAction(tr("&Delete drawing"), this);
 
-    drawing_act = new QAction(tr("&Drawings"), this);
+    drawing_act = new QAction(tr("Show &drawings"), this);
     drawing_act->setCheckable(true);
     drawing_act->setChecked(true);
 
