@@ -45,6 +45,7 @@ private slots:
     void cont_bri(void);
     void export_images();
     void help_clicked();
+    void about_clicked();
     void update_text(QString, Shapes*);
     void clear(int frame);
     void delete_drawing(Shapes* shape);

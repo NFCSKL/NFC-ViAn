@@ -32,14 +32,19 @@
 
 #include <QCoreApplication>
 
+#include <QBoxLayout>
 #include <QCloseEvent>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QLabel>
 #include <QListWidget>
 #include <QMenuBar>
 #include <QProgressDialog>
+#include <QPushButton>
+#include <QSplashScreen>
 #include <QThread>
 #include <QTimer>
 
@@ -303,6 +308,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(video_wgt, &VideoWidget::interval_to_edit, videoedit_wgt, &VideoEditWidget::interval_to_edit);
     connect(videoedit_wgt, &VideoEditWidget::set_video, project_wgt, &ProjectWidget::select_video_project);
     connect(videoedit_wgt, &VideoEditWidget::add_video, project_wgt, &ProjectWidget::generate_video);
+
+    showMaximized();
 }
 
 /**
@@ -806,13 +813,17 @@ void MainWindow::init_export_menu() {
 void MainWindow::init_help_menu() {
     QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
     QAction* help_act = new QAction(tr("&Open manual"), this);
+    QAction* about_act = new QAction(tr("&About"), this);
     help_act->setIcon(QIcon(":/Icons/question.png"));
+    about_act->setIcon(QIcon(":/Icons/analys.png"));
     help_menu->addAction(help_act);
+    help_menu->addAction(about_act);
     help_act->setShortcut(QKeySequence(Qt::Key_F1));
     help_act->setStatusTip(tr("Help"));
 
     //connect
     connect(help_act, &QAction::triggered, this, &MainWindow::help_clicked);
+    connect(about_act, &QAction::triggered, this, &MainWindow::about_clicked);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -924,6 +935,25 @@ void MainWindow::help_clicked() {
     // Move to release when done
     QUrl url3 = QUrl::fromLocalFile(qApp->applicationDirPath().append("/vian-help.pdf"));
     QDesktopServices::openUrl(url3);
+}
+
+void MainWindow::about_clicked() {
+    QPixmap pixmap(":Splashscreen.png");
+    QDialog dialog;
+    QVBoxLayout* dialog_layout = new QVBoxLayout();
+    QLabel* img_label = new QLabel();
+    img_label->setPixmap(pixmap);
+    QLabel* version_label = new QLabel("Version: 1.2.1");
+    QDialogButtonBox* btn_box = new QDialogButtonBox();
+    btn_box->addButton(QDialogButtonBox::Ok);
+    connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, &dialog, &QDialog::accept);
+
+    dialog_layout->addWidget(img_label);
+    dialog_layout->addWidget(version_label);
+    dialog_layout->addWidget(btn_box);
+
+    dialog.setLayout(dialog_layout);
+    dialog.exec();
 }
 
 /**

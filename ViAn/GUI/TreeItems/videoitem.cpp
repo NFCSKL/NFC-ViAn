@@ -6,12 +6,14 @@
 #include "Project/videoproject.h"
 #include "sequencecontaineritem.h"
 #include "sequenceitem.h"
+#include "utility.h"
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/videoio/videoio.hpp"
 
 #include <QTreeWidgetItem>
+#include <QDebug>
 
 VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     m_vid_proj = video_project;
@@ -21,9 +23,8 @@ VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     auto vid = m_vid_proj->get_video();
     if (vid && vid->is_sequence()) {
         load_sequence_items();
-    } else {
-        set_thumbnail();
     }
+    set_thumbnail();
 }
 
 VideoItem::VideoItem(): TreeItem(VIDEO_ITEM) {
@@ -52,7 +53,13 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
  * Create a thumbnail from the video and set it as icon.
  */
 void VideoItem::set_thumbnail() {
-    std::string path = m_vid_proj->get_video()->file_path.toStdString();
+    std::string path;
+    if (m_vid_proj->get_video()->is_sequence()) {
+        ImageSequence* img_seq = dynamic_cast<ImageSequence*>(m_vid_proj->get_video());
+        path = img_seq->get_original_name_from_index(0).toStdString();
+    } else {
+        path = m_vid_proj->get_video()->file_path.toStdString();
+    }
     cv::VideoCapture cap(path);
     if (!cap.isOpened()) {
         setIcon(0, error_icon);
@@ -99,7 +106,31 @@ void VideoItem::load_sequence_items() {
 
         // Add all SequenceItems
         for (auto pair : seq->get_unsaved_order()) {
-            auto seq_item = new SequenceItem(seq->get_original_name_from_hash(pair.first), pair.first);
+            auto seq_item = new SequenceItem(Utility::name_from_path(seq->get_original_name_from_hash(pair.first)), pair.first);
+
+            // Add thumbnail
+
+            // TODO!! Move this to a seperate thread
+            std::string path = seq->get_original_name_from_hash(pair.first).toStdString();
+            cv::VideoCapture cap(path);
+            if (!cap.isOpened()) {
+                seq_item->setIcon(0, error_icon);
+                continue;
+            }
+            cv::Mat frame;
+            cap >> frame;
+            switch (frame.type()) {
+                case CV_8UC1:
+                    cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
+                    break;
+                case CV_8UC3:
+                    cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+                    break;
+            }
+            ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());
+            QString thumbnail_path = im_gen.create_thumbnail(m_vid_proj->get_video()->get_name());
+            const QIcon icon(thumbnail_path);
+            seq_item->setIcon(0, icon);
 
             // Insert in order
             if (!container->childCount()) {

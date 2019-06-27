@@ -888,6 +888,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
             VideoState state;
             state = vid_item->get_video_project()->state;
             emit marked_video_state(vid_item->get_video_project(), state);
+        } else {
+            tree_item_changed(item->child(0)->child(0));
         }
         emit item_type(item->type());
 
