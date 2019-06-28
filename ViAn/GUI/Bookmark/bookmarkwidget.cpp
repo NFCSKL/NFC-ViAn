@@ -90,7 +90,7 @@ void BookmarkWidget::add_to_container(BookmarkItem *bm_item, int type) {
 }
 
 void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, cv::Mat bookmark_frame, cv::Mat org_frame, QString time, QString description) {
-    export_original_frame(vid_proj, state.frame, org_frame);
+    QString export_path = export_original_frame(vid_proj, state.frame, org_frame);
     // Get the original file name
     // Videos and sequences is saved differently so need to get them different ways
     QString file_name;
@@ -108,7 +108,7 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     QString bm_file = im_gen.create_bookmark(file_name);
 
     Bookmark* bookmark = new Bookmark(bm_file, description, state, time);
-    bookmark->m_image_name = file_name;
+    bookmark->m_image_name = Utility::name_from_path(export_path);
     bookmark->set_thumbnail_path(thumbnail_path);
     bookmark->set_vid_proj_id(vid_proj->get_id());
 
@@ -125,21 +125,23 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, VideoState state, c
     }
 }
 
-void BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
+QString BookmarkWidget::export_original_frame(VideoProject* vid_proj, const int frame_nbr, cv::Mat frame) {
     QString file_name;
+    QString export_path;
     if (vid_proj->get_video()->is_sequence()) {
         ImageSequence* seq = dynamic_cast<ImageSequence*>(vid_proj->get_video());
         ImageGenerator im_gen(frame, m_proj->get_dir());
         QString path = seq->get_original_name_from_index(frame_nbr);
         QString name = Utility::name_from_path(path);
-        im_gen.create_tiff(name);
+        export_path = im_gen.create_tiff(name);
     } else {
         Video* vid = vid_proj->get_video();
         file_name = vid->get_name();
         file_name += "_" + QString::number(frame_nbr);
         ImageGenerator im_gen(frame, m_proj->get_dir());
-        im_gen.create_tiff(file_name);
+        export_path = im_gen.create_tiff(file_name);
     }
+    return export_path;
 }
 
 void BookmarkWidget::load_bookmarks() {

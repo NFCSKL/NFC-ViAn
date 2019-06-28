@@ -25,6 +25,7 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     frames_combo = new QComboBox();
     frames_combo->setDisabled(true);
     frames_combo->addItem("---");
+
     // Prev and next button for choosing frame
     prev_btn = new QPushButton(QIcon(":/Icons/prev_frame.png"), "", this);
     next_btn = new QPushButton(QIcon(":/Icons/next_frame.png"), "", this);
@@ -32,7 +33,7 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     next_btn->setFixedSize(22, 22);
     exact_frame_box = new QCheckBox;
     exact_frame_box->setMaximumWidth(20);
-    QLabel* exact_label = new QLabel("Exact frame");
+    QLabel* exact_label = new QLabel("Exact frame:");
     exact_label->setMaximumWidth(60);
 
     // Drop down for classes
@@ -51,11 +52,17 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     conf_value = new QLabel();
     conf_value->setText(QString::number(confidence_slider->value()) + "%");
 
+    // Slider for icon size
     icon_size_slider = new QSlider(Qt::Horizontal);
     icon_size_slider->setMaximum(500);
     icon_size_slider->setMinimum(100);
     icon_size_slider->setValue(250);
 
+    // Label for number of detections
+    detection_number_label = new QLabel();
+    set_detection_number(0);
+
+    // Slider for showing analysis
     frames_slider = new AnalysisSlider(Qt::Horizontal, this);
     curr_time = new QLabel("Start");
     end_time = new QLabel("End");
@@ -95,6 +102,7 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     layout->addLayout(top_layout);
     layout->addLayout(conf_layout);
     layout->addLayout(icon_size_layout);
+    layout->addWidget(detection_number_label);
     layout->addWidget(m_list);
     layout->addLayout(ana_slider_layout);
 
@@ -116,6 +124,7 @@ YoloWidget::YoloWidget(QWidget* parent) : QWidget(parent) {
     connect(frames_slider, &AnalysisSlider::valueChanged, m_list, &YoloListWidget::update_frame_filter_int);
 
     connect(m_list, &YoloListWidget::set_slider, this, &YoloWidget::set_slider_value);
+    connect(m_list, &YoloListWidget::number_items, this, &YoloWidget::set_detection_number);
     connect(icon_size_slider, &QSlider::valueChanged, this, &YoloWidget::set_icon_size);
 }
 
@@ -155,10 +164,12 @@ void YoloWidget::set_analysis(AnalysisProxy* analysis) {
     default:
         break;
     }
+    double number = analysis->get_settings()->get_object_setting("Confidence threshold")*100;
+    int conf = int (number);
+    confidence_slider->setMinimum(conf);
+    m_list->clear_detection_list();
     m_list->set_analysis(analysis);
     frames_slider->set_analysis_proxy(analysis);
-    int conf = int(analysis->get_settings()->get_object_setting("Confidence threshold")*100);
-    confidence_slider->setMinimum(conf);
 }
 
 void YoloWidget::set_project(Project* proj) {
@@ -204,6 +215,10 @@ void YoloWidget::set_slider_value(int value) {
     frames_slider->setValue(value);
     end_time->setText(QString::number(m_list->last_frame));
     curr_time->setText(QString::number(value));
+}
+
+void YoloWidget::set_detection_number(int number) {
+    detection_number_label->setText("Number of detections: " + QString::number(number));
 }
 
 void YoloWidget::set_icon_size(int size) {

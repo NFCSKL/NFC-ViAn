@@ -888,6 +888,8 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
             VideoState state;
             state = vid_item->get_video_project()->state;
             emit marked_video_state(vid_item->get_video_project(), state);
+        } else {
+            tree_item_changed(item->child(0)->child(0));
         }
         emit item_type(item->type());
 
@@ -1094,6 +1096,18 @@ void ProjectWidget::tree_item_changed(QTreeWidgetItem* item, QTreeWidgetItem* pr
     emit update_slider();
 }
 
+void ProjectWidget::mouseDoubleClickEvent(QMouseEvent* event) {
+    if (!itemAt(event->pos())) return;
+    auto item = itemAt(event->pos());
+    if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        if (!ana_item->is_finished()) return;
+        if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
+            open_yolo_widget(ana_item);
+        }
+    }
+}
+
 /**
  * @brief ProjectWidget::update_current_tag
  * Deselect the current tag if an item under a different video project is chosen
@@ -1198,9 +1212,12 @@ void ProjectWidget::context_menu(const QPoint &point) {
         case INTERVAL_AREA_ITEM:
             menu.addAction("Add to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
-            //menu.addAction("Add to video edit", this, &ProjectWidget::add_to_video_edit);
             break;
         case INTERVAL_ITEM:
+            menu.addAction("Add all to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
+            menu.addAction("Rename", this, &ProjectWidget::rename_item);
+            menu.addAction("Delete", this, &ProjectWidget::remove_item);
+            break;
         case TAG_ITEM:
             menu.addAction("Rename", this, &ProjectWidget::rename_item);
             menu.addAction("Delete", this, &ProjectWidget::remove_item);
@@ -1215,10 +1232,12 @@ void ProjectWidget::context_menu(const QPoint &point) {
             if (ana_item->is_finished()) {
                 menu.addAction(show_details_act);
                 menu.addAction(show_settings_act);
+                menu.addSeparator();
                 menu.addAction("Rename", this, &ProjectWidget::rename_item);
                 menu.addAction("Delete", this, &ProjectWidget::remove_item);
+                menu.addSeparator();
+                menu.addAction("Add all detections to video edit", this, [this, point] { add_to_video_edit(itemAt(point)); });
                 if (ana_item->get_analysis()->get_type() == OBJECT_DETECTION) {
-                    menu.addSeparator();
                     menu.addAction("Open object detection widget", this, [this, ana_item]{ open_yolo_widget(ana_item);});
                 }
             }
@@ -1317,11 +1336,30 @@ void ProjectWidget::add_to_video_edit(QTreeWidgetItem* item) {
         start = ia_item->get_start();
         end = ia_item->get_end();
         vid_proj = v_item->get_video_project();
+    } else if (item->type() == INTERVAL_ITEM) {
+        IntervalItem* i_item = dynamic_cast<IntervalItem*>(item);
+        for (auto i = 0; i < i_item->childCount(); ++i) {
+            auto child_item = dynamic_cast<IntervalAreaItem*>(i_item->child(i));
+            if (!child_item) {
+                continue;
+            } else {
+                add_to_video_edit(child_item);
+            }
+        }
+        return;
+    } else if (item->type() == ANALYSIS_ITEM) {
+        AnalysisItem* a_item = dynamic_cast<AnalysisItem*>(item);
+        VideoItem* v_item = dynamic_cast<VideoItem*>(item->parent());
+        vid_proj = v_item->get_video_project();
+        std::vector<std::pair<int, int>> intervals = a_item->get_analysis()->m_slider_interval;
+        for (std::pair<int, int> interval : intervals) {
+            emit interval_to_edit(interval.first, interval.second, vid_proj);
+        }
+        return;
     } else {
         return;
     }
     emit interval_to_edit(start, end, vid_proj);
-
 }
 
 /**
@@ -1667,6 +1705,7 @@ bool ProjectWidget::save_project() {
 
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
+    // NIAP This if will open the save dialog, use this to make save as...
     if (m_proj->is_temporary()) {
         QString name{}, path{};
         ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, Constants::DEFAULT_PATH);

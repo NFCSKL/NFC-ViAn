@@ -66,9 +66,8 @@ void VideoEditList::context_menu(const QPoint &point) {
     else{                   // R-clicked not on item
         setCurrentItem(nullptr);
         QMenu* menu = new QMenu;
+        menu->addAction("Clear all", this, &VideoEditList::clear_all_items);
         menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
-        menu->addSeparator();
-        menu->addAction("Show video", this, &VideoEditList::show_video);
         menu->addAction("Generate Video", this, &VideoEditList::generate_video);
         menu->exec(mapToGlobal(point));
         delete menu;
@@ -86,8 +85,8 @@ void VideoEditList::item_right_clicked(const QPoint pos) {
     menu->addAction("Edit interval", this, [this, pos] { edit_item(itemAt(pos)); });
     menu->addAction("Remove", this, [this, pos] { remove_item(itemAt(pos)); });
     menu->addSeparator();
+    menu->addAction("Clear all", this, &VideoEditList::clear_all_items);
     menu->addAction("Toggle horizontal/vertical view", this, &VideoEditList::toggle_viewlayout);
-    menu->addAction("Show video", this, &VideoEditList::show_video);
     menu->addAction("Generate Video", this, &VideoEditList::generate_video);
 
     menu->exec(mapToGlobal(pos));
@@ -116,6 +115,26 @@ void VideoEditList::remove_item(QListWidgetItem* item) {
     delete ve_item;
 }
 
+/**
+ * @brief VideoEditList::clear_all_items
+ * Removes all the items in the list
+ */
+void VideoEditList::clear_all_items() {
+    QMessageBox clear_box(this);
+    clear_box.setIcon(QMessageBox::Warning);
+    clear_box.setMinimumSize(300,200);
+    clear_box.setText("Deleting item(s)\n");
+    clear_box.setInformativeText("Are you sure you wanna delete all the items?");
+    clear_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    clear_box.setDefaultButton(QMessageBox::No);
+    int reply = clear_box.exec();
+    if (reply == QMessageBox::No) return;
+
+    for (int i = count()-1; i >= 0; i--) {
+        remove_item(item(i));
+    }
+}
+
 
 /**
  * @brief VideoEditList::toggle_viewlayout
@@ -131,26 +150,6 @@ void VideoEditList::toggle_viewlayout() {
     }
 
     horizontalLayout = !horizontalLayout;
-}
-
-
-/**
- * @brief VideoEditList::show_video
- * Shows the video from the videoclip-items in list
- */
-// Todo make this do something or remove
-void VideoEditList::show_video() {
-    QString str;
-
-    for(int i = 0; i < selectedItems().count(); ++i)
-    {
-        // QListWidgetItem* item = item(i);
-        QString tmp = selectedItems().at(i)->text();
-        str = str + "\n" + tmp;
-    }
-    QMessageBox msgBox;
-    msgBox.setText(str);
-    msgBox.exec();
 }
 
 /**
@@ -192,6 +191,7 @@ void VideoEditList::generate_video() {
     name = video_folder_path + name;
     name = Utility::add_serial_number(name, ".mkv");
 
+    // This class will run on a sepperate thread
     VideoGenerator* vid_gen = new VideoGenerator(this, name, size, fps,
                                                  keep_size, title_screen,
                                                  title_text, description,
@@ -237,9 +237,9 @@ void VideoEditList::get_video_info(std::vector<QSize>* sizes, std::vector<int>* 
         cv::VideoCapture video_cap;
         video_cap.open(ve_item->get_path().toStdString());
         if (!video_cap.isOpened()) return;
-        int width = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_WIDTH));
-        int height = static_cast<int>(video_cap.get(CV_CAP_PROP_FRAME_HEIGHT));
-        int fps = static_cast<int>(video_cap.get(CV_CAP_PROP_FPS));
+        int width = static_cast<int>(video_cap.get(cv::CAP_PROP_FRAME_WIDTH));
+        int height = static_cast<int>(video_cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+        int fps = static_cast<int>(video_cap.get(cv::CAP_PROP_FPS));
         if (rotation == Constants::DEGREE_90 || rotation == Constants::DEGREE_270) {
             std::swap(width, height);
         }

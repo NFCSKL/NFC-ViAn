@@ -23,6 +23,7 @@ public slots:
 
 signals:
     void detection_added();
+    void update_progress(int);
     void send_last_frame(int);
     void finished();
 };

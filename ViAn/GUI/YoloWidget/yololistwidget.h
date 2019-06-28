@@ -26,6 +26,7 @@ public:
     YoloListWidget(QWidget* parent = nullptr);
 
     void set_analysis(AnalysisProxy* analysis);
+    void clear_detection_list();
     void show_frame(int frame_num);
     void update_video_widget(int frame);
 
@@ -46,6 +47,7 @@ public slots:
 signals:
     void update_frames(std::vector<int>);
     void set_frame(VideoProject*, int);
+    void number_items(int);
     void slider_max(int);
     void set_slider(int frame);
 

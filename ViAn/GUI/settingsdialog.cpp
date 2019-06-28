@@ -32,9 +32,9 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     connect(page_step_slider, &QSlider::valueChanged, this, &SettingsDialog::page_step_changed);
     connect(widget_max_slider, &QSlider::valueChanged, this, &SettingsDialog::widget_max_changed);
     connect(thumbnail_size_slider, &QSlider::valueChanged, this, &SettingsDialog::thumbnail_size_changed);
-    connect(class_file_btn, &QPushButton::clicked, this, &SettingsDialog::class_btn_clicked);
-    connect(config_file_btn, &QPushButton::clicked, this, &SettingsDialog::config_btn_clicked);
-    connect(weight_file_btn, &QPushButton::clicked, this, &SettingsDialog::weight_btn_clicked);
+//    connect(class_file_btn, &QPushButton::clicked, this, &SettingsDialog::class_btn_clicked);
+//    connect(config_file_btn, &QPushButton::clicked, this, &SettingsDialog::config_btn_clicked);
+//    connect(weight_file_btn, &QPushButton::clicked, this, &SettingsDialog::weight_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &SettingsDialog::ok_btn_clicked);
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &SettingsDialog::cancel_btn_clicked);
 
@@ -105,32 +105,32 @@ void SettingsDialog::add_widgets() {
     thumbnail_size_layout->addRow(thumbnail_size_label, thumbnail_size_slider);
     layout->addRow("Video thumbnail size", thumbnail_size_layout);
 
-    // Add class
-    class_file_layout = new QFormLayout();
-    // Add label
-    class_file_label = new QLabel(s->class_file);
-    class_file_btn = new QPushButton("Change");
+//    // Add class
+//    class_file_layout = new QFormLayout();
+//    // Add label
+//    class_file_label = new QLabel(s->class_file);
+//    class_file_btn = new QPushButton("Change");
 
-    class_file_layout->addRow(class_file_label, class_file_btn);
-    layout->addRow("Class file path", class_file_layout);
+//    class_file_layout->addRow(class_file_label, class_file_btn);
+//    layout->addRow("Class file path", class_file_layout);
 
-    // Add config
-    config_file_layout = new QFormLayout();
-    // Add label
-    config_file_label = new QLabel(s->config_file);
-    config_file_btn = new QPushButton("Change");
+//    // Add config
+//    config_file_layout = new QFormLayout();
+//    // Add label
+//    config_file_label = new QLabel(s->config_file);
+//    config_file_btn = new QPushButton("Change");
 
-    config_file_layout->addRow(config_file_label, config_file_btn);
-    layout->addRow("Config file path", config_file_layout);
+//    config_file_layout->addRow(config_file_label, config_file_btn);
+//    layout->addRow("Config file path", config_file_layout);
 
-    // Add weight
-    weight_file_layout = new QFormLayout();
-    // Add label
-    weight_file_label = new QLabel(s->weight_file);
-    weight_file_btn = new QPushButton("Change");
+//    // Add weight
+//    weight_file_layout = new QFormLayout();
+//    // Add label
+//    weight_file_label = new QLabel(s->weight_file);
+//    weight_file_btn = new QPushButton("Change");
 
-    weight_file_layout->addRow(weight_file_label, weight_file_btn);
-    layout->addRow("Weight file path", weight_file_layout);
+//    weight_file_layout->addRow(weight_file_label, weight_file_btn);
+//    layout->addRow("Weight file path", weight_file_layout);
 
 }
 
@@ -172,11 +172,9 @@ void SettingsDialog::weight_btn_clicked() {
     QString path = QFileDialog::getOpenFileName(this,
                                                 tr("Choose path"),
                                                 weight_file_label->text());
-    qDebug() << path;
     if (!path.isEmpty()) {
         weight_file_label->setText(path);
     }
-    qDebug() << weight_file_label->text();
 }
 
 void SettingsDialog::ok_btn_clicked() {
@@ -185,9 +183,9 @@ void SettingsDialog::ok_btn_clicked() {
     s->PAGE_STEP = page_step_slider->value();
     s->FLOATING_WIDGET_MAX = widget_max_slider->value();
     s->PROJ_THUMBNAIL_SIZE = QSize(thumbnail_size_slider->value(),thumbnail_size_slider->value());
-    s->class_file = class_file_label->text();
-    s->config_file = config_file_label->text();
-    s->weight_file = weight_file_label->text();
+//    s->class_file = class_file_label->text();
+//    s->config_file = config_file_label->text();
+//    s->weight_file = weight_file_label->text();
     accept();
 }
 

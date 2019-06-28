@@ -21,16 +21,11 @@ ItemCreator::ItemCreator(Analysis* analysis, std::vector<YoloWidgetItem*>* detec
 }
 
 void ItemCreator::create_detection_items() {
-    for (auto item : *m_detection_list) {
-        delete item;
-    }
-    m_detection_list->clear();
-
     cv::Mat frame;
     cv::VideoCapture cap(video_path.toStdString());
 
     last_frame = int(cap.get(cv::CAP_PROP_FRAME_COUNT)) - 1;
-
+    int progress = 0;
     // Iterate over all frames
     for (int frame_num : m_frame_list) {
         cap.set(cv::CAP_PROP_POS_FRAMES, frame_num);
@@ -82,6 +77,7 @@ void ItemCreator::create_detection_items() {
             m_detection_list->push_back(y_item);
             emit detection_added();
         }
+        emit update_progress(++progress);
     }
     emit send_last_frame(last_frame);
     emit finished();

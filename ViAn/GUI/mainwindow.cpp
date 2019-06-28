@@ -32,14 +32,19 @@
 
 #include <QCoreApplication>
 
+#include <QBoxLayout>
 #include <QCloseEvent>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QLabel>
 #include <QListWidget>
 #include <QMenuBar>
 #include <QProgressDialog>
+#include <QPushButton>
+#include <QSplashScreen>
 #include <QThread>
 #include <QTimer>
 
@@ -175,7 +180,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(yolo_wgt, &YoloWidget::set_frame, project_wgt, &ProjectWidget::select_analysis);
 
     // Initialize videoedit widget
-    VideoEditWidget *videoedit_wgt = new VideoEditWidget;
+    videoedit_wgt = new VideoEditWidget;
     videoedit_dock->setWidget(videoedit_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, videoedit_dock);
 
@@ -304,9 +309,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(videoedit_wgt, &VideoEditWidget::set_video, project_wgt, &ProjectWidget::select_video_project);
     connect(videoedit_wgt, &VideoEditWidget::add_video, project_wgt, &ProjectWidget::generate_video);
 
-    // Open the recent project dialog
-    rp_dialog->exec();
-    //QTimer::singleShot(0, rp_dialog, &RecentProjectDialog::exec);
+    showMaximized();
 }
 
 /**
@@ -369,7 +372,7 @@ void MainWindow::init_file_menu() {
     open_proj_folder_act->setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O));
     save_project_act->setShortcut(QKeySequence::Save);     //Ctrl + S
     add_vid_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));     //Ctrl + I
-    // TODO    add_seq_act->setShortcuts(QKeySequence::SelectAll);     //Ctrl + A
+    add_seq_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));     //Ctrl + A
     // TODO    view_paths->setShortcuts(Q);     //Ctrl + smth
     quit_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
@@ -512,9 +515,9 @@ void MainWindow::init_analysis_menu() {
     QAction* yolo_advanced_act = new QAction(tr("&Object detection (batch)..."));
     QAction* settings_motion_act = new QAction(tr("Motion detection &settings..."), this);
     QAction* settings_object_act = new QAction(tr("Object detection &settings..."), this);
-    ana_details_act = new QAction(tr("&Analysis input"), this);
-    detect_intv_act = new QAction(tr("&Detection on timeline"), this);      //Slider pois
-    bound_box_act = new QAction(tr("&Detection boxes"), this);        //Video oois
+    ana_details_act = new QAction(tr("Show &analysis input"), this);
+    detect_intv_act = new QAction(tr("Show &detection on timeline"), this);      //Slider pois
+    bound_box_act = new QAction(tr("Show &detection boxes"), this);        //Video oois
 
     ana_details_act->setCheckable(true);
     detect_intv_act->setCheckable(true);
@@ -616,7 +619,7 @@ void MainWindow::open_yolo_widget(AnalysisProxy* analysis) {
 void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Tag/Interval"));
 
-    QAction* new_label_act = new QAction(tr("New tag &label..."));
+    QAction* new_label_act = new QAction(tr("New &label..."));
     QAction* new_tag_act = new QAction(tr("New &tag"));
     QAction* remove_tag_act = new QAction(tr("&Delete tag"));
     QAction* interval_start_act = new QAction(tr("Set &start"));
@@ -624,7 +627,7 @@ void MainWindow::init_interval_menu() {
     QAction* tag_interval_act = new QAction(tr("&Tag interval"));
     QAction* add_interval_act = new QAction(tr("&Add interval"));
     QAction* rm_interval_act = new QAction(tr("&Clear interval"), this);
-    interval_act = new QAction(tr("&Interval"), this);
+    interval_act = new QAction(tr("Show &interval"), this);
 
     interval_act->setCheckable(true);
     interval_act->setChecked(true);
@@ -646,7 +649,7 @@ void MainWindow::init_interval_menu() {
     add_interval_act->setShortcut(Qt::Key_P);
     rm_interval_act->setShortcut(Qt::Key_J);
 
-    new_label_act->setStatusTip(tr("Create new tag label"));
+    new_label_act->setStatusTip(tr("Create new label"));
     new_tag_act->setStatusTip(tr("Tag the current frame"));
     interval_start_act->setStatusTip(tr("Set the start of an interval"));
     interval_end_act->setStatusTip(tr("Set the end of an interval"));
@@ -686,29 +689,28 @@ void MainWindow::init_interval_menu() {
 void MainWindow::init_drawings_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Drawings"));
 
-    color_act = new QAction(tr("&Color..."), this);
     QAction* rectangle_act = new QAction(tr("&Rectangle"), this);
     QAction* circle_act = new QAction(tr("&Circle"), this);
     QAction* line_act = new QAction(tr("&Line"), this);
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
+    color_act = new QAction(tr("&Color..."), this);
     QAction* delete_drawing_act = new QAction(tr("&Delete drawing"), this);
 
-    drawing_act = new QAction(tr("&Drawings"), this);
+    drawing_act = new QAction(tr("Show &drawings"), this);
     drawing_act->setCheckable(true);
     drawing_act->setChecked(true);
 
-    color_act->setIcon(QIcon(":/Icons/color.png"));
     rectangle_act->setIcon(QIcon(":/Icons/box.png"));
     circle_act->setIcon(QIcon(":/Icons/circle.png"));
     line_act->setIcon(QIcon(":/Icons/line.png"));
     arrow_act->setIcon(QIcon(":/Icons/arrow.png"));
     pen_act->setIcon(QIcon(":/Icons/pen.png"));
     text_act->setIcon(QIcon(":/Icons/text.png"));
+    color_act->setIcon(QIcon(":/Icons/color.png"));
     delete_drawing_act->setIcon(QIcon(":/Icons/clear.png"));
 
-    tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
     drawing_tools->addAction(rectangle_act);
     drawing_tools->addAction(circle_act);
@@ -716,12 +718,12 @@ void MainWindow::init_drawings_menu() {
     drawing_tools->addAction(line_act);
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
+    tool_menu->addAction(color_act);
 
     tool_menu->addAction(delete_drawing_act);
     tool_menu->addSeparator();
     tool_menu->addAction(drawing_act);
 
-    color_act->setStatusTip(tr("Color picker"));
     rectangle_act->setStatusTip(tr("Rectangle tool"));
     circle_act->setStatusTip(tr("Circle tool"));
     line_act->setStatusTip(tr("Line tool"));
@@ -729,6 +731,7 @@ void MainWindow::init_drawings_menu() {
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
     delete_drawing_act->setStatusTip(tr("Delete the current drawing"));
+    color_act->setStatusTip(tr("Color picker"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
     rectangle_act->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
@@ -753,18 +756,20 @@ void MainWindow::init_drawings_menu() {
 void MainWindow::init_export_menu() {
     QMenu* export_menu = menuBar()->addMenu(tr("E&xport"));
 
-    QAction* export_act = new QAction(tr("E&xport intervals to stills..."), this);
+    QAction* export_act = new QAction(tr("E&xport interval to stills..."), this);
     QAction* export_current_act = new QAction(tr("E&xport current frame to still"), this);
     QAction* copy_frame_act = new QAction(tr("&Copy frame to clipboard"), this);
     QAction* bookmark_act = new QAction(tr("&Create a bookmark"), this);
     QAction* bookmark_desc_act = new QAction(tr("&Create a bookmark with description"), this);
     QAction* gen_report_act = new QAction(tr("&Generate report"), this);
+    QAction* gen_video_act = new QAction(tr("&Generate video"), this);
 
     export_act->setIcon(QIcon(":/Icons/folder_interval.png"));
     export_current_act->setIcon(QIcon(":/Icons/export.png"));
     copy_frame_act->setIcon(QIcon(":/Icons/copy.png"));
     bookmark_desc_act->setIcon(QIcon(":/Icons/bookmark.png"));
     gen_report_act->setIcon(QIcon(":/Icons/report.png"));
+    gen_video_act->setIcon(QIcon(":/Icons/add_video.png"));
 
     export_menu->addAction(export_act);
     export_menu->addAction(export_current_act);
@@ -773,6 +778,7 @@ void MainWindow::init_export_menu() {
     export_menu->addAction(bookmark_desc_act);
     export_menu->addSeparator();
     export_menu->addAction(gen_report_act);
+    export_menu->addAction(gen_video_act);
 
     export_act->setShortcut(tr("Shift+X"));
     export_current_act->setShortcut(Qt::Key_X);
@@ -780,6 +786,7 @@ void MainWindow::init_export_menu() {
     bookmark_act->setShortcut(Qt::Key_B);
     bookmark_desc_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     gen_report_act->setShortcuts(QKeySequence::Print);      //Ctrl + P
+    //gen_video_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_)); // TODO add shortcut
 
     export_act->setStatusTip(tr("Export all frames in an interval"));
     export_current_act->setStatusTip(tr("Export the current frame to a still"));
@@ -787,6 +794,7 @@ void MainWindow::init_export_menu() {
     bookmark_act->setStatusTip(tr("Bookmark current frame"));
     bookmark_desc_act->setStatusTip(tr("Bookmark current frame with description"));
     gen_report_act->setStatusTip(tr("Generate report"));
+    gen_video_act->setStatusTip(tr("Generate video"));
 
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(export_current_act, &QAction::triggered, video_wgt, &VideoWidget::on_export_frame);
@@ -794,6 +802,7 @@ void MainWindow::init_export_menu() {
     connect(bookmark_act, &QAction::triggered, video_wgt, &VideoWidget::quick_bookmark);
     connect(bookmark_desc_act, &QAction::triggered, video_wgt, &VideoWidget::on_bookmark_clicked);
     connect(gen_report_act, &QAction::triggered, bookmark_wgt, &BookmarkWidget::generate_report);
+    connect(gen_video_act, &QAction::triggered, videoedit_wgt, &VideoEditWidget::generate_video);
     connect(bookmark_wgt, &BookmarkWidget::play_video, video_wgt, &VideoWidget::play_btn_toggled);
 }
 
@@ -804,13 +813,17 @@ void MainWindow::init_export_menu() {
 void MainWindow::init_help_menu() {
     QMenu* help_menu = menuBar()->addMenu(tr("&Help"));
     QAction* help_act = new QAction(tr("&Open manual"), this);
+    QAction* about_act = new QAction(tr("&About"), this);
     help_act->setIcon(QIcon(":/Icons/question.png"));
+    about_act->setIcon(QIcon(":/Icons/analys.png"));
     help_menu->addAction(help_act);
+    help_menu->addAction(about_act);
     help_act->setShortcut(QKeySequence(Qt::Key_F1));
     help_act->setStatusTip(tr("Help"));
 
     //connect
     connect(help_act, &QAction::triggered, this, &MainWindow::help_clicked);
+    connect(about_act, &QAction::triggered, this, &MainWindow::about_clicked);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -855,12 +868,16 @@ void MainWindow::init_rp_dialog() {
     connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::open_project_from_file, project_wgt, &ProjectWidget::open_project);
     connect(rp_dialog, &RecentProjectDialog::remove_project, project_wgt, &ProjectWidget::remove_project);
-    connect(rp_dialog, &RecentProjectDialog::exit, this, &QWidget::close);
+    connect(rp_dialog, &RecentProjectDialog::exit, this, &MainWindow::close_program);
 }
 
 void MainWindow::open_rp_dialog() {
     init_rp_dialog();
     rp_dialog->exec();
+}
+
+void MainWindow::close_program() {
+    QTimer::singleShot(0, qApp, &QCoreApplication::quit);
 }
 
 /**
@@ -918,6 +935,25 @@ void MainWindow::help_clicked() {
     // Move to release when done
     QUrl url3 = QUrl::fromLocalFile(qApp->applicationDirPath().append("/vian-help.pdf"));
     QDesktopServices::openUrl(url3);
+}
+
+void MainWindow::about_clicked() {
+    QPixmap pixmap(":Splashscreen.png");
+    QDialog dialog;
+    QVBoxLayout* dialog_layout = new QVBoxLayout();
+    QLabel* img_label = new QLabel();
+    img_label->setPixmap(pixmap);
+    QLabel* version_label = new QLabel("Version: 1.2.1");
+    QDialogButtonBox* btn_box = new QDialogButtonBox();
+    btn_box->addButton(QDialogButtonBox::Ok);
+    connect(btn_box->button(QDialogButtonBox::Ok), &QPushButton::clicked, &dialog, &QDialog::accept);
+
+    dialog_layout->addWidget(img_label);
+    dialog_layout->addWidget(version_label);
+    dialog_layout->addWidget(btn_box);
+
+    dialog.setLayout(dialog_layout);
+    dialog.exec();
 }
 
 /**

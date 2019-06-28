@@ -103,10 +103,13 @@ bool Overlay::is_showing_overlay() {
 
 /**
  * @brief Overlay::set_showing_overlay
+ * return true if the value changed
  * @param value
  */
-void Overlay::set_showing_overlay(bool value) {
+bool Overlay::set_showing_overlay(bool value) {
+    bool res = (show_overlay != value);
     show_overlay = value;
+    return res;
 }
 
 /**

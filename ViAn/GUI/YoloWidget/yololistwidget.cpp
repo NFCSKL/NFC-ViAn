@@ -15,6 +15,7 @@
 #include "opencv2/videoio/videoio.hpp"
 
 #include <QMouseEvent>
+#include <QProgressDialog>
 #include <QThread>
 
 #include <QDebug>
@@ -43,8 +44,10 @@ void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     emit update_frames(m_frame_list);
     QString video_path = m_proxy->get_video_path();
 
+    // This class will run on a sepperate thread
     ItemCreator* item_creator = new ItemCreator(m_analysis, &m_detection_list,
                                                 m_frame_list, video_path, m_proj->get_dir());
+
 
     QThread* create_thread = new QThread;
     item_creator->moveToThread(create_thread);
@@ -54,10 +57,25 @@ void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     connect(create_thread, &QThread::finished, create_thread, &QThread::deleteLater);
     connect(item_creator, &ItemCreator::send_last_frame, this, &YoloListWidget::set_last_frame);
     connect(item_creator, &ItemCreator::detection_added, this, &YoloListWidget::filter_detections);
+    if (m_frame_list.size() != 0) {
+        QProgressDialog* progress = new QProgressDialog(
+                    "Loading detections...", "Close", 0, m_frame_list.size(), this, Qt::WindowMinimizeButtonHint);
+        connect(item_creator, &ItemCreator::update_progress, progress, &QProgressDialog::setValue);
+        progress->show();
+    }
+
     create_thread->start();
 
     filter_detections();
     update_slider();
+}
+
+void YoloListWidget::clear_detection_list() {
+    if (m_detection_list.empty()) return;
+    for (auto item : m_detection_list) {
+        delete item;
+    }
+    m_detection_list.clear();
 }
 
 /**
@@ -111,6 +129,7 @@ void YoloListWidget::filter_detections() {
             addItem(y_item);
         }
     }
+    emit number_items(count());
 }
 
 void YoloListWidget::update_frame_filter(QString text) {

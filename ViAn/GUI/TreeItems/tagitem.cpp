@@ -5,7 +5,11 @@
 TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     m_tag = tag;
     setText(0, tag->get_name());
-    const QIcon tag_icon(":/Icons/tag.png");
+    QString path = ":/Icons/tag.png";
+    if (m_tag->get_type() == SEQUENCE_TAG) {
+        path = ":/Icons/image_sequence.png";
+    }
+    const QIcon tag_icon(path);
     setIcon(0, tag_icon);
 }
 

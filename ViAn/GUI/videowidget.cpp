@@ -12,9 +12,7 @@
 #include "Project/Analysis/interval.h"
 #include "Project/Analysis/tag.h"
 #include "Project/Analysis/tagframe.h"
-//#include "Project/imagesequence.h"
 #include "Project/videoproject.h"
-//#include "utility.h"
 #include "Video/videocontroller.h"
 
 #include <QBoxLayout>
@@ -127,7 +125,6 @@ int VideoWidget::get_current_video_length(){
 void VideoWidget::quick_analysis(AnalysisSettings * settings) {
     if(m_interval.first != -1 && m_interval.second != -1 && (m_interval.first < m_interval.second)) {
         settings->set_interval(m_interval);
-        delete_interval();
     }
     emit start_analysis(m_vid_proj, settings);
 }
@@ -294,7 +291,7 @@ void VideoWidget::set_btn_tool_tip() {
     bookmark_btn->setToolTip(tr("Bookmark current frame: Ctrl + B"));
     export_frame_btn->setToolTip("Export current frame: X");
     tag_btn->setToolTip(tr("Tag the current frame: T"));
-    new_label_btn->setToolTip(tr("Create a new tag label: Ctrl + T"));
+    new_label_btn->setToolTip(tr("Create a new label: Ctrl + T"));
     set_start_interval_btn->setToolTip("Set left interval point: I");
     set_end_interval_btn->setToolTip("Set right interval point: O");
     create_interval_btn->setToolTip("Save the current marked interval: K");
@@ -380,9 +377,7 @@ void VideoWidget::set_btn_shortcuts() {
     prev_frame_btn->setShortcut(Qt::Key_Left);
     next_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right));
     prev_poi_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left));
-    // Tag and zoom shortcuts are in the menus
-    set_start_interval_btn->setShortcut(QKeySequence(Qt::Key_I));
-    set_end_interval_btn->setShortcut(QKeySequence(Qt::Key_O));
+    // Tag, zoom and interval shortcuts are in the menus
 
     zoom_edit_sc = new QShortcut(QKeySequence(Qt::Key_Z), this);
     interpol_sc = new QShortcut(QKeySequence(Qt::Key_N), this);

@@ -162,8 +162,6 @@
         <file>Icons/loop.png</file>
         <file>Icons/add_interval.png</file>
         <file>Splashscreen.png</file>
-        <file>Icons/flip_horizontal.png</file>
-        <file>Icons/flip_vertical.png</file>
         <file>Icons/object_detection.png</file>
         <file>Icons/advanced_object_detection.png</file>
         <file>Icons/advanced_analysis_black.png</file>
@@ -171,6 +169,10 @@
         <file>Icons/settings_object.png</file>
         <file>Icons/analysis_motion.png</file>
         <file>Icons/analysis_object.png</file>
+        <file>yolov3.cfg</file>
+        <file>coco.names</file>
         <file>vian-help.pdf</file>
+        <file>Icons/flip_horizontal.png</file>
+        <file>Icons/flip_vertical.png</file>
     </qresource>
 </RCC>

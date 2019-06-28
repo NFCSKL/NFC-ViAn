@@ -42,7 +42,7 @@ void VideoEditItem::set_icon() {
     cv::VideoCapture cap(path);
     if (!cap.isOpened()) return;
     cv::Mat frame;
-    cap.set(CV_CAP_PROP_POS_FRAMES, get_start());
+    cap.set(cv::CAP_PROP_POS_FRAMES, get_start());
     cap >> frame;
     // Update color corrections
     FrameManipulator manipulator;
@@ -82,10 +82,10 @@ void VideoEditItem::set_icon() {
 
     switch (frame.type()) {
     case CV_8UC1:
-        cvtColor(frame, frame, CV_GRAY2RGB);
+        cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
         break;
     case CV_8UC3:
-        cvtColor(frame, frame, CV_BGR2RGB);
+        cvtColor(frame, frame, cv::COLOR_BGR2RGB);
         break;
     }
 

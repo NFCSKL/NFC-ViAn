@@ -23,7 +23,7 @@ class AnalysisSettings {
 public:
     int type = MOTION_DETECTION;
     cv::Rect bounding_box;
-    std::pair<int, int> interval;
+    std::pair<int, int> interval = std::make_pair(-1,-1);
     bool use_bounding_box = false;
     bool use_interval = false;
     bool quick_analysis = false;

@@ -131,7 +131,7 @@ int ImageSequence::get_index_of_hash(const QString &hash) const {
  * @return QString containing original image path
  */
 QString ImageSequence::get_original_name_from_hash(const QString &hash) const {
-    return Utility::name_from_path(m_original_images.at(hash));
+    return m_original_images.at(hash);
 }
 
 QString ImageSequence::get_original_name_from_index(const int& index) const {

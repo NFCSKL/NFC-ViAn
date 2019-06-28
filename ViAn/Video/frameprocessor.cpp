@@ -172,9 +172,9 @@ void FrameProcessor::process_frame() {
     if (m_flip_state_h && m_flip_state_v) {
         flip = -1;
     } else if (m_flip_state_h) {
-        flip = 0;
-    } else if (m_flip_state_v) {
         flip = 1;
+    } else if (m_flip_state_v) {
+        flip = 0;
     }
     if (flip != 5) cv::flip(manipulated_frame, manipulated_frame, flip);
 
@@ -300,7 +300,7 @@ void FrameProcessor::update_zoomer_settings() {
         m_zoomer.set_viewport_size(m_z_settings->draw_area_size);
     }
     // Set a new state to the zoomer, that means (currently) a new anchor and scale_factor
-    else if (m_z_settings->set_state) {
+    if (m_z_settings->set_state) {
         load_zoomer_state();
     }
     // Scale/zoom factor has been changed
@@ -366,8 +366,9 @@ void FrameProcessor::update_manipulator_settings() {
  *
  */
 bool FrameProcessor::update_overlay_settings() {
+    bool res = false;
     int curr_frame = m_frame_index->load();
-    m_overlay->set_showing_overlay(m_o_settings->show_overlay);
+    res = m_overlay->set_showing_overlay(m_o_settings->show_overlay);
     m_overlay->set_tool(m_o_settings->tool);
     m_overlay->set_colour(m_o_settings->color);
     m_overlay->set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
@@ -414,9 +415,11 @@ bool FrameProcessor::update_overlay_settings() {
         m_o_settings->set_current_drawing = false;
         m_overlay->set_current_drawing(m_o_settings->shape);
     } else {
-        return false;
+        return res;
     }
-    return true;
+    res = true;
+
+    return res;
 }
 
 void FrameProcessor::update_rotation(const int& direction) {
