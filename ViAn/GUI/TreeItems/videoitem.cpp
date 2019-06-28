@@ -135,7 +135,7 @@ void VideoItem::load_sequence_items() {
 
             // Check if thumbnail already exists
             // then open it instead of creating new one
-
+            // NIAP Check here for thumbnails path if they exist
             QString name = m_vid_proj->get_video()->get_name();
             int index = seq->get_index_of_hash(pair.first);
             name = name + "-" + QString::number(index);
