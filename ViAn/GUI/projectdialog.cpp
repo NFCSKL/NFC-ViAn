@@ -98,6 +98,25 @@ void ProjectDialog::ok_btn_clicked() {
             return;
         }
     }
+
+    for (auto it : path_text->text()) {
+        char ch = it.toLatin1();
+        unsigned char u_ch = static_cast<unsigned char>(ch);
+        // Check if ch is outside the ASCII characters
+        if (u_ch > 127) {
+            // If not, send popup to notify user
+            QMessageBox msg_box;
+            msg_box.setMinimumSize(370,120);
+            msg_box.setModal(true);
+            msg_box.setIcon(QMessageBox::Warning);
+            msg_box.setText("The selected project path is not accepted. Please try again.");
+            msg_box.setInformativeText("The path can only contain ASCII characters");
+            msg_box.setStandardButtons(QMessageBox::Ok);
+            msg_box.setDefaultButton(QMessageBox::Ok);
+            msg_box.exec();
+            return;
+        }
+    }
     QString path = path_text->text() + "/" + name_text->text() + "/" + name_text->text() + ".vian";
 
     QFile pathFile(path);
