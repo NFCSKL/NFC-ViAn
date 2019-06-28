@@ -1705,6 +1705,7 @@ bool ProjectWidget::save_project() {
 
     // Move all project files if the current project is temporary
     // i.e. has not been saved yet
+    // NIAP This if will open the save dialog, use this to make save as...
     if (m_proj->is_temporary()) {
         QString name{}, path{};
         ProjectDialog* project_dialog = new ProjectDialog(&name, &path, this, Constants::DEFAULT_PATH);

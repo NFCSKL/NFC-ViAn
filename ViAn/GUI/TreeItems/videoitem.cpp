@@ -60,6 +60,8 @@ void VideoItem::set_thumbnail() {
     } else {
         path = m_vid_proj->get_video()->file_path.toStdString();
     }
+
+    // NIAP This one is not created when path is a .png file
     cv::VideoCapture cap(path);
     if (!cap.isOpened()) {
         setIcon(0, error_icon);
@@ -109,7 +111,7 @@ void VideoItem::load_sequence_items() {
             auto seq_item = new SequenceItem(Utility::name_from_path(seq->get_original_name_from_hash(pair.first)), pair.first);
 
             // Add thumbnail
-
+            // NIAP
             // TODO!! Move this to a seperate thread
             std::string path = seq->get_original_name_from_hash(pair.first).toStdString();
             cv::VideoCapture cap(path);
