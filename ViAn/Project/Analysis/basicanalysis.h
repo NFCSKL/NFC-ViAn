@@ -19,7 +19,7 @@ enum ANALYSIS_TYPE {MOTION_DETECTION = 1, TAG, BASIC_ANALYSIS, DRAWING_TAG, INTE
 struct interval_cmp {
     bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {
         return lhs->get_start() <= rhs->get_start();
-    }
+    }g
 };
 
 using interval_set = std::set<AnalysisInterval*, interval_cmp>;
