@@ -355,6 +355,7 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
  * @param item
  */
 void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
+    // NIAP
     const QIcon error_icon = QIcon(":/Icons/error_stop.png");
     Tag* tag = nullptr;
     if (item->type() == TAG_ITEM) {
@@ -365,6 +366,7 @@ void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
     for (auto t_frame : tag->tag_map) {
         TagFrameItem* tf_item = new TagFrameItem(t_frame.second);
         item->addChild(tf_item);
+        // NIAP
         tf_item->setIcon(0, error_icon);
     }
 }
