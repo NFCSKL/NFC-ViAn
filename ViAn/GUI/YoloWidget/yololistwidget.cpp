@@ -44,6 +44,7 @@ void YoloListWidget::set_analysis(AnalysisProxy* analysis) {
     emit update_frames(m_frame_list);
     QString video_path = m_proxy->get_video_path();
 
+    // This class will run on a sepperate thread
     ItemCreator* item_creator = new ItemCreator(m_analysis, &m_detection_list,
                                                 m_frame_list, video_path, m_proj->get_dir());
 

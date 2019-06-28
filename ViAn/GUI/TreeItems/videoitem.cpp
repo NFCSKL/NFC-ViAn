@@ -113,24 +113,44 @@ void VideoItem::load_sequence_items() {
             // TODO!! Move this to a seperate thread
             std::string path = seq->get_original_name_from_hash(pair.first).toStdString();
             cv::VideoCapture cap(path);
-            if (!cap.isOpened()) {
-                seq_item->setIcon(0, error_icon);
-                continue;
-            }
             cv::Mat frame;
-            cap >> frame;
-            switch (frame.type()) {
-                case CV_8UC1:
-                    cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
-                    break;
-                case CV_8UC3:
-                    cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-                    break;
+            bool error = false;
+            if (!cap.isOpened()) {
+                error = true;
             }
-            ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());
-            QString thumbnail_path = im_gen.create_thumbnail(m_vid_proj->get_video()->get_name());
-            const QIcon icon(thumbnail_path);
-            seq_item->setIcon(0, icon);
+            else {
+                cap >> frame;
+                switch (frame.type()) {
+                    case CV_8UC1:
+                        cvtColor(frame, frame, cv::COLOR_GRAY2RGB);
+                        break;
+                    case CV_8UC3:
+                        cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+                        break;
+                }
+            }
+
+
+            // Check if thumbnail already exists
+            // then open it instead of creating new one
+
+            QString name = m_vid_proj->get_video()->get_name();
+            int index = seq->get_index_of_hash(pair.first);
+            name = name + "-" + QString::number(index);
+            QString thumb_path = m_vid_proj->get_proj_path() + Constants::THUMBNAIL_FOLDER +
+                    name + ".png";
+            QFile file(thumb_path);
+            if (error) {
+                seq_item->setIcon(0, error_icon);
+            } else if (file.exists()) {
+                const QIcon icon(thumb_path);
+                seq_item->setIcon(0, icon);
+            } else {
+                ImageGenerator im_gen(frame, m_vid_proj->get_proj_path());
+                QString thumbnail_path = im_gen.create_thumbnail(name);
+                const QIcon icon(thumbnail_path);
+                seq_item->setIcon(0, icon);
+            }
 
             // Insert in order
             if (!container->childCount()) {

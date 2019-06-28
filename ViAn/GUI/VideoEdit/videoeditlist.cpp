@@ -191,6 +191,7 @@ void VideoEditList::generate_video() {
     name = video_folder_path + name;
     name = Utility::add_serial_number(name, ".mkv");
 
+    // This class will run on a sepperate thread
     VideoGenerator* vid_gen = new VideoGenerator(this, name, size, fps,
                                                  keep_size, title_screen,
                                                  title_text, description,
