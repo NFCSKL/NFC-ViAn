@@ -355,6 +355,8 @@ void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
  * @param item
  */
 void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
+    // NIAP
+    const QIcon error_icon = QIcon(":/Icons/error_stop.png");
     Tag* tag = nullptr;
     if (item->type() == TAG_ITEM) {
         tag = dynamic_cast<TagItem*>(item)->get_tag();
@@ -364,6 +366,8 @@ void ProjectWidget::add_frames_to_tag_item(TreeItem* item) {
     for (auto t_frame : tag->tag_map) {
         TagFrameItem* tf_item = new TagFrameItem(t_frame.second);
         item->addChild(tf_item);
+        // NIAP
+        tf_item->setIcon(0, error_icon);
     }
 }
 
@@ -712,6 +716,8 @@ void ProjectWidget::add_analyses_to_item(VideoItem *v_item) {
         if (ana.second->get_type() == TAG || ana.second->get_type() == SEQUENCE_TAG) {
             TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second));
             v_item->addChild(tag_item);
+
+            // NIAP Add icon to SEQUENCE TAG
             add_frames_to_tag_item(tag_item);
         } else if (ana.second->get_type() == DRAWING_TAG) {
             DrawingTagItem* tag_item = new DrawingTagItem(dynamic_cast<Tag*>(ana.second));
