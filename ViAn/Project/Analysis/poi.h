@@ -1,25 +1,29 @@
 #ifndef POI_H
 #define POI_H
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QString>
-#include <QObject>
-#include <vector>
-#include <map>
-#include "Filehandler/saveable.h"
+
+#include "analysisinterval.h"
+#include "detectionbox.h"
+
 #include "opencv2/core/core.hpp"
-#include "ooi.h"
-class POI : Saveable{
-    std::map<int,std::vector<OOI>> OOIs;
+
+#include <QJsonObject>
+
+#include <map>
+
+class POI : public AnalysisInterval{    
+    std::map<int,std::vector<DetectionBox>> OOIs = {};
 public:
     POI();
-    int start_frame = -1;
-    int end_frame = -1;
-    void read(const QJsonObject& json);
-    void write(QJsonObject& json);
-    void add_detections(int frame_num, std::vector<OOI> detections);
+    ~POI() override;
+    void read(const QJsonObject& json) override;
+    void write(QJsonObject& json) override;
+
+    void add_detections(int frame_num, std::vector<DetectionBox> detections);
     void set_end_frame(int frame_num);
+    std::vector<cv::Rect> get_detections_on_frame(int frame_num);
+    std::vector<DetectionBox> get_detectionbox_on_frame(int frame_num);
     friend class Analysis;
+
 };
 
 

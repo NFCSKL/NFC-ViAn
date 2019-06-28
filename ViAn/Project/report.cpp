@@ -1,5 +1,5 @@
 #include "report.h"
-
+#include "utility.h"
 /**
  * @brief Report::Report
  * @param file_path
@@ -12,6 +12,15 @@ Report::Report(std::string file_path){
  * Empty constructor, required for read
  */
 Report::Report(){
+}
+
+/**
+ * @brief Report::reset_root_dir
+ * @param dir
+ */
+void Report::reset_root_dir(const std::string &dir)
+{
+    file_path = dir+Utility::name_from_path(file_path);
 }
 
 /**

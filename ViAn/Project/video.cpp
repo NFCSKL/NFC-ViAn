@@ -1,8 +1,11 @@
 #include "video.h"
+#include "utility.h"
+
 /**
  * @brief Video::Video
  */
-Video::Video(){
+Video::Video(const VIDEO_TYPE& sequence_type){
+    m_sequence_type = sequence_type;
     this->file_path = "";
 }
 
@@ -11,8 +14,62 @@ Video::Video(){
  * @param id
  * @param filepath
  */
-Video::Video(std::string file_path){
+Video::Video(QString file_path, const VIDEO_TYPE &sequence_type){
+    m_sequence_type = sequence_type;
     this->file_path = file_path;
+    m_name = Utility::name_from_path(file_path);
+    m_is_saved = (m_sequence_type == VIDEO); // Ordinary videos can't be changed thus are allways "saved"
+}
+
+Video::~Video() {}
+
+QString Video::get_name() {
+    return m_name;
+}
+
+void Video::set_name(const QString &new_name) {
+    m_name = new_name;
+}
+
+bool Video::is_sequence() {
+    return m_sequence_type != VIDEO;
+}
+
+VIDEO_TYPE Video::get_sequence_type() {
+    return m_sequence_type;
+}
+
+bool Video::is_saved() {
+    return m_is_saved;
+}
+
+int Video::get_width() {
+    return m_width;
+}
+
+int Video::get_height() {
+    return m_height;
+}
+
+int Video::get_last_frame() {
+    return m_last_frame;
+}
+
+void Video::set_size(int width, int height) {
+    m_width = width;
+    m_height = height;
+}
+
+void Video::set_frame_rate(int fps) {
+    frame_rate = fps;
+}
+
+int Video::get_frame_rate() {
+    return frame_rate;
+}
+
+void Video::set_last_frame(int frame) {
+    m_last_frame = frame;
 }
 
 /**
@@ -31,7 +88,13 @@ bool operator==(Video v1, Video v2){
  * Read video parameters from json object.
  */
 void Video::read(const QJsonObject& json){
-    this->file_path = json["file_path"].toString().toStdString();
+    m_sequence_type = static_cast<VIDEO_TYPE>(json["sequence"].toInt());
+    this->file_path = json["file_path"].toString();
+    m_name = json["name"].toString();
+    frame_rate = json["frame_rate"].toInt();
+    m_width = json["width"].toInt();
+    m_height = json["height"].toInt();
+    m_is_saved = true;
 }
 
 /**
@@ -40,5 +103,43 @@ void Video::read(const QJsonObject& json){
  * Write video parameters to json object.
  */
 void Video::write(QJsonObject& json){
-    json["file_path"] = QString::fromStdString(this->file_path);
+    json["sequence"] = m_sequence_type;
+    json["name"] = m_name;
+    json["file_path"] = this->file_path;
+    json["frame_rate"] = frame_rate;
+    json["width"] = m_width;
+    json["height"] = m_height;
+    m_is_saved = true;
+}
+
+void VideoState::read(const QJsonObject& json) {
+   frame = json["frame"].toInt();
+   scale_factor = json["scale_factor"].toDouble();
+   int x = json["anchor x"].toInt();
+   int y = json["anchor y"].toInt();
+   anchor = QPoint(x, y);
+   x = json["center_x"].toInt();
+   y = json["center_y"].toInt();
+   center = QPoint(x, y);
+   rotation = json["rotation"].toInt();
+   flip_h = json["flip_h"].toBool();
+   flip_v = json["flip_v"].toBool();
+   brightness = json["brightness"].toInt();
+   contrast = json["contrast"].toDouble();
+   gamma = json["gamma"].toDouble();
+}
+
+void VideoState::write(QJsonObject& json) {
+   json["frame"] = frame;
+   json["scale_factor"] = scale_factor;
+   json["anchor x"] = anchor.x();
+   json["anchor y"] = anchor.y();
+   json["center_x"] = center.x();
+   json["center_y"] = center.y();
+   json["rotation"] = rotation;
+   json["flip_h"] = flip_h;
+   json["flip_v"] = flip_v;
+   json["brightness"] = brightness;
+   json["contrast"] = contrast;
+   json["gamma"] = gamma;
 }

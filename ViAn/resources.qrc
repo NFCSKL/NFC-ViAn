@@ -1,27 +1,178 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias ="play.png">Resources/play.png</file>
-    <file alias ="pause.png">Resources/pause.png</file>
-    <file alias ="stop.png">Resources/stop.png</file>
-    <file alias ="previous_frame.png">Resources/previous_frame.png</file>
-    <file alias ="next_frame.png">Resources/next_frame.png</file>
-    <file alias ="error.png">Resources/error.png</file>
-    <file alias ="add_video.png">Resources/add_video.png</file>
-    <file alias ="show_hide_overlay.png">Resources/show_hide_overlay.png</file>
-    <file alias ="save_project.png">Resources/save_project.png</file>
-    <file alias ="load_project.png">Resources/load_project.png</file>
-    <file alias ="arrow.png">Resources/arrow.png</file>
-    <file alias ="box.png">Resources/box.png</file>
-    <file alias ="circle.png">Resources/circle.png</file>
-    <file alias ="zoom_in.png">Resources/zoom_in.png</file>
-    <file alias ="zoom_out.png">Resources/zoom_out.png</file>
-    <file alias ="pen.png">Resources/pen.png</file>
-    <file alias ="line.png">Resources/line.png</file>
-    <file alias ="undo.png">Resources/undo.png</file>
-    <file alias ="colour.png">Resources/colour.png</file>
-    <file alias ="clear.png">Resources/clear.png</file>
-    <file alias ="text.png">Resources/text.png</file>
-    <file alias ="rotate_right.png">Resources/rotate_right.png</file>
-    <file alias ="rotate_left.png">Resources/rotate_left.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>Icons/1471538455_pause-circle-outline.png</file>
+        <file>Icons/1471538683_icon-ios7-fastforward.png</file>
+        <file>Icons/1471538710_fast-backward.png</file>
+        <file>Icons/1471538716_media-fast-backward.png</file>
+        <file>Icons/1471538879_search.png</file>
+        <file>Icons/1471538881_edit.png</file>
+        <file>Icons/1471538890_list-alt.png</file>
+        <file>Icons/1471538893_login.png</file>
+        <file>Icons/1471539022_calendar.png</file>
+        <file>Icons/1471539025_arrow-right.png</file>
+        <file>Icons/1471539029_plus-sign.png</file>
+        <file>Icons/1471539032_user.png</file>
+        <file>Icons/1471539033_ok-sign.png</file>
+        <file>Icons/1471539035_hand-right.png</file>
+        <file>Icons/1471539037_arrow-down.png</file>
+        <file>Icons/1471539041_download.png</file>
+        <file>Icons/1471539043_chevron-down.png</file>
+        <file>Icons/1471539044_circle-arrow-right.png</file>
+        <file>Icons/1471539045_hand-up.png</file>
+        <file>Icons/1471539047_phone-old.png</file>
+        <file>Icons/1471539048_download-alt.png</file>
+        <file>Icons/1471539050_box-open.png</file>
+        <file>Icons/1471539052_upload.png</file>
+        <file>Icons/1471539053_phone.png</file>
+        <file>Icons/1471539054_check.png</file>
+        <file>Icons/1471539056_info-sign.png</file>
+        <file>Icons/1471539057_chat.png</file>
+        <file>Icons/1471539058_list.png</file>
+        <file>Icons/1471539063_barcode.png</file>
+        <file>Icons/1471539064_remove-sign.png</file>
+        <file>Icons/1471539065_shopping-cart.png</file>
+        <file>Icons/1471539067_minus-sign.png</file>
+        <file>Icons/1471539072_arrow-up.png</file>
+        <file>Icons/1471539074_application-code.png</file>
+        <file>Icons/1471539082_comment.png</file>
+        <file>Icons/1471539083_filter.png</file>
+        <file>Icons/1471539084_exclamation-sign.png</file>
+        <file>Icons/1471539085_train.png</file>
+        <file>Icons/1471539086_arrow-left.png</file>
+        <file>Icons/1471539098_tasks.png</file>
+        <file>Icons/1471539099_chevron-up.png</file>
+        <file>Icons/1471539104_hourglass.png</file>
+        <file>Icons/1471539108_star.png</file>
+        <file>Icons/1471539111_calculator.png</file>
+        <file>Icons/1471539112_certificate.png</file>
+        <file>Icons/1471539115_compass.png</file>
+        <file>Icons/1471539116_ok.png</file>
+        <file>Icons/1471539123_lightbulb.png</file>
+        <file>Icons/1471539126_play-circle.png</file>
+        <file>Icons/1471539129_zoom-out.png</file>
+        <file>Icons/1471539130_circle-arrow-left.png</file>
+        <file>Icons/1471539137_forward.png</file>
+        <file>Icons/1471539153_star-empty.png</file>
+        <file>Icons/1471539163_backward.png</file>
+        <file>Icons/1471539168_ban-circle.png</file>
+        <file>Icons/1471539170_scissors.png</file>
+        <file>Icons/1471539179_cd.png</file>
+        <file>Icons/1471539184_heart.png</file>
+        <file>Icons/1471539599_question-sign.png</file>
+        <file>Icons/1471539641_globe.png</file>
+        <file>Icons/1471539642_font.png</file>
+        <file>Icons/1471539689_warning-sign.png</file>
+        <file>Icons/1471539694_timer.png</file>
+        <file>Icons/1471539700_address-book.png</file>
+        <file>Icons/1471539868_pause.png</file>
+        <file>Icons/1471539939_picture.png</file>
+        <file>Icons/1471540027_map-map-marker.png</file>
+        <file>Icons/1471540227_folder-video.png</file>
+        <file>Icons/1471540229_folder-picture.png</file>
+        <file>Icons/1471540240_wrench.png</file>
+        <file>Icons/1471540262_map.png</file>
+        <file>Icons/1471540267_star.png</file>
+        <file>Icons/1471540269_light-bulb.png</file>
+        <file>Icons/1471540275_map-marker.png</file>
+        <file>Icons/1471540399_icon-image.png</file>
+        <file>Icons/1471540406_style.png</file>
+        <file>Icons/abort.png</file>
+        <file>Icons/add_video.png</file>
+        <file>Icons/advanced_analys.png</file>
+        <file>Icons/advanced_analysis.png</file>
+        <file>Icons/analys.png</file>
+        <file>Icons/analysis.png</file>
+        <file>Icons/arrow.png</file>
+        <file>Icons/bookmark.png</file>
+        <file>Icons/box.png</file>
+        <file>Icons/camera.png</file>
+        <file>Icons/check.png</file>
+        <file>Icons/circle.png</file>
+        <file>Icons/clear.png</file>
+        <file>Icons/cog.png</file>
+        <file>Icons/color.png</file>
+        <file>Icons/computer.png</file>
+        <file>Icons/copy.png</file>
+        <file>Icons/create_interval.png</file>
+        <file>Icons/cross.png</file>
+        <file>Icons/cursor.png</file>
+        <file>Icons/dec_speed.png</file>
+        <file>Icons/edit.png</file>
+        <file>Icons/end_interval.png</file>
+        <file>Icons/error_stop.png</file>
+        <file>Icons/export.png</file>
+        <file>Icons/eye.png</file>
+        <file>Icons/fit_screen.png</file>
+        <file>Icons/folder.png</file>
+        <file>Icons/folder_interval.png</file>
+        <file>Icons/gears.png</file>
+        <file>Icons/hand.png</file>
+        <file>Icons/hide.png</file>
+        <file>Icons/home.png</file>
+        <file>Icons/image_sequence.png</file>
+        <file>Icons/inc_speed.png</file>
+        <file>Icons/interval.png</file>
+        <file>Icons/left.png</file>
+        <file>Icons/line.png</file>
+        <file>Icons/logga_kva2.jpg</file>
+        <file>Icons/logo.png</file>
+        <file>Icons/Logotyp.jpg</file>
+        <file>Icons/marker.png</file>
+        <file>Icons/move.png</file>
+        <file>Icons/new.png</file>
+        <file>Icons/new_folder.png</file>
+        <file>Icons/new_zoom.png</file>
+        <file>Icons/next.png</file>
+        <file>Icons/next_frame.png</file>
+        <file>Icons/next_poi.png</file>
+        <file>Icons/open.png</file>
+        <file>Icons/original_size.png</file>
+        <file>Icons/path.png</file>
+        <file>Icons/pause.png</file>
+        <file>Icons/pen.png</file>
+        <file>Icons/play.png</file>
+        <file>Icons/play+check.png</file>
+        <file>Icons/Polisen - logo1.png</file>
+        <file>Icons/polisen.png</file>
+        <file>Icons/prev.png</file>
+        <file>Icons/prev_frame.png</file>
+        <file>Icons/prev_poi.png</file>
+        <file>Icons/question.png</file>
+        <file>Icons/quit.png</file>
+        <file>Icons/recent.png</file>
+        <file>Icons/redo.png</file>
+        <file>Icons/remove_frame.png</file>
+        <file>Icons/report.png</file>
+        <file>Icons/resize.png</file>
+        <file>Icons/right.png</file>
+        <file>Icons/save.png</file>
+        <file>Icons/screen.png</file>
+        <file>Icons/select.png</file>
+        <file>Icons/show.png</file>
+        <file>Icons/start_interval.png</file>
+        <file>Icons/stop.png</file>
+        <file>Icons/tag.png</file>
+        <file>Icons/tag_frame.png</file>
+        <file>Icons/text.png</file>
+        <file>Icons/toggle_draw.png</file>
+        <file>Icons/undo.png</file>
+        <file>Icons/zoom.png</file>
+        <file>Icons/zoom_in.png</file>
+        <file>Icons/zoom_out.png</file>
+        <file>Icons/loop.png</file>
+        <file>Icons/add_interval.png</file>
+        <file>Splashscreen.png</file>
+        <file>Icons/object_detection.png</file>
+        <file>Icons/advanced_object_detection.png</file>
+        <file>Icons/advanced_analysis_black.png</file>
+        <file>Icons/settings_motion.png</file>
+        <file>Icons/settings_object.png</file>
+        <file>Icons/analysis_motion.png</file>
+        <file>Icons/analysis_object.png</file>
+        <file>yolov3.cfg</file>
+        <file>coco.names</file>
+        <file>vian-help.pdf</file>
+        <file>Icons/flip_horizontal.png</file>
+        <file>Icons/flip_vertical.png</file>
+    </qresource>
 </RCC>

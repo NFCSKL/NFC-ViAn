@@ -1,9 +1,16 @@
 #include "rectangle.h"
 
+#include "utility.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QPoint>
+
 /**
  * @brief Rectangle::Rectangle
  */
-Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
+Rectangle::Rectangle() : Shapes(SHAPES::RECTANGLE) {
+    m_name = "Rectangle";
 }
 
 /**
@@ -11,18 +18,33 @@ Rectangle::Rectangle() : Shape(SHAPES::RECTANGLE) {
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Rectangle::Rectangle(QColor col, QPoint pos) : Shape(SHAPES::RECTANGLE, col, pos) {
+Rectangle::Rectangle(QColor col, QPoint pos) : Shapes(SHAPES::RECTANGLE, col, pos) {
+    m_name = "Rectangle";
 }
 
+Rectangle::~Rectangle() {}
+
 /**
- * @brief Rectangle::draw
- * Draws the object on top of the specified frame.
- * @param frame Frame to draw on.
+ * @brief Rectangle::draw_scaled
+ * Scales and draws the object on top the specified frame.
+ * @param frame - Frame to draw on.
+ * @param anchor - Top left corner in zoomrect, used to scale drawing.
+ * @param scale_factor - Zoom factor, used to scale drawing.
  * @return Returns the frame with drawing.
  */
-cv::Mat Rectangle::draw(cv::Mat &frame) {
-    cv::Rect rect(draw_start, draw_end);
-    cv::rectangle(frame, rect, colour, LINE_THICKNESS);
+cv::Mat Rectangle::draw_scaled(cv::Mat &frame, cv::Point anchor,
+                               double scale_factor, int angle,
+                               bool flip_h, bool flip_v,
+                               int width, int height) {
+    QPoint rot_start = Utility::from_cvpoint(draw_start);
+    QPoint rot_end = Utility::from_cvpoint(draw_end);
+    rot_start = Utility::flip(rot_start, flip_h, flip_v, width, height);
+    rot_end = Utility::flip(rot_end, flip_h, flip_v, width, height);
+    rot_start = Utility::rotate(rot_start, angle, width, height);
+    rot_end = Utility::rotate(rot_end, angle, width, height);
+    cv::Rect rect((Utility::from_qpoint(rot_start)-anchor)*scale_factor, (Utility::from_qpoint(rot_end)-anchor)*scale_factor);
+    cv::InputOutputArray inout_array = frame;
+    cv::rectangle(inout_array, rect, color, thickness);
     return frame;
 }
 
@@ -33,6 +55,7 @@ cv::Mat Rectangle::draw(cv::Mat &frame) {
  * @param pos
  */
 void Rectangle::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
 }
 
 /**

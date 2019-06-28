@@ -1,122 +1,213 @@
 #include "project.h"
+
+#include "bookmark.h"
+#include "GUI/Bookmark/bookmarkcategory.h"
+#include "GUI/VideoEdit/videointerval.h"
+#include "videoproject.h"
+
+#include <QDebug>
+#include <QDir>
+#include <QFileInfoList>
+#include <QJsonArray>
+#include <QTemporaryDir>
+
+#include <chrono>
+#include <ctime>
+
 /**
  * @brief Project::Project
- * @param file_handler
- * @param id
- * @param name
+ * Empty private constructor, used for Project::fromFile
  */
-Project::Project(FileHandler* file_handler, ID id, std::string name){
-    this->file_handler = file_handler;
-    this->name = name;
-    this->save_name = name;
-    this->id = id;
-    this->video_counter = 0;
-    this->videos.clear();
-    this->changes_made = true;
+Project::Project(){}
 
-    // Setting ids to default values, -1 indicating invalid value.
-    this->dir = -1;
-    this->dir_videos = -1;
-    this->dir_bookmarks = -1;
+Project* Project::fromFile(const QString &full_path){
+    Project* proj = new Project();
+    proj->m_temporary = false;
+    proj->load_saveable(full_path);
+    return proj;
 }
+
 /**
  * @brief Project::Project
+ * @param name     := name of the project
+ * @param dir_path := directory to save project in
  */
-Project::Project(FileHandler* file_handler){
-    this->file_handler = file_handler;
-    this->name = "";
-    this->save_name = "";
-    this->videos.clear();
-    this->video_counter = 0;
-    // Setting ids to default values, -1 indicating invalid value.
-    this->id = -1;
-    this->dir = -1;
-    this->dir_bookmarks = -1;
-    this->dir_videos = -1;
-
+Project::Project(const QString& name, const QString& dir_path){
+    set_name_and_path(name, dir_path);
+    save_project();
 }
+
 
 /**
  * @brief Project::~Project
  * Clears contents of video map
  */
 Project::~Project(){
-    for (auto vid_it = this->videos.begin(); vid_it != this->videos.end(); ++vid_it) {
-        delete vid_it->second;
+    for (auto video_proj : m_videos) {
+        delete video_proj;
     }
-    for (auto rep_it = this->reports.begin(); rep_it != this->reports.end(); ++rep_it) {
-        delete *rep_it;
-    }
+    m_videos.clear();
 }
 
 /**
- * @brief Project::remove_video
- * @param id
+ * @brief Project::add_video_project
+ * @return Video ID to be used for identifying the video.
+ */
+ID Project::add_video_project(VideoProject *vid_proj){
+    vid_proj->set_project(this);
+    m_videos.push_back(vid_proj);
+    int id;
+    if (vid_proj->get_id() == -1) {
+        vid_proj->set_id(m_vid_count);
+        id = m_vid_count;
+        m_vid_count++;
+    } else {
+        id = vid_proj->get_id();
+    }
+    m_unsaved_changes = true;
+    return id;
+}
+
+/**
+ * @brief Project::remove_video_project
+ * @param vid_proj
  * Remove video from videos and delete its contents.
  */
-void Project::remove_video_project(ID id){
-    VideoProject* temp = this->videos.at(id);
-    delete temp;
-    videos.erase(id);
-    this->changes_made = true;
+void Project::remove_video_project(VideoProject* vid_proj){
+    auto it = std::find(m_videos.begin(), m_videos.end(), vid_proj);
+    if (it == m_videos.end()) return;
+    vid_proj->set_current(false);
+    delete *it;
+    m_videos.erase(it);
+    m_unsaved_changes = true;
 }
 
-/**
- * @brief Project::add_video
- * @return Video ID to be used for identifying the video.
- */
-ID Project::add_video(Video* vid){
-    VideoProject* vid_proj = new VideoProject(vid);
-    vid_proj->id  = this->video_counter;
-    this->videos.insert(std::make_pair(this->video_counter, vid_proj));
-    this->changes_made = true;
-    return this->video_counter++;
+void Project::add_bookmark(Bookmark* bmark) {
+    bmark->set_project(this);
+    m_bookmarks.push_back(bmark);
+    m_unsaved_changes = true;
 }
 
-/**
- * @brief Project::add_report
- * @param file_path
- */
-void Project::add_report(std::string file_path){
-    this->reports.push_back(new Report(file_path));
-    this->changes_made = true;
+void Project::remove_bookmark(Bookmark* bmark) {
+    auto it = std::find(m_bookmarks.begin(), m_bookmarks.end(), bmark);
+    if (it == m_bookmarks.end()) return;
+    delete *it;
+    m_bookmarks.erase(it);
+    m_unsaved_changes = true;
+    bmark->remove_exported_image();
 }
 
-/**
- * @brief Project::add_report
- * @param report
- * Required for load, object locally allocated
- */
-void Project::add_report(Report* report){
-    this->reports.push_back(report);
-}
-
-/**
- * @brief Project::add_video
- * @return Video ID to be used for identifying the video.
- */
-ID Project::add_video_project(VideoProject* vid_proj){
-    vid_proj->id = this->video_counter;
-    this->videos.insert(std::make_pair(this->video_counter, vid_proj));
-    this->changes_made = true;
-    return this->video_counter++;
-}
-/**
- * @brief Project::delete_artifacts
- * Delete all projects files.
- */
-void Project::delete_artifacts(){
-    // Delete files in all videoprojects
-    for(auto it = videos.begin(); it != videos.end(); it++){
-        VideoProject* vp = it->second;
-        vp->delete_artifacts();
+ID Project::add_category(BookmarkCategory* cat) {
+    cat->set_project(this);
+    m_categories.push_back(cat);
+    int id;
+    if (cat->get_id() == -1) {
+        cat->set_id(m_cat_count);
+        id = m_cat_count;
+        m_cat_count++;
+    } else {
+        id = cat->get_id();
     }
-    // Delete all reports.
-    for(auto it = reports.begin(); it != reports.end(); it++){
-        Report* temp = *it;
-        QFile file (QString::fromStdString(temp->get_file_path()));
-        file.remove();
+    m_unsaved_changes = true;
+    return id;
+}
+
+void Project::remove_category(BookmarkCategory* cat) {
+    auto it = std::find(m_categories.begin(), m_categories.end(), cat);
+    if (it == m_categories.end()) return;
+    delete *it;
+    m_categories.erase(it);
+    m_unsaved_changes = true;
+}
+
+void Project::add_analysis(AnalysisProxy* ana) {
+    m_analyses.push_back(ana);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_analysis(AnalysisProxy* ana) {
+    auto it = std::find(m_analyses.begin(), m_analyses.end(), ana);
+    if (it == m_analyses.end()) return;
+    m_analyses.erase(it);
+    m_unsaved_changes = true;
+}
+
+void Project::add_interval(VideoInterval* interval) {
+    interval->set_project(this);
+    m_intervals.push_back(interval);
+    m_unsaved_changes = true;
+}
+
+void Project::remove_interval(VideoInterval *interval) {
+    auto it = std::find(m_intervals.begin(), m_intervals.end(), interval);
+    if (it == m_intervals.end()) return;
+    delete *it;
+    m_intervals.erase(it);
+    m_unsaved_changes = true;
+}
+
+/**
+ * @brief Project::set_unsaved
+ * Set unsaved status
+ * Should be used by video_project and analysis
+ * @param changed
+ */
+void Project::set_unsaved(const bool& changed) {
+    m_unsaved_changes = changed;
+}
+
+void Project::set_name_and_path(const QString &name, const QString &path) {
+    // TODO: Handle case where tmp directory is empty
+    m_name = name;
+    if (!path.isEmpty()){
+        // Update path for all VideoProjects
+        m_dir = path + name + "/";
+        for (auto it = begin(m_videos); it != end(m_videos); ++it) {
+            (*it)->reset_root_dir(m_dir);
+        }
+        for (auto bmark : m_bookmarks) {
+            bmark->reset_root_dir(m_dir);
+        }
+    } else {
+        // Attempts to generate a temporary path
+        // Use default path on failure
+        QString tmp_dir = generate_tmp_directory();
+        m_dir = !tmp_dir.isEmpty() ? (tmp_dir + "/") : (Constants::DEFAULT_TEMP_PATH + "/temporary" + QString::number(std::rand()) + "/");
     }
+    m_file = m_dir + m_name + ".vian";
+    m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER;
+}
+
+/**
+ * @brief Project::set_temporary
+ * Sets whether the project is temporary or not
+ * @param is_temporary
+ */
+void Project::set_temporary(const bool &is_temporary){
+    m_temporary = is_temporary;
+}
+
+/**
+ * @brief Project::is_saved
+ * Check if the project has unsaved changes
+ * @return m_unsaved_changes
+ */
+bool Project::is_saved() const {
+    bool video_projects_saved = std::all_of(m_videos.begin(), m_videos.end(),
+                                            [](VideoProject* vp){return vp->is_saved();});
+    bool bookmarks_saved = std::all_of(m_bookmarks.begin(), m_bookmarks.end(),
+                                            [](Bookmark* bm){return bm->is_saved();});
+    bool categories_saved = std::all_of(m_categories.begin(), m_categories.end(),
+                                            [](BookmarkCategory* cat){return cat->is_saved();});
+    bool intervals_saved = std::all_of(m_intervals.begin(), m_intervals.end(),
+                                            [](VideoInterval* interval){return interval->is_saved();});
+
+    return !m_unsaved_changes && video_projects_saved &&
+            bookmarks_saved && categories_saved && intervals_saved;
+}
+
+bool Project::is_temporary() const {
+    return m_temporary;
 }
 
 /**
@@ -125,27 +216,58 @@ void Project::delete_artifacts(){
  * Read project parameters from json object.
  */
 void Project::read(const QJsonObject& json){
-    this->name = json["name"].toString().toStdString();
-    this->dir = file_handler->create_directory(json["root_dir"].toString());
-    this->dir_bookmarks = file_handler->create_directory(json["bookmark_dir"].toString());
-    this->dir_videos = file_handler->create_directory(json["video_dir"].toString());
-    this->save_name = this->name;
+    m_name = json["name"].toString();
+    m_file = full_path();
+    m_dir = m_file.left(m_file.lastIndexOf("/")+1);
+    m_dir_bookmarks = m_dir + Constants::BOOKMARK_FOLDER;
+    m_vid_count = json["vid IDs"].toInt();
+    m_cat_count = json["cat IDs"].toInt();
+
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
         QJsonObject json_vid_proj = json_vid_projs[i].toObject();
         VideoProject* v = new VideoProject();
+        add_video_project(v);
         v->read(json_vid_proj);
-        this->add_video_project(v);
-    }    
-    // Read reports from json
-    QJsonArray json_reports = json["reports"].toArray();
-    for (int i = 0; i < json_reports.size(); ++i) {
-        QJsonObject json_report = json_reports[i].toObject();
-        Report* report = new Report();
-        report->read(json_report);
-        this->add_report(report);
+        v->reset_root_dir(m_dir);
     }
+
+    // Read bookmarks from json
+    QJsonArray json_bookmarks = json["bookmarks"].toArray();
+    for (int i = 0; i < json_bookmarks.size(); ++i) {
+        QJsonObject json_bmark = json_bookmarks[i].toObject();
+        Bookmark* bmark = new Bookmark();
+        bmark->read(json_bmark);
+        add_bookmark(bmark);
+        bmark->reset_root_dir(m_dir);
+    }
+
+    // Read categories from json
+    QJsonArray json_cats = json["categories"].toArray();
+    for (int i = 0; i < json_cats.size(); ++i) {
+        QJsonObject json_category = json_cats[i].toObject();
+
+        QString name = json_category["name"].toString();
+        int index = json_category["index"].toInt();
+        int id = json_category["id"].toInt();
+
+        BookmarkCategory* new_category = new BookmarkCategory(name, 1);
+        new_category->set_index(index);
+        new_category->set_id(id);
+        add_category(new_category);
+        new_category->m_unsaved_changes = false;
+    }
+
+    // Read intervals from json
+    QJsonArray json_intervals = json["intervals"].toArray();
+    for (int i = 0; i < json_intervals.size(); ++i) {
+        QJsonObject json_interval = json_intervals[i].toObject();
+        VideoInterval* interval = new VideoInterval();
+        interval->read(json_interval);
+        add_interval(interval);
+    }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -154,81 +276,204 @@ void Project::read(const QJsonObject& json){
  * Write project parameters to json object.
  */
 void Project::write(QJsonObject& json){
-    json["name"] = QString::fromStdString(this->name);
-    json["root_dir"] =  file_handler->get_dir(this->dir).absolutePath();
-    json["bookmark_dir"] = file_handler->get_dir(this->dir_bookmarks).absolutePath();
-    json["video_dir"] = file_handler->get_dir(this->dir_videos).absolutePath();
-    QJsonArray json_proj;
+    json["name"] = m_name;
+    json["root_dir"] = m_dir;
+    json["vid IDs"] = m_vid_count;
+    json["cat IDs"] = m_cat_count;
+
     // Write Videos to json
-    for(auto it = this->videos.begin(); it != this->videos.end(); it++){
+    QJsonArray json_proj;
+    for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         QJsonObject json_vid_proj;
-        VideoProject* v = it->second;
-        v->write(json_vid_proj);
+        (*it)->write(json_vid_proj);
         json_proj.append(json_vid_proj);
     }
     json["videos"] = json_proj;
-    // Write reports to json
-    QJsonArray json_reports;
-    for(auto it = this->reports.begin(); it != this->reports.end(); it++){
-        QJsonObject json_report;
-        Report* report = *it;
-        report->write(json_report);
-        json_reports.append(json_report);
+
+    // Write Bookmarks to json
+    QJsonArray json_bmarks;
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
+        QJsonObject json_bmark;
+        (*it)->write(json_bmark);
+        json_bmarks.append(json_bmark);
     }
-    json["reports"] = json_reports;
-}
+    json["bookmarks"] = json_bmarks;
 
-/**
- * @brief Project::add_analysis
- * @param v_id id of video to add analysis to
- * @param analysis
- */
-ID Project::add_analysis(ID v_id, Analysis analysis){
-    this->changes_made = true;
-    return this->videos.at(v_id)->add_analysis(analysis);
-}
+    // Write Categories to json
+    QJsonArray json_cats;
+    for(auto it = m_categories.begin(); it != m_categories.end(); it++){
+        QJsonObject json_category;
+        json_category["name"] = (*it)->get_name();
+        json_category["index"] = (*it)->get_index();
+        json_category["id"] = (*it)->get_id();
+        json_cats.append(json_category);
+        (*it)->m_unsaved_changes = false;
+    }
+    json["categories"] = json_cats;
 
-/**
- * @brief Project::add_bookmark
- * @param v_id the id of the video
- * @param bookmark
- * Add new bookmark to Videoproj corresponding to id.
- */
-ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
-    VideoProject* v = this->videos.at(v_id);
-    this->changes_made = true;
-    return v->add_bookmark(bookmark);
-}
+    QJsonArray json_intervals;
+    for(auto it = m_intervals.begin(); it != m_intervals.end(); it++){
+        QJsonObject json_interval;
+        (*it)->write(json_interval);
+        json_intervals.append(json_interval);
+    }
+    json["intervals"] = json_intervals;
 
-/**
- * @brief Project::is_saved
- * @return true if saved
- */
-bool Project::is_saved(){
-    return !this->changes_made;
+    m_unsaved_changes = false;
 }
 
 /**
  * @brief Project::save_project
  * @return sets saved =true
  */
-void Project::save_project(){
-    this->changes_made = false;
+bool Project::save_project(){
+    QDir directory;
+    directory.mkpath(m_dir);
+    directory.mkpath(m_dir_bookmarks);
+    auto time = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(time);
+    last_changed = std::ctime(&now_c);
+    last_changed.remove(last_changed.size()-1, 1);
+    return save_saveable(m_file);
 }
+
+/**
+ * @brief Project::copy_directory_files
+ * @param from_dir
+ * @param to_dir
+ * @param coverFileIfExist
+ * @return
+ * Iterates over from_dir and copies all files and sub-directories to to_dir
+ */
+bool Project::copy_directory_files(const QString &from_dir, const QString &to_dir, const bool& coverFileIfExist, const std::vector<QString>& exclude_suffix){
+    QDir source_dir(from_dir);
+    QDir target_dir(to_dir);
+    if(!target_dir.exists()){    /* if directory don't exists, build it */
+        if(!target_dir.mkdir(target_dir.absolutePath()))
+            return false;
+    }
+
+    QFileInfoList fileInfoList = source_dir.entryInfoList();
+    foreach(QFileInfo fileInfo, fileInfoList){
+        if(fileInfo.fileName() == "." || fileInfo.fileName() == "..")
+            continue;
+
+        if(fileInfo.isDir()){    /* if it is directory, copy recursively*/
+            if(!copy_directory_files(fileInfo.filePath(),
+                target_dir.filePath(fileInfo.fileName()),
+                coverFileIfExist, exclude_suffix))
+                return false;
+        }
+        else {            /* if coverFileIfExist == true, remove old file first */
+            if (std::find(begin(exclude_suffix), end(exclude_suffix), fileInfo.suffix()) != end(exclude_suffix))
+                continue;
+
+            if(coverFileIfExist && target_dir.exists(fileInfo.fileName())){
+                target_dir.remove(fileInfo.fileName());
+            }
+
+            // files copy
+            if(!QFile::copy(fileInfo.filePath(),
+                target_dir.filePath(fileInfo.fileName()))){
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Project::remove_files
+ * Removes the project folder and all of its content
+ * @return
+ */
+bool Project::remove_files() {
+    QDir path(m_dir);
+    bool success{false};
+
+    if (path.exists()) {
+        success = path.removeRecursively();
+    }
+    return success;
+}
+
+ /**
+ * @brief Project::generate_tmp_directory
+ * Tries to generates a temporary directory and returns the path if successful
+ */
+QString Project::generate_tmp_directory() {
+    QTemporaryDir tmp_dir;
+    tmp_dir.setAutoRemove(false);
+    if(tmp_dir.isValid())
+        return tmp_dir.path();
+    return "";
+}
+
 
 /**
  * @brief Project::get_videos
  * @return videos&
  */
-std::map<ID, VideoProject* > &Project::get_videos(){
-    return this->videos;
+std::vector<VideoProject*> &Project::get_videos() {
+    return m_videos;
+}
+
+std::vector<Bookmark*> &Project::get_bookmarks() {
+    return m_bookmarks;
+}
+
+std::vector<BookmarkCategory*> &Project::get_categories() {
+    return m_categories;
+}
+
+std::vector<AnalysisProxy*> &Project::get_analyses() {
+    return m_analyses;
+}
+
+std::vector<VideoInterval*> &Project::get_intervals() {
+    return m_intervals;
 }
 
 /**
- * @brief Project::get_video
+ * @brief Project::get_video_project
+ * Get the videoproject with the ID from the list of videoproject.
+ * If the videoproject is not found return nullptr.
  * @param id
- * @return Returns the video with the specified id.
+ * @return
  */
-VideoProject* Project::get_video(ID id) {
-    return this->videos[id];
+VideoProject* Project::get_video_project(int id) {
+    for (auto vp : m_videos) {
+        if (vp->get_id() == id) {
+            return vp;
+        }
+    }
+    return nullptr;
+}
+
+QString Project::get_dir() const {
+    return m_dir;
+}
+
+QString Project::get_name() const {
+    return m_name;
+}
+
+QString Project::get_file() const {
+    return m_file;
+}
+
+QString Project::get_last_changed() const {
+    return last_changed;
+}
+
+void Project::set_name(QString name) {
+    m_name = name;
+}
+
+void Project::set_dir(QString dir) {
+    m_dir = dir;
+}
+
+void Project::set_file(QString file) {
+    m_file = file;
 }

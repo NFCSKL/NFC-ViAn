@@ -1,6 +1,0 @@
-#ifndef ACTION_H
-#define ACTION_H
-
-enum ACTION {ADD_PROJECT, CANCEL, ADD_VIDEO};
-
-#endif // ACTION_H

@@ -1,10 +1,17 @@
 #include "text.h"
 
+#include "constants.h"
+#include "utility.h"
+
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <QPoint>
+
 /**
  * @brief Text::Text
  */
-Text::Text() : Shape(SHAPES::TEXT) {
-    string = QString();
+Text::Text() : Shapes(SHAPES::TEXT) {
+    m_name = "Text";
     font_scale = 0;
 }
 
@@ -15,20 +22,28 @@ Text::Text() : Shape(SHAPES::TEXT) {
  * @param strng String to be displayed
  * @param fnt_scl Font scale of the string
  */
-Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES::TEXT, col, pos) {
-    string = strng;
+Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shapes(SHAPES::TEXT, col, pos) {
+    set_name(strng);
     font_scale = fnt_scl;
+    cv::String cv_string = m_name.toStdString();
+    text_size = cv::getTextSize(cv_string, cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
+    cv::Point bl = cv::Point(draw_start.x-text_size.width/2, draw_start.y + text_size.height/2);
+    draw_end = cv::Point(draw_start.x + text_size.width/2, draw_start.y-text_size.height/2);
+    draw_start = bl;
 }
 
-/**
- * @brief Text::draw
- * Draws the object on top of the specified frame.
- * @param frame Frame to draw on.
- * @return Returns the frame with drawing.
- */
-cv::Mat Text::draw(cv::Mat &frame) {
-    cv::putText(frame, string.toStdString(), draw_end, cv::FONT_HERSHEY_SIMPLEX, font_scale,
-                colour, LINE_THICKNESS);
+Text::~Text() {}
+
+cv::Mat Text::draw_scaled(cv::Mat &frame, cv::Point anchor,
+                          double scale_factor, int angle,
+                          bool flip_h, bool flip_v,
+                          int width, int height) {
+    Q_UNUSED(anchor) Q_UNUSED(scale_factor)
+    QPoint rot_start = Utility::from_cvpoint(draw_start);
+    rot_start = Utility::flip(rot_start, flip_h, flip_v, width, height);
+    rot_start = Utility::rotate(rot_start, angle, width, height);
+    cv::putText(frame, m_name.toStdString(), Utility::from_qpoint(rot_start), cv::FONT_HERSHEY_SIMPLEX, font_scale,
+                color, thickness);
     return frame;
 }
 
@@ -39,6 +54,53 @@ cv::Mat Text::draw(cv::Mat &frame) {
  * @param pos
  */
 void Text::handle_new_pos(QPoint pos) {
+    Q_UNUSED( pos )
+}
+
+double Text::set_font_scale(QPoint diff_point) {
+    int diff_sum = diff_point.x() + diff_point.y();
+    if (diff_sum > 0 && font_scale < Constants::FONT_SCALE_MAX) {
+        font_scale += Constants::FONT_SCALE_STEP;
+    } else if (diff_sum < 0 && font_scale > Constants::FONT_SCALE_MIN) {
+        font_scale += -Constants::FONT_SCALE_STEP;
+    }
+    return font_scale;
+}
+
+double Text::get_font_scale() {
+    return font_scale;
+}
+
+cv::Size Text::get_text_size() {
+    return text_size;
+}
+
+void Text::set_text_size(cv::Size size) {
+    text_size = size;
+}
+
+/**
+ * @brief Text::update_text_pos
+ * Updates the start and end point of the text-drawing
+ * @param pos
+ */
+void Text::update_text_pos(QPoint pos) {
+    draw_start = Utility::from_qpoint(pos);
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
+}
+
+void Text::update_text_draw_end() {
+    cv::Point p(draw_start.x + text_size.width, draw_start.y - text_size.height);
+    draw_end = p;
+}
+
+cv::Point Text::get_text_draw_end() {
+    return text_draw_end;
+}
+
+void Text::set_text_draw_end(cv::Point pos) {
+    text_draw_end = pos;
 }
 
 /**
@@ -48,7 +110,6 @@ void Text::handle_new_pos(QPoint pos) {
  */
 void Text::write(QJsonObject& json) {
     write_shape(json);
-    json["text"] = string;
     json["font"] = font_scale;
 }
 
@@ -59,6 +120,7 @@ void Text::write(QJsonObject& json) {
  */
 void Text::read(const QJsonObject& json) {
     read_shape(json);
-    this->string = json["text"].toString();
-    this->font_scale = json["font"].toDouble();
+    font_scale = json["font"].toDouble();
+    text_size = cv::Size(draw_end.x - draw_start.x, draw_start.y - draw_end.y);
+    text_draw_end = draw_end;
 }

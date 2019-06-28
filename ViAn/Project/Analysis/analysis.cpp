@@ -1,43 +1,22 @@
 #include "analysis.h"
 
-/**
- * @brief Analysis::Analysis
- */
-Analysis::Analysis() {
-}
+#include "Analysis/analysissettings.h"
+#include "poi.h"
 
-/**
- * @brief Analysis::Analysis
- * Copy constructor. Needed for signals and slots.
- * @param obj
- */
-Analysis::Analysis(const Analysis &obj) {
-    POIs = obj.POIs;
-    type = obj.type;
-    name = obj.name;
-}
+#include "opencv2/core/core.hpp"
 
-/**
- * @brief Analysis::set_name
- * @param QString name
- */
-void Analysis::set_name(QString name){
-    this->name = name;
-}
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-/**
- * @brief Analysis::~Analysis
- */
+//#include "Filehandler/saveable.h"
+
 Analysis::~Analysis() {
-}
-
-/**
- * @brief Analysis::add_POI
- * Adds a POI to the analysis.
- * @param poi
- */
-void Analysis::add_POI(POI poi){
-    this->POIs.push_back(poi);
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it){
+        delete *it;
+    }
+    m_intervals.clear();
 }
 
 /**
@@ -46,15 +25,26 @@ void Analysis::add_POI(POI poi){
  * @param json
  */
 void Analysis::read(const QJsonObject &json){
-    this->type = (ANALYSIS_TYPE)json["type"].toInt();
-    this->name = json["name"].toString();
+    AnalysisSettings* new_settings = new AnalysisSettings();
+    int height = json["bounding box height"].toInt();
+    int width = json["bounding box width"].toInt();
+    int y = json["bounding box y"].toInt();
+    int x = json["bounding box x"].toInt();
+    new_settings->bounding_box = cv::Rect(x, y, width, height);
+
+    new_settings->interval = std::make_pair(json["interval start"].toInt(), json["interval end"].toInt());
+    settings = new_settings;
+
+    this->type = json["type"].toInt();
+    this->m_name = json["name"].toString();
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
-        POI poi;
-        poi.read(json_poi);
-        this->add_POI(poi);
+        POI* poi = new POI();
+        poi->read(json_poi);
+        this->add_interval(poi);
     }
+    m_unsaved_changes = false;
 }
 
 /**
@@ -63,34 +53,51 @@ void Analysis::read(const QJsonObject &json){
  * @param json
  */
 void Analysis::write(QJsonObject &json){
+    json["bounding box height"] = settings->bounding_box.height;
+    json["bounding box width"] = settings->bounding_box.width;
+    json["bounding box y"] = settings->bounding_box.y;
+    json["bounding box x"] = settings->bounding_box.x;
+    json["interval start"] = settings->interval.first;
+    json["interval end"] = settings->interval.second;
     json["type"] = this->type;
-    json["name"] = this->name;
+    json["name"] = this->m_name;
+    // The intervals
     QJsonArray json_POIs;
-    for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
+    for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
+        // The detections
         QJsonObject json_POI;
-        POI p = *it;
-        p.write(json_POI);
+        POI* p = dynamic_cast<POI*>(*it);
+        p->write(json_POI);
         json_POIs.append(json_POI);
     }
     json["POI:s"] = json_POIs;
+    m_unsaved_changes = false;
 }
 
-/**
- * @brief Analysis::get_detections_on_frame
- * Returns all detections on a specified frame in the analysed video.
- * @param frame_num
- * @return
- */
+int Analysis::get_type() const {
+    return type;
+}
+
 std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
-    std::vector<cv::Rect> rects;
-    for (POI p : POIs) {
-        if (frame_num >= p.start_frame && frame_num <= p.end_frame) {
-            std::vector<OOI> oois = p.OOIs[frame_num];
-            for (OOI o : oois) {
-                rects.push_back(o.get_rect());
-            }
+    std::vector<cv::Rect> res;
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); it++) {
+        POI* ai = static_cast<POI*>(*it);
+        if(ai->in_interval(frame_num)) {
+            res = ai->get_detections_on_frame(frame_num);
             break;
         }
     }
-    return rects;
+    return res;
+}
+
+std::vector<DetectionBox> Analysis::get_detectionbox_on_frame(int frame_num) {
+    std::vector<DetectionBox> res;
+    for (auto it = m_intervals.begin(); it != m_intervals.end(); it++) {
+        POI* ai = static_cast<POI*>(*it);
+        if (ai->in_interval(frame_num)) {
+            res = ai->get_detectionbox_on_frame(frame_num);
+            break;
+        }
+    }
+    return res;
 }

@@ -1,11 +1,23 @@
-#include "Video/video_player.h"
-#include "Test/test_video_player.h"
-#include "Test/filehandlertest.h"
-#include "Test/test_mainwindow.h"
-#include "Test/test_report_generator.h"
-#include "Test/overlayintegrationtest.h"
+
 #include "GUI/mainwindow.h"
+#include "GUI/recentprojectdialog.h"
+#include "Project/Analysis/analysisproxy.h"
+#include "Project/Analysis/basicanalysis.h"
+#include "Project/Test/bookmarktest.h"
+#include "Project/Test/projecttestsuite.h"
+#include "Project/Test/videoprojecttest.h"
+
+#include "opencv2/core/core.hpp"
+
 #include <QApplication>
+#include <QSplashScreen>
+#include <QTest>
+#include <QTimer>
+
+#include <windows.h>
+
+Q_DECLARE_METATYPE(cv::Mat)
+Q_DECLARE_METATYPE(std::string)
 /**
  * @brief qMain
  * Constructor
@@ -16,30 +28,26 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QPixmap pixmap(":/Splashscreen.png");
+    QSplashScreen splash(pixmap);
+    splash.setWindowFlags(splash.windowFlags() & Qt::WindowStaysOnTopHint);
+    splash.show();
+    a.processEvents();
+    QTimer::singleShot(1000, &splash, &QSplashScreen::close); // Timer
     MainWindow w;
-    qRegisterMetaType<Analysis>();
+    /**
+     * qRegisterMetaType i
+     */
+    qRegisterMetaType<std::string>();
+    qRegisterMetaType<BasicAnalysis>();
+    qRegisterMetaType<AnalysisProxy>();
+    bool unit_testing = false;
+    if(unit_testing){
+        QTest::qExec(new ProjectTestsuite());
+        QTest::qExec(new BookmarkTest());
+        QTest::qExec(new VideoProjectTest());
+    }
     w.show();
-
-    bool testing = false;
-    bool integration_testing = false;
-
-    if (testing) {
-        //For testing video player.
-        test_video_player* video_test = new test_video_player();
-        QTest::qExec(video_test);
-        //For testing filehandler.
-        FileHandlerTest* file_test = new FileHandlerTest();
-        QTest::qExec(file_test);
-        //For testing the mainwindow
-        test_mainwindow* window_test = new test_mainwindow(&w);
-        QTest::qExec(window_test);
-        //For testing the report_generator(THIS TEST WILL CREATE FILES)
-        test_report_generator* report_test = new test_report_generator();
-        QTest::qExec(report_test);
-    }
-    if (integration_testing) {
-        OverlayIntegrationTest* ot = new OverlayIntegrationTest();
-        ot->exec();
-    }
+    w.rp_dialog->exec();
     return a.exec();
 }

@@ -1,67 +1,96 @@
 #ifndef PROJECT_H
 #define PROJECT_H
-#include <map>
-#include <string>
-#include <cstddef>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QDir>
 
-#include "Filehandler/filehandler.h"
-#include "videoproject.h"
-#include "video.h"
 #include "Filehandler/saveable.h"
-#include "Project/Analysis/analysis.h"
 
-typedef int ID;
-class FileHandler;
+#include <QJsonObject>
+#include <QStandardPaths>
 
+#include <vector>
+
+class AnalysisProxy;
+class Bookmark;
+class BookmarkCategory;
+class VideoInterval;
+class VideoProject;
+
+using ID = int;
 /**
  * @brief The Project class
  * incomplete class, will be added on
  * along with parser functionality
  */
 class Project : public Saveable{
-    FileHandler* file_handler;
-    bool changes_made;
-    std::map<ID,VideoProject*> videos;
-    std::vector<Report*> reports;
-public:
-    std::string name;
-    ID id;
-    ID video_counter;
-    ID dir;
-    ID dir_bookmarks;
-    ID dir_videos;
+    friend class ProjectTestsuite;
 
+    QString m_name = "";            // Simply the project name
+    QString m_dir_bookmarks = "";   // Project directory + /Bookmarks
+    QString m_file = "";            // Full path to the project file: project path + project name + .vian
+    QString last_changed = "";      // Date and time when the project was last saved
+
+    std::vector<VideoProject*> m_videos;
+    std::vector<Bookmark*> m_bookmarks;
+    std::vector<BookmarkCategory*> m_categories;
+    std::vector<AnalysisProxy*> m_analyses;
+    std::vector<VideoInterval*> m_intervals;
+
+    int m_vid_count = 0;
+    int m_cat_count = 0;
+    int m_interval_count = 0;
+    bool m_temporary = true;
+    bool m_unsaved_changes = false;
 public:
-    Project(FileHandler* file_handler);
-    Project(FileHandler* file_handler, ID id, std::string name);
+    static Project* fromFile(const QString& file_name);
+    Project(const QString &name, const QString &dir_path="");
     ~Project();
-    void add_report(Report* report);
-    ID add_video(Video *vid);
-    ID add_video_project(VideoProject* vid_proj);
-    ID add_bookmark(ID video_counter, Bookmark *bookmark);
-    ID add_analysis(ID video_counter, Analysis analysis);
-    void add_report(std::string file_path);
 
-    void delete_artifacts();
-    void remove_video_project(ID id);
+    QString m_dir = "";             // Path to the project folder: choosen path + project name
+
+    ID add_video_project(VideoProject *vid_proj);
+    void remove_video_project(VideoProject* vid_proj);
+
+    void add_bookmark(Bookmark* bmark);
+    void remove_bookmark(Bookmark* bmark);
+
+    ID add_category(BookmarkCategory* cat);
+    void remove_category(BookmarkCategory* cat);
+
+    void add_analysis(AnalysisProxy* ana);
+    void remove_analysis(AnalysisProxy* ana);
+
+    void add_interval(VideoInterval* interval);
+    void remove_interval(VideoInterval* interval);
+
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    void add_analysis(Analysis an);
-    bool is_saved();
-    void save_project();
-    std::map<ID, VideoProject *>& get_videos();
-    VideoProject* get_video(ID id);
-    bool proj_equals(Project& other);
-// TODO
 
-//    void add_drawing();      
+    void set_unsaved(const bool& changed);
+    void set_name_and_path(const QString& name, const QString& path);
+    void set_temporary(const bool& is_temporary);
+
+    bool is_saved() const;
+    bool is_temporary() const;
+    bool save_project();
+    bool copy_directory_files(const QString &fromDir, const QString &toDir, const bool& coverFileIfExist, const std::vector<QString> &exclude_suffix);
+    bool remove_files();
+    QString generate_tmp_directory();
+
+    std::vector<VideoProject *>& get_videos();
+    std::vector<Bookmark *>& get_bookmarks();
+    std::vector<BookmarkCategory *>& get_categories();
+    std::vector<AnalysisProxy *>& get_analyses();
+    std::vector<VideoInterval *> &get_intervals();
+    VideoProject* get_video_project(int id);
+    QString get_dir() const;
+    QString get_name() const;
+    QString get_file() const;
+    QString get_last_changed() const;
+    void set_name(QString);
+    void set_dir(QString);
+    void set_file(QString);
+private:
+    Project();
 };
 
 

@@ -1,23 +1,47 @@
 #include "bookmark.h"
 
+#include "project.h"
+#include "utility.h"
+#include "videoproject.h"
+
+#include <QDebug>
+
 /**
  * @brief Bookmark::Bookmark
- * @param time The time in the video associated with the bookmark (in millisecs).
- * @param frame_nbr Frame number associated with the bookmark.
- * @param frame Frame associated with the bookmark.
- * @param video_file_name Name of the video associated with the bookmark.
- * @param dir_path Path to the directory to store image in.
+ * @param file_name file name for bookmark
  * @param text Text description of the bookmark.
+ * @param state State of the video containing info like frame number and zoom level.
+ * @param time The time in the video associated with the bookmark (format "mm:ss").
+ * @param type The type of the bookmark, which list it is in.
  */
-Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString text) {
-    this->time = time;
-    this->frame_number = frame_nbr;
-    this->frame = frame;
-    this->video_file_name = video_file_name;
-    this->dir_path = dir_path;
-    this->description = text;
-    // There's no file path yet, since the frame has not been exported
-    this->file_path = QString();
+Bookmark::Bookmark(const QString &file_name, const QString &text,
+                   const VideoState &state, const QString &time,
+                   const int &type){
+    m_file = file_name;
+    m_description = text;
+    m_state = state;
+    m_time = time;
+    m_type = type;
+}
+
+/**
+ * @brief Bookmark::Bookmark
+ * Copy constructor
+ * @param bookmark
+ */
+Bookmark::Bookmark(const Bookmark &bookmark) {
+    m_proj = bookmark.m_proj;
+    m_vid_proj_id = bookmark.m_vid_proj_id;
+    m_time = bookmark.m_time;
+    m_description = bookmark.m_description;
+    m_state = bookmark.m_state;
+    m_thumbnail_path = bookmark.m_thumbnail_path;
+    m_index = bookmark.m_index;
+    m_type = bookmark.m_type;
+    m_container_id = bookmark.m_container_id;
+
+    m_file = bookmark.m_file;
+    m_image_name = bookmark.m_image_name;
 }
 
 /**
@@ -25,20 +49,47 @@ Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_nam
  * Null initializing constructor.
  */
 Bookmark::Bookmark() {
-    frame_number = 0;
-    frame = QImage();
-    video_file_name = QString();
-    dir_path = QString();
-    file_path = QString();
-    description = QString();
+}
+
+/**
+ * @brief Bookmark::~Bookmark
+ * Destructor
+ */
+Bookmark::~Bookmark(){
+}
+
+int Bookmark::get_vid_proj_id() {
+    return m_vid_proj_id;
+}
+
+void Bookmark::set_vid_proj_id(int new_id) {
+    m_vid_proj_id = new_id;
+}
+
+int Bookmark::get_index() {
+    return m_index;
+}
+
+void Bookmark::set_index(int index) {
+    m_index = index;
+}
+
+int Bookmark::get_type() {
+    return m_type;
+}
+
+void Bookmark::reset_root_dir(const QString &dir) {
+    m_file = dir + Constants::BOOKMARK_FOLDER + Utility::name_from_path(m_file);
+    m_thumbnail_path = dir + Constants::THUMBNAIL_FOLDER + Utility::name_from_path(m_thumbnail_path);
+    m_unsaved_changes = true;
 }
 
 /**
  * @brief Bookmark::get_time
- * @return Returns the time in the video where the bookmark points to (in millisecs).
+ * @return Returns the time in the video where the bookmark points to (format "mm:ss").
  */
-int Bookmark::get_time() {
-    return time;
+QString Bookmark::get_time() {
+    return m_time;
 }
 
 /**
@@ -46,24 +97,19 @@ int Bookmark::get_time() {
  * @return Returns the frame number that the bookmark points to.
  */
 int Bookmark::get_frame_number() {
-    return frame_number;
+    return m_state.frame;
 }
 
-/**
- * @brief Bookmark::get_frame
- * @return Returns the frame of the bookmark.
- */
-QImage Bookmark::get_frame() {
-    return frame;
+VideoState Bookmark::get_state() {
+    return m_state;
 }
 
-/**
- * @brief Bookmark::get_file_path
- * @return Returns the file_path of the exported bookmark.
- *         If bookmark is not exported yet, an empty string is returned
- */
-QString Bookmark::get_file_path() {
-    return file_path;
+int Bookmark::get_container_id() {
+    return m_container_id;
+}
+
+Project* Bookmark::get_project() {
+    return m_proj;
 }
 
 /**
@@ -71,7 +117,7 @@ QString Bookmark::get_file_path() {
  * @return Returns the description associated with the bookmark.
  */
 QString Bookmark::get_description() {
-    return description;
+    return m_description;
 }
 
 /**
@@ -79,8 +125,34 @@ QString Bookmark::get_description() {
  * Sets the text description of the bookmark to the specified string.
  * @param text
  */
-void Bookmark::set_description(QString text) {
-    this->description = text;
+void Bookmark::set_description(const QString& text) {
+    m_description = text;
+    m_unsaved_changes = true;
+}
+
+void Bookmark::set_container(int new_id, int type) {
+    m_container_id = new_id;
+    m_type = type;
+    m_unsaved_changes = true;
+}
+
+/**
+ * @brief Bookmark::set_thumbnail_path
+ * Saves the path where the thumbnail for the bookmark is saved.
+ * @param path
+ */
+void Bookmark::set_thumbnail_path(QString path) {
+    m_thumbnail_path = path;
+    m_unsaved_changes = true;
+}
+
+QString Bookmark::get_thumbnail_path() {
+    return m_thumbnail_path;
+}
+
+void Bookmark::set_project(Project* proj) {
+    m_proj = proj;
+    m_unsaved_changes = true;
 }
 
 /**
@@ -89,82 +161,56 @@ void Bookmark::set_description(QString text) {
  * Reads a bookmark from a Json object.
  */
 void Bookmark::read(const QJsonObject& json){
-    this->time = json["time"].toInt();
-    this->frame_number = json["frame"].toInt();
-    this->video_file_name = json["video_name"].toString();
-    this->dir_path = json["dir"].toString();
-    this->file_path = json["path"].toString();
-    this->description = json["note"].toString();
-    frame.load(file_path);
+    m_vid_proj_id = json["vid_proj id"].toInt();
+    m_time = json["time"].toString();
+    m_file = json["path"].toString();
+    m_thumbnail_path = json["thumbnail path"].toString();
+    m_description = json["description"].toString();
+    m_index = json["index"].toInt();
+    m_type = json["type"].toInt();
+    m_container_id = json["container"].toInt();
+    m_image_name = json["image name"].toString();
+
+    VideoState state;
+    QJsonObject json_state = json["state"].toObject();
+    state.read(json_state);
+    m_state = state;
+    
+    m_unsaved_changes = false;
 }
 
 /**
  * @brief Bookmark::write
  * @param json
- * Writes a bookmark to a Json object, and exports the frame.
+ * Writes a bookmark to a Json object.
  */
 void Bookmark::write(QJsonObject& json){
-    // Exports the frame and updates file_path.
-    export_frame();
+    json["vid_proj id"] = m_vid_proj_id;
+    json["time"] = m_time;
+    json["path"] = m_file;
+    json["thumbnail path"] = m_thumbnail_path;
+    json["description"] = m_description;
+    json["index"] = m_index;
+    json["container"] = m_container_id;
+    json["type"] = m_type;
+    json["image name"] = m_image_name;
 
-    json["time"] = this->time;
-    json["frame"] = this->frame_number;
-    json["video_name"] = this->video_file_name;
-    json["dir"] = this->dir_path;
-    json["path"] = this->file_path;
-    json["note"] = this->description;
+    QJsonObject json_state;
+    m_state.write(json_state);
+    json["state"] = json_state;
+
+    m_unsaved_changes = false;
 }
 
-/**
- * @brief Bookmark::export_frame
- * Export the frame of the bookmark to a tiff-file in the project folder.
- */
-void Bookmark::export_frame() {
-    // Update file path in case there's already a file with this file name
-    create_file_path();
-    QImageWriter writer(file_path, "tiff");
-    writer.write(frame);
-}
-
-/**
- * @brief Bookmark::create_file_path
- * Creates and updates the file path to export the bookmark frame to.
- */
-void Bookmark::create_file_path() {
-
-    // Append FRAMENR.tiff to the directory path
-    QString path = QString(dir_path);
-    path.append("/");
-    path.append(video_file_name);
-    path.append("_");
-    path.append(QString::number(frame_number));
-    path.append(".tiff");
-         
-    int counter = 1;
-    while (QFile::exists(path)) {
-        // If file exists, try FRAMENR(X).tiff
-        path = QString(dir_path);
-        path.append("/");
-        path.append(video_file_name);
-        path.append("_");
-        path.append(QString::number(frame_number));
-        path.append("(");
-        path.append(QString::number(counter));
-        path.append(").tiff");
-        counter++;
-    }
-    // Update file path variable
-    file_path = path;
+bool Bookmark::is_saved() const{
+    return !m_unsaved_changes;
 }
 
 /**
  * @brief Bookmark::remove_exported_image
  * Removes the exported image, if there is one.
  */
+// TODO update, currently empty
 void Bookmark::remove_exported_image() {
-    // If the file path is empty, then the frame has not been exported so there's nothing to remove.
-    if (!file_path.isEmpty()) {
-        QFile file(file_path);
-        file.remove();
-    }
+
 }
